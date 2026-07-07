@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+# One in-flight run per ref; a new push cancels the previous run for the same branch/PR.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read   # least privilege — CI only reads the repo
+
+jobs:
+  build-test-coverage:
+    name: build-test-coverage   # stable name — this is the required status check (setup-branch-protection.sh)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      # Reuses the project's coverage script (dotnet tool restore → dotnet test --collect → ReportGenerator).
+      # Integration tests with no game install fall back to DMCA-safe synthetic mock rooms, so they run here.
+      - name: Test + coverage
+        run: bash scripts/coverage.sh
+
+      - name: Coverage gate
+        run: |
+          # Floor set just below today's ~60% line coverage so the build is green now. RATCHET IT UPWARD as
+          # coverage grows — new features earn coverage via this floor + PR review, never by lowering it.
+          THRESHOLD=59
+          PCT=$(python3 -c "import xml.etree.ElementTree as ET; \
+            print(round(float(ET.parse('coverage-report/Cobertura.xml').getroot().get('line-rate')) * 100, 2))")
+          echo "Overall line coverage: ${PCT}%  (floor: ${THRESHOLD}%)"
+          awk -v p="$PCT" -v t="$THRESHOLD" 'BEGIN { exit (p + 0 < t + 0) ? 1 : 0 }' || {
+            echo "::error::Line coverage ${PCT}% is below the ${THRESHOLD}% floor"; exit 1; }
+
+      - name: Coverage summary → job summary
+        if: always()
+        run: |
+          if [ -f coverage-report/Summary.txt ]; then
+            { echo '```'; cat coverage-report/Summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report/

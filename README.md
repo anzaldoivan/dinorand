@@ -142,6 +142,13 @@ No data files ship alongside the binary: the game data is already baked in (`map
 embedded resource; the rest of `data/dc1` is compiled into `Definitions/DinoCrisis1.cs`), so
 each published executable is the whole tool.
 
+## Contributing & Releases
+
+Branch off `main` and open a PR — `main` is protected, and CI (`build-test-coverage`)
+runs the tests behind a coverage floor. New features need tests that hold or raise it.
+Releases are cut by pushing a `release/vX.Y.Z` branch, which auto-builds and publishes
+the binaries. Full details: **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+
 ## Legal
 
 DinoRand is an **unofficial, fan-made** project. It is **not affiliated with, authorized

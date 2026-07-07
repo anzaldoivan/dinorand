@@ -21,14 +21,13 @@ public class RoomFileRoundTripTests
 
     public static IEnumerable<object[]> RoomFiles()
     {
-        // Explicit env var wins; otherwise fall back to the in-repo English data so the
-        // tests run on a fresh clone with no setup. Either way a missing dir no-ops below.
+        // Precedence: explicit DINORAND_DC1_DIR (or a .env, see TestEnvBootstrap) → an auto-discovered
+        // in-repo install → the DMCA-safe synthetic corpus (MockRooms). The mock fallback is what lets
+        // this gate run WITH DATA on CI / a fresh clone, where game files can never be present.
         var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
         if (string.IsNullOrEmpty(root)) root = FindRepoRoot();
-        if (string.IsNullOrEmpty(root)) yield break;
-
-        var dataDir = FindDataDir(root);
-        if (dataDir is null) yield break;
+        var dataDir = string.IsNullOrEmpty(root) ? null : FindDataDir(root);
+        dataDir ??= MockRooms.Dc1DataDir();
 
         foreach (var path in Directory.EnumerateFiles(dataDir, "st*.dat"))
             if (RoomPattern.IsMatch(Path.GetFileName(path)))

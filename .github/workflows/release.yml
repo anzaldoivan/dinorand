@@ -1,0 +1,72 @@
+name: release
+
+# Fires when a version branch `release/vX.Y.Z` is CREATED (push a new branch to cut a
+# release). Common alternative: trigger on a pushed tag `v*` (on: push: tags: ['v*']).
+# `workflow_dispatch` is a manual fallback — run it from the release branch.
+on:
+  create:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to create the GitHub Release + upload assets
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # `create` fires for tags too — gate to branch + release/v* only. Manual dispatch always runs.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.ref_type == 'branch' && startsWith(github.event.ref, 'release/v'))
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Derive VERSION from the release branch name
+        id: ver
+        run: |
+          # On `create` the branch is in github.event.ref; on manual dispatch use the ref we ran from.
+          if [ "${{ github.event_name }}" = "create" ]; then
+            REF="${{ github.event.ref }}"
+          else
+            REF="${{ github.ref_name }}"
+          fi
+          case "$REF" in
+            release/v*) ;;
+            *) echo "Not a release/vX.Y.Z branch: $REF" >&2; exit 1 ;;
+          esac
+          VERSION="${REF#release/v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          # A '-' suffix (e.g. 1.2.0-rc1, 2.0.0-beta) marks a prerelease.
+          case "$VERSION" in
+            *-*) echo "prerelease=true"  >> "$GITHUB_OUTPUT" ;;
+            *)   echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Build self-contained release binaries
+        run: bash scripts/publish-release.sh win-x64 linux-x64 osx-arm64
+
+      - name: Package per-RID zips
+        id: pkg
+        run: |
+          # One zip per RID — the raw dist/<rid>/ files share names across RIDs
+          # (dinorand, DinoRand.Avalonia), which would collide as release assets.
+          VERSION="${{ steps.ver.outputs.version }}"
+          for rid in win-x64 linux-x64 osx-arm64; do
+            ( cd "dist/$rid" && zip -r "../../dinorand-v$VERSION-$rid.zip" . )
+          done
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          PRERELEASE=""
+          [ "${{ steps.ver.outputs.prerelease }}" = "true" ] && PRERELEASE="--prerelease"
+          gh release create "v$VERSION" ./dinorand-v"$VERSION"-*.zip \
+            --title "v$VERSION" \
+            --target "$GITHUB_SHA" \
+            --generate-notes \
+            $PRERELEASE

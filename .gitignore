@@ -23,10 +23,13 @@
 # !/tools/  (held back from publish for now — kept local)
 !/.github/
 !/.githooks/
+!/.config/
 
 # Top-level project files
 !/.gitignore
 !/README.md
+!/CONTRIBUTING.md
+!/.env.example
 !/LICENSE
 !/THIRD-PARTY-NOTICES.md
 !/CHANGELOG.md

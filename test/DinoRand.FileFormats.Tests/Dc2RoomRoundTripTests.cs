@@ -38,8 +38,9 @@ public class Dc2RoomRoundTripTests
 
     public static IEnumerable<object[]> RoomFiles()
     {
-        var dataDir = FindRebirthDataDir();
-        if (dataDir is null) yield break;
+        // Real rebirth install (env/.env or auto-discovered) → DMCA-safe synthetic corpus fallback, so the
+        // gate runs WITH DATA on CI / a fresh clone where game files can never be present.
+        var dataDir = FindRebirthDataDir() ?? MockRooms.Dc2DataDir();
         foreach (var path in Directory.EnumerateFiles(dataDir, "ST*.DAT"))
             if (RoomPattern.IsMatch(Path.GetFileName(path)))
                 yield return new object[] { path };
