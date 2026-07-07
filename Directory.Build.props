@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Project version. Bump alongside an entry in CHANGELOG.md. VersionPrefix feeds
+       AssemblyVersion/FileVersion/InformationalVersion for every project in the build. -->
+  <PropertyGroup>
+    <VersionPrefix>0.2.0</VersionPrefix>
+  </PropertyGroup>
+</Project>

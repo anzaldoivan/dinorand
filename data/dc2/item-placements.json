@@ -1,0 +1,1442 @@
+{
+  "_source": "decode_script.item_commits() (init-routine fix 2026-06-27 p2). ONE item path: op 0x31 in per-room slot-5. id byte (block+0x04) is the randomizer lever.",
+  "_fields": "id=block+0x04 (editable item-id byte = THE randomizer lever, always mode-0 literal); param=block+0x00 (the 0x48bf20 `param` arg = rec+0x18; a x4 INDEX into the [scene_mgr+0xa54] scene-object array, NOT an item quantity -- do NOT shuffle it, it binds the item to its pickup location); slot=block+0x30 (AOT array slot); id_blob_off=byte offset of the id literal in the DECOMPRESSED room blob; op_blob_off=offset of the op-0x31 byte. See docs/dc2/AOT-SYSTEM-RE.md (SAT-1 handler).",
+  "_named_ids": {
+    "1": "Med Pak S",
+    "2": "Resusc Pack",
+    "5": "Dino File",
+    "7": "ammo? (qty7)"
+  },
+  "rooms": {
+    "ST000": [
+      {
+        "id": 3,
+        "name": null,
+        "param": 2,
+        "slot": 9,
+        "id_blob_off": 32926,
+        "op_blob_off": 32932
+      }
+    ],
+    "ST002": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 6,
+        "slot": 0,
+        "id_blob_off": 70910,
+        "op_blob_off": 70916
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 8,
+        "slot": 0,
+        "id_blob_off": 71322,
+        "op_blob_off": 71328
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 4,
+        "slot": 5,
+        "id_blob_off": 71490,
+        "op_blob_off": 71496
+      }
+    ],
+    "ST003": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 0,
+        "id_blob_off": 131198,
+        "op_blob_off": 131204
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 17,
+        "slot": 2,
+        "id_blob_off": 131442,
+        "op_blob_off": 131448
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 3,
+        "id_blob_off": 132106,
+        "op_blob_off": 132112
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 11,
+        "slot": 3,
+        "id_blob_off": 132278,
+        "op_blob_off": 132284
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 11,
+        "slot": 3,
+        "id_blob_off": 141632,
+        "op_blob_off": 141638
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 14,
+        "slot": 3,
+        "id_blob_off": 145800,
+        "op_blob_off": 145806
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 21,
+        "slot": 4,
+        "id_blob_off": 149276,
+        "op_blob_off": 149282
+      }
+    ],
+    "ST005": [
+      {
+        "id": 3,
+        "name": null,
+        "param": 2,
+        "slot": 9,
+        "id_blob_off": 30448,
+        "op_blob_off": 30454
+      }
+    ],
+    "ST102": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 5,
+        "id_blob_off": 45450,
+        "op_blob_off": 45456
+      }
+    ],
+    "ST106": [
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 1,
+        "slot": 12,
+        "id_blob_off": 41446,
+        "op_blob_off": 41452
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 2,
+        "slot": 7,
+        "id_blob_off": 41510,
+        "op_blob_off": 41516
+      }
+    ],
+    "ST107": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 5,
+        "id_blob_off": 20522,
+        "op_blob_off": 20528
+      }
+    ],
+    "ST109": [
+      {
+        "id": 9,
+        "name": null,
+        "param": 1,
+        "slot": 6,
+        "id_blob_off": 34332,
+        "op_blob_off": 34338
+      },
+      {
+        "id": 7,
+        "name": "ammo? (qty7)",
+        "param": 7,
+        "slot": 8,
+        "id_blob_off": 36312,
+        "op_blob_off": 36318
+      }
+    ],
+    "ST10C": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 2,
+        "slot": 3,
+        "id_blob_off": 70142,
+        "op_blob_off": 70148
+      }
+    ],
+    "ST10E": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 2,
+        "slot": 0,
+        "id_blob_off": 52326,
+        "op_blob_off": 52332
+      }
+    ],
+    "ST10F": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 0,
+        "id_blob_off": 24334,
+        "op_blob_off": 24340
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 1,
+        "id_blob_off": 24394,
+        "op_blob_off": 24400
+      }
+    ],
+    "ST110": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 2,
+        "id_blob_off": 12034,
+        "op_blob_off": 12040
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 3,
+        "id_blob_off": 12162,
+        "op_blob_off": 12168
+      }
+    ],
+    "ST200": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 3,
+        "id_blob_off": 66190,
+        "op_blob_off": 66196
+      }
+    ],
+    "ST201": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 0,
+        "id_blob_off": 8834,
+        "op_blob_off": 8840
+      }
+    ],
+    "ST203": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 4,
+        "slot": 1,
+        "id_blob_off": 9820,
+        "op_blob_off": 9826
+      }
+    ],
+    "ST204": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 13356,
+        "op_blob_off": 13362
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 2,
+        "slot": 1,
+        "id_blob_off": 13416,
+        "op_blob_off": 13422
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 3,
+        "slot": 2,
+        "id_blob_off": 13476,
+        "op_blob_off": 13482
+      }
+    ],
+    "ST205": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 12,
+        "slot": 2,
+        "id_blob_off": 53832,
+        "op_blob_off": 53838
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 25,
+        "slot": 3,
+        "id_blob_off": 55498,
+        "op_blob_off": 55504
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 23,
+        "slot": 17,
+        "id_blob_off": 55630,
+        "op_blob_off": 55636
+      }
+    ],
+    "ST301": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 8,
+        "slot": 4,
+        "id_blob_off": 37716,
+        "op_blob_off": 37722
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 6,
+        "slot": 5,
+        "id_blob_off": 41132,
+        "op_blob_off": 41138
+      }
+    ],
+    "ST302": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 3,
+        "id_blob_off": 25206,
+        "op_blob_off": 25212
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 2,
+        "id_blob_off": 25662,
+        "op_blob_off": 25668
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 7,
+        "slot": 4,
+        "id_blob_off": 30710,
+        "op_blob_off": 30716
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 7,
+        "slot": 5,
+        "id_blob_off": 30770,
+        "op_blob_off": 30776
+      }
+    ],
+    "ST303": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 3,
+        "slot": 11,
+        "id_blob_off": 20828,
+        "op_blob_off": 20834
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 4,
+        "slot": 12,
+        "id_blob_off": 20888,
+        "op_blob_off": 20894
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 5,
+        "slot": 13,
+        "id_blob_off": 20948,
+        "op_blob_off": 20954
+      }
+    ],
+    "ST304": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 10,
+        "slot": 21,
+        "id_blob_off": 30058,
+        "op_blob_off": 30064
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 6,
+        "id_blob_off": 30254,
+        "op_blob_off": 30260
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 7,
+        "id_blob_off": 30434,
+        "op_blob_off": 30440
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 8,
+        "id_blob_off": 30558,
+        "op_blob_off": 30564
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 5,
+        "slot": 9,
+        "id_blob_off": 30618,
+        "op_blob_off": 30624
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 6,
+        "slot": 10,
+        "id_blob_off": 30678,
+        "op_blob_off": 30684
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 7,
+        "slot": 15,
+        "id_blob_off": 30798,
+        "op_blob_off": 30804
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 8,
+        "slot": 16,
+        "id_blob_off": 30858,
+        "op_blob_off": 30864
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 8,
+        "slot": 17,
+        "id_blob_off": 30918,
+        "op_blob_off": 30924
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 9,
+        "slot": 12,
+        "id_blob_off": 30978,
+        "op_blob_off": 30984
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 12,
+        "slot": 11,
+        "id_blob_off": 31342,
+        "op_blob_off": 31348
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 14,
+        "slot": 18,
+        "id_blob_off": 31402,
+        "op_blob_off": 31408
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 16,
+        "slot": 5,
+        "id_blob_off": 31462,
+        "op_blob_off": 31468
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 17,
+        "slot": 13,
+        "id_blob_off": 32464,
+        "op_blob_off": 32470
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 18,
+        "slot": 13,
+        "id_blob_off": 32540,
+        "op_blob_off": 32546
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 17,
+        "slot": 13,
+        "id_blob_off": 38044,
+        "op_blob_off": 38050
+      }
+    ],
+    "ST305": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 5,
+        "slot": 2,
+        "id_blob_off": 16516,
+        "op_blob_off": 16522
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 6,
+        "slot": 3,
+        "id_blob_off": 16576,
+        "op_blob_off": 16582
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 7,
+        "slot": 4,
+        "id_blob_off": 16676,
+        "op_blob_off": 16682
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 8,
+        "slot": 6,
+        "id_blob_off": 16920,
+        "op_blob_off": 16926
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 9,
+        "slot": 7,
+        "id_blob_off": 16980,
+        "op_blob_off": 16986
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 10,
+        "id_blob_off": 17200,
+        "op_blob_off": 17206
+      }
+    ],
+    "ST306": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 3,
+        "id_blob_off": 11210,
+        "op_blob_off": 11216
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 2,
+        "slot": 2,
+        "id_blob_off": 11430,
+        "op_blob_off": 11436
+      }
+    ],
+    "ST400": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 50522,
+        "op_blob_off": 50528
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 1,
+        "id_blob_off": 50582,
+        "op_blob_off": 50588
+      }
+    ],
+    "ST401": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 8,
+        "slot": 3,
+        "id_blob_off": 22832,
+        "op_blob_off": 22838
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 5,
+        "id_blob_off": 22992,
+        "op_blob_off": 22998
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 6,
+        "slot": 2,
+        "id_blob_off": 23428,
+        "op_blob_off": 23434
+      }
+    ],
+    "ST402": [
+      {
+        "id": 7,
+        "name": "ammo? (qty7)",
+        "param": 11,
+        "slot": 0,
+        "id_blob_off": 91868,
+        "op_blob_off": 91874
+      },
+      {
+        "id": 8,
+        "name": null,
+        "param": 12,
+        "slot": 1,
+        "id_blob_off": 91928,
+        "op_blob_off": 91934
+      },
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 13,
+        "slot": 2,
+        "id_blob_off": 92068,
+        "op_blob_off": 92074
+      },
+      {
+        "id": 6,
+        "name": null,
+        "param": 14,
+        "slot": 3,
+        "id_blob_off": 92208,
+        "op_blob_off": 92214
+      },
+      {
+        "id": 4,
+        "name": null,
+        "param": 15,
+        "slot": 5,
+        "id_blob_off": 93252,
+        "op_blob_off": 93258
+      },
+      {
+        "id": 4,
+        "name": null,
+        "param": 25,
+        "slot": 8,
+        "id_blob_off": 93520,
+        "op_blob_off": 93526
+      },
+      {
+        "id": 4,
+        "name": null,
+        "param": 26,
+        "slot": 9,
+        "id_blob_off": 93580,
+        "op_blob_off": 93586
+      },
+      {
+        "id": 4,
+        "name": null,
+        "param": 15,
+        "slot": 5,
+        "id_blob_off": 100078,
+        "op_blob_off": 100084
+      }
+    ],
+    "ST403": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 0,
+        "id_blob_off": 77536,
+        "op_blob_off": 77542
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 1,
+        "id_blob_off": 77596,
+        "op_blob_off": 77602
+      },
+      {
+        "id": 4,
+        "name": null,
+        "param": 9,
+        "slot": 3,
+        "id_blob_off": 77656,
+        "op_blob_off": 77662
+      }
+    ],
+    "ST408": [
+      {
+        "id": 3,
+        "name": null,
+        "param": 4,
+        "slot": 0,
+        "id_blob_off": 75726,
+        "op_blob_off": 75732
+      }
+    ],
+    "ST409": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 74942,
+        "op_blob_off": 74948
+      }
+    ],
+    "ST40A": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 10,
+        "slot": 8,
+        "id_blob_off": 52920,
+        "op_blob_off": 52926
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 5,
+        "slot": 3,
+        "id_blob_off": 53384,
+        "op_blob_off": 53390
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 6,
+        "slot": 4,
+        "id_blob_off": 53444,
+        "op_blob_off": 53450
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 7,
+        "slot": 5,
+        "id_blob_off": 53504,
+        "op_blob_off": 53510
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 8,
+        "slot": 6,
+        "id_blob_off": 53564,
+        "op_blob_off": 53570
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 9,
+        "slot": 7,
+        "id_blob_off": 53624,
+        "op_blob_off": 53630
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 11,
+        "slot": 8,
+        "id_blob_off": 53956,
+        "op_blob_off": 53962
+      }
+    ],
+    "ST40B": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 2,
+        "id_blob_off": 5030,
+        "op_blob_off": 5036
+      }
+    ],
+    "ST501": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 10,
+        "id_blob_off": 11658,
+        "op_blob_off": 11664
+      }
+    ],
+    "ST502": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 2,
+        "id_blob_off": 157822,
+        "op_blob_off": 157828
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 5,
+        "slot": 3,
+        "id_blob_off": 157882,
+        "op_blob_off": 157888
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 4,
+        "id_blob_off": 157942,
+        "op_blob_off": 157948
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 6,
+        "slot": 5,
+        "id_blob_off": 158002,
+        "op_blob_off": 158008
+      },
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 10,
+        "slot": 16,
+        "id_blob_off": 160810,
+        "op_blob_off": 160816
+      },
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 10,
+        "slot": 16,
+        "id_blob_off": 183222,
+        "op_blob_off": 183228
+      }
+    ],
+    "ST503": [
+      {
+        "id": 3,
+        "name": null,
+        "param": 2,
+        "slot": 1,
+        "id_blob_off": 88202,
+        "op_blob_off": 88208
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 1,
+        "slot": 7,
+        "id_blob_off": 88262,
+        "op_blob_off": 88268
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 4,
+        "slot": 2,
+        "id_blob_off": 88342,
+        "op_blob_off": 88348
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 5,
+        "slot": 3,
+        "id_blob_off": 88402,
+        "op_blob_off": 88408
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 6,
+        "slot": 4,
+        "id_blob_off": 88462,
+        "op_blob_off": 88468
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 24,
+        "slot": 6,
+        "id_blob_off": 104050,
+        "op_blob_off": 104056
+      }
+    ],
+    "ST603": [
+      {
+        "id": 8,
+        "name": null,
+        "param": 10,
+        "slot": 7,
+        "id_blob_off": 16106,
+        "op_blob_off": 16112
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 3,
+        "slot": 4,
+        "id_blob_off": 16410,
+        "op_blob_off": 16416
+      }
+    ],
+    "ST605": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 4,
+        "id_blob_off": 70380,
+        "op_blob_off": 70386
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 5,
+        "id_blob_off": 70440,
+        "op_blob_off": 70446
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 6,
+        "id_blob_off": 70500,
+        "op_blob_off": 70506
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 7,
+        "id_blob_off": 70560,
+        "op_blob_off": 70566
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 6,
+        "slot": 13,
+        "id_blob_off": 70620,
+        "op_blob_off": 70626
+      },
+      {
+        "id": 6,
+        "name": null,
+        "param": 9,
+        "slot": 10,
+        "id_blob_off": 71270,
+        "op_blob_off": 71276
+      },
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 8,
+        "slot": 21,
+        "id_blob_off": 71774,
+        "op_blob_off": 71780
+      },
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 8,
+        "slot": 21,
+        "id_blob_off": 78624,
+        "op_blob_off": 78630
+      }
+    ],
+    "ST606": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 3,
+        "slot": 6,
+        "id_blob_off": 58226,
+        "op_blob_off": 58232
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 2,
+        "id_blob_off": 58486,
+        "op_blob_off": 58492
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 3,
+        "id_blob_off": 58546,
+        "op_blob_off": 58552
+      }
+    ],
+    "ST607": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 18,
+        "slot": 12,
+        "id_blob_off": 45674,
+        "op_blob_off": 45680
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 4,
+        "id_blob_off": 46238,
+        "op_blob_off": 46244
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 20,
+        "slot": 10,
+        "id_blob_off": 47060,
+        "op_blob_off": 47066
+      }
+    ],
+    "ST608": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 674,
+        "op_blob_off": 680
+      }
+    ],
+    "ST701": [
+      {
+        "id": 4,
+        "name": null,
+        "param": 6,
+        "slot": 3,
+        "id_blob_off": 14014,
+        "op_blob_off": 14020
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 2,
+        "id_blob_off": 14370,
+        "op_blob_off": 14376
+      }
+    ],
+    "ST703": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 4,
+        "id_blob_off": 27978,
+        "op_blob_off": 27984
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 6,
+        "id_blob_off": 28094,
+        "op_blob_off": 28100
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 4,
+        "id_blob_off": 31156,
+        "op_blob_off": 31162
+      }
+    ],
+    "ST704": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 6,
+        "id_blob_off": 45058,
+        "op_blob_off": 45064
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 2,
+        "slot": 7,
+        "id_blob_off": 45118,
+        "op_blob_off": 45124
+      }
+    ],
+    "ST705": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 21632,
+        "op_blob_off": 21638
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 1,
+        "id_blob_off": 21692,
+        "op_blob_off": 21698
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 2,
+        "id_blob_off": 21752,
+        "op_blob_off": 21758
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 4,
+        "slot": 3,
+        "id_blob_off": 21812,
+        "op_blob_off": 21818
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 5,
+        "slot": 6,
+        "id_blob_off": 21872,
+        "op_blob_off": 21878
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 7,
+        "slot": 8,
+        "id_blob_off": 22780,
+        "op_blob_off": 22786
+      }
+    ],
+    "ST706": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 15,
+        "slot": 14,
+        "id_blob_off": 54302,
+        "op_blob_off": 54308
+      },
+      {
+        "id": 6,
+        "name": null,
+        "param": 10,
+        "slot": 13,
+        "id_blob_off": 54426,
+        "op_blob_off": 54432
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 4,
+        "slot": 7,
+        "id_blob_off": 55616,
+        "op_blob_off": 55622
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 4,
+        "slot": 8,
+        "id_blob_off": 55676,
+        "op_blob_off": 55682
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 4,
+        "slot": 9,
+        "id_blob_off": 55736,
+        "op_blob_off": 55742
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 5,
+        "slot": 10,
+        "id_blob_off": 56154,
+        "op_blob_off": 56160
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 5,
+        "slot": 11,
+        "id_blob_off": 56214,
+        "op_blob_off": 56220
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 5,
+        "slot": 12,
+        "id_blob_off": 56274,
+        "op_blob_off": 56280
+      },
+      {
+        "id": 6,
+        "name": null,
+        "param": 10,
+        "slot": 13,
+        "id_blob_off": 73812,
+        "op_blob_off": 73818
+      }
+    ],
+    "ST707": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 674,
+        "op_blob_off": 680
+      }
+    ],
+    "ST800": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 99974,
+        "op_blob_off": 99980
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 2,
+        "slot": 1,
+        "id_blob_off": 100034,
+        "op_blob_off": 100040
+      },
+      {
+        "id": 6,
+        "name": null,
+        "param": 7,
+        "slot": 10,
+        "id_blob_off": 100162,
+        "op_blob_off": 100168
+      },
+      {
+        "id": 3,
+        "name": null,
+        "param": 3,
+        "slot": 2,
+        "id_blob_off": 100434,
+        "op_blob_off": 100440
+      }
+    ],
+    "ST801": [
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 4,
+        "slot": 8,
+        "id_blob_off": 16920,
+        "op_blob_off": 16926
+      },
+      {
+        "id": 5,
+        "name": "Dino File",
+        "param": 4,
+        "slot": 8,
+        "id_blob_off": 19510,
+        "op_blob_off": 19516
+      }
+    ],
+    "ST802": [
+      {
+        "id": 3,
+        "name": null,
+        "param": 3,
+        "slot": 7,
+        "id_blob_off": 11822,
+        "op_blob_off": 11828
+      }
+    ],
+    "ST803": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 3,
+        "slot": 2,
+        "id_blob_off": 35676,
+        "op_blob_off": 35682
+      }
+    ],
+    "ST808": [
+      {
+        "id": 7,
+        "name": "ammo? (qty7)",
+        "param": 18,
+        "slot": 7,
+        "id_blob_off": 49696,
+        "op_blob_off": 49702
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 0,
+        "id_blob_off": 50234,
+        "op_blob_off": 50240
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 3,
+        "slot": 1,
+        "id_blob_off": 50294,
+        "op_blob_off": 50300
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 5,
+        "slot": 2,
+        "id_blob_off": 50354,
+        "op_blob_off": 50360
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 7,
+        "slot": 1,
+        "id_blob_off": 62364,
+        "op_blob_off": 62370
+      }
+    ],
+    "ST809": [
+      {
+        "id": 3,
+        "name": null,
+        "param": 6,
+        "slot": 0,
+        "id_blob_off": 96744,
+        "op_blob_off": 96750
+      },
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 3,
+        "slot": 8,
+        "id_blob_off": 97252,
+        "op_blob_off": 97258
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 9,
+        "id_blob_off": 97652,
+        "op_blob_off": 97658
+      }
+    ],
+    "ST900": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 10,
+        "id_blob_off": 15334,
+        "op_blob_off": 15340
+      }
+    ],
+    "ST901": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 1,
+        "slot": 9,
+        "id_blob_off": 7602,
+        "op_blob_off": 7608
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 2,
+        "slot": 6,
+        "id_blob_off": 8038,
+        "op_blob_off": 8044
+      }
+    ],
+    "ST903": [
+      {
+        "id": 2,
+        "name": "Resusc Pack",
+        "param": 9,
+        "slot": 0,
+        "id_blob_off": 47322,
+        "op_blob_off": 47328
+      }
+    ]
+  },
+  "_total_items": 165,
+  "_total_rooms": 54
+}

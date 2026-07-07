@@ -1,0 +1,579 @@
+{
+  "_source": "Zone NAMES (English) are byte-confirmed from Dino2.exe (rebirth build area-name table @ VA 0x733e90). Zone Japanese names AND all per-zone ROOM names are from the XGameMania Japanese walkthrough maps (https://xgamemania.com/dino/2/map/1.html .. /10.html), cross-referenced with the GameFAQs walkthrough + Wikipedia. Zone order follows the XGameMania map numbering (story progression).",
+  "_comment": "DC2 map at ZONE + ROOM granularity. Room names are GUIDE-SOURCED (XGameMania, a single Japanese source) and given in Japanese (jp) with an English gloss (en). NOTE: room names are NOT yet linked to ST*.DAT ids - that linkage is unresolved (see rooms.json _stage_zone_structure). DC2's on-screen area name (e.g. 基地・エントランス) is baked into the pre-rendered .DBS background graphics, NOT stored as a text string in any EXE or DAT (verified: zero SJIS hits for area kanji across all exes + 2071 DAT files), which is why these names come from a guide rather than bytes.",
+  "_provenance_legend": "bytes = from game files; confirmed = bytes + external source; guide:xgamemania = XGameMania Japanese walkthrough (single source); hypothesis = reasoned/unverified.",
+  "_room_counts": "XGameMania rooms per zone: Jungle 16, Military 6, Patrol 2, Research 7, 3E-Facility 9, 3E-Reactor 12, City-Liaison 11, Edward-City 5, Missile 8, Habitat 8 = 84. (vs 89 ST*.DAT files; sub-area count != file count, e.g. Patrol Ship lists only 2 player-relevant rooms.)",
+  "beginEnd": {
+    "start": "ジャングル / Jungle (port, game opening)",
+    "end": "環境調整施設 / Habitat Support Facility (≪Gate≫ Development Laboratory, finale)",
+    "provenance": "confirmed (walkthrough)"
+  },
+  "zones": [
+    {
+      "order": 0,
+      "zone_en": "Jungle",
+      "zone_jp": "ジャングル",
+      "zone_name_provenance": "confirmed (EXE 'JUNGLE' + XGameMania)",
+      "room_count": 16,
+      "next": "Military Facility",
+      "rooms": [
+        {
+          "jp": "港・荷揚げ場",
+          "en": "Port - Cargo Unloading Area"
+        },
+        {
+          "jp": "港・運搬用機材置き場",
+          "en": "Port - Equipment Storage"
+        },
+        {
+          "jp": "港・吊り橋",
+          "en": "Port - Suspension Bridge"
+        },
+        {
+          "jp": "密林・北側ルート①",
+          "en": "Jungle - North Route 1"
+        },
+        {
+          "jp": "密林・北側ルート②",
+          "en": "Jungle - North Route 2"
+        },
+        {
+          "jp": "密林・北側ルート③",
+          "en": "Jungle - North Route 3"
+        },
+        {
+          "jp": "密林・北側ルート④",
+          "en": "Jungle - North Route 4"
+        },
+        {
+          "jp": "密林・北側連絡ルート",
+          "en": "Jungle - North Connecting Route"
+        },
+        {
+          "jp": "密林・南側ルート①",
+          "en": "Jungle - South Route 1"
+        },
+        {
+          "jp": "密林・南側ルート②",
+          "en": "Jungle - South Route 2"
+        },
+        {
+          "jp": "湿地帯・毒植物エリア南",
+          "en": "Wetland - Poison Plant Area South"
+        },
+        {
+          "jp": "湿地帯・毒植物エリア北",
+          "en": "Wetland - Poison Plant Area North"
+        },
+        {
+          "jp": "給水塔",
+          "en": "Water Tower"
+        },
+        {
+          "jp": "猛毒ガスエリア",
+          "en": "Toxic Gas Area"
+        },
+        {
+          "jp": "軍事基地連絡通路",
+          "en": "Military Base Connecting Passage"
+        },
+        {
+          "jp": "研究施設連絡エリア",
+          "en": "Research Facility Connecting Area"
+        }
+      ],
+      "st_ids": [
+        "100",
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+        "109",
+        "10A",
+        "10B",
+        "10C",
+        "10D",
+        "10E",
+        "10F",
+        "110"
+      ],
+      "st_room_count": 17,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 1,
+      "zone_en": "Military Facility",
+      "zone_jp": "軍事基地",
+      "zone_name_provenance": "confirmed (EXE 'MILITARY FACILITY' (jp lit. 'Military Base') + XGameMania)",
+      "room_count": 6,
+      "next": "Patrol Ship",
+      "rooms": [
+        {
+          "jp": "基地前エリア",
+          "en": "Base Front Area"
+        },
+        {
+          "jp": "機材保管室",
+          "en": "Equipment Storage Room"
+        },
+        {
+          "jp": "医務室",
+          "en": "Infirmary"
+        },
+        {
+          "jp": "基地・エントランス",
+          "en": "Base - Entrance"
+        },
+        {
+          "jp": "基地・連絡通路",
+          "en": "Base - Connecting Passage"
+        },
+        {
+          "jp": "管制室",
+          "en": "Control Room"
+        }
+      ],
+      "st_ids": [
+        "200",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205"
+      ],
+      "st_room_count": 6,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 2,
+      "zone_en": "Patrol Ship",
+      "zone_jp": "巡視艇",
+      "zone_name_provenance": "confirmed (EXE 'PATROL SHIP' + XGameMania)",
+      "room_count": 2,
+      "next": "Research Facility",
+      "rooms": [
+        {
+          "jp": "船室",
+          "en": "Cabin"
+        },
+        {
+          "jp": "操舵室",
+          "en": "Wheelhouse"
+        }
+      ],
+      "st_ids": [
+        "000",
+        "001",
+        "002",
+        "003",
+        "004",
+        "005"
+      ],
+      "st_room_count": 6,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 3,
+      "zone_en": "Research Facility",
+      "zone_jp": "研究施設",
+      "zone_name_provenance": "confirmed (EXE 'RESEARCH FACILITY' + XGameMania)",
+      "room_count": 7,
+      "next": "3rd Energy Facility",
+      "rooms": [
+        {
+          "jp": "施設・裏庭",
+          "en": "Facility - Backyard"
+        },
+        {
+          "jp": "研究用広間",
+          "en": "Research Hall"
+        },
+        {
+          "jp": "セキュリティ管制室",
+          "en": "Security Control Room"
+        },
+        {
+          "jp": "精密実験室",
+          "en": "Precision Laboratory"
+        },
+        {
+          "jp": "施設・エントランス",
+          "en": "Facility - Entrance"
+        },
+        {
+          "jp": "施設・連絡通路",
+          "en": "Facility - Connecting Passage"
+        },
+        {
+          "jp": "機械電源室",
+          "en": "Machine Power Room"
+        }
+      ],
+      "st_ids": [
+        "300",
+        "301",
+        "302",
+        "303",
+        "304",
+        "305",
+        "306"
+      ],
+      "st_room_count": 7,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 4,
+      "zone_en": "3rd Energy Facility",
+      "zone_jp": "湖上エネルギー管理施設",
+      "zone_name_provenance": "confirmed (EXE '3RD ENERGY FACILITY' (jp lit. 'Lake-surface Energy Management Facility') + XGameMania)",
+      "room_count": 9,
+      "next": "3rd Energy Reactor",
+      "rooms": [
+        {
+          "jp": "湖上・船着場",
+          "en": "Lake-surface - Dock"
+        },
+        {
+          "jp": "湖上・通路①",
+          "en": "Lake-surface - Passage 1"
+        },
+        {
+          "jp": "湖上・通路②",
+          "en": "Lake-surface - Passage 2"
+        },
+        {
+          "jp": "湖上・資材置き場【１Ｆ】",
+          "en": "Lake-surface - Materials Storage [1F]"
+        },
+        {
+          "jp": "湖上・資材置き場【２Ｆ】",
+          "en": "Lake-surface - Materials Storage [2F]"
+        },
+        {
+          "jp": "湖上・通路③",
+          "en": "Lake-surface - Passage 3"
+        },
+        {
+          "jp": "湖上施設管制室",
+          "en": "Lake-surface Facility Control Room"
+        },
+        {
+          "jp": "地下連絡通路",
+          "en": "Underground Connecting Passage"
+        },
+        {
+          "jp": "地下大型エレベータ",
+          "en": "Underground Large Elevator"
+        }
+      ],
+      "st_ids": [
+        "600",
+        "601",
+        "602",
+        "603",
+        "604",
+        "605",
+        "606",
+        "607",
+        "608"
+      ],
+      "st_room_count": 9,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 5,
+      "zone_en": "3rd Energy Reactor",
+      "zone_jp": "湖底サードエナジー炉",
+      "zone_name_provenance": "confirmed (EXE '3RD ENERGY REACTOR' (jp lit. 'Lakebed Third Energy Reactor'; underwater) + XGameMania)",
+      "room_count": 12,
+      "next": "Areaway to City",
+      "rooms": [
+        {
+          "jp": "エレベータ・シャフト内",
+          "en": "Inside Elevator Shaft"
+        },
+        {
+          "jp": "湖水・連絡通路①",
+          "en": "Lake-water - Connecting Passage 1"
+        },
+        {
+          "jp": "湖底・連絡通路②【上層】",
+          "en": "Lakebed - Connecting Passage 2 [Upper]"
+        },
+        {
+          "jp": "湖底・連絡通路②【下層】",
+          "en": "Lakebed - Connecting Passage 2 [Lower]"
+        },
+        {
+          "jp": "冷却用湖水循環室【上層】",
+          "en": "Cooling Lake-water Circulation Room [Upper]"
+        },
+        {
+          "jp": "冷却用湖水循環室【下層】",
+          "en": "Cooling Lake-water Circulation Room [Lower]"
+        },
+        {
+          "jp": "湖水循環システム管理室",
+          "en": "Lake-water Circulation System Control Room"
+        },
+        {
+          "jp": "機械冷却用水路内【上層】",
+          "en": "Inside Machine-cooling Waterway [Upper]"
+        },
+        {
+          "jp": "機械冷却用水路内【中層】",
+          "en": "Inside Machine-cooling Waterway [Middle]"
+        },
+        {
+          "jp": "機械冷却用水路内【下層】",
+          "en": "Inside Machine-cooling Waterway [Lower]"
+        },
+        {
+          "jp": "サードエナジー炉【上層】",
+          "en": "Third Energy Reactor [Upper]"
+        },
+        {
+          "jp": "サードエナジー炉【下層】",
+          "en": "Third Energy Reactor [Lower]"
+        }
+      ],
+      "st_ids": [
+        "700",
+        "701",
+        "702",
+        "703",
+        "704",
+        "705",
+        "706",
+        "707"
+      ],
+      "st_room_count": 8,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 6,
+      "zone_en": "Areaway to City",
+      "zone_jp": "シティ連絡エリア",
+      "zone_name_provenance": "confirmed (EXE 'AREAWAY TO CITY' + XGameMania)",
+      "room_count": 11,
+      "next": "Edward City",
+      "rooms": [
+        {
+          "jp": "シティ前・運搬通路",
+          "en": "City Front - Transport Passage"
+        },
+        {
+          "jp": "シティ前・資材置き場",
+          "en": "City Front - Materials Storage"
+        },
+        {
+          "jp": "シティ前・船着場",
+          "en": "City Front - Dock"
+        },
+        {
+          "jp": "湖畔①",
+          "en": "Lakeside 1"
+        },
+        {
+          "jp": "湖畔②",
+          "en": "Lakeside 2"
+        },
+        {
+          "jp": "洞窟①",
+          "en": "Cave 1"
+        },
+        {
+          "jp": "洞窟②",
+          "en": "Cave 2"
+        },
+        {
+          "jp": "洞窟③",
+          "en": "Cave 3"
+        },
+        {
+          "jp": "洞窟④",
+          "en": "Cave 4"
+        },
+        {
+          "jp": "司令基地・敷地内",
+          "en": "Command Base - Grounds"
+        },
+        {
+          "jp": "司令基地・外周",
+          "en": "Command Base - Perimeter"
+        }
+      ],
+      "st_ids": [
+        "800",
+        "801",
+        "802",
+        "803",
+        "804",
+        "805",
+        "806",
+        "807",
+        "808",
+        "809",
+        "80A",
+        "80B"
+      ],
+      "st_room_count": 12,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 7,
+      "zone_en": "Edward City",
+      "zone_jp": "エドワード・シティ",
+      "zone_name_provenance": "confirmed (EXE 'EDWARD CITY' + XGameMania)",
+      "room_count": 5,
+      "next": "Missile Silo",
+      "rooms": [
+        {
+          "jp": "ドラッグストア",
+          "en": "Drugstore"
+        },
+        {
+          "jp": "シティ・居住区①",
+          "en": "City - Residential Area 1"
+        },
+        {
+          "jp": "シティ・居住区②",
+          "en": "City - Residential Area 2"
+        },
+        {
+          "jp": "シティ外・倉庫街",
+          "en": "Outside City - Warehouse District"
+        },
+        {
+          "jp": "シティ外・ハイウェイ",
+          "en": "Outside City - Highway"
+        }
+      ],
+      "st_ids": [
+        "900",
+        "901",
+        "902",
+        "903",
+        "904",
+        "905",
+        "906"
+      ],
+      "st_room_count": 7,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 8,
+      "zone_en": "Missile Silo",
+      "zone_jp": "ミサイル発射場",
+      "zone_name_provenance": "confirmed (EXE 'MISSILE SILO' (jp lit. 'Missile Launch Site') + XGameMania)",
+      "room_count": 8,
+      "next": "Habitat Support Facility",
+      "rooms": [
+        {
+          "jp": "発射場前エリア",
+          "en": "Launch Site Front Area"
+        },
+        {
+          "jp": "ミサイル室",
+          "en": "Missile Room"
+        },
+        {
+          "jp": "裏口連絡通路①",
+          "en": "Back-entrance Connecting Passage 1"
+        },
+        {
+          "jp": "裏口連絡通路②",
+          "en": "Back-entrance Connecting Passage 2"
+        },
+        {
+          "jp": "廃棄物処理室",
+          "en": "Waste Disposal Room"
+        },
+        {
+          "jp": "データ管理室",
+          "en": "Data Management Room"
+        },
+        {
+          "jp": "発射管制室",
+          "en": "Launch Control Room"
+        },
+        {
+          "jp": "発射場・裏口前",
+          "en": "Launch Site - Before Back Entrance"
+        }
+      ],
+      "st_ids": [
+        "400",
+        "401",
+        "402",
+        "403",
+        "404",
+        "405",
+        "406",
+        "40B"
+      ],
+      "st_room_count": 8,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    },
+    {
+      "order": 9,
+      "zone_en": "Habitat Support Facility",
+      "zone_jp": "環境調整施設",
+      "zone_name_provenance": "confirmed (EXE 'HABITAT SUPPORT FACILITY' (jp lit. 'Environment Adjustment Facility') + XGameMania)",
+      "room_count": 8,
+      "next": null,
+      "rooms": [
+        {
+          "jp": "密林・未知のエリア①",
+          "en": "Jungle - Unknown Area 1"
+        },
+        {
+          "jp": "密林・未知のエリア②",
+          "en": "Jungle - Unknown Area 2"
+        },
+        {
+          "jp": "施設前エリア",
+          "en": "Facility Front Area"
+        },
+        {
+          "jp": "巨大生物転送室",
+          "en": "Giant Creature Transfer Room"
+        },
+        {
+          "jp": "施設・エントランス",
+          "en": "Facility - Entrance"
+        },
+        {
+          "jp": "\"管理人\"の私室",
+          "en": "\"Caretaker's\" Private Room"
+        },
+        {
+          "jp": "実験用大ホール",
+          "en": "Experiment Grand Hall"
+        },
+        {
+          "jp": "≪ゲート≫開発実験室",
+          "en": "≪Gate≫ Development Laboratory"
+        }
+      ],
+      "st_ids": [
+        "407",
+        "408",
+        "409",
+        "40A",
+        "500",
+        "501",
+        "502",
+        "503",
+        "504"
+      ],
+      "st_room_count": 9,
+      "st_ids_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)"
+    }
+  ],
+  "_st_zone_link": "ST<->zone is BYTE-RESOLVED via fn 0x491c70 (see ZONE-MAPPING-RE.md): each zone's `st_ids` lists the ST rooms the EXE assigns to it. ST4 splits across Missile Silo (rooms 0-6,11) and Habitat (rooms 7-10). NOTE: the guide room NAMES below are NOT individually tied to ST ids (name<->id alignment is unresolved); only the zone-level grouping is byte-confirmed. `room_count` = guide count; `st_room_count` = byte count."
+}

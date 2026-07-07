@@ -1,0 +1,43 @@
+{
+  "_doc": "DC1 numeric puzzle codes that share ONE common scramble function: a single 4-digit keypad code table baked into DINO.exe .data (AOT-recompiled from the JP build, 8 identical copies) checked by a shared comparator, with an optional in-prose document that states the code as a glyph-token string. A randomizer scrambles a row by (a) writing the new digits to all 8 EXE copies and (b) rewriting the document glyph run to the same number. Decoded + CE-witnessed 2026-07-01/02; see docs/dc1/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md 14/16/17.",
+  "keypad_code_table": {
+    "exe_copies_file_offsets": ["0x260858", "0x260ba8", "0x2623a0", "0x263388", "0x264ae0", "0x2678f0", "0x2685ac", "0x268a50"],
+    "row_stride_bytes": 4,
+    "jp_rows_at": "base + row*4  (rows 0..5)",
+    "us_rows_at": "base + (6+row)*4  (rows 0..5)",
+    "digit_encoding": "stored byte = displayed digit + 1  ('0'->0x01 ... '9'->0x0a)",
+    "region_select": "comparator picks US half if byte[[PSX-scratch0]+0x9ab8] & 0x80 else JP half; this build runs JP",
+    "room_0103_reads": "copy #8 (0x268a50), row 0 (CE-witnessed compare 0x5df43f)"
+  },
+  "document_glyph_format": {
+    "unit": "16-bit little-endian token per glyph",
+    "normal_glyph": "(index << 1) | 0x8000  (high byte 0x80, low byte = index*2, always even)",
+    "index_map": {
+      "0": "space", "1..26": "A..Z", "27..52": "a..z", "53..62": "0..9",
+      "63": "!", "65": "?", "67": "\"", "68": ":", "72": "-", "77": ".", "78": ",", "79": "'"
+    },
+    "controls": {"0xA000 0x1001 0x2000": "paragraph break", "0xC000": "line break"},
+    "language_independent": "glyph indices identical across english/ french/ etc.; only the text differs",
+    "location": "in the decompressed room RDT (type-7 LZSS entry, load 0x80100000); edit needs re-LZSS + package repack"
+  },
+  "family": [
+    {"row": 0, "jp": "0375", "us": "0426", "lock": "Management Office safe", "room": "0103", "keypad_stage_file": "st1.bin (EXE .data)",
+     "document": {"stage_file": "st100.dat", "room": "0100", "rdt_offset": "0x3a9f6", "quoted": true}},
+    {"row": 1, "jp": "7687", "us": "8159", "lock": "Lounge safe (optional)", "room": null, "keypad_stage_file": "EXE .data",
+     "document": {"stage_file": "st200.dat", "room": "0200", "rdt_offset": "0x0fb0c", "quoted": true}},
+    {"row": 2, "jp": "5037", "us": "7248", "lock": "Computer Room gas-room unlock code", "room": null, "keypad_stage_file": "EXE .data",
+     "document": {"stage_file": "st302.dat", "room": "0302", "rdt_offset": "0x3dc82", "quoted": false}},
+    {"row": 3, "jp": "0367", "us": "0367", "lock": "Stabilizer Design Room code A", "room": null, "keypad_stage_file": "EXE .data",
+     "document": null, "note": "no readable document mention found (Reverse% content)"},
+    {"row": 4, "jp": "0204", "us": "0204", "lock": "Stabilizer Design Room code B", "room": null, "keypad_stage_file": "EXE .data",
+     "document": null, "note": "no readable document mention found (Reverse% content)"},
+    {"row": 5, "jp": "1281", "us": "1281", "lock": "Stabilizer Experiment Room safe (optional)", "room": null, "keypad_stage_file": "EXE .data",
+     "document": null, "note": "no readable document mention found"}
+  ],
+  "excluded_other_formats": {
+    "_doc": "Detected by the same scan but NOT part of the keypad-table common function; a randomizer for those needs a different lever.",
+    "id_card_fingerprint_panels": {"format": "5-key/2-row object type 0x1a, RAW-digit encoding (no +1), separate comparators 0x800eddc8/0x800edf98", "codes_jp_us": {"paul_baker": ["46907", "58104"], "mark_doyle": ["47812", "57036"], "doctor_kirk": ["78814", "31415"]}, "document_hits": ["st10b.dat 46907", "st400.dat 47812", "st50c.dat 78814", "stA0b.dat 58104"]},
+    "key_chip_codes": {"format": "4-digit code shown in a document but the lock is a tile/slide puzzle, not the keypad table", "codes": {"library_b1": "3695", "security_pass_b2": "0392"}, "document_hits": ["st305.dat 3695", "st506.dat/st508.dat 0392"]},
+    "six_digit_and_word_and_sequence": {"format": "different subsystems entirely", "examples": ["Chief's Room 705037", "Parts Storage 367204", "DDK word passwords HEAD/NEWCOMER/...", "battery/gas/circuit/crane sequence puzzles"]}
+  }
+}

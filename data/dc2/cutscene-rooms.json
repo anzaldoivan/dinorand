@@ -1,0 +1,694 @@
+{
+  "_source": "tools/dc2_re/scan_cutscene_rooms.py over rebirth/Data ST*.DAT slot-5 SCD programs (decode_script.py). Static, read-only.",
+  "_generated": "2026-06-30",
+  "_rooms_parsed": 89,
+  "_signature": {
+    "primary_barrier_ops": [
+      "0x41",
+      "0x42"
+    ],
+    "barrier_meaning": "bank-2 scripted-event WAIT/predicate via 0x46fa70(type=2,id); op-0x41 blocks the VM IP until the flag reaches state -> scripted sequencing, not the universal camera setup",
+    "anim_op": "0x46",
+    "anim_meaning": "scripted actor-motion/animation (0x48a6a0 -> 0x48e050, anim cluster). A species swap breaks the actor's clip table -> zero-span keyframe -> the K60 divide-by-zero crash. Catches the ST102-class scripted set-pieces the barrier misses; absent in the plain adjacent raptor rooms ST105/104/107",
+    "turret_op": "0x58",
+    "turret_meaning": "ST407-unique actor-flag script (auto-confirm set-piece)",
+    "boss_setpiece_spawn_types": {
+      "0x03": "Tyrannosaurus(boss)",
+      "0x05": "Mosasaurus(aquatic-boss)",
+      "0x06": "Giganotosaurus(boss)",
+      "0x09": "Triceratops(setpiece)"
+    },
+    "boss_setpiece_meaning": "hardcoded (mode-0) boss/set-piece spawn species -> auto-confirm a scripted boss/set-piece fight a swap would break; corpus-wide these 5 rooms all also carry the barrier signature",
+    "scene_op_documented_not_used": "0x29 (scene-stack/camera-cut) \u2014 in only 10 rooms, none GT",
+    "exe_refs": [
+      "0x48aed0",
+      "0x48af30",
+      "0x48ac80",
+      "0x46fa70",
+      "0x723c40",
+      "0x4892f0"
+    ]
+  },
+  "_legend": {
+    "flagged": "confirmed set-piece \u2014 excluded. Auto-confirm = op-0x46 scripted actor-animation (swap-crash risk) OR op-0x58 (turret) OR a hardcoded boss/set-piece spawn (Tyranno/Mosa/Gigano/Trice) OR a human ground-truth cutscene label (ST101 intro, ST106 water-tower)",
+    "uncertain": "matches the scripted-event barrier (op-0x41/0x42) only \u2014 no animation/boss/label confirmation; static opcodes cannot tell swap-breaking from safe-scripted; PLAYTEST to promote to flagged or demote to clear. NOT auto-excluded.",
+    "keys": "3-char st_id (no ST prefix), matching spawn-graph.json / Dc2RoomExclusions"
+  },
+  "_ground_truth": {
+    "cutscene": [
+      "101",
+      "106"
+    ],
+    "anim_setpiece": [
+      "102"
+    ],
+    "combat_safe": [
+      "105",
+      "202"
+    ]
+  },
+  "_validation": "PASS",
+  "flagged": [
+    "101",
+    "102",
+    "106",
+    "109",
+    "10A",
+    "10B",
+    "10C",
+    "10F",
+    "200",
+    "201",
+    "205",
+    "302",
+    "402",
+    "407",
+    "503",
+    "605",
+    "606",
+    "706",
+    "800",
+    "809",
+    "80A",
+    "903"
+  ],
+  "uncertain": [
+    "000",
+    "001",
+    "002",
+    "003",
+    "005",
+    "300",
+    "301",
+    "303",
+    "400",
+    "401",
+    "403",
+    "406",
+    "408",
+    "502",
+    "504",
+    "607",
+    "700",
+    "803",
+    "808",
+    "900",
+    "904"
+  ],
+  "rooms": {
+    "101": {
+      "spawns": 2,
+      "barrier": 24,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x24"
+      ],
+      "reason": "ground-truth cutscene label"
+    },
+    "102": {
+      "spawns": 6,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 6,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x6"
+      ],
+      "reason": "op-0x46 scripted actor-animation x6 (auto; swap-crash risk)"
+    },
+    "106": {
+      "spawns": 8,
+      "barrier": 8,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x8"
+      ],
+      "reason": "ground-truth cutscene label"
+    },
+    "109": {
+      "spawns": 6,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 9,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x9"
+      ],
+      "reason": "op-0x46 scripted actor-animation x9 (auto; swap-crash risk)"
+    },
+    "10A": {
+      "spawns": 2,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 2,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x2"
+      ],
+      "reason": "op-0x46 scripted actor-animation x2 (auto; swap-crash risk)"
+    },
+    "10B": {
+      "spawns": 1,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 1,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x1"
+      ],
+      "reason": "op-0x46 scripted actor-animation x1 (auto; swap-crash risk)"
+    },
+    "10C": {
+      "spawns": 21,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 15,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x15"
+      ],
+      "reason": "op-0x46 scripted actor-animation x15 (auto; swap-crash risk)"
+    },
+    "10F": {
+      "spawns": 10,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 10,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x10"
+      ],
+      "reason": "op-0x46 scripted actor-animation x10 (auto; swap-crash risk)"
+    },
+    "200": {
+      "spawns": 13,
+      "barrier": 2,
+      "turret": 0,
+      "anim": 1,
+      "boss_setpiece": [
+        "Tyrannosaurus(boss)"
+      ],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x1",
+        "boss_setpiece_spawn:Tyrannosaurus(boss)",
+        "event_barrier_op_0x41/0x42 x2"
+      ],
+      "reason": "op-0x46 scripted actor-animation x1 (auto; swap-crash risk); hardcoded boss/set-piece spawn Tyrannosaurus(boss) (auto)"
+    },
+    "201": {
+      "spawns": 4,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 4,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x4"
+      ],
+      "reason": "op-0x46 scripted actor-animation x4 (auto; swap-crash risk)"
+    },
+    "205": {
+      "spawns": 4,
+      "barrier": 24,
+      "turret": 0,
+      "anim": 1,
+      "boss_setpiece": [],
+      "scene_op": 1,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x1",
+        "event_barrier_op_0x41/0x42 x24",
+        "scene_op_0x29 x1"
+      ],
+      "reason": "op-0x46 scripted actor-animation x1 (auto; swap-crash risk)"
+    },
+    "302": {
+      "spawns": 9,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 9,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x9"
+      ],
+      "reason": "op-0x46 scripted actor-animation x9 (auto; swap-crash risk)"
+    },
+    "402": {
+      "spawns": 8,
+      "barrier": 22,
+      "turret": 0,
+      "anim": 6,
+      "boss_setpiece": [
+        "Giganotosaurus(boss)"
+      ],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x6",
+        "boss_setpiece_spawn:Giganotosaurus(boss)",
+        "event_barrier_op_0x41/0x42 x22"
+      ],
+      "reason": "op-0x46 scripted actor-animation x6 (auto; swap-crash risk); hardcoded boss/set-piece spawn Giganotosaurus(boss) (auto)"
+    },
+    "407": {
+      "spawns": 12,
+      "barrier": 38,
+      "turret": 1,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "turret_actor_op_0x58 x1",
+        "event_barrier_op_0x41/0x42 x38"
+      ],
+      "reason": "op-0x58 turret-class actor script (auto)"
+    },
+    "503": {
+      "spawns": 9,
+      "barrier": 36,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [
+        "Giganotosaurus(boss)"
+      ],
+      "scene_op": 0,
+      "decode_clean": false,
+      "evidence": [
+        "boss_setpiece_spawn:Giganotosaurus(boss)",
+        "event_barrier_op_0x41/0x42 x36"
+      ],
+      "reason": "hardcoded boss/set-piece spawn Giganotosaurus(boss) (auto)"
+    },
+    "605": {
+      "spawns": 0,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 2,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x2"
+      ],
+      "reason": "op-0x46 scripted actor-animation x2 (auto; swap-crash risk)"
+    },
+    "606": {
+      "spawns": 0,
+      "barrier": 0,
+      "turret": 0,
+      "anim": 1,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x1"
+      ],
+      "reason": "op-0x46 scripted actor-animation x1 (auto; swap-crash risk)"
+    },
+    "706": {
+      "spawns": 4,
+      "barrier": 10,
+      "turret": 0,
+      "anim": 2,
+      "boss_setpiece": [
+        "Mosasaurus(aquatic-boss)"
+      ],
+      "scene_op": 1,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x2",
+        "boss_setpiece_spawn:Mosasaurus(aquatic-boss)",
+        "event_barrier_op_0x41/0x42 x10",
+        "scene_op_0x29 x1"
+      ],
+      "reason": "op-0x46 scripted actor-animation x2 (auto; swap-crash risk); hardcoded boss/set-piece spawn Mosasaurus(aquatic-boss) (auto)"
+    },
+    "800": {
+      "spawns": 2,
+      "barrier": 20,
+      "turret": 0,
+      "anim": 1,
+      "boss_setpiece": [],
+      "scene_op": 2,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x1",
+        "event_barrier_op_0x41/0x42 x20",
+        "scene_op_0x29 x2"
+      ],
+      "reason": "op-0x46 scripted actor-animation x1 (auto; swap-crash risk)"
+    },
+    "809": {
+      "spawns": 11,
+      "barrier": 6,
+      "turret": 0,
+      "anim": 3,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "scripted_anim_op_0x46 x3",
+        "event_barrier_op_0x41/0x42 x6"
+      ],
+      "reason": "op-0x46 scripted actor-animation x3 (auto; swap-crash risk)"
+    },
+    "80A": {
+      "spawns": 6,
+      "barrier": 6,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [
+        "Triceratops(setpiece)"
+      ],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "boss_setpiece_spawn:Triceratops(setpiece)",
+        "event_barrier_op_0x41/0x42 x6"
+      ],
+      "reason": "hardcoded boss/set-piece spawn Triceratops(setpiece) (auto)"
+    },
+    "903": {
+      "spawns": 18,
+      "barrier": 4,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [
+        "Tyrannosaurus(boss)"
+      ],
+      "scene_op": 2,
+      "decode_clean": true,
+      "evidence": [
+        "boss_setpiece_spawn:Tyrannosaurus(boss)",
+        "event_barrier_op_0x41/0x42 x4",
+        "scene_op_0x29 x2"
+      ],
+      "reason": "hardcoded boss/set-piece spawn Tyrannosaurus(boss) (auto)"
+    },
+    "000": {
+      "spawns": 1,
+      "barrier": 2,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x2"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "001": {
+      "spawns": 4,
+      "barrier": 4,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 1,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x4",
+        "scene_op_0x29 x1"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "002": {
+      "spawns": 4,
+      "barrier": 24,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 1,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x24",
+        "scene_op_0x29 x1"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "003": {
+      "spawns": 15,
+      "barrier": 52,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x52"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "005": {
+      "spawns": 1,
+      "barrier": 2,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x2"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "300": {
+      "spawns": 8,
+      "barrier": 14,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x14"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "301": {
+      "spawns": 3,
+      "barrier": 10,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x10"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "303": {
+      "spawns": 4,
+      "barrier": 4,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x4"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "400": {
+      "spawns": 5,
+      "barrier": 2,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x2"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "401": {
+      "spawns": 2,
+      "barrier": 28,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x28"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "403": {
+      "spawns": 1,
+      "barrier": 6,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x6"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "406": {
+      "spawns": 3,
+      "barrier": 6,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 1,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x6",
+        "scene_op_0x29 x1"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "408": {
+      "spawns": 5,
+      "barrier": 12,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x12"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "502": {
+      "spawns": 4,
+      "barrier": 60,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x60"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "504": {
+      "spawns": 6,
+      "barrier": 14,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x14"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "607": {
+      "spawns": 3,
+      "barrier": 10,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 1,
+      "decode_clean": false,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x10",
+        "scene_op_0x29 x1"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "700": {
+      "spawns": 5,
+      "barrier": 2,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x2"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "803": {
+      "spawns": 2,
+      "barrier": 8,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x8"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "808": {
+      "spawns": 10,
+      "barrier": 20,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 4,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x20",
+        "scene_op_0x29 x4"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "900": {
+      "spawns": 3,
+      "barrier": 20,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 0,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x20"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    },
+    "904": {
+      "spawns": 7,
+      "barrier": 42,
+      "turret": 0,
+      "anim": 0,
+      "boss_setpiece": [],
+      "scene_op": 1,
+      "decode_clean": true,
+      "evidence": [
+        "event_barrier_op_0x41/0x42 x42",
+        "scene_op_0x29 x1"
+      ],
+      "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
+    }
+  }
+}

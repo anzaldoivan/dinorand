@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+#
+# pre-commit — block copyrighted game assets / binaries before they enter history.
+# Version-controlled hook. Enable once per clone with:
+#
+#     git config core.hooksPath .githooks
+#
+# (or run: bash scripts/setup-hooks.sh)
+#
+# Client hooks can be bypassed with `git commit --no-verify`; the CI gate
+# (.github/workflows/no-copyrighted-files.yml) is the enforceable backstop.
+
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+
+# Staged additions/copies/modifications, NUL-delimited for spaces/odd names.
+mapfile -d '' -t staged < <(git diff --cached --name-only --diff-filter=ACM -z)
+
+[ "${#staged[@]}" -eq 0 ] && exit 0
+
+# Derived-data contracts: if the room data, flag labels, map, or a generator is staged,
+# the derived layers must be in sync (CI re-checks both).
+needs_check=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    data/dc1/room-data.json|data/dc1/flag-labels.json|data/dc1/map.json|scripts/trigger_decode.py|scripts/gen_item_map.py)
+      needs_check=1; break ;;
+  esac
+done
+if [ "$needs_check" = 1 ] && command -v python3 >/dev/null 2>&1; then
+  python3 "$root/scripts/trigger_decode.py" --check || {
+    echo "pre-commit: trigger-decode contract failed — run 'python3 scripts/trigger_decode.py --apply'" >&2
+    exit 1
+  }
+  python3 "$root/scripts/gen_item_map.py" --check || {
+    echo "pre-commit: item-map contract failed — run 'python3 scripts/gen_item_map.py --apply'" >&2
+    exit 1
+  }
+fi
+
+# Docs index contract: if any corpus doc (or the generator) is staged, every
+# docs/*.md must carry frontmatter and the generated docs/index.md must be in sync.
+docs_touched=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    docs/*.md|scripts/gen_docs_index.py) docs_touched=1; break ;;
+  esac
+done
+if [ "$docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
+  python3 "$root/scripts/gen_docs_index.py" --check || {
+    echo "pre-commit: docs index/frontmatter contract failed — run 'python3 scripts/gen_docs_index.py --apply' and stage docs/index.md" >&2
+    exit 1
+  }
+fi
+
+exec "$root/scripts/check-no-copyrighted-files.sh" "${staged[@]}"

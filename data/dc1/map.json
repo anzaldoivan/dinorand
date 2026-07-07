@@ -1,0 +1,981 @@
+{
+  "_derivation": {
+    "purpose": "Segmented door-randomizer metadata (BioRand Map.cs subset) \u2014 docs/dc1/DOOR-RANDOMIZER-PLAN.md \u00a76.",
+    "beginEnd": "start=010d (Backyard, GameDefinition.StartRoomCode), end=060d (Underground Heliport, GoalRoomCode).",
+    "scope": "96 story rooms (stages 1-6). Stage variants 7/8/9 (alt-state of 3/5/6), demo stages A/B/C, and the unused ST60E shell (060E, unfinished room \u2014 uncompressed segment, no lighting/enemy triggers/final textures) are excluded by being absent here; resolve by id never name (31 names non-unique).",
+    "category": "Box = room name contains \"Storage\" (supply/item-box first cut, refine by playtest). Bridge = decoded door out-degree>2 among story rooms. Segment = default (floor grouping from room-data.json.map). All noisy first-cut classifiers per plan \u00a76.",
+    "floor": "Normalized from room-data.json.map (B3/B2/B1/1F/2F/Outdoors; Unknown for the 18 None/2 malformed/2 mixed-floor entries).",
+    "staticTargets": "Per-room one-way decoded door destinations (no reciprocal edge) \u2014 excluded from the reciprocal-only shuffle (decision 3). Keyed by destination SSRR, robust across rebuilds (FileOffset is recomputed each load).",
+    "requires": "Graph-logic-parity overlay (GRAPH-LOGIC-PARITY-PLAN.md \u00a74.1), parsed by MapRequirements and stamped onto the room graph; not yet AUTHORED for any room (no gates below). Per-room optional keys: \"requiresRoom\": [SSRR,...] = rooms that must be visited/reachable (AND, applied on entry to this room); \"doors\": {\"<destSSRR>\": {\"requires\": [itemId,...], \"requiresRoom\": [SSRR,...]}} = items held (AND) and/or rooms visited (AND) to cross the edge to that destination \u2014 \"requiresRoom\" is how an auto-derived story-unlock door (type 1/3, opened by a SetFlag(9,..) event elsewhere) records the producer room (extract_logic.py); \"items\": {\"<itemIdHex>\": {\"requires\": [itemId,...]}} = items held before the pickup of that id in this room is reachable (AND). Item keys are the pickup's id (robust across rebuilds, like staticTargets' destination SSRR), applied to every matching record in the room. OR stays structural + the existing door-type key-set. Provenance for each authored gate lives in data/dc1/map-requirements.md. DoorMap.Parse ignores these keys (door-rando only); MapRequirements owns them.",
+    "itemPriorities": "Per-item randomization priority (ITEM-RANDO-PLAN.md \u00a77.1), parsed by MapRequirements and stamped onto NodeItem.Priority; authored for spots that must not move (e.g. the Plug / DDK Input Disc and runtime-armed slots). Per-room optional key: \"itemPriorities\": [ { \"at\": \"X,Z\", \"priority\": \"Fixed\" } ] where \"at\" is the placement quad's first corner (decimal X,Z of the 0x28 record at +0x04/+0x06) and \"priority\" is Fixed (the only non-Normal value today). Fixed = the pickup stays exactly vanilla (never rerolled or pool-placed), the per-item form of GameDefinition.ItemProtectedRoomCodes; keyed by POSITION (not item id) so one of several same-id spots can be pinned. BioRand's Low/Hidden affect key placement only (KeyItemPlacer) and are deferred. GENERATED for the 22 item_control rooms by scripts/gen_item_map.py from the decoded item gates (room-data.json item_control + per-record pos) \u2014 do NOT hand-edit those arrays; run `scripts/gen_item_map.py --apply` and the trigger-decode-contract CI enforces sync. Policy: a pickup is pinned Fixed iff it is runtime-armed (0xff), flag-gated, has an unresolved trigger, or is a relocation twin (same id in >1 record). See docs/dc1/TRIGGER-DECODE.md.",
+    "cutsceneStatic": "Door edges incident to a scripted/cutscene room (GameDefinition.CutsceneRoomCodes: 010D,0112,0109,030A,030E) are tagged static so the shuffle never re-points a FORCED traversal \u2014 e.g. the prologue forces Regina through the 0112<->010d door, which is a real 0x28 record (CE-traced 2026-06-20, STATIC-SCD-RE.md cont.24/25); re-pointing it would break the intro. IsStaticEdge is symmetric, so each cutscene room lists its decoded neighbours (out+in), excluding demo-stage (0Axx) targets. EXCEPTION: 010D is the connector's start/growth anchor, so only its forced edge (0112) is locked; its ordinary doors stay shuffleable or the connector cannot grow from start. A full per-script forced-door audit of the remaining cutscene rooms is Increment-C work.",
+    "transportLinksExcluded": "The \u00a76.1 non-door transport/elevator links (no 0x28 record, so never in the door graph): 0401<->060d, 0401<->0614, 0606/0906<->0401, 0509<->050f. Listed for the record; nothing to tag because they are not shuffleable door edges.",
+    "transportRooms": [
+      "0401",
+      "060D",
+      "0614",
+      "0606",
+      "0509",
+      "050F"
+    ]
+  },
+  "beginEnd": {
+    "start": "010d",
+    "end": "060d"
+  },
+  "rooms": {
+    "0100": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Locker Room"
+    },
+    "0101": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Toilet"
+    },
+    "0102": {
+      "category": "Bridge",
+      "floor": "1F",
+      "name": "Management Office Hall"
+    },
+    "0103": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Management Office",
+      "itemPriorities": [
+        {
+          "at": "-544,640",
+          "priority": "Fixed",
+          "_why": "unresolved-trigger \u2014 Plug"
+        },
+        {
+          "at": "-512,1072",
+          "priority": "Fixed",
+          "_why": "flag-gated 7:84; unresolved-trigger \u2014 DDK Input Disc H"
+        }
+      ]
+    },
+    "0104": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Strategy Room"
+    },
+    "0105": {
+      "category": "Bridge",
+      "floor": "1F",
+      "name": "Control Room Hall"
+    },
+    "0106": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Control Room 1F"
+    },
+    "0107": {
+      "category": "Bridge",
+      "floor": "Unknown",
+      "name": "Main Entrance"
+    },
+    "0108": {
+      "category": "Bridge",
+      "floor": "1F",
+      "name": "Lecture Room Hallway",
+      "doors": {
+        "0113": {
+          "requiresRoom": [
+            "0113"
+          ]
+        }
+      },
+      "itemPriorities": [
+        {
+          "at": "-8256,-7904",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Plug"
+        },
+        {
+          "at": "-8240,-7904",
+          "priority": "Fixed",
+          "_why": "flag-gated 7:99; relocation-twin; unresolved-trigger \u2014 Plug"
+        },
+        {
+          "at": "-7408,-8592",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "7840,10464",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "2b",
+          "_why": "relocation-twin \u00d72 \u2014 Plug"
+        }
+      ]
+    },
+    "0109": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Lecture Room",
+      "staticTargets": [
+        "0108"
+      ]
+    },
+    "010A": {
+      "category": "Bridge",
+      "floor": "1F",
+      "name": "Office Hallway"
+    },
+    "010B": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Office"
+    },
+    "010C": {
+      "category": "Box",
+      "floor": "1F",
+      "name": "Material Storage",
+      "itemPriorities": [
+        {
+          "at": "-2992,2720",
+          "priority": "Fixed",
+          "_why": "BG Area Key 0x30 pinned \u2014 gates the generator region, an early/return-trip dependency the door-graph can't model (softlock-safe)"
+        }
+      ]
+    },
+    "010D": {
+      "category": "Bridge",
+      "floor": "1F",
+      "name": "Backyard of the Facility",
+      "staticTargets": [
+        "0112"
+      ]
+    },
+    "010E": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Passageway to the Backup Generator"
+    },
+    "010F": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Backup Generator Room 1F"
+    },
+    "0110": {
+      "category": "Bridge",
+      "floor": "1F",
+      "name": "Piping Check Passageway A 1F"
+    },
+    "0111": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Piping Check Passageway B 1F"
+    },
+    "0112": {
+      "category": "Bridge",
+      "floor": "1F",
+      "name": "The Backyard",
+      "staticTargets": [
+        "010D",
+        "010E",
+        "0114",
+        "0404"
+      ],
+      "doors": {
+        "0114": {
+          "requires": [
+            48
+          ]
+        }
+      }
+    },
+    "0113": {
+      "category": "Bridge",
+      "floor": "Unknown",
+      "name": "Elevator Hall"
+    },
+    "0114": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Passageway to the Backup Generator"
+    },
+    "0200": {
+      "category": "Segment",
+      "floor": "2F",
+      "name": "Communication Antenna Room"
+    },
+    "0201": {
+      "category": "Bridge",
+      "floor": "2F",
+      "name": "Passageway to the Communication Area"
+    },
+    "0202": {
+      "category": "Segment",
+      "floor": "2F",
+      "name": "Chief's Room",
+      "itemPriorities": [
+        {
+          "at": "-3468,2768",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:11 \u2014 Key Card L"
+        },
+        {
+          "at": "-1792,1792",
+          "priority": "Fixed",
+          "_why": "unresolved-trigger \u2014 Panel Key 1"
+        }
+      ]
+    },
+    "0203": {
+      "category": "Bridge",
+      "floor": "2F",
+      "name": "Hall 2F"
+    },
+    "0204": {
+      "category": "Segment",
+      "floor": "2F",
+      "name": "Lounge",
+      "itemPriorities": [
+        {
+          "at": "-3900,4300",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "3600,-1000",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
+    },
+    "0205": {
+      "category": "Segment",
+      "floor": "2F",
+      "name": "Communication Room",
+      "itemPriorities": [
+        {
+          "at": "-2032,1632",
+          "priority": "Fixed",
+          "_why": "flag-gated 7:38 \u2014 Antenna Key"
+        }
+      ]
+    },
+    "0206": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Main Entrance"
+    },
+    "0300": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Experiment Simulation Room",
+      "staticTargets": [
+        "030C"
+      ]
+    },
+    "0301": {
+      "category": "Bridge",
+      "floor": "B1",
+      "name": "Research Area Hall"
+    },
+    "0302": {
+      "category": "Segment",
+      "floor": "B1",
+      "name": "Research Meeting Room"
+    },
+    "0303": {
+      "category": "Segment",
+      "floor": "B1",
+      "name": "Gas Experiment Room",
+      "itemPriorities": [
+        {
+          "at": "-6144,-2048",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "3088,-1008",
+          "priority": "Fixed",
+          "_why": "flag-gated 0:86; flag-gated 0:90; relocation-twin \u2014 B1 Key Chip, Small Size Key"
+        },
+        {
+          "at": "3328,-2560",
+          "priority": "Fixed",
+          "_why": "flag-gated 0:86; relocation-twin \u2014 B1 Key Chip"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "2d",
+          "_why": "relocation-twin \u00d72 \u2014 Small Size Key"
+        },
+        {
+          "id": "46",
+          "_why": "relocation-twin \u00d73 \u2014 B1 Key Chip"
+        }
+      ]
+    },
+    "0304": {
+      "category": "Bridge",
+      "floor": "B1",
+      "name": "Computer Room",
+      "itemPriorities": [
+        {
+          "at": "-1500,0",
+          "priority": "Fixed",
+          "_why": "flag-gated 7:37 \u2014 Screwdriver"
+        },
+        {
+          "at": "3300,-4200",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
+    },
+    "0305": {
+      "category": "Segment",
+      "floor": "B1",
+      "name": "Library Room",
+      "itemPriorities": [
+        {
+          "at": "-6400,-4864",
+          "priority": "Fixed",
+          "_why": "flag-gated 0:96; unresolved-trigger \u2014 B1 Key Chip \" with number \"(3695)"
+        },
+        {
+          "at": "5136,-4352",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "5376,5184",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
+    },
+    "0306": {
+      "category": "Bridge",
+      "floor": "Unknown",
+      "name": "Main Hallway",
+      "doors": {
+        "0304": {
+          "requiresRoom": [
+            "030C"
+          ]
+        }
+      }
+    },
+    "0307": {
+      "category": "Bridge",
+      "floor": "B1",
+      "name": "Medical Room Hallway"
+    },
+    "0308": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Medical Room"
+    },
+    "0309": {
+      "category": "Bridge",
+      "floor": "B1",
+      "name": "Hall B1"
+    },
+    "030A": {
+      "category": "Bridge",
+      "floor": "B1",
+      "name": "Hallway for Carrying in Materials",
+      "staticTargets": [
+        "0309",
+        "030B",
+        "030C"
+      ]
+    },
+    "030B": {
+      "category": "Bridge",
+      "floor": "Unknown",
+      "name": "Backup Generator Room B1"
+    },
+    "030C": {
+      "category": "Bridge",
+      "floor": "B1",
+      "name": "Carrying Out Room B1"
+    },
+    "030D": {
+      "category": "Bridge",
+      "floor": "B1",
+      "name": "Hallway for Carrying in Materials"
+    },
+    "030E": {
+      "category": "Segment",
+      "floor": "B1",
+      "name": "Hall B1",
+      "staticTargets": [
+        "030D",
+        "0307"
+      ]
+    },
+    "0400": {
+      "category": "Segment",
+      "floor": "1F",
+      "name": "Front Area of Entrance",
+      "doors": {
+        "0401": {
+          "requiresRoom": [
+            "0205"
+          ]
+        }
+      }
+    },
+    "0401": {
+      "category": "Bridge",
+      "floor": "B3",
+      "name": "Passageway to the Heliport",
+      "staticTargets": [
+        "0403"
+      ]
+    },
+    "0402": {
+      "category": "Bridge",
+      "floor": "Outdoors",
+      "name": "Hangar",
+      "staticTargets": [
+        "040D"
+      ]
+    },
+    "0403": {
+      "category": "Segment",
+      "floor": "Outdoors",
+      "name": "Heliport",
+      "staticTargets": [
+        "0409"
+      ]
+    },
+    "0404": {
+      "category": "Segment",
+      "floor": "Outdoors",
+      "name": "Large Size Elevator Passageway"
+    },
+    "0405": {
+      "category": "Bridge",
+      "floor": "Unknown",
+      "name": "Large Size Elevator"
+    },
+    "0406": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Large Size Elevator Control Room",
+      "itemPriorities": [
+        {
+          "at": "-4352,224",
+          "priority": "Fixed",
+          "_why": "relocation-twin; unresolved-trigger \u2014 DDK Code Disc L"
+        },
+        {
+          "at": "-3956,-1600",
+          "priority": "Fixed",
+          "_why": "flag-gated 0:1; relocation-twin \u2014 DDK Code Disc L"
+        },
+        {
+          "at": "2896,-3360",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "6b",
+          "_why": "relocation-twin \u00d72 \u2014 DDK Code Disc L"
+        }
+      ]
+    },
+    "0407": {
+      "category": "Segment",
+      "floor": "Outdoors",
+      "name": "Passageway to the Power Room"
+    },
+    "0408": {
+      "category": "Segment",
+      "floor": "Outdoors",
+      "name": "Elevator Power Room"
+    },
+    "0409": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Liaison Elevator No.2",
+      "staticTargets": [
+        "040A"
+      ]
+    },
+    "040A": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Underground Passageway to the Facility"
+    },
+    "040B": {
+      "category": "Segment",
+      "floor": "B1",
+      "name": "Materials Room"
+    },
+    "040C": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Liaison Elevator No.1",
+      "staticTargets": [
+        "0405"
+      ]
+    },
+    "040D": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "/Filmato Eliporto/"
+    },
+    "0500": {
+      "category": "Bridge",
+      "floor": "Unknown",
+      "name": "Passageway to the Experiment Area"
+    },
+    "0501": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Piping Check Passageway B2"
+    },
+    "0502": {
+      "category": "Bridge",
+      "floor": "B2",
+      "name": "Experiment Room Hall"
+    },
+    "0503": {
+      "category": "Bridge",
+      "floor": "B2",
+      "name": "Stabilizer Experiment Room",
+      "staticTargets": [
+        "0609",
+        "060D"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-3468,2768",
+          "priority": "Fixed",
+          "_why": "flag-gated 11:83 \u2014 Initializer, Stabilizer"
+        },
+        {
+          "at": "-1792,1792",
+          "priority": "Fixed",
+          "_why": "unresolved-trigger \u2014 Secret Disc \" With Data \""
+        }
+      ],
+      "doors": {
+        "060D": {
+          "requires": [
+            58
+          ]
+        }
+      }
+    },
+    "0504": {
+      "category": "Segment",
+      "floor": "B2",
+      "name": "Stabilizer Design Room",
+      "itemPriorities": [
+        {
+          "at": "-2912,3872",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:11; relocation-twin; unresolved-trigger \u2014 Protect P. 1-B, Protect P. 2-A"
+        },
+        {
+          "at": "2256,-3840",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:11; flag-gated 7:47; relocation-twin; unresolved-trigger \u2014 Protect P. 1-A"
+        },
+        {
+          "at": "4896,-3840",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:11; flag-gated 7:49; relocation-twin; unresolved-trigger \u2014 Protect P. 1-B, Protect P. 2-A"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "4e",
+          "_why": "relocation-twin \u00d72 \u2014 Protect P. 1-A"
+        },
+        {
+          "id": "4f",
+          "_why": "relocation-twin \u00d72 \u2014 Protect P. 2-A"
+        },
+        {
+          "id": "50",
+          "_why": "relocation-twin \u00d72 \u2014 Protect P. 1-B"
+        }
+      ]
+    },
+    "0505": {
+      "category": "Segment",
+      "floor": "B2",
+      "name": "Researcher Rest Room"
+    },
+    "0506": {
+      "category": "Segment",
+      "floor": "B2",
+      "name": "Security Pass Room",
+      "itemPriorities": [
+        {
+          "at": "-6912,3328",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:4 \u2014 ID Card Type \" Project Superintendent \" (Dr. Kirk)"
+        }
+      ]
+    },
+    "0507": {
+      "category": "Box",
+      "floor": "B2",
+      "name": "Parts Storage",
+      "itemPriorities": [
+        {
+          "at": "4352,7824",
+          "priority": "Fixed",
+          "_why": "flag-gated 0:213; relocation-twin; unresolved-trigger \u2014 Core Parts 1"
+        },
+        {
+          "at": "4352,9616",
+          "priority": "Fixed",
+          "_why": "flag-gated 0:213; relocation-twin; unresolved-trigger \u2014 Core Parts 2"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "52",
+          "_why": "relocation-twin \u00d72 \u2014 Core Parts 1"
+        },
+        {
+          "id": "53",
+          "_why": "relocation-twin \u00d72 \u2014 Core Parts 2"
+        }
+      ]
+    },
+    "0508": {
+      "category": "Segment",
+      "floor": "B2",
+      "name": "Passageway"
+    },
+    "0509": {
+      "category": "Bridge",
+      "floor": "B2",
+      "name": "Third Energy Area B2",
+      "staticTargets": [
+        "0510"
+      ]
+    },
+    "050A": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Third Energy Area B3"
+    },
+    "050B": {
+      "category": "Bridge",
+      "floor": "B2",
+      "name": "Third Energy Control Room"
+    },
+    "050C": {
+      "category": "Segment",
+      "floor": "B2",
+      "name": "Power Freq. Room",
+      "doors": {
+        "050D": {
+          "requiresRoom": [
+            "050B"
+          ]
+        }
+      }
+    },
+    "050D": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Passageway to Personal Lab"
+    },
+    "050E": {
+      "category": "Bridge",
+      "floor": "B2",
+      "name": "Dr. Kirk's Personal Lab"
+    },
+    "050F": {
+      "category": "Bridge",
+      "floor": "B2",
+      "name": "Dr. Kirk's Library Room",
+      "staticTargets": [
+        "050B",
+        "0609"
+      ]
+    },
+    "0510": {
+      "category": "Segment",
+      "floor": "B2",
+      "name": "Third Energy Control Room",
+      "staticTargets": [
+        "050F"
+      ]
+    },
+    "0511": {
+      "category": "Segment",
+      "floor": "B2",
+      "name": "Stabilizer Experiment Room"
+    },
+    "0600": {
+      "category": "Bridge",
+      "floor": "B3",
+      "name": "Carrying Out Room B3",
+      "itemPriorities": [
+        {
+          "at": "-5120,3584",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:4 \u2014 Startup Battery. W \" Large \""
+        },
+        {
+          "at": "3840,-11056",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "doors": {
+        "0602": {
+          "requires": [
+            49
+          ]
+        },
+        "060F": {
+          "requires": [
+            49
+          ]
+        }
+      }
+    },
+    "0601": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Backup Generator Room B3",
+      "itemPriorities": [
+        {
+          "at": "-5120,3584",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:4 \u2014 Startup Battery. W \" Large \""
+        },
+        {
+          "at": "2752,4560",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
+    },
+    "0602": {
+      "category": "Bridge",
+      "floor": "B3",
+      "name": "Control Room B3",
+      "doors": {
+        "0605": {
+          "requires": [
+            58
+          ]
+        },
+        "0615": {
+          "requires": [
+            58
+          ]
+        }
+      }
+    },
+    "0603": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Passageway to the Carrying Out Room"
+    },
+    "0604": {
+      "category": "Bridge",
+      "floor": "B3",
+      "name": "Rest Station"
+    },
+    "0605": {
+      "category": "Box",
+      "floor": "B3",
+      "name": "General Weapons Storage"
+    },
+    "0606": {
+      "category": "Bridge",
+      "floor": "B3",
+      "name": "Transport Passageway",
+      "doors": {
+        "0605": {
+          "requires": [
+            58
+          ]
+        },
+        "0615": {
+          "requires": [
+            58
+          ]
+        },
+        "0611": {
+          "requires": [
+            58
+          ]
+        }
+      }
+    },
+    "0607": {
+      "category": "Box",
+      "floor": "B3",
+      "name": "Special Weapons Storage",
+      "staticTargets": [
+        "0609",
+        "060D"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-5248,8192",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "-1792,1792",
+          "priority": "Fixed",
+          "_why": "unresolved-trigger \u2014 Secret Disc \" With Data \""
+        },
+        {
+          "at": "4480,640",
+          "priority": "Fixed",
+          "_why": "flag-gated 0:4 \u2014 Initializer, Stabilizer"
+        }
+      ],
+      "doors": {
+        "060D": {
+          "requires": [
+            58
+          ]
+        }
+      }
+    },
+    "0608": {
+      "category": "Bridge",
+      "floor": "B3",
+      "name": "Central Stairway",
+      "doors": {
+        "0614": {
+          "requires": [
+            58
+          ]
+        }
+      }
+    },
+    "0609": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Disembarkation Immigration Office"
+    },
+    "060A": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Port"
+    },
+    "060B": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Passageway to the Port"
+    },
+    "060C": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Channel"
+    },
+    "060D": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Underground Heliport"
+    },
+    "060F": {
+      "category": "Bridge",
+      "floor": "Unknown",
+      "name": "Large Size Elevator"
+    },
+    "0610": {
+      "category": "Box",
+      "floor": "Unknown",
+      "name": "Hovercraft Storage",
+      "staticTargets": [
+        "0612",
+        "0613"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-1664,-2016",
+          "priority": "Fixed",
+          "_why": "flag-gated 2:18 \u2014 Energy Tank"
+        },
+        {
+          "at": "-1024,-2048",
+          "priority": "Fixed",
+          "_why": "flag-gated 11:10; relocation-twin \u2014 Grenade Bullets, Grenade Gun (40mmHK), Plug"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "18",
+          "_why": "relocation-twin \u00d74 \u2014 Grenade Bullets"
+        },
+        {
+          "id": "2b",
+          "_why": "relocation-twin \u00d72 \u2014 Plug"
+        }
+      ]
+    },
+    "0611": {
+      "category": "Bridge",
+      "floor": "B3",
+      "name": "Heliport Transport Passageway",
+      "doors": {
+        "0505": {
+          "requires": [
+            58
+          ]
+        }
+      }
+    },
+    "0612": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Hovercraft",
+      "staticTargets": [
+        "060C"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-896,0",
+          "priority": "Fixed",
+          "_why": "flag-gated 11:10; relocation-twin; unresolved-trigger \u2014 Grenade Bullets, Grenade Gun (40mmHK), Plug"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "18",
+          "_why": "relocation-twin \u00d72 \u2014 Grenade Bullets"
+        }
+      ]
+    },
+    "0613": {
+      "category": "Segment",
+      "floor": "Unknown",
+      "name": "Port"
+    },
+    "0614": {
+      "category": "Segment",
+      "floor": "B3",
+      "name": "Port Transport Passageway"
+    },
+    "0615": {
+      "category": "Box",
+      "floor": "B3",
+      "name": "General Weapons Storage"
+    }
+  }
+}

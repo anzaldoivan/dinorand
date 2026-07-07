@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             x:Class="DinoRand.App.RandoSlider"
+             x:Name="randoSlider"
+             d:DesignWidth="200">
+    <!-- Mirror of the WPF RandoSlider.xaml. ElementName bindings become #name references; the
+         Slider.Value binding is explicitly TwoWay so dragging writes back to RandoSlider.Value. -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="headingLabel" Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding #randoSlider.Heading}" />
+        <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding #randoSlider.LowText}" />
+        <Slider x:Name="slider" Grid.Row="1" Grid.Column="2"
+                Margin="3,0"
+                SmallChange="1"
+                LargeChange="4"
+                Minimum="0"
+                Maximum="{Binding #randoSlider.Maximum}"
+                Value="{Binding #randoSlider.Value, Mode=TwoWay}"
+                TickFrequency="1"
+                ValueChanged="Slider_ValueChanged" />
+        <TextBlock Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" Text="{Binding #randoSlider.HighText}" />
+        <!-- Optional centred caption (e.g. the "Vanilla" midpoint of a signed dial); collapsed unless CenterText is set. -->
+        <TextBlock x:Name="centerLabel" Grid.Row="2" Grid.Column="2"
+                   HorizontalAlignment="Center"
+                   FontSize="10"
+                   Foreground="Gray"
+                   IsVisible="False"
+                   Text="{Binding #randoSlider.CenterText}" />
+    </Grid>
+</UserControl>

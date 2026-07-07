@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>DinoRand.Randomizer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DinoRand.FileFormats\DinoRand.FileFormats.csproj" />
+  </ItemGroup>
+  <!-- Ship the door-rando metadata (plan §6) inside the assembly so DoorMap.LoadDefault finds it. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\data\dc1\map.json" LogicalName="DinoRand.Randomizer.Data.dc1.map.json" />
+    <!-- DC1 target voice manifest (VOICE-RANDO-PLAN.md §11) so Dc1VoiceManifest.LoadDefault finds it. -->
+    <EmbeddedResource Include="..\..\data\dc1\voice.json" LogicalName="DinoRand.Randomizer.Data.dc1.voice.json" />
+    <!-- DC2 target voice manifest (docs/dc2/VOICE-DECODE-REPORT.md) so Dc2VoiceManifest.LoadDefault finds it. -->
+    <EmbeddedResource Include="..\..\data\dc2\voice.json" LogicalName="DinoRand.Randomizer.Data.dc2.voice.json" />
+    <!-- DC1 full item-name table (SPOILER-LOG-PLAN.md §4) so Dc1ItemNames finds it. -->
+    <EmbeddedResource Include="..\..\data\dc1\items.json" LogicalName="DinoRand.Randomizer.Data.dc1.items.json" />
+    <!-- DC2 per-spawn operand offsets (CROSS-SPECIES-RANDO-PLAN.md) so Dc2SpawnGraph.LoadEmbedded finds it. -->
+    <EmbeddedResource Include="..\..\data\dc2\spawn-graph.json" LogicalName="DinoRand.Randomizer.Data.dc2.spawn-graph.json" />
+    <EmbeddedResource Include="..\..\data\dc2\wave-descriptors.json" LogicalName="DinoRand.Randomizer.Data.dc2.wave-descriptors.json" />
+    <!-- DC2 donor-distribution registry (ENEMY-DISTRIBUTION-PLAN.md) so Dc2EnemyDistribution.LoadEmbedded finds it. -->
+    <EmbeddedResource Include="..\..\data\dc2\enemy-distribution.json" LogicalName="DinoRand.Randomizer.Data.dc2.enemy-distribution.json" />
+    <!-- DC2 auto-detected cutscene/set-piece rooms (CUTSCENE-DETECTION-PLAN.md) so Dc2RoomExclusions finds it. -->
+    <EmbeddedResource Include="..\..\data\dc2\cutscene-rooms.json" LogicalName="DinoRand.Randomizer.Data.dc2.cutscene-rooms.json" />
+    <!-- DC2 raptor tier/variant table (RAPTOR-TIER-RE.md) so Dc2RaptorTierTable.LoadEmbedded finds it. -->
+    <EmbeddedResource Include="..\..\data\dc2\raptor-tiers.json" LogicalName="DinoRand.Randomizer.Data.dc2.raptor-tiers.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NVorbis" Version="0.10.5" />
+  </ItemGroup>
+</Project>

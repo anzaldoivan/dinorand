@@ -1,0 +1,4 @@
+{
+  "_note": "Human by-ear corrections/labels for DC2 Speech banks (mirrors data/dc1/voice-corrections.json). 'corrections' maps a Speech bank stem (e.g. '0000') to its TRUE speaker; this file is the authoritative human-verified label record, applied into voice.json (actor + _verified). Seeded empty pending the categorization pass over voice-export/dc2-voice.",
+  "corrections": {}
+}

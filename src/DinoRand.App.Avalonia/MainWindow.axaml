@@ -1,0 +1,458 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DinoRand.App"
+        x:Class="DinoRand.App.MainWindow"
+        x:DataType="local:MainWindowViewModel"
+        Title="DinoRand: Dino Crisis Randomizer"
+        Icon="/resources/dinorand.ico"
+        Width="520" Height="640" MinWidth="460">
+    <!-- MVVM refactor of the Avalonia MainWindow (was code-behind; see docs/decisions/cross/AVALONIA-PORT.md). All state and
+         actions live in MainWindowViewModel; this view only binds. Notes: WPF GroupBox →
+         HeaderedContentControl Classes="group"; Hyperlink → HyperlinkButton; ToolTip → ToolTip.Tip;
+         Visibility → IsVisible. Dynamically-coloured labels bind their brush through NullToUnsetConverter
+         so a null brush reproduces the old ClearValue (themed-default) behaviour. The two LostFocus
+         handlers and the PieChart are the only view glue left in code-behind (the rest is bindings). -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8">
+        <StackPanel>
+
+            <!-- Header -->
+            <Grid Margin="4,4,4,8" ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="DinoRand" FontSize="20" FontWeight="Bold" />
+                    <TextBlock Text="v0.3.0" Margin="8,0,0,0"
+                               VerticalAlignment="Bottom" Foreground="Gray" />
+                </StackPanel>
+                <HyperlinkButton Grid.Column="1" VerticalAlignment="Center"
+                                 Content="GitHub"
+                                 NavigateUri="https://github.com/anzaldoivan/dinorand" />
+            </Grid>
+
+            <!-- Game -->
+            <HeaderedContentControl Classes="group" Header="Game">
+                <ComboBox Margin="4" HorizontalAlignment="Stretch"
+                          ItemsSource="{Binding Games}"
+                          SelectedIndex="{Binding SelectedGameIndex, Mode=TwoWay}" />
+            </HeaderedContentControl>
+
+            <!-- Game Location -->
+            <HeaderedContentControl Classes="group" Header="Game Location">
+                <Grid Margin="4" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                    <!-- LostFocus validates (matches the old per-LostFocus behaviour; Avalonia has no
+                         native event→command without a behaviours package). -->
+                    <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,4,0"
+                             VerticalContentAlignment="Center"
+                             Text="{Binding GamePath, Mode=TwoWay}"
+                             LostFocus="GamePath_LostFocus" />
+                    <Button Grid.Row="0" Grid.Column="1" Content="Browse..."
+                            Padding="10,2" Command="{Binding BrowseGameCommand}" />
+                    <TextBlock Grid.Row="1" Grid.ColumnSpan="2"
+                               Margin="0,4,0,0" TextWrapping="Wrap"
+                               Text="{Binding GameValidationText}"
+                               Foreground="{Binding GameValidationBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
+                </Grid>
+            </HeaderedContentControl>
+
+            <!-- Seed -->
+            <HeaderedContentControl Classes="group" Header="Seed">
+                <Grid Margin="4" ColumnDefinitions="Auto,*">
+                    <local:SeedQR Grid.Column="0" Width="96" Height="96"
+                                  VerticalAlignment="Top" Margin="0,0,8,0"
+                                  SeedString="{Binding SeedQrString}" />
+                    <StackPanel Grid.Column="1">
+                        <TextBox FontFamily="Courier New" FontSize="20"
+                                 VerticalContentAlignment="Center"
+                                 Text="{Binding SeedText, Mode=TwoWay}"
+                                 BorderBrush="{Binding SeedBorder, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Content="Paste" Padding="10,2" Margin="0,0,4,0"
+                                    Command="{Binding PasteCommand}" />
+                            <Button Content="Copy" Padding="10,2" Margin="0,0,4,0"
+                                    Command="{Binding CopyCommand}" />
+                            <Button Content="Randomize Seed" Padding="10,2"
+                                    Command="{Binding RandomizeCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </HeaderedContentControl>
+
+            <!-- Options -->
+            <HeaderedContentControl Classes="group" Header="Options">
+                <StackPanel Margin="4">
+                    <CheckBox Content="Randomize Items" Margin="0,2"
+                              IsEnabled="{Binding CanRandomizeItems}"
+                              IsChecked="{Binding RandomizeItems, Mode=TwoWay}" />
+                    <CheckBox Content="Randomize Enemies (EXPERIMENTAL/Crash Risk)" Margin="0,2"
+                              IsEnabled="{Binding CanRandomizeEnemies}"
+                              ToolTip.Tip="Permute enemy types within each room (same-category swaps; scripted bosses left untouched)."
+                              IsChecked="{Binding RandomizeEnemies, Mode=TwoWay}" />
+                    <!-- DC2-only cross-species donor-pool sub-options; shown only for DC2 with enemy rando on. -->
+                    <StackPanel Margin="20,0,0,0" IsVisible="{Binding Dc2EnemyOptionsVisible}">
+                        <CheckBox Content="Include setpiece enemies (Triceratops)" Margin="0,2"
+                                  ToolTip.Tip="Add the no-damage setpiece Triceratops to the DC2 cross-species donor pool. Off by default (makes a degenerate trash mob)."
+                                  IsChecked="{Binding IncludeDc2SetpieceEnemies, Mode=TwoWay}" />
+                        <CheckBox Content="Include boss enemies (T-Rex / Giganotosaurus)" Margin="0,2"
+                                  ToolTip.Tip="Add the LAND bosses to the DC2 cross-species donor pool. Off by default — they keep boss-scale models/HP, so they make degenerate trash mobs."
+                                  IsChecked="{Binding IncludeDc2BossEnemies, Mode=TwoWay}" />
+                        <!-- Donor distribution (docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md): weighted vs fixed. -->
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,2">
+                            <TextBlock Text="Donor selection:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox SelectedIndex="{Binding Dc2EnemyModeIndex, Mode=TwoWay}" MinWidth="120"
+                                      ToolTip.Tip="Weighted: per-species weights bias each room's donor pick (defaults keep the classic mix; boss donors rare). Fixed: ONE pinned species for every eligible room (e.g. an all-T-Rex run).">
+                                <ComboBoxItem Content="Weighted" />
+                                <ComboBoxItem Content="Fixed species" />
+                            </ComboBox>
+                            <ComboBox ItemsSource="{Binding Dc2FixedSpeciesOptions}"
+                                      SelectedItem="{Binding SelectedDc2FixedSpecies, Mode=TwoWay}"
+                                      IsVisible="{Binding Dc2FixedOptionsVisible}"
+                                      MinWidth="140" Margin="6,0,0,0"
+                                      ToolTip.Tip="The pinned donor. Pinning a boss/setpiece species doesn't need the include-toggles; rooms where the pin is unsafe stay vanilla." />
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Dc2WeightOptions}"
+                                      IsVisible="{Binding Dc2WeightedOptionsVisible}" Margin="0,2,0,2">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!-- Row hidden while its species is outside the toggled donor pool
+                                         (weight kept, display-only — Dc2WeightVisibilityTests). -->
+                                    <Grid ColumnDefinitions="110,140,Auto" Margin="0,1"
+                                          IsVisible="{Binding IsVisible}">
+                                        <TextBlock Grid.Column="0" Text="{Binding Creature}" VerticalAlignment="Center" />
+                                        <Slider Grid.Column="1" Minimum="0" Maximum="15"
+                                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                                Value="{Binding Weight, Mode=TwoWay}"
+                                                ToolTip.Tip="Relative pick weight (0 = never). Weights bias the choice among donors the boss/setpiece toggles allow." />
+                                        <TextBlock Grid.Column="2" Text="{Binding Weight, StringFormat={}{0:0}}"
+                                                   VerticalAlignment="Center" Margin="6,0,0,0" MinWidth="18" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    <!-- DC2 raptor tier randomization (docs/reference/dc2/enemies/RAPTOR-TIER-RE.md): weighted colour/HP
+                         variants incl. the blue/super raptor, plus its natural combo-spawn threshold. -->
+                    <StackPanel IsVisible="{Binding Dc2RaptorPanelVisible}">
+                        <!-- DC2 shop shuffle (docs/decisions/dc2/shop/DC2-SHOP-RANDO-PLAN.md): reversible Dino2.exe patch. -->
+                        <CheckBox Content="Shuffle Shop (prices + stock unlocks)" Margin="0,2"
+                                  ToolTip.Tip="Permute the 11 shop items' prices and the shop level each appears at (backup-protected Dino2.exe patch, undone by Restore). Difficulty half/double pricing still applies."
+                                  IsChecked="{Binding Dc2ShuffleShop, Mode=TwoWay}" />
+                        <CheckBox Content="Randomize Raptor Tiers (colour + HP)" Margin="0,2"
+                                  ToolTip.Tip="Shuffle raptor colour/HP tier variants per spawn using the weights below (room-file edits + a small backup-protected Dino2.exe patch for wave rooms, undone by Restore)."
+                                  IsChecked="{Binding Dc2RandomizeRaptorTiers, Mode=TwoWay}" />
+                        <StackPanel Margin="20,0,0,0" IsVisible="{Binding Dc2RaptorTierOptionsVisible}">
+                            <StackPanel Orientation="Horizontal" Margin="0,2" Spacing="6"
+                                        ToolTip.Tip="A room can render only ONE raptor skin (engine limit). Room tier: one variant per room — colour always matches strength. Mixed tiers: the room's colour shows the STRONGEST tier present; other raptors in it may be weaker.">
+                                <TextBlock Text="Colour mode:" VerticalAlignment="Center" />
+                                <ComboBox SelectedIndex="{Binding Dc2RaptorColourModeIndex, Mode=TwoWay}" MinWidth="220">
+                                    <ComboBoxItem Content="Room tier (colour = strength)" />
+                                    <ComboBoxItem Content="Mixed tiers (colour = strongest in room)" />
+                                </ComboBox>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding Dc2RaptorTierOptions}" Margin="0,2,0,2">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid ColumnDefinitions="220,140,Auto" Margin="0,1">
+                                            <TextBlock Grid.Column="0" Text="{Binding Creature}" VerticalAlignment="Center" />
+                                            <Slider Grid.Column="1" Minimum="0" Maximum="15"
+                                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                                    Value="{Binding Weight, Mode=TwoWay}"
+                                                    ToolTip.Tip="Relative pick weight (0 = never). V5 is the blue/super raptor (10000 HP)." />
+                                            <TextBlock Grid.Column="2" Text="{Binding Weight, StringFormat={}{0:0}}"
+                                                       VerticalAlignment="Center" Margin="6,0,0,0" MinWidth="18" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2" Spacing="6"
+                                    ToolTip.Tip="The natural blue/super-raptor mechanic: hitting this many combo hits arms a blue raptor for the next room (vanilla = 20; needs a 1-byte Dino2.exe patch applied at install, undone by Restore). Works even with tier randomization off.">
+                            <TextBlock Text="Blue Raptor Spawn Condition (combo hits):" VerticalAlignment="Center" />
+                            <Slider Minimum="1" Maximum="20" Width="140"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    Value="{Binding Dc2BlueRaptorCombo, Mode=TwoWay}" />
+                            <TextBlock Text="{Binding Dc2BlueRaptorCombo, StringFormat={}{0:0}}"
+                                       VerticalAlignment="Center" MinWidth="18" />
+                        </StackPanel>
+                        <!-- DC2 starting main weapon (docs/decisions/dc2/loadout/DC2-STARTING-LOADOUT-PLAN.md): bootstrap
+                             equip-immediate Dino2.exe patch; Machete/Stun Gun always kept. -->
+                        <CheckBox Content="Randomize Starting Weapon (new game only)" Margin="0,2"
+                                  ToolTip.Tip="Change Dylan's and Regina's starting MAIN weapon within each character's own weapon set (backup-protected Dino2.exe patch, undone by Restore). Subweapons are untouched — the Machete and Large Stun Gun are always kept. Applies to a NEW game only; weapon names beyond the stock shotgun/handgun are unverified in-game."
+                                  IsChecked="{Binding Dc2RandomizeStartWeapon, Mode=TwoWay}" />
+                        <StackPanel Orientation="Horizontal" Margin="20,0,0,0" Spacing="6"
+                                    IsVisible="{Binding Dc2StartWeaponOptionsVisible}">
+                            <TextBlock Text="Dylan:" VerticalAlignment="Center" />
+                            <ComboBox MinWidth="140"
+                                      ItemsSource="{Binding Dc2DylanStartWeaponOptions}"
+                                      SelectedIndex="{Binding Dc2DylanStartWeaponIndex, Mode=TwoWay}" />
+                            <TextBlock Text="Regina:" VerticalAlignment="Center" />
+                            <ComboBox MinWidth="140"
+                                      ItemsSource="{Binding Dc2ReginaStartWeaponOptions}"
+                                      SelectedIndex="{Binding Dc2ReginaStartWeaponIndex, Mode=TwoWay}" />
+                        </StackPanel>
+                        <CheckBox Content="Add-and-equip (unlock full weapon band)" Margin="20,0,0,0"
+                                  IsVisible="{Binding Dc2StartWeaponOptionsVisible}"
+                                  ToolTip.Tip="Also installs the weapon-ring div-0 zero-guard, so the RANDOM roll can pick from each character's FULL weapon band — subweapons, other-character mains, and the fire-empty Grenade Gun — instead of only the safe owned-mains. Crash-safe in the weapon menu regardless of pick. Reversible with Restore."
+                                  IsChecked="{Binding Dc2AddAndEquipStartWeapon, Mode=TwoWay}" />
+                    </StackPanel>
+                    <!-- DC2-only character-skin swap; hidden for games without GameFeature.PlayerModel. -->
+                    <StackPanel Orientation="Horizontal" Margin="0,2" Spacing="6"
+                                IsVisible="{Binding CanSwapDc2PlayerCharacters}"
+                                ToolTip.Tip="Which character Dylan renders as in the main game (Extra Crisis Gail/Rick via their own graft files — visual only, weapons and gameplay unchanged; needs a 2-byte Dino2.exe patch applied at install, undone by Restore). Random lets the seed pick.">
+                        <TextBlock Text="Player character skin (Dylan):" VerticalAlignment="Center" />
+                        <ComboBox SelectedIndex="{Binding Dc2CharacterSkinIndex, Mode=TwoWay}" MinWidth="110">
+                            <ComboBoxItem Content="Dylan (stock)" />
+                            <ComboBoxItem Content="Gail" />
+                            <ComboBoxItem Content="Rick" />
+                            <ComboBoxItem Content="Random" />
+                        </ComboBox>
+                        <TextBlock Text="(Regina):" VerticalAlignment="Center" />
+                        <ComboBox SelectedIndex="{Binding Dc2ReginaSkinIndex, Mode=TwoWay}" MinWidth="110">
+                            <ComboBoxItem Content="Regina (stock)" />
+                            <ComboBoxItem Content="Gail" />
+                            <ComboBoxItem Content="Rick" />
+                            <ComboBoxItem Content="Random" />
+                        </ComboBox>
+                    </StackPanel>
+                    <CheckBox Content="Randomize Doors (EXPERIMENTAL/Soft-Lock Risk)" Margin="0,2"
+                              IsEnabled="{Binding CanRandomizeDoors}"
+                              ToolTip.Tip="Shuffle where doors lead (reciprocal, kept provably beatable; scripted/cutscene doors left vanilla)."
+                              IsChecked="{Binding RandomizeDoors, Mode=TwoWay}" />
+                    <CheckBox Content="Shuffle Key Items (EXPERIMENTAL/Soft-Lock Risk)" Margin="0,2"
+                              IsEnabled="{Binding CanShuffleKeyItems}"
+                              ToolTip.Tip="Relocate the door-gating key items (Entrance / BG Area / C.O. Area keys, Key Card Lv A) to new spots, kept provably beatable."
+                              IsChecked="{Binding ShuffleKeyItems, Mode=TwoWay}" />
+                    <CheckBox Content="Randomize starting inventory (EXPERIMENTAL)" Margin="0,2"
+                              IsEnabled="{Binding CanRandomizeStartingInventory}"
+                              ToolTip.Tip="EXPERIMENTAL — patches DINO.exe so a new game starts with a randomized supply kit (the Handgun and its ammo are always granted, so it stays beatable). Seen on the next new game after relaunch."
+                              IsChecked="{Binding RandomizeStartingInventory, Mode=TwoWay}" />
+
+                    <!-- Randomize Cutscene Voices. The header checkbox is the master enable; children disable
+                         as a unit (handled by the control's own template). -->
+                    <local:CheckGroupBox Header="Randomize Cutscene Voices" Margin="0,8,0,2"
+                                         IsEnabled="{Binding CanRandomizeVoices}"
+                                         IsChecked="{Binding IsVoicesChecked, Mode=TwoWay}">
+                        <StackPanel Margin="6,4,4,4">
+                            <TextBlock Text="Voice Packs folder (e.g. biorand\datapacks)" Margin="0,0,0,2" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Margin="0,0,4,0"
+                                         VerticalContentAlignment="Center"
+                                         Text="{Binding VoicePacksRoot, Mode=TwoWay}"
+                                         ToolTip.Tip="Folder holding the BioRand-layout donor datapacks (each subfolder or .zip is a pack). Discovered characters populate the dropdowns below."
+                                         LostFocus="VoicePacksRoot_LostFocus" />
+                                <Button Grid.Column="1" Content="Browse..."
+                                        Padding="10,2" Command="{Binding BrowseVoicePacksCommand}" />
+                            </Grid>
+                            <TextBlock Margin="0,4,0,0" TextWrapping="Wrap"
+                                       Text="{Binding VoicePacksValidationText}"
+                                       Foreground="{Binding VoicePacksValidationBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
+
+                            <CheckBox Content="Allow voices from other games (RE1/2/3, …)"
+                                      Margin="0,8,0,2"
+                                      ToolTip.Tip="DC1's own cast has only Regina, so with this OFF the dropdowns only offer Regina. Turn it ON to add the cross-game roster (Claire, Leon, …)."
+                                      IsChecked="{Binding CrossGameVoices, Mode=TwoWay}" />
+
+                            <!-- The voice-target rows are per-game hard-coded casts (DC1 Regina/Rick/Gail/Kirk,
+                                 DC2 Dylan/Regina/David/Old Dylan); for a game without voice support they're
+                                 hidden behind a placeholder line. -->
+                            <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" FontStyle="Italic"
+                                       IsVisible="{Binding !CanRandomizeVoices}"
+                                       Text="{Binding GameContentPlaceholder}" />
+                            <Grid Margin="0,8,0,0" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto"
+                                  IsVisible="{Binding ShowDc1VoiceCast}">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Regina speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorRegina, Mode=TwoWay}" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Rick speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorRick, Mode=TwoWay}" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Gail speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorGail, Mode=TwoWay}" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Kirk speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorKirk, Mode=TwoWay}" />
+                            </Grid>
+                            <Grid Margin="0,8,0,0" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto"
+                                  IsVisible="{Binding ShowDc2VoiceCast}">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Dylan speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorDylan, Mode=TwoWay}" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Regina speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorDc2Regina, Mode=TwoWay}" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="David speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorDavid, Mode=TwoWay}" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Old Dylan speaks as"
+                                           VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,2" HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding VoiceDonorOptions}"
+                                          SelectedItem="{Binding SelectedDonorOldDylan, Mode=TwoWay}" />
+                            </Grid>
+                        </StackPanel>
+                    </local:CheckGroupBox>
+
+                    <local:RandoSlider Margin="0,8,0,0"
+                                       Heading="Enemy Difficulty" LowText="Easy" HighText="Hard" Maximum="31"
+                                       Value="{Binding Difficulty, Mode=TwoWay}"
+                                       IsEnabled="{Binding RandomizeEnemies}" />
+
+                    <!-- Item-pool mode + pickup distribution; shown only while Randomize Items is on. -->
+                    <CheckBox Content="Replace item pool (random pickups)" Margin="0,10,0,0"
+                              ToolTip.Tip="Checked: every non-key pickup becomes a weighted-random item. Unchecked: keep the game's items but shuffle their locations."
+                              IsChecked="{Binding ReplaceItemPool, Mode=TwoWay}"
+                              IsVisible="{Binding ReplacePoolVisible}" />
+                    <StackPanel Margin="0,8,0,0" IsVisible="{Binding ItemRatiosVisible}">
+                        <TextBlock Text="Item Pickup Distribution" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <Grid ColumnDefinitions="Auto,12,*">
+                            <!-- PieChart has no data binding API; the view rebuilds it in code-behind off the
+                                 view-model's PieDataChanged event (named so the glue can reach it). -->
+                            <local:PieChart x:Name="pieItemRatios" Grid.Column="0" Width="120" VerticalAlignment="Top"
+                                            ToolTip.Tip="The Keys slice is illustrative (a fixed reserve) — key items are placed by logic, not by this ratio." />
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <local:RandoSlider Heading="Ammo" LowText="None" HighText="High" Maximum="31"
+                                                   Value="{Binding Ammo, Mode=TwoWay}"
+                                                   ToolTip.Tip="Bias of non-key pickups toward ammunition." />
+                                <local:RandoSlider Margin="0,6,0,0" Heading="Health" LowText="None" HighText="High" Maximum="31"
+                                                   Value="{Binding Health, Mode=TwoWay}"
+                                                   ToolTip.Tip="Bias of non-key pickups toward healing items." />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Margin="16,2,0,0" FontSize="11" TextWrapping="Wrap"
+                                   Text="{Binding RatioVanillaText}"
+                                   Foreground="{Binding RatioVanillaBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}"
+                                   ToolTip.Tip="Equal Ammo and Health bias reproduces the game's own pickup split (no tilt). Move either slider to bias the mix." />
+                        <local:RandoSlider Margin="0,6,0,0"
+                                           Heading="Ammo average quantity" LowText="Less" HighText="More"
+                                           CenterText="▲ Vanilla" ShowTicks="True" Maximum="14"
+                                           Value="{Binding AmmoQuantity, Mode=TwoWay}"
+                                           ToolTip.Tip="Scales the size of ammunition stacks. The midpoint is the game's vanilla amount; drag left for smaller ammo stacks, right for larger ones." />
+                        <local:RandoSlider Margin="0,6,0,0"
+                                           Heading="Weapon upgrade part frequency" LowText="None" HighText="All" Maximum="15"
+                                           Value="{Binding WeaponUpgrade, Mode=TwoWay}"
+                                           ToolTip.Tip="How often a weapon's upgrade part is placed when that weapon is in the pool. 'All' places every upgrade part (vanilla); 'None' means upgrades never appear. Parts whose base weapon isn't in the seed are never placed regardless." />
+                        <CheckBox Content="Insert upgraded weapons" Margin="0,8,0,0"
+                                  ToolTip.Tip="EXPERIMENTAL / UNVALIDATED: base weapons may be placed already-upgraded, using weapon variant ids the vanilla game never hands out as a pickup. Needs in-game confirmation before relying on it. Off by default."
+                                  IsChecked="{Binding PreUpgradedWeapons, Mode=TwoWay}" />
+                        <TextBlock Text="Weapons in pool" FontWeight="SemiBold" Margin="0,10,0,2"
+                                   ToolTip.Tip="Unchecking a weapon family drops its pickups and upgrade parts from the pool — those spots become consumables instead. Your starting handgun (and its 9mm) is unaffected." />
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Handgun" Margin="0,0,12,0"
+                                      ToolTip.Tip="Include Handgun pickups/upgrades (Glock 34/35 + sights/slides). You always keep the starting handgun regardless."
+                                      IsChecked="{Binding WeaponHandgun, Mode=TwoWay}" />
+                            <CheckBox Content="Shotgun" Margin="0,0,12,0"
+                                      ToolTip.Tip="Include Shotgun pickups/upgrades (PA3 / SPAS12 + parts/stock)."
+                                      IsChecked="{Binding WeaponShotgun, Mode=TwoWay}" />
+                            <CheckBox Content="Grenade Gun"
+                                      ToolTip.Tip="Include Grenade Gun pickups/upgrades (40mmHK + Regina Custom part)."
+                                      IsChecked="{Binding WeaponGrenade, Mode=TwoWay}" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </HeaderedContentControl>
+
+            <!-- Generate -->
+            <Grid Margin="4,8,4,4" ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Text="{Binding ProgressText}"
+                           Foreground="{Binding ProgressBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
+                <Button Grid.Column="1" Content="Generate" Padding="20,6" FontWeight="Bold"
+                        Background="#FF4CAF50" Foreground="White"
+                        Command="{Binding GenerateCommand}" IsEnabled="{Binding CanGenerate}" />
+            </Grid>
+
+            <!-- Busy indicator; collapsed while idle. -->
+            <ProgressBar Height="6" Margin="4,0,4,0" IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+
+            <!-- Install to game -->
+            <HeaderedContentControl Classes="group" Header="Install to Game" Margin="4,8,4,4">
+                <StackPanel Margin="4">
+                    <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,6"
+                               Text="Overlays the generated rooms onto the game's Data folder. Your originals are backed up first and can be restored at any time." />
+                    <CheckBox Content="Shuffle music (BGM)" Margin="0,0,0,6"
+                              IsEnabled="{Binding CanShuffleBgm}"
+                              IsChecked="{Binding ShuffleBgm, Mode=TwoWay}"
+                              ToolTip.Tip="Also patch DINO.exe so every track plays a different cue (within its stream/loop class), seeded from the same seed. Reversed by Restore. CLOSE the game first — it edits the executable, and the change is heard after the next launch." />
+                    <CheckBox Content="Scramble puzzle codes (safes)" Margin="0,0,0,6"
+                              IsEnabled="{Binding CanScramblePuzzleCodes}"
+                              IsChecked="{Binding ScramblePuzzleCodes, Mode=TwoWay}"
+                              ToolTip.Tip="Also patch DINO.exe + room files so each keypad safe (Management Office, Lounge, Computer Room gas, Stabilizer) accepts a new seed-derived 4-digit code, and the in-game document that states the code is rewritten to match. Reversed by Restore. CLOSE the game first — codes are read at load, seen after the next launch." />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <CheckBox Content="Randomize emergency boxes" VerticalAlignment="Center"
+                                  IsEnabled="{Binding CanRandomizeBoxes}"
+                                  IsChecked="{Binding RandomizeBoxes, Mode=TwoWay}"
+                                  ToolTip.Tip="EXPERIMENTAL: also patch DINO.exe to randomize emergency-box contents (seeded from the same seed). Plug costs and box locations are unchanged. Reversed by Restore. CLOSE the game first — the change is seen after the next launch." />
+                        <ComboBox Width="150" Margin="8,0,0,0" VerticalAlignment="Center"
+                                  SelectedIndex="{Binding BoxModeIndex, Mode=TwoWay}"
+                                  IsEnabled="{Binding BoxModeEnabled}"
+                                  ToolTip.Tip="Shuffle = move each box's whole loadout to another box. Reroll from box pool = redraw each box's items from that difficulty's own box loot (distinct from map drops).">
+                            <ComboBoxItem Content="Shuffle" />
+                            <ComboBoxItem Content="Reroll from box pool" />
+                        </ComboBox>
+                    </StackPanel>
+                    <Expander Header="Starting inventory (EXPERIMENTAL)" Margin="0,0,0,6"
+                              IsEnabled="{Binding CanRandomizeStartingInventory}">
+                        <StackPanel Margin="0,4,0,0">
+                            <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,6"
+                                       Text="Patches DINO.exe for the new game. 'Randomize starting inventory' (Options) rolls a random supply kit; here you can pin the starting weapon and/or set explicit supply slots. CLOSE the game first — seen on the next NEW GAME, reversed by Restore." />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="Starting weapon:" VerticalAlignment="Center" Width="110" />
+                                <ComboBox Width="200"
+                                          ItemsSource="{Binding StartWeapons}"
+                                          SelectedItem="{Binding SelectedStartWeapon, Mode=TwoWay}"
+                                          ToolTip.Tip="Vanilla keeps the game's start (Handgun). None = start weaponless; the removed Handgun is then placed in the early world (needs Randomize Items on). Or pick a weapon to start with instead." />
+                            </StackPanel>
+                            <StackPanel IsEnabled="{Binding CustomSupplyEnabled}">
+                                <TextBlock Text="{Binding CustomSupplyLabel}"
+                                           Foreground="Gray" Margin="0,0,0,4" />
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
+                                              SelectedItem="{Binding SelectedItem0, Mode=TwoWay}" />
+                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
+                                    <TextBox Width="50" Text="{Binding Count0, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
+                                              SelectedItem="{Binding SelectedItem1, Mode=TwoWay}" />
+                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
+                                    <TextBox Width="50" Text="{Binding Count1, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
+                                              SelectedItem="{Binding SelectedItem2, Mode=TwoWay}" />
+                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
+                                    <TextBox Width="50" Text="{Binding Count2, Mode=TwoWay}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
+                                   Text="{Binding InstallStatusText}"
+                                   Foreground="{Binding InstallStatusBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
+                        <Button Grid.Column="1" Content="▶ Play" Padding="12,6" Margin="0,0,6,0"
+                                Command="{Binding PlayCommand}" IsEnabled="{Binding CanPlay}"
+                                ToolTip.Tip="Launch the selected DINO.exe. Whatever is currently in the game's Data folder is what loads — install first to play the randomized rooms." />
+                        <Button Grid.Column="2" Content="Restore Originals" Padding="12,6" Margin="0,0,6,0"
+                                Command="{Binding RestoreCommand}" IsEnabled="{Binding CanRestore}" />
+                        <Button Grid.Column="3" Content="Install to Game" Padding="14,6" FontWeight="Bold"
+                                Command="{Binding InstallCommand}" IsEnabled="{Binding CanInstall}" />
+                    </Grid>
+                </StackPanel>
+            </HeaderedContentControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>

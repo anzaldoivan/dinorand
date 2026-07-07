@@ -1,0 +1,17 @@
+name: no-copyrighted-files
+
+# Enforceable backstop: client pre-commit hooks can be skipped with --no-verify,
+# this cannot. Make this check REQUIRED in branch protection for `main` so a PR
+# carrying a game asset / binary can never be merged.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan whole tree for copyrighted game assets / binaries
+        run: bash scripts/check-no-copyrighted-files.sh

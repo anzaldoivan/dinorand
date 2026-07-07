@@ -1,0 +1,2242 @@
+{
+ "_source": "decode_script.door_commits() (2026-06-27 p2). DOOR = op 0x30 AOT_COMMIT; dest = block+0x0c literal push. dest word value IS the destination st_id: dest_id = f'{w:03X}' (stage=high byte, room=low byte), the identity mapping st_id = '%X%02X' % (stage,room) confirmed by the live CreateFileA trace (DOOR-ROUTING-RE.md: 0x102->ST102, hardcoded 0x101->ST101). Validates 178/179 literal doors. The prior stage=low formula ('ST101->ST201') was a byte-order bug, now RETRACTED. Rebuilt off the corrected routine discovery (83 rooms with doors, was 20).",
+ "_editable": "Redirect a door = overwrite the 2 LE bytes at dest_push_off in the decompressed blob (the dest st_id, e.g. 0x0102 for ST102) + recompress. ROOM-FILE editable (literal doors only). dest routing itself is EXE-internal (DOOR-ROUTING-RE).",
+ "_confidence": "high = literal (mode 0) dest that maps to a real room id; low = variable/expression dest (mode!=0). The ONLY low-conf door corpus-wide is ST003 routine[4] @+0xfd6: dest = stack[15] (mode 2), a value assembled at runtime by op-0x01/0x02 assignments (some sourced from GLOBALS = story flags) and gated by op-0x07. It is a story-conditional COMPUTED warp with NO static dest literal/editable byte -> correctly excluded from the editable door set. Concrete dest needs a SCD symbolic interpreter or a live trace. VM operand model decoded: AOT-SYSTEM-RE.md / scd-vm-opcodes.json _operand_model.",
+ "rooms": {
+  "000": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x7e80",
+     "dest_push_off": 32370,
+     "dest_va": "0x5e7e72",
+     "dest_word": "0x0003",
+     "dest_id": "003",
+     "dest_mode": 0,
+     "slot": "0x8",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x7ed4",
+     "dest_push_off": 32454,
+     "dest_va": "0x5e7ec6",
+     "dest_word": "0x0100",
+     "dest_id": "100",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    }
+   ]
+  },
+  "001": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x130e",
+     "dest_push_off": 4864,
+     "dest_va": "0x5e1300",
+     "dest_word": "0x0003",
+     "dest_id": "003",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "002": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x11368",
+     "dest_push_off": 70490,
+     "dest_va": "0x5f135a",
+     "dest_word": "0x0003",
+     "dest_id": "003",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "003": {
+   "door_count": 4,
+   "doors": [
+    {
+     "commit_off": "0x200fc",
+     "dest_push_off": 131310,
+     "dest_va": "0x6000ee",
+     "dest_word": "0x0002",
+     "dest_id": "002",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x20c52",
+     "dest_push_off": 134212,
+     "dest_va": "0x600c44",
+     "dest_word": "0x000f",
+     "dest_id": "00F",
+     "dest_mode": 2,
+     "slot": "0x0",
+     "confidence": "low"
+    },
+    {
+     "commit_off": "0x21356",
+     "dest_push_off": 136008,
+     "dest_va": "0x601348",
+     "dest_word": "0x0002",
+     "dest_id": "002",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x239e2",
+     "dest_push_off": 145876,
+     "dest_va": "0x6039d4",
+     "dest_word": "0x0001",
+     "dest_id": "001",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "004": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x14c0",
+     "dest_push_off": 5298,
+     "dest_va": "0x5e14b2",
+     "dest_word": "0x0003",
+     "dest_id": "003",
+     "dest_mode": 0,
+     "slot": "0x8",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1514",
+     "dest_push_off": 5382,
+     "dest_va": "0x5e1506",
+     "dest_word": "0x0600",
+     "dest_id": "600",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    }
+   ]
+  },
+  "005": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x751c",
+     "dest_push_off": 29966,
+     "dest_va": "0x5e750e",
+     "dest_word": "0x0003",
+     "dest_id": "003",
+     "dest_mode": 0,
+     "slot": "0x8",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x7570",
+     "dest_push_off": 30050,
+     "dest_va": "0x5e7562",
+     "dest_word": "0x0800",
+     "dest_id": "800",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    }
+   ]
+  },
+  "100": {
+   "door_count": 4,
+   "doors": [
+    {
+     "commit_off": "0x3424",
+     "dest_push_off": 13334,
+     "dest_va": "0x5e3416",
+     "dest_word": "0x0110",
+     "dest_id": "110",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x37e4",
+     "dest_push_off": 14294,
+     "dest_va": "0x5e37d6",
+     "dest_word": "0x0000",
+     "dest_id": "000",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x39d8",
+     "dest_push_off": 14794,
+     "dest_va": "0x5e39ca",
+     "dest_word": "0x0109",
+     "dest_id": "109",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x3a2c",
+     "dest_push_off": 14878,
+     "dest_va": "0x5e3a1e",
+     "dest_word": "0x0101",
+     "dest_id": "101",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "101": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xa800",
+     "dest_push_off": 42994,
+     "dest_va": "0x5ea7f2",
+     "dest_word": "0x0102",
+     "dest_id": "102",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xa8f4",
+     "dest_push_off": 43238,
+     "dest_va": "0x5ea8e6",
+     "dest_word": "0x0100",
+     "dest_id": "100",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "102": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0xae5e",
+     "dest_push_off": 44624,
+     "dest_va": "0x5eae50",
+     "dest_word": "0x0101",
+     "dest_id": "101",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xaf3a",
+     "dest_push_off": 44844,
+     "dest_va": "0x5eaf2c",
+     "dest_word": "0x0105",
+     "dest_id": "105",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xafe6",
+     "dest_push_off": 45016,
+     "dest_va": "0x5eafd8",
+     "dest_word": "0x0110",
+     "dest_id": "110",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "103": {
+   "door_count": 0,
+   "doors": []
+  },
+  "104": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x3358",
+     "dest_push_off": 13130,
+     "dest_va": "0x5e334a",
+     "dest_word": "0x0103",
+     "dest_id": "103",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x33ac",
+     "dest_push_off": 13214,
+     "dest_va": "0x5e339e",
+     "dest_word": "0x0106",
+     "dest_id": "106",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "105": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x8880",
+     "dest_push_off": 34930,
+     "dest_va": "0x5e8872",
+     "dest_word": "0x0102",
+     "dest_id": "102",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x88d4",
+     "dest_push_off": 35014,
+     "dest_va": "0x5e88c6",
+     "dest_word": "0x0103",
+     "dest_id": "103",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "106": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x9f44",
+     "dest_push_off": 40758,
+     "dest_va": "0x5e9f36",
+     "dest_word": "0x0107",
+     "dest_id": "107",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x9fbc",
+     "dest_push_off": 40878,
+     "dest_va": "0x5e9fae",
+     "dest_word": "0x010e",
+     "dest_id": "10E",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xa050",
+     "dest_push_off": 41026,
+     "dest_va": "0x5ea042",
+     "dest_word": "0x0104",
+     "dest_id": "104",
+     "dest_mode": 0,
+     "slot": "0x5",
+     "confidence": "high"
+    }
+   ]
+  },
+  "107": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x4dae",
+     "dest_push_off": 19872,
+     "dest_va": "0x5e4da0",
+     "dest_word": "0x0108",
+     "dest_id": "108",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x4e02",
+     "dest_push_off": 19956,
+     "dest_va": "0x5e4df4",
+     "dest_word": "0x0106",
+     "dest_id": "106",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "108": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x7406",
+     "dest_push_off": 29688,
+     "dest_va": "0x5e73f8",
+     "dest_word": "0x0107",
+     "dest_id": "107",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x745a",
+     "dest_push_off": 29772,
+     "dest_va": "0x5e744c",
+     "dest_word": "0x0200",
+     "dest_id": "200",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "109": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x83f4",
+     "dest_push_off": 33766,
+     "dest_va": "0x5e83e6",
+     "dest_word": "0x010a",
+     "dest_id": "10A",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x8448",
+     "dest_push_off": 33850,
+     "dest_va": "0x5e843a",
+     "dest_word": "0x0100",
+     "dest_id": "100",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "10A": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x26ec",
+     "dest_push_off": 9950,
+     "dest_va": "0x5e26de",
+     "dest_word": "0x010b",
+     "dest_id": "10B",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x2740",
+     "dest_push_off": 10034,
+     "dest_va": "0x5e2732",
+     "dest_word": "0x0109",
+     "dest_id": "109",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "10B": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x3a8c",
+     "dest_push_off": 14974,
+     "dest_va": "0x5e3a7e",
+     "dest_word": "0x010d",
+     "dest_id": "10D",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x3ae0",
+     "dest_push_off": 15058,
+     "dest_va": "0x5e3ad2",
+     "dest_word": "0x010a",
+     "dest_id": "10A",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x3b34",
+     "dest_push_off": 15142,
+     "dest_va": "0x5e3b26",
+     "dest_word": "0x010c",
+     "dest_id": "10C",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "10C": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x11056",
+     "dest_push_off": 69704,
+     "dest_va": "0x5f1048",
+     "dest_word": "0x010b",
+     "dest_id": "10B",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x110aa",
+     "dest_push_off": 69788,
+     "dest_va": "0x5f109c",
+     "dest_word": "0x0300",
+     "dest_id": "300",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "10D": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0xe3f4",
+     "dest_push_off": 58342,
+     "dest_va": "0x5ee3e6",
+     "dest_word": "0x010b",
+     "dest_id": "10B",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xe448",
+     "dest_push_off": 58426,
+     "dest_va": "0x5ee43a",
+     "dest_word": "0x010e",
+     "dest_id": "10E",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xe4c0",
+     "dest_push_off": 58546,
+     "dest_va": "0x5ee4b2",
+     "dest_word": "0x010f",
+     "dest_id": "10F",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "10E": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0xcc2c",
+     "dest_push_off": 52254,
+     "dest_va": "0x5ecc1e",
+     "dest_word": "0x0106",
+     "dest_id": "106",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xccc0",
+     "dest_push_off": 52402,
+     "dest_va": "0x5eccb2",
+     "dest_word": "0x010d",
+     "dest_id": "10D",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xce6e",
+     "dest_push_off": 52832,
+     "dest_va": "0x5ece60",
+     "dest_word": "0x0106",
+     "dest_id": "106",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "10F": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x6140",
+     "dest_push_off": 24882,
+     "dest_va": "0x5e6132",
+     "dest_word": "0x010d",
+     "dest_id": "10D",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x61ca",
+     "dest_push_off": 25020,
+     "dest_va": "0x5e61bc",
+     "dest_word": "0x040b",
+     "dest_id": "40B",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "110": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x2de4",
+     "dest_push_off": 11734,
+     "dest_va": "0x5e2dd6",
+     "dest_word": "0x0100",
+     "dest_id": "100",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x2e38",
+     "dest_push_off": 11818,
+     "dest_va": "0x5e2e2a",
+     "dest_word": "0x0102",
+     "dest_id": "102",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "200": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0xf24c",
+     "dest_push_off": 62014,
+     "dest_va": "0x5ef23e",
+     "dest_word": "0x0108",
+     "dest_id": "108",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xf2a0",
+     "dest_push_off": 62098,
+     "dest_va": "0x5ef292",
+     "dest_word": "0x0201",
+     "dest_id": "201",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xf2f4",
+     "dest_push_off": 62182,
+     "dest_va": "0x5ef2e6",
+     "dest_word": "0x0205",
+     "dest_id": "205",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "201": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x2098",
+     "dest_push_off": 8330,
+     "dest_va": "0x5e208a",
+     "dest_word": "0x0200",
+     "dest_id": "200",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x20ec",
+     "dest_push_off": 8414,
+     "dest_va": "0x5e20de",
+     "dest_word": "0x0202",
+     "dest_id": "202",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "202": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x24c8",
+     "dest_push_off": 9402,
+     "dest_va": "0x5e24ba",
+     "dest_word": "0x0201",
+     "dest_id": "201",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x251c",
+     "dest_push_off": 9486,
+     "dest_va": "0x5e250e",
+     "dest_word": "0x0203",
+     "dest_id": "203",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x25a4",
+     "dest_push_off": 9622,
+     "dest_va": "0x5e2596",
+     "dest_word": "0x0204",
+     "dest_id": "204",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "203": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x25e2",
+     "dest_push_off": 9684,
+     "dest_va": "0x5e25d4",
+     "dest_word": "0x0202",
+     "dest_id": "202",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "204": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x4082",
+     "dest_push_off": 16500,
+     "dest_va": "0x5e4074",
+     "dest_word": "0x0202",
+     "dest_id": "202",
+     "dest_mode": 0,
+     "slot": "0xb",
+     "confidence": "high"
+    }
+   ]
+  },
+  "205": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0xd1d6",
+     "dest_push_off": 53704,
+     "dest_va": "0x5ed1c8",
+     "dest_word": "0x0200",
+     "dest_id": "200",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xedac",
+     "dest_push_off": 60830,
+     "dest_va": "0x5eed9e",
+     "dest_word": "0x0100",
+     "dest_id": "100",
+     "dest_mode": 0,
+     "slot": "0x12",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xf784",
+     "dest_push_off": 63350,
+     "dest_va": "0x5ef776",
+     "dest_word": "0x0003",
+     "dest_id": "003",
+     "dest_mode": 0,
+     "slot": "0x13",
+     "confidence": "high"
+    }
+   ]
+  },
+  "300": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x5094",
+     "dest_push_off": 20614,
+     "dest_va": "0x5e5086",
+     "dest_word": "0x010c",
+     "dest_id": "10C",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x50e8",
+     "dest_push_off": 20698,
+     "dest_va": "0x5e50da",
+     "dest_word": "0x0301",
+     "dest_id": "301",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x513c",
+     "dest_push_off": 20782,
+     "dest_va": "0x5e512e",
+     "dest_word": "0x0302",
+     "dest_id": "302",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "301": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x904e",
+     "dest_push_off": 36928,
+     "dest_va": "0x5e9040",
+     "dest_word": "0x0300",
+     "dest_id": "300",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "302": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x61c8",
+     "dest_push_off": 25018,
+     "dest_va": "0x5e61ba",
+     "dest_word": "0x0300",
+     "dest_id": "300",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x6324",
+     "dest_push_off": 25366,
+     "dest_va": "0x5e6316",
+     "dest_word": "0x0303",
+     "dest_id": "303",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "303": {
+   "door_count": 4,
+   "doors": [
+    {
+     "commit_off": "0x4eba",
+     "dest_push_off": 20140,
+     "dest_va": "0x5e4eac",
+     "dest_word": "0x0304",
+     "dest_id": "304",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x4f86",
+     "dest_push_off": 20344,
+     "dest_va": "0x5e4f78",
+     "dest_word": "0x0305",
+     "dest_id": "305",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x4fda",
+     "dest_push_off": 20428,
+     "dest_va": "0x5e4fcc",
+     "dest_word": "0x0302",
+     "dest_id": "302",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x50aa",
+     "dest_push_off": 20636,
+     "dest_va": "0x5e509c",
+     "dest_word": "0x0306",
+     "dest_id": "306",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "304": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x73f0",
+     "dest_push_off": 29666,
+     "dest_va": "0x5e73e2",
+     "dest_word": "0x0303",
+     "dest_id": "303",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x74bc",
+     "dest_push_off": 29870,
+     "dest_va": "0x5e74ae",
+     "dest_word": "0x0305",
+     "dest_id": "305",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "305": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x3f82",
+     "dest_push_off": 16244,
+     "dest_va": "0x5e3f74",
+     "dest_word": "0x0303",
+     "dest_id": "303",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x3fd6",
+     "dest_push_off": 16328,
+     "dest_va": "0x5e3fc8",
+     "dest_word": "0x0304",
+     "dest_id": "304",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "306": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x2b94",
+     "dest_push_off": 11142,
+     "dest_va": "0x5e2b86",
+     "dest_word": "0x0303",
+     "dest_id": "303",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "400": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xc5f0",
+     "dest_push_off": 50658,
+     "dest_va": "0x5ec5e2",
+     "dest_word": "0x0401",
+     "dest_id": "401",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xc644",
+     "dest_push_off": 50742,
+     "dest_va": "0x5ec636",
+     "dest_word": "0x040b",
+     "dest_id": "40B",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "401": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x7b0e",
+     "dest_push_off": 31488,
+     "dest_va": "0x5e7b00",
+     "dest_word": "0x0402",
+     "dest_id": "402",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x7f2e",
+     "dest_push_off": 32544,
+     "dest_va": "0x5e7f20",
+     "dest_word": "0x0400",
+     "dest_id": "400",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "402": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x1a8c2",
+     "dest_push_off": 108724,
+     "dest_va": "0x5fa8b4",
+     "dest_word": "0x0403",
+     "dest_id": "403",
+     "dest_mode": 0,
+     "slot": "0x7",
+     "confidence": "high"
+    }
+   ]
+  },
+  "403": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x12eaa",
+     "dest_push_off": 77468,
+     "dest_va": "0x5f2e9c",
+     "dest_word": "0x0404",
+     "dest_id": "404",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "404": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x3028",
+     "dest_push_off": 12314,
+     "dest_va": "0x5e301a",
+     "dest_word": "0x0403",
+     "dest_id": "403",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x307c",
+     "dest_push_off": 12398,
+     "dest_va": "0x5e306e",
+     "dest_word": "0x0405",
+     "dest_id": "405",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "405": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x2c68",
+     "dest_push_off": 11354,
+     "dest_va": "0x5e2c5a",
+     "dest_word": "0x0404",
+     "dest_id": "404",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x2cbc",
+     "dest_push_off": 11438,
+     "dest_va": "0x5e2cae",
+     "dest_word": "0x0406",
+     "dest_id": "406",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "406": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0xa59c",
+     "dest_push_off": 42382,
+     "dest_va": "0x5ea58e",
+     "dest_word": "0x0407",
+     "dest_id": "407",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "407": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x18f8c",
+     "dest_push_off": 102270,
+     "dest_va": "0x5f8f7e",
+     "dest_word": "0x0408",
+     "dest_id": "408",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "408": {
+   "door_count": 4,
+   "doors": [
+    {
+     "commit_off": "0x126c8",
+     "dest_push_off": 75450,
+     "dest_va": "0x5f26ba",
+     "dest_word": "0x0409",
+     "dest_id": "409",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x12874",
+     "dest_push_off": 75878,
+     "dest_va": "0x5f2866",
+     "dest_word": "0x0409",
+     "dest_id": "409",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x13a4c",
+     "dest_push_off": 80446,
+     "dest_va": "0x5f3a3e",
+     "dest_word": "0x0409",
+     "dest_id": "409",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x13b0e",
+     "dest_push_off": 80640,
+     "dest_va": "0x5f3b00",
+     "dest_word": "0x0409",
+     "dest_id": "409",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "409": {
+   "door_count": 6,
+   "doors": [
+    {
+     "commit_off": "0x12430",
+     "dest_push_off": 74786,
+     "dest_va": "0x5f2422",
+     "dest_word": "0x040a",
+     "dest_id": "40A",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x12484",
+     "dest_push_off": 74870,
+     "dest_va": "0x5f2476",
+     "dest_word": "0x0408",
+     "dest_id": "408",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x12600",
+     "dest_push_off": 75250,
+     "dest_va": "0x5f25f2",
+     "dest_word": "0x040a",
+     "dest_id": "40A",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x12654",
+     "dest_push_off": 75334,
+     "dest_va": "0x5f2646",
+     "dest_word": "0x0408",
+     "dest_id": "408",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x12ac4",
+     "dest_push_off": 76470,
+     "dest_va": "0x5f2ab6",
+     "dest_word": "0x040a",
+     "dest_id": "40A",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x12b9a",
+     "dest_push_off": 76684,
+     "dest_va": "0x5f2b8c",
+     "dest_word": "0x040a",
+     "dest_id": "40A",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "40A": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xcb6c",
+     "dest_push_off": 52062,
+     "dest_va": "0x5ecb5e",
+     "dest_word": "0x0409",
+     "dest_id": "409",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xcbc0",
+     "dest_push_off": 52146,
+     "dest_va": "0x5ecbb2",
+     "dest_word": "0x0500",
+     "dest_id": "500",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "40B": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x1168",
+     "dest_push_off": 4442,
+     "dest_va": "0x5e115a",
+     "dest_word": "0x010f",
+     "dest_id": "10F",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x11bc",
+     "dest_push_off": 4526,
+     "dest_va": "0x5e11ae",
+     "dest_word": "0x0400",
+     "dest_id": "400",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "500": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x2190",
+     "dest_push_off": 8578,
+     "dest_va": "0x5e2182",
+     "dest_word": "0x040a",
+     "dest_id": "40A",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x21e4",
+     "dest_push_off": 8662,
+     "dest_va": "0x5e21d6",
+     "dest_word": "0x0501",
+     "dest_id": "501",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "501": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x2a70",
+     "dest_push_off": 10850,
+     "dest_va": "0x5e2a62",
+     "dest_word": "0x0500",
+     "dest_id": "500",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x2ac4",
+     "dest_push_off": 10934,
+     "dest_va": "0x5e2ab6",
+     "dest_word": "0x0502",
+     "dest_id": "502",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    }
+   ]
+  },
+  "502": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x267f4",
+     "dest_push_off": 157670,
+     "dest_va": "0x6067e6",
+     "dest_word": "0x0503",
+     "dest_id": "503",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x26848",
+     "dest_push_off": 157754,
+     "dest_va": "0x60683a",
+     "dest_word": "0x0501",
+     "dest_id": "501",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "503": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x15f56",
+     "dest_push_off": 89928,
+     "dest_va": "0x5f5f48",
+     "dest_word": "0x0504",
+     "dest_id": "504",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "504": {
+   "door_count": 0,
+   "doors": []
+  },
+  "600": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x2120",
+     "dest_push_off": 8466,
+     "dest_va": "0x5e2112",
+     "dest_word": "0x0601",
+     "dest_id": "601",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x2174",
+     "dest_push_off": 8550,
+     "dest_va": "0x5e2166",
+     "dest_word": "0x0004",
+     "dest_id": "004",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "601": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x20f8",
+     "dest_push_off": 8426,
+     "dest_va": "0x5e20ea",
+     "dest_word": "0x0600",
+     "dest_id": "600",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x214c",
+     "dest_push_off": 8510,
+     "dest_va": "0x5e213e",
+     "dest_word": "0x0602",
+     "dest_id": "602",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "602": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x1d6c",
+     "dest_push_off": 7518,
+     "dest_va": "0x5e1d5e",
+     "dest_word": "0x0601",
+     "dest_id": "601",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1dc0",
+     "dest_push_off": 7602,
+     "dest_va": "0x5e1db2",
+     "dest_word": "0x0603",
+     "dest_id": "603",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "603": {
+   "door_count": 4,
+   "doors": [
+    {
+     "commit_off": "0x3c24",
+     "dest_push_off": 15382,
+     "dest_va": "0x5e3c16",
+     "dest_word": "0x0602",
+     "dest_id": "602",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x3c78",
+     "dest_push_off": 15466,
+     "dest_va": "0x5e3c6a",
+     "dest_word": "0x0605",
+     "dest_id": "605",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x3cf0",
+     "dest_push_off": 15586,
+     "dest_va": "0x5e3ce2",
+     "dest_word": "0x0604",
+     "dest_id": "604",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x4aaa",
+     "dest_push_off": 19100,
+     "dest_va": "0x5e4a9c",
+     "dest_word": "0x0604",
+     "dest_id": "604",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "604": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x2ea4",
+     "dest_push_off": 11926,
+     "dest_va": "0x5e2e96",
+     "dest_word": "0x0603",
+     "dest_id": "603",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x2ef8",
+     "dest_push_off": 12010,
+     "dest_va": "0x5e2eea",
+     "dest_word": "0x0605",
+     "dest_id": "605",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "605": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x11262",
+     "dest_push_off": 70228,
+     "dest_va": "0x5f1254",
+     "dest_word": "0x0603",
+     "dest_id": "603",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x112b6",
+     "dest_push_off": 70312,
+     "dest_va": "0x5f12a8",
+     "dest_word": "0x0604",
+     "dest_id": "604",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x14362",
+     "dest_push_off": 82772,
+     "dest_va": "0x5f4354",
+     "dest_word": "0x0606",
+     "dest_id": "606",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "606": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xe400",
+     "dest_push_off": 58354,
+     "dest_va": "0x5ee3f2",
+     "dest_word": "0x0607",
+     "dest_id": "607",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xf126",
+     "dest_push_off": 61720,
+     "dest_va": "0x5ef118",
+     "dest_word": "0x0605",
+     "dest_id": "605",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "607": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xb1f8",
+     "dest_push_off": 45546,
+     "dest_va": "0x5eb1ea",
+     "dest_word": "0x0606",
+     "dest_id": "606",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xe586",
+     "dest_push_off": 58744,
+     "dest_va": "0x5ee578",
+     "dest_word": "0x0700",
+     "dest_id": "700",
+     "dest_mode": 0,
+     "slot": "0xd",
+     "confidence": "high"
+    }
+   ]
+  },
+  "608": {
+   "door_count": 0,
+   "doors": []
+  },
+  "700": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x4670",
+     "dest_push_off": 18018,
+     "dest_va": "0x5e4662",
+     "dest_word": "0x0701",
+     "dest_id": "701",
+     "dest_mode": 0,
+     "slot": "0x5",
+     "confidence": "high"
+    }
+   ]
+  },
+  "701": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x38f8",
+     "dest_push_off": 14570,
+     "dest_va": "0x5e38ea",
+     "dest_word": "0x0700",
+     "dest_id": "700",
+     "dest_mode": 0,
+     "slot": "0x5",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x394c",
+     "dest_push_off": 14654,
+     "dest_va": "0x5e393e",
+     "dest_word": "0x0702",
+     "dest_id": "702",
+     "dest_mode": 0,
+     "slot": "0x6",
+     "confidence": "high"
+    }
+   ]
+  },
+  "702": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x262c",
+     "dest_push_off": 9758,
+     "dest_va": "0x5e261e",
+     "dest_word": "0x0701",
+     "dest_id": "701",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x2680",
+     "dest_push_off": 9842,
+     "dest_va": "0x5e2672",
+     "dest_word": "0x0703",
+     "dest_id": "703",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "703": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x6a6c",
+     "dest_push_off": 27230,
+     "dest_va": "0x5e6a5e",
+     "dest_word": "0x0702",
+     "dest_id": "702",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x6ac0",
+     "dest_push_off": 27314,
+     "dest_va": "0x5e6ab2",
+     "dest_word": "0x0704",
+     "dest_id": "704",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x6b14",
+     "dest_push_off": 27398,
+     "dest_va": "0x5e6b06",
+     "dest_word": "0x0704",
+     "dest_id": "704",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "704": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0xae60",
+     "dest_push_off": 44626,
+     "dest_va": "0x5eae52",
+     "dest_word": "0x0703",
+     "dest_id": "703",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xaeb4",
+     "dest_push_off": 44710,
+     "dest_va": "0x5eaea6",
+     "dest_word": "0x0705",
+     "dest_id": "705",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xaf08",
+     "dest_push_off": 44794,
+     "dest_va": "0x5eaefa",
+     "dest_word": "0x0703",
+     "dest_id": "703",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    }
+   ]
+  },
+  "705": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x53f6",
+     "dest_push_off": 21480,
+     "dest_va": "0x5e53e8",
+     "dest_word": "0x0704",
+     "dest_id": "704",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x544a",
+     "dest_push_off": 21564,
+     "dest_va": "0x5e543c",
+     "dest_word": "0x0706",
+     "dest_id": "706",
+     "dest_mode": 0,
+     "slot": "0x5",
+     "confidence": "high"
+    }
+   ]
+  },
+  "706": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xd3b4",
+     "dest_push_off": 54182,
+     "dest_va": "0x5ed3a6",
+     "dest_word": "0x0705",
+     "dest_id": "705",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x10894",
+     "dest_push_off": 67718,
+     "dest_va": "0x5f0886",
+     "dest_word": "0x0800",
+     "dest_id": "800",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "707": {
+   "door_count": 0,
+   "doors": []
+  },
+  "800": {
+   "door_count": 5,
+   "doors": [
+    {
+     "commit_off": "0x18516",
+     "dest_push_off": 99592,
+     "dest_va": "0x5f8508",
+     "dest_word": "0x0005",
+     "dest_id": "005",
+     "dest_mode": 0,
+     "slot": "0x5",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x18610",
+     "dest_push_off": 99842,
+     "dest_va": "0x5f8602",
+     "dest_word": "0x0801",
+     "dest_id": "801",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1a0b0",
+     "dest_push_off": 106658,
+     "dest_va": "0x5fa0a2",
+     "dest_word": "0x0005",
+     "dest_id": "005",
+     "dest_mode": 0,
+     "slot": "0x5",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1a138",
+     "dest_push_off": 106794,
+     "dest_va": "0x5fa12a",
+     "dest_word": "0x0801",
+     "dest_id": "801",
+     "dest_mode": 0,
+     "slot": "0x4",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1a952",
+     "dest_push_off": 108868,
+     "dest_va": "0x5fa944",
+     "dest_word": "0x0706",
+     "dest_id": "706",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "801": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x463e",
+     "dest_push_off": 17968,
+     "dest_va": "0x5e4630",
+     "dest_word": "0x0803",
+     "dest_id": "803",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x470a",
+     "dest_push_off": 18172,
+     "dest_va": "0x5e46fc",
+     "dest_word": "0x0802",
+     "dest_id": "802",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x475e",
+     "dest_push_off": 18256,
+     "dest_va": "0x5e4750",
+     "dest_word": "0x0800",
+     "dest_id": "800",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "802": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x2df8",
+     "dest_push_off": 11754,
+     "dest_va": "0x5e2dea",
+     "dest_word": "0x0801",
+     "dest_id": "801",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "803": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x89e0",
+     "dest_push_off": 35282,
+     "dest_va": "0x5e89d2",
+     "dest_word": "0x0804",
+     "dest_id": "804",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x8a34",
+     "dest_push_off": 35366,
+     "dest_va": "0x5e8a26",
+     "dest_word": "0x0801",
+     "dest_id": "801",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "804": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x1c98",
+     "dest_push_off": 7306,
+     "dest_va": "0x5e1c8a",
+     "dest_word": "0x0805",
+     "dest_id": "805",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1cec",
+     "dest_push_off": 7390,
+     "dest_va": "0x5e1cde",
+     "dest_word": "0x0803",
+     "dest_id": "803",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "805": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x784a",
+     "dest_push_off": 30780,
+     "dest_va": "0x5e783c",
+     "dest_word": "0x0804",
+     "dest_id": "804",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x789e",
+     "dest_push_off": 30864,
+     "dest_va": "0x5e7890",
+     "dest_word": "0x080b",
+     "dest_id": "80B",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "806": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xb874",
+     "dest_push_off": 47206,
+     "dest_va": "0x5eb866",
+     "dest_word": "0x080b",
+     "dest_id": "80B",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xb8c8",
+     "dest_push_off": 47290,
+     "dest_va": "0x5eb8ba",
+     "dest_word": "0x0807",
+     "dest_id": "807",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "807": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x581a",
+     "dest_push_off": 22540,
+     "dest_va": "0x5e580c",
+     "dest_word": "0x0806",
+     "dest_id": "806",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x586e",
+     "dest_push_off": 22624,
+     "dest_va": "0x5e5860",
+     "dest_word": "0x0808",
+     "dest_id": "808",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "808": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0xc342",
+     "dest_push_off": 49972,
+     "dest_va": "0x5ec334",
+     "dest_word": "0x0807",
+     "dest_id": "807",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0xfca6",
+     "dest_push_off": 64664,
+     "dest_va": "0x5efc98",
+     "dest_word": "0x0809",
+     "dest_id": "809",
+     "dest_mode": 0,
+     "slot": "0x2",
+     "confidence": "high"
+    }
+   ]
+  },
+  "809": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x19aae",
+     "dest_push_off": 105120,
+     "dest_va": "0x5f9aa0",
+     "dest_word": "0x080a",
+     "dest_id": "80A",
+     "dest_mode": 0,
+     "slot": "0x7",
+     "confidence": "high"
+    }
+   ]
+  },
+  "80A": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x4df60",
+     "dest_push_off": 319314,
+     "dest_va": "0x62df52",
+     "dest_word": "0x0900",
+     "dest_id": "900",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "80B": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x319e",
+     "dest_push_off": 12688,
+     "dest_va": "0x5e3190",
+     "dest_word": "0x0805",
+     "dest_id": "805",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x31f2",
+     "dest_push_off": 12772,
+     "dest_va": "0x5e31e4",
+     "dest_word": "0x0806",
+     "dest_id": "806",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "900": {
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x38fc",
+     "dest_push_off": 14574,
+     "dest_va": "0x5e38ee",
+     "dest_word": "0x0901",
+     "dest_id": "901",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x3950",
+     "dest_push_off": 14658,
+     "dest_va": "0x5e3942",
+     "dest_word": "0x0902",
+     "dest_id": "902",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "901": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x1d7c",
+     "dest_push_off": 7534,
+     "dest_va": "0x5e1d6e",
+     "dest_word": "0x0900",
+     "dest_id": "900",
+     "dest_mode": 0,
+     "slot": "0x3",
+     "confidence": "high"
+    }
+   ]
+  },
+  "902": {
+   "door_count": 3,
+   "doors": [
+    {
+     "commit_off": "0x19d8",
+     "dest_push_off": 6602,
+     "dest_va": "0x5e19ca",
+     "dest_word": "0x0900",
+     "dest_id": "900",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1b40",
+     "dest_push_off": 6962,
+     "dest_va": "0x5e1b32",
+     "dest_word": "0x0903",
+     "dest_id": "903",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    },
+    {
+     "commit_off": "0x1d80",
+     "dest_push_off": 7538,
+     "dest_va": "0x5e1d72",
+     "dest_word": "0x0903",
+     "dest_id": "903",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "903": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0xc91e",
+     "dest_push_off": 51472,
+     "dest_va": "0x5ec910",
+     "dest_word": "0x0904",
+     "dest_id": "904",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high"
+    }
+   ]
+  },
+  "904": {
+   "door_count": 1,
+   "doors": [
+    {
+     "commit_off": "0x90c8",
+     "dest_push_off": 37050,
+     "dest_va": "0x5e90ba",
+     "dest_word": "0x0003",
+     "dest_id": "003",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high"
+    }
+   ]
+  },
+  "905": {
+   "door_count": 0,
+   "doors": []
+  },
+  "906": {
+   "door_count": 0,
+   "doors": []
+  }
+ },
+ "_stats": {
+  "rooms": 89,
+  "rooms_with_doors": 83,
+  "total_doors": 179,
+  "high_conf_doors": 178
+ }
+}

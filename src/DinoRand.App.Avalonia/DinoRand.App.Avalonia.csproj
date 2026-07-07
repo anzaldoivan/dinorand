@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- No TargetFramework here: inherits net8.0 (the plain, non-Windows TFM) from
+         Directory.Build.props, which is exactly what makes this UI cross-platform.
+         The WPF DinoRand.App overrides it to net8.0-windows; we do NOT. -->
+    <!-- The controls are mechanical code-behind ports of the WPF originals, which predate
+         nullable reference types, so disable NRT here to match (the rest of the solution
+         enables it via Directory.Build.props). -->
+    <Nullable>disable</Nullable>
+    <RootNamespace>DinoRand.App</RootNamespace>
+    <AssemblyName>DinoRand.Avalonia</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Win32 .exe icon (same art as the WPF front-end). The window/taskbar icon is set via
+         Window.Icon in MainWindow.axaml off the AvaloniaResource below. -->
+    <ApplicationIcon>resources\dinorand.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Bundle the icon as an Avalonia resource so Window.Icon can load it cross-platform. -->
+    <AvaloniaResource Include="resources\dinorand.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.5" />
+    <!-- QR generation for SeedQR — same version the WPF front uses; produces PNG bytes (no System.Drawing). -->
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+    <!-- MVVM source generators (ObservableObject / [ObservableProperty] / [RelayCommand]) for
+         MainWindowViewModel — the only package the MVVM refactor adds. -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The UI references ONLY the (already cross-platform) randomizer, exactly like the
+         WPF app. FileFormats/Randomizer/Cli are unchanged by this port. -->
+    <ProjectReference Include="..\DinoRand.Randomizer\DinoRand.Randomizer.csproj" />
+  </ItemGroup>
+</Project>

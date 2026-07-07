@@ -1,0 +1,74 @@
+# ── Fail-closed ALLOWLIST ─────────────────────────────────────────────────────
+# Ignore EVERYTHING by default, then re-include only the paths we intentionally
+# track. Any new top-level file or folder is ignored automatically — you must opt it in here on purpose.
+#
+# Defence in depth: scripts/check-no-copyrighted-files.sh (pre-commit hook + CI)
+# still scans whatever IS tracked for binaries / asset bytes.
+#
+# Note: /* only governs the ROOT level. Once a top-level dir is re-included, its
+# contents are tracked unless re-excluded by the backstop section at the bottom.
+
+/*
+
+# Source & tests
+!/src/
+!/test/
+
+# Authored game data & docs (JSON / markdown only — enforced by the backstop)
+!/data/
+# !/docs/  (held back from publish for now — kept local)
+
+# Tooling, git hooks, CI
+!/scripts/
+# !/tools/  (held back from publish for now — kept local)
+!/.github/
+!/.githooks/
+
+# Top-level project files
+!/.gitignore
+!/README.md
+!/LICENSE
+!/THIRD-PARTY-NOTICES.md
+!/CHANGELOG.md
+!/DinoRand.sln
+!/Directory.Build.props
+
+# ── Backstop: inside the allowed trees, still exclude build output & asset bytes ─
+bin/
+obj/
+TestResults/
+*.user
+.vs/
+__pycache__/
+*.pyc
+
+# Verbatim third-party reference material (GameFAQs/forum pastes) — keep local, never publish.
+/docs/_reference-dumps/
+
+# Local process scaffolding — session prompts + the in-progress docs-refactor plan (keep local).
+/docs/_prompts/
+/docs/DOCS-REFACTOR/
+
+*.exe
+*.dll
+*.dat
+*.afs
+*.mrg
+*.tim
+*.emd
+*.pak
+*.iso
+*.img
+*.bin
+*.sav
+*.vab
+*.str
+*.xa
+*.pss
+*.mov
+*.CT
+*.ct
+
+# OS / editor cruft (harmless, but keep noise out)
+.DS_Store
+Thumbs.db

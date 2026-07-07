@@ -1,0 +1,1379 @@
+{
+  "_source": "Enumerated from the real rebirth install (4249140_DinoCrisis2/rebirth/Speech), format decoded 2026-07-04 (docs/dc2/VOICE-DECODE-REPORT.md).",
+  "_note": "DC2 TARGET voice manifest, BioRand voice.json format (path -> {player,actor,kind}). Banks are RIFF/WAVE PCM mono 18900 Hz 16-bit .dat. Actors labelled by the 2026-07-05 human folder-curation pass (entries tagged _source: folder-curation 2026-07-05); corrections land in data/dc2/voice-corrections.json and are baked back here.",
+  "_cast": [
+    "david",
+    "dylan",
+    "old-dylan",
+    "regina"
+  ],
+  "_castNote": "Cast labelled by the human folder-curation pass 2026-07-05 (voice-export/dc2-characters/<actor>/NNNN.wav 1:1 with Speech/NNNN.dat; folder name = actor). old-dylan is a distinct actor. Unknown actor strings map to Dc2VoiceActor.Unknown and are never swap targets. ponytail: Paula curation is WIP \u2014 her lines remain unknown; relabel from voice-export/dc2-characters/paula when that folder lands.",
+  "_actorsLabelled": [
+    "david",
+    "dylan",
+    "old-dylan",
+    "regina"
+  ],
+  "_count": 284,
+  "_folderCuration": {
+    "date": "2026-07-05",
+    "folders": "voice-export/dc2-characters/<actor>",
+    "labelled": {
+      "david": 17,
+      "dylan": 118,
+      "old-dylan": 18,
+      "regina": 61
+    },
+    "unknown": 70
+  },
+  "Speech/0000.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0001.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0002.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0003.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0004.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0005.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0006.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0007.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0008.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0009.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0010.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0011.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0012.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0013.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0014.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0015.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0016.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0017.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0018.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0019.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0020.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0021.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0022.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0023.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0024.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0025.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0026.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0027.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0028.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0029.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0030.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0031.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0032.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0033.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0034.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0035.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0036.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0037.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0038.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0039.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0040.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0041.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0042.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0043.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0044.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0100.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0101.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0102.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0103.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0104.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0105.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0106.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0107.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0108.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0109.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0110.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0111.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0112.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0113.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0114.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0115.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0116.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0117.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0200.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0201.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0202.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0203.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0204.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0205.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0206.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0207.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0208.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0209.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0210.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0211.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0212.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0213.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0214.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0300.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0301.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0302.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0303.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0304.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0305.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0306.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0307.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0308.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0309.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0310.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0311.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0312.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0313.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0400.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0401.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0402.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0403.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0404.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0405.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0406.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0407.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0408.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0409.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0410.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0411.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0412.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0413.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0414.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0415.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0416.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0417.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0418.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0419.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0420.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0421.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0422.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0423.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0424.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0425.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0426.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0427.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0428.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0429.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0430.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0431.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0432.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0433.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0434.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0435.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0436.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0437.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0438.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0439.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0440.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0441.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0442.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0443.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0444.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0445.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0446.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0447.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0448.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0449.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0450.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0451.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0452.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0453.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0500.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0501.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0502.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0503.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0504.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0505.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0506.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0507.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0508.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0509.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0510.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0511.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0512.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0513.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0514.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0515.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0516.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0517.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0518.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0519.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0520.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0521.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0522.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0523.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0524.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0525.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0526.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0527.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0528.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0529.dat": {
+    "player": 0,
+    "actor": "old-dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0530.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0531.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0532.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0533.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0534.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0535.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0536.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0537.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0538.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0539.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0540.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0541.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0542.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0543.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0544.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0545.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0546.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0547.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0548.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0549.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0550.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0551.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0552.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0553.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0554.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0555.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0556.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0557.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0558.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0600.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0601.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0602.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0603.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0604.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0605.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0700.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0701.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0702.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0703.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0704.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0800.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0801.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0802.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0803.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0804.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0805.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0806.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0807.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0808.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0809.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0810.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0811.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0812.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0813.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0814.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0815.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0816.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0817.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0818.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0819.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0820.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0821.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0822.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0823.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0824.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0825.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0826.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0827.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0828.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0829.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0830.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0831.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0900.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0901.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0902.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0903.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0904.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0905.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0906.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0907.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0908.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0909.dat": {
+    "player": 0,
+    "actor": "david",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0910.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0911.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0912.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0913.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0914.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0915.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0916.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0917.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0918.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0919.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0920.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0921.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0922.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0923.dat": {
+    "player": 0,
+    "actor": "unknown"
+  },
+  "Speech/0924.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0925.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0926.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0927.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0928.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0929.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0930.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0931.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0932.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0933.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0934.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-07-05"
+  },
+  "Speech/0935.dat": {
+    "player": 0,
+    "actor": "dylan",
+    "_source": "folder-curation 2026-07-05"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "_note": "Human by-ear corrections to the fingerprint labels in voice.json (docs/dc1/VOICE-RANDO-PLAN.md §12.8). 'corrections' maps a VOICE bank stem to its TRUE speaker, overriding the bank-centric fingerprint guess (which false-matched these to Regina across the whole score range, 0.92-0.97). This file is the authoritative human-verified label record AND the seed of supporting-cast labelling (§9.2): Gail + Rick banks are real DC1-cast targets; 'computer' is the endgame results screen voice (non-cast). Applied into voice.json (actor + _verified); re-apply after any fingerprint regeneration so these survive.",
+  "_verifiedOn": "2026-06-27",
+  "_remainderIsRegina": "User confirmed every other bank in the 144-set is Regina.",
+  "corrections": {
+    "xa30407": "gail",
+    "xa50f04": "gail",
+    "xa50f07": "gail",
+    "xa10d06": "gail",
+    "xa60f07": "rick",
+    "xa10610": "rick",
+    "xa40903": "rick",
+    "xa60921a": "rick",
+    "xa61008": "rick",
+    "xa30803a": "rick",
+    "xa6090da": "rick",
+    "xa30a01": "rick",
+    "xa_ep0e": "computer"
+  }
+}

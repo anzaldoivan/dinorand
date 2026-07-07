@@ -1,0 +1,30 @@
+MIT License
+
+Copyright (c) 2026 anzaldoivan
+
+SCOPE NOTE (not part of the MIT grant): This license covers ONLY the original
+source code, documentation, and data authored for the DinoRand project. It does
+NOT grant any rights in "Dino Crisis," the Dino Crisis game data/assets, or the
+DINO.exe binary, all of which are the property of their respective owner (Capcom).
+DinoRand ships no game assets and requires the user to supply their own legally
+owned copy of the game. Third-party components — including third-party-sourced data such as Dino Crisis Fandom
+Wiki content (CC BY-SA 3.0) — are credited in THIRD-PARTY-NOTICES.md and remain under
+their own licenses, not this MIT grant.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

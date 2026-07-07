@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DinoRand.App.PieChart"
+             d:DesignHeight="450" d:DesignWidth="800"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008">
+    <!-- Mirror of the WPF PieChart.xaml. The static <Path> placeholders are dropped: the
+         code-behind builds the visual tree at runtime. The inner grid is pinned to the
+         0..100 coordinate space the geometry is drawn in, and the Viewbox scales it. -->
+    <Grid>
+        <Viewbox x:Name="viewBox" Stretch="Uniform" UseLayoutRounding="True">
+            <Grid x:Name="grid" Width="100" Height="100" />
+        </Viewbox>
+        <Grid x:Name="topGrid" />
+    </Grid>
+</UserControl>

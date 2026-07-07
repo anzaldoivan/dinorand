@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="coverlet.collector" Version="6.*" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DinoRand.FileFormats\DinoRand.FileFormats.csproj" />
+    <ProjectReference Include="..\..\src\DinoRand.Randomizer\DinoRand.Randomizer.csproj" />
+    <!-- Per-game settings isolation (GameSelectionTests) lives in the Avalonia app's AppSettings;
+         the test only touches its Avalonia-free POCO surface (FromJson/ToJson/ForGame). -->
+    <ProjectReference Include="..\..\src\DinoRand.App.Avalonia\DinoRand.App.Avalonia.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Reference data tables locked to the C# definitions by EnemySpeciesTableTests /
+         ItemTableTests / RoomDataConsistencyTests; copy them to the test output so the guards
+         can read them. -->
+    <Content Include="..\..\data\dc1\enemies.json" Link="data\dc1\enemies.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc1\enemy-textures.json" Link="data\dc1\enemy-textures.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc1\items.json" Link="data\dc1\items.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc1\emergency-boxes.json" Link="data\dc1\emergency-boxes.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc1\map.json" Link="data\dc1\map.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc1\room-data.json" Link="data\dc1\room-data.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc1\voice.json" Link="data\dc1\voice.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

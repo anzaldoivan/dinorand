@@ -1,0 +1,1447 @@
+{
+  "_source": "tools/dc2_re/scan_wave_descriptors.py over the rebirth Data corpus (K65).",
+  "_semantics": "op-0x4f (0x48a960) arms [scene_mgr+0xa68] with the descriptor at desc_off (decompressed-blob offset; RAM = 0x5e0000+off) and self-loads LoadEnemyCategory(desc+1, desc+4). The per-frame wave spawner 0x4720d0 sets [actor+0x58]=desc+1. type_off = THE one-byte species lever (Gates W1/W2 live-PASSED, ST105 -> Oviraptor/T-Rex). generic_creature_spawns = dormant op-0x1a TYPE-0x10 records whose MODEL_BASE global holds a real E-base; a wave swap must normalize them to the donor (mode6->lit0 + TYPE->donor, K64) so nothing binds the unloaded native base.",
+  "_counts": {
+    "rooms": 49,
+    "rooms_armed": 49,
+    "descriptors": 67,
+    "generic_creature_spawns": 9
+  },
+  "rooms": {
+    "001": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x308",
+          "type_off": "0x309",
+          "variant_off": "0x30c",
+          "kind": 1,
+          "native_type": 12,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 3,
+              "op_off": "0x193a"
+            },
+            {
+              "routine": 3,
+              "op_off": "0x19f6"
+            },
+            {
+              "routine": 3,
+              "op_off": "0x1daa"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x3b8",
+          "type_off": "0x3b9",
+          "variant_off": "0x3bc",
+          "kind": 1,
+          "native_type": 12,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 3,
+              "op_off": "0x1c7a"
+            },
+            {
+              "routine": 3,
+              "op_off": "0x1ccc"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x458",
+          "type_off": "0x459",
+          "variant_off": "0x45c",
+          "kind": 1,
+          "native_type": 12,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 3,
+              "op_off": "0x18dc"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x4f8",
+          "type_off": "0x4f9",
+          "variant_off": "0x4fc",
+          "kind": 1,
+          "native_type": 12,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 3,
+              "op_off": "0x187e"
+            },
+            {
+              "routine": 3,
+              "op_off": "0x1998"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x598",
+          "type_off": "0x599",
+          "variant_off": "0x59c",
+          "kind": 1,
+          "native_type": 12,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 3,
+              "op_off": "0x1dda"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 8
+    },
+    "102": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x65a8",
+          "type_off": "0x65a9",
+          "variant_off": "0x65ac",
+          "kind": 14,
+          "native_type": 2,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0xb1e4"
+            },
+            {
+              "routine": 3,
+              "op_off": "0xc08c"
+            }
+          ],
+          "also_preload": true
+        },
+        {
+          "desc_off": "0x6988",
+          "type_off": "0x6989",
+          "variant_off": "0x698c",
+          "kind": 14,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0xb1f4"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "104": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x2c8",
+          "type_off": "0x2c9",
+          "variant_off": "0x2cc",
+          "kind": 14,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x3448"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x648",
+          "type_off": "0x649",
+          "variant_off": "0x64c",
+          "kind": 14,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x3404"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "105": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x5ed4",
+          "type_off": "0x5ed5",
+          "variant_off": "0x5ed8",
+          "kind": 11,
+          "native_type": 2,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x8a20"
+            }
+          ],
+          "also_preload": true
+        },
+        {
+          "desc_off": "0x6194",
+          "type_off": "0x6195",
+          "variant_off": "0x6198",
+          "kind": 11,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x8a10"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [
+        {
+          "spawn_off": "0x91cc",
+          "type_push_off": "0x91a8",
+          "mb_push_off": "0x91bc",
+          "hp_push_off": "0x91c0",
+          "hp_push_mode": 6,
+          "mb_glb_idx": 13,
+          "mb_base": "0x633000"
+        },
+        {
+          "spawn_off": "0x9258",
+          "type_push_off": "0x9234",
+          "mb_push_off": "0x9248",
+          "hp_push_off": "0x924c",
+          "hp_push_mode": 6,
+          "mb_glb_idx": 17,
+          "mb_base": "0x633000"
+        },
+        {
+          "spawn_off": "0x932e",
+          "type_push_off": "0x930a",
+          "mb_push_off": "0x931e",
+          "hp_push_off": "0x9322",
+          "hp_push_mode": 6,
+          "mb_glb_idx": 19,
+          "mb_base": "0x633000"
+        },
+        {
+          "spawn_off": "0x93d4",
+          "type_push_off": "0x93b0",
+          "mb_push_off": "0x93c4",
+          "hp_push_off": "0x93c8",
+          "hp_push_mode": 6,
+          "mb_glb_idx": 21,
+          "mb_base": "0x633000"
+        }
+      ],
+      "disarm_sites": 0
+    },
+    "107": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x18a8",
+          "type_off": "0x18a9",
+          "variant_off": "0x18ac",
+          "kind": 8,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x4f54"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x1ae8",
+          "type_off": "0x1ae9",
+          "variant_off": "0x1aec",
+          "kind": 8,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x4fa8"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x1cf8",
+          "type_off": "0x1cf9",
+          "variant_off": "0x1cfc",
+          "kind": 8,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x505c"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "108": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x4ea0",
+          "type_off": "0x4ea1",
+          "variant_off": "0x4ea4",
+          "kind": 8,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x757a"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x5100",
+          "type_off": "0x5101",
+          "variant_off": "0x5104",
+          "kind": 8,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x7634"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x5300",
+          "type_off": "0x5301",
+          "variant_off": "0x5304",
+          "kind": 8,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x7644"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "10A": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x984",
+          "type_off": "0x985",
+          "variant_off": "0x988",
+          "kind": 8,
+          "native_type": 2,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x2698"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "10B": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xfac",
+          "type_off": "0xfad",
+          "variant_off": "0xfb0",
+          "kind": 11,
+          "native_type": 2,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x3938"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "10C": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xdb9c",
+          "type_off": "0xdb9d",
+          "variant_off": "0xdba0",
+          "kind": 11,
+          "native_type": 4,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x1143c"
+            },
+            {
+              "routine": 0,
+              "op_off": "0x11584"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "10D": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x7120",
+          "type_off": "0x7121",
+          "variant_off": "0x7124",
+          "kind": 12,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0xe65a"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x74a0",
+          "type_off": "0x74a1",
+          "variant_off": "0x74a4",
+          "kind": 12,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0xe66a"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "10E": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x6f10",
+          "type_off": "0x6f11",
+          "variant_off": "0x6f14",
+          "kind": 7,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0xcd92"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x7180",
+          "type_off": "0x7181",
+          "variant_off": "0x7184",
+          "kind": 7,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0xcda2"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "110": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x964",
+          "type_off": "0x965",
+          "variant_off": "0x968",
+          "kind": 13,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x3018"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "200": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x8cac",
+          "type_off": "0x8cad",
+          "variant_off": "0x8cb0",
+          "kind": 4,
+          "native_type": 4,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0xf3ac"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [
+        {
+          "spawn_off": "0xfc56",
+          "type_push_off": "0xfc32",
+          "mb_push_off": "0xfc46",
+          "hp_push_off": "0xfc4a",
+          "hp_push_mode": 0,
+          "mb_glb_idx": 20,
+          "mb_base": "0x640000"
+        },
+        {
+          "spawn_off": "0x109cc",
+          "type_push_off": "0x109a8",
+          "mb_push_off": "0x109bc",
+          "hp_push_off": "0x109c0",
+          "hp_push_mode": 6,
+          "mb_glb_idx": 37,
+          "mb_base": "0x640000"
+        },
+        {
+          "spawn_off": "0x11204",
+          "type_push_off": "0x111e0",
+          "mb_push_off": "0x111f4",
+          "hp_push_off": "0x111f8",
+          "hp_push_mode": 6,
+          "mb_glb_idx": 56,
+          "mb_base": "0x640000"
+        },
+        {
+          "spawn_off": "0x1132c",
+          "type_push_off": "0x11308",
+          "mb_push_off": "0x1131c",
+          "hp_push_off": "0x11320",
+          "hp_push_mode": 0,
+          "mb_glb_idx": 58,
+          "mb_base": "0x640000"
+        }
+      ],
+      "disarm_sites": 0
+    },
+    "201": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xa94",
+          "type_off": "0xa95",
+          "variant_off": "0xa98",
+          "kind": 4,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x22bc"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0xbb4",
+          "type_off": "0xbb5",
+          "variant_off": "0xbb8",
+          "kind": 4,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x22f0"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 1
+    },
+    "300": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xc1c",
+          "type_off": "0xc1d",
+          "variant_off": "0xc20",
+          "kind": 6,
+          "native_type": 2,
+          "variant": 2,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0x5408"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0xdcc",
+          "type_off": "0xdcd",
+          "variant_off": "0xdd0",
+          "kind": 7,
+          "native_type": 7,
+          "variant": 2,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0x53f8"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "301": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x7384",
+          "type_off": "0x7385",
+          "variant_off": "0x7388",
+          "kind": 4,
+          "native_type": 7,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 2,
+              "op_off": "0x9502"
+            },
+            {
+              "routine": 2,
+              "op_off": "0x9590"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "302": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x27b0",
+          "type_off": "0x27b1",
+          "variant_off": "0x27b4",
+          "kind": 9,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x6404"
+            },
+            {
+              "routine": 3,
+              "op_off": "0x7256"
+            }
+          ],
+          "also_preload": true
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "303": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x2498",
+          "type_off": "0x2499",
+          "variant_off": "0x249c",
+          "kind": 9,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0x558e"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 1
+    },
+    "304": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x3bf0",
+          "type_off": "0x3bf1",
+          "variant_off": "0x3bf4",
+          "kind": 11,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0x7e48"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 1
+    },
+    "305": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x25b4",
+          "type_off": "0x25b5",
+          "variant_off": "0x25b8",
+          "kind": 7,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x4656"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "400": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x6618",
+          "type_off": "0x6619",
+          "variant_off": "0x661c",
+          "kind": 18,
+          "native_type": 2,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0xc704"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "404": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x103c",
+          "type_off": "0x103d",
+          "variant_off": "0x1040",
+          "kind": 9,
+          "native_type": 14,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x30f4"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "405": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xd8c",
+          "type_off": "0xd8d",
+          "variant_off": "0xd90",
+          "kind": 7,
+          "native_type": 14,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x2d40"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "407": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x10f48",
+          "type_off": "0x10f49",
+          "variant_off": "0x10f4c",
+          "kind": 1,
+          "native_type": 2,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x16abc"
+            },
+            {
+              "routine": 2,
+              "op_off": "0x17ad2"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x10fb8",
+          "type_off": "0x10fb9",
+          "variant_off": "0x10fbc",
+          "kind": 1,
+          "native_type": 2,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 8,
+              "op_off": "0x19cba"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 2
+    },
+    "408": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xf7ac",
+          "type_off": "0xf7ad",
+          "variant_off": "0xf7b0",
+          "kind": 11,
+          "native_type": 7,
+          "variant": 2,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x1281c"
+            },
+            {
+              "routine": 3,
+              "op_off": "0x134fe"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "409": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xf7ac",
+          "type_off": "0xf7ad",
+          "variant_off": "0xf7b0",
+          "kind": 16,
+          "native_type": 7,
+          "variant": 2,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x125a8"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "40A": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x7578",
+          "type_off": "0x7579",
+          "variant_off": "0x757c",
+          "kind": 15,
+          "native_type": 2,
+          "variant": 2,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0xcc1c"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "600": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x6f4",
+          "type_off": "0x6f5",
+          "variant_off": "0x6f8",
+          "kind": 5,
+          "native_type": 11,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x2240"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "601": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x448",
+          "type_off": "0x449",
+          "variant_off": "0x44c",
+          "kind": 8,
+          "native_type": 11,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x21b4"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "602": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x2c8",
+          "type_off": "0x2c9",
+          "variant_off": "0x2cc",
+          "kind": 5,
+          "native_type": 4,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x1dcc"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "603": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x60c",
+          "type_off": "0x60d",
+          "variant_off": "0x610",
+          "kind": 18,
+          "native_type": 4,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x403c"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "604": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x974",
+          "type_off": "0x975",
+          "variant_off": "0x978",
+          "kind": 12,
+          "native_type": 11,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x3170"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "700": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x658",
+          "type_off": "0x659",
+          "variant_off": "0x65c",
+          "kind": 17,
+          "native_type": 10,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x4894"
+            },
+            {
+              "routine": 2,
+              "op_off": "0x59fe"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "702": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x2a8",
+          "type_off": "0x2a9",
+          "variant_off": "0x2ac",
+          "kind": 9,
+          "native_type": 10,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0x26c8"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "703": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x4644",
+          "type_off": "0x4645",
+          "variant_off": "0x4648",
+          "kind": 10,
+          "native_type": 10,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x6fbc"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "704": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x4878",
+          "type_off": "0x4879",
+          "variant_off": "0x487c",
+          "kind": 24,
+          "native_type": 10,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0xb050"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "801": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x204c",
+          "type_off": "0x204d",
+          "variant_off": "0x2050",
+          "kind": 9,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0x3ffa"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 1
+    },
+    "802": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x6c0",
+          "type_off": "0x6c1",
+          "variant_off": "0x6c4",
+          "kind": 12,
+          "native_type": 2,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x3134"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "803": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x6224",
+          "type_off": "0x6225",
+          "variant_off": "0x6228",
+          "kind": 6,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x8b72"
+            },
+            {
+              "routine": 5,
+              "op_off": "0x966e"
+            }
+          ],
+          "also_preload": true
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "804": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xd0",
+          "type_off": "0xd1",
+          "variant_off": "0xd4",
+          "kind": 8,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x1be8"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "806": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x7890",
+          "type_off": "0x7891",
+          "variant_off": "0x7894",
+          "kind": 16,
+          "native_type": 14,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0xb820"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "807": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x1af0",
+          "type_off": "0x1af1",
+          "variant_off": "0x1af4",
+          "kind": 14,
+          "native_type": 14,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x55ea"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "808": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x4944",
+          "type_off": "0x4945",
+          "variant_off": "0x4948",
+          "kind": 7,
+          "native_type": 8,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 2,
+              "op_off": "0xe27e"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x4ad4",
+          "type_off": "0x4ad5",
+          "variant_off": "0x4ad8",
+          "kind": 23,
+          "native_type": 8,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 4,
+              "op_off": "0xed9e"
+            }
+          ],
+          "also_preload": false
+        },
+        {
+          "desc_off": "0x5024",
+          "type_off": "0x5025",
+          "variant_off": "0x5028",
+          "kind": 13,
+          "native_type": 8,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 6,
+              "op_off": "0xf610"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [
+        {
+          "spawn_off": "0xd160",
+          "type_push_off": "0xd13c",
+          "mb_push_off": "0xd150",
+          "hp_push_off": "0xd154",
+          "hp_push_mode": 6,
+          "mb_glb_idx": 21,
+          "mb_base": "0x638000"
+        }
+      ],
+      "disarm_sites": 0
+    },
+    "80B": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x300",
+          "type_off": "0x301",
+          "variant_off": "0x304",
+          "kind": 9,
+          "native_type": 14,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x3242"
+            },
+            {
+              "routine": 6,
+              "op_off": "0x41c2"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "900": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x280",
+          "type_off": "0x281",
+          "variant_off": "0x284",
+          "kind": 10,
+          "native_type": 4,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 1,
+              "op_off": "0x3cea"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 1
+    },
+    "901": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0xb7c",
+          "type_off": "0xb7d",
+          "variant_off": "0xb80",
+          "kind": 5,
+          "native_type": 7,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x211c"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "902": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x1b0",
+          "type_off": "0x1b1",
+          "variant_off": "0x1b4",
+          "kind": 6,
+          "native_type": 7,
+          "variant": 1,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x1984"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "905": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x10fec",
+          "type_off": "0x10fed",
+          "variant_off": "0x10ff0",
+          "kind": 1,
+          "native_type": 7,
+          "variant": 0,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x1270e"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    },
+    "906": {
+      "wave_descriptors": [
+        {
+          "desc_off": "0x640c",
+          "type_off": "0x640d",
+          "variant_off": "0x6410",
+          "kind": 1,
+          "native_type": 7,
+          "variant": 7,
+          "arm_sites": [
+            {
+              "routine": 0,
+              "op_off": "0x7aa8"
+            }
+          ],
+          "also_preload": false
+        }
+      ],
+      "generic_creature_spawns": [],
+      "disarm_sites": 0
+    }
+  }
+}

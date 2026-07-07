@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DinoRand.App"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             x:Class="DinoRand.App.GameLocationBox"
+             x:Name="gameLocationBox"
+             d:DesignWidth="400">
+    <local:CheckGroupBox x:Name="groupBox" Header="{Binding #gameLocationBox.Header}">
+        <StackPanel>
+            <Grid ColumnDefinitions="*,30" RowDefinitions="Auto,Auto">
+                <TextBox Grid.Column="0" Grid.Row="0"
+                         x:Name="txtGameDataLocation"
+                         Margin="4,4,2,4"
+                         Text="{Binding #gameLocationBox.Location, Mode=TwoWay}"
+                         LostFocus="txtGameDataLocation_LostFocus" />
+                <Button Grid.Column="1" Grid.Row="0" Margin="2,4,4,4" Click="btnBrowse_Click" Content="…" />
+                <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
+                           x:Name="txtValidationMessage" />
+            </Grid>
+        </StackPanel>
+    </local:CheckGroupBox>
+</UserControl>

@@ -1,0 +1,193 @@
+{
+ "_comment": "DC2 (rebirth) per-room enemy SET, recovered at RUNTIME (Cheat Engine MCP bridge attached to Dino2.exe, imagebase 0x400000, no rebase). Resolves the room<->E-file link that static RE (docs/dc2/ROOM-SECTION-TABLE.md, EXE-SPAWN-SYSTEM.md) could not: DC2 has no spawn table in the room file or .data; spawns are EXE code-driven. This file is observed ground-truth, not inference.",
+ "_method": "CreateFileA hook (kernel32 0x75A9E9F0) as a non-breaking logging breakpoint. On each hit, register ESI holds a STABLE pointer into the EXE's static filename table (0x71xxxx) for the file being opened (lpFileName at [esp+4] is a transient stack path and is NOT reliable). Filter hits to ESI in [0x710000,0x720000) and read the ASCII string: ST*.DAT/.DBS = room being loaded, E*.DAT/E*.TEX = that room's enemy model/texture, DOOR*.DAT = door. A room's enemy set = the E* files opened between its ST* open and the next ST* open. Enemy id = E-slot (E00..EA0); model RAM base per docs/dc2/EXE-SPAWN-SYSTEM.md.",
+ "_caveat": "Model files are CACHED across rooms: a previously-loaded E* model stays resident (e.g. E00 model remained at 0x633000 after leaving ST102), so a residency snapshot is NOT a per-room set. Only the file-OPEN during a room load is authoritative, and a cached model may open only its .TEX (not .DAT) on re-entry. Some enemies are one-time scripted spawns (the ST102 pack did not reconstruct on re-entry). Coverage below is partial (session in progress); 40 of 42 combat rooms still to walk.",
+ "_provenance_legend": "runtime-fileload = observed via the CreateFileA/ESI hook this session; partial = room visited but may have triggered/late spawns not yet seen.",
+ "_slot_note": "ST102's jungle 'raptor' loads model base 0x633000 = the E00 slot (E00.TEX opened; live actor [+0x5C]=0x00633000). This is in tension with data/dc2/enemies.json's UNRESOLVED guess that the Velociraptor is the E30/E31/E32 triple. The rigorous datum here is the E-SLOT/base; the slot<->creature-name mapping remains open and should be reconciled against this runtime evidence.",
+ "rooms": {
+  "ST101": {
+   "enemies": [],
+   "enemy_bases": [],
+   "doors": [
+    "DOOR03.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Dock / starting area. Entered from ST102 via DOOR03; no E* file opened on entry. E00 model was resident at 0x633000 but only as cached residue from the prior ST102 visit (not loaded for ST101). Treated as no-enemy, consistent with it being the start dock."
+  },
+  "ST102": {
+   "enemies": [
+    "E00"
+   ],
+   "enemy_bases": [
+    "0x00633000"
+   ],
+   "doors": [
+    "DOOR03.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Jungle / north area 1. Loads E00 (model base 0x633000) - player-perceived 'raptor' pack (3 actors constructed in a burst, stride 0x260, at 0x5ECCC4/0x5ECF24/0x5ED184). On RE-entry only E00.TEX opened (E00.DAT model still cached); the pack is a ONE-TIME scripted spawn and did not reconstruct (ctor 0x4461D0 fired 0 times on re-entry). s1 has 16 item/event-shaped markers (see docs/dc2/EXE-SPAWN-SYSTEM.md Phase D)."
+  },
+  "ST105": {
+   "enemies": [
+    "E00"
+   ],
+   "enemy_bases": [
+    "0x00633000"
+   ],
+   "doors": [
+    "DOOR00D.DAT"
+   ],
+   "source": "runtime-actorscan",
+   "confidence": "partial",
+   "note": "Jungle / north area 2. Two E00 raptors, TRIGGER-spawned partway into the room (NOT at room-load): the room-load opened only ST105.DAT + player weapons WEP_P100/P101.DAT + DOOR00D.DAT, NO E* file (E00 model served from cache). Located the 2 live actors by scanning writable memory for base 0x633000 at [+0x5C]: actors at 0x5EA258 and 0x5EA4B8 (stride 0x260 confirmed). Spawned via a different E00-variant ctor (ctor 0x4461D0 stayed silent). Both actors share floor-Y ~ -7000 = the room's s1 floor plane."
+  },
+  "ST103": {
+   "enemies": [
+    "E00"
+   ],
+   "enemy_bases": [
+    "0x00633000"
+   ],
+   "doors": [
+    "DOOR00D.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Jungle / north area 3. Room-load opened ST103.DAT + E00.TEX (ESI=0x71D250) + player weapons WEP_P100/P101.DAT + DOOR00D.DAT; enemies (E00 raptors) confirmed spawned in-room. E00.DAT model served from cache (only .TEX re-opened)."
+  },
+  "ST104": {
+   "enemies": [
+    "E00"
+   ],
+   "enemy_bases": [
+    "0x00633000"
+   ],
+   "doors": [
+    "DOOR00D.DAT"
+   ],
+   "source": "runtime-cache+actorscan",
+   "confidence": "partial",
+   "note": "Jungle 4. Room-load opened ST104.DAT + weapons WEP_P100/P101.DAT + DOOR00D.DAT and NO E* file at all (E00 fully cached from prior jungle rooms). Species confirmed E00 by scanning writable memory: base 0x633000 resident at 0x5E4D8C. Enemies confirmed spawned by player. E00 is the only enemy model loaded across the entire jungle sequence (ST102-105)."
+  },
+  "ST106": {
+   "enemies": [],
+   "doors": [
+    "DOOR10.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "confirmed",
+   "note": "Water tower / safe area (cutscene). Room-load opened ST106.DAT + DOOR10.DAT and NO E* file; player confirmed no enemies. A genuine no-combat room."
+  },
+  "ST201": {
+   "enemies": [
+    "E00"
+   ],
+   "enemy_bases": [
+    "0x00633000"
+   ],
+   "doors": [],
+   "source": "runtime-actorscan",
+   "confidence": "confirmed",
+   "difficulty": "HARD",
+   "note": "HARD-mode 'green raptor' room (reached via the ST101->ST201 door, K41). Live actor-array scan ([[0x876DB8]+0x940]=0x5EC5A4, stride 0x260, count 20): player in slot0 (model base 0x662500, HP 1200) + THREE raptors in slots 3/4/5, ALL species model base 0x00633000 = the E00 slot. NO divergent model base anywhere in the array. => the hard-mode 'green raptor' is the SAME E00 model, NOT a distinct E*.DAT (resolves OPEN #6 case a-vs-b in favour of 'same model + delta', case b). Green coloration is intrinsic to the E00 load (CLUT/palette/material applied by the variant ctor), not a separate model file. Per-actor deltas observed: state [+0x54]=0x00010701 (slots 3/4) vs 0x00010301 (slot5); class [+0x50]=0x0F; candidate HP word-pair [+0x10C]={818,844,798} (NOT the 1000 the 0x4461D0 ST102-pack ctor writes -> consistent with a different E00-variant trigger ctor); distinct instance heap ptrs [+0x64]=0x5F404C/0x5F5108/0x5F61C4. SPECIES OFFSET CORRECTION: in the allocator/array frame the resting species base is at [actor+0x60] (where loader 0x48DAC2 writes it), with [+0x5C]=0 -- the earlier '[+0x5C]' figure was a +4 frame artifact of the value-scan locate method. Read-only capture; no CreateFileA hook this session (raptors were already spawned)."
+  },
+  "ST107": {
+   "enemies": [
+    "E00"
+   ],
+   "enemy_bases": [
+    "0x00633000"
+   ],
+   "doors": [
+    "DOOR05.DAT",
+    "DOOR10.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Captured 2026-06-27 (CreateFileA ESI-hook, time-ordered ST-segmentation). ST107.DAT segment opened E00.TEX (E00 model cached from jungle, only .TEX re-opens) + DOOR05.DAT; reached from ST106 (DOOR10). E00 raptor = the only enemy file. First NEW combat room captured this session. Item/file behaviour note (this capture): ITEM.DAT (0x71D10C) + FILE.DAT (0x71D128) + SUBSCR3.DAT (0x71C018) loaded in the ST106 segment exactly when the inventory/file SUBSCREEN was opened -- i.e. the global item/dino-file CATALOGS load on subscreen open, NOT per room-entry and NOT per world-pickup => item-id shuffle is residency-safe (resolves the K16 ITEM.DAT-catalog open + AOT item-residency open)."
+  },
+  "ST200": {
+   "enemies": [
+    "E10"
+   ],
+   "enemy_bases": [
+    "0x00640000"
+   ],
+   "doors": [
+    "DOOR06.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Captured 2026-06-27 (CreateFileA ESI-hook). ST200.DAT segment opened E10.DAT (FRESH full-model load, NOT cached -> first non-E00 enemy seen this session) + DOOR06.DAT; reached from ST108 (whose AOT door dest=0x0200). E10 = stage-2 entrance enemy; per DC2 slot<->creature live map (K46) E10=T-Rex, static model base 0x640000 (SHARED base -> confirm species by filename/vtable not base alone). First captured cross-stage transition jungle(ST108)->stage2(ST200). enemy_base listed as static 0x640000; runtime resting base not yet actor-scanned this room."
+  },
+  "ST202": {
+   "enemies": [
+    "E00"
+   ],
+   "enemy_bases": [
+    "0x00633000"
+   ],
+   "doors": [
+    "DOOR16.DAT",
+    "DOOR12.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Captured 2026-06-27 (CreateFileA ESI-hook, time-ordered segmentation; user-confirmed room). ST202.DAT segment opened E00_02.TEX (an E00 raptor TEXTURE VARIANT -- '_02' suffix, cf. ST201 green-raptor uses the same E00 model 0x633000 with a variant CLUT/texture) + DOOR16.DAT/DOOR12.DAT. E00 (raptor) enemy. Hub room: the loader also pre-read ST201.DAT (known green-raptor room) and ST203.DAT (save room) in the same burst, so doors connect ST202<->ST201/ST203."
+  },
+  "ST203": {
+   "enemies": [],
+   "doors": [
+    "DOOR12.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Captured 2026-06-27 INCIDENTALLY (user was in ST202; ST203.DAT loaded in the same burst -- neighbor of ST202 via DOOR12). ST203.DAT segment opened SAVE.DAT (a SAVE POINT room) + WEP_P104.DAT (weapon) + DOOR12.DAT and NO E* file => save room, enemy-free. Note: SAVE.DAT = the save-point resource; first capture of it this session. Confidence partial: not directly walked; confirm enemy-free on a direct visit."
+  },
+  "ST205": {
+   "enemies": [
+    "?cached"
+   ],
+   "enemy_bases": [],
+   "doors": [
+    "DOOR23.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "partial",
+   "note": "Captured 2026-06-27 (CreateFileA ESI-hook; user-confirmed in room). ST205.DAT segment opened DOOR23.DAT and NO E* file (the ITEM/SUBSCR3/FILE in the buffer = user opened inventory). Enemy model CACHED (E00 raptor and/or E10 T-Rex were already resident from jungle/ST200) or trigger-spawned -> file-load hook cannot name it. NEEDS a live actor-array scan ([[0x876DB8]+0x940], stride 0x260, species base [+0x60]) when enemies are present to resolve the slot. K29 lists ST205 as combat (SOUND>120KB)."
+  },
+  "ST100": {
+   "enemies": [],
+   "doors": [
+    "DOOR04.DAT",
+    "DOOR00U.DAT"
+   ],
+   "source": "runtime-fileload",
+   "confidence": "low",
+   "note": "Captured 2026-06-27 during BACKTRACK (user went ST205->ST109->ST100; buffer mixed across rooms). ST100.DAT opened with NO E* file (also MAP_ST1.DAT = map opened; WEP_* weapons). Doors DOOR04/DOOR00U seen in the ST100 vicinity but attribution is low-confidence due to the multi-room backtrack buffer. Likely a low/start-area connector room (enemy-free or E00 cached). ST109.DAT (0x71C708) also passed through. Re-capture with a clean single transition to confirm."
+  },
+  "ST109": {
+   "enemies": [
+    "?hook-dead"
+   ],
+   "doors_dest": [
+    "ST10A",
+    "ST100",
+    "ST109"
+   ],
+   "source": "runtime-aot-read",
+   "confidence": "partial",
+   "note": "Captured 2026-06-27 via AOT array read (0x752388) -- file-load hook was DEAD (HW BP died on the ST100->ST109 transition), so enemy E-file set NOT captured; needs hook recovery or actor-scan. AOT doors (SAT-0 dest, rec+0x1c): ST10A, ST100, ST109. AOT items (SAT-1): slot6 id=0x09 qty=1; slot8 id=0x07 qty=7 (qty7 reconfirms rec+0x18=COUNT). Demonstrates item/door decode works read-only without the breakpoint."
+  },
+  "ST704": {
+   "enemies": [
+    "E30 (Mosasaurus)"
+   ],
+   "source": "runtime-actor-read + user visual ID (CE, 2026-06-27, PID 8296)",
+   "confidence": "high",
+   "note": "User visually identified Mosasaurus. Live actor read: actor_base [scene_mgr+0x940]=0x5ED1D8 (stride 0x260); 11 active enemies at slots 2,3,4 all TYPE=0x13 (generic family, [actor+0x58]) sharing one runtime model base [actor+0x60]=0x5E37B0 (stage-7 relocated, not a Colosseum 0x6xxxxx base) + 1 TYPE 0x10 at slot1 (inactive). Matches static spawn-graph ST704 (12 spawns, TYPE 0x13 x11 / TYPE 0x10 x1). HP not at [actor+0x108] (read 0) -> stats likely in a separate AI struct (unpinned). E-file PINNED via resident header read: model base 0x5E3878 has tri290/quad132/obj20 = E30 (also resident at canonical 0x640010). Resolves one of the 4 long-open creatures (Pteranodon/Plesiosaurus/Mosasaurus/Triceratops)."
+  }
+ }
+}

@@ -1,0 +1,1697 @@
+{
+ "_source": "tools/dc2_re/gen_connectivity.py over data/dc2/door-graph.json (178 high-conf op-0x30 doors / 83 rooms). Room-level directed warp graph. Only literal mode-0 doors mapping to a real room form edges; the lone low-confidence computed door (ST003, mode-2) is in _low_confidence_doors, NOT an edge. dest_id = f'{w:03X}' (DOOR-ROUTING-RE identity encoding).",
+ "_validation": {
+  "room_ids_count": 89,
+  "matches_rooms_json": true,
+  "matches_stage_room_map": true,
+  "expected_89": true,
+  "high_conf_dest_not_a_real_room": []
+ },
+ "summary": {
+  "total_rooms": 89,
+  "rooms_with_outbound": 83,
+  "rooms_with_inbound": 85,
+  "total_directed_edges": 163,
+  "bidirectional_edge_dirs": 142,
+  "oneway_edge_dirs": 21,
+  "dead_end_rooms_no_outbound": [
+   "103",
+   "504",
+   "608",
+   "707",
+   "905",
+   "906"
+  ],
+  "no_inbound_rooms": [
+   "608",
+   "707",
+   "905",
+   "906"
+  ],
+  "isolated_rooms_no_doors": [
+   "608",
+   "707",
+   "905",
+   "906"
+  ],
+  "hub_rooms_top10": [
+   {
+    "id": "003",
+    "degree": 7
+   },
+   {
+    "id": "100",
+    "degree": 5
+   },
+   {
+    "id": "303",
+    "degree": 4
+   },
+   {
+    "id": "102",
+    "degree": 3
+   },
+   {
+    "id": "106",
+    "degree": 3
+   },
+   {
+    "id": "10B",
+    "degree": 3
+   },
+   {
+    "id": "10D",
+    "degree": 3
+   },
+   {
+    "id": "200",
+    "degree": 3
+   },
+   {
+    "id": "202",
+    "degree": 3
+   },
+   {
+    "id": "205",
+    "degree": 3
+   }
+  ]
+ },
+ "_low_confidence_doors": [
+  {
+   "source": "003",
+   "dest_id": "00F",
+   "dest_mode": 2,
+   "commit_off": "0x20c52",
+   "reason": "computed/variable dest (no static lever)"
+  }
+ ],
+ "rooms": {
+  "000": {
+   "outbound": [
+    {
+     "dest": "003",
+     "bidirectional": false
+    },
+    {
+     "dest": "100",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "100"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "001": {
+   "outbound": [
+    {
+     "dest": "003",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "003"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "002": {
+   "outbound": [
+    {
+     "dest": "003",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "003"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "003": {
+   "outbound": [
+    {
+     "dest": "001",
+     "bidirectional": true
+    },
+    {
+     "dest": "002",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "000",
+    "001",
+    "002",
+    "004",
+    "005",
+    "205",
+    "904"
+   ],
+   "out_degree": 2,
+   "in_degree": 7,
+   "dead_end": false
+  },
+  "004": {
+   "outbound": [
+    {
+     "dest": "003",
+     "bidirectional": false
+    },
+    {
+     "dest": "600",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "600"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "005": {
+   "outbound": [
+    {
+     "dest": "003",
+     "bidirectional": false
+    },
+    {
+     "dest": "800",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "800"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "100": {
+   "outbound": [
+    {
+     "dest": "000",
+     "bidirectional": true
+    },
+    {
+     "dest": "101",
+     "bidirectional": true
+    },
+    {
+     "dest": "109",
+     "bidirectional": true
+    },
+    {
+     "dest": "110",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "000",
+    "101",
+    "109",
+    "110",
+    "205"
+   ],
+   "out_degree": 4,
+   "in_degree": 5,
+   "dead_end": false
+  },
+  "101": {
+   "outbound": [
+    {
+     "dest": "100",
+     "bidirectional": true
+    },
+    {
+     "dest": "102",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "100",
+    "102"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "102": {
+   "outbound": [
+    {
+     "dest": "101",
+     "bidirectional": true
+    },
+    {
+     "dest": "105",
+     "bidirectional": true
+    },
+    {
+     "dest": "110",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "101",
+    "105",
+    "110"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "103": {
+   "outbound": [],
+   "inbound": [
+    "104",
+    "105"
+   ],
+   "out_degree": 0,
+   "in_degree": 2,
+   "dead_end": true
+  },
+  "104": {
+   "outbound": [
+    {
+     "dest": "103",
+     "bidirectional": false
+    },
+    {
+     "dest": "106",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "106"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "105": {
+   "outbound": [
+    {
+     "dest": "102",
+     "bidirectional": true
+    },
+    {
+     "dest": "103",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "102"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "106": {
+   "outbound": [
+    {
+     "dest": "104",
+     "bidirectional": true
+    },
+    {
+     "dest": "107",
+     "bidirectional": true
+    },
+    {
+     "dest": "10E",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "104",
+    "107",
+    "10E"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "107": {
+   "outbound": [
+    {
+     "dest": "106",
+     "bidirectional": true
+    },
+    {
+     "dest": "108",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "106",
+    "108"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "108": {
+   "outbound": [
+    {
+     "dest": "107",
+     "bidirectional": true
+    },
+    {
+     "dest": "200",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "107",
+    "200"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "109": {
+   "outbound": [
+    {
+     "dest": "100",
+     "bidirectional": true
+    },
+    {
+     "dest": "10A",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "100",
+    "10A"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "10A": {
+   "outbound": [
+    {
+     "dest": "109",
+     "bidirectional": true
+    },
+    {
+     "dest": "10B",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "109",
+    "10B"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "10B": {
+   "outbound": [
+    {
+     "dest": "10A",
+     "bidirectional": true
+    },
+    {
+     "dest": "10C",
+     "bidirectional": true
+    },
+    {
+     "dest": "10D",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "10A",
+    "10C",
+    "10D"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "10C": {
+   "outbound": [
+    {
+     "dest": "10B",
+     "bidirectional": true
+    },
+    {
+     "dest": "300",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "10B",
+    "300"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "10D": {
+   "outbound": [
+    {
+     "dest": "10B",
+     "bidirectional": true
+    },
+    {
+     "dest": "10E",
+     "bidirectional": true
+    },
+    {
+     "dest": "10F",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "10B",
+    "10E",
+    "10F"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "10E": {
+   "outbound": [
+    {
+     "dest": "106",
+     "bidirectional": true
+    },
+    {
+     "dest": "10D",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "106",
+    "10D"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "10F": {
+   "outbound": [
+    {
+     "dest": "10D",
+     "bidirectional": true
+    },
+    {
+     "dest": "40B",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "10D",
+    "40B"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "110": {
+   "outbound": [
+    {
+     "dest": "100",
+     "bidirectional": true
+    },
+    {
+     "dest": "102",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "100",
+    "102"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "200": {
+   "outbound": [
+    {
+     "dest": "108",
+     "bidirectional": true
+    },
+    {
+     "dest": "201",
+     "bidirectional": true
+    },
+    {
+     "dest": "205",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "108",
+    "201",
+    "205"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "201": {
+   "outbound": [
+    {
+     "dest": "200",
+     "bidirectional": true
+    },
+    {
+     "dest": "202",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "200",
+    "202"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "202": {
+   "outbound": [
+    {
+     "dest": "201",
+     "bidirectional": true
+    },
+    {
+     "dest": "203",
+     "bidirectional": true
+    },
+    {
+     "dest": "204",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "201",
+    "203",
+    "204"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "203": {
+   "outbound": [
+    {
+     "dest": "202",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "202"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "204": {
+   "outbound": [
+    {
+     "dest": "202",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "202"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "205": {
+   "outbound": [
+    {
+     "dest": "003",
+     "bidirectional": false
+    },
+    {
+     "dest": "100",
+     "bidirectional": false
+    },
+    {
+     "dest": "200",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "200"
+   ],
+   "out_degree": 3,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "300": {
+   "outbound": [
+    {
+     "dest": "10C",
+     "bidirectional": true
+    },
+    {
+     "dest": "301",
+     "bidirectional": true
+    },
+    {
+     "dest": "302",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "10C",
+    "301",
+    "302"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "301": {
+   "outbound": [
+    {
+     "dest": "300",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "300"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "302": {
+   "outbound": [
+    {
+     "dest": "300",
+     "bidirectional": true
+    },
+    {
+     "dest": "303",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "300",
+    "303"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "303": {
+   "outbound": [
+    {
+     "dest": "302",
+     "bidirectional": true
+    },
+    {
+     "dest": "304",
+     "bidirectional": true
+    },
+    {
+     "dest": "305",
+     "bidirectional": true
+    },
+    {
+     "dest": "306",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "302",
+    "304",
+    "305",
+    "306"
+   ],
+   "out_degree": 4,
+   "in_degree": 4,
+   "dead_end": false
+  },
+  "304": {
+   "outbound": [
+    {
+     "dest": "303",
+     "bidirectional": true
+    },
+    {
+     "dest": "305",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "303",
+    "305"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "305": {
+   "outbound": [
+    {
+     "dest": "303",
+     "bidirectional": true
+    },
+    {
+     "dest": "304",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "303",
+    "304"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "306": {
+   "outbound": [
+    {
+     "dest": "303",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "303"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "400": {
+   "outbound": [
+    {
+     "dest": "401",
+     "bidirectional": true
+    },
+    {
+     "dest": "40B",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "401",
+    "40B"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "401": {
+   "outbound": [
+    {
+     "dest": "400",
+     "bidirectional": true
+    },
+    {
+     "dest": "402",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "400"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "402": {
+   "outbound": [
+    {
+     "dest": "403",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "401"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "403": {
+   "outbound": [
+    {
+     "dest": "404",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "402",
+    "404"
+   ],
+   "out_degree": 1,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "404": {
+   "outbound": [
+    {
+     "dest": "403",
+     "bidirectional": true
+    },
+    {
+     "dest": "405",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "403",
+    "405"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "405": {
+   "outbound": [
+    {
+     "dest": "404",
+     "bidirectional": true
+    },
+    {
+     "dest": "406",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "404"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "406": {
+   "outbound": [
+    {
+     "dest": "407",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "405"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "407": {
+   "outbound": [
+    {
+     "dest": "408",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "406"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "408": {
+   "outbound": [
+    {
+     "dest": "409",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "407",
+    "409"
+   ],
+   "out_degree": 1,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "409": {
+   "outbound": [
+    {
+     "dest": "408",
+     "bidirectional": true
+    },
+    {
+     "dest": "40A",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "408",
+    "40A"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "40A": {
+   "outbound": [
+    {
+     "dest": "409",
+     "bidirectional": true
+    },
+    {
+     "dest": "500",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "409",
+    "500"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "40B": {
+   "outbound": [
+    {
+     "dest": "10F",
+     "bidirectional": true
+    },
+    {
+     "dest": "400",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "10F",
+    "400"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "500": {
+   "outbound": [
+    {
+     "dest": "40A",
+     "bidirectional": true
+    },
+    {
+     "dest": "501",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "40A",
+    "501"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "501": {
+   "outbound": [
+    {
+     "dest": "500",
+     "bidirectional": true
+    },
+    {
+     "dest": "502",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "500",
+    "502"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "502": {
+   "outbound": [
+    {
+     "dest": "501",
+     "bidirectional": true
+    },
+    {
+     "dest": "503",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "501"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "503": {
+   "outbound": [
+    {
+     "dest": "504",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "502"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "504": {
+   "outbound": [],
+   "inbound": [
+    "503"
+   ],
+   "out_degree": 0,
+   "in_degree": 1,
+   "dead_end": true
+  },
+  "600": {
+   "outbound": [
+    {
+     "dest": "004",
+     "bidirectional": true
+    },
+    {
+     "dest": "601",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "004",
+    "601"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "601": {
+   "outbound": [
+    {
+     "dest": "600",
+     "bidirectional": true
+    },
+    {
+     "dest": "602",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "600",
+    "602"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "602": {
+   "outbound": [
+    {
+     "dest": "601",
+     "bidirectional": true
+    },
+    {
+     "dest": "603",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "601",
+    "603"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "603": {
+   "outbound": [
+    {
+     "dest": "602",
+     "bidirectional": true
+    },
+    {
+     "dest": "604",
+     "bidirectional": true
+    },
+    {
+     "dest": "605",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "602",
+    "604",
+    "605"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "604": {
+   "outbound": [
+    {
+     "dest": "603",
+     "bidirectional": true
+    },
+    {
+     "dest": "605",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "603",
+    "605"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "605": {
+   "outbound": [
+    {
+     "dest": "603",
+     "bidirectional": true
+    },
+    {
+     "dest": "604",
+     "bidirectional": true
+    },
+    {
+     "dest": "606",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "603",
+    "604",
+    "606"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "606": {
+   "outbound": [
+    {
+     "dest": "605",
+     "bidirectional": true
+    },
+    {
+     "dest": "607",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "605",
+    "607"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "607": {
+   "outbound": [
+    {
+     "dest": "606",
+     "bidirectional": true
+    },
+    {
+     "dest": "700",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "606"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "608": {
+   "outbound": [],
+   "inbound": [],
+   "out_degree": 0,
+   "in_degree": 0,
+   "dead_end": true
+  },
+  "700": {
+   "outbound": [
+    {
+     "dest": "701",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "607",
+    "701"
+   ],
+   "out_degree": 1,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "701": {
+   "outbound": [
+    {
+     "dest": "700",
+     "bidirectional": true
+    },
+    {
+     "dest": "702",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "700",
+    "702"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "702": {
+   "outbound": [
+    {
+     "dest": "701",
+     "bidirectional": true
+    },
+    {
+     "dest": "703",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "701",
+    "703"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "703": {
+   "outbound": [
+    {
+     "dest": "702",
+     "bidirectional": true
+    },
+    {
+     "dest": "704",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "702",
+    "704"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "704": {
+   "outbound": [
+    {
+     "dest": "703",
+     "bidirectional": true
+    },
+    {
+     "dest": "705",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "703",
+    "705"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "705": {
+   "outbound": [
+    {
+     "dest": "704",
+     "bidirectional": true
+    },
+    {
+     "dest": "706",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "704",
+    "706"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "706": {
+   "outbound": [
+    {
+     "dest": "705",
+     "bidirectional": true
+    },
+    {
+     "dest": "800",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "705",
+    "800"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "707": {
+   "outbound": [],
+   "inbound": [],
+   "out_degree": 0,
+   "in_degree": 0,
+   "dead_end": true
+  },
+  "800": {
+   "outbound": [
+    {
+     "dest": "005",
+     "bidirectional": true
+    },
+    {
+     "dest": "706",
+     "bidirectional": true
+    },
+    {
+     "dest": "801",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "005",
+    "706",
+    "801"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "801": {
+   "outbound": [
+    {
+     "dest": "800",
+     "bidirectional": true
+    },
+    {
+     "dest": "802",
+     "bidirectional": true
+    },
+    {
+     "dest": "803",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "800",
+    "802",
+    "803"
+   ],
+   "out_degree": 3,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "802": {
+   "outbound": [
+    {
+     "dest": "801",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "801"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "803": {
+   "outbound": [
+    {
+     "dest": "801",
+     "bidirectional": true
+    },
+    {
+     "dest": "804",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "801",
+    "804"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "804": {
+   "outbound": [
+    {
+     "dest": "803",
+     "bidirectional": true
+    },
+    {
+     "dest": "805",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "803",
+    "805"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "805": {
+   "outbound": [
+    {
+     "dest": "804",
+     "bidirectional": true
+    },
+    {
+     "dest": "80B",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "804",
+    "80B"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "806": {
+   "outbound": [
+    {
+     "dest": "807",
+     "bidirectional": true
+    },
+    {
+     "dest": "80B",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "807",
+    "80B"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "807": {
+   "outbound": [
+    {
+     "dest": "806",
+     "bidirectional": true
+    },
+    {
+     "dest": "808",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "806",
+    "808"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "808": {
+   "outbound": [
+    {
+     "dest": "807",
+     "bidirectional": true
+    },
+    {
+     "dest": "809",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "807"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "809": {
+   "outbound": [
+    {
+     "dest": "80A",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "808"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "80A": {
+   "outbound": [
+    {
+     "dest": "900",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "809"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "80B": {
+   "outbound": [
+    {
+     "dest": "805",
+     "bidirectional": true
+    },
+    {
+     "dest": "806",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "805",
+    "806"
+   ],
+   "out_degree": 2,
+   "in_degree": 2,
+   "dead_end": false
+  },
+  "900": {
+   "outbound": [
+    {
+     "dest": "901",
+     "bidirectional": true
+    },
+    {
+     "dest": "902",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "80A",
+    "901",
+    "902"
+   ],
+   "out_degree": 2,
+   "in_degree": 3,
+   "dead_end": false
+  },
+  "901": {
+   "outbound": [
+    {
+     "dest": "900",
+     "bidirectional": true
+    }
+   ],
+   "inbound": [
+    "900"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "902": {
+   "outbound": [
+    {
+     "dest": "900",
+     "bidirectional": true
+    },
+    {
+     "dest": "903",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "900"
+   ],
+   "out_degree": 2,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "903": {
+   "outbound": [
+    {
+     "dest": "904",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "902"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "904": {
+   "outbound": [
+    {
+     "dest": "003",
+     "bidirectional": false
+    }
+   ],
+   "inbound": [
+    "903"
+   ],
+   "out_degree": 1,
+   "in_degree": 1,
+   "dead_end": false
+  },
+  "905": {
+   "outbound": [],
+   "inbound": [],
+   "out_degree": 0,
+   "in_degree": 0,
+   "dead_end": true
+  },
+  "906": {
+   "outbound": [],
+   "inbound": [],
+   "out_degree": 0,
+   "in_degree": 0,
+   "dead_end": true
+  }
+ }
+}

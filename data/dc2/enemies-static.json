@@ -1,0 +1,455 @@
+{
+ "_source": "Static spawn-graph (op-0x1a, edit_spawn.py) -> type_species TYPE->species. Counterpart to the live enemies-per-room.json. Generic TYPEs 0x10/0x11/0x12 take their model from a per-room MODEL_BASE global (mode-6) that static decode can't resolve -> counted as generic_model_global; see live_efiles for the runtime answer.",
+ "_resolved_types": "TYPE 0x02=Velociraptor(E00), 0x03=Tyrannosaurus(E10, ST200 live-anchor), 0x05=shared-0x640000 (still ambiguous), 0x07=Oviraptor(E90? E-file E3d via 0x63d000), 0x08=Allosaurus. See type_species.py.",
+ "rooms": {
+  "ST000": {
+   "spawn_count": 1,
+   "resolved_species": {},
+   "generic_model_global": 1,
+   "live_efiles": null
+  },
+  "ST001": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": null
+  },
+  "ST002": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": null
+  },
+  "ST003": {
+   "spawn_count": 15,
+   "resolved_species": {},
+   "generic_model_global": 15,
+   "live_efiles": null
+  },
+  "ST005": {
+   "spawn_count": 1,
+   "resolved_species": {},
+   "generic_model_global": 1,
+   "live_efiles": null
+  },
+  "ST100": {
+   "spawn_count": 5,
+   "resolved_species": {
+    "Allosaurus": 5
+   },
+   "generic_model_global": 0,
+   "live_efiles": []
+  },
+  "ST101": {
+   "spawn_count": 2,
+   "resolved_species": {},
+   "generic_model_global": 2,
+   "live_efiles": []
+  },
+  "ST102": {
+   "spawn_count": 6,
+   "resolved_species": {
+    "Velociraptor": 3
+   },
+   "generic_model_global": 3,
+   "live_efiles": [
+    "E00"
+   ]
+  },
+  "ST105": {
+   "spawn_count": 5,
+   "resolved_species": {},
+   "generic_model_global": 5,
+   "live_efiles": [
+    "E00"
+   ]
+  },
+  "ST106": {
+   "spawn_count": 8,
+   "resolved_species": {},
+   "generic_model_global": 8,
+   "live_efiles": []
+  },
+  "ST107": {
+   "spawn_count": 15,
+   "resolved_species": {},
+   "generic_model_global": 15,
+   "live_efiles": [
+    "E00"
+   ]
+  },
+  "ST108": {
+   "spawn_count": 2,
+   "resolved_species": {},
+   "generic_model_global": 2,
+   "live_efiles": null
+  },
+  "ST109": {
+   "spawn_count": 6,
+   "resolved_species": {},
+   "generic_model_global": 6,
+   "live_efiles": [
+    "?hook-dead"
+   ]
+  },
+  "ST10A": {
+   "spawn_count": 2,
+   "resolved_species": {},
+   "generic_model_global": 2,
+   "live_efiles": null
+  },
+  "ST10B": {
+   "spawn_count": 1,
+   "resolved_species": {},
+   "generic_model_global": 1,
+   "live_efiles": null
+  },
+  "ST10C": {
+   "spawn_count": 21,
+   "resolved_species": {
+    "Allosaurus": 7
+   },
+   "generic_model_global": 14,
+   "live_efiles": null
+  },
+  "ST10D": {
+   "spawn_count": 13,
+   "resolved_species": {},
+   "generic_model_global": 13,
+   "live_efiles": null
+  },
+  "ST10E": {
+   "spawn_count": 11,
+   "resolved_species": {},
+   "generic_model_global": 11,
+   "live_efiles": null
+  },
+  "ST10F": {
+   "spawn_count": 10,
+   "resolved_species": {},
+   "generic_model_global": 10,
+   "live_efiles": null
+  },
+  "ST110": {
+   "spawn_count": 1,
+   "resolved_species": {
+    "Allosaurus": 1
+   },
+   "generic_model_global": 0,
+   "live_efiles": null
+  },
+  "ST200": {
+   "spawn_count": 13,
+   "resolved_species": {
+    "Tyrannosaurus (E10)": 3
+   },
+   "generic_model_global": 10,
+   "live_efiles": [
+    "E10"
+   ]
+  },
+  "ST201": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": [
+    "E00"
+   ]
+  },
+  "ST202": {
+   "spawn_count": 48,
+   "resolved_species": {
+    "Velociraptor": 18,
+    "Oviraptor": 26
+   },
+   "generic_model_global": 4,
+   "live_efiles": [
+    "E00"
+   ]
+  },
+  "ST203": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": []
+  },
+  "ST205": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": [
+    "?cached"
+   ]
+  },
+  "ST300": {
+   "spawn_count": 8,
+   "resolved_species": {},
+   "generic_model_global": 8,
+   "live_efiles": null
+  },
+  "ST301": {
+   "spawn_count": 3,
+   "resolved_species": {},
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST302": {
+   "spawn_count": 9,
+   "resolved_species": {
+    "Oviraptor": 4
+   },
+   "generic_model_global": 5,
+   "live_efiles": null
+  },
+  "ST303": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": null
+  },
+  "ST304": {
+   "spawn_count": 1,
+   "resolved_species": {},
+   "generic_model_global": 1,
+   "live_efiles": null
+  },
+  "ST305": {
+   "spawn_count": 1,
+   "resolved_species": {},
+   "generic_model_global": 1,
+   "live_efiles": null
+  },
+  "ST400": {
+   "spawn_count": 5,
+   "resolved_species": {},
+   "generic_model_global": 5,
+   "live_efiles": null
+  },
+  "ST401": {
+   "spawn_count": 2,
+   "resolved_species": {},
+   "generic_model_global": 2,
+   "live_efiles": null
+  },
+  "ST402": {
+   "spawn_count": 8,
+   "resolved_species": {
+    "Giganotosaurus": 2
+   },
+   "generic_model_global": 6,
+   "live_efiles": null
+  },
+  "ST403": {
+   "spawn_count": 1,
+   "resolved_species": {},
+   "generic_model_global": 1,
+   "live_efiles": null
+  },
+  "ST406": {
+   "spawn_count": 3,
+   "resolved_species": {},
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST407": {
+   "spawn_count": 12,
+   "resolved_species": {
+    "Velociraptor": 2
+   },
+   "generic_model_global": 10,
+   "live_efiles": null
+  },
+  "ST408": {
+   "spawn_count": 5,
+   "resolved_species": {},
+   "generic_model_global": 5,
+   "live_efiles": null
+  },
+  "ST409": {
+   "spawn_count": 2,
+   "resolved_species": {},
+   "generic_model_global": 2,
+   "live_efiles": null
+  },
+  "ST40A": {
+   "spawn_count": 1,
+   "resolved_species": {},
+   "generic_model_global": 1,
+   "live_efiles": null
+  },
+  "ST502": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": null
+  },
+  "ST503": {
+   "spawn_count": 9,
+   "resolved_species": {
+    "Giganotosaurus": 1
+   },
+   "generic_model_global": 8,
+   "live_efiles": null
+  },
+  "ST504": {
+   "spawn_count": 6,
+   "resolved_species": {},
+   "generic_model_global": 6,
+   "live_efiles": null
+  },
+  "ST603": {
+   "spawn_count": 4,
+   "resolved_species": {},
+   "generic_model_global": 4,
+   "live_efiles": null
+  },
+  "ST607": {
+   "spawn_count": 3,
+   "resolved_species": {},
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST700": {
+   "spawn_count": 5,
+   "resolved_species": {
+    "shared 0x640000 group": 2
+   },
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST703": {
+   "spawn_count": 21,
+   "resolved_species": {},
+   "generic_model_global": 21,
+   "live_efiles": null
+  },
+  "ST704": {
+   "spawn_count": 12,
+   "resolved_species": {},
+   "generic_model_global": 12,
+   "live_efiles": [
+    "E30 (Mosasaurus)"
+   ]
+  },
+  "ST706": {
+   "spawn_count": 4,
+   "resolved_species": {
+    "Tyrannosaurus-class? (HP 10000 shared by 2 TYPEs - AMBIGUOUS)": 2
+   },
+   "generic_model_global": 2,
+   "live_efiles": null
+  },
+  "ST800": {
+   "spawn_count": 2,
+   "resolved_species": {},
+   "generic_model_global": 2,
+   "live_efiles": null
+  },
+  "ST801": {
+   "spawn_count": 10,
+   "resolved_species": {},
+   "generic_model_global": 10,
+   "live_efiles": null
+  },
+  "ST802": {
+   "spawn_count": 4,
+   "resolved_species": {
+    "Allosaurus": 4
+   },
+   "generic_model_global": 0,
+   "live_efiles": null
+  },
+  "ST803": {
+   "spawn_count": 2,
+   "resolved_species": {},
+   "generic_model_global": 2,
+   "live_efiles": null
+  },
+  "ST805": {
+   "spawn_count": 6,
+   "resolved_species": {},
+   "generic_model_global": 6,
+   "live_efiles": null
+  },
+  "ST806": {
+   "spawn_count": 3,
+   "resolved_species": {},
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST807": {
+   "spawn_count": 9,
+   "resolved_species": {},
+   "generic_model_global": 9,
+   "live_efiles": null
+  },
+  "ST808": {
+   "spawn_count": 10,
+   "resolved_species": {
+    "Allosaurus": 1
+   },
+   "generic_model_global": 9,
+   "live_efiles": null
+  },
+  "ST809": {
+   "spawn_count": 11,
+   "resolved_species": {},
+   "generic_model_global": 11,
+   "live_efiles": null
+  },
+  "ST80A": {
+   "spawn_count": 6,
+   "resolved_species": {
+    "(E-file unresolved)": 3
+   },
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST80B": {
+   "spawn_count": 1,
+   "resolved_species": {
+    "Inostrancevia (E50 via unique HP 2300)": 1
+   },
+   "generic_model_global": 0,
+   "live_efiles": null
+  },
+  "ST900": {
+   "spawn_count": 3,
+   "resolved_species": {},
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST903": {
+   "spawn_count": 18,
+   "resolved_species": {
+    "Tyrannosaurus (E10)": 1
+   },
+   "generic_model_global": 17,
+   "live_efiles": null
+  },
+  "ST904": {
+   "spawn_count": 7,
+   "resolved_species": {},
+   "generic_model_global": 7,
+   "live_efiles": null
+  },
+  "ST905": {
+   "spawn_count": 3,
+   "resolved_species": {},
+   "generic_model_global": 3,
+   "live_efiles": null
+  },
+  "ST906": {
+   "spawn_count": 3,
+   "resolved_species": {},
+   "generic_model_global": 3,
+   "live_efiles": null
+  }
+ },
+ "_stats": {
+  "rooms_with_spawns": 65,
+  "total_spawns": 437,
+  "resolved_spawns": 86,
+  "generic_spawns": 351
+ }
+}

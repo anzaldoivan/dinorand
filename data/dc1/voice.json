@@ -1,0 +1,3401 @@
+{
+  "_source": "Bank-centric fingerprint match (ReginaVoiceMatcher.MatchBanks @score>=0.92) of BioRand regina.dc1 corpus to english/Sound/VOICE banks; user-confirmed method (docs/dc1/VOICE-DECODE-REPORT.md, VOICE-RANDO-PLAN.md §12.6).",
+  "_note": "DC1 TARGET voice manifest, BioRand voice.json format (path -> {player,actor,kind}). Banks are RIFF/WAVE PCM mono 22050 8-bit .dat (§4). Regina banks come from the bank-centric fingerprint (MatchBanks @>=0.92, §12.6); entries with '_verified' are HUMAN by-ear corrections from data/dc1/voice-corrections.json (§12.8) that override the fingerprint — incl. the first supporting-cast (gail/rick) and the non-cast 'computer' (endgame results). Non-Regina actors map to VoiceActor.Unknown in the loader (not a Regina swap target). 'kind' omitted == dialogue. '_donor'/'_score' = fingerprint provenance.",
+  "_lock": "Loaded by Dc1VoiceManifest.Load, locked by Dc1VoiceManifestTests. Regenerate Regina set via ReginaVoiceMatcherTests.Validate_BankCentric_* then the generator; ALWAYS re-apply data/dc1/voice-corrections.json afterwards.",
+  "_actorsLabelled": [
+    "colonel",
+    "computer",
+    "computer-lab",
+    "gail",
+    "kirk",
+    "regina",
+    "rick",
+    "tom"
+  ],
+  "_count": 630,
+  "_verifiedOn": "2026-06-27",
+  "_folderCuration": "2026-06-27 human folder-curation pass (voice-export/<actor>/): labelled the full DC1 cutscene cast from sorted WAVs. Entries with '_source: folder-curation 2026-06-27' are the curation additions; the original fingerprint+by-ear entries keep their _donor/_score/_verified. Non-cast machine voices 'computer'/'computer-lab' are recorded but map to VoiceActor.Unknown (not swap targets). The 19 'others' banks remain unlabelled by request.",
+  "Sound/VOICE/xa10201.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina064",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa10501.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina065",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa10503.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina066",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa10600.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina067",
+    "_score": 0.971
+  },
+  "Sound/VOICE/xa10602a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina068",
+    "_score": 0.994
+  },
+  "Sound/VOICE/xa10602b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina069",
+    "_score": 0.995
+  },
+  "Sound/VOICE/xa10604.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina070",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa10605.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina071",
+    "_score": 0.984
+  },
+  "Sound/VOICE/xa10607.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina072",
+    "_score": 0.985
+  },
+  "Sound/VOICE/xa10609.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina073",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa1060d.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina050",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa1060f.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina051",
+    "_score": 1.0
+  },
+  "Sound/VOICE/xa10610.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "regina128",
+    "_score": 0.936,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa10612.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina074",
+    "_score": 0.979
+  },
+  "Sound/VOICE/xa10616.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina075",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa10618.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina076",
+    "_score": 0.995
+  },
+  "Sound/VOICE/xa10900.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "gail"
+    ],
+    "_donor": "regina077-gail",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa10902.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina078",
+    "_score": 0.99
+  },
+  "Sound/VOICE/xa10d01.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina013",
+    "_score": 0.995
+  },
+  "Sound/VOICE/xa10d03.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina014",
+    "_score": 0.987
+  },
+  "Sound/VOICE/xa10d05.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina015",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa10d06.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_donor": "regina136",
+    "_score": 0.924,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa10d09.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina016",
+    "_score": 0.98
+  },
+  "Sound/VOICE/xa10d0b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina010",
+    "_score": 0.991
+  },
+  "Sound/VOICE/xa10d0d.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina011",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa10d0e.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina012",
+    "_score": 0.985
+  },
+  "Sound/VOICE/xa10d11.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina017",
+    "_score": 0.993
+  },
+  "Sound/VOICE/xa10e00.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina018",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa10e02.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina019",
+    "_score": 0.987
+  },
+  "Sound/VOICE/xa10f00.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "Regina154",
+    "_score": 0.94
+  },
+  "Sound/VOICE/xa11205.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nogail"
+    ],
+    "_donor": "regina079-nogail",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa11208.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nogail"
+    ],
+    "_donor": "regina080-nogail",
+    "_score": 0.989
+  },
+  "Sound/VOICE/xa1120a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina052",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa1120c.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina053",
+    "_score": 0.995
+  },
+  "Sound/VOICE/xa11211.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina081",
+    "_score": 0.935
+  },
+  "Sound/VOICE/xa11400.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina082",
+    "_score": 0.99
+  },
+  "Sound/VOICE/xa11401.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina066",
+    "_score": 0.926
+  },
+  "Sound/VOICE/xa20101.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina083",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa20200.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina084",
+    "_score": 0.954
+  },
+  "Sound/VOICE/xa20202.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina085",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa20204.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina086",
+    "_score": 1.0
+  },
+  "Sound/VOICE/xa20206.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina087",
+    "_score": 0.981
+  },
+  "Sound/VOICE/xa20208.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina088",
+    "_score": 0.988
+  },
+  "Sound/VOICE/xa20501.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina089",
+    "_score": 0.987
+  },
+  "Sound/VOICE/xa20503a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina090",
+    "_score": 0.993
+  },
+  "Sound/VOICE/xa20503b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina091",
+    "_score": 0.99
+  },
+  "Sound/VOICE/xa20505a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina092",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa20505b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina093",
+    "_score": 0.987
+  },
+  "Sound/VOICE/xa20508.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina094",
+    "_score": 0.981
+  },
+  "Sound/VOICE/xa30004.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "rick"
+    ],
+    "_donor": "regina096-rick",
+    "_score": 1.0
+  },
+  "Sound/VOICE/xa30401.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nokirk"
+    ],
+    "_donor": "regina098-nokirk",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa30403.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina099",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa30406.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina100",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa30407.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_donor": "regina011",
+    "_score": 0.924,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa3040a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina054",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa3040d.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina055",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa30410.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina101",
+    "_score": 0.991
+  },
+  "Sound/VOICE/xa30412.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina102",
+    "_score": 0.99
+  },
+  "Sound/VOICE/xa3041b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina056",
+    "_score": 0.993
+  },
+  "Sound/VOICE/xa30803a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "regina136",
+    "_score": 0.942,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa30903.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina105",
+    "_score": 0.989
+  },
+  "Sound/VOICE/xa30906.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina106",
+    "_score": 0.929
+  },
+  "Sound/VOICE/xa3090a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina057",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa30a01.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "Regina197",
+    "_score": 0.927,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa30b01.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina020",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa30c01.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina021",
+    "_score": 0.941
+  },
+  "Sound/VOICE/xa30c03.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina024",
+    "_score": 0.972
+  },
+  "Sound/VOICE/xa30c06a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "kirk",
+      "william"
+    ],
+    "_donor": "regina026-kirk-william",
+    "_score": 0.95
+  },
+  "Sound/VOICE/xa30c18.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina028",
+    "_score": 0.978
+  },
+  "Sound/VOICE/xa40501.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina108",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa40503.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina109",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa40506.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina110",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa40508.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nogail"
+    ],
+    "_donor": "regina111-nogail",
+    "_score": 0.991
+  },
+  "Sound/VOICE/xa40606.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina112",
+    "_score": 0.923
+  },
+  "Sound/VOICE/xa40901.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina113",
+    "_score": 0.964
+  },
+  "Sound/VOICE/xa40903.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "regina128",
+    "_score": 0.92,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa40904.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina114",
+    "_score": 1.0
+  },
+  "Sound/VOICE/xa40c00.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina029",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa40c02.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina030",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa40c04.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina031",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa50302.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina115",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa50307.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nokirk"
+    ],
+    "_donor": "regina116-nokirk",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa5030b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina058",
+    "_score": 0.937
+  },
+  "Sound/VOICE/xa5030d.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina059",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa5030f.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "gail"
+    ],
+    "_donor": "regina060-gail",
+    "_score": 0.995
+  },
+  "Sound/VOICE/xa50311.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina117",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa50314.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "gail"
+    ],
+    "_donor": "regina118-gail",
+    "_score": 0.993
+  },
+  "Sound/VOICE/xa50316.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "Regina193",
+    "_score": 0.959
+  },
+  "Sound/VOICE/xa50318.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina119",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa5031b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "gail"
+    ],
+    "_donor": "regina061-gail",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa5031d.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina062",
+    "_score": 0.959
+  },
+  "Sound/VOICE/xa50500.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "Regina197",
+    "_score": 0.95
+  },
+  "Sound/VOICE/xa50502.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "norick"
+    ],
+    "_donor": "regina120-norick",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa50900.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "rick"
+    ],
+    "_donor": "regina121-rick",
+    "_score": 0.925
+  },
+  "Sound/VOICE/xa50e01.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina034",
+    "_score": 0.995
+  },
+  "Sound/VOICE/xa50e03a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina035",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa50e03b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina036",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa50e08.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina037",
+    "_score": 0.971
+  },
+  "Sound/VOICE/xa50e0e.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina033",
+    "_score": 0.994
+  },
+  "Sound/VOICE/xa50e13.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina038",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa50e15.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina039",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa50f04.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_donor": "regina056",
+    "_score": 0.955,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa50f07.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_donor": "regina128",
+    "_score": 0.955,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa51002.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina122",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa60903.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina123",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa60906.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina124",
+    "_score": 0.972
+  },
+  "Sound/VOICE/xa6090da.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "Regina191",
+    "_score": 0.925,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa6090e.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nokirk"
+    ],
+    "_donor": "regina063-nokirk",
+    "_score": 0.964
+  },
+  "Sound/VOICE/xa60912.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nokirk"
+    ],
+    "_donor": "regina125-nokirk",
+    "_score": 0.994
+  },
+  "Sound/VOICE/xa6091a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina128",
+    "_score": 0.935
+  },
+  "Sound/VOICE/xa60920a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina126",
+    "_score": 0.969
+  },
+  "Sound/VOICE/xa60920b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina127",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa60921a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "regina128",
+    "_score": 0.958,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa60923.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina128",
+    "_score": 0.979
+  },
+  "Sound/VOICE/xa60927.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina129",
+    "_score": 0.994
+  },
+  "Sound/VOICE/xa60b01a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nokirk"
+    ],
+    "_donor": "regina040-nokirk",
+    "_score": 0.992
+  },
+  "Sound/VOICE/xa60b01b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina041",
+    "_score": 0.993
+  },
+  "Sound/VOICE/xa60b03.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina042",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa60d02.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina011",
+    "_score": 0.944
+  },
+  "Sound/VOICE/xa60d07a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "rick"
+    ],
+    "_donor": "regina045-rick",
+    "_score": 0.986
+  },
+  "Sound/VOICE/xa60d07b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina046",
+    "_score": 0.936
+  },
+  "Sound/VOICE/xa60d09.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina047",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa60d0a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nogail"
+    ],
+    "_donor": "regina043-nogail",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa60d0c.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "rick"
+    ],
+    "_donor": "regina044-rick",
+    "_score": 0.963
+  },
+  "Sound/VOICE/xa60f00.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina048",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa60f03.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "gail"
+    ],
+    "_donor": "regina049-gail",
+    "_score": 1.0
+  },
+  "Sound/VOICE/xa60f07.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "regina128",
+    "_score": 0.968,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa61001.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina130",
+    "_score": 1.0
+  },
+  "Sound/VOICE/xa61005.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina132",
+    "_score": 0.974
+  },
+  "Sound/VOICE/xa61007.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina134",
+    "_score": 0.963
+  },
+  "Sound/VOICE/xa61008.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_donor": "regina128",
+    "_score": 0.934,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa61101.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina135",
+    "_score": 0.928
+  },
+  "Sound/VOICE/xa61103.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina136",
+    "_score": 0.994
+  },
+  "Sound/VOICE/xa61106.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina137",
+    "_score": 0.961
+  },
+  "Sound/VOICE/xa61201.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina138",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa_ep02b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nokirk"
+    ],
+    "_donor": "regina002-nokirk",
+    "_score": 0.999
+  },
+  "Sound/VOICE/xa_ep03b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nokirk"
+    ],
+    "_donor": "regina003-nokirk",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa_ep04b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nogail"
+    ],
+    "_donor": "regina004-nogail",
+    "_score": 0.993
+  },
+  "Sound/VOICE/xa_ep05b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "nogail"
+    ],
+    "_donor": "regina005-nogail",
+    "_score": 0.996
+  },
+  "Sound/VOICE/xa_ep06b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "donorConditions": [
+      "norick"
+    ],
+    "_donor": "regina006-norick",
+    "_score": 0.987
+  },
+  "Sound/VOICE/xa_ep08b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina008",
+    "_score": 0.972
+  },
+  "Sound/VOICE/xa_ep09b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina009",
+    "_score": 0.997
+  },
+  "Sound/VOICE/xa_ep0ab.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_donor": "regina001",
+    "_score": 0.998
+  },
+  "Sound/VOICE/xa_ep0e.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_donor": "regina029",
+    "_score": 0.92,
+    "_verified": "by-ear 2026-06-27"
+  },
+  "Sound/VOICE/xa10904.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1120f.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11402.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30001.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30300.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30302.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30304.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30414.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30800.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30802.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30908.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c05.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c06b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c1a.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c1b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c1d.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40600.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50300.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50304.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50309.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50319.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e0c.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f09.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f0b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f0d.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d03.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61003.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61104.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61105.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep07b.dat": {
+    "player": 0,
+    "actor": "regina",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1060e.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10611.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10614.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10615.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10619.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1061b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1061d.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10620.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10901.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10903.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10905a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10905b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10906.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d02a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d02b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d04a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d04b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d07.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d0f.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d10.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d12.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10e01.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10e03.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10e04.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11200.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11201.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11203.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30000.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30002.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30400.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30402.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30404.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30405.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30408.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30409.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3040b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3040e.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30413.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30416.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30417.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30419.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3041d.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3041f.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30421.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30900.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30901.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30902.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30904.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30905.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30907.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30909.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c08.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c09.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0da.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0db.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0dc.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0f.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c11.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c13.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c15.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c17.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c19a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c19b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c1c.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c1ea.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c1eb.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c20.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50303.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50305a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50305b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50305c.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030ca.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030cb.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030cc.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030cd.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030ce.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030cf.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030cg.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030ch.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50310.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50312a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50312b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50315a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50315b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50315c.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50317b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50317c.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5031ca.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5031cb.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50501.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50503a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50503b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e05a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e05b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e06.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e0a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e10a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e10b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e10c.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e12a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e12b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e17a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e17b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e19a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e19b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e19c.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1ca.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1cb.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1cc.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1ea.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1eb.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e20.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e21.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f00a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f00b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f03.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f05.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f08.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f0aa.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f0ab.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f0ca.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f0cb.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f0cc.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60914.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60916.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60918.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6091b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6091e.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d0e.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60f02.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60f04.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60f06a.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60f06b.dat": {
+    "player": 0,
+    "actor": "gail",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10200.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10202.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10500.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10502.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10601a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10601b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10603.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10606.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10608.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1060aa.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1060ab.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1060ba.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1060bb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1060c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10613.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10617a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10617b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1061a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1061c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1061e.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1061fa.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1061fb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10621.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10700a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10700b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10700c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d00a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d00b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d00c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d08a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d08b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d0a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d0ca.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa10d0cb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11202a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11202b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11204.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11206.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11207a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11207b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11209.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1120b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1120da.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1120db.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa1120e.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11210.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11212a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa11212b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa20100.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa20102.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa20103.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa20507.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa20509.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30003.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30005a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30005b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30005c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30006.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30007.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30008.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30009.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3000a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3000ba.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3000bb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3040f.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30411.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30418.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3041aa.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3041ab.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3041ca.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3041cb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa3041e.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30420.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30801.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30803b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30b00.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30b02a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30b02b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c00a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c00b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c02.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c04.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40300.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40301.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40500.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40502a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40502b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40504.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40505.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40507.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40509a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40509b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40602.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40605.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40607.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40608a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40608b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40900.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40902.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40905a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40905b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40c01a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40c01b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40c03a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40c03b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40c05.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50901.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e18a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e18b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1aa.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1ab.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1ac.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1ad.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1ba.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1bb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1bc.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1bd.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1d.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e1f.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e22.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51001.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51003a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51003b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60000.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60001.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60002a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60002b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60200a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60200b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60200c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60800.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60900a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60900b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60901.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60904a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60904b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60904c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60905.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60907.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60908a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60908b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60909a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60909b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090aa.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090ab.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090ba.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090bb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090bc.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090ca.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090cb.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090db.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6090f.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60910.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60911.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60913a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60913b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60915a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60915b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60917a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60917b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60919.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6091c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6091d.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa6091f.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60921b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60921c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60922.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60924.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60925.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60926.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60b00.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60b02a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60b02b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60b04a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60b04b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60b04c.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60c00.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60c01a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60c01b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d00.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d06.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d08.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d0b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d0d.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60f01.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60f05.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61000.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61002a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61002b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61004a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61004b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61006.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61009.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61100.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61102.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61200a.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61200b.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa61202.dat": {
+    "player": 0,
+    "actor": "rick",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c07a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c07b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0ca.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0cb.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c0e.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c10.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c12.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c14.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c16.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c1f.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c21a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30c21b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50301.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50306.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50308a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50308b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030aa.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030ab.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030ea.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5030eb.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50313.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50317a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa5031a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50700a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50700b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50702a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50702b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e00.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e02.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e04a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e04b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e07a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e07b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e07c.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e07d.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e07e.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e07f.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e07g.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e09a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e09b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e09c.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e0b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e0da.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e0db.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e0fa.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e0fb.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e11a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e11b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e11c.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e11d.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e11e.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e14.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e16a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50e16b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f01.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f02.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f06a.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50f06b.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d01.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d04.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa60d05.dat": {
+    "player": 0,
+    "actor": "kirk",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30a00.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa30a02.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40601.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40603a.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40603b.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa40604.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op02a.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op02b.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op02c.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op03a.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op04a.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op04b.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op04c.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op04d.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op04e.dat": {
+    "player": 0,
+    "actor": "tom",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50701a.dat": {
+    "player": 0,
+    "actor": "colonel",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50701b.dat": {
+    "player": 0,
+    "actor": "colonel",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50701c.dat": {
+    "player": 0,
+    "actor": "colonel",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50703a.dat": {
+    "player": 0,
+    "actor": "colonel",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50703b.dat": {
+    "player": 0,
+    "actor": "colonel",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep00.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep01.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep02a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep03a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep04a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep05a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep06a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep07a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep08a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep09a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep0aa.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep0f.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep10a.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep10b.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep10c.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep10d.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep10e.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_ep10f.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op00.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op01.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op05.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa_op06.dat": {
+    "player": 0,
+    "actor": "computer",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50704a.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50704b.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50705.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50902a.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50902b.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50903a.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50903b.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50903c.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50b00a.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50b00b.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50b01.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50b02.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50b03.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50b04.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa50b05.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51000a.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51000b.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51004a.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51004b.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  },
+  "Sound/VOICE/xa51004c.dat": {
+    "player": 0,
+    "actor": "computer-lab",
+    "_source": "folder-curation 2026-06-27"
+  }
+}

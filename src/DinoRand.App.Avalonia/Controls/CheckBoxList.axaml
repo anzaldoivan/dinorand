@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:DinoRand.App"
+             x:Class="DinoRand.App.CheckBoxList"
+             d:DesignHeight="200" d:DesignWidth="100">
+    <!-- WPF ListView → Avalonia ListBox; the per-item Checked/Unchecked pair → IsCheckedChanged;
+         ToolTip="…" → ToolTip.Tip="…". Container styling moves into ListBox.Styles. -->
+    <ListBox x:Name="list">
+        <ListBox.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Unselect All" Click="menuUnselectAll_Click" />
+                <MenuItem Header="Select All" Click="menuSelectAll_Click" />
+                <MenuItem Header="Random" Click="menuRandom_Click" />
+            </ContextMenu>
+        </ListBox.ContextMenu>
+        <ListBox.Styles>
+            <Style Selector="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+        </ListBox.Styles>
+        <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="local:CheckBoxListItem">
+                <CheckBox Content="{Binding Text}"
+                          ToolTip.Tip="{Binding ToolTip}"
+                          IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                          IsCheckedChanged="OnCheckBoxChanged" />
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

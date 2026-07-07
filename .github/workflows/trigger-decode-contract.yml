@@ -1,0 +1,41 @@
+name: trigger-decode-contract
+
+# Enforces that the DERIVED data layers stay in sync with their generators + authored inputs:
+#   1. data/dc1/room-data.json trigger layer (summary / logic / confidence + _flag_glossary)
+#      <- scripts/trigger_decode.py + data/dc1/flag-labels.json
+#   2. data/dc1/map.json itemPriorities (Fixed pins for flag-gated/runtime-armed/twin items)
+#      <- scripts/gen_item_map.py + data/dc1/room-data.json item_control
+#
+# Both checks read only JSON (no game .dat / install needed), so they run on a stock runner.
+# Make this REQUIRED in branch protection so a PR can't merge with a hand-edited summary, a
+# stale glossary, an unlabeled gate flag, or item pins out of sync with the decoded gates.
+
+on:
+  push:
+    paths:
+      - "data/dc1/room-data.json"
+      - "data/dc1/flag-labels.json"
+      - "data/dc1/map.json"
+      - "scripts/trigger_decode.py"
+      - "scripts/gen_item_map.py"
+      - ".github/workflows/trigger-decode-contract.yml"
+  pull_request:
+    paths:
+      - "data/dc1/room-data.json"
+      - "data/dc1/flag-labels.json"
+      - "data/dc1/map.json"
+      - "scripts/trigger_decode.py"
+      - "scripts/gen_item_map.py"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: trigger-decode contract (C1..C7)
+        run: python scripts/trigger_decode.py --check
+      - name: item-map contract (Fixed pins ⟷ item_control)
+        run: python scripts/gen_item_map.py --check

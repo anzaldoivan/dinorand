@@ -1,0 +1,55 @@
+{
+  "_comment": "Per-species enemy-texture catalog for DC1. SOURCE: the room-file MODEL PRIMITIVES (not DINO.exe). Each enemy model's tri/quad packets carry a CLUT code (u16 @ prim+0x0a) and a tpage code (u16 @ prim+0x0e); the room package's 16-byte Gian entry headers are PSX LoadImage RECTs that DMA those texels into VRAM. DINO.exe holds NO per-species texture table — texture identity comes entirely from the model primitives, which we cross-reference to data/dc1/enemies.json by (category, bones). Codes/rects dumped offline by tools/scd_re/species_tpage.py and verified by EnemyTextureCatalogTests against TextureImporter.ExtractSpeciesTexture. tpage code: bits0-3=col*64, bit4=row*256, bits7-8=bpp(1=8bpp). CLUT code: bits0-5=X/16, bits6-14=Y. The palette ROW (palette_rect[1]) is the per-species discriminator within a shared texture column. Rects are [X, Y, W, H] in 16-bit VRAM units.",
+  "_xref": "Each row joins to data/dc1/enemies.json on (category == species.id) AND (bones == species.bones). enemies.json carries the species prose; this file carries its VRAM texture footprint. donor_room is one canonical room that loads this species' texture; place_op is the SCD opcode that places it (0x20 inline record, model@+0x10; 0x59 record, model@+0x04).",
+  "textures": [
+    {
+      "category": 1, "bones": 15, "name": "Velociraptor",
+      "donor_room": "10e", "place_op": "0x20", "model_ptr": "0x80110e70",
+      "tpage_codes": ["0x8b", "0x9b"], "clut_code": "0x7fb0",
+      "texture_rect": [704, 0, 64, 512], "palette_rect": [768, 510, 256, 1],
+      "note": "Shares the X=704 texture column with Raptor-heavy, Pteranodon and Swarm; distinguished only by palette row 510 (CLUT 0x7fb0)."
+    },
+    {
+      "category": 2, "bones": 21, "name": "Raptor (heavy rig)",
+      "donor_room": "401", "place_op": "0x20", "model_ptr": "0x801081c0",
+      "tpage_codes": ["0x8b", "0x9b"], "clut_code": "0x7ff0",
+      "texture_rect": [704, 0, 64, 512], "palette_rect": [768, 511, 256, 1],
+      "note": "Shares the X=704 column with Velociraptor/Pteranodon/Swarm; palette row 511 (CLUT 0x7ff0). st401 hosts only cat2 enemies, so the slot is unambiguous."
+    },
+    {
+      "category": 3, "bones": 20, "name": "Tyrannosaurus (boss rig)",
+      "donor_room": "60a", "place_op": "0x20", "model_ptr": "0x80114144",
+      "tpage_codes": ["0x8a", "0x9a"], "clut_code": "0x7fb0",
+      "texture_rect": [640, 0, 64, 512], "palette_rect": [768, 510, 256, 1],
+      "note": "T-Rex CAVEAT: the boss is a scripted set-piece; st60a places it via a single 0x20 record (sole entity in the room), which is the cleanest donor. Uses the X=640 column (NOT 704), shared with Therizinosaurus; palette row 510."
+    },
+    {
+      "category": 4, "bones": 10, "name": "Tyrannosaurus (Chief's Room rig)",
+      "donor_room": "202", "place_op": "0x20", "model_ptr": "0x8010f5d0",
+      "tpage_codes": ["0x89", "0x99"], "clut_code": "0x7f70",
+      "texture_rect": [576, 0, 64, 512], "palette_rect": [768, 509, 256, 1],
+      "note": "T-Rex CAVEAT: the 10-bone Chief's-Room rig is placed via a 0x20 record ONLY in st202. The only species on the X=576 column; palette row 509 (CLUT 0x7f70) — a unique column AND row."
+    },
+    {
+      "category": 5, "bones": 7, "name": "Swarm (small dino)",
+      "donor_room": "307", "place_op": "0x20", "model_ptr": "0x8010e39c",
+      "tpage_codes": ["0x8b"], "clut_code": "0x7ff0",
+      "texture_rect": [704, 0, 64, 128], "palette_rect": [768, 511, 256, 1],
+      "note": "SWARM CAVEAT: all instances share ONE model pointer (st307: 4 slots, same 0x8010e39c). Only a single tpage (0x8b) — the texture block is just 64x128 (top of the X=704 column), not the full 512. Shares the X=704 column + palette row 511 with Raptor-heavy/Pteranodon."
+    },
+    {
+      "category": 7, "bones": 18, "name": "Pteranodon",
+      "donor_room": "400", "place_op": "0x20", "model_ptr": "0x80109bd8",
+      "tpage_codes": ["0x8b", "0x9b"], "clut_code": "0x7ff0",
+      "texture_rect": [704, 0, 64, 512], "palette_rect": [768, 511, 256, 1],
+      "note": "Shares the X=704 column + palette row 511 (CLUT 0x7ff0) with Raptor-heavy/Swarm — this is why a Pteranodon imported into a raptor room (0102) wore the raptor skin (same VRAM coords, different palette content)."
+    },
+    {
+      "category": 8, "bones": 22, "name": "Therizinosaurus",
+      "donor_room": "603", "place_op": "0x59", "model_ptr": "0x8010cd68",
+      "tpage_codes": ["0x8a", "0x9a"], "clut_code": "0x7ff0",
+      "texture_rect": [640, 0, 64, 512], "palette_rect": [768, 511, 256, 1],
+      "note": "Placed via the 0x59 opcode (model@+0x04), not 0x20. Uses the X=640 column shared with the T-Rex boss rig; distinguished by palette row 511 (CLUT 0x7ff0) vs the boss's row 510."
+    }
+  ]
+}

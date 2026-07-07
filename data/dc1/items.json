@@ -1,0 +1,991 @@
+{
+  "_source": "residentevil123 forum 't3242' (item ID table)",
+  "_note": "IDs verified from forum; item-record opcode is 0x62 (22 bytes). Key items gate progression.",
+  "_lock": "The 'allItems' table is the id->name->category source of truth, locked to DinoCrisis1 by ItemTableTests: every DinoCrisis1.ItemPool entry's id/name/category must match a row here, and every category=='key' id must be in DinoCrisis1.KeyItemIds. The 'pool' weights/membership below are an informational reference only — the code's ItemPool is hand-tuned and intentionally differs. Edit allItems + the code together, or the test fails.",
+  "_weaponAmmo_note": "Weapon-id -> compatible ammo-ids, the linked-ammo source of truth (ITEM-RANDO-PLAN.md §2). Mirrored by DinoCrisis1.AmmoForWeapon and locked by ItemTableTests. Confidence: handgun/shotgun high; grenade-gun round-sharing medium (mis-weights ammo only, never beatability). startingWeapons = weapons Regina begins with, so their ammo is always linked.",
+  "_weaponPartUpgrades_note": "Weapon-PART id -> the weapon it upgrades into, so a placed part links the upgraded weapon's ammo (ITEM-RANDO-PLAN.md §6/§7.3). Only Handgun Slides (0x0e -> Glock 35 0x07) is mapped: it is the one part whose upgrade introduces NEW ammo (40S&W 0x17) and whose base (Glock 34) is the always-present starting weapon. The shotgun parts reuse shotgun ammo (already linked via the Shotgun pickup), so mapping them would only risk linking shotgun ammo off a stray stock with no shotgun.",
+  "_weaponPartBase_note": "Weapon-PART id -> the BASE weapon it requires to be useful (ITEM-RANDO-PLAN.md §7.3). Drives the weapon-upgrade-chance feature: an upgrade part is only placed when its base weapon is in the seed, and then only with probability RandomizerConfig.WeaponUpgradeChance. 0x0b/0x0c (shotgun parts/stock) need a Shotgun 0x01; 0x0d/0x0e (handgun sights/slides) need the Handgun 0x05 (the start weapon, always present); 0x0f (grenade-gun part) needs the Grenade Gun 0x09. Mirrored by DinoCrisis1.WeaponForPart, locked by ItemTableTests.",
+  "startingWeapons": ["0x05"],
+  "weaponPartUpgrades": { "0x0e": "0x07" },
+  "weaponPartBase": { "0x0b": "0x01", "0x0c": "0x01", "0x0d": "0x05", "0x0e": "0x05", "0x0f": "0x09" },
+  "_weaponUpgradeVariants_note": "Base weapon -> { part-id: resulting upgraded-weapon variant }, for the EXPERIMENTAL pre-upgraded-weapon feature (ITEM-RANDO-PLAN.md §7.3): with RandomizerConfig.PreUpgradedWeaponChance (default 0, OFF), a found base weapon is placed already-upgraded (the variant id) instead of base + a loose part. These variant ids (0x02-0x08, 0x0a) are NEVER vanilla world pickups in DC1 (the game only places base 0x01/0x09 and combines parts at runtime), so a direct variant pickup is UNVALIDATED and the feature is default-off pending CE/playtest. Confidence: shotgun/handgun combinations high; grenade 0x09+0x0f->0x0a medium. Mirrored by DinoCrisis1.WeaponUpgradeVariants, locked by ItemTableTests.",
+  "weaponUpgradeVariants": {
+    "0x01": { "0x0b": "0x02", "0x0c": "0x03" },
+    "0x02": { "0x0c": "0x04" },
+    "0x05": { "0x0d": "0x06", "0x0e": "0x07" },
+    "0x07": { "0x0d": "0x08" },
+    "0x09": { "0x0f": "0x0a" }
+  },
+  "weaponAmmo": {
+    "0x01": ["0x10", "0x11"],
+    "0x02": ["0x10", "0x11"],
+    "0x03": ["0x10", "0x11"],
+    "0x04": ["0x10", "0x11"],
+    "0x05": ["0x16"],
+    "0x06": ["0x16"],
+    "0x07": ["0x17"],
+    "0x08": ["0x17"],
+    "0x09": ["0x18", "0x19", "0x12", "0x13", "0x14", "0x15"],
+    "0x0a": ["0x18", "0x19", "0x12", "0x13", "0x14", "0x15", "0x1a"]
+  },
+  "_weaponFamilies_note": "Player-facing weapon FAMILY -> { name, ids }, the source of truth for the per-family EnabledWeapons toggles (ITEM-RANDO-PLAN.md §7.4). Each family groups a base weapon, its custom variants, and its upgrade parts; every weapon/weapon_part id (0x01-0x0f) appears in exactly one family. Mirrored by DinoCrisis1.WeaponFamilyOf / WeaponFamilies and locked by ItemTableTests. Disabling a family (RandomizerConfig.EnabledWeaponFamilies) drops its ids from pool placement; the order here is the UI/CLI display order. The Handgun is Regina's start weapon, so disabling it only removes handgun pickups/upgrades — the starting Glock 34 (and its 9mm) is unaffected.",
+  "weaponFamilies": {
+    "handgun": { "name": "Handgun", "ids": ["0x05", "0x06", "0x07", "0x08", "0x0d", "0x0e"] },
+    "shotgun": { "name": "Shotgun", "ids": ["0x01", "0x02", "0x03", "0x04", "0x0b", "0x0c"] },
+    "grenade": { "name": "Grenade Gun", "ids": ["0x09", "0x0a", "0x0f"] }
+  },
+  "keyItems": [
+    {
+      "id": "0x2B",
+      "name": "Plug"
+    },
+    {
+      "id": "0x2C",
+      "name": "locker Room Key"
+    },
+    {
+      "id": "0x2D",
+      "name": "Small Size Key"
+    },
+    {
+      "id": "0x2E",
+      "name": "Entrance Key"
+    },
+    {
+      "id": "0x2F",
+      "name": "BG Room B1 Key"
+    },
+    {
+      "id": "0x30",
+      "name": "BG Area Key"
+    },
+    {
+      "id": "0x31",
+      "name": "C. O. Area Key"
+    },
+    {
+      "id": "0x32",
+      "name": "Port Card Key"
+    },
+    {
+      "id": "0x34",
+      "name": "ID Card Type \" Colonel \""
+    },
+    {
+      "id": "0x35",
+      "name": "ID Card Type \" Communicator \""
+    },
+    {
+      "id": "0x36",
+      "name": "ID Card Type \" Researcher \""
+    },
+    {
+      "id": "0x37",
+      "name": "Key Card Lv. D"
+    },
+    {
+      "id": "0x38",
+      "name": "Key Card Lv. C"
+    },
+    {
+      "id": "0x39",
+      "name": "Key Card Lv. B"
+    },
+    {
+      "id": "0x3A",
+      "name": "Key Card Lv. A"
+    },
+    {
+      "id": "0x3B",
+      "name": "ID Card Type \" Project Superintendent \" (Dr. Kirk)"
+    },
+    {
+      "id": "0x3C",
+      "name": "C. O. Pass Card"
+    },
+    {
+      "id": "0x3D",
+      "name": "Panel Key 1"
+    },
+    {
+      "id": "0x3E",
+      "name": "Panel Key 2"
+    },
+    {
+      "id": "0x3F",
+      "name": "Startup Battery. R \" Uncharged \""
+    },
+    {
+      "id": "0x40",
+      "name": "Startup Battery. R \" Charged \""
+    },
+    {
+      "id": "0x41",
+      "name": "F. C. Device \" without FingerPrint \""
+    },
+    {
+      "id": "0x42",
+      "name": "F. C. Device \" With FingerPrint \""
+    },
+    {
+      "id": "0x43",
+      "name": "B1 Crane Card"
+    },
+    {
+      "id": "0x44",
+      "name": "Screwdriver"
+    },
+    {
+      "id": "0x45",
+      "name": "Antenna Key"
+    },
+    {
+      "id": "0x46",
+      "name": "B1 Key Chip"
+    },
+    {
+      "id": "0x47",
+      "name": "Key Card L"
+    },
+    {
+      "id": "0x48",
+      "name": "Key Card R"
+    },
+    {
+      "id": "0x49",
+      "name": "B3 Crane Card 1"
+    },
+    {
+      "id": "0x4A",
+      "name": "B3 Crane Card 2"
+    },
+    {
+      "id": "0x4B",
+      "name": "B3 Crane Card 3"
+    },
+    {
+      "id": "0x4C",
+      "name": "Stabilizer"
+    },
+    {
+      "id": "0x4D",
+      "name": "Initializer"
+    },
+    {
+      "id": "0x4E",
+      "name": "Protect P. 1-A"
+    },
+    {
+      "id": "0x4F",
+      "name": "Protect P. 2-A"
+    },
+    {
+      "id": "0x50",
+      "name": "Protect P. 1-B"
+    },
+    {
+      "id": "0x51",
+      "name": "Protect P. 2-B"
+    },
+    {
+      "id": "0x52",
+      "name": "Core Parts 1"
+    },
+    {
+      "id": "0x53",
+      "name": "Core Parts 2"
+    },
+    {
+      "id": "0x54",
+      "name": "Energy Tank"
+    },
+    {
+      "id": "0x55",
+      "name": "Nucleum"
+    },
+    {
+      "id": "0x56",
+      "name": "B2 Key Chip 1"
+    },
+    {
+      "id": "0x57",
+      "name": "B2 Key Chip 2"
+    },
+    {
+      "id": "0x58",
+      "name": "Pulse Receiver"
+    },
+    {
+      "id": "0x59",
+      "name": "Startup Battery. R \" Large \""
+    },
+    {
+      "id": "0x5A",
+      "name": "Startup Battery. W \" Large \""
+    },
+    {
+      "id": "0x5B",
+      "name": "Secret Disc \" With Data \""
+    },
+    {
+      "id": "0x5D",
+      "name": "Researcher Memo \" with number \"(1281)"
+    },
+    {
+      "id": "0x5E",
+      "name": "B1 Key Chip \" with number \"(3695)"
+    },
+    {
+      "id": "0x5F",
+      "name": "B2 Key Chip 1 \" without number \""
+    },
+    {
+      "id": "0x60",
+      "name": "B2 Key Chip 2 \" with number \" (0392)"
+    },
+    {
+      "id": "0x61",
+      "name": "Planning Disc"
+    },
+    {
+      "id": "0x62",
+      "name": "DDK Input Disc H"
+    },
+    {
+      "id": "0x63",
+      "name": "DDK Input Disc N"
+    },
+    {
+      "id": "0x64",
+      "name": "DDK Input Disc L"
+    },
+    {
+      "id": "0x65",
+      "name": "DDK Input Disc E"
+    },
+    {
+      "id": "0x66",
+      "name": "DDK Input Disc W"
+    },
+    {
+      "id": "0x67",
+      "name": "DDK Input Disc S"
+    },
+    {
+      "id": "0x68",
+      "name": "DDK Input Disc D"
+    },
+    {
+      "id": "0x69",
+      "name": "DDK Code Disc H"
+    },
+    {
+      "id": "0x6A",
+      "name": "DDK Code Disc N"
+    },
+    {
+      "id": "0x6B",
+      "name": "DDK Code Disc L"
+    },
+    {
+      "id": "0x6C",
+      "name": "DDK Code Disc E"
+    },
+    {
+      "id": "0x6D",
+      "name": "DDK Code Disc W"
+    },
+    {
+      "id": "0x6E",
+      "name": "DDK Code Disc S"
+    },
+    {
+      "id": "0x6F",
+      "name": "DDK Code Disc D"
+    }
+  ],
+  "pool": [
+    {
+      "id": "0x10",
+      "name": "SG Bullets",
+      "weight": 3.0
+    },
+    {
+      "id": "0x11",
+      "name": "Slag Bullets",
+      "weight": 3.0
+    },
+    {
+      "id": "0x12",
+      "name": "An. Darts S",
+      "weight": 3.0
+    },
+    {
+      "id": "0x13",
+      "name": "An. Darts M",
+      "weight": 3.0
+    },
+    {
+      "id": "0x14",
+      "name": "An. Darts L",
+      "weight": 3.0
+    },
+    {
+      "id": "0x15",
+      "name": "Poison Dart",
+      "weight": 3.0
+    },
+    {
+      "id": "0x16",
+      "name": "9mm Parabellum",
+      "weight": 3.0
+    },
+    {
+      "id": "0x17",
+      "name": "40S&W Bullets",
+      "weight": 3.0
+    },
+    {
+      "id": "0x18",
+      "name": "Grenade Bullets",
+      "weight": 3.0
+    },
+    {
+      "id": "0x19",
+      "name": "Heat Bullets",
+      "weight": 3.0
+    },
+    {
+      "id": "0x1A",
+      "name": "inf. Grenades",
+      "weight": 3.0
+    },
+    {
+      "id": "0x1B",
+      "name": "Hemostat",
+      "weight": 2.0
+    },
+    {
+      "id": "0x1C",
+      "name": "Med. Pak S",
+      "weight": 2.0
+    },
+    {
+      "id": "0x1D",
+      "name": "Med. Pak M",
+      "weight": 2.0
+    },
+    {
+      "id": "0x1E",
+      "name": "Med. Pak L",
+      "weight": 2.0
+    },
+    {
+      "id": "0x1F",
+      "name": "Resuscitation",
+      "weight": 2.0
+    },
+    {
+      "id": "0x20",
+      "name": "An. Aid",
+      "weight": 2.0
+    },
+    {
+      "id": "0x21",
+      "name": "Recovery Aid",
+      "weight": 2.0
+    },
+    {
+      "id": "0x22",
+      "name": "Intensifier",
+      "weight": 2.0
+    },
+    {
+      "id": "0x23",
+      "name": "Multiplier",
+      "weight": 2.0
+    }
+  ],
+  "allItems": [
+    {
+      "id": "0x01",
+      "name": "Shotgun \"\"Model PA3\"\" (pump-action)",
+      "category": "weapon"
+    },
+    {
+      "id": "0x02",
+      "name": "Shotgun Custom \"\"Model SPAS12\"\" (military shotgun)",
+      "category": "weapon"
+    },
+    {
+      "id": "0x03",
+      "name": "Shotgun + Stock \"\"Model PA3\"\"",
+      "category": "weapon"
+    },
+    {
+      "id": "0x04",
+      "name": "Shotgun Custom + Stock \"\"Model SPAS12\"\"",
+      "category": "weapon"
+    },
+    {
+      "id": "0x05",
+      "name": "Handgun (Glock 34)",
+      "category": "weapon"
+    },
+    {
+      "id": "0x06",
+      "name": "Handgun + Sight (Glock 34)",
+      "category": "weapon"
+    },
+    {
+      "id": "0x07",
+      "name": "Handgun Custom (Glock 35)",
+      "category": "weapon"
+    },
+    {
+      "id": "0x08",
+      "name": "Handgun Custom + Sight (Glock 35)",
+      "category": "weapon"
+    },
+    {
+      "id": "0x09",
+      "name": "Grenade Gun (40mmHK)",
+      "category": "weapon"
+    },
+    {
+      "id": "0x0A",
+      "name": "Grenade Gun Custom (40mmHK) \"\"Regina Custom\"\"",
+      "category": "weapon"
+    },
+    {
+      "id": "0x0B",
+      "name": "Shotgun Parts (upgrade To SPAS12)",
+      "category": "weapon_part"
+    },
+    {
+      "id": "0x0C",
+      "name": "Shotgun Stock",
+      "category": "weapon_part"
+    },
+    {
+      "id": "0x0D",
+      "name": "Handgun Sights (critical hit)",
+      "category": "weapon_part"
+    },
+    {
+      "id": "0x0E",
+      "name": "Handgun Slides (upgrade To Glock 35)",
+      "category": "weapon_part"
+    },
+    {
+      "id": "0x0F",
+      "name": "Grenade Gun",
+      "category": "weapon_part"
+    },
+    {
+      "id": "0x10",
+      "name": "SG Bullets",
+      "category": "ammo"
+    },
+    {
+      "id": "0x11",
+      "name": "Slag Bullets",
+      "category": "ammo"
+    },
+    {
+      "id": "0x12",
+      "name": "An. Darts S",
+      "category": "ammo"
+    },
+    {
+      "id": "0x13",
+      "name": "An. Darts M",
+      "category": "ammo"
+    },
+    {
+      "id": "0x14",
+      "name": "An. Darts L",
+      "category": "ammo"
+    },
+    {
+      "id": "0x15",
+      "name": "Poison Dart",
+      "category": "ammo"
+    },
+    {
+      "id": "0x16",
+      "name": "9mm Parabellum",
+      "category": "ammo"
+    },
+    {
+      "id": "0x17",
+      "name": "40S&W Bullets",
+      "category": "ammo"
+    },
+    {
+      "id": "0x18",
+      "name": "Grenade Bullets",
+      "category": "ammo"
+    },
+    {
+      "id": "0x19",
+      "name": "Heat Bullets",
+      "category": "ammo"
+    },
+    {
+      "id": "0x1A",
+      "name": "inf. Grenades",
+      "category": "ammo"
+    },
+    {
+      "id": "0x1B",
+      "name": "Hemostat",
+      "category": "health"
+    },
+    {
+      "id": "0x1C",
+      "name": "Med. Pak S",
+      "category": "health"
+    },
+    {
+      "id": "0x1D",
+      "name": "Med. Pak M",
+      "category": "health"
+    },
+    {
+      "id": "0x1E",
+      "name": "Med. Pak L",
+      "category": "health"
+    },
+    {
+      "id": "0x1F",
+      "name": "Resuscitation",
+      "category": "health"
+    },
+    {
+      "id": "0x20",
+      "name": "An. Aid",
+      "category": "health"
+    },
+    {
+      "id": "0x21",
+      "name": "Recovery Aid",
+      "category": "health"
+    },
+    {
+      "id": "0x22",
+      "name": "Intensifier",
+      "category": "health"
+    },
+    {
+      "id": "0x23",
+      "name": "Multiplier",
+      "category": "health"
+    },
+    {
+      "id": "0x2B",
+      "name": "Plug",
+      "category": "key"
+    },
+    {
+      "id": "0x2C",
+      "name": "locker Room Key",
+      "category": "key"
+    },
+    {
+      "id": "0x2D",
+      "name": "Small Size Key",
+      "category": "key"
+    },
+    {
+      "id": "0x2E",
+      "name": "Entrance Key",
+      "category": "key"
+    },
+    {
+      "id": "0x2F",
+      "name": "BG Room B1 Key",
+      "category": "key"
+    },
+    {
+      "id": "0x30",
+      "name": "BG Area Key",
+      "category": "key"
+    },
+    {
+      "id": "0x31",
+      "name": "C. O. Area Key",
+      "category": "key"
+    },
+    {
+      "id": "0x32",
+      "name": "Port Card Key",
+      "category": "key"
+    },
+    {
+      "id": "0x34",
+      "name": "ID Card Type \" Colonel \"",
+      "category": "key"
+    },
+    {
+      "id": "0x35",
+      "name": "ID Card Type \" Communicator \"",
+      "category": "key"
+    },
+    {
+      "id": "0x36",
+      "name": "ID Card Type \" Researcher \"",
+      "category": "key"
+    },
+    {
+      "id": "0x37",
+      "name": "Key Card Lv. D",
+      "category": "key"
+    },
+    {
+      "id": "0x38",
+      "name": "Key Card Lv. C",
+      "category": "key"
+    },
+    {
+      "id": "0x39",
+      "name": "Key Card Lv. B",
+      "category": "key"
+    },
+    {
+      "id": "0x3A",
+      "name": "Key Card Lv. A",
+      "category": "key"
+    },
+    {
+      "id": "0x3B",
+      "name": "ID Card Type \" Project Superintendent \" (Dr. Kirk)",
+      "category": "key"
+    },
+    {
+      "id": "0x3C",
+      "name": "C. O. Pass Card",
+      "category": "key"
+    },
+    {
+      "id": "0x3D",
+      "name": "Panel Key 1",
+      "category": "key"
+    },
+    {
+      "id": "0x3E",
+      "name": "Panel Key 2",
+      "category": "key"
+    },
+    {
+      "id": "0x3F",
+      "name": "Startup Battery. R \" Uncharged \"",
+      "category": "key"
+    },
+    {
+      "id": "0x40",
+      "name": "Startup Battery. R \" Charged \"",
+      "category": "key"
+    },
+    {
+      "id": "0x41",
+      "name": "F. C. Device \" without FingerPrint \"",
+      "category": "key"
+    },
+    {
+      "id": "0x42",
+      "name": "F. C. Device \" With FingerPrint \"",
+      "category": "key"
+    },
+    {
+      "id": "0x43",
+      "name": "B1 Crane Card",
+      "category": "key"
+    },
+    {
+      "id": "0x44",
+      "name": "Screwdriver",
+      "category": "key"
+    },
+    {
+      "id": "0x45",
+      "name": "Antenna Key",
+      "category": "key"
+    },
+    {
+      "id": "0x46",
+      "name": "B1 Key Chip",
+      "category": "key"
+    },
+    {
+      "id": "0x47",
+      "name": "Key Card L",
+      "category": "key"
+    },
+    {
+      "id": "0x48",
+      "name": "Key Card R",
+      "category": "key"
+    },
+    {
+      "id": "0x49",
+      "name": "B3 Crane Card 1",
+      "category": "key"
+    },
+    {
+      "id": "0x4A",
+      "name": "B3 Crane Card 2",
+      "category": "key"
+    },
+    {
+      "id": "0x4B",
+      "name": "B3 Crane Card 3",
+      "category": "key"
+    },
+    {
+      "id": "0x4C",
+      "name": "Stabilizer",
+      "category": "key"
+    },
+    {
+      "id": "0x4D",
+      "name": "Initializer",
+      "category": "key"
+    },
+    {
+      "id": "0x4E",
+      "name": "Protect P. 1-A",
+      "category": "key"
+    },
+    {
+      "id": "0x4F",
+      "name": "Protect P. 2-A",
+      "category": "key"
+    },
+    {
+      "id": "0x50",
+      "name": "Protect P. 1-B",
+      "category": "key"
+    },
+    {
+      "id": "0x51",
+      "name": "Protect P. 2-B",
+      "category": "key"
+    },
+    {
+      "id": "0x52",
+      "name": "Core Parts 1",
+      "category": "key"
+    },
+    {
+      "id": "0x53",
+      "name": "Core Parts 2",
+      "category": "key"
+    },
+    {
+      "id": "0x54",
+      "name": "Energy Tank",
+      "category": "key"
+    },
+    {
+      "id": "0x55",
+      "name": "Nucleum",
+      "category": "key"
+    },
+    {
+      "id": "0x56",
+      "name": "B2 Key Chip 1",
+      "category": "key"
+    },
+    {
+      "id": "0x57",
+      "name": "B2 Key Chip 2",
+      "category": "key"
+    },
+    {
+      "id": "0x58",
+      "name": "Pulse Receiver",
+      "category": "key"
+    },
+    {
+      "id": "0x59",
+      "name": "Startup Battery. R \" Large \"",
+      "category": "key"
+    },
+    {
+      "id": "0x5A",
+      "name": "Startup Battery. W \" Large \"",
+      "category": "key"
+    },
+    {
+      "id": "0x5B",
+      "name": "Secret Disc \" With Data \"",
+      "category": "key"
+    },
+    {
+      "id": "0x5D",
+      "name": "Researcher Memo \" with number \"(1281)",
+      "category": "key"
+    },
+    {
+      "id": "0x5E",
+      "name": "B1 Key Chip \" with number \"(3695)",
+      "category": "key"
+    },
+    {
+      "id": "0x5F",
+      "name": "B2 Key Chip 1 \" without number \"",
+      "category": "key"
+    },
+    {
+      "id": "0x60",
+      "name": "B2 Key Chip 2 \" with number \" (0392)",
+      "category": "key"
+    },
+    {
+      "id": "0x61",
+      "name": "Planning Disc",
+      "category": "key"
+    },
+    {
+      "id": "0x62",
+      "name": "DDK Input Disc H",
+      "category": "key"
+    },
+    {
+      "id": "0x63",
+      "name": "DDK Input Disc N",
+      "category": "key"
+    },
+    {
+      "id": "0x64",
+      "name": "DDK Input Disc L",
+      "category": "key"
+    },
+    {
+      "id": "0x65",
+      "name": "DDK Input Disc E",
+      "category": "key"
+    },
+    {
+      "id": "0x66",
+      "name": "DDK Input Disc W",
+      "category": "key"
+    },
+    {
+      "id": "0x67",
+      "name": "DDK Input Disc S",
+      "category": "key"
+    },
+    {
+      "id": "0x68",
+      "name": "DDK Input Disc D",
+      "category": "key"
+    },
+    {
+      "id": "0x69",
+      "name": "DDK Code Disc H",
+      "category": "key"
+    },
+    {
+      "id": "0x6A",
+      "name": "DDK Code Disc N",
+      "category": "key"
+    },
+    {
+      "id": "0x6B",
+      "name": "DDK Code Disc L",
+      "category": "key"
+    },
+    {
+      "id": "0x6C",
+      "name": "DDK Code Disc E",
+      "category": "key"
+    },
+    {
+      "id": "0x6D",
+      "name": "DDK Code Disc W",
+      "category": "key"
+    },
+    {
+      "id": "0x6E",
+      "name": "DDK Code Disc S",
+      "category": "key"
+    },
+    {
+      "id": "0x6F",
+      "name": "DDK Code Disc D",
+      "category": "key"
+    },
+    {
+      "id": "0x78",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x79",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x7A",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x7B",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x7C",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x7D",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x7E",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x7F",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x80",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x81",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x82",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x83",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x84",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    },
+    {
+      "id": "0x85",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "category": "ancient_part"
+    }
+  ]
+}

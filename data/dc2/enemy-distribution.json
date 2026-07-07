@@ -1,0 +1,12 @@
+{
+  "comment": "DC2 donor-distribution registry (docs/dc2/ENEMY-DISTRIBUTION-PLAN.md D2/D4/D5). One row per weighable donor species (= Dc2SpeciesTable Known+LAND, locked by Dc2EnemyDistributionTests). default_weight 0-15 biases the per-room weighted donor pick (equal weights over a room's valid donors reproduce the legacy uniform pick exactly); room_cap bounds how many rooms a species may win per seed in weighted mode (null = unlimited). Tuning rarity is an edit HERE, not a code change. Pool MEMBERSHIP still comes from the boss/setpiece toggles; weights only bias among members.",
+  "species": [
+    { "type": "0x02", "creature": "Velociraptor",   "default_weight": 8, "room_cap": null },
+    { "type": "0x03", "creature": "Tyrannosaurus",  "default_weight": 2, "room_cap": 2 },
+    { "type": "0x06", "creature": "Giganotosaurus", "default_weight": 1, "room_cap": 1 },
+    { "type": "0x07", "creature": "Oviraptor",      "default_weight": 8, "room_cap": null },
+    { "type": "0x08", "creature": "Allosaurus",     "default_weight": 8, "room_cap": null },
+    { "type": "0x09", "creature": "Triceratops",    "default_weight": 8, "room_cap": null },
+    { "type": "0x0e", "creature": "Inostrancevia",  "default_weight": 8, "room_cap": null }
+  ]
+}

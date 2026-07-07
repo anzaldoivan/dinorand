@@ -1,0 +1,325 @@
+{
+  "_source": "Cached GameFAQs walkthrough/weapon tables (docs/dc2/dc2-rooms-faq.md, JL Lee v1.0). GUIDE-SOURCED. No DC2 item-record byte decode exists yet (ITEM.DAT is a global catalog only; per-room placement is in the undecoded room blob).",
+  "_comment": "DC2 has NO numeric item id table decoded from bytes (unlike DC1 items.json whose ids came from the residentevil123 forum + file cross-check). All ids below are PLACEHOLDER (null). Currency is 'Extinct Points' (called 'Vital Credits' in this FAQ). Names are guide-sourced; weapon owner/type single-source.",
+  "_provenance_legend": "confirmed = FAQ + Wikipedia/other; single-source = FAQ only; placeholder = unknown (e.g. all numeric ids).",
+  "_runtime_decoded_ids": {
+    "_source": "CE live capture 2026-06-27 (Dino2.exe @0x400000). FIRST byte-grounded DC2 item ids. AOT SAT-1 record (0x752388+slot*0x28): item-id = rec+0x14 (ctor 0x48bf20 `type` arg, sourced from slot-5 op-0x31 builder 0x489880 <- block+0x04). NOTE (p2 correction): rec+0x18 (<- block+0x00) is NOT the count -- static decode of 0x48bf20 shows it is a x4 index into the [scene_mgr+0xa54] scene-object array; the earlier 'count' matches were coincidental small values. Only rec+0x14 (id) is the editable lever. See docs/dc2/AOT-SYSTEM-RE.md (SAT-1 handler).",
+    "ids": {
+      "0x01": "Med Pak S (in-game name; healing). count 2 -> inv 2/2",
+      "0x02": "Resusc Pack (in-game name; healing/revival). count 2 -> inv 2/2",
+      "0x05": "Dino File (collectible; routes to dino-file log, not item inventory). count 1",
+      "0x07": "UNNAMED -- captured ST109 with count 7 (likely ammo); confirm name from inventory. Static-confirmed in ST109 script (decode_script op-0x31, id=7 count=7)",
+      "0x09": "CONFIRMED REAL 2026-06-27 (p2) -- NO LONGER stale. The corrected decode_script.py finds op-0x31 id=9 count=1 slot=6 in ST109's init-area routine (previously skipped by the routine-discovery bug); slot 6 matches the runtime AOT read. Name still unknown.",
+      "0x04": "UNNAMED -- static decode (ST402 + ST403/701 op-0x31). count field unreliable (block+0x00 is likely an AOT index, not qty); confirm name",
+      "0x06": "UNNAMED -- static decode (ST706/800/605 op-0x31); confirm name",
+      "0x03": "UNNAMED -- static decode (14 occurrences, e.g. ST000/002/204/408/802); confirm name",
+      "0x08": "UNNAMED -- static decode (ST402, ST603 op-0x31); confirm name"
+    },
+    "_static_decode_note": "decode_script.py reads scripted item ids straight from room files. CORRECTED 2026-06-27 (p2): a routine-discovery bug skipped the INIT routine (offset @ section+0x1c) of every multi-routine room -- exactly where most door/item commits live. After the fix: 165 op-0x31 items across 54 rooms (was 25/17). id=block+0x04 literal = randomizer lever (the byte at script+offset that decode_script prints). The 'separate s7/s8 / CORE0x path' for ST104/ST106 is REFUTED -- there is ONE item path (op 0x31 in per-room slot-5); ST106's items were in the skipped init routine and now match the live capture exactly (id5/slot12, id2/slot7). ST104 is the lone holdout (true 1-routine room, 0 op-0x31) -> its live Med Pak S is likely a stale record. Id histogram: 1=95,2=31,3=14,4=6,5=8,6=5,7=3,8=2,9=1. See docs/dc2/AOT-SYSTEM-RE.md (CORRECTION p2)."
+  },
+  "currency": {
+    "name": "Extinct Points",
+    "alias": "Vital Credits",
+    "provenance": "confirmed (FAQ + Wikipedia)"
+  },
+  "weapons": [
+    {
+      "id": null,
+      "name": "Handgun",
+      "owner": "Regina",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Shotgun",
+      "owner": "Dylan",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Solid Cannon",
+      "owner": "Dylan",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Anti-Tank Rifle",
+      "owner": "Dylan",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Rocket Launcher",
+      "owner": "Dylan",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Submachine Gun",
+      "owner": "Regina",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Heavy Machine Gun",
+      "owner": "Regina",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Missile Pod",
+      "owner": "Regina",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Needle Gun",
+      "owner": "Regina",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Aqua Grenade",
+      "owner": "Regina",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Flame Launcher",
+      "owner": "Both",
+      "type": "main",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Machete",
+      "owner": "Dylan",
+      "type": "sub",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Large Stun Gun",
+      "owner": "Regina",
+      "type": "sub",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Shock Wave",
+      "owner": "Regina",
+      "type": "sub",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Chain Mine",
+      "owner": "Both",
+      "type": "sub",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Fire Wall",
+      "owner": "Both",
+      "type": "sub",
+      "provenance": "single-source (FAQ)"
+    }
+  ],
+  "keyItems": [
+    {
+      "id": null,
+      "name": "Research Facility Keycard",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Box Key",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "ID Card",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Shutter Control Plug",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Living Area Key",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Energy Disc",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "City Keycard",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Blue Keyplate",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Keyplate",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Signal Shooter",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Battery",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Diver Suit",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Inner Suit",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Light Armour",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    },
+    {
+      "id": null,
+      "name": "Gas Mask",
+      "category": "key",
+      "provenance": "single-source (FAQ walkthrough pickups)"
+    }
+  ],
+  "dinoFiles": [
+    {
+      "id": null,
+      "name": "Velociraptor Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Oviraptor Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Pteranodon Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Plesiosaurus Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Inostrancevia Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Mosasaurus Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Allosaurus Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Triceratops Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Compsognathus Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    },
+    {
+      "id": null,
+      "name": "Giganotosaurus Dino File",
+      "category": "collectible",
+      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
+    }
+  ],
+  "healing": [
+    {
+      "id": null,
+      "name": "Hemostat",
+      "category": "health",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Recovery (Small)",
+      "category": "health",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Recovery (Large)",
+      "category": "health",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Complete Recovery",
+      "category": "health",
+      "provenance": "single-source (FAQ)"
+    },
+    {
+      "id": null,
+      "name": "Med Pack",
+      "category": "health",
+      "provenance": "single-source (FAQ)"
+    }
+  ]
+}

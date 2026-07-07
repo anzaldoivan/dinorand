@@ -1,0 +1,20 @@
+{
+  "$comment": "DC2 raptor (E00-family) variant/tier table, decoded from Dino2.exe (RAPTOR-TIER-RE.md). variant = low nibble of [actor+0x10C]; hp = hpBase + rand(0..31), x2 hard / /2 easy ([G+0x108E]); tex ids are PSX-order file ids (PC = same filename). Valid variants 0-7 (stock static spawns use 7; 8+ read garbage records) - the randomizer must clamp to these. aiNibbles = raw bytes 1-2 of the 5-byte record at 0x7031E8 (semantics unverified). default_weight: 0-15 pool weight (v5 super raptor rare by default).",
+  "hpTableVA": "0x7031B8",
+  "recordTableVA": "0x7031E8",
+  "texTableVA": "0x703E48",
+  "wavePairTableVA": "0x703E9C",
+  "variants": [
+    { "variant": 0, "hpClass": 0, "hpBase": 395,   "texId": 88, "texFile": "E00.TEX",    "aiNibbles": "00 00", "default_weight": 4, "notes": "green (ST201 live: hard HP 790-852)" },
+    { "variant": 1, "hpClass": 1, "hpBase": 775,   "texId": 88, "texFile": "E00.TEX",    "aiNibbles": "11 10", "default_weight": 4 },
+    { "variant": 2, "hpClass": 2, "hpBase": 795,   "texId": 88, "texFile": "E00.TEX",    "aiNibbles": "11 01", "default_weight": 4 },
+    { "variant": 3, "hpClass": 2, "hpBase": 795,   "texId": 95, "texFile": "E02.TEX",    "aiNibbles": "11 11", "default_weight": 4 },
+    { "variant": 4, "hpClass": 3, "hpBase": 1595,  "texId": 90, "texFile": "E00_02.TEX", "aiNibbles": "12 02", "default_weight": 4, "notes": "red (ST40A live: hard HP 3190-3252)" },
+    { "variant": 5, "hpClass": 4, "hpBase": 10000, "texId": 95, "texFile": "E02.TEX",    "aiNibbles": "12 13", "default_weight": 1, "notes": "super/'blue' raptor; forced naturally by combo latch [G+0x138A]; rare in pool by default" },
+    { "variant": 6, "hpClass": 2, "hpBase": 795,   "texId": 97, "texFile": "E03.TEX",    "aiNibbles": "11 01", "default_weight": 4 },
+    { "variant": 7, "hpClass": 0, "hpBase": 395,   "texId": 91, "texFile": "E00_03.TEX", "aiNibbles": "30 44", "default_weight": 4, "notes": "the common STOCK static-spawn variant (16/23 op-0x1a raptor spawns use literal 7)" }
+  ],
+  "wavePairTable": [[0,0],[0,1],[1,1],[6,6],[2,3],[3,3],[4,4],[2,4],[4,4],[5,5]],
+  "waveIndexFormula": "idx = min(desc[+4] + 3*word[G+0x1388], 9); variant = pair[idx][rand()&1]; latch word[G+0x138A]!=0 forces variant 5",
+  "comboTrigger": { "counterVA": "[G+0xC24]", "threshold": 20, "armSiteVA": "0x41E59F", "latchVA": "[G+0x138A]", "difficultyGate": "[G+0x108E] != 0" }
+}

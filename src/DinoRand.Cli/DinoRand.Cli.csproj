@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>DinoRand.Cli</RootNamespace>
+    <AssemblyName>dinorand</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DinoRand.Randomizer\DinoRand.Randomizer.csproj" />
+  </ItemGroup>
+</Project>

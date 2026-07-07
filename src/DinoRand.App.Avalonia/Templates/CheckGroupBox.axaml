@@ -1,0 +1,44 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DinoRand.App">
+    <!-- Plain titled-border "group box" — Avalonia core has no GroupBox, so MainWindow's WPF
+         <GroupBox> sections become <HeaderedContentControl Classes="group">. -->
+    <Style Selector="HeaderedContentControl.group">
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="8">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" FontWeight="SemiBold" Margin="0,0,0,6"
+                                   Text="{TemplateBinding Header}" />
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <!-- Template for CheckGroupBox. Avalonia has no GroupBox, so this is a titled Border with the
+         check box on the header row; the content border is disabled until the box is ticked
+         (IsChildrenEnabled). Port of Templates/CheckGroupBox.xaml. -->
+    <Style Selector="local|CheckGroupBox">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="Auto,*">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="4,0,0,2">
+                        <CheckBox x:Name="PART_checkbox"
+                                  VerticalAlignment="Center"
+                                  IsChecked="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="2,0,0,0"
+                                   Text="{TemplateBinding ActualHeader}" />
+                    </StackPanel>
+                    <Border Grid.Row="1"
+                            BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsEnabled="{TemplateBinding IsChildrenEnabled}">
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
