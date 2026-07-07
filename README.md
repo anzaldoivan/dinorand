@@ -13,6 +13,13 @@ related: []
 
 # DinoRand
 
+[![CI](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml/badge.svg)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/badge/coverage-60%25-yellow)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)
+[![no-copyrighted-files](https://github.com/anzaldoivan/dinorand/actions/workflows/no-copyrighted-files.yml/badge.svg)](https://github.com/anzaldoivan/dinorand/actions/workflows/no-copyrighted-files.yml)
+
+<!-- Coverage badge is static (60%, the current line-coverage floor). To make it auto-update, see CONTRIBUTING.md /
+     the CI runbook: Codecov (works on private repos) or a shields.io endpoint (needs a public repo). -->
+
 A randomizer for **Dino Crisis 1 & 2**, modelled on [BioRand](https://github.com/biorand/classic),
 the classic Resident Evil randomizer.
 
