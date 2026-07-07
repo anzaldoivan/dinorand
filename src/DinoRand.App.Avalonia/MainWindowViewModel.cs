@@ -54,7 +54,7 @@ namespace DinoRand.App
         private readonly Func<IClipboard> _clipboard;
 
         private AppSeed _appSeed = AppSeed.Random();
-        private readonly AppSettings _settings = AppSettings.Load();
+        private readonly AppSettings _settings;
         private bool _suspend;
         private bool _gameDrmProtected;
 
@@ -75,11 +75,15 @@ namespace DinoRand.App
         /// <summary>The live config behind the current seed, for the view's PieChart glue (read-only).</summary>
         public RandomizerConfig CurrentConfig => _appSeed.Config;
 
-        public MainWindowViewModel(IFilePicker filePicker, IDialogs dialogs, Func<IClipboard> clipboard)
+        // <paramref name="settings"/> defaults to the on-disk store (%APPDATA%\DinoRand\settings.json);
+        // tests pass an in-memory AppSettings so they neither read nor depend on a real settings file.
+        public MainWindowViewModel(IFilePicker filePicker, IDialogs dialogs, Func<IClipboard> clipboard,
+            AppSettings settings = null)
         {
             _filePicker = filePicker;
             _dialogs = dialogs;
             _clipboard = clipboard;
+            _settings = settings ?? AppSettings.Load();
 
             BuildStartingInventoryEditor();
 

@@ -42,8 +42,24 @@ jobs:
           PCT=$(python3 -c "import xml.etree.ElementTree as ET; \
             print(round(float(ET.parse('coverage-report/Cobertura.xml').getroot().get('line-rate')) * 100, 2))")
           echo "Overall line coverage: ${PCT}%  (floor: ${THRESHOLD}%)"
+          echo "PCT=$PCT" >> "$GITHUB_ENV"   # reused by the badge step below
           awk -v p="$PCT" -v t="$THRESHOLD" 'BEGIN { exit (p + 0 < t + 0) ? 1 : 0 }' || {
             echo "::error::Line coverage ${PCT}% is below the ${THRESHOLD}% floor"; exit 1; }
+
+      # Publishes the live PCT (from the gate step) to a public gist that the README shields.io badge reads.
+      # main-push only: never republish from PRs or feature branches. Skips silently if the gate step failed.
+      - name: Update coverage badge gist
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: b1a330aadd5e6deb20cf6ec18c738b6a
+          filename: dinorand-coverage.json
+          label: coverage
+          message: ${{ env.PCT }}%
+          valColorRange: ${{ env.PCT }}
+          maxColorRange: 90
+          minColorRange: 50
 
       - name: Coverage summary → job summary
         if: always()

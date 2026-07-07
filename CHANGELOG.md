@@ -9,6 +9,21 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+### Removed — WPF GUI retired
+
+- The Windows-only WPF front-end (`src/DinoRand.App` → `DinoRand.exe`) has been removed. The
+  cross-platform **Avalonia** GUI (`src/DinoRand.App.Avalonia` → `DinoRand.Avalonia`, Win/Linux/macOS)
+  is now the sole GUI front-end (AVALONIA-PORT.md Phase 5). Release publishing no longer produces
+  `DinoRand.exe`.
+
+### Added — Avalonia GUI test coverage
+
+- View-model + converter tests for the Avalonia GUI, decoupled from the randomizer engine and any
+  real game install (fake `IFilePicker`/`IDialogs`, in-memory `AppSettings`): seed↔UI round-trip,
+  option→seed encoding, computed visibility, and per-game slice isolation on game switch. The VM
+  gained one optional constructor seam (`AppSettings` injection) so tests never read/write a real
+  settings file.
+
 ### Added — DC2 starting main-weapon randomizer (I3 in-game witness pending)
 
 - **Starting main weapon** (`--dc2-randomize-start-weapon [--seed N]` random, or

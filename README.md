@@ -14,11 +14,11 @@ related: []
 # DinoRand
 
 [![CI](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml/badge.svg)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)
-[![coverage](https://img.shields.io/badge/coverage-60%25-yellow)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/anzaldoivan/b1a330aadd5e6deb20cf6ec18c738b6a/raw/dinorand-coverage.json)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)
 [![no-copyrighted-files](https://github.com/anzaldoivan/dinorand/actions/workflows/no-copyrighted-files.yml/badge.svg)](https://github.com/anzaldoivan/dinorand/actions/workflows/no-copyrighted-files.yml)
 
-<!-- Coverage badge is static (60%, the current line-coverage floor). To make it auto-update, see CONTRIBUTING.md /
-     the CI runbook: Codecov (works on private repos) or a shields.io endpoint (needs a public repo). -->
+<!-- Coverage badge auto-updates: CI's "Update coverage badge gist" step writes PCT to a public gist on each
+     main push; shields.io renders it via the endpoint URL above. -->
 
 A randomizer for **Dino Crisis 1 & 2**, modelled on [BioRand](https://github.com/biorand/classic),
 the classic Resident Evil randomizer.
@@ -41,8 +41,7 @@ get back a randomized, still-completable playthrough — items, enemies, loadout
 src/DinoRand.FileFormats   "dino-utils": parse/write STxxx.DAT stage files (no logic)
 src/DinoRand.Randomizer    seed-driven engine: graph, key-item logic, item/enemy passes
 src/DinoRand.Cli           console front-end (cross-platform)
-src/DinoRand.App           WPF GUI front-end → DinoRand.exe (Windows only)
-src/DinoRand.App.Avalonia  cross-platform GUI port (in progress — see AVALONIA-PORT.md)
+src/DinoRand.App.Avalonia  cross-platform GUI front-end → DinoRand.Avalonia (Win/Linux/macOS)
 test/                      unit tests (codec + parser round-trips)
 data/dc1/                  JSON game data (items, enemies, room metadata)
 ```
@@ -91,29 +90,11 @@ Outputs:
 - `coverage-report/Cobertura.xml` — machine-readable, CI-consumable
 - `coverage-report/Summary.txt` — plain-text table printed at the end of the script
 
-### Windows GUI executable (PowerShell)
-
-`src/DinoRand.App` is the WPF front-end; it builds to **`DinoRand.exe`** and runs **only on
-Windows**. From a PowerShell prompt at the repo root (with the .NET 8 SDK installed):
-
-```powershell
-# Build and launch the GUI in one step
-dotnet run --project src\DinoRand.App
-
-# …or produce a standalone DinoRand.exe and run it
-dotnet build src\DinoRand.App -c Release
-.\src\DinoRand.App\bin\Release\net8.0-windows\DinoRand.exe
-```
-
-> The `.App` project targets `net8.0-windows` (WPF). It _compiles_ on Linux/WSL
-> (`EnableWindowsTargeting`) but can only be **launched** on Windows — use the
-> cross-platform `DinoRand.Cli` for headless/WSL runs.
-
 ### Cross-platform GUI (Avalonia)
 
-`src/DinoRand.App.Avalonia` is the cross-platform GUI (Avalonia 12, `net8.0`); it builds to
-**`DinoRand.Avalonia`** and runs on Windows, Linux and macOS. It is the front-end going forward
-(the WPF `.App` above is being retired — see [AVALONIA-PORT.md](docs/decisions/cross/AVALONIA-PORT.md)). From the repo root
+`src/DinoRand.App.Avalonia` is the GUI (Avalonia 12, `net8.0`); it builds to
+**`DinoRand.Avalonia`** and runs on Windows, Linux and macOS. It is the sole GUI front-end (the
+former WPF `.App` was retired — see [AVALONIA-PORT.md](docs/decisions/cross/AVALONIA-PORT.md)). From the repo root
 with the .NET 8 SDK installed:
 
 ```bash
@@ -135,14 +116,14 @@ runtime installed to launch. For a release, use `scripts/publish-release.sh` to 
 **self-contained, single-file** executables that run with **no .NET runtime installed**:
 
 ```bash
-scripts/publish-release.sh                 # default: win-x64 (GUI + CLI)
-scripts/publish-release.sh linux-x64       # CLI only (GUI is Windows-only, auto-skipped)
+scripts/publish-release.sh                 # default: win-x64 (Avalonia GUI + CLI)
+scripts/publish-release.sh linux-x64       # Avalonia GUI + CLI
 scripts/publish-release.sh win-x64 osx-arm64 linux-x64   # several RIDs at once
 ```
 
 Artifacts land in `dist/<rid>/`:
 
-- `DinoRand.exe` — WPF GUI front-end (`win-*` RIDs only)
+- `DinoRand.Avalonia` / `DinoRand.Avalonia.exe` — cross-platform GUI front-end (every RID)
 - `dinorand` / `dinorand.exe` — CLI front-end (every RID)
 
 No data files ship alongside the binary: the game data is already baked in (`map.json` is an

@@ -5,8 +5,6 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <!-- Exclude the WPF GUI project — it can't run headlessly -->
-          <Exclude>[DinoRand.App]*</Exclude>
           <ExcludeByFile>**/*.g.cs,**/*.designer.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
