@@ -63,6 +63,21 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
   witnessed live). The lever now also rewrites the main-weapon record id in all three
   templates (Dylan's register-sourced record via a same-length imm16 instruction rewrite);
   ammo counts stay canonical, restore is byte-identical to pristine.
+- **Changed: append the chosen weapon instead of replacing the default (sub-weapon soft-lock
+  fix, in-game witnessed).** Replacing the default record with a two-handed main (e.g. the
+  flamethrower) blocks the sub-weapon (Machete / Large Stun Gun) — which is required to
+  progress — and with the one-handed default gone the player can't switch to a one-handed-main
+  + sub setup, soft-locking the run (an undocumented DC2 mechanic, found live). The lever now
+  keeps each character's shotgun/handgun inventory record **pristine** and **appends** the
+  chosen weapon as an extra record, so the chosen weapon is equipped at start but the player can
+  always switch to the default one-handed main to use the sub-weapon. Implemented as a reversible
+  code cave (`Dc2StartWeaponAppendPatch`): it steals the `mov esi,3` at `0x496A7E` (right after
+  the inventory-init `rep movsd`, where `edi` = the first free record slot) to write a 12-byte
+  record `{present, id, count, countMax}` per non-canonical pick into the free tail of
+  `scene+0x10BC`, with the weapon's own starting ammo (weapon table `0x71D7E8`); the ring builder
+  walks all 20 slots by the `present` flag, so the record is auto-discovered. Because the default
+  main is now always present, the weapon-menu `0x496EAC` div-0 is **structurally impossible** for
+  the whole band. Restore reverts the hook + cave; `--restore` is byte-identical to pristine.
 
 ### Fixed — DC2 starting-weapon guard is now an owned-MAIN rule (closes a latent crash gap)
 

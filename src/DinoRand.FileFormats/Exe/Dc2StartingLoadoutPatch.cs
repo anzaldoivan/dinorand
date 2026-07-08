@@ -178,13 +178,6 @@ public static class Dc2StartingLoadoutPatch
     // (record+8 / record+0xA); we rewrite that pair as ONE dword-immediate store. Canonical
     // shotgun/handgun are NOT overridden — they keep the template's deliberate 100/200 start amount.
 
-    /// <summary>Canonical starting count/countMax per weapon id (weapon table <c>0x71D7E8</c>).
-    /// Only non-canonical mains appear here; canonical 0x01/0x02 keep the template default.</summary>
-    private static readonly Dictionary<byte, ushort> WeaponStartCounts = new()
-    {
-        [0x03] = 20, [0x04] = 50, [0x05] = 300, [0x06] = 1000, [0x07] = 300, [0x08] = 20, [0x09] = 50,
-    };
-
     // ---- Live catalog ownership (menu-safety is exe-state-dependent) ---------------------------
     // The weapon-ring div-0 fires when the current character has ZERO owned present mains. Whether an
     // id is an owned MAIN is read from the item catalog 0x704260, and that catalog is NOT invariant —
@@ -237,22 +230,6 @@ public static class Dc2StartingLoadoutPatch
         new(0x9695A, Convert.FromHexString("66897424206689742422"),
                      Convert.FromHexString("c7442420" + "00000000" + "9090"), 4),
     };
-
-    /// <summary>Write the count/countMax override for <paramref name="id"/> across a character's three
-    /// mode-template sites, or restore the stock stores when the id keeps the template default
-    /// (canonical, or an id with no table entry).</summary>
-    private static void ApplyCounts(byte[] exe, CountSite[] sites, byte id)
-    {
-        if (WeaponStartCounts.TryGetValue(id, out ushort cnt))
-            foreach (var s in sites)
-            {
-                s.Patched.CopyTo(exe, s.Offset);
-                uint imm = (uint)cnt | ((uint)cnt << 16); // count | countMax<<16 (contiguous +8/+0xA)
-                BitConverter.GetBytes(imm).CopyTo(exe, s.Offset + s.ImmOffset);
-            }
-        else
-            foreach (var s in sites) s.Original.CopyTo(exe, s.Offset);
-    }
 
     /// <summary>Current (dylanId, reginaId) weapon ids. Validates first. Dylan's id comes from
     /// the equip-site rewrite when present, else the legacy imm byte (covers pristine and both
@@ -319,9 +296,13 @@ public static class Dc2StartingLoadoutPatch
         exe[LegacyDylanWeaponIdOffset] = DylanCanonicalId;
         exe[ReginaWeaponIdOffset] = reginaId;
 
-        // Dylan equip writes + inventory templates in lockstep (I3 findings: the equip word
-        // alone leaves the new weapon record-less -> 0 ammo, status screen unchanged).
-        foreach (var site in DylanEquipSites.Concat(DylanTemplateSites))
+        // Equip word carries the chosen weapon; the inventory TEMPLATE records + count stores stay
+        // PRISTINE. The chosen weapon is APPENDED as an extra record (Dc2StartWeaponAppendPatch), so
+        // the default shotgun/handgun record survives: the player keeps a one-handed main to pair with
+        // the sub-weapon (fixes the two-handed soft-lock) and the default survives every char-switch
+        // restock. Template/count sites are written to pristine here so this also repairs any legacy
+        // replace-lever install (which had overwritten them).
+        foreach (var site in DylanEquipSites)
         {
             if (dylanId == DylanCanonicalId)
                 site.Original.CopyTo(exe, site.Offset);   // canonical id: back to the stock code
@@ -331,13 +312,9 @@ public static class Dc2StartingLoadoutPatch
                 exe[site.Offset + site.IdOffset] = dylanId;
             }
         }
-        foreach (int off in ReginaTemplateIdOffsets)
-            exe[off] = reginaId;
-
-        // Per-weapon starting ammo: a swapped main gets its own canonical count/countMax instead of
-        // inheriting the slot's 100/200; canonical shotgun/handgun keep the template default.
-        ApplyCounts(exe, DylanCountSites, dylanId);
-        ApplyCounts(exe, ReginaCountSites, reginaId);
+        foreach (var site in DylanTemplateSites) site.Original.CopyTo(exe, site.Offset);
+        foreach (int off in ReginaTemplateIdOffsets) exe[off] = ReginaCanonicalId;
+        foreach (var s in DylanCountSites.Concat(ReginaCountSites)) s.Original.CopyTo(exe, s.Offset);
     }
 
     /// <summary>Rewrite the equip bytes and inventory-template sites to canonical (the undo;
