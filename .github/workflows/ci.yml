@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build-test-coverage:
-    name: build-test-coverage   # stable name — this is the required status check (setup-branch-protection.sh)
+    name: build-test-coverage   # stable name — this is a required status check (scripts/setup-rulesets.sh)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
