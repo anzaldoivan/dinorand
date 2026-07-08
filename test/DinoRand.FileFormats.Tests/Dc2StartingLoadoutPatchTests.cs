@@ -64,18 +64,16 @@ public class Dc2StartingLoadoutPatchTests
 
     private static HashSet<int> BuildOwnedOffsets()
     {
+        // Append-mode lever: the ONLY bytes Apply may change are the equip-word stores (equip the
+        // chosen weapon) + the Regina equip byte + the dual-use room imm. The inventory-template
+        // records and count stores stay pristine — the chosen weapon is APPENDED as an extra record
+        // (Dc2StartWeaponAppendPatch), so the default shotgun/handgun survives.
         var s = new HashSet<int>
         {
             Dc2StartingLoadoutPatch.LegacyDylanWeaponIdOffset,
             Dc2StartingLoadoutPatch.ReginaWeaponIdOffset,
-            0x967C1, 0x968D9, 0x96A02, // Regina template id imms
         };
-        foreach (var (off, len) in new[]
-                 { (0x96786, 14), (0x968B6, 8), (0x969E9, 8),   // Dylan template sites
-                   (0x50E84, 13), (0x50E9F, 18),                // Dylan equip sites
-                   (0x967A3, 16), (0x967D1, 16),                // mode0 count pairs (Dylan R0 / Regina R1)
-                   (0x968C7, 10), (0x968E3, 10),                // mode1 count pairs
-                   (0x96950, 10), (0x9695A, 10) })              // else count pairs
+        foreach (var (off, len) in new[] { (0x50E84, 13), (0x50E9F, 18) }) // Dylan equip sites only
             for (int i = 0; i < len; i++) s.Add(off + i);
         return s;
     }
@@ -90,13 +88,16 @@ public class Dc2StartingLoadoutPatchTests
     }
 
     [Fact]
-    public void Apply_WritesOnlyItsOwnedSites()
+    public void Apply_KeepsDefaultRecords_EquipsNewWeapon_WritesOnlyEquipSites()
     {
         var exe = MakeExe();
         var pristine = (byte[])exe.Clone();
         Dc2StartingLoadoutPatch.Apply(exe, dylanId: 0x03, reginaId: 0x08);
 
         Assert.Equal(((byte)0x03, (byte)0x08), Dc2StartingLoadoutPatch.Read(exe));
+        // Only the equip sites (+ Regina equip byte + room imm) may change; everything else stays
+        // pristine — including the inventory-template records + count stores, so the default
+        // shotgun/handgun record survives (fixes the two-handed sub-weapon soft-lock).
         for (int i = 0; i < exe.Length; i++)
             if (!OwnedOffsets.Contains(i))
                 Assert.Equal(pristine[i], exe[i]);
@@ -110,10 +111,10 @@ public class Dc2StartingLoadoutPatchTests
         Assert.Equal(0x03, exe[0x50E84 + 7]);
         Assert.Equal(0x03, exe[0x50E9F + 7]);
         Assert.Equal(0xB8, exe[0x50E9F + 9]); // mov eax,0x4B0 kept
-        // inventory-template rewrite: id imm carried in the imm16 form (template A) + Regina imm
-        Assert.Equal(0x03, exe[0x96786 + 9]);
-        Assert.Equal(0x01, exe[0x96786 + 8]); // present flag byte of the word write
-        Assert.Equal(0x08, exe[0x967C1]);
+        // inventory-template records stay PRISTINE (default weapons preserved, not overwritten)
+        foreach (var (off, len) in new[] { (0x96786, 14), (0x968B6, 8), (0x969E9, 8) })
+            Assert.Equal(pristine.Skip(off).Take(len), exe.Skip(off).Take(len));
+        Assert.Equal(0x02, exe[0x967C1]); // Regina handgun template id kept canonical
     }
 
     [Fact]
@@ -268,23 +269,16 @@ public class Dc2StartingLoadoutPatchTests
     }
 
     [Fact]
-    public void Apply_SwappedMain_OverridesStartingAmmo_ToWeaponCanonical()
+    public void Apply_SwappedMain_LeavesTemplateCountStoresPristine()
     {
-        // A swapped-in main gets its own canonical count/countMax (weapon table 0x71D7E8) instead of
-        // the slot's 100 — e.g. Dylan rocket launcher (0x03) = 20. The mode-1 R0 count pair at 0x968C7
-        // becomes `mov dword[esp+0x5c], imm32` with imm32 = 20 | (20<<16).
+        // Under append semantics the chosen weapon's ammo lives in its APPENDED record
+        // (Dc2StartWeaponAppendPatch), so the mode-template count/countMax stores of the default
+        // shotgun/handgun stay pristine (their real starting ammo is preserved). Verified in
+        // Dc2StartWeaponAppendPatchTests: the appended record carries the weapon's own count.
         var exe = MakeExe();
-        Dc2StartingLoadoutPatch.Apply(exe, 0x03, 0x08); // Dylan RL=20, Regina id08=20
-
-        // mode1 R0 (Dylan): C7 44 24 5C 14 00 14 00 90 90
-        Assert.Equal(new byte[] { 0xC7, 0x44, 0x24, 0x5C, 0x14, 0x00, 0x14, 0x00, 0x90, 0x90 },
-                     exe.Skip(0x968C7).Take(10).ToArray());
-        // mode0 R0 (Dylan): C7 84 24 C8 00 00 00 <imm32=20|20<<16> 90*5
-        Assert.Equal(new byte[] { 0xC7, 0x84, 0x24, 0xC8, 0x00, 0x00, 0x00, 0x14, 0x00, 0x14, 0x00, 0x90, 0x90, 0x90, 0x90, 0x90 },
-                     exe.Skip(0x967A3).Take(16).ToArray());
-        // Regina id 0x08 = 20 too, at its R1 mode1 site 0x968E3
-        Assert.Equal(new byte[] { 0xC7, 0x44, 0x24, 0x68, 0x14, 0x00, 0x14, 0x00, 0x90, 0x90 },
-                     exe.Skip(0x968E3).Take(10).ToArray());
+        Dc2StartingLoadoutPatch.Apply(exe, 0x03, 0x08);
+        foreach (var (off, hex) in CountSiteOriginals)
+            Assert.Equal(Convert.FromHexString(hex), exe.Skip(off).Take(hex.Length / 2).ToArray());
     }
 
     [Fact]

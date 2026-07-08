@@ -58,6 +58,7 @@ public static class Dc2StartingLoadoutInstaller
         if (restore)
         {
             Dc2StartingLoadoutPatch.RestoreCanonical(bytes);
+            Dc2StartWeaponAppendPatch.Restore(bytes);   // no-op if never appended
             Dc2WeaponRingGuardPatch.Restore(bytes); // no-op if the guard was never installed
             File.WriteAllBytes(exePath, bytes);
             log?.Invoke("[start-weapon] starting weapons restored to canonical (Dylan shotgun 0x01, Regina handgun 0x02)");
@@ -97,6 +98,9 @@ public static class Dc2StartingLoadoutInstaller
         if (addAndEquip)
             Dc2WeaponRingGuardPatch.Apply(bytes); // idempotent; must precede the relaxed loadout apply
         Dc2StartingLoadoutPatch.Apply(bytes, d, r, allowUnsafe, addAndEquip);
+        // Append the chosen weapon(s) as extra records so the default shotgun/handgun survives (the
+        // player can switch to a one-handed main + sub-weapon — fixes the two-handed soft-lock).
+        Dc2StartWeaponAppendPatch.Apply(bytes, d, r);
         File.WriteAllBytes(exePath, bytes);
         log?.Invoke($"[start-weapon] Dylan weapon id 0x{d:X2}, Regina weapon id 0x{r:X2} "
                     + (addAndEquip ? "(add-and-equip: weapon-ring div-0 guard installed; full band unlocked) " : "")
