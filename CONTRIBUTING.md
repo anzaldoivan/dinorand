@@ -6,10 +6,12 @@
 
 ## Branching & pull requests
 
-- **Branch off `main`.** No direct pushes to `main` — it is protected
-  (see `scripts/setup-branch-protection.sh`).
-- **All changes land via pull request.** Every PR needs the `build-test-coverage` CI
-  check green and **≥1 approving review**; stale approvals are dismissed on new pushes.
+- **Branch off `main`** into a **`feature/<name>`** branch (releases use `release/vX.Y.Z`).
+  No direct pushes to `main` — it is protected by repository rulesets
+  (see `scripts/setup-rulesets.sh`). PR branch names are checked by the `branch-name` CI job.
+- **All changes land via pull request.** Every PR needs the `build-test-coverage` and
+  `no-copyrighted-files` (`scan`) checks green and **≥1 approving review**; stale approvals are
+  dismissed on new pushes. (Repo admins can bypass in an emergency.)
 - Read `CLAUDE.md` and `docs/CONTRIBUTING-RE.md` for the reverse-engineering session
   contract (append decoded symbols/findings in the same change).
 - **Never commit game bytes or copyrighted content.** `scripts/check-no-copyrighted-files.sh`
