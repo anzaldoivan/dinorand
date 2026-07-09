@@ -140,12 +140,16 @@ public class AppSeedTests
     }
 
     [Fact]
-    public void CanonicalSpeciesOrder_LocksToTheDistributionRegistry()
+    public void CanonicalSpeciesOrder_LocksToTheSeedEncodedLandSpecies()
     {
-        // The wire order is FROZEN; the registry (ascending TYPE) must currently coincide with it.
-        // If a new weighable species lands, APPEND it to AppSeed.Dc2CanonicalSpecies (never
-        // reorder) and extend the block — this test is the tripwire.
-        Assert.Equal(Dc2EnemyDistribution.LoadEmbedded().Rows.Select(r => r.Type),
-                     AppSeed.Dc2CanonicalSpeciesOrder);
+        // The wire order is FROZEN and only holds the LAND species — the aquatic donors (0x05/0x0a/0x0b/
+        // 0x0c) are experimental, gated behind Dc2AllowWaterLevelEnemySwaps (itself NOT seed-encoded), so
+        // their weights are intentionally NOT carried in the 8-nibble seed block. The canonical order must
+        // therefore equal the registry rows MINUS the aquatic ones. If a new LAND weighable species lands,
+        // APPEND it to AppSeed.Dc2CanonicalSpecies (never reorder) and extend the block — this is the tripwire.
+        var seedEncodable = Dc2EnemyDistribution.LoadEmbedded().Rows
+            .Select(r => r.Type)
+            .Where(t => !Dc2SpeciesTable.IsWaterHabitat(Dc2SpeciesTable.ForType(t)!.Habitat));
+        Assert.Equal(seedEncodable, AppSeed.Dc2CanonicalSpeciesOrder);
     }
 }

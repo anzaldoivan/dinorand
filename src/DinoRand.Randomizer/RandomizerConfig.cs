@@ -54,6 +54,21 @@ public sealed class RandomizerConfig
     public bool IncludeDc2BossEnemies { get; set; } = false;
 
     /// <summary>
+    /// DC2 only (EXPERIMENTAL, off by default). "Allow Enemy swaps in the Water Levels" — lifts the
+    /// aquatic-room protection and admits aquatic donors, all gated to the crash-safe op-0x4f wave /
+    /// op-0x23 preload path (K72, docs/decisions/dc2/enemies/DC2-AQUATIC-LAND-UNLOCK-FEASIBILITY.md). ON:
+    /// (a) the Mosasaurus wave rooms (ST700/702/703/704, <see cref="Dc2.Dc2AquaticRooms"/>) become
+    /// swappable — LAND donors placed on their wave descriptors (live-proven safe); (b) aquatic species
+    /// become eligible donors (wave-only per the planner's placement gate) — Mosasaurus enters the default
+    /// weighted pool at low weight, the Plesiosaurus boss/grunts additionally need
+    /// <see cref="IncludeDc2SetpieceEnemies"/>. OFF (default): aquatic rooms hard-blocked AND no aquatic
+    /// species used as donors — byte-identical to before the feature. Threads into
+    /// <see cref="Dc2.Dc2SpeciesTable.DonorPool"/> + <see cref="Dc2.Dc2CrossSpeciesPlanner"/> +
+    /// <see cref="Dc2.Passes.Dc2EnemyRandomizer"/>. CLI <c>--dc2-allow-water-swaps</c>; no effect on DC1.
+    /// </summary>
+    public bool Dc2AllowWaterLevelEnemySwaps { get; set; } = false;
+
+    /// <summary>
     /// DC2 only. How the enemy pass picks each room's donor species
     /// (docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md): <see cref="Dc2.Dc2EnemyDistributionMode.Weighted"/>
     /// (default — per-species weights bias the per-room pick; curated defaults reproduce the legacy

@@ -94,7 +94,10 @@ public static class Dc2CrossSpeciesPlanner
         var nativeTypes = eligible.Select(s => s.Type).ToHashSet();
         var validDonors = donorPool
             .Where(d => !nativeTypes.Contains(d.Type)
-                     && !(hasGenericSpawn && d.BaseClass == Dc2BaseClass.Shared640000))
+                     && !(hasGenericSpawn && d.BaseClass == Dc2BaseClass.Shared640000)
+                     // Every edit on this (wave-less) path is an op-0x1a spawn-time load, which CRASHES
+                     // for an aquatic donor (K62b/DC2-G3). Aquatic donors are wave/preload-only — never here.
+                     && !Dc2SpeciesTable.IsWaterDonor(d))
             .ToList();
         if (validDonors.Count == 0) return Array.Empty<Dc2SpawnTypeEdit>();
 
@@ -128,7 +131,8 @@ public static class Dc2CrossSpeciesPlanner
         Dc2WaveRoom? wave,
         Random rng,
         IReadOnlyList<Dc2Species>? donorPool = null,
-        Dc2DonorPicker? picker = null)
+        Dc2DonorPicker? picker = null,
+        bool allowWaterLevels = false)
     {
         if (wave is null || wave.Descriptors.Count == 0)
         {
@@ -141,11 +145,18 @@ public static class Dc2CrossSpeciesPlanner
 
         donorPool ??= Dc2SpeciesTable.DefaultDonors;
 
-        // Non-land-native skip, extended to the wave path: a room whose WAVES are natively
-        // aquatic/non-land (ST001/600/601/604/700/702/703/704) keeps them — a land donor there is
-        // wrong (and its spawn points assume a non-land scene). Same rule as the spawn-based skip.
-        if (wave.Descriptors.Any(d => Dc2SpeciesTable.IsNonLandNativeType(d.NativeType)) ||
-            spawns.Any(s => Dc2SpeciesTable.IsNonLandNativeType(s.Type)))
+        // Non-land-native skip, extended to the wave path. Two halves:
+        //  • FLYER-native (0x04) rooms are ALWAYS left vanilla — a land replacement spawns outside the
+        //    level hitbox (unreachable, live 2026-07-04); the water flag never lifts this.
+        //  • WATER-native (aquatic/non-land) rooms (ST700/702/703/704, K72) are left vanilla by default,
+        //    but Dc2AllowWaterLevelEnemySwaps lifts the block: the reverse direction places a LAND donor
+        //    onto the crash-safe wave descriptors (live-proven safe).
+        if (wave.Descriptors.Any(d => Dc2SpeciesTable.IsFlyerNativeType(d.NativeType)) ||
+            spawns.Any(s => Dc2SpeciesTable.IsFlyerNativeType(s.Type)))
+            return Dc2RoomPlan.Empty;
+        if (!allowWaterLevels &&
+            (wave.Descriptors.Any(d => Dc2SpeciesTable.IsWaterNativeType(d.NativeType)) ||
+             spawns.Any(s => Dc2SpeciesTable.IsWaterNativeType(s.Type))))
             return Dc2RoomPlan.Empty;
 
         // ONE donor across both paths, distinct from every species the room natively hosts
@@ -160,6 +171,14 @@ public static class Dc2CrossSpeciesPlanner
             .Concat(wave.Descriptors.Select(d => d.NativeType))
             .ToHashSet();
         var validDonors = donorPool.Where(d => !nativeTypes.Contains(d.Type)).ToList();
+
+        // Aquatic-donor placement gate (K72/DC2-G3): an aquatic donor is crash-safe ONLY on an op-0x4f
+        // wave / op-0x23 preload record. If this room also carries a spawn-time record — an op-0x1a
+        // hardcoded spawn OR a generic creature spawn that gets NORMALIZED to the self-loading (op-0x1a-
+        // class) form — placing the single shared donor there would crash. So drop aquatic donors from
+        // any room that has such a record; only fully wave/preload rooms may host them.
+        if (eligible.Count > 0 || wave.GenericCreatureSpawns.Count > 0)
+            validDonors = validDonors.Where(d => !Dc2SpeciesTable.IsWaterDonor(d)).ToList();
         if (validDonors.Count == 0) return Dc2RoomPlan.Empty;
         var donor = picker is null
             ? validDonors[rng.Next(validDonors.Count)]

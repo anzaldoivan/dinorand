@@ -142,6 +142,10 @@ namespace DinoRand.App
         [ObservableProperty] private bool _includeDc2SetpieceEnemies;
         [ObservableProperty] private bool _includeDc2BossEnemies;
 
+        // DC2 EXPERIMENTAL (off): "Allow Enemy swaps in the Water Levels" — lifts the aquatic-room block and
+        // admits aquatic (wave-only) donors (K72). Maps to RandomizerConfig.Dc2AllowWaterLevelEnemySwaps.
+        [ObservableProperty] private bool _dc2AllowWaterLevelEnemySwaps;
+
         // DC2 donor distribution (docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md D7): mode selector
         // (0 = Weighted, 1 = Fixed), the fixed-donor pick, and one weight slider row per registry
         // species. All changes funnel into UpdateSeedFromUi (the block seed-encodes, AppSeed D6).
@@ -339,6 +343,7 @@ namespace DinoRand.App
             if (SelectedGame.Id != "dc2")
             {
                 IncludeDc2SetpieceEnemies = false; IncludeDc2BossEnemies = false;
+                Dc2AllowWaterLevelEnemySwaps = false;
                 // Distribution block back to defaults too, so a non-DC2 game never emits it.
                 Dc2EnemyModeIndex = 0;
                 foreach (var row in Dc2WeightOptions)
@@ -531,6 +536,13 @@ namespace DinoRand.App
             UpdateSeedFromUi();
         }
 
+        partial void OnDc2AllowWaterLevelEnemySwapsChanged(bool value)
+        {
+            // Admits aquatic species to the pool ⇒ their weight rows become relevant. Not seed-encoded
+            // (experimental), so no UpdateSeedFromUi — just refresh the visible weight set.
+            RefreshDc2WeightVisibility();
+        }
+
         /// <summary>Show each weight row iff its species is in the donor pool under the current
         /// toggles — the tested registry rule (<see cref="Dc2SpeciesTable.IsDonorPoolMember"/>), so
         /// the UI can never offer a weight the pick can't use. Values are kept, only hidden.</summary>
@@ -538,7 +550,7 @@ namespace DinoRand.App
         {
             foreach (var row in Dc2WeightOptions)
                 row.IsVisible = Dc2SpeciesTable.IsDonorPoolMember(
-                    row.Type, IncludeDc2SetpieceEnemies, IncludeDc2BossEnemies);
+                    row.Type, IncludeDc2SetpieceEnemies, IncludeDc2BossEnemies, Dc2AllowWaterLevelEnemySwaps);
         }
         partial void OnDc2EnemyModeIndexChanged(int value) => UpdateSeedFromUi();
         partial void OnDc2RandomizeRaptorTiersChanged(bool value) => UpdateSeedFromUi();
@@ -709,6 +721,7 @@ namespace DinoRand.App
                 RandomizeEnemies = RandomizeEnemies,
                 IncludeDc2SetpieceEnemies = IncludeDc2SetpieceEnemies,
                 IncludeDc2BossEnemies = IncludeDc2BossEnemies,
+                Dc2AllowWaterLevelEnemySwaps = Dc2AllowWaterLevelEnemySwaps,
                 Dc2EnemyMode = Dc2EnemyModeIndex == 1
                     ? Dc2EnemyDistributionMode.Fixed : Dc2EnemyDistributionMode.Weighted,
                 Dc2FixedSpeciesType = Dc2EnemyModeIndex == 1 ? SelectedDc2FixedSpecies?.Type : null,

@@ -52,6 +52,10 @@ public sealed class Dc2EnemyRandomizer : IDc2RandomizationPass
         // pool members off by default (docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md).
         bool fixedMode = context.Config.Dc2EnemyMode == Dc2EnemyDistributionMode.Fixed;
 
+        // Experimental (default OFF): lift the aquatic-room block + admit aquatic (wave-only) donors (K72).
+        // With this off the pool, room eligibility, and emitted edits are byte-identical to before.
+        bool allowWater = context.Config.Dc2AllowWaterLevelEnemySwaps;
+
         // Spoiler section (docs/decisions/cross/SPOILER-LOG-PLAN.md §4): one row per changed room, recorded at the
         // moment the plan is applied — never re-derived. Created up-front so skip summaries appear
         // even when nothing changes.
@@ -61,7 +65,7 @@ public sealed class Dc2EnemyRandomizer : IDc2RandomizationPass
         if (fixedMode)
         {
             var pin = context.Config.Dc2FixedSpeciesType is int t ? Dc2SpeciesTable.ForType(t) : null;
-            if (pin is null || !Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true)
+            if (pin is null || !Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true, allowWater)
                     .Any(d => d.Type == pin.Type))
             {
                 context.Log("[dc2-enemy] fixed mode: Dc2FixedSpeciesType is missing or not a safe "
@@ -79,9 +83,9 @@ public sealed class Dc2EnemyRandomizer : IDc2RandomizationPass
                     : "; curated default weights"));
         }
         var donorPool = fixedMode
-            ? Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true)
+            ? Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true, allowWater)
             : Dc2SpeciesTable.DonorPool(
-                context.Config.IncludeDc2SetpieceEnemies, context.Config.IncludeDc2BossEnemies);
+                context.Config.IncludeDc2SetpieceEnemies, context.Config.IncludeDc2BossEnemies, allowWater);
         var picker = fixedMode
             ? Dc2DonorPicker.Fixed(context.Config.Dc2FixedSpeciesType!.Value)
             : Dc2DonorPicker.Weighted(distribution.EffectiveWeights(context.Config.Dc2SpeciesWeights));
@@ -104,7 +108,7 @@ public sealed class Dc2EnemyRandomizer : IDc2RandomizationPass
             // Explicit aquatic rooms whose enemy is generic-delivered (e.g. ST704's Mosasaurus via TYPE-0x10)
             // are invisible to PlanRoom's habitat skip — protect them by st_id so their intended aquatic
             // enemy is never converted to a land donor (docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md).
-            if (Dc2AquaticRooms.Contains(roomKey)) { roomsAquatic++; continue; }
+            if (Dc2AquaticRooms.Contains(roomKey) && !allowWater) { roomsAquatic++; continue; }
 
             // A wave-only room (e.g. ST104: zero op-0x1a spawns, raptors purely from waves) has no
             // spawn-graph entry — plan with an empty spawn list rather than skipping it.
@@ -119,7 +123,7 @@ public sealed class Dc2EnemyRandomizer : IDc2RandomizationPass
                 : donorPool.Where(d => !capsLeft.TryGetValue(d.Type, out var left) || left > 0).ToArray();
 
             var rng = context.Seed.RngFor($"{Name}:{room.Stage:X}{room.Room:X2}"); // per-room determinism
-            var plan = Dc2CrossSpeciesPlanner.PlanRoomWithWaves(spawns, wave, rng, roomPool, picker);
+            var plan = Dc2CrossSpeciesPlanner.PlanRoomWithWaves(spawns, wave, rng, roomPool, picker, allowWater);
             if (plan.IsEmpty) { roomsSkipped++; continue; }
 
             if (plan.DonorType is int donorType)

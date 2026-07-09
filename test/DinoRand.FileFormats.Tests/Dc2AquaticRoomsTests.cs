@@ -11,17 +11,20 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class Dc2AquaticRoomsTests
 {
-    [Fact]
-    public void Contains_TrueForKnownGenericDeliveredAquaticRoom()
+    [Theory]
+    [InlineData("700")] // op-0x4f Mosasaurus wave room (K72) — hard-blocked by st_id
+    [InlineData("702")]
+    [InlineData("703")]
+    [InlineData("704")] // Plesiosaurus boss area; enemy is generic-delivered (TYPE-0x10), invisible to the habitat skip
+    public void Contains_TrueForTheHardBlockedWaterRooms(string roomKey)
     {
-        // ST704: underwater; its enemy is a Mosasaurus (E30, aquatic) delivered via the generic TYPE-0x10
-        // spawn path (live map: E30=Mosasaurus ST704), so the spawn-habitat skip can't see it.
-        Assert.True(Dc2AquaticRooms.Contains("704"));
+        // The op-0x4f Mosasaurus wave rooms + the generic-delivered ST704: the randomizer must never touch
+        // them by default (K72, DC2-AQUATIC-LAND-UNLOCK-FEASIBILITY.md).
+        Assert.True(Dc2AquaticRooms.Contains(roomKey));
     }
 
     [Theory]
     [InlineData("102")] // land raptor room — never aquatic
-    [InlineData("700")] // aquatic, but caught by the habitat skip (hardcoded 0x0a) — not in the explicit list
     [InlineData("706")] // aquatic, but caught by the habitat skip (hardcoded 0x05) — not in the explicit list
     public void Contains_FalseForRoomsNotExplicitlyListed(string roomKey)
     {

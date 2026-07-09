@@ -20,9 +20,15 @@ public static class Dc2AquaticRooms
     /// habitat skip). Grows as more are identified via the per-room E-file census / live capture.</summary>
     public static IReadOnlySet<string> Explicit { get; } = new HashSet<string>
     {
-        "704", // ST704 — underwater; its enemy is a Mosasaurus (E30, aquatic) spawned via the generic
-               // TYPE-0x10 path (live map: E30=Mosasaurus ST704). No hardcoded aquatic ctor TYPE in its
-               // spawns, so IsAquaticNativeRoom's habitat check can't see it — protect it by st_id.
+        // The op-0x4f Mosasaurus wave rooms (K72 / DC2-AQUATIC-LAND-UNLOCK-FEASIBILITY.md). Their aquatic
+        // enemy is armed at room-init via the wave/preload path, so the randomizer must never touch them by
+        // default (bulk pass AND single-room CLI). The experimental Dc2AllowWaterLevelEnemySwaps flag lifts
+        // this block (reverse direction: land donors placed onto the wave descriptors — live-proven safe).
+        "700", // ST700 — Mosasaurus wave room.
+        "702", // ST702 — Mosasaurus wave room.
+        "703", // ST703 — Mosasaurus wave room.
+        "704", // ST704 — Plesiosaurus boss area; its enemy is generic-delivered (TYPE-0x10 path), invisible
+               // to the habitat skip, so it must be protected by st_id.
     };
 
     /// <summary>True iff <paramref name="roomKey"/> (an <c>st_id</c> like "704") is an explicitly-listed
