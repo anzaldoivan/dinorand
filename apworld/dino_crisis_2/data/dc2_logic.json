@@ -1,16 +1,2324 @@
 {
   "_generated_by": "scripts/gen_ap_logic.py",
-  "_source": "stub \u2014 DC2 has a decoded door-graph + item spots (data/dc2) but no key-item ids or door\u2192key gating yet (KaQ OPEN #2/#5); locations/items/edges intentionally empty.",
+  "_source": "data/dc2/{door-graph,door-gating,item-placements,room-data}.json (byte-grounded, K74-K78). v1: visit-gated edges only; key items are flag-driven and not yet relocatable (requiresItems empty until the Phase-2 give-path decode) \u2014 see docs/decisions/dc2/ITEMS-KEYITEMS-RE-PLAN.md.",
   "version": 1,
-  "startRoom": "0000",
-  "goalRoom": "0000",
-  "regions": {},
-  "edges": [],
-  "locations": [],
+  "startRoom": "000",
+  "goalRoom": "904",
+  "regions": {
+    "000": "000",
+    "001": "001",
+    "002": "002",
+    "003": "003",
+    "004": "004",
+    "005": "005",
+    "100": "100",
+    "101": "101",
+    "102": "102",
+    "103": "103",
+    "104": "104",
+    "105": "105",
+    "106": "106",
+    "107": "107",
+    "108": "108",
+    "109": "109",
+    "10A": "10A",
+    "10B": "10B",
+    "10C": "10C",
+    "10D": "10D",
+    "10E": "10E",
+    "10F": "10F",
+    "110": "110",
+    "200": "200",
+    "201": "201",
+    "202": "202",
+    "203": "203",
+    "204": "204",
+    "205": "205",
+    "300": "300",
+    "301": "301",
+    "302": "302",
+    "303": "303",
+    "304": "304",
+    "305": "305",
+    "306": "306",
+    "400": "400",
+    "401": "401",
+    "402": "402",
+    "403": "403",
+    "404": "404",
+    "405": "405",
+    "406": "406",
+    "407": "407",
+    "408": "408",
+    "409": "409",
+    "40A": "40A",
+    "40B": "40B",
+    "500": "500",
+    "501": "501",
+    "502": "502",
+    "503": "503",
+    "504": "504",
+    "600": "600",
+    "601": "601",
+    "602": "602",
+    "603": "603",
+    "604": "604",
+    "605": "605",
+    "606": "606",
+    "607": "607",
+    "608": "608",
+    "700": "700",
+    "701": "701",
+    "702": "702",
+    "703": "703",
+    "704": "704",
+    "705": "705",
+    "706": "706",
+    "707": "707",
+    "800": "800",
+    "801": "801",
+    "802": "802",
+    "803": "803",
+    "804": "804",
+    "805": "805",
+    "806": "806",
+    "807": "807",
+    "808": "808",
+    "809": "809",
+    "80A": "80A",
+    "80B": "80B",
+    "900": "900",
+    "901": "901",
+    "902": "902",
+    "903": "903",
+    "904": "904",
+    "905": "905",
+    "906": "906"
+  },
+  "edges": [
+    {
+      "from": "100",
+      "to": "109",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "100",
+      "to": "101",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "101",
+      "to": "102",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "101",
+      "to": "102",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "101",
+      "to": "100",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "102",
+      "to": "101",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "109",
+      "to": "100",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "202",
+      "to": "204",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "300",
+      "to": "302",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "302",
+      "to": "300",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "302",
+      "to": "303",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "303",
+      "to": "304",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "303",
+      "to": "302",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "303",
+      "to": "306",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "304",
+      "to": "303",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "304",
+      "to": "305",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "305",
+      "to": "304",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "801",
+      "to": "803",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "000",
+      "to": "100",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "105",
+      "to": "102",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "10A",
+      "to": "109",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "10C",
+      "to": "300",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "110",
+      "to": "100",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "110",
+      "to": "102",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "205",
+      "to": "100",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "301",
+      "to": "300",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "303",
+      "to": "305",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "305",
+      "to": "303",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "306",
+      "to": "303",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "804",
+      "to": "803",
+      "requiresItems": [],
+      "requiresRooms": []
+    }
+  ],
+  "locations": [
+    {
+      "key": "000:9:32926",
+      "name": "000 (ST000) - Field item 3 @slot9/0x809e",
+      "room": "000",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        32926,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "002:0:70910",
+      "name": "002 (ST002) - Resusc. Pak @slot0/0x114fe",
+      "room": "002",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        70910,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "002:0:71322",
+      "name": "002 (ST002) - Resusc. Pak @slot0/0x1169a",
+      "room": "002",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        71322,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "002:5:71490",
+      "name": "002 (ST002) - Field item 3 @slot5/0x11742",
+      "room": "002",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        71490,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "003:0:131198",
+      "name": "003 (ST003) - Med Pak S @slot0/0x2007e",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        131198,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "003:2:131442",
+      "name": "003 (ST003) - Med Pak S @slot2/0x20172",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        131442,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "003:3:132106",
+      "name": "003 (ST003) - Med Pak S @slot3/0x2040a",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        132106,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "003:3:132278",
+      "name": "003 (ST003) - Med Pak S @slot3/0x204b6",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        132278,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "003:3:141632",
+      "name": "003 (ST003) - Med Pak S @slot3/0x22940",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        141632,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "003:3:145800",
+      "name": "003 (ST003) - Med Pak S @slot3/0x23988",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        145800,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "003:4:149276",
+      "name": "003 (ST003) - Med Pak S @slot4/0x2471c",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        149276,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "005:9:30448",
+      "name": "005 (ST005) - Field item 3 @slot9/0x76f0",
+      "room": "005",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        30448,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "102:5:45450",
+      "name": "102 (ST102) - Med Pak S @slot5/0xb18a",
+      "room": "102",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        45450,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "106:12:41446",
+      "name": "106 (ST106) - Dino File @slot12/0xa1e6",
+      "room": "106",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        41446,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "106:7:41510",
+      "name": "106 (ST106) - Resusc. Pak @slot7/0xa226",
+      "room": "106",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        41510,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "107:5:20522",
+      "name": "107 (ST107) - Med Pak S @slot5/0x502a",
+      "room": "107",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        20522,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "109:6:34332",
+      "name": "109 (ST109) - Field item 9 @slot6/0x861c",
+      "room": "109",
+      "itemId": 9,
+      "itemName": "Field item 9",
+      "pos": [
+        34332,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "109:8:36312",
+      "name": "109 (ST109) - Ammo pickup @slot8/0x8dd8",
+      "room": "109",
+      "itemId": 7,
+      "itemName": "Ammo pickup",
+      "pos": [
+        36312,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "10C:3:70142",
+      "name": "10C (ST10C) - Resusc. Pak @slot3/0x111fe",
+      "room": "10C",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        70142,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "10E:0:52326",
+      "name": "10E (ST10E) - Resusc. Pak @slot0/0xcc66",
+      "room": "10E",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        52326,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "10F:0:24334",
+      "name": "10F (ST10F) - Med Pak S @slot0/0x5f0e",
+      "room": "10F",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        24334,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "10F:1:24394",
+      "name": "10F (ST10F) - Med Pak S @slot1/0x5f4a",
+      "room": "10F",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        24394,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "110:2:12034",
+      "name": "110 (ST110) - Med Pak S @slot2/0x2f02",
+      "room": "110",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        12034,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "110:3:12162",
+      "name": "110 (ST110) - Med Pak S @slot3/0x2f82",
+      "room": "110",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        12162,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "200:3:66190",
+      "name": "200 (ST200) - Med Pak S @slot3/0x1028e",
+      "room": "200",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        66190,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "201:0:8834",
+      "name": "201 (ST201) - Med Pak S @slot0/0x2282",
+      "room": "201",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        8834,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "203:1:9820",
+      "name": "203 (ST203) - Resusc. Pak @slot1/0x265c",
+      "room": "203",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        9820,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "204:0:13356",
+      "name": "204 (ST204) - Med Pak S @slot0/0x342c",
+      "room": "204",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        13356,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "204:1:13416",
+      "name": "204 (ST204) - Resusc. Pak @slot1/0x3468",
+      "room": "204",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        13416,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "204:2:13476",
+      "name": "204 (ST204) - Field item 3 @slot2/0x34a4",
+      "room": "204",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        13476,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "205:2:53832",
+      "name": "205 (ST205) - Med Pak S @slot2/0xd248",
+      "room": "205",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        53832,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "205:3:55498",
+      "name": "205 (ST205) - Resusc. Pak @slot3/0xd8ca",
+      "room": "205",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        55498,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "205:17:55630",
+      "name": "205 (ST205) - Resusc. Pak @slot17/0xd94e",
+      "room": "205",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        55630,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "301:4:37716",
+      "name": "301 (ST301) - Med Pak S @slot4/0x9354",
+      "room": "301",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        37716,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "301:5:41132",
+      "name": "301 (ST301) - Med Pak S @slot5/0xa0ac",
+      "room": "301",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        41132,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "302:3:25206",
+      "name": "302 (ST302) - Med Pak S @slot3/0x6276",
+      "room": "302",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        25206,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "302:2:25662",
+      "name": "302 (ST302) - Med Pak S @slot2/0x643e",
+      "room": "302",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        25662,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "302:4:30710",
+      "name": "302 (ST302) - Resusc. Pak @slot4/0x77f6",
+      "room": "302",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        30710,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "302:5:30770",
+      "name": "302 (ST302) - Resusc. Pak @slot5/0x7832",
+      "room": "302",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        30770,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "303:11:20828",
+      "name": "303 (ST303) - Resusc. Pak @slot11/0x515c",
+      "room": "303",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        20828,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "303:12:20888",
+      "name": "303 (ST303) - Resusc. Pak @slot12/0x5198",
+      "room": "303",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        20888,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "303:13:20948",
+      "name": "303 (ST303) - Resusc. Pak @slot13/0x51d4",
+      "room": "303",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        20948,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:21:30058",
+      "name": "304 (ST304) - Med Pak S @slot21/0x756a",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30058,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:6:30254",
+      "name": "304 (ST304) - Med Pak S @slot6/0x762e",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30254,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:7:30434",
+      "name": "304 (ST304) - Med Pak S @slot7/0x76e2",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30434,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:8:30558",
+      "name": "304 (ST304) - Med Pak S @slot8/0x775e",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30558,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:9:30618",
+      "name": "304 (ST304) - Med Pak S @slot9/0x779a",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30618,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:10:30678",
+      "name": "304 (ST304) - Med Pak S @slot10/0x77d6",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30678,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:15:30798",
+      "name": "304 (ST304) - Med Pak S @slot15/0x784e",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30798,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:16:30858",
+      "name": "304 (ST304) - Med Pak S @slot16/0x788a",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30858,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:17:30918",
+      "name": "304 (ST304) - Med Pak S @slot17/0x78c6",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30918,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:12:30978",
+      "name": "304 (ST304) - Med Pak S @slot12/0x7902",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        30978,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:11:31342",
+      "name": "304 (ST304) - Med Pak S @slot11/0x7a6e",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        31342,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:18:31402",
+      "name": "304 (ST304) - Med Pak S @slot18/0x7aaa",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        31402,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:5:31462",
+      "name": "304 (ST304) - Med Pak S @slot5/0x7ae6",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        31462,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:13:32464",
+      "name": "304 (ST304) - Med Pak S @slot13/0x7ed0",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        32464,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:13:32540",
+      "name": "304 (ST304) - Med Pak S @slot13/0x7f1c",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        32540,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "304:13:38044",
+      "name": "304 (ST304) - Med Pak S @slot13/0x949c",
+      "room": "304",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        38044,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "305:2:16516",
+      "name": "305 (ST305) - Med Pak S @slot2/0x4084",
+      "room": "305",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        16516,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "305:3:16576",
+      "name": "305 (ST305) - Med Pak S @slot3/0x40c0",
+      "room": "305",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        16576,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "305:4:16676",
+      "name": "305 (ST305) - Med Pak S @slot4/0x4124",
+      "room": "305",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        16676,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "305:6:16920",
+      "name": "305 (ST305) - Med Pak S @slot6/0x4218",
+      "room": "305",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        16920,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "305:7:16980",
+      "name": "305 (ST305) - Med Pak S @slot7/0x4254",
+      "room": "305",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        16980,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "305:10:17200",
+      "name": "305 (ST305) - Med Pak S @slot10/0x4330",
+      "room": "305",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        17200,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "306:3:11210",
+      "name": "306 (ST306) - Med Pak S @slot3/0x2bca",
+      "room": "306",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        11210,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "306:2:11430",
+      "name": "306 (ST306) - Resusc. Pak @slot2/0x2ca6",
+      "room": "306",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        11430,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "400:0:50522",
+      "name": "400 (ST400) - Med Pak S @slot0/0xc55a",
+      "room": "400",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        50522,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "400:1:50582",
+      "name": "400 (ST400) - Med Pak S @slot1/0xc596",
+      "room": "400",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        50582,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "401:3:22832",
+      "name": "401 (ST401) - Med Pak S @slot3/0x5930",
+      "room": "401",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        22832,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "401:5:22992",
+      "name": "401 (ST401) - Med Pak S @slot5/0x59d0",
+      "room": "401",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        22992,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "401:2:23428",
+      "name": "401 (ST401) - Med Pak S @slot2/0x5b84",
+      "room": "401",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        23428,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:0:91868",
+      "name": "402 (ST402) - Ammo pickup @slot0/0x166dc",
+      "room": "402",
+      "itemId": 7,
+      "itemName": "Ammo pickup",
+      "pos": [
+        91868,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:1:91928",
+      "name": "402 (ST402) - Field item 8 @slot1/0x16718",
+      "room": "402",
+      "itemId": 8,
+      "itemName": "Field item 8",
+      "pos": [
+        91928,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:2:92068",
+      "name": "402 (ST402) - Dino File @slot2/0x167a4",
+      "room": "402",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        92068,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:3:92208",
+      "name": "402 (ST402) - Field item 6 @slot3/0x16830",
+      "room": "402",
+      "itemId": 6,
+      "itemName": "Field item 6",
+      "pos": [
+        92208,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:5:93252",
+      "name": "402 (ST402) - Field item 4 @slot5/0x16c44",
+      "room": "402",
+      "itemId": 4,
+      "itemName": "Field item 4",
+      "pos": [
+        93252,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:8:93520",
+      "name": "402 (ST402) - Field item 4 @slot8/0x16d50",
+      "room": "402",
+      "itemId": 4,
+      "itemName": "Field item 4",
+      "pos": [
+        93520,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:9:93580",
+      "name": "402 (ST402) - Field item 4 @slot9/0x16d8c",
+      "room": "402",
+      "itemId": 4,
+      "itemName": "Field item 4",
+      "pos": [
+        93580,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:5:100078",
+      "name": "402 (ST402) - Field item 4 @slot5/0x186ee",
+      "room": "402",
+      "itemId": 4,
+      "itemName": "Field item 4",
+      "pos": [
+        100078,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "403:0:77536",
+      "name": "403 (ST403) - Med Pak S @slot0/0x12ee0",
+      "room": "403",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        77536,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "403:1:77596",
+      "name": "403 (ST403) - Med Pak S @slot1/0x12f1c",
+      "room": "403",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        77596,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "403:3:77656",
+      "name": "403 (ST403) - Field item 4 @slot3/0x12f58",
+      "room": "403",
+      "itemId": 4,
+      "itemName": "Field item 4",
+      "pos": [
+        77656,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "408:0:75726",
+      "name": "408 (ST408) - Field item 3 @slot0/0x127ce",
+      "room": "408",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        75726,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "409:0:74942",
+      "name": "409 (ST409) - Med Pak S @slot0/0x124be",
+      "room": "409",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        74942,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40A:8:52920",
+      "name": "40A (ST40A) - Med Pak S @slot8/0xceb8",
+      "room": "40A",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        52920,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40A:3:53384",
+      "name": "40A (ST40A) - Med Pak S @slot3/0xd088",
+      "room": "40A",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        53384,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40A:4:53444",
+      "name": "40A (ST40A) - Med Pak S @slot4/0xd0c4",
+      "room": "40A",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        53444,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40A:5:53504",
+      "name": "40A (ST40A) - Med Pak S @slot5/0xd100",
+      "room": "40A",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        53504,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40A:6:53564",
+      "name": "40A (ST40A) - Med Pak S @slot6/0xd13c",
+      "room": "40A",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        53564,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40A:7:53624",
+      "name": "40A (ST40A) - Med Pak S @slot7/0xd178",
+      "room": "40A",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        53624,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40A:8:53956",
+      "name": "40A (ST40A) - Med Pak S @slot8/0xd2c4",
+      "room": "40A",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        53956,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "40B:2:5030",
+      "name": "40B (ST40B) - Med Pak S @slot2/0x13a6",
+      "room": "40B",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        5030,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "501:10:11658",
+      "name": "501 (ST501) - Med Pak S @slot10/0x2d8a",
+      "room": "501",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        11658,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "502:2:157822",
+      "name": "502 (ST502) - Med Pak S @slot2/0x2687e",
+      "room": "502",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        157822,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "502:3:157882",
+      "name": "502 (ST502) - Med Pak S @slot3/0x268ba",
+      "room": "502",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        157882,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "502:4:157942",
+      "name": "502 (ST502) - Med Pak S @slot4/0x268f6",
+      "room": "502",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        157942,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "502:5:158002",
+      "name": "502 (ST502) - Med Pak S @slot5/0x26932",
+      "room": "502",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        158002,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "502:16:160810",
+      "name": "502 (ST502) - Dino File @slot16/0x2742a",
+      "room": "502",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        160810,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "502:16:183222",
+      "name": "502 (ST502) - Dino File @slot16/0x2cbb6",
+      "room": "502",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        183222,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "503:1:88202",
+      "name": "503 (ST503) - Field item 3 @slot1/0x1588a",
+      "room": "503",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        88202,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "503:7:88262",
+      "name": "503 (ST503) - Resusc. Pak @slot7/0x158c6",
+      "room": "503",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        88262,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "503:2:88342",
+      "name": "503 (ST503) - Resusc. Pak @slot2/0x15916",
+      "room": "503",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        88342,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "503:3:88402",
+      "name": "503 (ST503) - Resusc. Pak @slot3/0x15952",
+      "room": "503",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        88402,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "503:4:88462",
+      "name": "503 (ST503) - Resusc. Pak @slot4/0x1598e",
+      "room": "503",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        88462,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "503:6:104050",
+      "name": "503 (ST503) - Resusc. Pak @slot6/0x19672",
+      "room": "503",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        104050,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "603:7:16106",
+      "name": "603 (ST603) - Field item 8 @slot7/0x3eea",
+      "room": "603",
+      "itemId": 8,
+      "itemName": "Field item 8",
+      "pos": [
+        16106,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "603:4:16410",
+      "name": "603 (ST603) - Resusc. Pak @slot4/0x401a",
+      "room": "603",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        16410,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:4:70380",
+      "name": "605 (ST605) - Med Pak S @slot4/0x112ec",
+      "room": "605",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        70380,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:5:70440",
+      "name": "605 (ST605) - Med Pak S @slot5/0x11328",
+      "room": "605",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        70440,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:6:70500",
+      "name": "605 (ST605) - Med Pak S @slot6/0x11364",
+      "room": "605",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        70500,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:7:70560",
+      "name": "605 (ST605) - Med Pak S @slot7/0x113a0",
+      "room": "605",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        70560,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:13:70620",
+      "name": "605 (ST605) - Field item 3 @slot13/0x113dc",
+      "room": "605",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        70620,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:10:71270",
+      "name": "605 (ST605) - Field item 6 @slot10/0x11666",
+      "room": "605",
+      "itemId": 6,
+      "itemName": "Field item 6",
+      "pos": [
+        71270,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:21:71774",
+      "name": "605 (ST605) - Dino File @slot21/0x1185e",
+      "room": "605",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        71774,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "605:21:78624",
+      "name": "605 (ST605) - Dino File @slot21/0x13320",
+      "room": "605",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        78624,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "606:6:58226",
+      "name": "606 (ST606) - Resusc. Pak @slot6/0xe372",
+      "room": "606",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        58226,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "606:2:58486",
+      "name": "606 (ST606) - Med Pak S @slot2/0xe476",
+      "room": "606",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        58486,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "606:3:58546",
+      "name": "606 (ST606) - Med Pak S @slot3/0xe4b2",
+      "room": "606",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        58546,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "607:12:45674",
+      "name": "607 (ST607) - Med Pak S @slot12/0xb26a",
+      "room": "607",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        45674,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "607:4:46238",
+      "name": "607 (ST607) - Med Pak S @slot4/0xb49e",
+      "room": "607",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        46238,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "607:10:47060",
+      "name": "607 (ST607) - Med Pak S @slot10/0xb7d4",
+      "room": "607",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        47060,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "608:0:674",
+      "name": "608 (ST608) - Med Pak S @slot0/0x2a2",
+      "room": "608",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        674,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "701:3:14014",
+      "name": "701 (ST701) - Field item 4 @slot3/0x36be",
+      "room": "701",
+      "itemId": 4,
+      "itemName": "Field item 4",
+      "pos": [
+        14014,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "701:2:14370",
+      "name": "701 (ST701) - Med Pak S @slot2/0x3822",
+      "room": "701",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        14370,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "703:4:27978",
+      "name": "703 (ST703) - Med Pak S @slot4/0x6d4a",
+      "room": "703",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        27978,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "703:6:28094",
+      "name": "703 (ST703) - Med Pak S @slot6/0x6dbe",
+      "room": "703",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        28094,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "703:4:31156",
+      "name": "703 (ST703) - Med Pak S @slot4/0x79b4",
+      "room": "703",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        31156,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "704:6:45058",
+      "name": "704 (ST704) - Med Pak S @slot6/0xb002",
+      "room": "704",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        45058,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "704:7:45118",
+      "name": "704 (ST704) - Resusc. Pak @slot7/0xb03e",
+      "room": "704",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        45118,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "705:0:21632",
+      "name": "705 (ST705) - Med Pak S @slot0/0x5480",
+      "room": "705",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        21632,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "705:1:21692",
+      "name": "705 (ST705) - Med Pak S @slot1/0x54bc",
+      "room": "705",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        21692,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "705:2:21752",
+      "name": "705 (ST705) - Med Pak S @slot2/0x54f8",
+      "room": "705",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        21752,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "705:3:21812",
+      "name": "705 (ST705) - Med Pak S @slot3/0x5534",
+      "room": "705",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        21812,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "705:6:21872",
+      "name": "705 (ST705) - Resusc. Pak @slot6/0x5570",
+      "room": "705",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        21872,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "705:8:22780",
+      "name": "705 (ST705) - Field item 3 @slot8/0x58fc",
+      "room": "705",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        22780,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:14:54302",
+      "name": "706 (ST706) - Med Pak S @slot14/0xd41e",
+      "room": "706",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        54302,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:13:54426",
+      "name": "706 (ST706) - Field item 6 @slot13/0xd49a",
+      "room": "706",
+      "itemId": 6,
+      "itemName": "Field item 6",
+      "pos": [
+        54426,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:7:55616",
+      "name": "706 (ST706) - Resusc. Pak @slot7/0xd940",
+      "room": "706",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        55616,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:8:55676",
+      "name": "706 (ST706) - Resusc. Pak @slot8/0xd97c",
+      "room": "706",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        55676,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:9:55736",
+      "name": "706 (ST706) - Resusc. Pak @slot9/0xd9b8",
+      "room": "706",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        55736,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:10:56154",
+      "name": "706 (ST706) - Field item 3 @slot10/0xdb5a",
+      "room": "706",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        56154,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:11:56214",
+      "name": "706 (ST706) - Field item 3 @slot11/0xdb96",
+      "room": "706",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        56214,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:12:56274",
+      "name": "706 (ST706) - Field item 3 @slot12/0xdbd2",
+      "room": "706",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        56274,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "706:13:73812",
+      "name": "706 (ST706) - Field item 6 @slot13/0x12054",
+      "room": "706",
+      "itemId": 6,
+      "itemName": "Field item 6",
+      "pos": [
+        73812,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "707:0:674",
+      "name": "707 (ST707) - Med Pak S @slot0/0x2a2",
+      "room": "707",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        674,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "800:0:99974",
+      "name": "800 (ST800) - Med Pak S @slot0/0x18686",
+      "room": "800",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        99974,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "800:1:100034",
+      "name": "800 (ST800) - Resusc. Pak @slot1/0x186c2",
+      "room": "800",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        100034,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "800:10:100162",
+      "name": "800 (ST800) - Field item 6 @slot10/0x18742",
+      "room": "800",
+      "itemId": 6,
+      "itemName": "Field item 6",
+      "pos": [
+        100162,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "800:2:100434",
+      "name": "800 (ST800) - Field item 3 @slot2/0x18852",
+      "room": "800",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        100434,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "801:8:16920",
+      "name": "801 (ST801) - Dino File @slot8/0x4218",
+      "room": "801",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        16920,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "801:8:19510",
+      "name": "801 (ST801) - Dino File @slot8/0x4c36",
+      "room": "801",
+      "itemId": 5,
+      "itemName": "Dino File",
+      "pos": [
+        19510,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "802:7:11822",
+      "name": "802 (ST802) - Field item 3 @slot7/0x2e2e",
+      "room": "802",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        11822,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "803:2:35676",
+      "name": "803 (ST803) - Resusc. Pak @slot2/0x8b5c",
+      "room": "803",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        35676,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "808:7:49696",
+      "name": "808 (ST808) - Ammo pickup @slot7/0xc220",
+      "room": "808",
+      "itemId": 7,
+      "itemName": "Ammo pickup",
+      "pos": [
+        49696,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "808:0:50234",
+      "name": "808 (ST808) - Med Pak S @slot0/0xc43a",
+      "room": "808",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        50234,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "808:1:50294",
+      "name": "808 (ST808) - Med Pak S @slot1/0xc476",
+      "room": "808",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        50294,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "808:2:50354",
+      "name": "808 (ST808) - Med Pak S @slot2/0xc4b2",
+      "room": "808",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        50354,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "808:1:62364",
+      "name": "808 (ST808) - Med Pak S @slot1/0xf39c",
+      "room": "808",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        62364,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "809:0:96744",
+      "name": "809 (ST809) - Field item 3 @slot0/0x179e8",
+      "room": "809",
+      "itemId": 3,
+      "itemName": "Field item 3",
+      "pos": [
+        96744,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "809:8:97252",
+      "name": "809 (ST809) - Resusc. Pak @slot8/0x17be4",
+      "room": "809",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        97252,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "809:9:97652",
+      "name": "809 (ST809) - Med Pak S @slot9/0x17d74",
+      "room": "809",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        97652,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "900:10:15334",
+      "name": "900 (ST900) - Med Pak S @slot10/0x3be6",
+      "room": "900",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        15334,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "901:9:7602",
+      "name": "901 (ST901) - Med Pak S @slot9/0x1db2",
+      "room": "901",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        7602,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "901:6:8038",
+      "name": "901 (ST901) - Med Pak S @slot6/0x1f66",
+      "room": "901",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        8038,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "903:0:47322",
+      "name": "903 (ST903) - Resusc. Pak @slot0/0xb8da",
+      "room": "903",
+      "itemId": 2,
+      "itemName": "Resusc. Pak",
+      "pos": [
+        47322,
+        0
+      ],
+      "collectedFlag": null
+    }
+  ],
   "items": {
-    "names": {},
+    "names": {
+      "1": "Med Pak S",
+      "2": "Resusc. Pak",
+      "3": "Field item 3",
+      "4": "Field item 4",
+      "5": "Dino File",
+      "6": "Field item 6",
+      "7": "Ammo pickup",
+      "8": "Field item 8",
+      "9": "Field item 9"
+    },
     "keyItemIds": [],
     "progressionItemIds": [],
-    "pool": []
+    "pool": [
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "weight": 95.0
+      },
+      {
+        "id": 2,
+        "name": "Resusc. Pak",
+        "weight": 31.0
+      },
+      {
+        "id": 3,
+        "name": "Field item 3",
+        "weight": 14.0
+      },
+      {
+        "id": 4,
+        "name": "Field item 4",
+        "weight": 6.0
+      },
+      {
+        "id": 5,
+        "name": "Dino File",
+        "weight": 8.0
+      },
+      {
+        "id": 6,
+        "name": "Field item 6",
+        "weight": 5.0
+      },
+      {
+        "id": 7,
+        "name": "Ammo pickup",
+        "weight": 3.0
+      },
+      {
+        "id": 8,
+        "name": "Field item 8",
+        "weight": 2.0
+      },
+      {
+        "id": 9,
+        "name": "Field item 9",
+        "weight": 1.0
+      }
+    ]
   }
 }

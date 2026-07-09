@@ -207,6 +207,39 @@ public class MgmtOfficeSafeCodeSyncTests
     }
 
     /// <summary>
+    /// FAIL-LOUD guard: a documented lock (<c>DocFile != null</c>) whose document bytes are unavailable must
+    /// abort the whole scramble — never silently ship an EXE-only change (safe accepts the new code while the
+    /// document still shows the old one, <b>displayed != checked</b>). Pure: no game files needed.
+    /// </summary>
+    [Fact]
+    public void Scramble_DocumentedLock_MissingDoc_ThrowsInsteadOfSilentDesync()
+    {
+        var exe = BuildExeWithDefaultCode();
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            Dc1PuzzleCodeSync.Scramble(exe, _ => null, _ => new[] { 6, 7, 6, 7 }));
+        Assert.Contains("st100.dat", ex.Message);      // first documented lock (row 0)
+        Assert.Contains("displayed != checked", ex.Message);
+    }
+
+    /// <summary>
+    /// FAIL-LOUD guard, present-but-unlocatable branch: a documented lock whose room bytes exist but do NOT
+    /// contain its code run (the corrupted/altered-install case) must also abort. Feeds row 0 the wrong room's
+    /// bytes so its <c>0375</c> run is absent. Real-file (skips if game data absent).
+    /// </summary>
+    [Fact]
+    public void Scramble_DocumentedLock_CodeRunAbsent_ThrowsInsteadOfSilentDesync()
+    {
+        string? st302 = FindGameFile(Path.Combine("english", "Data", "st302.dat"));
+        if (st302 is null) return; // game data not in this checkout
+        byte[] wrongRoom = File.ReadAllBytes(st302); // has 5037, not row 0's 0375
+
+        var exe = BuildExeWithDefaultCode();
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            Dc1PuzzleCodeSync.Scramble(exe, _ => wrongRoom, _ => new[] { 6, 7, 6, 7 }));
+        Assert.Contains("0375", ex.Message);           // the code it could not locate
+    }
+
+    /// <summary>
     /// Exercises the real disk-write + backup path (<see cref="Dc1PuzzleCodeSync.ApplyToInstall"/>) in an
     /// isolated temp copy of the game files: writes patched files, makes one-time <c>.dinorand-codebak</c>
     /// backups, and the patched st100 re-reads to the new code. No-ops if game data is absent.

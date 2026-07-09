@@ -184,10 +184,17 @@ public class LogicAuditTests
         var graph = RoomGraph.Build(rooms);
         var critical = LogicAudit.CriticalDoorKeys(graph, Game, KeysByRoom(rooms));
 
-        // Vanilla locks four door keys (Entrance 0x2e, BG Area 0x30, C.O. Area 0x31, Key Card Lv A
-        // 0x3a). Today only the Key Card is progression-critical — the under-gating headline. Pinned as
-        // a characterization: when gates are authored this set grows and this assertion is tightened.
-        Assert.Equal(new[] { 0x3a }, critical);
+        // Characterization of the RAW door graph (LogicAudit builds without the map.json requires
+        // overlay — that is applied later in ProgressionPass). Vanilla locks four door keys (Entrance
+        // 0x2e, BG Area 0x30, C.O. Area 0x31, Key Card Lv A 0x3a). Today the raw graph makes NONE of
+        // them solely progression-critical — the under-gating headline in its starkest form: the goal
+        // 060d has raw type-0 FREE door records from 0503 and 0607 (their real lock is an event/native
+        // gate the static decode misses), so once room 0502 (the B2 card hub — enumerated correctly
+        // since the St502.dat case fix, cont.42) makes 0503 reachable via a Key-Card-C door, the free
+        // 0503->060d edge reaches the goal without Key Card Lv A. Authoring those event gates (the
+        // placement-axis / GRAPH-LOGIC-PARITY §8 work) will restore criticality and this assertion is
+        // tightened toward the four-key RealInstall_LogicGraph_IsSound target.
+        Assert.Empty(critical);
     }
 
     [Fact(Skip = "KNOWN GAP: event-activated progression gates not yet authored into map.json " +

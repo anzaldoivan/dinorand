@@ -4,19 +4,19 @@ namespace DinoRand.FileFormats.Stage;
 /// Byte layout of the <b>entry pose</b> inside the 48-B door record — the position/orientation the
 /// engine drops the player at when they walk through a door into its <i>destination</i> room.
 ///
-/// <para><b>UNDECODED — HARD GATE (docs/decisions/dc1/doors/DOOR-RANDOMIZER-PLAN.md §3.2, Increment A).</b> Unlike the
-/// destination word (<c>+0x1c</c>) and lock/type bytes, the pose offsets are <i>not</i> proven: the
-/// <c>+0x1e..</c> region is an explicit guess and the RE-vs-destination-driven model is unresolved.
-/// Resolving it needs Cheat-Engine / in-game observation that cannot be done from source. Until then
-/// <see cref="IsDecoded"/> is <c>false</c> and every offset is the <see cref="Unknown"/> sentinel, so
-/// <b>no pose byte is ever written</b>: <see cref="RoomScript.ApplyDoorEdits"/> throws if asked to
-/// write a pose while undecoded, and the door pass refuses to commit re-pointed doors. This makes it
-/// impossible to silently patch a wrong byte. When CE supplies the real offsets, flip
-/// <see cref="IsDecoded"/> to <c>true</c> and fill the four constants — nothing else changes.</para>
+/// <para><b>DECODED — CE-validated 2026-06-20 (docs/decisions/dc1/doors/DOOR-RANDOMIZER-PLAN.md §3.2, Increment A).</b>
+/// The four pose offsets are proven: the pose is RE-style, living in the <i>source</i> door record as
+/// four consecutive signed words immediately after the destination word (<c>+0x1c</c>) — see
+/// <see cref="IsDecoded"/> for the byte-cited proof. So <see cref="IsDecoded"/> is <c>true</c> and
+/// re-pointed doors carry their arrival pose. The safety machinery around the gate is retained: while
+/// <see cref="IsDecoded"/> is <c>false</c> the offsets fall back to the <see cref="Unknown"/> sentinel
+/// and <see cref="RoomScript.ApplyDoorEdits"/> throws rather than write a guessed byte, so the class
+/// can be reverted to the undecoded state without touching call sites.</para>
 /// </summary>
 public static class DoorPoseLayout
 {
-    /// <summary>Sentinel for an offset that Increment A has not yet established.</summary>
+    /// <summary>Sentinel for an unestablished offset — used only in the reverted/undecoded state
+    /// (offsets are CE-established today; see <see cref="IsDecoded"/>).</summary>
     public const int Unknown = -1;
 
     /// <summary>
@@ -114,9 +114,9 @@ public sealed class DoorRecord
     /// <summary>
     /// Entry pose the player arrives at in the <i>destination</i> room: position
     /// (<see cref="EntryX"/>/<see cref="EntryY"/>/<see cref="EntryZ"/>) and facing (<see cref="EntryD"/>).
-    /// <b>Undecoded</b> — only populated/written once <see cref="DoorPoseLayout.IsDecoded"/> is true
-    /// (HARD GATE, plan §3.2). While undecoded these stay 0 and equal their <c>Original*</c> mirrors,
-    /// so <see cref="PoseEdited"/> is false and nothing is written.
+    /// Populated/written when <see cref="DoorPoseLayout.IsDecoded"/> is true (CE-decoded today, plan
+    /// §3.2). Should the gate ever be reverted to undecoded, these stay 0 and equal their
+    /// <c>Original*</c> mirrors, so <see cref="PoseEdited"/> is false and nothing is written.
     /// </summary>
     public short EntryX { get; set; }
     /// <summary>Entry-pose Y (height) word — see <see cref="EntryX"/>.</summary>

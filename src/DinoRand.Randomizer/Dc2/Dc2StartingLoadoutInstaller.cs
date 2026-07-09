@@ -55,6 +55,19 @@ public static class Dc2StartingLoadoutInstaller
             return Dc2BgmShuffleOutcome.UnrecognizedVersion;
         }
 
+        // Repair the item-catalog flags to their PSX source-of-truth values first (before anything
+        // reads them below): external weapon-shuffle tools corrupt these flags in place, and the byte
+        // is overloaded (owner + MAIN/SUB class + the icon-width bit 0x20). A corrupt flag both
+        // mis-renders the weapon-select icon (the antitank/"firewall" 128px overdraw,
+        // DC2-WEAPON-CATALOG-SOURCE-OF-TRUTH.md §4) and mis-classes the weapon for the ownership/ring
+        // logic used below. Idempotent and byte-identical on a clean exe; icon (U,V) stays untouched.
+        // (in-memory only — the pristine .bak is still captured from the untouched on-disk file below,
+        // and both the apply and restore paths persist `bytes` with their own File.WriteAllBytes.)
+        int catalogRepaired = Dc2WeaponCatalogFlagsPatch.Apply(bytes);
+        if (catalogRepaired > 0)
+            log?.Invoke($"[start-weapon] repaired {catalogRepaired} corrupted weapon-catalog flag(s) to PSX "
+                        + "source-of-truth (fixes weapon-select icon + MAIN/SUB/owner class)");
+
         if (restore)
         {
             Dc2StartingLoadoutPatch.RestoreCanonical(bytes);

@@ -66,16 +66,31 @@ public static class Dc1PuzzleCodeSync
             MgmtOfficeSafeCode.WriteRow(exe, lk.Row, code, bothRegions: true);
 
             string? docFile = null; byte[]? docBytes = null; bool rewritten = false;
-            if (lk.DocFile is not null && readDoc(lk) is { } raw)
+            if (lk.DocFile is not null)
             {
-                var room = RoomFile.Read(lk.DocStage, lk.DocRoom, raw);
-                var rdt = (byte[])room.RdtBuffer.Clone();
-                if (MgmtOfficeDocumentCode.TryRewriteKnownCode(rdt, lk.OriginalDigits, code))
+                if (readDoc(lk) is { } raw)
                 {
-                    docBytes = room.WriteWithRdt(rdt);
-                    docFile = lk.DocFile;
-                    rewritten = true;
+                    var room = RoomFile.Read(lk.DocStage, lk.DocRoom, raw);
+                    var rdt = (byte[])room.RdtBuffer.Clone();
+                    if (MgmtOfficeDocumentCode.TryRewriteKnownCode(rdt, lk.OriginalDigits, code))
+                    {
+                        docBytes = room.WriteWithRdt(rdt);
+                        docFile = lk.DocFile;
+                        rewritten = true;
+                    }
                 }
+
+                // Fail loud: a lock that is SUPPOSED to have a document must actually get rewritten. Silently
+                // shipping the EXE code change alone would make the safe accept the new code while the document
+                // still shows the old one (displayed != checked). The usual cause is a non-pristine install
+                // whose room-document text was repacked/blanked away. Scramble is filesystem-pure and callers
+                // (ApplyToInstall) only write after it returns, so throwing here leaves nothing half-applied.
+                if (!rewritten)
+                    throw new InvalidOperationException(
+                        $"Puzzle-code scramble refused for {lk.Name} (row {lk.Row}): could not locate/rewrite the " +
+                        $"code {string.Concat(lk.OriginalDigits)} in document '{lk.DocFile}' — the install may not be " +
+                        $"pristine (document text missing or altered). Aborting so the safe does not accept " +
+                        $"{string.Concat(code)} while the document still shows the old combination (displayed != checked).");
             }
             results.Add(new LockResult(lk, code, docFile, docBytes, rewritten));
         }

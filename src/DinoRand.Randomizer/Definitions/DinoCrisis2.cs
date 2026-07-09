@@ -62,6 +62,11 @@ public sealed class DinoCrisis2 : GameDefinition
     private static readonly System.Text.RegularExpressions.Regex RoomPattern =
         new(@"^ST(\d)(\d{2})\.DAT$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
+    // Case-INSENSITIVE room glob so a differently-cased room file is never dropped on Linux/WSL/CI
+    // (the DC1-side St502.dat class of bug — STATIC-SCD-RE cont.42). RoomPattern (IgnoreCase) filters.
+    private static readonly EnumerationOptions CaseInsensitive =
+        new() { MatchCasing = MatchCasing.CaseInsensitive };
+
     public override string? GetDataDir(string installDir) => FindDataDir(installDir);
 
     public override IReadOnlyList<RoomFileRef> EnumerateRooms(string installDir)
@@ -70,7 +75,7 @@ public sealed class DinoCrisis2 : GameDefinition
         if (dataDir is null) return Array.Empty<RoomFileRef>();
 
         var rooms = new List<RoomFileRef>();
-        foreach (var path in Directory.EnumerateFiles(dataDir, "ST*.DAT"))
+        foreach (var path in Directory.EnumerateFiles(dataDir, "ST*.DAT", CaseInsensitive))
         {
             var m = RoomPattern.Match(Path.GetFileName(path));
             if (!m.Success) continue;
@@ -98,5 +103,5 @@ public sealed class DinoCrisis2 : GameDefinition
 
     private static bool HasRoomFiles(string dir) =>
         Directory.Exists(dir) &&
-        Directory.EnumerateFiles(dir, "ST*.DAT").Any(f => RoomPattern.IsMatch(Path.GetFileName(f)));
+        Directory.EnumerateFiles(dir, "ST*.DAT", CaseInsensitive).Any(f => RoomPattern.IsMatch(Path.GetFileName(f)));
 }

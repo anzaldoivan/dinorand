@@ -33,6 +33,14 @@ public sealed class DinoCrisis1 : GameDefinition
         new(@"^st([0-9a-c])([0-9a-f]{2})\.dat$",
             System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
+    // Room-file globs must be case-INSENSITIVE: the GOG english/Data ships room 0502 as `St502.dat`
+    // (capital S), and .NET's default search-pattern matching is case-sensitive on Linux/WSL/CI — a
+    // plain "st*.dat" glob silently drops it, deleting room 0502 from the door graph. Force
+    // case-insensitive matching so RoomPattern (already IgnoreCase) is the single source of truth.
+    // (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.42.)
+    private static readonly EnumerationOptions CaseInsensitive =
+        new() { MatchCasing = MatchCasing.CaseInsensitive };
+
     // Progression spine = the game's "Keys" item block, ids 0x2B–0x6F (plugs, room/area
     // keys, ID/key cards, panel keys, batteries, crane cards, stabilizer/initializer,
     // core parts, key chips, DDK input/code discs, …). These must be placed by logic and
@@ -206,8 +214,10 @@ public sealed class DinoCrisis1 : GameDefinition
     public override int GoalRoomCode => 0x060d;
 
     // Hand-authored progression-logic overlay (puzzle gates / room-state / item-guards) from
-    // data/dc1/map.json. Loaded once and reused; empty today (no gates authored yet) so the graph
-    // is unaffected until map.json gains requires/requiresRoom entries (provenance: map-requirements.md).
+    // data/dc1/map.json. Loaded once and reused; map.json authors 12 door `requires` + 4 door
+    // `requiresRoom` gates today (provenance: map-requirements.md for the lock axis, placement-gates.md
+    // for the placement axis), which MapRequirements stamps onto the graph. Rooms with no requirement
+    // field are skipped, so an un-authored room is unaffected.
     private readonly Graph.IRequirementOverlay _requirements = Maps.MapRequirements.LoadDefault();
     public override Graph.IRequirementOverlay Requirements => _requirements;
 
@@ -241,7 +251,7 @@ public sealed class DinoCrisis1 : GameDefinition
         if (dataDir is null) return Array.Empty<RoomFileRef>();
 
         var rooms = new List<RoomFileRef>();
-        foreach (var path in Directory.EnumerateFiles(dataDir, "st*.dat"))
+        foreach (var path in Directory.EnumerateFiles(dataDir, "st*.dat", CaseInsensitive))
         {
             var m = RoomPattern.Match(Path.GetFileName(path));
             if (!m.Success) continue;
@@ -277,5 +287,5 @@ public sealed class DinoCrisis1 : GameDefinition
 
     private static bool HasRoomFiles(string dir) =>
         Directory.Exists(dir) &&
-        Directory.EnumerateFiles(dir, "st*.dat").Any(f => RoomPattern.IsMatch(Path.GetFileName(f)));
+        Directory.EnumerateFiles(dir, "st*.dat", CaseInsensitive).Any(f => RoomPattern.IsMatch(Path.GetFileName(f)));
 }

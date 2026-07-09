@@ -144,7 +144,7 @@ public class Dc2PlayerModelSwapTests
     }
 
     [Fact]
-    public void Menu_atlas_carries_donor_texture_and_palette_with_sort_plate_over_trat()
+    public void Menu_atlas_carries_donor_portrait_strip_keeps_target_palette_with_sort_plate_over_trat()
     {
         var dataDir = FindDataDir();
         if (dataDir is null) return; // no game files → skip
@@ -188,10 +188,12 @@ public class Dc2PlayerModelSwapTests
         }
         Assert.True(riffs > 0);
 
-        // PALETTE is the donor's; TEXTURE is the donor's except the 128-byte TRAT plate region,
-        // which now repeats the SORT row (strip 0, byte cols 48..63, rows 0..7 → 8..15).
+        // PALETTE stays the TARGET's (donor palette + target weapon icons = colour artifacts, witnessed);
+        // strip-0 TEXTURE is the donor's except the 128-byte TRAT plate region, which now repeats the
+        // SORT row (strip 0, byte cols 48..63, rows 0..7 → 8..15). Strips 1-3 (weapon icons) stay the
+        // target's — asserted in Menu_atlas_preserves_target_weapon_icons_and_palette_takes_only_donor_portrait.
         var pal = E(builtPkg, GianEntryType.Palette);
-        Assert.Equal(donor.AsSpan(E(donorPkg, GianEntryType.Palette).PayloadOffset, (int)pal.DeclaredSize).ToArray(),
+        Assert.Equal(target.AsSpan(E(targetPkg, GianEntryType.Palette).PayloadOffset, (int)pal.DeclaredSize).ToArray(),
                      built.AsSpan(pal.PayloadOffset, (int)pal.DeclaredSize).ToArray());
 
         var tex = E(builtPkg, GianEntryType.Texture).PayloadOffset;
@@ -206,6 +208,38 @@ public class Dc2PlayerModelSwapTests
         // Face region (the only per-char texture diff) is the donor's.
         Assert.Equal(donor.AsSpan(donorTex + 0x2000, 0x2000).ToArray(),
                      built.AsSpan(tex + 0x2000, 0x2000).ToArray());
+    }
+
+    [Fact]
+    public void Menu_atlas_preserves_target_weapon_icons_and_palette_takes_only_donor_portrait()
+    {
+        // Root-caused live 2026-07-10 (CE + CORE-texture bisection): the menu weapon-select icons are a
+        // PER-CHARACTER atlas in the CORE texture's strips 1-3 (bytes 0x4000..0xFFFF), indexed by the
+        // item-catalog (U,V). The portrait/name/plates live in strip 0 (0x0000..0x3FFF). Copying the
+        // WHOLE donor texture (+ donor palette) replaced the target's weapon icons with the donor's, so
+        // e.g. Regina-as-Gail rendered Gail's icons for Regina's weapons. The fix: take ONLY the donor's
+        // strip 0 (portrait), keep the target's strips 1-3 (weapon icons) AND the target's PALETTE
+        // (donor palette + target icons = colour artifacts, also witnessed).
+        var dataDir = FindDataDir();
+        if (dataDir is null) return; // no game files → skip
+
+        var built = Dc2PlayerModelSwap.BuildCoreFile(dataDir, "CORE01.DAT", "CORE06.DAT");
+        var target = Pristine(dataDir, "CORE01.DAT");
+        var donor = Pristine(dataDir, "CORE06.DAT");
+        var bp = GianPackage.TryParse(built)!; var tp = GianPackage.TryParse(target)!; var dp = GianPackage.TryParse(donor)!;
+        GianEntry E(GianPackage p, GianEntryType t) => p.Entries.Single(e => e.Type == t);
+        int bt = E(bp, GianEntryType.Texture).PayloadOffset;
+        int tt = E(tp, GianEntryType.Texture).PayloadOffset;
+        int dt = E(dp, GianEntryType.Texture).PayloadOffset;
+
+        // Weapon-icon strips 1-3 stay the TARGET's, byte-for-byte.
+        Assert.Equal(target.AsSpan(tt + 0x4000, 0xC000).ToArray(), built.AsSpan(bt + 0x4000, 0xC000).ToArray());
+        // Portrait (strip-0 face region 0x2000..0x3FFF, no plate/name fixups) is the DONOR's.
+        Assert.Equal(donor.AsSpan(dt + 0x2000, 0x2000).ToArray(), built.AsSpan(bt + 0x2000, 0x2000).ToArray());
+        // PALETTE stays the TARGET's.
+        var bpal = E(bp, GianEntryType.Palette); var tpal = E(tp, GianEntryType.Palette);
+        Assert.Equal(target.AsSpan(tpal.PayloadOffset, (int)tpal.DeclaredSize).ToArray(),
+                     built.AsSpan(bpal.PayloadOffset, (int)bpal.DeclaredSize).ToArray());
     }
 
     [Fact]

@@ -1,0 +1,52 @@
+{
+  "_comment": "DC2 weapon/item catalog — SOURCE OF TRUTH decoded from the ORIGINAL PSX disc (Dino Crisis 2 USA, SLUS_012.79) and cross-checked against the 2002 PC port (Dino2.exe @ 0x704260). Authored RE knowledge, no game bytes. See docs/reference/dc2/weapon/DC2-WEAPON-CATALOG-SOURCE-OF-TRUTH.md.",
+  "record": {
+    "psx_table_ram": "0x80019770",
+    "psx_exe": "SLUS_012.79 (Dino Crisis 2 USA)",
+    "pc_table_va": "0x704260",
+    "stride_bytes": 12,
+    "fields": {
+      "+0": "dword ptr (name/menu resource; runtime-filled on PC)",
+      "+4": "dword ptr (icon/data resource; runtime-filled on PC)",
+      "+8": "iconU (atlas column, byte)",
+      "+9": "iconV (atlas row, byte)",
+      "+0xA": "flags (u16)"
+    },
+    "flags_bits": {
+      "0x01": "owner Regina",
+      "0x02": "owner Dylan",
+      "0x04": "owner David",
+      "0x08": "MAIN weapon",
+      "0x10": "SUB weapon (melee/tool)",
+      "0x20": "WIDE icon (128px blit; else 64px) — the icon-width bit",
+      "0x40": "narrow-icon/standard render class (set on 64px weapons)",
+      "0x80": "set on SUB rows"
+    },
+    "icon_draw": {
+      "menu_narrow_64px": "0x498488",
+      "menu_wide_128px": "0x498700",
+      "hud_width_selector": "0x404E04  test byte[id*12+0x70426A],0x20  (set=wide add cl,0x7F / clear=narrow add cl,0x3F)"
+    }
+  },
+  "note": "class/owner/iconUV/wide are PSX-EXE-verified. names are now BYTE-GROUNDED from the US SLUS glyph-string name table (RAM 0x80019770 ptr+0, glyph/2 alphabet -- K75, data/dc2/items.json); the earlier community guesses for 0x05/0x07/0x08/0x0A/0x0B/0x12-0x15 are corrected. psx_flags is authoritative; pc_live_flags documents the external-weapon-shuffle corruption observed on this install (dinorand does NOT write 0x704260).",
+  "weapons": [
+    { "id": "0x00", "name": "unarmed/base package", "class": "MAIN", "owner": ["R","D"], "iconUV": [0,0],      "wideIcon": false, "psx_flags": "0x004B" },
+    { "id": "0x01", "name": "Shotgun",              "class": "MAIN", "owner": ["D"],     "iconUV": [0,64],     "wideIcon": false, "psx_flags": "0x004A" },
+    { "id": "0x02", "name": "Hand gun",              "class": "MAIN", "owner": ["R"],     "iconUV": [0,64],     "wideIcon": false, "psx_flags": "0x0049" },
+    { "id": "0x03", "name": "Rocket Launcher",      "class": "MAIN", "owner": ["D"],     "iconUV": [0,192],    "wideIcon": true,  "psx_flags": "0x002A", "pc_live_flags": "0x0053", "corrupted": true },
+    { "id": "0x04", "name": "Solid Cannon",         "class": "MAIN", "owner": ["D"],     "iconUV": [64,64],    "wideIcon": false, "psx_flags": "0x004A", "pc_live_flags": "0x004C", "corrupted": true },
+    { "id": "0x05", "name": "Flame Launcher",         "class": "MAIN", "owner": ["R","D"], "iconUV": [0,160],    "wideIcon": true,  "psx_flags": "0x002B" },
+    { "id": "0x06", "name": "Submachine gun",       "class": "MAIN", "owner": ["R"],     "iconUV": [0,192],    "wideIcon": true,  "psx_flags": "0x0029" },
+    { "id": "0x07", "name": "Heavy Machine gun",          "class": "MAIN", "owner": ["R"],     "iconUV": [64,64],    "wideIcon": false, "psx_flags": "0x0049", "pc_live_flags": "0x0053", "corrupted": true },
+    { "id": "0x08", "name": "Missile Pod", "class": "MAIN", "owner": ["R"],  "iconUV": [0,224],    "wideIcon": true,  "psx_flags": "0x0029" },
+    { "id": "0x09", "name": "Antitank Rifle",       "class": "MAIN", "owner": ["D"],     "iconUV": [0,96],     "wideIcon": false, "psx_flags": "0x004A", "pc_live_flags": "0x002A", "corrupted": true, "corruption_effect": "PC flip 0x4A->0x2A SETS wide bit 0x20 -> antitank icon blits 128px, overdrawing the adjacent atlas tile into the slot (the phantom 'firewall'/second icon)." },
+    { "id": "0x0A", "name": "Needle gun",        "class": "MAIN", "owner": ["V"],     "iconUV": [0,64],     "wideIcon": false, "psx_flags": "0x00CC" },
+    { "id": "0x0B", "name": "Aquagrenade",        "class": "MAIN", "owner": ["V"],     "iconUV": [0,96],     "wideIcon": false, "psx_flags": "0x004C", "pc_live_flags": "0x0053", "corrupted": true },
+    { "id": "0x10", "name": "(catalog '???' placeholder row)",                "class": "SUB",  "owner": ["R","D"], "iconUV": [0,0],      "wideIcon": false, "psx_flags": "0x0053" },
+    { "id": "0x11", "name": "Machete",   "class": "SUB",  "owner": ["D"],     "iconUV": [64,128],   "wideIcon": false, "psx_flags": "0x00D2" },
+    { "id": "0x12", "name": "Large Stungun",       "class": "SUB",  "owner": ["R"],     "iconUV": [0,96],     "wideIcon": false, "psx_flags": "0x00D1" },
+    { "id": "0x13", "name": "Firewall",                "class": "SUB",  "owner": ["R","D"], "iconUV": [64,96],    "wideIcon": false, "psx_flags": "0x0053", "pc_live_flags": "0x004A", "corrupted": true },
+    { "id": "0x14", "name": "Shockwave",                "class": "SUB",  "owner": ["R","D"], "iconUV": [0,128],    "wideIcon": false, "psx_flags": "0x0053", "pc_live_flags": "0x004A", "corrupted": true },
+    { "id": "0x15", "name": "Shockwave (David)",        "class": "SUB",  "owner": ["V"],     "iconUV": [64,64],    "wideIcon": false, "psx_flags": "0x00D4" }
+  ]
+}
