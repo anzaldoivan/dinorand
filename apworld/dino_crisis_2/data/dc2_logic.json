@@ -1,0 +1,16 @@
+{
+  "_generated_by": "scripts/gen_ap_logic.py",
+  "_source": "stub \u2014 DC2 has a decoded door-graph + item spots (data/dc2) but no key-item ids or door\u2192key gating yet (KaQ OPEN #2/#5); locations/items/edges intentionally empty.",
+  "version": 1,
+  "startRoom": "0000",
+  "goalRoom": "0000",
+  "regions": {},
+  "edges": [],
+  "locations": [],
+  "items": {
+    "names": {},
+    "keyItemIds": [],
+    "progressionItemIds": [],
+    "pool": []
+  }
+}

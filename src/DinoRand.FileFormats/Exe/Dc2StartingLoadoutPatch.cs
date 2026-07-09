@@ -205,6 +205,28 @@ public static class Dc2StartingLoadoutPatch
         return (flags & FlagMain) != 0 && (flags & ownerBit) != 0;
     }
 
+    /// <summary>True iff <paramref name="id"/> is safe to APPEND-and-equip on THIS exe without the
+    /// cross-character stale-blob crash (DC2-STARTING-LOADOUT-CROSS-CHAR-RCA.md, crash site 0x4bf073).
+    /// Add-and-equip appends BOTH characters' picks into the single shared inventory array
+    /// (<see cref="Dc2StartWeaponAppendPatch"/>), so an appended weapon can surface in the OTHER
+    /// character's weapon menu. If that character does not own its <c>WEP_P</c> grid slot
+    /// (<c>0x71B230</c> = band membership) the load returns nothing and equipping it dereferences a
+    /// stale/garbage weapon object. The ring guard only covers the menu div-0, not this. Safe iff the
+    /// id is catalog-classed MAIN (so it lands in the ownership-filtered main ring, not an unfiltered
+    /// sub menu) AND every character the LIVE catalog marks as an owner also owns its grid slot — i.e.
+    /// no character can menu-reach it with a NULL slot. Keys on the live catalog: byte-identical to the
+    /// prior full-band behaviour on a pristine exe; only a shuffled/corrupted catalog narrows the set.
+    /// A dual-owned MAIN whose grid slot BOTH characters own (id 0x05) stays safe.</summary>
+    public static bool IsCrossSafeAddAndEquipMain(byte[] exe, byte id)
+    {
+        int off = CatalogFileOffset + id * 12 + 0xA;
+        ushort flags = (ushort)(exe[off] | (exe[off + 1] << 8));
+        if ((flags & FlagMain) == 0) return false;
+        if ((flags & OwnerDylan) != 0 && !DylanWeaponIds.Contains(id)) return false;
+        if ((flags & OwnerRegina) != 0 && !ReginaWeaponIds.Contains(id)) return false;
+        return true;
+    }
+
     /// <summary>One count/countMax store-pair rewrite: the two original u16 register stores and the
     /// same-length <c>mov dword [esp+disp], imm32</c> + NOP replacement (imm32 at <see cref="ImmOffset"/>).</summary>
     private readonly record struct CountSite(int Offset, byte[] Original, byte[] Patched, int ImmOffset);
@@ -292,6 +314,23 @@ public static class Dc2StartingLoadoutPatch
                 + "owned MAIN (or it empties its own record on fire), so as the sole starting weapon it "
                 + "empties the weapon menu ring → div-0 at 0x496EAC. Enable add-and-equip for the full "
                 + "band safely, or pass allowUnsafe to force it.");
+        // Add-and-equip appends BOTH characters' picks into the SHARED inventory array
+        // (Dc2StartWeaponAppendPatch), so a pick the LIVE catalog exposes to the OTHER character — who
+        // may not own its WEP_P grid slot — is the cross-character stale-blob crash on equip
+        // (DC2-STARTING-LOADOUT-CROSS-CHAR-RCA.md, site 0x4bf073). The ring guard only covers the menu
+        // div-0, NOT this, so add-and-equip must still refuse a cross-exposed pick (was: bypassed).
+        if (addAndEquip && !allowUnsafe && dylanId != DylanCanonicalId && !IsCrossSafeAddAndEquipMain(exe, dylanId))
+            throw new ArgumentOutOfRangeException(nameof(dylanId),
+                $"0x{dylanId:X2} is not a cross-safe add-and-equip main for Dylan on this exe: its live "
+                + "catalog flags expose it in the other character's weapon menu, but they lack its WEP_P "
+                + "grid slot → equipping it crashes (stale-blob at 0x4bf073). Restore the item catalog, "
+                + "pick a single-owner main, or pass allowUnsafe to force it.");
+        if (addAndEquip && !allowUnsafe && reginaId != ReginaCanonicalId && !IsCrossSafeAddAndEquipMain(exe, reginaId))
+            throw new ArgumentOutOfRangeException(nameof(reginaId),
+                $"0x{reginaId:X2} is not a cross-safe add-and-equip main for Regina on this exe: its live "
+                + "catalog flags expose it in the other character's weapon menu, but they lack its WEP_P "
+                + "grid slot → equipping it crashes (stale-blob at 0x4bf073). Restore the item catalog, "
+                + "pick a single-owner main, or pass allowUnsafe to force it.");
         // The 0x50D69 imm is the START ROOM (dual-use) — always canonical; repairs legacy installs.
         exe[LegacyDylanWeaponIdOffset] = DylanCanonicalId;
         exe[ReginaWeaponIdOffset] = reginaId;
