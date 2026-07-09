@@ -1,8 +1,8 @@
 name: release
 
-# Fires when a version branch `release/vX.Y.Z` is CREATED (push a new branch to cut a
+# Fires when a version branch `version/VX.Y.Z` is CREATED (push a new branch to cut a
 # release). Common alternative: trigger on a pushed tag `v*` (on: push: tags: ['v*']).
-# `workflow_dispatch` is a manual fallback — run it from the release branch.
+# `workflow_dispatch` is a manual fallback — run it from the version branch.
 on:
   create:
   workflow_dispatch:
@@ -13,10 +13,10 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    # `create` fires for tags too — gate to branch + release/v* only. Manual dispatch always runs.
+    # `create` fires for tags too — gate to branch + version/V* only. Manual dispatch always runs.
     if: >
       github.event_name == 'workflow_dispatch' ||
-      (github.event.ref_type == 'branch' && startsWith(github.event.ref, 'release/v'))
+      (github.event.ref_type == 'branch' && startsWith(github.event.ref, 'version/V'))
     steps:
       - uses: actions/checkout@v4
 
@@ -34,10 +34,10 @@ jobs:
             REF="${{ github.ref_name }}"
           fi
           case "$REF" in
-            release/v*) ;;
-            *) echo "Not a release/vX.Y.Z branch: $REF" >&2; exit 1 ;;
+            version/V*) ;;
+            *) echo "Not a version/VX.Y.Z branch: $REF" >&2; exit 1 ;;
           esac
-          VERSION="${REF#release/v}"
+          VERSION="${REF#version/V}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           # A '-' suffix (e.g. 1.2.0-rc1, 2.0.0-beta) marks a prerelease.
           case "$VERSION" in
@@ -58,6 +58,23 @@ jobs:
             ( cd "dist/$rid" && zip -r "../../dinorand-v$VERSION-$rid.zip" . )
           done
 
+      - name: Extract release notes from CHANGELOG.md
+        id: notes
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          # Pull the `## [VERSION] …` section body (up to the next `## [` heading).
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { grab=1; next }
+            grab && /^## \[/        { exit }
+            grab                    { print }
+          ' CHANGELOG.md > NOTES.md
+          if [ -s NOTES.md ]; then
+            echo "have_notes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have_notes=false" >> "$GITHUB_OUTPUT"
+            echo "No CHANGELOG.md section for v$VERSION — falling back to auto-generated notes." >&2
+          fi
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,8 +82,14 @@ jobs:
           VERSION="${{ steps.ver.outputs.version }}"
           PRERELEASE=""
           [ "${{ steps.ver.outputs.prerelease }}" = "true" ] && PRERELEASE="--prerelease"
+          # Prefer the curated CHANGELOG.md section; fall back to auto-generated notes if absent.
+          if [ "${{ steps.notes.outputs.have_notes }}" = "true" ]; then
+            NOTES="--notes-file NOTES.md"
+          else
+            NOTES="--generate-notes"
+          fi
           gh release create "v$VERSION" ./dinorand-v"$VERSION"-*.zip \
             --title "v$VERSION" \
             --target "$GITHUB_SHA" \
-            --generate-notes \
+            $NOTES \
             $PRERELEASE
