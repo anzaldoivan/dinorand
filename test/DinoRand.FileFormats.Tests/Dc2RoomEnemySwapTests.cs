@@ -59,9 +59,10 @@ public class Dc2RoomEnemySwapTests
     {
         // Aquatic / flyer / unresolved RESOLVE (so the CLI can name them in its error/warning), but they
         // are not safe donors — that gate is IsSafeLandDonor below.
-        Assert.Equal(0x05, Dc2RoomEnemySwap.ResolveDonor("mosasaurus")!.Type);  // aquatic
-        Assert.Equal(0x04, Dc2RoomEnemySwap.ResolveDonor("pteranodon")!.Type);  // flyer
-        Assert.Equal(0x0a, Dc2RoomEnemySwap.ResolveDonor("0x0a")!.Type);        // unresolved
+        Assert.Equal(0x0a, Dc2RoomEnemySwap.ResolveDonor("mosasaurus")!.Type);              // aquatic (E80)
+        Assert.Equal(0x05, Dc2RoomEnemySwap.ResolveDonor("Plesiosaurus (boss form)")!.Type); // aquatic (E30 boss)
+        Assert.Equal(0x04, Dc2RoomEnemySwap.ResolveDonor("pteranodon")!.Type);              // flyer
+        Assert.Equal(0x0a, Dc2RoomEnemySwap.ResolveDonor("0x0a")!.Type);                    // by TYPE literal
     }
 
     // --- IsSafeLandDonor: the LAND-only guard (anything else needs --allow-unsafe) ---
@@ -72,7 +73,7 @@ public class Dc2RoomEnemySwapTests
         Assert.True(Dc2RoomEnemySwap.IsSafeLandDonor(Dc2SpeciesTable.ForType(0x02)!)); // Velociraptor LAND
         Assert.True(Dc2RoomEnemySwap.IsSafeLandDonor(Dc2SpeciesTable.ForType(0x03)!)); // T-Rex LAND (boss)
         Assert.True(Dc2RoomEnemySwap.IsSafeLandDonor(Dc2SpeciesTable.ForType(0x09)!)); // Triceratops LAND (setpiece)
-        Assert.False(Dc2RoomEnemySwap.IsSafeLandDonor(Dc2SpeciesTable.ForType(0x05)!)); // Mosasaurus AQUATIC
+        Assert.False(Dc2RoomEnemySwap.IsSafeLandDonor(Dc2SpeciesTable.ForType(0x05)!)); // Plesiosaurus boss AQUATIC
         Assert.False(Dc2RoomEnemySwap.IsSafeLandDonor(Dc2SpeciesTable.ForType(0x04)!)); // Pteranodon FLYER
         Assert.False(Dc2RoomEnemySwap.IsSafeLandDonor(Dc2SpeciesTable.ForType(0x0a)!)); // AQUATIC
     }

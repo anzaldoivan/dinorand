@@ -19,7 +19,7 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
         Usage:
           dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]
                    [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--exotic-enemies]
-                   [--include-setpiece-enemies] [--include-boss-enemies]
+                   [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps]
                    [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]
                    [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)
                    [--dc2-character-skin stock|gail|rick|random]           (dc2)
@@ -61,8 +61,13 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             manual testing. (docs/decisions/dc1/doors/DOOR-RANDOMIZER-PLAN.md.)
           - --include-setpiece-enemies / --include-boss-enemies (dc2 enemy rando, both off by
             default) widen the cross-species donor pool: setpiece adds the no-damage Triceratops
-            (0x09); boss adds the LAND bosses Tyrannosaurus (0x03) + Giganotosaurus (0x06). Both keep
+            (0x09) + Giganotosaurus (0x06); boss adds the LAND boss Tyrannosaurus (0x03). Both keep
             their own scale/HP, so they make degenerate trash mobs — opt-in only. They compose.
+          - --dc2-allow-water-swaps (dc2 enemy rando, off; EXPERIMENTAL) "Allow Enemy swaps in the
+            Water Levels": lifts the aquatic-room block (ST700/702/703/704 take land donors on their
+            wave descriptors) AND admits aquatic donors, all wave-only (Mosasaurus at low weight; the
+            Plesiosaurus boss/grunts also need --include-setpiece-enemies). Off = byte-identical.
+            docs/decisions/dc2/enemies/DC2-AQUATIC-LAND-UNLOCK-FEASIBILITY.md.
           - --dc2-enemy-mode (dc2 enemy rando, default weighted) selects how each room's donor is
             picked (docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md): weighted biases the per-room pick by the
             per-species weight table (curated defaults = today's uniform pick; boss donors rare);
@@ -418,9 +423,12 @@ var config = new RandomizerConfig
     // DC2 cross-species: include the no-damage setpiece Triceratops (E70/0x09, K62) in the donor pool.
     // Off by default (degenerate trash mob); opt-in. docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.
     IncludeDc2SetpieceEnemies = argv.Contains("--include-setpiece-enemies"),
-    // DC2 cross-species: include the boss donors (T-Rex 0x03 / Giganotosaurus 0x06, K61). Off by default
-    // (degenerate trash mob); opt-in. docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.
+    // DC2 cross-species: include the boss donors (T-Rex 0x03, K61). Off by default (degenerate trash
+    // mob); opt-in. docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.
     IncludeDc2BossEnemies = argv.Contains("--include-boss-enemies"),
+    // DC2 EXPERIMENTAL (off): allow enemy swaps in the water levels — lifts the aquatic-room block and
+    // admits aquatic (wave-only) donors (K72). Default off = byte-identical. docs/decisions/dc2/enemies/DC2-AQUATIC-LAND-UNLOCK-FEASIBILITY.md.
+    Dc2AllowWaterLevelEnemySwaps = argv.Contains("--dc2-allow-water-swaps"),
     ShuffleKeyItems = argv.Contains("--shuffle-keys"),
     // Experimental: import foreign species (cat8 Theri + grounded RaptorHeavy) into eligible rooms and queue
     // the EXE patches they need. Off unless asked; with --install-to-data it patches DINO.exe (game must be
@@ -750,8 +758,11 @@ int RunDc2(string installDir)
         RandomizeEnemies = !argv.Contains("--no-enemies"),
         // Opt-in: add the no-damage setpiece Triceratops (E70/0x09, K62) to the cross-species donor pool.
         IncludeDc2SetpieceEnemies = argv.Contains("--include-setpiece-enemies"),
-        // Opt-in: add the boss donors (T-Rex 0x03 / Giganotosaurus 0x06, K61) to the cross-species donor pool.
+        // Opt-in: add the boss donors (T-Rex 0x03, K61) to the cross-species donor pool.
         IncludeDc2BossEnemies = argv.Contains("--include-boss-enemies"),
+        // EXPERIMENTAL (off): allow enemy swaps in the water levels — lifts the aquatic-room block and admits
+        // aquatic (wave-only) donors (K72). docs/decisions/dc2/enemies/DC2-AQUATIC-LAND-UNLOCK-FEASIBILITY.md.
+        Dc2AllowWaterLevelEnemySwaps = argv.Contains("--dc2-allow-water-swaps"),
         // Character-skin swap: Dylan renders as Gail/Rick (docs/reference/dc2/models/DC2-EXTRA-CRISIS-ROSTER-DECODE.md §7-9).
         Dc2CharacterSkin = ParseSkin(GetOpt("--dc2-character-skin")),
         Dc2ReginaSkin = ParseSkin(GetOpt("--dc2-regina-skin")),

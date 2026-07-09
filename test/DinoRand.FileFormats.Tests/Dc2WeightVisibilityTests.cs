@@ -29,18 +29,19 @@ public class Dc2WeightVisibilityTests
         Assert.True(Dc2SpeciesTable.IsDonorPoolMember(type, includeSetpiece: true, includeBoss: true));
     }
 
-    [Fact]
-    public void SetpieceTriceratops_VisibleOnlyWithSetpieceToggle()
+    [Theory]
+    [InlineData(Trice)]
+    [InlineData(Giga)] // Giganotosaurus moved boss→setpiece 2026-07-09
+    public void SetpieceSpecies_VisibleOnlyWithSetpieceToggle(int type)
     {
-        Assert.False(Dc2SpeciesTable.IsDonorPoolMember(Trice, includeSetpiece: false, includeBoss: false));
-        Assert.False(Dc2SpeciesTable.IsDonorPoolMember(Trice, includeSetpiece: false, includeBoss: true));
-        Assert.True(Dc2SpeciesTable.IsDonorPoolMember(Trice, includeSetpiece: true, includeBoss: false));
-        Assert.True(Dc2SpeciesTable.IsDonorPoolMember(Trice, includeSetpiece: true, includeBoss: true));
+        Assert.False(Dc2SpeciesTable.IsDonorPoolMember(type, includeSetpiece: false, includeBoss: false));
+        Assert.False(Dc2SpeciesTable.IsDonorPoolMember(type, includeSetpiece: false, includeBoss: true));
+        Assert.True(Dc2SpeciesTable.IsDonorPoolMember(type, includeSetpiece: true, includeBoss: false));
+        Assert.True(Dc2SpeciesTable.IsDonorPoolMember(type, includeSetpiece: true, includeBoss: true));
     }
 
     [Theory]
     [InlineData(TRex)]
-    [InlineData(Giga)]
     public void BossSpecies_VisibleOnlyWithBossToggle(int type)
     {
         Assert.False(Dc2SpeciesTable.IsDonorPoolMember(type, includeSetpiece: false, includeBoss: false));
@@ -56,12 +57,13 @@ public class Dc2WeightVisibilityTests
         // ever diverge, a visible slider could weight a species the pick can't choose (or vice versa).
         foreach (var setpiece in new[] { false, true })
             foreach (var boss in new[] { false, true })
-            {
-                var pool = Dc2SpeciesTable.DonorPool(setpiece, boss).Select(d => d.Type).ToHashSet();
-                foreach (var row in Dc2EnemyDistribution.LoadEmbedded().Rows)
-                    Assert.Equal(pool.Contains(row.Type),
-                                 Dc2SpeciesTable.IsDonorPoolMember(row.Type, setpiece, boss));
-            }
+                foreach (var water in new[] { false, true })
+                {
+                    var pool = Dc2SpeciesTable.DonorPool(setpiece, boss, water).Select(d => d.Type).ToHashSet();
+                    foreach (var row in Dc2EnemyDistribution.LoadEmbedded().Rows)
+                        Assert.Equal(pool.Contains(row.Type),
+                                     Dc2SpeciesTable.IsDonorPoolMember(row.Type, setpiece, boss, water));
+                }
     }
 
     [Fact]

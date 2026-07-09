@@ -93,6 +93,9 @@
                         <CheckBox Content="Include boss enemies (T-Rex / Giganotosaurus)" Margin="0,2"
                                   ToolTip.Tip="Add the LAND bosses to the DC2 cross-species donor pool. Off by default — they keep boss-scale models/HP, so they make degenerate trash mobs."
                                   IsChecked="{Binding IncludeDc2BossEnemies, Mode=TwoWay}" />
+                        <CheckBox Content="Allow Enemy swaps in the Water Levels" Margin="0,2"
+                                  ToolTip.Tip="EXPERIMENTAL. Lets the water levels (ST700/702/703/704) take land donors on their wave descriptors AND admits aquatic donors (Mosasaurus, and the Plesiosaurus set-pieces with the setpiece toggle) — all wave-only, non-functional on land. Off by default (identical to today)."
+                                  IsChecked="{Binding Dc2AllowWaterLevelEnemySwaps, Mode=TwoWay}" />
                         <!-- Donor distribution (docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md): weighted vs fixed. -->
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,2">
                             <TextBlock Text="Donor selection:" VerticalAlignment="Center" Margin="0,0,6,0" />

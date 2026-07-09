@@ -14,11 +14,12 @@ public class Dc2EnemyDistributionTests
     private static readonly Dc2EnemyDistribution Dist = Dc2EnemyDistribution.LoadEmbedded();
 
     [Fact]
-    public void Registry_RowsAreExactlyTheKnownLandSpecies()
+    public void Registry_RowsAreExactlyTheMaximalDonorPool()
     {
-        // The weighable set == every possible donor (both toggles on). A species added to
-        // Dc2SpeciesTable as Known+LAND must get a registry row (and vice versa) or this locks.
-        var weighable = Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true)
+        // The weighable set == every POSSIBLE donor (both opt-ins + the water flag on, which is the only
+        // way the aquatic wave-only donors ever become weighable). A species added to Dc2SpeciesTable as
+        // a Known donor must get a registry row (and vice versa) or this locks.
+        var weighable = Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true, allowWater: true)
             .Select(s => s.Type).OrderBy(t => t);
         Assert.Equal(weighable, Dist.Rows.Select(r => r.Type));
     }

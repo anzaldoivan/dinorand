@@ -33,18 +33,23 @@ public class Dc2SpeciesTableTests
     }
 
     [Fact]
-    public void DefaultDonors_AreAllLand_AndExcludeAquaticMosasaurus()
+    public void DefaultDonors_AreAllLand_AndExcludeAquaticSpecies()
     {
         Assert.All(Dc2SpeciesTable.DefaultDonors, s => Assert.Equal(Dc2Habitat.Land, s.Habitat));
 
-        // Mosasaurus (TYPE 0x05 = E30) is aquatic — forcing it into a land room crashes (live ST202,
-        // 2026-06-30) — so it must be flagged Aquatic and never appear in the donor pool.
-        var mosa = Dc2SpeciesTable.ForType(0x05);
-        Assert.NotNull(mosa);
-        Assert.Equal("Mosasaurus", mosa!.Creature);
-        Assert.Equal("E30", mosa.EFile);
-        Assert.Equal(Dc2Habitat.Aquatic, mosa.Habitat);
-        Assert.DoesNotContain(0x05, Dc2SpeciesTable.DefaultDonors.Select(d => d.Type));
+        // Aquatic set (K68/K66/K70): 0x05=E30 Plesiosaurus BOSS, 0x0a=E80 Mosasaurus, 0x0b/0x0c=E31/E32
+        // Plesiosaurus grunt. All aquatic (crash-on-land via op-0x1a, K62b) ⇒ never in the DEFAULT pool.
+        var boss = Dc2SpeciesTable.ForType(0x05)!;
+        Assert.Equal("Plesiosaurus (boss form)", boss.Creature);
+        Assert.Equal("E30", boss.EFile);
+        var mosa = Dc2SpeciesTable.ForType(0x0a)!;
+        Assert.Equal("Mosasaurus", mosa.Creature);
+        Assert.Equal("E80", mosa.EFile);
+        foreach (var t in new[] { 0x05, 0x0a, 0x0b, 0x0c })
+        {
+            Assert.Equal(Dc2Habitat.Aquatic, Dc2SpeciesTable.ForType(t)!.Habitat);
+            Assert.DoesNotContain(t, Dc2SpeciesTable.DefaultDonors.Select(d => d.Type));
+        }
     }
 
     [Fact]
@@ -77,7 +82,8 @@ public class Dc2SpeciesTableTests
 
         var withSetpiece = Dc2SpeciesTable.DonorPool(includeSetpiece: true).Select(s => s.Type).ToList();
         Assert.Contains(0x09, withSetpiece);
-        Assert.Equal(new[] { 0x02, 0x07, 0x08, 0x09, 0x0e }, withSetpiece.OrderBy(x => x));
+        // Giganotosaurus (0x06) is now a LAND setpiece (boss→setpiece 2026-07-09), so it joins here too.
+        Assert.Equal(new[] { 0x02, 0x06, 0x07, 0x08, 0x09, 0x0e }, withSetpiece.OrderBy(x => x));
         // Still LAND/non-boss/Known — the setpiece flag is the only thing the default pool drops.
         Assert.All(Dc2SpeciesTable.DonorPool(includeSetpiece: true),
                    s => { Assert.False(s.IsBoss); Assert.Equal(Dc2Habitat.Land, s.Habitat); });
@@ -86,8 +92,9 @@ public class Dc2SpeciesTableTests
     [Fact]
     public void DonorPool_IncludesBosses_OnlyWhenOptedIn()
     {
-        // includeBoss:false (default) keeps the bosses out; true adds the LAND boss donors — T-Rex (0x03,
-        // shared) + Giganotosaurus (0x06, dedicated), both live-proven LAND but degenerate as trash mobs.
+        // includeBoss:false (default) keeps the boss out; true adds the sole LAND boss donor — T-Rex
+        // (0x03, shared), live-proven LAND but degenerate as a trash mob. (Giganotosaurus 0x06 is no
+        // longer a boss donor — it moved boss→setpiece 2026-07-09.)
         var noBoss = Dc2SpeciesTable.DonorPool(includeSetpiece: false, includeBoss: false).Select(s => s.Type).ToList();
         Assert.DoesNotContain(0x03, noBoss);
         Assert.DoesNotContain(0x06, noBoss);
@@ -95,13 +102,14 @@ public class Dc2SpeciesTableTests
 
         var withBoss = Dc2SpeciesTable.DonorPool(includeSetpiece: false, includeBoss: true).Select(s => s.Type).ToList();
         Assert.Contains(0x03, withBoss);
-        Assert.Contains(0x06, withBoss);
-        Assert.Equal(new[] { 0x02, 0x03, 0x06, 0x07, 0x08, 0x0e }, withBoss.OrderBy(x => x).ToArray());
-        // Bosses are added, but the LAND-only / Known invariant still holds (no aquatic/flyer/unresolved).
+        Assert.DoesNotContain(0x06, withBoss); // Giganotosaurus is a setpiece now, not a boss
+        Assert.Equal(new[] { 0x02, 0x03, 0x07, 0x08, 0x0e }, withBoss.OrderBy(x => x).ToArray());
+        // The boss is added, but the LAND-only / Known invariant still holds (no aquatic/flyer/unresolved).
         Assert.All(Dc2SpeciesTable.DonorPool(includeSetpiece: false, includeBoss: true),
                    s => { Assert.Equal(Dc2Habitat.Land, s.Habitat); Assert.Equal(Confidence.Known, s.Confidence); });
-        // Aquatic Mosasaurus (0x05) is NOT a boss but must never enter the pool via the boss flag.
+        // Aquatic species must never enter the pool via the boss flag.
         Assert.DoesNotContain(0x05, withBoss);
+        Assert.DoesNotContain(0x0a, withBoss);
     }
 
     [Fact]
@@ -131,18 +139,18 @@ public class Dc2SpeciesTableTests
     }
 
     [Fact]
-    public void NonLandUnresolvedTypes_AreSkipWorthy_AndNeverDonors()
+    public void AquaticTypes_AreNeverLandDonors_AndAbsentUnlessWaterFlagOn()
     {
-        // 0x0a is confirmed AQUATIC (live crash + maintainer in-game ID, ST202 2026-06-30; native host
-        // ST700). 0x0b/0x0c are live-confirmed NON-LAND (crash), aquatic-vs-flyer still unresolved — tagged
-        // NonLand (conservative decision 2026-06-30) so the planner's aquatic-native room skip and
-        // Dc2RoomEnemySwap.IsAquaticNativeRoom leave their rooms unchanged, exactly like Mosasaurus (0x05).
-        Assert.Equal(Dc2Habitat.Aquatic, Dc2SpeciesTable.ForType(0x0a)!.Habitat);
-        Assert.Equal(Dc2Habitat.NonLand, Dc2SpeciesTable.ForType(0x0b)!.Habitat);
-        Assert.Equal(Dc2Habitat.NonLand, Dc2SpeciesTable.ForType(0x0c)!.Habitat);
+        // Aquatic set closed live 2026-07-08 (K68): 0x0a=E80 Mosasaurus, 0x0b=E31 / 0x0c=E32 Plesiosaurus
+        // grunt (the old "NonLand/unresolved" tags are corrected to Aquatic). The planner's aquatic-native
+        // room skip + Dc2RoomEnemySwap.IsAquaticNativeRoom leave their rooms unchanged, like Plesiosaurus
+        // boss (0x05).
+        foreach (var t in new[] { 0x05, 0x0a, 0x0b, 0x0c })
+            Assert.Equal(Dc2Habitat.Aquatic, Dc2SpeciesTable.ForType(t)!.Habitat);
 
-        // None may ever enter the donor pool (even with every opt-in) — they are not LAND.
-        foreach (var t in new[] { 0x0a, 0x0b, 0x0c })
+        // None enters the DEFAULT (land-only) pool, even with every opt-in — the water flag is the only
+        // door in, and there they are wave-only (planner placement gate).
+        foreach (var t in new[] { 0x05, 0x0a, 0x0b, 0x0c })
         {
             Assert.DoesNotContain(t, Dc2SpeciesTable.DefaultDonors.Select(d => d.Type));
             Assert.DoesNotContain(t, Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true).Select(d => d.Type));

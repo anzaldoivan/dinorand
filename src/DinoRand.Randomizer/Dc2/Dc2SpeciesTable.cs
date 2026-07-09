@@ -68,22 +68,26 @@ public static class Dc2SpeciesTable
     {
         // --- Dedicated bases (coexist). LIVE-swap-confirmed donors flagged (ST202, 2026-06-30). ---
         new Dc2Species(0x02, "E00", 0x00633000, "Velociraptor",   Dc2BaseClass.Dedicated,    IsBoss: false, Confidence.Known,     Dc2Habitat.Land),
-        new Dc2Species(0x06, "E40", 0x0063f500, "Giganotosaurus", Dc2BaseClass.Dedicated,    IsBoss: true,  Confidence.Known,     Dc2Habitat.Land),    // live ✓ (boss-scale)
+        new Dc2Species(0x06, "E40", 0x0063f500, "Giganotosaurus", Dc2BaseClass.Dedicated,    IsBoss: false, Confidence.Known,     Dc2Habitat.Land, IsSetpiece: true), // live ✓ (boss-scale); boss→setpiece 2026-07-09 (opt-in only, grouped with Triceratops)
         new Dc2Species(0x07, "E90", 0x0063d000, "Oviraptor",      Dc2BaseClass.Dedicated,    IsBoss: false, Confidence.Known,     Dc2Habitat.Land),    // live ✓
         new Dc2Species(0x08, "E60", 0x00638000, "Allosaurus",     Dc2BaseClass.Dedicated,    IsBoss: false, Confidence.Known,     Dc2Habitat.Land),
         new Dc2Species(0x0d, "E60", 0x00638000, "Allosaurus",     Dc2BaseClass.Dedicated,    IsBoss: false, Confidence.Suspected, Dc2Habitat.Land),    // variant ctor
         new Dc2Species(0x09, "E70", 0x00650000, "Triceratops",      Dc2BaseClass.Dedicated,    IsBoss: false, Confidence.Known,     Dc2Habitat.Land, IsSetpiece: true), // RESOLVED LIVE 2026-06-30 (CE cave ST202): header 434/62/20@0x650000, HP 5333, no crash ⇒ LAND; setpiece (no-damage) ⇒ opt-in donor only
 
-        // --- Shared 0x640000 group (mutually exclusive; not v1 donors). 0x03/0x05 RESOLVED by the live
-        //     swap (2026-06-30): 0x03=E10 T-Rex worked, 0x05=E30 Mosasaurus CRASHED (aquatic) — the static
-        //     "both E10 by HP 10000" guess is corrected. ---
+        // --- Shared 0x640000 group (mutually exclusive; not v1 donors). Aquatic set CLOSED LIVE 2026-07-08
+        //     (K68/K66/K70): 0x03=E10 T-Rex (land), 0x05=E30 Plesiosaurus BOSS, 0x0a=E80 Mosasaurus,
+        //     0x0b/0x0c=E31/E32 Plesiosaurus grunt — all aquatic. The stale K61 "0x05=Mosasaurus/E30" and
+        //     "0x0a/0x0b/0x0c unresolved" mappings are corrected. Aquatic species run on land WITHOUT
+        //     crashing only via the op-0x4f wave / op-0x23 preload path (K72), so they are wave-only donors
+        //     gated behind Dc2AllowWaterLevelEnemySwaps (Mosasaurus a low-weight regular donor; the
+        //     Plesiosaurus boss/grunts additionally IsSetpiece = setpiece opt-in). ---
         new Dc2Species(0x0e, "E50", 0x00640000, "Inostrancevia",  Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Known,     Dc2Habitat.Land),    // live ✓
         new Dc2Species(0x03, "E10", 0x00640000, "Tyrannosaurus",  Dc2BaseClass.Shared640000, IsBoss: true,  Confidence.Known,     Dc2Habitat.Land),    // live ✓ (boss-scale)
-        new Dc2Species(0x05, "E30", 0x00640000, "Mosasaurus",     Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Known,     Dc2Habitat.Aquatic), // live ✗ CRASH (aquatic)
+        new Dc2Species(0x05, "E30", 0x00640000, "Plesiosaurus (boss form)", Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Known, Dc2Habitat.Aquatic, IsSetpiece: true), // K68/K70 live: BOSS form, HP 20000, oversized ⇒ setpiece opt-in + wave-only
         new Dc2Species(0x04, "E20", 0x00640000, "Pteranodon",     Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Known,     Dc2Habitat.Flyer),   // RESOLVED LIVE 2026-06-30 (CE cave ST202): header 358/58/18@0x640000=E20, HP 2400, NO crash ⇒ FLYER (crash-safe but not a land donor)
-        new Dc2Species(0x0a, "?",   0x00640000, "shared (unresolved)", Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Open,  Dc2Habitat.Aquatic), // habitat KNOWN: live CRASH + maintainer in-game ID = AQUATIC (ST202, K62b; native host ST700); creature/E-slot still open
-        new Dc2Species(0x0b, "?",   0x00640000, "shared (unresolved)", Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Open,  Dc2Habitat.NonLand), // habitat KNOWN: live CRASH = NON-LAND (ST202, K62b); aquatic-vs-flyer unresolved ⇒ skip-worthy (conservative)
-        new Dc2Species(0x0c, "?",   0x00640000, "shared (unresolved)", Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Open,  Dc2Habitat.NonLand), // habitat KNOWN: live CRASH = NON-LAND (ST202, K62b); aquatic-vs-flyer unresolved ⇒ skip-worthy (conservative)
+        new Dc2Species(0x0a, "E80", 0x00640000, "Mosasaurus",     Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Known,     Dc2Habitat.Aquatic), // K68 live: E80 Mosasaurus, HP 2800, cleanest aquatic ⇒ low-weight regular donor (wave-only, water-flag-gated)
+        new Dc2Species(0x0b, "E31", 0x00640000, "Plesiosaurus (regular/grunt form)", Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Known, Dc2Habitat.Aquatic, IsSetpiece: true), // K68 live: E31 grunt, HP 3000, inert on land ⇒ setpiece opt-in + wave-only
+        new Dc2Species(0x0c, "E32", 0x00640000, "Plesiosaurus (regular/grunt form)", Dc2BaseClass.Shared640000, IsBoss: false, Confidence.Known, Dc2Habitat.Aquatic, IsSetpiece: true), // K68: E32 = 0x0c sub-variant of E31 ⇒ setpiece opt-in + wave-only
     };
 
     private static readonly IReadOnlyDictionary<int, Dc2Species> ByType =
@@ -105,6 +109,23 @@ public static class Dc2SpeciesTable
     /// shared predicate behind every non-land room skip (planner + <c>Dc2RoomEnemySwap</c>).</summary>
     public static bool IsNonLandNativeType(int type) =>
         ForType(type)?.Habitat is Dc2Habitat.Aquatic or Dc2Habitat.NonLand or Dc2Habitat.Flyer;
+
+    /// <summary>Aquatic/non-land habitat — the crash-on-land set (K69). Water-level rooms native to one of
+    /// these are protected unless <c>Dc2AllowWaterLevelEnemySwaps</c> lifts the block; a donor with this
+    /// habitat may only be placed on the wave/preload path (never op-0x1a — K62b crash).</summary>
+    public static bool IsWaterHabitat(Dc2Habitat h) => h is Dc2Habitat.Aquatic or Dc2Habitat.NonLand;
+
+    /// <summary>True iff <paramref name="type"/>'s native species is water (aquatic/non-land) — the
+    /// water-flag-gated half of <see cref="IsNonLandNativeType"/> (flyers stay blocked regardless).</summary>
+    public static bool IsWaterNativeType(int type) => ForType(type) is { } s && IsWaterHabitat(s.Habitat);
+
+    /// <summary>True iff <paramref name="type"/>'s native species is a <see cref="Dc2Habitat.Flyer"/> — the
+    /// half of the non-land skip the water flag never lifts (land replacement spawns outside the hitbox).</summary>
+    public static bool IsFlyerNativeType(int type) => ForType(type)?.Habitat is Dc2Habitat.Flyer;
+
+    /// <summary>True iff <paramref name="donor"/> is an aquatic/non-land species — crash-safe as a land
+    /// spawn ONLY on the op-0x4f wave / op-0x23 preload path (K72), never an op-0x1a record (K62b).</summary>
+    public static bool IsWaterDonor(Dc2Species donor) => IsWaterHabitat(donor.Habitat);
 
     /// <summary>Donor pool: <b>non-boss, live-confirmed LAND</b> species — read as normal enemies and
     /// don't crash. v1 was dedicated-only; <b>v2 (2026-06-30) broadened it to include shared-base LAND
@@ -132,18 +153,23 @@ public static class Dc2SpeciesTable
     /// Both <c>false</c> (default) ⇒ exactly <see cref="DefaultDonors"/>. Wired in
     /// <see cref="Passes.Dc2EnemyRandomizer"/>; the planner's ≤1-shared-0x640000 budget guard keeps the
     /// shared-base members (Inostrancevia, T-Rex) safe at use-time.</summary>
-    public static IReadOnlyList<Dc2Species> DonorPool(bool includeSetpiece, bool includeBoss = false) => All
-        .Where(s => IsPoolMember(s, includeSetpiece, includeBoss))
+    /// <summary><paramref name="allowWater"/> <c>true</c> (the experimental
+    /// <c>Dc2AllowWaterLevelEnemySwaps</c>) additionally admits AQUATIC species — Mosasaurus as a regular
+    /// donor, the Plesiosaurus boss/grunts only with <paramref name="includeSetpiece"/> — all wave-only per
+    /// the planner's placement gate. Default <c>false</c> keeps the pool LAND-only (byte-identical).</summary>
+    public static IReadOnlyList<Dc2Species> DonorPool(bool includeSetpiece, bool includeBoss = false, bool allowWater = false) => All
+        .Where(s => IsPoolMember(s, includeSetpiece, includeBoss, allowWater))
         .ToArray();
 
     /// <summary>True iff <paramref name="type"/> would be in <see cref="DonorPool"/> under these
     /// toggles — the SAME predicate the pool is built from, exposed so consumers (e.g. the app's
     /// weight-slider visibility, docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md D7) can't drift from it.</summary>
-    public static bool IsDonorPoolMember(int type, bool includeSetpiece, bool includeBoss) =>
-        ForType(type) is { } s && IsPoolMember(s, includeSetpiece, includeBoss);
+    public static bool IsDonorPoolMember(int type, bool includeSetpiece, bool includeBoss, bool allowWater = false) =>
+        ForType(type) is { } s && IsPoolMember(s, includeSetpiece, includeBoss, allowWater);
 
-    private static bool IsPoolMember(Dc2Species s, bool includeSetpiece, bool includeBoss) =>
-        s.Confidence == Confidence.Known && s.Habitat == Dc2Habitat.Land
+    private static bool IsPoolMember(Dc2Species s, bool includeSetpiece, bool includeBoss, bool allowWater) =>
+        s.Confidence == Confidence.Known
+        && (s.Habitat == Dc2Habitat.Land || (allowWater && IsWaterHabitat(s.Habitat)))
         && (!s.IsSetpiece || includeSetpiece)
         && (!s.IsBoss || includeBoss);
 }
