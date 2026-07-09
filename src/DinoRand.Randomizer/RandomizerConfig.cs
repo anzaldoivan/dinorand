@@ -13,6 +13,17 @@ public sealed class RandomizerConfig
     public bool RandomizeStartingInventory { get; set; } = false;
 
     /// <summary>
+    /// DC1 only (off by default). Per-placement enemy maxHP override
+    /// (docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED", DC1-G2): writes a seeded,
+    /// <see cref="EnemyDifficulty"/>-scaled HP into each eligible <c>0x20</c> spawn record's <c>+6</c>
+    /// word (entity <c>+0x11A</c>), bypassing the engine's <c>{750,850,1000}</c> roll. A plain SCD file
+    /// edit — no EXE/DDRAW/CE. Only positively-decoded dinosaurs, scripted/cutscene rooms excluded, so
+    /// beatability is unaffected (HP gates nothing). Seed-encoded (byte 4 bit 6). CLI <c>--dc1-enemy-hp</c>.
+    /// <see cref="Passes.EnemyHpRandomizer"/>.
+    /// </summary>
+    public bool RandomizeEnemyHp { get; set; } = false;
+
+    /// <summary>
     /// DC2 only (on by default). Apply the reversible <c>ddraw.dll</c> MotionTrail over-brightening fix
     /// to the Classic REbirth wrapper when running Dino Crisis 2
     /// (<see cref="Dc2.Dc2MotionTrailInstaller"/> / <see cref="FileFormats.Exe.Dc2DdrawTrailPatch"/>).

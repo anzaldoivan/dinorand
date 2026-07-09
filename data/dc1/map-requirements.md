@@ -44,21 +44,34 @@ permissive type-1/3 handling already models these correctly (free once reachable
 | 0304 | 0300 | type 3 | 9/38 | — | door@0x276fc |
 | 0309 | 0306 | type 3 | 9/14 | — | door@0x3dd30 |
 | 0403 | 0402 | type 1 | 9/18 | — | door@0x54fd4 |
-| 0506 | 0507 | type 3 | 9/23 | — | door@0x23a0c |
+| 0506 | 0507 | type 3 | 9/23 | — | door@0x23a04 |
 | 0507 | 0508 | type 3 | 9/24 | — | door@0x414bc |
 | 0604 | 0609 | type 3 | 9/29 | — | door@0x3fc20 |
 
+## Door↔door shortcuts (latch-modeled — NOT a map.json gate)
+
+A type-1 reader whose lock is set by its reciprocal **type-2 door** (`SetFlag(9,lock)` on
+traversal — STATIC-SCD-RE.md cont.40), i.e. an "open from the far side" shortcut. The producer is
+a door, not an SCD event, so the old scan filed these under "No static producer" — they are not
+native/unknown. Owned by the group-9 latch in `KeyItemPlacer.Reachable` (a type-2 traverse sets
+the lock; a type-1 door is passable only once latched), the single source of truth — so they are
+**not** emitted to `map.json` (that would double-gate). Listed here for provenance only.
+
+| Door room | Dest | Door type | Flag (grp/idx) | Type-2 setter room(s) | Provenance |
+|---|---|---|---|---|---|
+| 010a | 010b | type 1 | 9/7 | 010b | door@0x486f8 |
+| 0201 | 0205 | type 1 | 9/11 | 0205 | door@0x4250c |
+| 030a | 030c | type 1 | 9/16 | 030c | door@0x54ddc |
+| 030b | 030a | type 1 | 9/15 | 030a, 030d | door@0x19414 |
+| 030d | 030c | type 1 | 9/16 | 030c | door@0x484b0 |
+| 0509 | 050e | type 1 | 9/25 | 050e | door@0x39200 |
+
 ## No static producer (CE follow-up — NOT activated)
 
-The unlock flag is never `SetFlag` in any room script (set by `DINO.exe` native code) or has
-multiple ambiguous producers. Engine stays permissive (beatable); revisit only for door-rando
-correctness — see ROADMAP / DATA-BACKFILL-PLAN §7.
+The unlock flag is never `SetFlag` in any room script, set by no type-2 door, and set by no
+`DINO.exe`-visible producer (native code / cutscene), or has multiple ambiguous producers. Engine
+stays permissive (beatable); revisit only for door-rando correctness — see ROADMAP / DATA-BACKFILL-PLAN §7.
 
 | Door room | Dest | Door type | Flag (grp/idx) | Producers | Provenance |
 |---|---|---|---|---|---|
-| 010a | 010b | type 1 | 9/7 | — | door@0x486f8 |
-| 0201 | 0205 | type 1 | 9/11 | — | door@0x4250c |
-| 030a | 030c | type 1 | 9/16 | — | door@0x54ddc |
-| 030b | 030a | type 1 | 9/15 | — | door@0x19414 |
-| 030d | 030c | type 1 | 9/16 | — | door@0x484b0 |
-| 0509 | 050e | type 1 | 9/25 | — | door@0x39200 |
+| _(none)_ | | | | | |

@@ -216,6 +216,50 @@ public class RoomFileRoundTripTests
             }
     }
 
+    /// <summary>
+    /// The enemy record's <c>+6</c> word is <b>maxHP</b> — the 0x20 handler preloads it into entity
+    /// <c>+0x11A</c> (DC1-G2, live-confirmed 2026-07-08; EXE-SYMBOLS <c>0x42656A</c>). It is <i>not</i> a
+    /// parsed <see cref="EnemyRecord"/> field, so it survives an edit only because
+    /// <see cref="RoomScript.ApplyEnemyEdits"/> patches in place (category/model/motion) and leaves every
+    /// other byte alone. This proves a nonzero <c>+6</c> on an <i>edited</i> record round-trips: bake maxHP
+    /// into a 0x20 record, permute its model/motion, write, re-read, and assert <c>+6</c> is intact. (All 83
+    /// vanilla records zero <c>+6</c>, so the nonzero case needs a synthetic room.)
+    /// </summary>
+    [Fact]
+    public void Enemy_MaxHpWord_SurvivesModelEditRoundTrip()
+    {
+        const ushort maxHp = 850; // a plausible preset (record +6 → entity +0x11A)
+        var enemies = new[]
+        {
+            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15), // Velociraptor
+            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21), // RaptorHeavy — a distinct model to swap in
+        };
+        var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(),
+                                        Array.Empty<SyntheticRoom.Door>(), enemies);
+        var room = RoomFile.Read(1, 3, raw);
+        Assert.Equal(2, room.Enemies.Count);
+
+        // Bake maxHP into enemy[0]'s +6 word. RdtBuffer is the decompressed RDT payload Write() clones, so
+        // this is byte-equivalent to the file having shipped a nonzero +6 (the DC1 mock stores the RDT raw).
+        var e0 = room.Enemies[0];
+        room.RdtBuffer[e0.FileOffset + 6] = unchecked((byte)maxHp);
+        room.RdtBuffer[e0.FileOffset + 7] = (byte)(maxHp >> 8);
+
+        // Edit that SAME record's (model, motion) — the permute pass's surface — to force a re-emit.
+        e0.ModelPtr = room.Enemies[1].OriginalModelPtr;
+        e0.MotionPtr = room.Enemies[1].OriginalMotionPtr;
+
+        var rewritten = room.Write();
+        Assert.NotEqual(room.OriginalBytes, rewritten);
+
+        var reread = RoomFile.Read(1, 3, rewritten);
+        // The model edit landed, and +6 (maxHP) is untouched despite the in-place record patch.
+        Assert.Equal(room.Enemies[1].OriginalModelPtr, reread.Enemies[0].ModelPtr);
+        int off = reread.Enemies[0].FileOffset + 6;
+        ushort got = (ushort)(reread.RdtBuffer[off] | (reread.RdtBuffer[off + 1] << 8));
+        Assert.Equal(maxHp, got);
+    }
+
     /// Walk up from the test assembly to the repo root (the dir holding <c>english/</c> or
     /// <c>DinoRand.sln</c>) so the in-repo English data is found on any clone — never a
     /// hardcoded per-machine path. Returns null if not found (caller then no-ops).

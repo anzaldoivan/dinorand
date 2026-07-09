@@ -18,7 +18,7 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
 
         Usage:
           dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]
-                   [--no-items] [--no-enemies] [--shuffle-keys] [--exotic-enemies]
+                   [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--exotic-enemies]
                    [--include-setpiece-enemies] [--include-boss-enemies]
                    [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]
                    [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)
@@ -106,6 +106,13 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             rooms (e.g. ST706 Mosasaurus) — the same room-level guards the bulk pass applies — unless
             --force is given (distinct from --allow-unsafe, which overrides the donor-habitat guard).
             Inherently DC2 (no --game needed). docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.
+          - --dc1-enemy-hp (dc1, off by default) overrides each eligible enemy's maxHP per placement:
+            it writes a seeded, --difficulty-scaled value into the 0x20 spawn record's +6 word (entity
+            +0x11A), bypassing the game's {750,850,1000} birth roll. A plain room-file edit (no DINO.exe
+            patch, no Cheat Engine). Eligibility matches the enemy permute (positively-decoded dinosaurs
+            only; scripted T-Rex and cutscene rooms skipped; 0x59-placed enemies untouched). Higher
+            --difficulty widens the band upward; HP gates no progression, so seeds stay beatable.
+            docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
           - --game selects the target (default dc1). dc2 is an early scaffold: it loads the
             Dino Crisis 2 (Rebirth) rooms but its passes are no-ops until the room-record
             decoders land (docs/parity/BIORAND-REUSE-VALIDATION.md). The DC1-only targeted
@@ -322,6 +329,9 @@ if (GetOpt("--set-door") is { } setDoorSpec)
 if (GetOpt("--set-item") is { } setItemSpec)
     return SetItem(install, setItemSpec);
 
+if (GetOpt("--set-enemy-hp") is { } setEnemyHpSpec)
+    return SetEnemyHp(install, setEnemyHpSpec);
+
 // Targeted EXE patch (docs/decisions/dc1/exe/EXE-PATCH-PER-ROOM-PLAN.md): repoint one stage's enemy-set record to
 // another stage's, swapping that whole stage's enemy set. The enemy-set index a room loads is
 // roomId>>8, so this is STAGE-scoped. Same backup/--restore contract as the room ops, but on
@@ -401,6 +411,10 @@ var config = new RandomizerConfig
 {
     RandomizeItems = !argv.Contains("--no-items"),
     RandomizeEnemies = !argv.Contains("--no-enemies"),
+    // DC1 per-placement enemy maxHP override (off by default). Writes a seeded, --difficulty-scaled HP into
+    // eligible 0x20 spawns' +6 word (entity +0x11A), bypassing the {750,850,1000} roll — plain SCD file edit.
+    // docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
+    RandomizeEnemyHp = argv.Contains("--dc1-enemy-hp"),
     // DC2 cross-species: include the no-damage setpiece Triceratops (E70/0x09, K62) in the donor pool.
     // Off by default (degenerate trash mob); opt-in. docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.
     IncludeDc2SetpieceEnemies = argv.Contains("--include-setpiece-enemies"),
@@ -2249,6 +2263,91 @@ static int SetItem(string installDir, string spec)
     Console.WriteLine($"backup  : {backupPath}");
     Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
     Console.WriteLine($"verify  : pick it up in-game; confirm item 0x{newId:X2} is granted/equips correctly.");
+    return 0;
+
+    static bool TryHex(string s, out int val)
+    {
+        s = s.Trim();
+        if (s.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) s = s.Substring(2);
+        return int.TryParse(s, System.Globalization.NumberStyles.HexNumber, null, out val);
+    }
+}
+
+// Preset maxHP (+6) on every eligible 0x20 dino in ONE room — the CE-verification knob for the DC1-G2 HP
+// lever (docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED"). spec is "<room>[:<hp>]" (room =
+// 3-hex SSRR, e.g. 102; hp = decimal 1..65535). With NO hp it just LISTS the room's enemies (dry inspect,
+// no write). Edits from the pristine backup so it's re-runnable and --restore undoes it. Same 0x20-only /
+// IsRandomizableDino eligibility as the enemy pass; 0x59 records are never touched (their +6 is a pointer).
+static int SetEnemyHp(string installDir, string spec)
+{
+    var game = new DinoCrisis1();
+    var dataDir = game.GetDataDir(installDir);
+    if (dataDir is null)
+    {
+        Console.Error.WriteLine($"error: could not locate a Data folder under {installDir}");
+        return 1;
+    }
+
+    var parts = spec.Split(':', StringSplitOptions.TrimEntries);
+    if (parts.Length is < 1 or > 2 || !TryHex(parts[0], out int code))
+    {
+        Console.Error.WriteLine($"error: --set-enemy-hp expects room[:hp] (e.g. 102:3400 or 102 to list), got '{spec}'");
+        return 1;
+    }
+    int? hp = null;
+    if (parts.Length == 2)
+    {
+        if (!int.TryParse(parts[1], out int h) || h < 1 || h > 65535)
+        {
+            Console.Error.WriteLine($"error: hp must be a decimal 1..65535 (word), got '{parts[1]}'");
+            return 1;
+        }
+        hp = h;
+    }
+    int stage = code >> 8, room = code & 0xff;
+
+    var targetRef = game.EnumerateRooms(installDir).FirstOrDefault(r => r.Stage == stage && r.Room == room);
+    if (targetRef is null)
+    {
+        Console.Error.WriteLine($"error: room ST{code:X3} not found under {dataDir}");
+        return 1;
+    }
+
+    // Read from the pristine backup so a patch is re-runnable (non-compounding) and --restore reverts it;
+    // a dry inspect reads the live file (no backup created).
+    var backupPath = hp is null ? targetRef.Path : GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
+
+    var eligible = target.Enemies.Where(e => e.Opcode == DcOpcodes.Enemy && e.IsRandomizableDino).ToList();
+    Console.WriteLine($"ST{code:X3}: {target.Enemies.Count} enemy record(s), {eligible.Count} eligible 0x20 dino(s):");
+    foreach (var e in target.Enemies)
+    {
+        Console.WriteLine($"  op=0x{e.Opcode:X2} cat={e.Category} species={e.Species} bones={e.SpeciesBoneCount} "
+            + $"model=0x{e.OriginalModelPtr:X8} motion=0x{e.OriginalMotionPtr:X8} maxHp(+6)={e.MaxHp} @0x{e.FileOffset:X}"
+            + (e.Opcode == DcOpcodes.Enemy && e.IsRandomizableDino ? "  [eligible]" : ""));
+        Console.WriteLine($"    raw: {BitConverter.ToString(e.Raw)}");
+    }
+
+    if (hp is null)
+    {
+        Console.WriteLine("dry inspect (no hp given) — nothing written. Re-run as --set-enemy-hp <room>:<hp> to patch.");
+        return 0;
+    }
+    if (eligible.Count == 0)
+    {
+        Console.Error.WriteLine($"error: ST{code:X3} has no eligible 0x20 dino to patch (0x59-placed enemies are excluded).");
+        return 1;
+    }
+
+    foreach (var e in eligible) e.MaxHp = (ushort)hp.Value;
+    File.WriteAllBytes(targetRef.Path, target.Write());
+
+    Console.WriteLine($"set maxHP(+6) = {hp} on {eligible.Count} record(s) (was rolling {{750,850,1000}})");
+    Console.WriteLine($"wrote   : {targetRef.Path}");
+    Console.WriteLine($"backup  : {backupPath}");
+    Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
+    Console.WriteLine($"verify  : in CE, read the spawned dino's entity +0x11A (maxHP) — expect {hp}; "
+        + $"it should take ~{hp.Value / 850.0:0.#}× the vanilla hits to drop.");
     return 0;
 
     static bool TryHex(string s, out int val)

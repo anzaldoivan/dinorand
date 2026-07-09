@@ -5,9 +5,13 @@ namespace DinoRand.Randomizer.Logic;
 
 /// <summary>
 /// Diagnostics that flag an <i>over-permissive</i> progression graph — places where our static door
-/// decode (type-byte key gates + a single group-9 story flag) misses the real, event-activated gates
-/// the game enforces in script / native code, so the intended multi-stage progression collapses into a
-/// near-free-roam (investigation 2026-06-26; docs/decisions/cross/GRAPH-LOGIC-PARITY-PLAN.md §8, map-requirements.md).
+/// decode (type-byte key gates + the group-9 reader/setter lock protocol) misses the real,
+/// event-activated gates the game enforces in script / native code, so the intended multi-stage
+/// progression collapses into a near-free-roam (investigation 2026-06-26;
+/// docs/decisions/cross/GRAPH-LOGIC-PARITY-PLAN.md §8, map-requirements.md). The group-9 lock is not a
+/// single flag but ~40 indices with a reader/setter protocol (door types 1/3 read, type 2 sets — see
+/// STATIC-SCD-RE.md cont.40); <see cref="Definitions.GameDefinition.KeyItemsForDoor"/> currently models
+/// types 1/3 as free, which is safe for vanilla reachability but must be latch-modelled before door-rando.
 ///
 /// <para>These are detectors, not fixes: they surface the gap (and guard against it widening) until the
 /// missing gates are authored into <c>map.json</c>. Pure functions over the graph — no game files

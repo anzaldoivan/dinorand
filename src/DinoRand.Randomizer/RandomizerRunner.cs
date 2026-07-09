@@ -25,6 +25,9 @@ public sealed class RandomizerRunner
         new ProgressionPass(),
         new ItemRandomizer(),
         new EnemyRandomizer(),
+        // Gated off by default: per-placement enemy maxHP override (writes +6). Runs after the permute so it
+        // sets HP on the final species assignment. docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
+        new EnemyHpRandomizer(),
         // Experimental, gated off by default: runs after the in-room permute and imports a foreign species
         // into eligible rooms, declaring the EXE patches they need on the context (the installer applies them).
         // docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.

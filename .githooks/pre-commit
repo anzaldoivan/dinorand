@@ -39,6 +39,26 @@ if [ "$needs_check" = 1 ] && command -v python3 >/dev/null 2>&1; then
   }
 fi
 
+# Archipelago logic contract: if the authored DC1 data, the distiller, or the derived contract /
+# apworld package is staged, the committed dc1_logic.json must be in sync and the world must wire up.
+ap_touched=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    data/dc1/map.json|data/dc1/items.json|data/dc1/room-data.json|scripts/gen_ap_logic.py|apworld/dino_crisis_1/*)
+      ap_touched=1; break ;;
+  esac
+done
+if [ "$ap_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
+  python3 "$root/scripts/gen_ap_logic.py" --check || {
+    echo "pre-commit: archipelago logic contract failed — run 'python3 scripts/gen_ap_logic.py --apply' and stage dc1_logic.json" >&2
+    exit 1
+  }
+  python3 "$root/apworld/dino_crisis_1/selfcheck.py" || {
+    echo "pre-commit: apworld world wiring self-check failed" >&2
+    exit 1
+  }
+fi
+
 # Docs index contract: if any corpus doc (or the generator) is staged, every
 # docs/*.md must carry frontmatter and the generated docs/index.md must be in sync.
 docs_touched=0

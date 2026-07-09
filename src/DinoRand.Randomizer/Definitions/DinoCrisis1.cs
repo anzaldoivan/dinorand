@@ -223,7 +223,12 @@ public sealed class DinoCrisis1 : GameDefinition
             return KeyCardLadder[(doorType - 6)..]; // type 8 -> {0x3a}; type 6 -> all three cards
         if (doorType is >= 9 and <= 0xfc)
             return new[] { doorType };              // the type byte is literally the required item id
-        return Array.Empty<int>();                  // 0..5 free door; 0xfd/fe/ff special non-door action
+        // ponytail: types 1/3 are story-flag READERS (GetFlag(9,lock)) and type 2 a SELF-latch SETTER
+        // (STATIC-SCD-RE.md cont.40), not free — but they are return-shortcuts whose destination is
+        // always independently reachable, so modelling them free never changes VANILLA reachability and
+        // needs no gate here. The group-9 latch only matters for door-rando (destination shuffle can
+        // strand a type-1 producer); model it in KeyItemPlacer.Reachable when RandomizeDoors ships.
+        return Array.Empty<int>();                  // 0..5 free-to-cross; 0xfd/fe/ff special non-door action
     }
 
     public override string? GetDataDir(string installDir) => FindDataDir(installDir);

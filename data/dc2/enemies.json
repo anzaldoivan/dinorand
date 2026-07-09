@@ -1,5 +1,5 @@
 {
-  "_comment": "DC2 enemy data. THREE layers: (1) 'models' = the 13 external E*.DAT slots with obj/tri/quad counts decoded FROM BYTES (tools/dc2_re/dcm_and_misc.py). (2) 'roster' = the 11 distinct creatures (Velociraptor counted once) with size/role from FAQ + Wikipedia + Dino Crisis Wiki api.php. (3) 'mapping' = slot<->creature, now driven by RUNTIME live capture (see mapping.resolved_runtime + mapping.method_runtime): CONFIRMED LIVE E00=Velociraptor, E90=Oviraptor, E50=Inostrancevia, E60=Allosaurus, E10=Tyrannosaurus, E40=Giganotosaurus; EA0=Compsognathus by inference. The earlier 'E30/E31/E32 = Velociraptor triple' lock is RETRACTED (live raptors incl. HARD green are E00) -- see mapping.retracted. remaining unresolved: Plesiosaurus (aquatic) over E31/E32/E80/EA0 (E30=Mosasaurus, E70=Triceratops, E20=Pteranodon now RESOLVED LIVE 2026-06-30 via the op-0x1a cross-species cave, K61/K62/K62c; the aquatic shared TYPEs 0x0a/0x0b/0x0c crash on the swap so their E-slots are still open), resolved one-by-one by reading live actor species base [+0x60] in a known-creature encounter (Dino Colosseum is the cleanest venue, or the cross-species cave in ST202). 'raptorVariants' details the four colour variants; live evidence says they share the E00 model (CLUT/param deltas), so Blue/Red 'Super' raptors are NOT separately the E30/E31/E32 files.",
+  "_comment": "DC2 enemy data. THREE layers: (1) 'models' = the 13 external E*.DAT slots with obj/tri/quad counts decoded FROM BYTES (tools/dc2_re/dcm_and_misc.py). (2) 'roster' = the 11 distinct creatures (Velociraptor counted once) with size/role from FAQ + Wikipedia + Dino Crisis Wiki api.php. (3) 'mapping' = slot<->creature, now driven by RUNTIME live capture (see mapping.resolved_runtime + mapping.method_runtime): CONFIRMED LIVE E00=Velociraptor, E90=Oviraptor, E50=Inostrancevia, E60=Allosaurus, E10=Tyrannosaurus, E40=Giganotosaurus, E30=Plesiosaurus(BOSS form, K68 2026-07-08), E80=Mosasaurus(K68 2026-07-08); EA0=Compsognathus by inference. The earlier 'E30/E31/E32 = Velociraptor triple' lock is RETRACTED (live raptors incl. HARD green are E00) -- see mapping.retracted. creature map COMPLETE 2026-07-08 (K68): every E-file is runtime-live-confirmed except EA0=Compsognathus (rig-size inference). Aquatic set fully closed live -- E30=Plesiosaurus BOSS form (cat 0x05), E31/E32=Plesiosaurus regular/grunt (cat 0x0b/0x0c; E31 direct, E32 same-geometry sub-variant), E80=Mosasaurus (cat 0x0a); RETRACTS the old K61 E30=Mosasaurus. (E70=Triceratops, E20=Pteranodon RESOLVED LIVE 2026-06-30, K62/K62c; the aquatic TYPEs 0x05/0x0a/0x0b/0x0c crash on land-swap = aquatic; TYPE<->E-file split closed by the category->file table 0x703520/0x800187ac, K66), resolved one-by-one by reading live actor species base [+0x60] in a known-creature encounter (Dino Colosseum is the cleanest venue, or the cross-species cave in ST202). 'raptorVariants' details the four colour variants; live evidence says they share the E00 model (CLUT/param deltas), so Blue/Red 'Super' raptors are NOT separately the E30/E31/E32 files.",
   "_provenance_legend": "bytes = decoded from game files this session; confirmed = >=2 external sources agree; single-source = one external source; inference = reasoned guess, unproven; placeholder = unknown.",
   "_byte_method": "obj_cnt @ decompressed LZSS0 +0x14; tri_cnt/quad_cnt u16 @ +0x10/+0x12; ram_base from package entry reserve[0]. EA0 is the clear outlier (7 obj).",
   "_hp_mechanism": "[OFFLINE+LIVE 2026-06-24] Enemy HP = a hard-coded ctor immediate `mov word[actor+0x108],imm16` (`66 C7 86 08 01 00 00 <hp16>`; 108 sites in Dino2.exe rebirth). For NORMAL enemies the live HP EQUALS that constant (no scaling) - Colosseum-confirmed: Inostrancevia 2300 @0x0043754B (unique), Allosaurus 5000 @0x00425FD0|0x00439ACA, T-Rex max 10000=0x2710 + 0xFFFF cur-HP (x35 sites). NOTE [2026-07-06]: the 0xFFFF is NOT a checked invincibility sentinel -- there is NO `cmp [+0x108],0xFFFF` anywhere and as signed -1 it would read as already-dead; it is (a) the cur-HP written by the T-Rex scripted-intro/INVINCIBLE STATE (0x4235a8, table 0x720078[0]/entry 0x423410) and (b) a post-death dead-marker (e.g. 0x402cef). T-Rex killability = whether the boss reaches its FIGHTABLE state (0x4238d0, table 0x7201b0[0]) which sets finite HP 10000/20000/5000 + combat tables; the campaign randomizer-swap T-Rex is stuck in the intro/invincible state. See docs/dc2/DC2-TREX-KILLABILITY-RE.md. Randomizer HP lever (normal enemies) = patch the ctor immediate (unique values 300/600/1400/1500/2300/2800/3000/4600/5333/8000/15000/30000 each = one ctor). EXCEPTIONS: the RAPTOR (ctor 0x004461DE writes Brown base 1000; campaign-HARD Green 818 / Red 3252 are NOT ctor immediates and have no .data table -> colour+difficulty spawn param, scaler OPEN) and Oviraptor (live 424 is not a ctor immediate either). Colour is NOT an actor field (material const [+0x104]=0x7FC0009E identical green/red) -> CLUT bound at E00.TEX load. See docs/dc2/EXE-SPAWN-SYSTEM.md + KaQ K45, OPEN #12.",
@@ -52,9 +52,9 @@
       "blob_bytes": 101280,
       "ram_base": "0x00640000",
       "provenance": "bytes",
-      "creature_guess": "Mosasaurus",
-      "creature_confidence": "high (LIVE ST704 2026-06-27: user visual ID + resident model header 290/132/20 = E30 at the actor model cluster 0x5E3878 AND canonical shared base 0x640010; matches obj20/tri290/quad132)",
-      "note": "Part of the E30/E31/E32 triple = the Velociraptor colour-variant family (E31==E32 geometry). Which colour (Brown/Green/Red/Blue) maps to which file is unproven."
+      "creature_guess": "Plesiosaurus",
+      "creature_confidence": "confirmed (runtime live 2026-07-08, K68: maintainer visual ID = Plesiosaurus BOSS form; resident model header 290/132/20 @ shared base 0x640000, cat/TYPE 0x05, live HP 20000/20000 boss-tier)",
+      "note": "RESOLVED LIVE 2026-07-08 (K68): E30 = Plesiosaurus (BOSS form). Live actor slot 2: TYPE [+0x58]=0x05, model base [+0x60]=0x00640000, resident header tri290/quad132/obj20 = unique E30 match, HP [+0x108]/[+0x10a]=20000/20000 (boss-tier), inst [+0x64]=0x005FB694; loaded category [scene_mgr+0x680]=5. Maintainer visual ID = Plesiosaurus boss. RETRACTS the earlier K61 'E30=Mosasaurus' label (the ST704 resident header was still E30 geometry, but the creature is Plesiosaurus, not Mosasaurus). Mosasaurus + the regular/grunt Plesiosaurus form now sit among {E80, E31/E32} (unresolved -- capture live). Aquatic (crashes on land-swap, K62b)."
     },
     {
       "slot": "E31",
@@ -65,9 +65,9 @@
       "blob_bytes": 115260,
       "ram_base": "0x00640000",
       "provenance": "bytes",
-      "creature_guess": "Velociraptor (colour variant)",
-      "creature_confidence": "high inference",
-      "note": "Part of the E30/E31/E32 triple = the Velociraptor colour-variant family (E31==E32 geometry). Which colour (Brown/Green/Red/Blue) maps to which file is unproven."
+      "creature_guess": "Plesiosaurus (regular/grunt form)",
+      "creature_confidence": "confirmed (runtime live 2026-07-08, K68: maintainer in a Plesiosaurus grunt encounter, 3rd Energy area; loaded category [scene_mgr+0x680]=0x0b, resident header 214/135/17 @0x640000 = E31, TYPE 0x0b, live HP 3000/3000 = 0x0b ctor hp_max)",
+      "note": "RESOLVED LIVE 2026-07-08 (K68): E31 = Plesiosaurus (regular/grunt form). Live actor slot 9: TYPE [+0x58]=0x0b, base [+0x60]=0x00640000, resident header tri214/quad135/obj17, HP [+0x108]/[+0x10a]=3000/3000, inst 0x005EC95C; 2 grunts (slots 9/10); loaded cat 0x0b. E31/E32 (identical 214/135/17) = one creature + sub-variant, so E32 is the same regular Plesiosaurus. Aquatic (crash-on-land, K62b). Distinct from E30 = Plesiosaurus BOSS form."
     },
     {
       "slot": "E32",
@@ -78,9 +78,9 @@
       "blob_bytes": 120700,
       "ram_base": "0x00640000",
       "provenance": "bytes",
-      "creature_guess": "Velociraptor (colour variant)",
-      "creature_confidence": "high inference",
-      "note": "Part of the E30/E31/E32 triple = the Velociraptor colour-variant family (E31==E32 geometry). Which colour (Brown/Green/Red/Blue) maps to which file is unproven."
+      "creature_guess": "Plesiosaurus (regular/grunt form)",
+      "creature_confidence": "confirmed (2026-07-08, K68): sub-variant of E31 (identical geometry 214/135/17 = one creature + sub-variant), which was live-confirmed = regular/grunt Plesiosaurus (TYPE 0x0b). E32 = TYPE 0x0c, same creature.",
+      "note": "E31/E32 (214/135/17 identical) = regular Plesiosaurus (E31 live-confirmed K68; E32 is the 0x0c sub-variant of the same creature). Aquatic (crash-on-land, K62b). Distinct from E30 = Plesiosaurus BOSS form."
     },
     {
       "slot": "E40",
@@ -143,9 +143,9 @@
       "blob_bytes": 127696,
       "ram_base": "0x00640000",
       "provenance": "bytes",
-      "creature_guess": null,
-      "creature_confidence": "placeholder",
-      "note": "One of the 9 unresolved non-raptor creatures (see mapping.unresolved). obj_cnt does not discriminate; needs the enemy-id<->E-file link."
+      "creature_guess": "Mosasaurus",
+      "creature_confidence": "confirmed (runtime live 2026-07-08, K68: maintainer in a Mosasaurus encounter; loaded category [scene_mgr+0x680]=0x0a, resident header 346/154/19 @0x640000 = unique E80, TYPE 0x0a, live HP 2800/2800)",
+      "note": "RESOLVED LIVE 2026-07-08 (K68): E80 = Mosasaurus. Live actor slot 6: TYPE [+0x58]=0x0a, model base [+0x60]=0x00640000, resident header tri346/quad154/obj19 = unique E80 match, HP [+0x108]/[+0x10a]=2800/2800 (= 0x0a ctor hp_max), inst [+0x64]=0x005F4234; loaded category 0x0a. Aquatic (crashes on land-swap, K62b). This corrects the retracted K61 'E30=Mosasaurus' -- Mosasaurus is E80, not E30 (E30 = Plesiosaurus boss)."
     },
     {
       "slot": "E90",
@@ -228,16 +228,16 @@
       "size": "17 m long (in-game)",
       "body": "aquatic, long neck, 4 fins",
       "role": "aquatic grunt AND a boss encounter (reactor room)",
-      "files_hyp": "one of the 9 (unresolved)",
-      "provenance": "confirmed (FAQ + Wikipedia + Dino Crisis Wiki)"
+      "files_hyp": "E30 = BOSS form + E31/E32 = regular/grunt form (BOTH CONFIRMED runtime live 2026-07-08, K68: E30 boss cat 0x05 header 290/132/20 HP 20000; E31 grunt cat 0x0b header 214/135/17 HP 3000, E32=0x0c sub-variant)",
+      "provenance": "confirmed (FAQ + Wikipedia + Dino Crisis Wiki) + runtime-live model (E30 boss + E31/E32 grunt)"
     },
     {
       "name": "Mosasaurus",
       "size": "6 m long (in-game)",
       "body": "aquatic, croc-like jaws",
       "role": "underwater grunt (1-shot Aqua Grenade)",
-      "files_hyp": "one of the 9 (unresolved)",
-      "provenance": "confirmed (FAQ + Wikipedia + Dino Crisis Wiki)"
+      "files_hyp": "E80 (CONFIRMED runtime live 2026-07-08, K68; TYPE/cat 0x0a, resident header 346/154/19, HP 1400/2800). The earlier E30 ID is RETRACTED (E30 = Plesiosaurus boss).",
+      "provenance": "confirmed (FAQ + Wikipedia + Dino Crisis Wiki) + runtime-live model (E80)"
     },
     {
       "name": "Triceratops",
@@ -354,7 +354,7 @@
       },
       "shared_640000_group": {
         "_note": "base 0x00640000 = E10/E20/E30/E31/E32/E50/E80/EA0. HP-split is reliable ONLY when an HP value is UNIQUE among the shared TYPEs AND live-confirmed. Resolved: 0x0e=Inostrancevia(E50) via unique HP 2300 (live ✓ ST202 swap). **0x03/0x05 RESOLVED by the live cross-species swap (2026-06-30) + the residency table (cat→file 0x703520): 0x03=E10 Tyrannosaurus (live ✓), 0x05=E30 Mosasaurus (live ✗ CRASH — aquatic).** The old 'both 0x10000-HP => both T-Rex' guess is RETRACTED: they share HP but are different creatures (the file loaded is keyed by category, not the ctor HP). Rest need the per-room CreateFileA E-file trace (K32) or live capture.",
-        "_habitat_note": "HABITAT RULE refined by the K62/K62c live cave swaps (2026-06-30): only AQUATIC creatures CRASH when forced into a land room (their ctor resolves a NULL anim-clip / assumes a water scene — 0x05 Mosasaurus and 0x0c both crashed with a NULL+5 read at anim setter 0x48DE55). LAND and FLYER spawn FINE — the Pteranodon (0x04/E20, FLYER) spawned with NO crash, refuting the earlier 'flyers also crash' guess. Cross-room donors must be LAND (flyers excluded too: ground-AI unverified). Land live-confirmed: 0x02 Raptor, 0x06 Gigano, 0x07 Ovi, 0x08 Allo, 0x0e Inostrancevia, 0x03 T-Rex, 0x09 Triceratops(E70). Flyer: 0x04 Pteranodon(E20). Aquatic (crash): 0x05 Mosasaurus(E30), 0x0a (user-ID aquatic), 0x0b, 0x0c (crashed = aquatic; E-slots open).",
+        "_habitat_note": "HABITAT RULE refined by the K62/K62c live cave swaps (2026-06-30): only AQUATIC creatures CRASH when forced into a land room (their ctor resolves a NULL anim-clip / assumes a water scene — 0x05 Mosasaurus and 0x0c both crashed with a NULL+5 read at anim setter 0x48DE55). LAND and FLYER spawn FINE — the Pteranodon (0x04/E20, FLYER) spawned with NO crash, refuting the earlier 'flyers also crash' guess. Cross-room donors must be LAND (flyers excluded too: ground-AI unverified). Land live-confirmed: 0x02 Raptor, 0x06 Gigano, 0x07 Ovi, 0x08 Allo, 0x0e Inostrancevia, 0x03 T-Rex, 0x09 Triceratops(E70). Flyer: 0x04 Pteranodon(E20). Aquatic (crash): 0x05 Mosasaurus(E30), 0x0a=E80 (user-ID aquatic), 0x0b=E31, 0x0c=E32 (crashed = aquatic; E-slots PINNED by K66 category table, creature NAMES open — one is Plesiosaurus).",
         "0x0e": {
           "ctor": "0x00437210",
           "hp_cur": 2300,
@@ -378,9 +378,10 @@
           "hp_cur": 10000,
           "hp_max": 20000,
           "efile": "E30",
-          "creature": "Mosasaurus",
+          "creature": "Plesiosaurus (boss form)",
           "habitat": "aquatic",
-          "confidence": "KNOWN (live ✗ CRASH ST202 2026-06-30 = aquatic; cat5->E30 in residency table 0x703520)"
+          "confidence": "KNOWN creature (live visual ID 2026-07-08, K68 = Plesiosaurus BOSS; live HP 20000/20000). Aquatic KNOWN (live ✗ CRASH ST202 2026-06-30). cat5->E30 in residency table 0x703520/0x800187ac (K66).",
+          "note": "RELABELLED 2026-07-08 (K68): creature = Plesiosaurus (boss form), NOT Mosasaurus (K61 retracted). Static ctor immediate hp_cur=10000; live boss read [+0x108]/[+0x10a]=20000/20000."
         },
         "0x04": {
           "ctor": "0x00429040",
@@ -398,27 +399,30 @@
           "hp_cur": 1400,
           "hp_max": 2800,
           "habitat": "aquatic",
-          "creature": "UNRESOLVED (AQUATIC)",
-          "confidence": "habitat KNOWN (live CRASH + maintainer in-game visual ID = AQUATIC, ST202 2026-06-30, K62b); creature/E-slot open",
-          "note": "LIVE 2026-06-30 (cross-species cave, donor poke 0x02->0x0a in ST202): CRASHED on the fresh spawn; maintainer identified it as an AQUATIC enemy. Native host room ST700 (survey). Same crash bucket as Mosasaurus 0x05. Never a land donor; specific creature/E-slot still open (aquatic candidates: Plesiosaurus, or a second Mosasaurus-class)."
+          "efile": "E80",
+          "creature": "Mosasaurus",
+          "confidence": "KNOWN creature (live visual ID 2026-07-08, K68 = Mosasaurus; loaded cat [scene_mgr+0x680]=0x0a, resident header 346/154/19 = unique E80, live HP 2800/2800). Aquatic KNOWN (live CRASH ST202 2026-06-30, K62b). E-slot = E80 (K66 category table 0x703520/0x800187ac).",
+          "note": "RESOLVED 2026-07-08 (K68): E80 = Mosasaurus (maintainer live Mosasaurus encounter; actor slot 6 TYPE 0x0a, base 0x640000, header 346/154/19, HP 2800/2800). Aquatic -- never a land donor. Corrects the earlier 'aquatic candidate: Plesiosaurus' note; Plesiosaurus is E30 (boss) / E31-E32 (regular)."
         },
         "0x0b": {
           "ctor": "0x0042dda0",
           "hp_cur": 1500,
           "hp_max": 3000,
-          "habitat": "non-land (aquatic/flyer)",
-          "creature": "UNRESOLVED (NON-LAND)",
-          "confidence": "habitat KNOWN (live CRASH ST202 2026-06-30, K62b); creature/E-slot open",
-          "note": "LIVE 2026-06-30 (cross-species cave, donor poke 0x02->0x0b in ST202): CRASHED on the fresh spawn (no dump generated) => NON-LAND (aquatic/flyer), same constraint bucket as Mosasaurus 0x05 and 0x0c. Never a cross-species donor; aquatic-vs-flyer needs a live capture in its native stage."
+          "habitat": "aquatic",
+          "efile": "E31",
+          "creature": "Plesiosaurus (regular/grunt form)",
+          "confidence": "KNOWN creature (live visual ID 2026-07-08, K68 = Plesiosaurus grunt, 3rd Energy area; loaded cat [scene_mgr+0x680]=0x0b, resident header 214/135/17 = E31, 2 grunts slots 9/10, live HP 3000/3000). Aquatic KNOWN (live CRASH ST202 2026-06-30, K62b). E-slot = E31 (K66 category table).",
+          "note": "RESOLVED 2026-07-08 (K68): E31 = regular/grunt Plesiosaurus (distinct from E30 = Plesiosaurus boss). Actor slot 9 TYPE 0x0b, base 0x640000, header 214/135/17, HP 3000/3000. Aquatic, never a land donor."
         },
         "0x0c": {
           "ctor": "0x004303d0",
           "hp_cur": 1200,
           "hp_max": 2400,
-          "habitat": "non-land (aquatic/flyer)",
-          "creature": "UNRESOLVED (NON-LAND)",
-          "confidence": "habitat KNOWN (live CRASH ST202 2026-06-30, K62b); creature/E-slot still open",
-          "note": "LIVE 2026-06-30 (cross-species cave, donor poke 0x02->0x0c in ST202): CRASHED on the fresh spawn => NON-LAND (aquatic/flyer), same constraint bucket as Mosasaurus 0x05. RCA of dump 'DC2 2026-06-30 18-08-16.dmp': access-violation 0xC0000005, NULL+5 read at 0x48DE55 in the anim-clip setter SetAnimClip 0x48DE40 (the actor's resident animation-clip pointer was NULL during ctor anim setup — the creature's scene-specific anim set is absent from a land room). EA0/Compy candidate RULED OUT (Compy is land; HP 1200/2400 also not the tiny rig). Aquatic-vs-flyer NOT distinguishable from the null-clip signature — needs a live capture in its native water/air stage. So 0x0c is NEVER a cross-species donor."
+          "habitat": "aquatic",
+          "efile": "E32",
+          "creature": "Plesiosaurus (regular/grunt form)",
+          "confidence": "KNOWN creature (2026-07-08, K68): E32 = 0x0c sub-variant of E31 (identical geometry 214/135/17 = one creature + sub-variant); E31 was live-confirmed = regular/grunt Plesiosaurus. Aquatic KNOWN (live CRASH ST202 2026-06-30, K62b; RCA dump below). E-slot = E32 (K66 category table).",
+          "note": "LIVE 2026-06-30 (cross-species cave, donor poke 0x02->0x0c in ST202): CRASHED => aquatic. RCA of dump 'DC2 2026-06-30 18-08-16.dmp': access-violation 0xC0000005, NULL+5 read at 0x48DE55 in the anim-clip setter SetAnimClip 0x48DE40 (the actor's resident animation-clip pointer was NULL during ctor anim setup -- the creature's scene-specific anim set is absent from a land room). E-slot PINNED = E32 (K66, cat12; E31/E32 = one creature + sub-variant). Inferred creature = regular/grunt Plesiosaurus (E30=boss, E80=Mosasaurus). Never a cross-species donor. Capture a Plesiosaurus grunt live to confirm the name."
         }
       },
       "survey": "tools/dc2_re/survey_types.py tallies TYPE usage across all 89 rooms. KEY: TYPE 0x10 (generic, model-from-record) dominates (42 rooms); species-hardcoded TYPEs are rare (0x06 Gigano: ST402/ST503; 0x07 Ovi: ST302; 0x08 Allo: ST100/ST10C/ST802/ST808; 0x02 Raptor: ST102/ST407; 0x09 E70: ST80A; shared 0x03: ST200/ST903, 0x05: ST706, 0x0a: ST700, 0x0e: ST80B). Room->creature naming blocked: stage->zone is an unproven count-match (ROOM-ZONE-CLUSTERING.md), so room context can't name the shared creatures statically.",
@@ -433,7 +437,7 @@
         },
         "0x11-0x24": "non-enemy actors (effects/items/NPC); no model base, no HP ctor immediate"
       },
-      "randomizer_note": "Two swap levers: (1) for species-hardcoded TYPEs (0x02/0x06/0x07/0x08/0x09/0x0d + the 0x640000 group) edit the op-0x1a TYPE literal (block[+0x20]) in slot-5; (2) for TYPE-0x10 generic spawns edit the MODEL_BASE operand (block[+0x0c]) -- but it is often a global-ref, not a literal."
+      "randomizer_note": "Two swap levers: (1) for species-hardcoded TYPEs (0x02/0x06/0x07/0x08/0x09 + the 0x640000 group 0x03/0x04/0x05/0x0a/0x0b/0x0c/0x0e) edit the op-0x1a TYPE literal (block[+0x20]) in slot-5; (2) for TYPE-0x10 generic spawns edit the MODEL_BASE operand (block[+0x0c]) -- but it is often a global-ref, not a literal. (NOTE K66: TYPE 0x0d is NOT a species — it is a latent non-species linked-actor ctor, never spawned; do not use it as a donor.)"
     },
     "resolved_runtime": [
       {
@@ -494,11 +498,26 @@
         "confidence": "confirmed (runtime live)"
       },
       {
-        "creature": "Mosasaurus",
+        "creature": "Plesiosaurus (boss form)",
         "files": [
           "E30"
         ],
-        "evidence": "LIVE ST704 (CE 2026-06-27, PID 8296): user visual ID + byte-grounded resident header (tri290/quad132/obj20 @ model base 0x5E3878, also @0x640010). Spawned via generic TYPE 0x13 (model-from-global). E31/E32 (214/135/17) are DIFFERENT geometry -> the old E30/E31/E32 'one-creature triple' is split: E30=Mosasaurus, E31/E32=separate creature (open)."
+        "evidence": "LIVE 2026-07-08 (CE, PID 84664): maintainer visual ID = Plesiosaurus BOSS + byte-grounded live actor. Actor array [[0x876DB8]+0x940]=0x005F2A78, count [0x876DC4]=31; slot 2 TYPE [+0x58]=0x05, model base [+0x60]=0x00640000, resident header @0x640000 tri290/quad132/obj20 = unique E30 match, HP [+0x108]/[+0x10a]=20000/20000 (boss-tier), inst [+0x64]=0x005FB694; loaded category [scene_mgr+0x680]=5. RETRACTS the 2026-06-27 'E30=Mosasaurus' ST704 ID (K61): the ST704 header was E30 geometry but the creature is Plesiosaurus, not Mosasaurus."
+      },
+      {
+        "creature": "Mosasaurus",
+        "files": [
+          "E80"
+        ],
+        "evidence": "LIVE 2026-07-08 (CE, PID 84664): maintainer in a Mosasaurus encounter. Actor array [[0x876DB8]+0x940]=0x005ED1D8, count [0x876DC4]=20; slot 6 TYPE [+0x58]=0x0a, model base [+0x60]=0x00640000, resident header @0x640000 tri346/quad154/obj19 = unique E80 match, HP [+0x108]/[+0x10a]=2800/2800 (=0x0a ctor hp_max 2800), inst [+0x64]=0x005F4234; loaded category [scene_mgr+0x680]=0x0a. Names Mosasaurus = E80 (not E30 -- K61 retracted). Aquatic (crashes on land-swap, K62b)."
+      },
+      {
+        "creature": "Plesiosaurus (regular/grunt form)",
+        "files": [
+          "E31",
+          "E32"
+        ],
+        "evidence": "LIVE 2026-07-08 (CE, PID 84664): maintainer in a Plesiosaurus grunt encounter (3rd Energy area). Actor array [[0x876DB8]+0x940]=0x005E2BFC, count [0x876DC4]=20; 2 grunts slots 9/10, slot 9 TYPE [+0x58]=0x0b, model base [+0x60]=0x00640000, resident header @0x640000 tri214/quad135/obj17 = E31/E32 match, HP [+0x108]/[+0x10a]=3000/3000 (=0x0b ctor hp_max 3000), inst [+0x64]=0x005EC95C; loaded category [scene_mgr+0x680]=0x0b (=E31). E31/E32 (identical 214/135/17) = one creature + sub-variant => E32 (TYPE 0x0c) is the same regular Plesiosaurus. Distinct from E30 = Plesiosaurus BOSS form. Aquatic (crash-on-land, K62b)."
       }
     ],
     "locked": [
@@ -507,8 +526,8 @@
         "files": [
           "EA0"
         ],
-        "basis": "only uniquely-tiny rig (7 obj / 32 tri / 23 KB) vs Compy's ~0.5 m size; not yet runtime-confirmed but consistent",
-        "confidence": "high inference"
+        "basis": "only uniquely-tiny rig (7 obj / 32 tri / 23 KB) vs Compy's ~0.5 m size; not yet runtime-confirmed but consistent. File EA0 = category-table cat 0x0d (K66, 0x703520/0x800187ac), but TYPE 0x0d is a latent non-species linked-actor ctor -- Compy's SPAWN TYPE is UNRESOLVED (it is NOT 0x0a; TYPE 0x0a = E80). File<->creature (EA0=Compy) stands on the rig outlier.",
+        "confidence": "high inference (file EA0 firm; spawn TYPE open)"
       }
     ],
     "retracted": [
@@ -522,22 +541,21 @@
         "old_basis": "the ONLY multi-variant enemy maps to the ONLY triple-file group (count-balance inference)",
         "why_retracted": "Live raptors (incl. the HARD green) are E00, not E30/E31/E32. The raptor is E00. What E30/E31/E32 actually are is now UNKNOWN (a different creature with sub-variants -- candidates: a Pteranodon/large-theropod colour set, or Red/Blue 'Super' raptor variants distinct from the E00 base). Needs live capture.",
         "confidence": "retracted"
+      },
+      {
+        "creature": "Mosasaurus",
+        "files": [
+          "E30"
+        ],
+        "old_basis": "K61 (LIVE ST704 2026-06-27): maintainer visual ID + resident header 290/132/20 = E30. Recorded as E30=Mosasaurus in resolved_runtime + 6 docs.",
+        "why_retracted": "2026-07-08 (K68) live re-capture of the same E30 model (header 290/132/20, TYPE 0x05, HP 20000 boss-tier): maintainer visual ID = Plesiosaurus (BOSS form), NOT Mosasaurus. The ST704 header was genuinely E30 geometry, but the creature is Plesiosaurus. Mosasaurus is E80 (K68, live cat 0x0a + header 346/154/19). OPEN loose thread: ST704 spawned 11 E30 grunts via generic TYPE 0x13 while the maintainer states E30 is the BOSS form -- whether ST704 shows the boss or grunt Plesiosaurus form is unreconciled.",
+        "confidence": "retracted"
       }
     ],
     "unresolved": {
-      "files": [
-        "E20",
-        "E31",
-        "E32",
-        "E70",
-        "E80"
-      ],
-      "creatures": [
-        "Pteranodon",
-        "Plesiosaurus",
-        "Triceratops"
-      ],
-      "note": "Mosasaurus RESOLVED = E30 (live ST704). Remaining 3 creatures across files {E20,E70,E80,[E31/E32]}. E31/E32 (214/135/17, identical geometry) = one creature with a sub-variant; E30 split off from the old triple. Resolve each by live capture (room + visual + resident-header read).",
+      "files": [],
+      "creatures": [],
+      "note": "COMPLETE as of 2026-07-08 (K68) -- all 13 E-files are creature-mapped and every mapping is RUNTIME-LIVE-CONFIRMED except EA0=Compsognathus (rig-size inference, mapping.locked). Aquatic set fully closed live: E30=Plesiosaurus BOSS form (cat 0x05), E31/E32=Plesiosaurus regular/grunt form (cat 0x0b/0x0c; E31 direct live, E32 = same-geometry sub-variant), E80=Mosasaurus (cat 0x0a). RETRACTED: K61 'E30=Mosasaurus'. Only residual note = the ST704 boss-vs-grunt-form loose thread (see live_room_anchors) and EA0's spawn TYPE (mapping.locked).",
       "how_to_resolve": "Live actor species-base capture per known-creature encounter; read the resident model header at whatever address [+0x60] points to (NOT a fixed reserve base -- see the E40 off-Colosseum caveat) and match models[] counts. The Dino Colosseum roster (Velociraptor/Oviraptor/Inostrancevia/Allosaurus/T-Rex) is the cleanest venue and is now exhausted for the base set; Giganotosaurus resolved via its late-game campaign boss room. Remaining Pteranodon (3rd Energy Pathway 2), Plesiosaurus (3rd Energy Dock), Mosasaurus (3rd Energy Reactor Elevator Shaft) are campaign aquatic/aerial grunts; Triceratops via colosseum-unlock or campaign set-piece.",
       "confidence": "placeholder",
       "status_after_exe_check": "EXE id table has no creature names (see mapping.exe_id_table); resolution is by runtime capture, IN PROGRESS (6 of the set done: E00=Velociraptor, E90=Oviraptor, E50=Inostrancevia, E60=Allosaurus, E10=Tyrannosaurus, E40=Giganotosaurus in resolved_runtime)."
@@ -545,20 +563,21 @@
     "exe_id_table": {
       "location": "Dino2.exe master filename pointer table @ VA 0x0071b3xx (.data; imagebase 0x400000). Tool: tools/dc2_re/exe_enemy_table.py.",
       "e_file_order": "E00,E10,E20,E30,E31,E32,E40,E50,E60,E70,E80,E90,EA0 (the on-disk 13; id == high nibble of the E-file number, with E30/E31/E32 = type 3 + two subtypes).",
-      "what_it_confirms": "id <-> E-file (the enemy id table). The consecutive E30/E31/E32 triple corroborates the Velociraptor colour-variant lock; EA0 (type 0x0A) is the lone outlier = Compsognathus.",
+      "what_it_confirms": "id <-> E-file (the enemy id table). CORRECTION (K66, 2026-07-08): the category->file table 0x703520 (PC) / 0x800187ac (PSX clean-oracle) keys each spawn TYPE=category to its E-file: 0x02=E00, 0x03=E10, 0x04=E20, 0x05=E30, 0x06=E40, 0x07=E90, 0x08=E60, 0x09=E70, 0x0a=E80, 0x0b=E31, 0x0c=E32, 0x0d=EA0, 0x0e=E50. The earlier 'EA0 = type 0x0A' claim was WRONG: TYPE 0x0a = E80; EA0 sits at cat 0x0d, but 0x0d is a LATENT non-species linked-actor ctor (0x461960, never spawned) -- so EA0's actual spawn TYPE is unresolved and EA0=Compsognathus rests on the rig-size outlier (models[]), not a TYPE index. The E30/E31/E32 'Velociraptor triple' is retracted (mapping.retracted; raptor=E00, E30=Mosasaurus).",
       "what_it_does_NOT_contain": "Creature names. All 11 species strings (Velociraptor, Allosaurus, Oviraptor, Inostrancevia, Triceratops, Giganotosaurus, Compsognathus, Mosasaurus, Plesiosaurus, Pteranodon, Tyrannosaurus) AND 'Raptor' = 0 hits in the EXE. The table is id->FILENAME, never id->creature.",
       "conclusion": "The EXE enemy-id table CANNOT resolve the within-9 file->creature assignment by itself - it has no species labels. Resolution still requires the in-room spawn-record decode (docs/dc2/SCRIPT-DC2.md) or a runtime RAM dump of a room with a known enemy. Per-room enemy lists are NOT recoverable from the room sound-config DATA blobs (only ST503 carries T=3 records, and those are stride-16 sound indices, not E-file ids)."
     },
     "live_room_anchors": {
-      "Mosasaurus": {
+      "Plesiosaurus_ST704": {
         "room": "ST704",
         "stage": 7,
-        "source": "CE live actor read + user visual ID 2026-06-27",
+        "source": "CE live actor read 2026-06-27 + resident header; creature RELABELLED 2026-07-08 (K68)",
         "spawn_type": "0x13 (generic family, model from per-room global)",
         "spawn_count": 11,
         "runtime_model_base": "0x5E37B0 (stage-7 relocated, not a Colosseum 0x6xxxxx base)",
-        "efile": "E30 (RESOLVED via resident header 290/132/20)",
-        "note": "First location of Mosasaurus (one of the 4 long-open creatures). Confirms it spawns via generic TYPE 0x13, so species is room-E-file-driven not TYPE-driven."
+        "efile": "E30 (resident header 290/132/20)",
+        "runtime_2026_07_09": "CE live read (K70): loaded cat [scene_mgr+0x680]=0x05; exactly ONE enemy actor live = the BOSS. Actor[2] TYPE [+0x58]=0x05, model base [+0x60]=0x640000 (aquatic .psxseg slot, relocated here vs 0x5E37B0 in the 2026-06-27 session), resident header @0x640000 = 290/132/20 (tri 0x0122 / quad 0x0084 / obj 0x14) = E30 boss geometry, HP [+0x108/+0x10a]=20000/20000 boss-tier. Only 3 actors live total: [0]=player (model 0x662500, 14-obj humanoid, HP 1200), [1]=partner/NPC (model 0x5E07CC, 14-obj humanoid, HP 1000), [2]=boss. No TYPE-0x13 grunt actor present.",
+        "note": "ST704 resident model = E30. Per K68 (E30 = Plesiosaurus, live boss ID 2026-07-08) these ST704 spawns are Plesiosaurus, NOT Mosasaurus -- the 2026-06-27 'Mosasaurus' visual label is RETRACTED (K61). RESOLVED (boss vs grunt, K70 live 2026-07-09): ST704 renders the Plesiosaurus BOSS form -- one boss actor (TYPE 0x05, HP 20000, header 290/132/20), NOT 11 grunts. The static/2026-06-27 '11x TYPE 0x13' spawn count does NOT manifest as 11 concurrent grunt bodies; those static op-0x1a entries are conditional/phased/marker spawns (only the single boss is live) [nature of the 11 entries: uncertain, witnessed only current moment]. Mosasaurus's true E-file is unresolved among {E80, E31/E32} -- capture live."
       }
     }
   }
