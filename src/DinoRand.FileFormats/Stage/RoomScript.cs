@@ -94,6 +94,9 @@ public sealed class RoomScript
             if (!ok && i != starts.Count - 1) clean = false;
         }
 
+        // Flag NPC-scene actors (Rick/Gail/Kirk) once all 0x20 records are visible: the shared-motion /
+        // distinct-model tell is relational, so it can't be decided per-record at parse (cont.41).
+        EnemyRecord.MarkNpcSceneActors(enemies);
         return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors);
     }
 
@@ -207,6 +210,9 @@ public sealed class RoomScript
                         MotionPtr = motion,
                         OriginalModelPtr = model,
                         OriginalMotionPtr = motion,
+                        // Preset maxHP (+6) — 0x20 only; copied to entity +0x11A by 0x42656A (DC1-G2).
+                        MaxHp = (ushort)ReadU16(buffer, pos + EnemyRecord.MaxHpOffset),
+                        OriginalMaxHp = (ushort)ReadU16(buffer, pos + EnemyRecord.MaxHpOffset),
                         // Decode the species from the model's embedded skeleton (cont.14): the
                         // model block lives in this same buffer at modelPtr - PSX base.
                         SpeciesBoneCount = EnemySkeleton.ReadBoneCount(buffer, model),
@@ -284,6 +290,11 @@ public sealed class RoomScript
             buffer[enemy.FileOffset + EnemyRecord.CategoryOffset] = enemy.Category;
             WriteU32(buffer, modelPos, enemy.ModelPtr);
             WriteU32(buffer, motionPos, enemy.MotionPtr);
+            // maxHP (+6) is a 0x20-only field (in a 0x59 record +6 is the model pointer); write it only
+            // when the HP pass changed it, so a model-only permute leaves the vanilla +6 (roll default,
+            // provably byte-exact — RoomFileRoundTripTests.Enemy_MaxHpWord_SurvivesModelEditRoundTrip).
+            if (enemy.Opcode == DcOpcodes.Enemy && enemy.MaxHp != enemy.OriginalMaxHp)
+                WriteU16(buffer, enemy.FileOffset + EnemyRecord.MaxHpOffset, enemy.MaxHp);
         }
     }
 

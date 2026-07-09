@@ -18,6 +18,7 @@ public class SeedStringTests
     {
         new(),                                                     // defaults (10-byte payload)
         new() { RandomizeItems = false, ShuffleKeyItems = true },  // flag bits
+        new() { RandomizeEnemyHp = true },                         // byte-4 bit6 (DC1 HP)
         new() { AmmoReduction = 3 },                               // 11-byte payload
         new()                                                      // 16-byte DC2 block
         {
@@ -57,6 +58,7 @@ public class SeedStringTests
             Assert.Equal(seed.Value, parsed.Seed.Value);
             Assert.Equal(cfg.RandomizeItems, parsed.Config.RandomizeItems);
             Assert.Equal(cfg.ShuffleKeyItems, parsed.Config.ShuffleKeyItems);
+            Assert.Equal(cfg.RandomizeEnemyHp, parsed.Config.RandomizeEnemyHp);
             Assert.Equal(cfg.AmmoReduction, parsed.Config.AmmoReduction);
             Assert.Equal(cfg.Dc2EnemyMode, parsed.Config.Dc2EnemyMode);
             Assert.Equal(cfg.Dc2FixedSpeciesType, parsed.Config.Dc2FixedSpeciesType);

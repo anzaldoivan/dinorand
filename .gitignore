@@ -18,6 +18,9 @@
 !/data/
 # !/docs/  (held back from publish for now — kept local)
 
+# Archipelago multiworld integration (authored Python apworld + distilled logic JSON)
+!/apworld/
+
 # Tooling, git hooks, CI
 !/scripts/
 # !/tools/  (held back from publish for now — kept local)

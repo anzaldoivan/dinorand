@@ -1,0 +1,1626 @@
+{
+  "_generated_by": "scripts/gen_ap_logic.py",
+  "_source": "data/dc1/{map,items,room-data}.json (authored)",
+  "version": 1,
+  "startRoom": "010d",
+  "goalRoom": "060d",
+  "regions": {
+    "0100": "Locker Room",
+    "0101": "Toilet",
+    "0102": "Management Office Hall",
+    "0103": "Management Office",
+    "0104": "Strategy Room",
+    "0105": "Control Room Hall",
+    "0106": "Control Room 1F",
+    "0107": "Main Entrance",
+    "0108": "Lecture Room Hallway",
+    "0109": "Lecture Room",
+    "010a": "Office Hallway",
+    "010b": "Office",
+    "010c": "Material Storage",
+    "010d": "Backyard of the Facility",
+    "010e": "Passageway to the Backup Generator",
+    "010f": "Backup Generator Room 1F",
+    "0110": "Piping Check Passageway A 1F",
+    "0111": "Piping Check Passageway B 1F",
+    "0112": "The Backyard",
+    "0113": "Elevator Hall",
+    "0114": "Passageway to the Backup Generator",
+    "0200": "Communication Antenna Room",
+    "0201": "Passageway to the Communication Area",
+    "0202": "Chief's Room",
+    "0203": "Hall 2F",
+    "0204": "Lounge",
+    "0205": "Communication Room",
+    "0206": "Main Entrance",
+    "0300": "Experiment Simulation Room",
+    "0301": "Research Area Hall",
+    "0302": "Research Meeting Room",
+    "0303": "Gas Experiment Room",
+    "0304": "Computer Room",
+    "0305": "Library Room",
+    "0306": "Main Hallway",
+    "0307": "Medical Room Hallway",
+    "0308": "Medical Room",
+    "0309": "Hall B1",
+    "030a": "Hallway for Carrying in Materials",
+    "030b": "Backup Generator Room B1",
+    "030c": "Carrying Out Room B1",
+    "030d": "Hallway for Carrying in Materials",
+    "030e": "Hall B1",
+    "0400": "Front Area of Entrance",
+    "0401": "Passageway to the Heliport",
+    "0402": "Hangar",
+    "0403": "Heliport",
+    "0404": "Large Size Elevator Passageway",
+    "0405": "Large Size Elevator",
+    "0406": "Large Size Elevator Control Room",
+    "0407": "Passageway to the Power Room",
+    "0408": "Elevator Power Room",
+    "0409": "Liaison Elevator No.2",
+    "040a": "Underground Passageway to the Facility",
+    "040b": "Materials Room",
+    "040c": "Liaison Elevator No.1",
+    "040d": "/Filmato Eliporto/",
+    "0500": "Passageway to the Experiment Area",
+    "0501": "Piping Check Passageway B2",
+    "0502": "Experiment Room Hall",
+    "0503": "Stabilizer Experiment Room",
+    "0504": "Stabilizer Design Room",
+    "0505": "Researcher Rest Room",
+    "0506": "Security Pass Room",
+    "0507": "Parts Storage",
+    "0508": "Passageway",
+    "0509": "Third Energy Area B2",
+    "050a": "Third Energy Area B3",
+    "050b": "Third Energy Control Room",
+    "050c": "Power Freq. Room",
+    "050d": "Passageway to Personal Lab",
+    "050e": "Dr. Kirk's Personal Lab",
+    "050f": "Dr. Kirk's Library Room",
+    "0510": "Third Energy Control Room",
+    "0511": "Stabilizer Experiment Room",
+    "0600": "Carrying Out Room B3",
+    "0601": "Backup Generator Room B3",
+    "0602": "Control Room B3",
+    "0603": "Passageway to the Carrying Out Room",
+    "0604": "Rest Station",
+    "0605": "General Weapons Storage",
+    "0606": "Transport Passageway",
+    "0607": "Special Weapons Storage",
+    "0608": "Central Stairway",
+    "0609": "Disembarkation Immigration Office",
+    "060a": "Port",
+    "060b": "Passageway to the Port",
+    "060c": "Channel",
+    "060d": "Underground Heliport",
+    "060f": "Large Size Elevator",
+    "0610": "Hovercraft Storage",
+    "0611": "Heliport Transport Passageway",
+    "0612": "Hovercraft",
+    "0613": "Port",
+    "0614": "Port Transport Passageway",
+    "0615": "General Weapons Storage"
+  },
+  "edges": [
+    {
+      "from": "0108",
+      "to": "0113",
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "0114",
+      "requiresItems": [
+        48
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0306",
+      "to": "0304",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030c"
+      ]
+    },
+    {
+      "from": "0400",
+      "to": "0401",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0205"
+      ]
+    },
+    {
+      "from": "0503",
+      "to": "060d",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "050c",
+      "to": "050d",
+      "requiresItems": [],
+      "requiresRooms": [
+        "050b"
+      ]
+    },
+    {
+      "from": "0600",
+      "to": "0602",
+      "requiresItems": [
+        49
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "060f",
+      "requiresItems": [
+        49
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0602",
+      "to": "0605",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0602",
+      "to": "0615",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0605",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0615",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0611",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
+      "to": "060d",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0608",
+      "to": "0614",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "0505",
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    }
+  ],
+  "locations": [
+    {
+      "key": "0103:01:2288,-2224",
+      "name": "Management Office (0103) - Shotgun \"Model PA3\" (pump-action) @2288,-2224",
+      "room": "0103",
+      "itemId": 1,
+      "itemName": "Shotgun \"Model PA3\" (pump-action)",
+      "pos": [
+        2288,
+        -2224
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 1
+      }
+    },
+    {
+      "key": "0103:3e:-2800,992",
+      "name": "Management Office (0103) - Panel Key 2 @-2800,992",
+      "room": "0103",
+      "itemId": 62,
+      "itemName": "Panel Key 2",
+      "pos": [
+        -2800,
+        992
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 62
+      }
+    },
+    {
+      "key": "0103:62:-512,1072",
+      "name": "Management Office (0103) - DDK Input Disc H @-512,1072",
+      "room": "0103",
+      "itemId": 98,
+      "itemName": "DDK Input Disc H",
+      "pos": [
+        -512,
+        1072
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 98
+      }
+    },
+    {
+      "key": "0103:2b:-544,640",
+      "name": "Management Office (0103) - Plug @-544,640",
+      "room": "0103",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -544,
+        640
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0103:20:-2576,3008",
+      "name": "Management Office (0103) - An. Aid @-2576,3008",
+      "room": "0103",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        -2576,
+        3008
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      }
+    },
+    {
+      "key": "0103:2e:-2576,3008",
+      "name": "Management Office (0103) - Entrance Key @-2576,3008",
+      "room": "0103",
+      "itemId": 46,
+      "itemName": "Entrance Key",
+      "pos": [
+        -2576,
+        3008
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 46
+      }
+    },
+    {
+      "key": "0108:2b:-8256,-7904",
+      "name": "Lecture Room Hallway (0108) - Plug @-8256,-7904",
+      "room": "0108",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -8256,
+        -7904
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0108:2b:-8240,-7904",
+      "name": "Lecture Room Hallway (0108) - Plug @-8240,-7904",
+      "room": "0108",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -8240,
+        -7904
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0202:63:-3568,720",
+      "name": "Chief's Room (0202) - DDK Input Disc N @-3568,720",
+      "room": "0202",
+      "itemId": 99,
+      "itemName": "DDK Input Disc N",
+      "pos": [
+        -3568,
+        720
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 99
+      }
+    },
+    {
+      "key": "0202:10:2020,-1392",
+      "name": "Chief's Room (0202) - SG Bullets @2020,-1392",
+      "room": "0202",
+      "itemId": 16,
+      "itemName": "SG Bullets",
+      "pos": [
+        2020,
+        -1392
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 16
+      }
+    },
+    {
+      "key": "0202:3d:-1792,1792",
+      "name": "Chief's Room (0202) - Panel Key 1 @-1792,1792",
+      "room": "0202",
+      "itemId": 61,
+      "itemName": "Panel Key 1",
+      "pos": [
+        -1792,
+        1792
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 61
+      }
+    },
+    {
+      "key": "0202:47:-3468,2768",
+      "name": "Chief's Room (0202) - Key Card L @-3468,2768",
+      "room": "0202",
+      "itemId": 71,
+      "itemName": "Key Card L",
+      "pos": [
+        -3468,
+        2768
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 71
+      }
+    },
+    {
+      "key": "0204:13:3800,2800",
+      "name": "Lounge (0204) - An. Darts M @3800,2800",
+      "room": "0204",
+      "itemId": 19,
+      "itemName": "An. Darts M",
+      "pos": [
+        3800,
+        2800
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 19
+      }
+    },
+    {
+      "key": "0204:0e:2000,-3000",
+      "name": "Lounge (0204) - Handgun Slides (upgrade To Glock 35) @2000,-3000",
+      "room": "0204",
+      "itemId": 14,
+      "itemName": "Handgun Slides (upgrade To Glock 35)",
+      "pos": [
+        2000,
+        -3000
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 14
+      }
+    },
+    {
+      "key": "0205:11:-208,-1248",
+      "name": "Communication Room (0205) - Slag Bullets @-208,-1248",
+      "room": "0205",
+      "itemId": 17,
+      "itemName": "Slag Bullets",
+      "pos": [
+        -208,
+        -1248
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 17
+      }
+    },
+    {
+      "key": "0205:45:-2032,1632",
+      "name": "Communication Room (0205) - Antenna Key @-2032,1632",
+      "room": "0205",
+      "itemId": 69,
+      "itemName": "Antenna Key",
+      "pos": [
+        -2032,
+        1632
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 69
+      }
+    },
+    {
+      "key": "0303:21:512,-2048",
+      "name": "Gas Experiment Room (0303) - Recovery Aid @512,-2048",
+      "room": "0303",
+      "itemId": 33,
+      "itemName": "Recovery Aid",
+      "pos": [
+        512,
+        -2048
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 33
+      }
+    },
+    {
+      "key": "0303:2d:3088,-1008",
+      "name": "Gas Experiment Room (0303) - Small Size Key @3088,-1008",
+      "room": "0303",
+      "itemId": 45,
+      "itemName": "Small Size Key",
+      "pos": [
+        3088,
+        -1008
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 45
+      }
+    },
+    {
+      "key": "0303:46:3088,-1008",
+      "name": "Gas Experiment Room (0303) - B1 Key Chip @3088,-1008",
+      "room": "0303",
+      "itemId": 70,
+      "itemName": "B1 Key Chip",
+      "pos": [
+        3088,
+        -1008
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 70
+      }
+    },
+    {
+      "key": "0303:46:3328,-2560",
+      "name": "Gas Experiment Room (0303) - B1 Key Chip @3328,-2560",
+      "room": "0303",
+      "itemId": 70,
+      "itemName": "B1 Key Chip",
+      "pos": [
+        3328,
+        -2560
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 70
+      }
+    },
+    {
+      "key": "0304:2b:-4700,6100",
+      "name": "Computer Room (0304) - Plug @-4700,6100",
+      "room": "0304",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -4700,
+        6100
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0304:44:-1500,0",
+      "name": "Computer Room (0304) - Screwdriver @-1500,0",
+      "room": "0304",
+      "itemId": 68,
+      "itemName": "Screwdriver",
+      "pos": [
+        -1500,
+        0
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 68
+      }
+    },
+    {
+      "key": "0305:1d:-6864,5888",
+      "name": "Library Room (0305) - Med. Pak M @-6864,5888",
+      "room": "0305",
+      "itemId": 29,
+      "itemName": "Med. Pak M",
+      "pos": [
+        -6864,
+        5888
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 29
+      }
+    },
+    {
+      "key": "0305:0d:-2176,2032",
+      "name": "Library Room (0305) - Handgun Sights (critical hit) @-2176,2032",
+      "room": "0305",
+      "itemId": 13,
+      "itemName": "Handgun Sights (critical hit)",
+      "pos": [
+        -2176,
+        2032
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 13
+      }
+    },
+    {
+      "key": "0305:5e:-6400,-4864",
+      "name": "Library Room (0305) - B1 Key Chip \" with number \"(3695) @-6400,-4864",
+      "room": "0305",
+      "itemId": 94,
+      "itemName": "B1 Key Chip \" with number \"(3695)",
+      "pos": [
+        -6400,
+        -4864
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 94
+      }
+    },
+    {
+      "key": "0305:48:2304,2560",
+      "name": "Library Room (0305) - Key Card R @2304,2560",
+      "room": "0305",
+      "itemId": 72,
+      "itemName": "Key Card R",
+      "pos": [
+        2304,
+        2560
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 72
+      }
+    },
+    {
+      "key": "0406:64:-3456,1280",
+      "name": "Large Size Elevator Control Room (0406) - DDK Input Disc L @-3456,1280",
+      "room": "0406",
+      "itemId": 100,
+      "itemName": "DDK Input Disc L",
+      "pos": [
+        -3456,
+        1280
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 100
+      }
+    },
+    {
+      "key": "0406:6b:-3956,-1600",
+      "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-3956,-1600",
+      "room": "0406",
+      "itemId": 107,
+      "itemName": "DDK Code Disc L",
+      "pos": [
+        -3956,
+        -1600
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 107
+      }
+    },
+    {
+      "key": "0406:6b:-4352,224",
+      "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-4352,224",
+      "room": "0406",
+      "itemId": 107,
+      "itemName": "DDK Code Disc L",
+      "pos": [
+        -4352,
+        224
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 107
+      }
+    },
+    {
+      "key": "0503:4c:-3468,2768",
+      "name": "Stabilizer Experiment Room (0503) - Stabilizer @-3468,2768",
+      "room": "0503",
+      "itemId": 76,
+      "itemName": "Stabilizer",
+      "pos": [
+        -3468,
+        2768
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 76
+      }
+    },
+    {
+      "key": "0503:4d:-3468,2768",
+      "name": "Stabilizer Experiment Room (0503) - Initializer @-3468,2768",
+      "room": "0503",
+      "itemId": 77,
+      "itemName": "Initializer",
+      "pos": [
+        -3468,
+        2768
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 77
+      }
+    },
+    {
+      "key": "0503:51:-3468,2768",
+      "name": "Stabilizer Experiment Room (0503) - Protect P. 2-B @-3468,2768",
+      "room": "0503",
+      "itemId": 81,
+      "itemName": "Protect P. 2-B",
+      "pos": [
+        -3468,
+        2768
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 81
+      }
+    },
+    {
+      "key": "0503:2b:-10240,-5248",
+      "name": "Stabilizer Experiment Room (0503) - Plug @-10240,-5248",
+      "room": "0503",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -10240,
+        -5248
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0503:6f:-2800,-3088",
+      "name": "Stabilizer Experiment Room (0503) - DDK Code Disc D @-2800,-3088",
+      "room": "0503",
+      "itemId": 111,
+      "itemName": "DDK Code Disc D",
+      "pos": [
+        -2800,
+        -3088
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 111
+      }
+    },
+    {
+      "key": "0503:0b:-10240,4480",
+      "name": "Stabilizer Experiment Room (0503) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+      "room": "0503",
+      "itemId": 11,
+      "itemName": "Shotgun Parts (upgrade To SPAS12)",
+      "pos": [
+        -10240,
+        4480
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 11
+      }
+    },
+    {
+      "key": "0503:5b:-1792,1792",
+      "name": "Stabilizer Experiment Room (0503) - Secret Disc \" With Data \" @-1792,1792",
+      "room": "0503",
+      "itemId": 91,
+      "itemName": "Secret Disc \" With Data \"",
+      "pos": [
+        -1792,
+        1792
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 91
+      }
+    },
+    {
+      "key": "0504:6d:-1632,2304",
+      "name": "Stabilizer Design Room (0504) - DDK Code Disc W @-1632,2304",
+      "room": "0504",
+      "itemId": 109,
+      "itemName": "DDK Code Disc W",
+      "pos": [
+        -1632,
+        2304
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 109
+      }
+    },
+    {
+      "key": "0504:4f:-2912,3872",
+      "name": "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872",
+      "room": "0504",
+      "itemId": 79,
+      "itemName": "Protect P. 2-A",
+      "pos": [
+        -2912,
+        3872
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 79
+      }
+    },
+    {
+      "key": "0504:50:4896,-3840",
+      "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
+      "room": "0504",
+      "itemId": 80,
+      "itemName": "Protect P. 1-B",
+      "pos": [
+        4896,
+        -3840
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 80
+      }
+    },
+    {
+      "key": "0504:4e:2256,-3840",
+      "name": "Stabilizer Design Room (0504) - Protect P. 1-A @2256,-3840",
+      "room": "0504",
+      "itemId": 78,
+      "itemName": "Protect P. 1-A",
+      "pos": [
+        2256,
+        -3840
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 78
+      }
+    },
+    {
+      "key": "0504:4f:4896,-3840",
+      "name": "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840",
+      "room": "0504",
+      "itemId": 79,
+      "itemName": "Protect P. 2-A",
+      "pos": [
+        4896,
+        -3840
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 79
+      }
+    },
+    {
+      "key": "0504:50:-2912,3872",
+      "name": "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872",
+      "room": "0504",
+      "itemId": 80,
+      "itemName": "Protect P. 1-B",
+      "pos": [
+        -2912,
+        3872
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 80
+      }
+    },
+    {
+      "key": "0506:56:-5696,-1232",
+      "name": "Security Pass Room (0506) - B2 Key Chip 1 @-5696,-1232",
+      "room": "0506",
+      "itemId": 86,
+      "itemName": "B2 Key Chip 1",
+      "pos": [
+        -5696,
+        -1232
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 86
+      }
+    },
+    {
+      "key": "0506:67:3840,2592",
+      "name": "Security Pass Room (0506) - DDK Input Disc S @3840,2592",
+      "room": "0506",
+      "itemId": 103,
+      "itemName": "DDK Input Disc S",
+      "pos": [
+        3840,
+        2592
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 103
+      }
+    },
+    {
+      "key": "0506:2b:-6144,128",
+      "name": "Security Pass Room (0506) - Plug @-6144,128",
+      "room": "0506",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -6144,
+        128
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0506:3b:-6912,3328",
+      "name": "Security Pass Room (0506) - ID Card Type \" Project Superintendent \" (Dr. Kirk) @-6912,3328",
+      "room": "0506",
+      "itemId": 59,
+      "itemName": "ID Card Type \" Project Superintendent \" (Dr. Kirk)",
+      "pos": [
+        -6912,
+        3328
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 59
+      }
+    },
+    {
+      "key": "0507:2b:6144,3088",
+      "name": "Parts Storage (0507) - Plug @6144,3088",
+      "room": "0507",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        6144,
+        3088
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0507:0f:-4352,10000",
+      "name": "Parts Storage (0507) - Grenade Gun @-4352,10000",
+      "room": "0507",
+      "itemId": 15,
+      "itemName": "Grenade Gun",
+      "pos": [
+        -4352,
+        10000
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 15
+      }
+    },
+    {
+      "key": "0507:52:4352,7824",
+      "name": "Parts Storage (0507) - Core Parts 1 @4352,7824",
+      "room": "0507",
+      "itemId": 82,
+      "itemName": "Core Parts 1",
+      "pos": [
+        4352,
+        7824
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 82
+      }
+    },
+    {
+      "key": "0507:53:4352,9616",
+      "name": "Parts Storage (0507) - Core Parts 2 @4352,9616",
+      "room": "0507",
+      "itemId": 83,
+      "itemName": "Core Parts 2",
+      "pos": [
+        4352,
+        9616
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 83
+      }
+    },
+    {
+      "key": "050c:5d:-3328,5616",
+      "name": "Power Freq. Room (050c) - Researcher Memo \" with number \"(1281) @-3328,5616",
+      "room": "050c",
+      "itemId": 93,
+      "itemName": "Researcher Memo \" with number \"(1281)",
+      "pos": [
+        -3328,
+        5616
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 93
+      }
+    },
+    {
+      "key": "050e:2b:-2100,-2700",
+      "name": "Dr. Kirk's Personal Lab (050e) - Plug @-2100,-2700",
+      "room": "050e",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -2100,
+        -2700
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "050e:3a:-7700,6900",
+      "name": "Dr. Kirk's Personal Lab (050e) - Key Card Lv. A @-7700,6900",
+      "room": "050e",
+      "itemId": 58,
+      "itemName": "Key Card Lv. A",
+      "pos": [
+        -7700,
+        6900
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 58
+      }
+    },
+    {
+      "key": "050e:61:-7700,6900",
+      "name": "Dr. Kirk's Personal Lab (050e) - Planning Disc @-7700,6900",
+      "room": "050e",
+      "itemId": 97,
+      "itemName": "Planning Disc",
+      "pos": [
+        -7700,
+        6900
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 97
+      }
+    },
+    {
+      "key": "0511:2b:-10240,-5248",
+      "name": "Stabilizer Experiment Room (0511) - Plug @-10240,-5248",
+      "room": "0511",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -10240,
+        -5248
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0511:6f:-2800,-3088",
+      "name": "Stabilizer Experiment Room (0511) - DDK Code Disc D @-2800,-3088",
+      "room": "0511",
+      "itemId": 111,
+      "itemName": "DDK Code Disc D",
+      "pos": [
+        -2800,
+        -3088
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 111
+      }
+    },
+    {
+      "key": "0511:0b:-10240,4480",
+      "name": "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+      "room": "0511",
+      "itemId": 11,
+      "itemName": "Shotgun Parts (upgrade To SPAS12)",
+      "pos": [
+        -10240,
+        4480
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 11
+      }
+    },
+    {
+      "key": "0600:18:-1616,4480",
+      "name": "Carrying Out Room B3 (0600) - Grenade Bullets @-1616,4480",
+      "room": "0600",
+      "itemId": 24,
+      "itemName": "Grenade Bullets",
+      "pos": [
+        -1616,
+        4480
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 24
+      }
+    },
+    {
+      "key": "0600:5a:-5120,3584",
+      "name": "Carrying Out Room B3 (0600) - Startup Battery. W \" Large \" @-5120,3584",
+      "room": "0600",
+      "itemId": 90,
+      "itemName": "Startup Battery. W \" Large \"",
+      "pos": [
+        -5120,
+        3584
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 90
+      }
+    },
+    {
+      "key": "0601:5a:-5120,3584",
+      "name": "Backup Generator Room B3 (0601) - Startup Battery. W \" Large \" @-5120,3584",
+      "room": "0601",
+      "itemId": 90,
+      "itemName": "Startup Battery. W \" Large \"",
+      "pos": [
+        -5120,
+        3584
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 90
+      }
+    },
+    {
+      "key": "0607:4d:4480,640",
+      "name": "Special Weapons Storage (0607) - Initializer @4480,640",
+      "room": "0607",
+      "itemId": 77,
+      "itemName": "Initializer",
+      "pos": [
+        4480,
+        640
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 77
+      }
+    },
+    {
+      "key": "0607:4c:4480,640",
+      "name": "Special Weapons Storage (0607) - Stabilizer @4480,640",
+      "room": "0607",
+      "itemId": 76,
+      "itemName": "Stabilizer",
+      "pos": [
+        4480,
+        640
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 76
+      }
+    },
+    {
+      "key": "0607:5b:-1792,1792",
+      "name": "Special Weapons Storage (0607) - Secret Disc \" With Data \" @-1792,1792",
+      "room": "0607",
+      "itemId": 91,
+      "itemName": "Secret Disc \" With Data \"",
+      "pos": [
+        -1792,
+        1792
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 91
+      }
+    },
+    {
+      "key": "060d:09:-2816,10368",
+      "name": "Underground Heliport (060d) - Grenade Gun (40mmHK) @-2816,10368",
+      "room": "060d",
+      "itemId": 9,
+      "itemName": "Grenade Gun (40mmHK)",
+      "pos": [
+        -2816,
+        10368
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 9
+      }
+    },
+    {
+      "key": "060d:2b:-2816,10368",
+      "name": "Underground Heliport (060d) - Plug @-2816,10368",
+      "room": "060d",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -2816,
+        10368
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "060d:18:-2816,10368",
+      "name": "Underground Heliport (060d) - Grenade Bullets @-2816,10368",
+      "room": "060d",
+      "itemId": 24,
+      "itemName": "Grenade Bullets",
+      "pos": [
+        -2816,
+        10368
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 24
+      }
+    },
+    {
+      "key": "0610:54:-1664,-2016",
+      "name": "Hovercraft Storage (0610) - Energy Tank @-1664,-2016",
+      "room": "0610",
+      "itemId": 84,
+      "itemName": "Energy Tank",
+      "pos": [
+        -1664,
+        -2016
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 84
+      }
+    },
+    {
+      "key": "0610:09:-1024,-2048",
+      "name": "Hovercraft Storage (0610) - Grenade Gun (40mmHK) @-1024,-2048",
+      "room": "0610",
+      "itemId": 9,
+      "itemName": "Grenade Gun (40mmHK)",
+      "pos": [
+        -1024,
+        -2048
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 9
+      }
+    },
+    {
+      "key": "0610:2b:-1024,-2048",
+      "name": "Hovercraft Storage (0610) - Plug @-1024,-2048",
+      "room": "0610",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -1024,
+        -2048
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0610:18:-1024,-2048",
+      "name": "Hovercraft Storage (0610) - Grenade Bullets @-1024,-2048",
+      "room": "0610",
+      "itemId": 24,
+      "itemName": "Grenade Bullets",
+      "pos": [
+        -1024,
+        -2048
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 24
+      }
+    },
+    {
+      "key": "0612:2b:-896,0",
+      "name": "Hovercraft (0612) - Plug @-896,0",
+      "room": "0612",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -896,
+        0
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      }
+    },
+    {
+      "key": "0612:09:-896,0",
+      "name": "Hovercraft (0612) - Grenade Gun (40mmHK) @-896,0",
+      "room": "0612",
+      "itemId": 9,
+      "itemName": "Grenade Gun (40mmHK)",
+      "pos": [
+        -896,
+        0
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 9
+      }
+    },
+    {
+      "key": "0612:18:-896,0",
+      "name": "Hovercraft (0612) - Grenade Bullets @-896,0",
+      "room": "0612",
+      "itemId": 24,
+      "itemName": "Grenade Bullets",
+      "pos": [
+        -896,
+        0
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 24
+      }
+    }
+  ],
+  "items": {
+    "names": {
+      "1": "Shotgun \"Model PA3\" (pump-action)",
+      "2": "Shotgun Custom \"Model SPAS12\" (military shotgun)",
+      "3": "Shotgun + Stock \"Model PA3\"",
+      "4": "Shotgun Custom + Stock \"Model SPAS12\"",
+      "5": "Handgun (Glock 34)",
+      "6": "Handgun + Sight (Glock 34)",
+      "7": "Handgun Custom (Glock 35)",
+      "8": "Handgun Custom + Sight (Glock 35)",
+      "9": "Grenade Gun (40mmHK)",
+      "10": "Grenade Gun Custom (40mmHK) \"Regina Custom\"",
+      "11": "Shotgun Parts (upgrade To SPAS12)",
+      "12": "Shotgun Stock",
+      "13": "Handgun Sights (critical hit)",
+      "14": "Handgun Slides (upgrade To Glock 35)",
+      "15": "Grenade Gun",
+      "16": "SG Bullets",
+      "17": "Slag Bullets",
+      "18": "An. Darts S",
+      "19": "An. Darts M",
+      "20": "An. Darts L",
+      "21": "Poison Dart",
+      "22": "9mm Parabellum",
+      "23": "40S&W Bullets",
+      "24": "Grenade Bullets",
+      "25": "Heat Bullets",
+      "26": "inf. Grenades",
+      "27": "Hemostat",
+      "28": "Med. Pak S",
+      "29": "Med. Pak M",
+      "30": "Med. Pak L",
+      "31": "Resuscitation",
+      "32": "An. Aid",
+      "33": "Recovery Aid",
+      "34": "Intensifier",
+      "35": "Multiplier",
+      "43": "Plug",
+      "44": "locker Room Key",
+      "45": "Small Size Key",
+      "46": "Entrance Key",
+      "47": "BG Room B1 Key",
+      "48": "BG Area Key",
+      "49": "C. O. Area Key",
+      "50": "Port Card Key",
+      "52": "ID Card Type \" Colonel \"",
+      "53": "ID Card Type \" Communicator \"",
+      "54": "ID Card Type \" Researcher \"",
+      "55": "Key Card Lv. D",
+      "56": "Key Card Lv. C",
+      "57": "Key Card Lv. B",
+      "58": "Key Card Lv. A",
+      "59": "ID Card Type \" Project Superintendent \" (Dr. Kirk)",
+      "60": "C. O. Pass Card",
+      "61": "Panel Key 1",
+      "62": "Panel Key 2",
+      "63": "Startup Battery. R \" Uncharged \"",
+      "64": "Startup Battery. R \" Charged \"",
+      "65": "F. C. Device \" without FingerPrint \"",
+      "66": "F. C. Device \" With FingerPrint \"",
+      "67": "B1 Crane Card",
+      "68": "Screwdriver",
+      "69": "Antenna Key",
+      "70": "B1 Key Chip",
+      "71": "Key Card L",
+      "72": "Key Card R",
+      "73": "B3 Crane Card 1",
+      "74": "B3 Crane Card 2",
+      "75": "B3 Crane Card 3",
+      "76": "Stabilizer",
+      "77": "Initializer",
+      "78": "Protect P. 1-A",
+      "79": "Protect P. 2-A",
+      "80": "Protect P. 1-B",
+      "81": "Protect P. 2-B",
+      "82": "Core Parts 1",
+      "83": "Core Parts 2",
+      "84": "Energy Tank",
+      "85": "Nucleum",
+      "86": "B2 Key Chip 1",
+      "87": "B2 Key Chip 2",
+      "88": "Pulse Receiver",
+      "89": "Startup Battery. R \" Large \"",
+      "90": "Startup Battery. W \" Large \"",
+      "91": "Secret Disc \" With Data \"",
+      "93": "Researcher Memo \" with number \"(1281)",
+      "94": "B1 Key Chip \" with number \"(3695)",
+      "95": "B2 Key Chip 1 \" without number \"",
+      "96": "B2 Key Chip 2 \" with number \" (0392)",
+      "97": "Planning Disc",
+      "98": "DDK Input Disc H",
+      "99": "DDK Input Disc N",
+      "100": "DDK Input Disc L",
+      "101": "DDK Input Disc E",
+      "102": "DDK Input Disc W",
+      "103": "DDK Input Disc S",
+      "104": "DDK Input Disc D",
+      "105": "DDK Code Disc H",
+      "106": "DDK Code Disc N",
+      "107": "DDK Code Disc L",
+      "108": "DDK Code Disc E",
+      "109": "DDK Code Disc W",
+      "110": "DDK Code Disc S",
+      "111": "DDK Code Disc D",
+      "120": "Custom part For \" Ancient Type Regina \"",
+      "121": "Custom part For \" Ancient Type Regina \"",
+      "122": "Custom part For \" Ancient Type Regina \"",
+      "123": "Custom part For \" Ancient Type Regina \"",
+      "124": "Custom part For \" Ancient Type Regina \"",
+      "125": "Custom part For \" Ancient Type Regina \"",
+      "126": "Custom part For \" Ancient Type Regina \"",
+      "127": "Custom part For \" Ancient Type Regina \"",
+      "128": "Custom part For \" Ancient Type Regina \"",
+      "129": "Custom part For \" Ancient Type Regina \"",
+      "130": "Custom part For \" Ancient Type Regina \"",
+      "131": "Custom part For \" Ancient Type Regina \"",
+      "132": "Custom part For \" Ancient Type Regina \"",
+      "133": "Custom part For \" Ancient Type Regina \""
+    },
+    "keyItemIds": [
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111
+    ],
+    "progressionItemIds": [
+      48,
+      49,
+      58
+    ],
+    "pool": [
+      {
+        "id": 16,
+        "name": "SG Bullets",
+        "weight": 3.0
+      },
+      {
+        "id": 17,
+        "name": "Slag Bullets",
+        "weight": 3.0
+      },
+      {
+        "id": 18,
+        "name": "An. Darts S",
+        "weight": 3.0
+      },
+      {
+        "id": 19,
+        "name": "An. Darts M",
+        "weight": 3.0
+      },
+      {
+        "id": 20,
+        "name": "An. Darts L",
+        "weight": 3.0
+      },
+      {
+        "id": 21,
+        "name": "Poison Dart",
+        "weight": 3.0
+      },
+      {
+        "id": 22,
+        "name": "9mm Parabellum",
+        "weight": 3.0
+      },
+      {
+        "id": 23,
+        "name": "40S&W Bullets",
+        "weight": 3.0
+      },
+      {
+        "id": 24,
+        "name": "Grenade Bullets",
+        "weight": 3.0
+      },
+      {
+        "id": 25,
+        "name": "Heat Bullets",
+        "weight": 3.0
+      },
+      {
+        "id": 26,
+        "name": "inf. Grenades",
+        "weight": 3.0
+      },
+      {
+        "id": 27,
+        "name": "Hemostat",
+        "weight": 2.0
+      },
+      {
+        "id": 28,
+        "name": "Med. Pak S",
+        "weight": 2.0
+      },
+      {
+        "id": 29,
+        "name": "Med. Pak M",
+        "weight": 2.0
+      },
+      {
+        "id": 30,
+        "name": "Med. Pak L",
+        "weight": 2.0
+      },
+      {
+        "id": 31,
+        "name": "Resuscitation",
+        "weight": 2.0
+      },
+      {
+        "id": 32,
+        "name": "An. Aid",
+        "weight": 2.0
+      },
+      {
+        "id": 33,
+        "name": "Recovery Aid",
+        "weight": 2.0
+      },
+      {
+        "id": 34,
+        "name": "Intensifier",
+        "weight": 2.0
+      },
+      {
+        "id": 35,
+        "name": "Multiplier",
+        "weight": 2.0
+      }
+    ]
+  }
+}

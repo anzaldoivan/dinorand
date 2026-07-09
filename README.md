@@ -130,6 +130,17 @@ No data files ship alongside the binary: the game data is already baked in (`map
 embedded resource; the rest of `data/dc1` is compiled into `Definitions/DinoCrisis1.cs`), so
 each published executable is the whole tool.
 
+## Archipelago (experimental)
+
+DinoRand ships a Python [Archipelago](https://archipelago.gg) world in **`apworld/dino_crisis_1/`**.
+It's separate from the .NET build — drop the folder into an Archipelago checkout's `worlds/` and AP
+can generate a Dino Crisis 1 multiworld seed. **Status: DC1 *generation half* only** (verified against
+AP 0.6.8); no in-game client/patching yet, and DC2 is not supported. It ships **no game assets** — the
+logic is distilled from authored data via `scripts/gen_ap_logic.py`.
+
+Setup + tests: **[apworld/dino_crisis_1/README.md](apworld/dino_crisis_1/README.md)**. Design notes:
+`docs/decisions/cross/ARCHIPELAGO-INTEGRATION-FEASIBILITY.md`.
+
 ## Contributing & Releases
 
 Branch off `main` and open a PR — `main` is protected, and CI (`build-test-coverage`)

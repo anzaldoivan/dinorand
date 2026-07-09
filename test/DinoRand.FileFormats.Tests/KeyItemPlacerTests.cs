@@ -17,18 +17,19 @@ public class KeyItemPlacerTests
 {
     private static readonly DinoCrisis1 Game = new();
 
-    private static DoorRecord Door(int destCode, int type) => new()
+    private static DoorRecord Door(int destCode, int type, int lockId = 0) => new()
     {
         TargetStage = (destCode >> 8) & 0xff,
         TargetRoom = destCode & 0xff,
         DoorType = type,
+        LockId = lockId,
     };
 
-    private static void Link(RoomGraph g, int from, int to, int type)
+    private static void Link(RoomGraph g, int from, int to, int type, int lockId = 0)
     {
         var a = g.GetOrAdd((from >> 8) & 0xff, from & 0xff);
         var b = g.GetOrAdd((to >> 8) & 0xff, to & 0xff);
-        a.Edges.Add(new RoomEdge(b, Door(to, type)));
+        a.Edges.Add(new RoomEdge(b, Door(to, type, lockId)));
     }
 
     private static KeyItemPlacer.Spot Spot(int roomCode, int originalId = 0x16) =>
@@ -88,6 +89,61 @@ public class KeyItemPlacerTests
         Assert.Contains(0x0100, KeyItemPlacer.Reachable(g, Game, 0x010d, new HashSet<int> { 0x3a }));
     }
 
+    // --- Group-9 reader/setter lock protocol (STATIC-SCD-RE.md cont.40) --------------------------
+    // A type-1 door READS GetFlag(9,lock); it is crossable only after a same-lock type-2 door has been
+    // traversed (which SetFlag(9,lock)s the latch). Type-2 self-latches (always crossable), type-3 is
+    // free-to-cross (its producer is a SetFlag in the reader's own source room).
+
+    [Fact]
+    public void Reachable_Type1Door_StrandedProducer_IsNotCrossable()
+    {
+        // 0200 is reachable ONLY through the type-1 door, and its same-lock type-2 producer (0200->0100)
+        // sits behind that same locked door → the latch can never be set → 0200 unreachable (softlock).
+        // This is the door-rando strand case; a free-edge model wrongly reports 0200 reachable.
+        var g = new RoomGraph();
+        Link(g, 0x010d, 0x0100, 0x00);          // free
+        Link(g, 0x0100, 0x0200, 0x01, 0x0f);    // type-1 reader, lock 0x0f
+        Link(g, 0x0200, 0x0100, 0x02, 0x0f);    // type-2 setter, lock 0x0f — but 0200 is unreachable
+
+        var reach = KeyItemPlacer.Reachable(g, Game, 0x010d, new HashSet<int>());
+        Assert.Contains(0x0100, reach);
+        Assert.DoesNotContain(0x0200, reach);
+    }
+
+    [Fact]
+    public void Reachable_Type1Door_ReachableProducer_ShortcutOpens()
+    {
+        // 0200 is reachable another way; crossing its type-2 door (0200->0100) sets lock 0x0f, so the
+        // type-1 shortcut 0100->0200 then opens. Everything reachable — the vanilla shortcut case.
+        var g = new RoomGraph();
+        Link(g, 0x010d, 0x0100, 0x00);          // free
+        Link(g, 0x010d, 0x0200, 0x00);          // independent path to 0200
+        Link(g, 0x0100, 0x0200, 0x01, 0x0f);    // type-1 reader, lock 0x0f
+        Link(g, 0x0200, 0x0100, 0x02, 0x0f);    // type-2 setter, lock 0x0f
+
+        var reach = KeyItemPlacer.Reachable(g, Game, 0x010d, new HashSet<int>());
+        Assert.Contains(0x0100, reach);
+        Assert.Contains(0x0200, reach);
+    }
+
+    [Fact]
+    public void Reachable_Type2Door_SelfLatches_AlwaysCrossable()
+    {
+        var g = new RoomGraph();
+        Link(g, 0x010d, 0x0100, 0x00);
+        Link(g, 0x0100, 0x0200, 0x02, 0x0f);    // type-2 opens itself on traverse
+        Assert.Contains(0x0200, KeyItemPlacer.Reachable(g, Game, 0x010d, new HashSet<int>()));
+    }
+
+    [Fact]
+    public void Reachable_Type3Door_InRoomProducer_IsFree()
+    {
+        var g = new RoomGraph();
+        Link(g, 0x010d, 0x0100, 0x00);
+        Link(g, 0x0100, 0x0200, 0x03, 0x0e);    // type-3 reader — producer is in-room, free once reached
+        Assert.Contains(0x0200, KeyItemPlacer.Reachable(g, Game, 0x010d, new HashSet<int>()));
+    }
+
     // --- Verify: an existing placement is/ isn't solvable ---------------------------------------
 
     [Fact]
@@ -101,6 +157,23 @@ public class KeyItemPlacerTests
         var keys = new Dictionary<int, IReadOnlyList<int>> { [0x0100] = new[] { 0x2e } };
         var res = KeyItemPlacer.Verify(g, Game, 0x010d, 0x0200, keys);
         Assert.True(res.Success);
+    }
+
+    [Fact]
+    public void Verify_GoalBehindStrandedType1Shortcut_IsRejected()
+    {
+        // The exact door-rando softlock DoorRandomizer.IsBeatable must catch: a shuffle strands the
+        // goal behind a type-1 shortcut whose type-2 producer sits past that same locked door. The
+        // beatability gate (Verify → the latch-aware Reachable) must report it unsolvable, so the pass
+        // rerolls / falls back to vanilla rather than shipping it.
+        var g = new RoomGraph();
+        Link(g, 0x010d, 0x0100, 0x00);          // free
+        Link(g, 0x0100, 0x0200, 0x01, 0x0f);    // type-1 reader gates the goal, lock 0x0f
+        Link(g, 0x0200, 0x0100, 0x02, 0x0f);    // its type-2 producer is behind the goal → never set
+
+        var res = KeyItemPlacer.Verify(g, Game, 0x010d, 0x0200,
+                                       new Dictionary<int, IReadOnlyList<int>>());
+        Assert.False(res.Success);
     }
 
     [Fact]

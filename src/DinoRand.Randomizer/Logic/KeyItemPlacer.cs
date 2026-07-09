@@ -48,10 +48,20 @@ public sealed class KeyItemPlacer
     {
         var byCode = graph.Nodes.ToDictionary(n => n.Code);
         var seen = new HashSet<int> { start };
+        // Group-9 story latches (STATIC-SCD-RE.md cont.40): a type-2 door is free to cross, so its lock
+        // is set once its source room is reachable; a type-1 reader door is passable only once its lock
+        // is in this set. Recomputed from `seen` each fixpoint pass (monotonic, set-once), which is what
+        // stops the door-rando "stranded shortcut" softlock the free-edge model could not see.
+        var latches = new HashSet<int>();
         bool grew = true;
         while (grew)
         {
             grew = false;
+            foreach (var code in seen)
+                if (byCode.TryGetValue(code, out var n))
+                    foreach (var e in n.Edges)
+                        if (e.Door.SetsStoryLatch) latches.Add(e.Door.LockId);
+
             var queue = new Queue<int>(seen);
             while (queue.Count > 0)
             {
@@ -59,7 +69,7 @@ public sealed class KeyItemPlacer
                 foreach (var edge in node.Edges)
                 {
                     if (seen.Contains(edge.Target.Code)) continue;
-                    if (!CanTraverse(game, edge, held, seen)) continue;
+                    if (!CanTraverse(game, edge, held, seen, latches)) continue;
                     seen.Add(edge.Target.Code);
                     queue.Enqueue(edge.Target.Code);
                     grew = true;
@@ -69,11 +79,13 @@ public sealed class KeyItemPlacer
         return seen;
     }
 
-    /// <summary>True when the door-type key-set (OR) is open <b>and</b> the edge's authored item gate
+    /// <summary>True when the door-type key-set (OR) is open, the group-9 story latch (if this is a
+    /// type-1 reader) has been set by a partner type-2 door, <b>and</b> the edge's authored item gate
     /// (AND) and the destination room's room-state gate (AND) are both satisfied.</summary>
     private static bool CanTraverse(GameDefinition game, RoomEdge edge, IReadOnlySet<int> held,
-                                    IReadOnlySet<int> reach)
+                                    IReadOnlySet<int> reach, IReadOnlySet<int> latches)
         => CanCross(game, edge.Door, held)
+           && (!edge.Door.GatesOnStoryLatch || latches.Contains(edge.Door.LockId))
            && edge.Requires.SatisfiedBy(held, reach)
            && edge.Target.Requires.SatisfiedBy(held, reach);
 

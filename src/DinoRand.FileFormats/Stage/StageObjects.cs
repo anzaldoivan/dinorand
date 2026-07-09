@@ -84,6 +84,17 @@ public sealed class DoorRecord
     /// <summary>Byte offset of the door sub-action / kind byte (0 = normal door).</summary>
     public const int DoorTypeOffset = 0x28;
 
+    /// <summary><see cref="DoorType"/> of a story-flag READER that is one half of a door↔door shortcut:
+    /// open iff <c>GetFlag(9, <see cref="LockId"/>)</c>, latched by its partner <see cref="StoryLatchSetterType"/>
+    /// door (STATIC-SCD-RE.md cont.40). Type 3 is also a reader, but its lock is set by an in-room SCD op
+    /// in its own source room (free-to-cross once reached), so it is NOT latch-gated.</summary>
+    public const int StoryLatchReaderType = 1;
+
+    /// <summary><see cref="DoorType"/> of a self-latching SETTER: traversing it runs
+    /// <c>SetFlag(9, <see cref="LockId"/>)</c>, permanently opening every same-lock
+    /// <see cref="StoryLatchReaderType"/> door (the "open from the far side" shortcut).</summary>
+    public const int StoryLatchSetterType = 2;
+
     /// <summary>Destination stage file index (ST1..STC → 1..12).</summary>
     public int TargetStage { get; set; }
 
@@ -93,7 +104,11 @@ public sealed class DoorRecord
     /// <summary>Lock / gate-flag id (<c>byte[+0x27]</c>), or 0 when ungated.</summary>
     public int LockId { get; set; }
 
-    /// <summary>Door sub-action / kind (<c>byte[+0x28]</c>); 0 = normal door.</summary>
+    /// <summary>Door sub-action / kind (<c>byte[+0x28]</c>); 0 = normal door. Selects the DINO.exe
+    /// door handler via jump table <c>0x449384</c> (STATIC-SCD-RE.md cont.40): 0 = free; <b>1/3 =
+    /// story-flag READER</b> (open iff <c>GetFlag(9, <see cref="LockId"/>)</c>, never sets); <b>2 =
+    /// self-latch SETTER</b> (<c>SetFlag(9, LockId)</c> on first traverse — the "open from the far
+    /// side" shortcut); 6/7/8 = Key Card ladder; 9..0xfc = item id == type; 0xfd/fe/ff = special.</summary>
     public int DoorType { get; set; }
 
     /// <summary>
@@ -131,6 +146,15 @@ public sealed class DoorRecord
 
     /// <summary>The destination as a <c>SSRR</c> code (<c>stage&lt;&lt;8 | room</c>).</summary>
     public int TargetCode => ((TargetStage & 0xff) << 8) | (TargetRoom & 0xff);
+
+    /// <summary>True when this door reads a group-9 story latch that a partner door must set first
+    /// (<see cref="StoryLatchReaderType"/>): passable only after some same-<see cref="LockId"/>
+    /// <see cref="StoryLatchSetterType"/> door has been traversed.</summary>
+    public bool GatesOnStoryLatch => DoorType == StoryLatchReaderType;
+
+    /// <summary>True when traversing this door sets its group-9 story latch
+    /// (<see cref="StoryLatchSetterType"/>), opening every same-<see cref="LockId"/> reader.</summary>
+    public bool SetsStoryLatch => DoorType == StoryLatchSetterType;
 
     /// <summary>
     /// Byte offset of this record's opcode within the decompressed RDT buffer, so an edited
@@ -220,6 +244,12 @@ public sealed class EnemyRecord
     /// <summary>Byte offset of the "already killed" GetFlag(group 4) id (<c>0x20</c> only; a
     /// <c>0x59</c> record's kill-flag lives in its instance-table entry).</summary>
     public const int KillFlagOffset = 0x04;
+    /// <summary>Byte offset of the preset <b>maxHP</b> word in a <c>0x20</c> record. The handler copies
+    /// it into entity <c>+0x11A</c> (<c>DINO.exe 0x42656A</c>); <c>0</c> ⇒ the per-category birth-init
+    /// random-rolls <c>{750,850,1000}</c>, nonzero ⇒ that value is kept (DC1-G2, live-confirmed
+    /// 2026-07-08). <b>Not meaningful for a <c>0x59</c> record</b>, where <c>+6</c> falls inside the
+    /// model pointer (<see cref="Enemy2ModelOffset"/>=0x04).</summary>
+    public const int MaxHpOffset = 0x06;
     /// <summary>Byte offset of the model-resource PSX pointer (the species) in a <c>0x20</c> record.</summary>
     public const int ModelOffset = 0x10;
     /// <summary>Byte offset of the motion/animation-resource PSX pointer in a <c>0x20</c> record.</summary>
@@ -283,6 +313,17 @@ public sealed class EnemyRecord
     /// <summary>Motion pointer as decoded from the file, before any randomizer edit.</summary>
     public uint OriginalMotionPtr { get; set; }
 
+    /// <summary>Preset maxHP for a <c>0x20</c> spawn (word at <see cref="MaxHpOffset"/>). A nonzero value
+    /// bypasses the engine's <c>{750,850,1000}</c> birth roll; <c>0</c> (the vanilla state — all 83 clean
+    /// records zero it) keeps the roll. Always <c>0</c> for a <c>0x59</c> record (its <c>+6</c> is
+    /// model-pointer bytes), which the HP pass never edits. <see cref="Passes"/> writes this; the permute
+    /// pass leaves it untouched. DC1-G2, EXE-SYMBOLS <c>0x42656A</c> / entity <c>+0x11A</c>.</summary>
+    public ushort MaxHp { get; set; }
+
+    /// <summary>MaxHP word as decoded from the file, before any randomizer edit (drives change detection so
+    /// a model-only permute leaves <c>+6</c> byte-exact).</summary>
+    public ushort OriginalMaxHp { get; set; }
+
     /// <summary>
     /// Bone count of the model's skeleton, read from the embedded model block
     /// (<see cref="EnemySkeleton.ReadBoneCount"/>); 0 if it did not decode. The bone count is a
@@ -314,18 +355,18 @@ public sealed class EnemyRecord
     /// which this holds, so a <c>0x20</c> record whose model does <i>not</i> decode as a dinosaur is
     /// never edited.
     ///
-    /// <para><b>What this does and does NOT catch (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.15).</b> <c>0x20</c> is
-    /// the general entity opcode; it also places the occasional non-dinosaur that <i>shares the
-    /// 15-bone biped rig</i> — e.g. the humanoid corpse in <c>st50c</c> (a "Researcher" body, decodes
-    /// as a 15-bone cat-1 "Velociraptor" because the rig is identical). Bone count and AI category
-    /// therefore <b>cannot</b> separate such a rig-sharing humanoid from a real raptor; the only
-    /// static tell is the model's rest-pose bone positions, which differ (the census tool fingerprints
-    /// this). So this flag is a sanity net against garbage/undecodable models, not a humanoid
-    /// detector. Rig-sharing non-dinosaurs are kept safe instead by (a) being singletons in their
-    /// room (the pass needs ≥2 same-category records to permute) and (b) the cutscene-room exclusion
-    /// (<see cref="DinoRand.Randomizer.Definitions.GameDefinition.CutsceneRoomCodes"/>). The live NPC
-    /// characters (Gail, Rick, Kirk) are not <c>0x20</c> entities at all — they load via the cutscene
-    /// system — so they are never in scope here.</para>
+    /// <para><b>What this does and does NOT catch (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.15, corrected cont.41).</b>
+    /// <c>0x20</c> is the general entity opcode; it also places non-dinosaurs that <i>share the 15-bone
+    /// biped rig</i>, decoding as a 15-bone cat-1 "Velociraptor" because the rig is identical: the
+    /// humanoid corpse in <c>st50c</c>, and — <b>refuting cont.15's "NPCs are never <c>0x20</c>
+    /// entities"</b> — the live NPC characters (Rick/Gail/Kirk) placed in scene-hub rooms such as
+    /// <c>0106</c> (PS1-confirmed on <c>ST106.DAT</c>, cont.41). Bone count / AI category / bind-pose
+    /// <b>cannot</b> separate any of these from a real raptor (the NPC placements even carry a vestigial
+    /// <i>raptor</i> skeleton — the real character model is loaded into the heap by the cutscene system
+    /// at runtime). So this flag is a sanity net against garbage/undecodable models, not an NPC detector.
+    /// NPC-scene actors are excluded instead by <see cref="IsNpcSceneActor"/> (the shared-motion /
+    /// distinct-model tell), folded in below, plus the singleton rule and
+    /// <see cref="DinoRand.Randomizer.Definitions.GameDefinition.CutsceneRoomCodes"/>.</para>
     ///
     /// <para><b>The Tyrannosaurus is excluded (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.23).</b> Both T-Rex model
     /// classes (20-bone cat-3 boss, 10-bone cat-4 Chief's-Room rig) are hand-placed scripted set-pieces,
@@ -333,7 +374,49 @@ public sealed class EnemyRecord
     /// "is a known dinosaur" check from the per-AI-category permute eligibility.</para>
     /// </summary>
     public bool IsRandomizableDino =>
-        SpeciesMatchesCategory && Species != DinoSpecies.Tyrannosaurus;
+        SpeciesMatchesCategory && Species != DinoSpecies.Tyrannosaurus && !IsNpcSceneActor;
+
+    /// <summary>
+    /// True when this <c>0x20</c> record is an <b>NPC-scene actor</b> (Rick/Gail/Kirk placed in a scene
+    /// hub), not a randomizable dinosaur — set by <see cref="MarkNpcSceneActors"/> at parse time
+    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.41). Such records carry a <i>vestigial raptor skeleton</i> in the RDT
+    /// (byte-identical raptor bind-pose — the cutscene system loads the real character model into the
+    /// heap at runtime and the file <see cref="MaxHp"/> is ignored), so bone count / AI
+    /// <see cref="Category"/> / bind-pose all mis-decode them as a Velociraptor.
+    /// </summary>
+    public bool IsNpcSceneActor { get; set; }
+
+    /// <summary>
+    /// Mark the NPC-scene actors among a single room's enemy records. Rule (cont.41): among the
+    /// <c>0x20</c> records, a <b>motion pointer shared by ≥2 distinct model pointers</b> is a shared
+    /// biped motion set driving two characters — every record on such a motion is an
+    /// <see cref="IsNpcSceneActor"/>. Proven file-static and PS1-stable: a full-corpus scan finds this
+    /// pattern in exactly six oracle-confirmed scene rooms (0106/030C/050E/050F/0609/0612). Two are pure
+    /// NPC rooms (0106 "Control Room 1F", live-CE Rick/Gail; 0612); the other four are <b>mixed</b> — the
+    /// flagged pair is the NPC duo (Rick/Gail/Kirk), coexisting with genuine raptors that keep their
+    /// <i>own</i> motion and stay randomizable, so the exclusion is surgical, not per-room. Genuine
+    /// multi-raptor spawns never trip the rule: identical raptors share <i>both</i> pointers (one distinct
+    /// model), and distinct raptors each get their own motion. Bone count / bind-pose cannot tell an NPC
+    /// actor from a raptor (the NPC placement even embeds a raptor skeleton), so this relational check is
+    /// the only reliable static discriminator.
+    /// </summary>
+    public static void MarkNpcSceneActors(IReadOnlyList<EnemyRecord> roomEnemies)
+    {
+        var distinctModelsByMotion = new Dictionary<uint, HashSet<uint>>();
+        foreach (var e in roomEnemies)
+        {
+            if (e.Opcode != DcOpcodes.Enemy) continue; // 0x59 offsets differ; NPC scenes use 0x20
+            if (!distinctModelsByMotion.TryGetValue(e.OriginalMotionPtr, out var models))
+                distinctModelsByMotion[e.OriginalMotionPtr] = models = new HashSet<uint>();
+            models.Add(e.OriginalModelPtr);
+        }
+        foreach (var e in roomEnemies)
+        {
+            if (e.Opcode != DcOpcodes.Enemy) continue;
+            if (distinctModelsByMotion.TryGetValue(e.OriginalMotionPtr, out var models) && models.Count >= 2)
+                e.IsNpcSceneActor = true;
+        }
+    }
 
     public byte[] Raw { get; set; } = Array.Empty<byte>();
 
@@ -344,6 +427,7 @@ public sealed class EnemyRecord
     /// </summary>
     public int FileOffset { get; set; } = -1;
 
-    /// <summary>True once the model or motion pointer has been changed from the original.</summary>
-    public bool IsEdited => ModelPtr != OriginalModelPtr || MotionPtr != OriginalMotionPtr;
+    /// <summary>True once the model/motion pointer or the preset maxHP has been changed from the original.</summary>
+    public bool IsEdited => ModelPtr != OriginalModelPtr || MotionPtr != OriginalMotionPtr
+        || MaxHp != OriginalMaxHp;
 }
