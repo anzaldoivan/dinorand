@@ -77,11 +77,21 @@ public static class Dc2StartingLoadoutInstaller
         // the other (shared inventory array + ownership-filtered ring); explicit picks still allowed.
         static byte[] NoShared(byte[] band) =>
             band.Where(id => !Dc2StartingLoadoutPatch.CrossCharacterSharedMainIds.Contains(id)).ToArray();
+        // In add-and-equip mode BOTH picks are appended into the SHARED inventory array, so exclude ids
+        // the LIVE catalog would expose in the OTHER character's weapon menu without its WEP_P grid slot
+        // (the cross-character stale-blob crash — DC2-STARTING-LOADOUT-CROSS-CHAR-RCA.md). Byte-identical
+        // on a pristine catalog (the whole band is cross-safe); a shuffled catalog narrows the pool, and
+        // an empty pool falls back to the canonical weapon (no append) so a random roll never draws an id
+        // that Apply would refuse.
+        byte[] AddEquipPool(byte[] band) =>
+            NoShared(band).Where(id => Dc2StartingLoadoutPatch.IsCrossSafeAddAndEquipMain(bytes, id)).ToArray();
         uint rng = (uint)seed;
-        byte d = dylanId ?? Pick(NoShared(addAndEquip ? Dc2StartingLoadoutPatch.DylanWeaponIds
-                                                       : Dc2StartingLoadoutPatch.DylanFireWitnessedIds), ref rng);
-        byte r = reginaId ?? Pick(NoShared(addAndEquip ? Dc2StartingLoadoutPatch.ReginaWeaponIds
-                                                        : Dc2StartingLoadoutPatch.ReginaFireWitnessedIds), ref rng);
+        byte d = dylanId ?? PickOrDefault(addAndEquip ? AddEquipPool(Dc2StartingLoadoutPatch.DylanWeaponIds)
+                                                      : NoShared(Dc2StartingLoadoutPatch.DylanFireWitnessedIds),
+                                          Dc2StartingLoadoutPatch.DylanCanonicalId, ref rng);
+        byte r = reginaId ?? PickOrDefault(addAndEquip ? AddEquipPool(Dc2StartingLoadoutPatch.ReginaWeaponIds)
+                                                       : NoShared(Dc2StartingLoadoutPatch.ReginaFireWitnessedIds),
+                                           Dc2StartingLoadoutPatch.ReginaCanonicalId, ref rng);
         WarnShared(dylanId, "Dylan", log);
         WarnShared(reginaId, "Regina", log);
         if (!addAndEquip)
@@ -124,6 +134,11 @@ public static class Dc2StartingLoadoutInstaller
         else
             log?.Invoke($"[start-weapon] warn: {who} id 0x{exp:X2} has no clean in-game fire witness yet — may crash on fire.");
     }
+
+    /// <summary>Draw from <paramref name="band"/>, or return <paramref name="fallback"/> (canonical,
+    /// no append) when the band is empty — a corrupted catalog can leave no cross-safe add-and-equip id.</summary>
+    private static byte PickOrDefault(byte[] band, byte fallback, ref uint state)
+        => band.Length == 0 ? fallback : Pick(band, ref state);
 
     /// <summary>splitmix32 — same deterministic PRNG family as the other levers.</summary>
     private static byte Pick(byte[] band, ref uint state)

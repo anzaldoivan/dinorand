@@ -40,6 +40,14 @@ public class Dc2StartingLoadoutPatchTests
         return exe;
     }
 
+    /// <summary>Overwrite one id's live item-catalog flags (0x704260 → file 0xE9260, +0xA) — models an
+    /// external weapon-shuffle tool having rewritten the owner/kind bits on the install being patched.</summary>
+    private static void SetCatalogFlags(byte[] exe, byte id, ushort flags)
+    {
+        int o = 0xE9260 + id * 12 + 0xA;
+        exe[o] = (byte)flags; exe[o + 1] = (byte)(flags >> 8);
+    }
+
     // Pristine 0x704260 flags (MAIN 0x08, owner Dylan 0x02 / Regina 0x01); ids 01–0b MAINs, 10–15 SUBs.
     private static readonly (byte Id, ushort Flags)[] PristineCatalogFlags =
     {
@@ -318,9 +326,60 @@ public class Dc2StartingLoadoutPatchTests
         Assert.Equal("dylanId", ex.ParamName);
         Assert.Contains("weapon menu", ex.Message);
 
-        // add-and-equip installs it anyway (the ring guard makes the catalog state irrelevant).
-        Dc2StartingLoadoutPatch.Apply(exe, 0x03, Dc2StartingLoadoutPatch.ReginaCanonicalId, addAndEquip: true);
+        // add-and-equip no longer bypasses blindly (DC2-STARTING-LOADOUT-CROSS-CHAR-RCA.md): a live SUB /
+        // cross-exposed id has a NULL grid slot for the character the corrupt catalog exposes it to →
+        // it would crash on equip, so add-and-equip refuses it too (the ring guard only covers the
+        // div-0). --allow-unsafe still forces it (investigation).
+        var ex2 = Assert.Throws<ArgumentOutOfRangeException>(
+            () => Dc2StartingLoadoutPatch.Apply(exe, 0x03, Dc2StartingLoadoutPatch.ReginaCanonicalId, addAndEquip: true));
+        Assert.Equal("dylanId", ex2.ParamName);
+        Assert.Contains("grid slot", ex2.Message);
+        Dc2StartingLoadoutPatch.Apply(exe, 0x03, Dc2StartingLoadoutPatch.ReginaCanonicalId, addAndEquip: true, allowUnsafe: true);
         Assert.Equal(((byte)0x03, Dc2StartingLoadoutPatch.ReginaCanonicalId), Dc2StartingLoadoutPatch.Read(exe));
+    }
+
+    [Fact]
+    public void Apply_AddAndEquip_RejectsCrossExposedMain_OnCorruptedCatalog()
+    {
+        // Repro of the DINO-wyjHEyIA… crash (DC2-STARTING-LOADOUT-CROSS-CHAR-RCA.md): an external
+        // weapon-shuffle tool flipped id 0x06 (Regina's Submachine Gun) from MAIN-Regina (0x29) to a
+        // dual-owned SUB (0x53) on the install. Add-and-equip appends BOTH characters' picks into the
+        // SHARED inventory (Dc2StartWeaponAppendPatch), so Regina's 0x06 surfaces in Dylan's corrupt-
+        // catalog subweapon menu — but 0x06 has a NULL Dylan WEP_P grid slot (0x06 ∉ DylanWeaponIds),
+        // so equipping it is the §5 stale-blob crash (garbage vtable dispatch at 0x4bf073). The ring
+        // guard only neutralizes the div-0, NOT this cross-character crash → add-and-equip must refuse.
+        var exe = MakeExe();
+        SetCatalogFlags(exe, 0x06, 0x0053); // the user's live-install state
+
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(
+            () => Dc2StartingLoadoutPatch.Apply(exe, Dc2StartingLoadoutPatch.DylanCanonicalId, 0x06, addAndEquip: true));
+        Assert.Equal("reginaId", ex.ParamName);
+        Assert.Contains("grid slot", ex.Message); // the reason is surfaced
+    }
+
+    [Fact]
+    public void Apply_AddAndEquip_AllowsSingleOwnerMain_OnPristineCatalog()
+    {
+        // Boundary (don't over-reject): on a pristine catalog 0x06 is a Regina-only MAIN (0x29). The
+        // ring's ownership filter hides it from Dylan, so it is cross-safe and add-and-equip installs
+        // it exactly as before — the fix keys on the LIVE catalog, byte-identical on a clean exe.
+        var exe = MakeExe();
+        Dc2StartingLoadoutPatch.Apply(exe, Dc2StartingLoadoutPatch.DylanCanonicalId, 0x06, addAndEquip: true);
+        Assert.Equal((Dc2StartingLoadoutPatch.DylanCanonicalId, (byte)0x06), Dc2StartingLoadoutPatch.Read(exe));
+    }
+
+    [Fact]
+    public void IsCrossSafeAddAndEquipMain_KeysOnGridOwnership_NotNaiveSingleOwner()
+    {
+        // The predicate: MAIN-classed AND every catalog-owner also owns the WEP_P grid slot (band
+        // membership). id 0x05 is catalog dual-owned (MRD) but BOTH characters own its grid slot
+        // (Dylan WEP_P105 / Regina WEP_P005) → no NULL slot → still safe. id 0x06 corrupted to a
+        // dual-owned SUB grants Dylan menu access without a grid slot → unsafe.
+        var exe = MakeExe();
+        Assert.True(Dc2StartingLoadoutPatch.IsCrossSafeAddAndEquipMain(exe, 0x05));  // dual grid-owned
+        Assert.True(Dc2StartingLoadoutPatch.IsCrossSafeAddAndEquipMain(exe, 0x06));  // pristine Regina MAIN
+        SetCatalogFlags(exe, 0x06, 0x0053);
+        Assert.False(Dc2StartingLoadoutPatch.IsCrossSafeAddAndEquipMain(exe, 0x06)); // corrupted → cross-exposed
     }
 
     [Fact]

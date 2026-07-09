@@ -1,16 +1,25 @@
 #!/usr/bin/env python3
-"""Distil the authored DC1 logic data into a compact Archipelago-world contract.
+"""Distil the authored per-game logic data into compact Archipelago-world contracts.
 
-Reads data/dc1/{map.json,items.json,room-data.json} (authored, no game bytes) and writes
-apworld/dino_crisis_1/data/dc1_logic.json — the stable input the .apworld consumes to build
-regions/locations/items/rules. See docs/decisions/cross/ARCHIPELAGO-INCREMENT-1-PLAN.md.
+Each supported game distils into apworld/<pkg>/data/<game>_logic.json — the stable input the
+.apworld consumes to build regions/locations/items/rules. Shared schema + structural checks live
+here (repo-side); the shipped apworlds stay self-contained (AP zips can't share runtime code).
+See docs/decisions/cross/ARCHIPELAGO-INCREMENT-1-PLAN.md and ARCHIPELAGO-DC2-STUB-PLAN.md.
 
-    python3 scripts/gen_ap_logic.py --apply    # regenerate the contract (writes + self-checks)
-    python3 scripts/gen_ap_logic.py --check    # verify the committed contract is in sync (non-mutating)
+    python3 scripts/gen_ap_logic.py            --check    # every game (used by pre-commit + CI)
+    python3 scripts/gen_ap_logic.py            --apply    # regenerate every game's contract
+    python3 scripts/gen_ap_logic.py dc2        --apply    # one game only
 
-No third-party deps. The logic graph is authored in map.json (door edges + `requires`
-item-id gates + `requiresRoom` visit gates); per-location pickup data comes from
-room-data.json item_control. Item names come from items.json (clean source of truth).
+No third-party deps.
+
+DC1: the logic graph is authored in map.json (door edges + `requires` item-id gates +
+`requiresRoom` visit gates); per-location pickup data comes from room-data.json item_control;
+item names from items.json (clean source of truth).
+
+DC2: intentionally an EMPTY stub — data/dc2 has a decoded door-graph + item spots but no key-item
+ids or door→key gating yet, so there is no logically-gated graph to distil. The contract carries
+the full schema with empty locations/items/edges so enabling DC2 later is populating data (a DC2
+builder), not rewriting the world. See the DC2 stub decision record.
 """
 from __future__ import annotations
 
@@ -20,7 +29,6 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 DC1 = REPO / "data" / "dc1"
-OUT = REPO / "apworld" / "dino_crisis_1" / "data" / "dc1_logic.json"
 
 EMPTY_SLOT_ID = 0xFF  # DC1 empty item slot sentinel
 
@@ -121,7 +129,7 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
     return locs
 
 
-def build() -> dict:
+def build_dc1() -> dict:
     items = load_items()
     m = load_map()
     locs = load_locations(items["names"])
@@ -141,6 +149,25 @@ def build() -> dict:
             "progressionItemIds": progression,
             "pool": items["pool"],
         },
+    }
+
+
+def build_dc2() -> dict:
+    """Empty-but-schema-valid DC2 stub. Same shape as DC1 so populating it later (a real DC2
+    builder over data/dc2's door-graph + item spots, once key-item ids and door→key gating are
+    decoded — KaQ OPEN #2/#5) is data, not a world rewrite. The world adds a free 'Victory' event
+    so AP still generates a (trivially beatable) DC2 seed."""
+    return {
+        "_generated_by": "scripts/gen_ap_logic.py",
+        "_source": "stub — DC2 has a decoded door-graph + item spots (data/dc2) but no key-item ids "
+        "or door→key gating yet (KaQ OPEN #2/#5); locations/items/edges intentionally empty.",
+        "version": 1,
+        "startRoom": "0000",
+        "goalRoom": "0000",
+        "regions": {},
+        "edges": [],
+        "locations": [],
+        "items": {"names": {}, "keyItemIds": [], "progressionItemIds": [], "pool": []},
     }
 
 
@@ -189,14 +216,12 @@ def _forward_fill_beatable(data: dict) -> bool:
     return data["goalRoom"] in _reachable_rooms(data, held)
 
 
-def check(data: dict) -> None:
+def _check_common(data: dict) -> dict:
+    """Schema/structural invariants that hold for every game (vacuous on an empty stub).
+    Returns the int-keyed item-name map for the caller."""
+    for field in ("startRoom", "goalRoom", "regions", "edges", "locations"):
+        assert field in data, f"missing contract field: {field}"
     names = {int(k): v for k, v in data["items"]["names"].items()}
-    assert data["startRoom"] == "010d", data["startRoom"]
-    assert data["goalRoom"] == "060d", data["goalRoom"]
-    # A known key gate: some door from room 0112 to 0114 requires the BG Area key (0x30).
-    gate = [e for e in data["edges"] if e["from"] == "0112" and e["to"] == "0114"]
-    assert gate and 0x30 in gate[0]["requiresItems"], gate
-    assert names.get(0x2E) == "Entrance Key", names.get(0x2E)
     # Every referenced item id resolves to a name.
     for e in data["edges"]:
         for i in e["requiresItems"]:
@@ -211,6 +236,26 @@ def check(data: dict) -> None:
     # Every edge endpoint is a known region.
     for e in data["edges"]:
         assert e["from"] in data["regions"] and e["to"] in data["regions"], e
+    return names
+
+
+def check_dc2(data: dict) -> None:
+    names = _check_common(data)
+    # DC2 is a stub: empty until key-item ids + door→key gating are decoded (KaQ OPEN #2/#5).
+    # When that data lands, replace these emptiness asserts with real solvability checks (see check_dc1).
+    assert not data["locations"] and not data["edges"] and not data["regions"], "DC2 stub must be empty"
+    assert not names, "DC2 stub carries no item names yet"
+    print("OK: DC2 stub (empty schema-valid contract; world adds a free Victory event)")
+
+
+def check_dc1(data: dict) -> None:
+    names = _check_common(data)
+    assert data["startRoom"] == "010d", data["startRoom"]
+    assert data["goalRoom"] == "060d", data["goalRoom"]
+    # A known key gate: some door from room 0112 to 0114 requires the BG Area key (0x30).
+    gate = [e for e in data["edges"] if e["from"] == "0112" and e["to"] == "0114"]
+    assert gate and 0x30 in gate[0]["requiresItems"], gate
+    assert names.get(0x2E) == "Entrance Key", names.get(0x2E)
     # Solvability: holding all progression items, every location's room + the goal are reachable;
     # and with no items there are already reachable locations to seed the fill.
     prog = set(data["items"]["progressionItemIds"])
@@ -243,31 +288,52 @@ def _serialize(data: dict) -> str:
     return json.dumps(data, indent=2) + "\n"
 
 
-def main(argv: list[str]) -> int:
+# game -> (apworld package dir, contract filename, builder, checker)
+GAMES: dict[str, tuple[str, str, "callable", "callable"]] = {
+    "dc1": ("dino_crisis_1", "dc1_logic.json", build_dc1, check_dc1),
+    "dc2": ("dino_crisis_2", "dc2_logic.json", build_dc2, check_dc2),
+}
+
+
+def _out(pkg: str, fname: str) -> Path:
+    return REPO / "apworld" / pkg / "data" / fname
+
+
+def _run_game(game: str, apply: bool) -> int:
+    pkg, fname, build, check = GAMES[game]
+    out = _out(pkg, fname)
     data = build()
     expected = _serialize(data)
-
-    if "--apply" in argv:
-        OUT.parent.mkdir(parents=True, exist_ok=True)
-        OUT.write_text(expected, encoding="utf-8")
+    print(f"[{game}]")
+    if apply:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(expected, encoding="utf-8")
         check(data)
-        print(f"wrote {OUT.relative_to(REPO)}")
+        print(f"wrote {out.relative_to(REPO)}")
         return 0
+    # Non-mutating derived-data contract: the committed file must equal a fresh regeneration.
+    if not out.exists() or out.read_text(encoding="utf-8") != expected:
+        print(
+            f"gen_ap_logic: {out.relative_to(REPO)} is stale or missing — "
+            f"run 'python3 scripts/gen_ap_logic.py {game} --apply' and stage it",
+            file=sys.stderr,
+        )
+        return 1
+    check(data)
+    return 0
 
-    if "--check" in argv:
-        # Non-mutating derived-data contract: the committed file must equal a fresh regeneration.
-        if not OUT.exists() or OUT.read_text(encoding="utf-8") != expected:
-            print(
-                f"gen_ap_logic: {OUT.relative_to(REPO)} is stale or missing — "
-                "run 'python3 scripts/gen_ap_logic.py --apply' and stage it",
-                file=sys.stderr,
-            )
-            return 1
-        check(data)
-        return 0
 
-    print("usage: gen_ap_logic.py --apply | --check", file=sys.stderr)
-    return 2
+def main(argv: list[str]) -> int:
+    apply = "--apply" in argv
+    if not apply and "--check" not in argv:
+        print("usage: gen_ap_logic.py [dc1|dc2] --apply | --check", file=sys.stderr)
+        return 2
+    games = [a for a in argv if not a.startswith("-")]
+    for g in games:
+        if g not in GAMES:
+            print(f"unknown game '{g}' (known: {', '.join(GAMES)})", file=sys.stderr)
+            return 2
+    return max(_run_game(g, apply) for g in (games or list(GAMES)))
 
 
 if __name__ == "__main__":

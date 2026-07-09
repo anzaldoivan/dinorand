@@ -23,7 +23,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: DC1 logic contract in sync with data/dc1 (non-mutating)
+      - name: logic contracts in sync with authored data (non-mutating, all games)
         run: python3 scripts/gen_ap_logic.py --check
-      - name: apworld generation wiring self-check
+      - name: DC1 apworld generation wiring self-check
         run: python3 apworld/dino_crisis_1/selfcheck.py
+      - name: DC2 apworld generation wiring self-check
+        run: python3 apworld/dino_crisis_2/selfcheck.py
