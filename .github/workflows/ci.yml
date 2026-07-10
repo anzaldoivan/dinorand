@@ -2,6 +2,7 @@ name: ci
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 # One in-flight run per ref; a new push cancels the previous run for the same branch/PR.

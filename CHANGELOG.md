@@ -9,6 +9,8 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-07-11
+
 ### Added
 
 - **DC1 edition-aware puzzle-code document sync**: the keypad-code scramble now detects the install
@@ -19,19 +21,22 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
   European installs keep the room-file text lever; REbirth-Japanese installs skip with a warning
   (codes stay stock); unclassifiable installs refuse rather than desync.
 
-- **`--verify-backup`** (both games, read-only): audits every `.dinorand_backup` capture against the
-  manifest's recorded pristine hash, any `<file>.dinorand-bak` sibling, and the live file, reporting
-  each as Ok / Installed / Suspect / Poisoned / LiveMissing (exit 1 on Suspect/Poisoned) — detects a
-  poisoned capture before it can be reinstalled by a restore or re-roll.
-
 ### Fixed
 
-- **Installer backup capture can no longer be poisoned by a prior out-of-band edit**: a first-time
-  backup capture now validates the live file against a tools-style `<file>.dinorand-bak` sibling and
-  captures the sibling when they differ (previously the already-edited live file was captured as
-  "pristine", so every later install/restore reinstalled the foreign edit — the DC2 ST001 Patrol-Ship
-  turret crash recurrence). The DC2 character-skin graft likewise refuses to read a pristine source
-  when its two backup copies disagree.
+- **DC2 turret and escort set-pieces are now excluded from the enemy randomizer** — the opening ST001
+  turret room (unmasked once the aquatic-swap toggle lifted its water-native guard), the ST408/ST409
+  escort rooms, and the ST808 Allosaurus room are scripted around their specific enemies; remixing them
+  broke the sequence (the ST001 Patrol-Ship turret crash). They join ST407 as unconditional exclusions.
+
+- **DC2 character model swap no longer corrupts the weapon-select menu** — the skin graft now takes only
+  the donor's portrait/name/team-plate strip and keeps the target's weapon-icon strips and palette;
+  the previous whole-texture copy rendered the donor's icons for the target's weapons.
+
+- **DC2 weapon randomizer no longer mis-renders or mis-classes weapons** — the item-catalog flags word
+  is repaired to its PSX source-of-truth before use, fixing the icon-width bit that made an external
+  weapon-shuffle overdraw a neighbour tile ("two weapons in one slot") and the owner/MAIN-SUB class the
+  ownership and inventory-ring logic reads. Add-and-equip starting weapons now draw only cross-safe ids
+  and fall back to the canonical weapon when a shuffled catalog leaves none.
 
 - **DC1 puzzle-code scramble refuses European GOG executables** instead of writing the JP-master
   keypad-table offsets into unrelated `.data` bytes (the European builds have a different, undecoded
@@ -162,6 +167,7 @@ Initial feature set — everything prior to the voice randomizer.
   backed up with SHA256, `--restore` returns the install byte-identical.
 - Self-contained single-file release builds (`scripts/publish-release.sh`).
 
+[0.4.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.1
 [0.4.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.0
 [0.2.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.2.0
 [0.1.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.1.0

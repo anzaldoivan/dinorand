@@ -19,7 +19,7 @@
             <Grid Margin="4,4,4,8" ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="DinoRand" FontSize="20" FontWeight="Bold" />
-                    <TextBlock Text="v0.3.0" Margin="8,0,0,0"
+                    <TextBlock Text="v0.4.1" Margin="8,0,0,0"
                                VerticalAlignment="Bottom" Foreground="Gray" />
                 </StackPanel>
                 <HyperlinkButton Grid.Column="1" VerticalAlignment="Center"

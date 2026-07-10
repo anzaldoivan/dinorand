@@ -12,6 +12,7 @@ name: trigger-decode-contract
 
 on:
   push:
+    branches: [main]
     paths:
       - "data/dc1/room-data.json"
       - "data/dc1/flag-labels.json"
