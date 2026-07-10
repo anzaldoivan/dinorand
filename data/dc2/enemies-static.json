@@ -21,9 +21,9 @@
    "live_efiles": null
   },
   "ST003": {
-   "spawn_count": 15,
+   "spawn_count": 18,
    "resolved_species": {},
-   "generic_model_global": 15,
+   "generic_model_global": 18,
    "live_efiles": null
   },
   "ST005": {
@@ -284,11 +284,11 @@
    "live_efiles": null
   },
   "ST503": {
-   "spawn_count": 9,
+   "spawn_count": 10,
    "resolved_species": {
     "Giganotosaurus": 1
    },
-   "generic_model_global": 8,
+   "generic_model_global": 9,
    "live_efiles": null
   },
   "ST504": {
@@ -448,8 +448,8 @@
  },
  "_stats": {
   "rooms_with_spawns": 65,
-  "total_spawns": 437,
+  "total_spawns": 441,
   "resolved_spawns": 86,
-  "generic_spawns": 351
+  "generic_spawns": 355
  }
 }

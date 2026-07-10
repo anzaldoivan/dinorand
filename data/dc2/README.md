@@ -19,12 +19,14 @@ here drives engine code yet.
 |---|---|---|
 | `enemies.json` | 13 `E*.DAT` model slots w/ obj/tri/quad counts **+** 12-creature roster | model counts = **bytes**; creature mapping = placeholder/inference |
 | `rooms.json` | 89 `ST*.DAT` room ids (stage/room) + per-room `zone` (byte-derived) | ids = **bytes**; **zone = bytes** (EXE 0x491c70, ZONE-MAPPING-RE.md); names = unresolved |
-| `items.json` | weapons, key items, Dino Files, healing, currency | guide (single-source); all numeric ids placeholder |
+| `items.json` | the unified item catalog: ids 0x00–0x39 with English names (weapons, subs, health, key items 0x21–0x34, EPS/perks) | **bytes** (K75: PC catalog `0x704260` + US-SLUS glyph decode; supersedes the old guide placeholders) |
 | `map.json` | 10 canonical zones (story order) + **84 named rooms (JP+EN)** + each zone's byte-derived `st_ids` | zone names = **bytes**+confirmed; `st_ids` = **bytes** (0x491c70); room names = guide (XGameMania) |
-| `door-graph.json` | per-room door dest-word blob offsets (literal-push doors) | **bytes** (static slot-5 decode; some live-validated) |
+| `door-graph.json` | per-room door dest-word blob offsets (180 literal doors / 84 rooms, K81) + lock gates (K78) + flags/built_state/door_type + ST003 `conditional_dests` | **bytes** (static slot-5 decode; some live-validated) |
 | `spawn-graph.json` | per-room enemy spawn (op 0x1a) editable literal operands (TYPE/posX/posY/posZ/SLOT) + blob offsets | **bytes** (static slot-5 decode, T10 `edit_spawn.py`; `verify` re-reads 1663 offsets, 0 mismatch) |
-| `item-placements.json` | per-room item commits (op 0x31): id (editable lever) + blob offset, 165 items / 54 rooms | **bytes** (static slot-5 decode; 3 live-validated) |
+| `item-placements.json` | per-room item commits (op 0x31): id (editable lever) + blob offset, 168 items / 54 rooms (K81) | **bytes** (static slot-5 decode; 3 live-validated) |
 | `door-connectivity.json` | room-level directed warp graph (outbound/inbound/degree, bidirectionality, dead-ends, hubs) from `door-graph.json` | **bytes** (derived; `gen_connectivity.py`) |
+| `door-gating.json` | per-room/per-routine flag dataflow (op-0x1d tests / op-0x1c+0x33 sets), items/examine/key_use, resolved `locked_doors`, + the K30 `entry_gate` flag list with native+script setters (K81) | **bytes** (static slot-5 decode + .text census; `gen_gating.py`) |
+| `enemies-static.json` | static per-room enemy set (65 rooms / 441 spawns) from the spawn-graph + TYPE→species table | **bytes** (derived; `gen_enemies_static.py`) |
 | `scd-vm-opcodes.json` | the slot-5 SCD-VM opcode + operand model (ALU table, stack-delta model, AOT builders) | **bytes** (offline disx, `AOT-SYSTEM-RE.md`) |
 | `room-data.json` | **consolidated per-room DB** — joins spawns+doors+connectivity+items+runtime-enemies per room (89), + **byte-derived `zone` per room** + 10-zone catalog. Mirrors `data/dc1/room-data.json` | **bytes** (pure join; `gen_room_data.py`). **ST→zone RESOLVED** (EXE 0x491c70, ZONE-MAPPING-RE.md) |
 | `placements.md` | per-area Dino File + item pickups, qualitative enemy roster | guide (single-source, **partial**) |

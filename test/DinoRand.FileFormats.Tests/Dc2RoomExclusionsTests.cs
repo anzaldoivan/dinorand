@@ -74,6 +74,47 @@ public class Dc2RoomExclusionsTests
     }
 
     [Fact]
+    public void St001_OpeningTurretSetpiece_IsExcluded_EvenWithWaterToggleOn()
+    {
+        // ST001 = the opening turret set-piece. Its only prior protection was being a water-native (0x0c)
+        // wave room, which Dc2CrossSpeciesPlanner skips ONLY while Dc2AllowWaterLevelEnemySwaps is off —
+        // the water toggle lifted that skip and unmasked it. As a hand-curated set-piece exclusion it is
+        // now skipped unconditionally: the enemy pass consults IsExcluded BEFORE the allowWater branch,
+        // so the toggle cannot reach it. Hand-curated → Setpiece (cutscene-rooms.json is generated).
+        Assert.True(Dc2RoomExclusions.IsExcluded("001"));
+        Assert.Contains("001", Dc2RoomExclusions.Setpiece);
+    }
+
+    [Theory]
+    [InlineData("408")] // escort set-piece with an NPC
+    [InlineData("409")] // escort set-piece with an NPC
+    public void EscortSetpieceRooms_AreExcluded(string roomKey)
+    {
+        // ST408/ST409 = escort set-pieces with an NPC (maintainer ID 2026-07-11): scripted around their
+        // enemies, so the randomizer must leave them vanilla. Hand-curated → Setpiece.
+        Assert.True(Dc2RoomExclusions.IsExcluded(roomKey));
+        Assert.Contains(roomKey, Dc2RoomExclusions.Setpiece);
+    }
+
+    [Fact]
+    public void St808_AllosaurusSetpiece_IsExcluded()
+    {
+        // ST808 = Allosaurus set-piece (maintainer ID 2026-07-11): scripted around its specific enemy, so
+        // the randomizer must not remix it. Hand-curated → Setpiece.
+        Assert.True(Dc2RoomExclusions.IsExcluded("808"));
+        Assert.Contains("808", Dc2RoomExclusions.Setpiece);
+    }
+
+    [Fact]
+    public void St80A_TriceratopsTurretSetpiece_IsExcluded()
+    {
+        // ST80A = the Triceratops turret set-piece: auto-confirmed by the scanner (flagged tier), so it is
+        // excluded via Dc2RoomExclusions.Cutscene. Reverified 2026-07-11.
+        Assert.Contains("80A", Dc2RoomExclusions.Cutscene);
+        Assert.True(Dc2RoomExclusions.IsExcluded("80A"));
+    }
+
+    [Fact]
     public void St905_ExtraCrisisBonusLevel_IsExcluded()
     {
         // ST905 = Extra Crisis bonus level (maintainer ID 2026-07-04): must stay vanilla, so the enemy

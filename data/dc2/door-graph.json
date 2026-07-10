@@ -1,8 +1,9 @@
 {
- "_source": "decode_script.door_commits() (2026-06-27 p2). DOOR = op 0x30 AOT_COMMIT; dest = block+0x0c literal push. dest word value IS the destination st_id: dest_id = f'{w:03X}' (stage=high byte, room=low byte), the identity mapping st_id = '%X%02X' % (stage,room) confirmed by the live CreateFileA trace (DOOR-ROUTING-RE.md: 0x102->ST102, hardcoded 0x101->ST101). Validates 178/179 literal doors. The prior stage=low formula ('ST101->ST201') was a byte-order bug, now RETRACTED. Rebuilt off the corrected routine discovery (83 rooms with doors, was 20).",
+ "_source": "decode_script.door_commits() (2026-06-27 p2; routine-DIRECTORY fix 2026-07-10). DOOR = op 0x30 AOT_COMMIT; dest = block+0x0c literal push. dest word value IS the destination st_id: dest_id = f'{w:03X}' (stage=high byte, room=low byte), the identity mapping st_id = '%X%02X' % (stage,room) confirmed by the live CreateFileA trace (DOOR-ROUTING-RE.md: 0x102->ST102, hardcoded 0x101->ST101). The prior stage=low formula ('ST101->ST201') was a byte-order bug, now RETRACTED. 2026-07-10: the slot-5 routine directory is SELF-BOUNDING (see decode_script.subprograms); the old 20-entry cap + phantom-entry heuristic hid ST103's two doors (->ST104/ST105) and the tail routines of ST003/205/402/503/607 (84 rooms with doors, 181 doors).",
  "_editable": "Redirect a door = overwrite the 2 LE bytes at dest_push_off in the decompressed blob (the dest st_id, e.g. 0x0102 for ST102) + recompress. ROOM-FILE editable (literal doors only). dest routing itself is EXE-internal (DOOR-ROUTING-RE).",
  "_gating": "K78 (2026-07-10): SAT-0 handler 0x48b500 warps iff lock_index==0 OR flag(8, unlock_flag_id) is SET; else it shows the lock message [0x731ab8 + lock_index*4]. Both fields are op-0x30 push literals (rec+0x21=block+0x00, rec+0x20=block+0x04). Doors omit the fields when unlocked (lock_index 0). Per-room key_use lists the op-0x3a SAT-10 records (builder 0x48a020 / consumer 0x48b790): interacting sets flag(8, flag8_id) = satisfies the matching locked door; subtype is the equip-class gate (scene_mgr+0x10b5 {2,8}->1, {1,7}->2). Door flags with no key_use record are script-set (op-0x1c SetFlag(8,K) unlock routines -- the flag-dataflow graph, ITEMS-KEYITEMS-RE-PLAN Phase 3).",
- "_confidence": "high = literal (mode 0) dest that maps to a real room id; low = variable/expression dest (mode!=0). The ONLY low-conf door corpus-wide is ST003 routine[4] @+0xfd6: dest = stack[15] (mode 2), a value assembled at runtime by op-0x01/0x02 assignments (some sourced from GLOBALS = story flags) and gated by op-0x07. It is a story-conditional COMPUTED warp with NO static dest literal/editable byte -> correctly excluded from the editable door set. Concrete dest needs a SCD symbolic interpreter or a live trace. VM operand model decoded: AOT-SYSTEM-RE.md / scd-vm-opcodes.json _operand_model.",
+ "_confidence": "high = literal (mode 0) dest that maps to a real room id; low = variable/expression dest (mode!=0). The ONLY low-conf door corpus-wide is ST003 routine[4] @+0xfd6: dest = stack[15] (mode 2), assembled at runtime and gated by op-0x07 -- a story-conditional COMPUTED warp with NO single editable dest byte. Its dest SET was symbolically resolved to {ST005, ST000, ST004} (see conditional_dests on the door + AOT-SYSTEM-RE.md); a graph consumer may treat it as a 3-edge conditional node. VM operand model: scd-vm-opcodes.json _operand_model.",
+ "_flags": "flags = the block+0x44 push literal; builder 0x489750 stores rec+0 = flags|9. built_state (derived, K38 rec+0 & 0xc): 'usable' (0x8) or 'blocked' (0xc -- built blocked-at-rest; corpus: 3 doors, all one-way story transitions). flags bit 0x80 (warp_notify): SAT-0 handler 0x48b524 writes scene_mgr+0x926=1, making the next room-entry step 0x451240 skip its 0x48f420 call (corpus: 2 doors, ST408 dual commits -> ST409). door_type = the block+0x08 word (rec+0x1e door-type/anim id; live-confirmed 0x0107 on ST101's ST102 door).",
  "rooms": {
   "000": {
    "door_count": 2,
@@ -15,7 +16,10 @@
      "dest_id": "003",
      "dest_mode": 0,
      "slot": "0x8",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x011c"
     },
     {
      "commit_off": "0x7ed4",
@@ -25,7 +29,10 @@
      "dest_id": "100",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0204"
     }
    ]
   },
@@ -40,7 +47,10 @@
      "dest_id": "003",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x00",
+     "built_state": "usable",
+     "door_type": "0x0058"
     }
    ]
   },
@@ -55,7 +65,10 @@
      "dest_id": "003",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x011f"
     }
    ]
   },
@@ -70,7 +83,10 @@
      "dest_id": "002",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x001e"
     },
     {
      "commit_off": "0x20c52",
@@ -80,7 +96,15 @@
      "dest_id": "00F",
      "dest_mode": 2,
      "slot": "0x0",
-     "confidence": "low"
+     "confidence": "low",
+     "conditional_dests": [
+      "005",
+      "000",
+      "004"
+     ],
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x001d"
     },
     {
      "commit_off": "0x21356",
@@ -90,7 +114,10 @@
      "dest_id": "002",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x001e"
     },
     {
      "commit_off": "0x239e2",
@@ -100,7 +127,10 @@
      "dest_id": "001",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0059"
     }
    ]
   },
@@ -115,7 +145,10 @@
      "dest_id": "003",
      "dest_mode": 0,
      "slot": "0x8",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x011c"
     },
     {
      "commit_off": "0x1514",
@@ -125,7 +158,10 @@
      "dest_id": "600",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0e4e"
     }
    ]
   },
@@ -140,7 +176,10 @@
      "dest_id": "003",
      "dest_mode": 0,
      "slot": "0x8",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x011c"
     },
     {
      "commit_off": "0x7570",
@@ -150,7 +189,10 @@
      "dest_id": "800",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0e4e"
     }
    ]
   },
@@ -165,7 +207,10 @@
      "dest_id": "110",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107"
     },
     {
      "commit_off": "0x37e4",
@@ -175,7 +220,10 @@
      "dest_id": "000",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0205"
     },
     {
      "commit_off": "0x39d8",
@@ -186,6 +234,9 @@
      "dest_mode": 0,
      "slot": "0x2",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0009",
      "lock_index": 1,
      "unlock_flag_id": 37
     },
@@ -198,6 +249,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006",
      "lock_index": 1,
      "unlock_flag_id": 32
     }
@@ -231,6 +285,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107",
      "lock_index": 2,
      "unlock_flag_id": 48
     },
@@ -243,6 +300,9 @@
      "dest_mode": 0,
      "slot": "0x0",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107",
      "lock_index": 1,
      "unlock_flag_id": 32
     }
@@ -276,6 +336,9 @@
      "dest_mode": 0,
      "slot": "0x0",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006",
      "lock_index": 2,
      "unlock_flag_id": 48
     },
@@ -287,7 +350,10 @@
      "dest_id": "105",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0201"
     },
     {
      "commit_off": "0xafe6",
@@ -297,7 +363,10 @@
      "dest_id": "110",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006"
     }
    ],
    "key_use": [
@@ -311,8 +380,35 @@
    ]
   },
   "103": {
-   "door_count": 0,
-   "doors": []
+   "door_count": 2,
+   "doors": [
+    {
+     "commit_off": "0x1d10",
+     "dest_push_off": 7426,
+     "dest_va": "0x5e1d02",
+     "dest_word": "0x0105",
+     "dest_id": "105",
+     "dest_mode": 0,
+     "slot": "0x0",
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0200"
+    },
+    {
+     "commit_off": "0x1d64",
+     "dest_push_off": 7510,
+     "dest_va": "0x5e1d56",
+     "dest_word": "0x0104",
+     "dest_id": "104",
+     "dest_mode": 0,
+     "slot": "0x1",
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0201"
+    }
+   ]
   },
   "104": {
    "door_count": 2,
@@ -325,7 +421,10 @@
      "dest_id": "103",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0200"
     },
     {
      "commit_off": "0x33ac",
@@ -335,7 +434,10 @@
      "dest_id": "106",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0420"
     }
    ]
   },
@@ -350,7 +452,10 @@
      "dest_id": "102",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x0a",
+     "built_state": "usable",
+     "door_type": "0x0200"
     },
     {
      "commit_off": "0x88d4",
@@ -360,7 +465,10 @@
      "dest_id": "103",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x0a",
+     "built_state": "usable",
+     "door_type": "0x0201"
     }
    ]
   },
@@ -375,7 +483,10 @@
      "dest_id": "107",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x000a"
     },
     {
      "commit_off": "0x9fbc",
@@ -385,7 +496,10 @@
      "dest_id": "10E",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0048"
     },
     {
      "commit_off": "0xa050",
@@ -395,7 +509,10 @@
      "dest_id": "104",
      "dest_mode": 0,
      "slot": "0x5",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0420"
     }
    ]
   },
@@ -410,7 +527,10 @@
      "dest_id": "108",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0109"
     },
     {
      "commit_off": "0x4e02",
@@ -420,7 +540,10 @@
      "dest_id": "106",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x010b"
     }
    ]
   },
@@ -435,7 +558,10 @@
      "dest_id": "107",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0108"
     },
     {
      "commit_off": "0x745a",
@@ -445,7 +571,10 @@
      "dest_id": "200",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x040c"
     }
    ]
   },
@@ -460,7 +589,10 @@
      "dest_id": "10A",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x010f"
     },
     {
      "commit_off": "0x8448",
@@ -471,6 +603,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0108",
      "lock_index": 1,
      "unlock_flag_id": 37
     }
@@ -496,7 +631,10 @@
      "dest_id": "10B",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0200"
     },
     {
      "commit_off": "0x2740",
@@ -506,7 +644,10 @@
      "dest_id": "109",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0d0e"
     }
    ]
   },
@@ -521,7 +662,10 @@
      "dest_id": "10D",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0148"
     },
     {
      "commit_off": "0x3ae0",
@@ -531,7 +675,10 @@
      "dest_id": "10A",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0201"
     },
     {
      "commit_off": "0x3b34",
@@ -541,7 +688,10 @@
      "dest_id": "10C",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0007"
     }
    ]
   },
@@ -556,7 +706,10 @@
      "dest_id": "10B",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006"
     },
     {
      "commit_off": "0x110aa",
@@ -566,7 +719,10 @@
      "dest_id": "300",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x012b"
     }
    ]
   },
@@ -581,7 +737,10 @@
      "dest_id": "10B",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0149"
     },
     {
      "commit_off": "0xe448",
@@ -591,7 +750,10 @@
      "dest_id": "10E",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006"
     },
     {
      "commit_off": "0xe4c0",
@@ -601,7 +763,10 @@
      "dest_id": "10F",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0201"
     }
    ]
   },
@@ -616,7 +781,10 @@
      "dest_id": "106",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0149"
     },
     {
      "commit_off": "0xccc0",
@@ -626,7 +794,10 @@
      "dest_id": "10D",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107"
     },
     {
      "commit_off": "0xce6e",
@@ -636,7 +807,10 @@
      "dest_id": "106",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0149"
     }
    ]
   },
@@ -651,7 +825,10 @@
      "dest_id": "10D",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0200"
     },
     {
      "commit_off": "0x61ca",
@@ -661,7 +838,10 @@
      "dest_id": "40B",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0446"
     }
    ]
   },
@@ -676,7 +856,10 @@
      "dest_id": "100",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006"
     },
     {
      "commit_off": "0x2e38",
@@ -686,7 +869,10 @@
      "dest_id": "102",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107"
     }
    ]
   },
@@ -701,7 +887,10 @@
      "dest_id": "108",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x040d"
     },
     {
      "commit_off": "0xf2a0",
@@ -711,7 +900,10 @@
      "dest_id": "201",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0022"
     },
     {
      "commit_off": "0xf2f4",
@@ -721,7 +913,10 @@
      "dest_id": "205",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0446"
     }
    ]
   },
@@ -736,7 +931,10 @@
      "dest_id": "200",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0123"
     },
     {
      "commit_off": "0x20ec",
@@ -746,7 +944,10 @@
      "dest_id": "202",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x042d"
     }
    ]
   },
@@ -761,7 +962,10 @@
      "dest_id": "201",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x042c"
     },
     {
      "commit_off": "0x251c",
@@ -771,7 +975,10 @@
      "dest_id": "203",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0424"
     },
     {
      "commit_off": "0x25a4",
@@ -782,6 +989,9 @@
      "dest_mode": 0,
      "slot": "0x3",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0426",
      "lock_index": 1,
      "unlock_flag_id": 33
     }
@@ -807,7 +1017,10 @@
      "dest_id": "202",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0425"
     }
    ]
   },
@@ -822,7 +1035,10 @@
      "dest_id": "202",
      "dest_mode": 0,
      "slot": "0xb",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0426"
     }
    ]
   },
@@ -837,7 +1053,10 @@
      "dest_id": "200",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0446"
     },
     {
      "commit_off": "0xedac",
@@ -847,7 +1066,10 @@
      "dest_id": "100",
      "dest_mode": 0,
      "slot": "0x12",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0000"
     },
     {
      "commit_off": "0xf784",
@@ -857,7 +1079,10 @@
      "dest_id": "003",
      "dest_mode": 0,
      "slot": "0x13",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0058"
     }
    ]
   },
@@ -872,7 +1097,10 @@
      "dest_id": "10C",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x002a"
     },
     {
      "commit_off": "0x50e8",
@@ -882,7 +1110,10 @@
      "dest_id": "301",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x000a"
     },
     {
      "commit_off": "0x513c",
@@ -893,6 +1124,9 @@
      "dest_mode": 0,
      "slot": "0x2",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0048",
      "lock_index": 2,
      "unlock_flag_id": 49
     }
@@ -918,7 +1152,10 @@
      "dest_id": "300",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x010b"
     }
    ]
   },
@@ -934,6 +1171,9 @@
      "dest_mode": 0,
      "slot": "0x0",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0149",
      "lock_index": 2,
      "unlock_flag_id": 49
     },
@@ -946,6 +1186,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0426",
      "lock_index": 3,
      "unlock_flag_id": 1
     }
@@ -972,6 +1215,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0646",
      "lock_index": 2,
      "unlock_flag_id": 50
     },
@@ -983,7 +1229,10 @@
      "dest_id": "305",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0612"
     },
     {
      "commit_off": "0x4fda",
@@ -994,6 +1243,9 @@
      "dest_mode": 0,
      "slot": "0x0",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0626",
      "lock_index": 3,
      "unlock_flag_id": 1
     },
@@ -1006,6 +1258,9 @@
      "dest_mode": 0,
      "slot": "0x3",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0614",
      "lock_index": 3,
      "unlock_flag_id": 2
     }
@@ -1032,6 +1287,9 @@
      "dest_mode": 0,
      "slot": "0x0",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0646",
      "lock_index": 2,
      "unlock_flag_id": 50
     },
@@ -1044,6 +1302,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x062d",
      "lock_index": 2,
      "unlock_flag_id": 51
     }
@@ -1076,7 +1337,10 @@
      "dest_id": "303",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0612"
     },
     {
      "commit_off": "0x3fd6",
@@ -1087,6 +1351,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x062c",
      "lock_index": 2,
      "unlock_flag_id": 51
     }
@@ -1112,7 +1379,10 @@
      "dest_id": "303",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0414"
     }
    ]
   },
@@ -1127,7 +1397,10 @@
      "dest_id": "401",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0449"
     },
     {
      "commit_off": "0xc644",
@@ -1137,7 +1410,10 @@
      "dest_id": "40B",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x014b"
     }
    ]
   },
@@ -1152,7 +1428,10 @@
      "dest_id": "402",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x06",
+     "built_state": "blocked",
+     "door_type": "0x0330"
     },
     {
      "commit_off": "0x7f2e",
@@ -1162,7 +1441,10 @@
      "dest_id": "400",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0048"
     }
    ]
   },
@@ -1177,7 +1459,10 @@
      "dest_id": "403",
      "dest_mode": 0,
      "slot": "0x7",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0058"
     }
    ]
   },
@@ -1192,7 +1477,10 @@
      "dest_id": "404",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0725"
     }
    ]
   },
@@ -1207,7 +1495,10 @@
      "dest_id": "403",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0724"
     },
     {
      "commit_off": "0x307c",
@@ -1217,7 +1508,10 @@
      "dest_id": "405",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0410"
     }
    ]
   },
@@ -1232,7 +1526,10 @@
      "dest_id": "404",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0710"
     },
     {
      "commit_off": "0x2cbc",
@@ -1242,7 +1539,10 @@
      "dest_id": "406",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x122e"
     }
    ]
   },
@@ -1257,7 +1557,10 @@
      "dest_id": "407",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x00",
+     "built_state": "usable",
+     "door_type": "0x0058"
     }
    ]
   },
@@ -1272,7 +1575,10 @@
      "dest_id": "408",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x00",
+     "built_state": "usable",
+     "door_type": "0x0058"
     }
    ]
   },
@@ -1287,7 +1593,10 @@
      "dest_id": "409",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0432"
     },
     {
      "commit_off": "0x12874",
@@ -1297,7 +1606,10 @@
      "dest_id": "409",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0432"
     },
     {
      "commit_off": "0x13a4c",
@@ -1307,7 +1619,11 @@
      "dest_id": "409",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x80",
+     "built_state": "usable",
+     "warp_notify": true,
+     "door_type": "0x0432"
     },
     {
      "commit_off": "0x13b0e",
@@ -1317,7 +1633,11 @@
      "dest_id": "409",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x80",
+     "built_state": "usable",
+     "warp_notify": true,
+     "door_type": "0x0432"
     }
    ]
   },
@@ -1332,7 +1652,10 @@
      "dest_id": "40A",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x0a",
+     "built_state": "usable",
+     "door_type": "0x0416"
     },
     {
      "commit_off": "0x12484",
@@ -1342,7 +1665,10 @@
      "dest_id": "408",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x0a",
+     "built_state": "usable",
+     "door_type": "0x0432"
     },
     {
      "commit_off": "0x12600",
@@ -1352,7 +1678,10 @@
      "dest_id": "40A",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x0a",
+     "built_state": "usable",
+     "door_type": "0x0416"
     },
     {
      "commit_off": "0x12654",
@@ -1362,7 +1691,10 @@
      "dest_id": "408",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x0a",
+     "built_state": "usable",
+     "door_type": "0x0432"
     },
     {
      "commit_off": "0x12ac4",
@@ -1372,7 +1704,10 @@
      "dest_id": "40A",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0416"
     },
     {
      "commit_off": "0x12b9a",
@@ -1382,7 +1717,10 @@
      "dest_id": "40A",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0416"
     }
    ]
   },
@@ -1397,7 +1735,10 @@
      "dest_id": "409",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0416"
     },
     {
      "commit_off": "0xcbc0",
@@ -1407,7 +1748,10 @@
      "dest_id": "500",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0454"
     }
    ]
   },
@@ -1422,7 +1766,10 @@
      "dest_id": "10F",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0446"
     },
     {
      "commit_off": "0x11bc",
@@ -1432,7 +1779,10 @@
      "dest_id": "400",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x044a"
     }
    ]
   },
@@ -1447,7 +1797,10 @@
      "dest_id": "40A",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0454"
     },
     {
      "commit_off": "0x21e4",
@@ -1457,7 +1810,10 @@
      "dest_id": "501",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0b34"
     }
    ]
   },
@@ -1472,7 +1828,10 @@
      "dest_id": "500",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0434"
     },
     {
      "commit_off": "0x2ac4",
@@ -1482,7 +1841,10 @@
      "dest_id": "502",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0432"
     }
    ]
   },
@@ -1497,7 +1859,10 @@
      "dest_id": "503",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0934"
     },
     {
      "commit_off": "0x26848",
@@ -1507,7 +1872,10 @@
      "dest_id": "501",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0932"
     }
    ]
   },
@@ -1522,7 +1890,10 @@
      "dest_id": "504",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x0a",
+     "built_state": "usable",
+     "door_type": "0x0c36"
     }
    ]
   },
@@ -1541,7 +1912,10 @@
      "dest_id": "601",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x013b"
     },
     {
      "commit_off": "0x2174",
@@ -1551,7 +1925,10 @@
      "dest_id": "004",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0e4e"
     }
    ]
   },
@@ -1566,7 +1943,10 @@
      "dest_id": "600",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x003a"
     },
     {
      "commit_off": "0x214c",
@@ -1576,7 +1956,10 @@
      "dest_id": "602",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107"
     }
    ]
   },
@@ -1591,7 +1974,10 @@
      "dest_id": "601",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006"
     },
     {
      "commit_off": "0x1dc0",
@@ -1601,7 +1987,10 @@
      "dest_id": "603",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0139"
     }
    ]
   },
@@ -1616,7 +2005,10 @@
      "dest_id": "602",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0038"
     },
     {
      "commit_off": "0x3c78",
@@ -1626,7 +2018,10 @@
      "dest_id": "605",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0412"
     },
     {
      "commit_off": "0x3cf0",
@@ -1636,7 +2031,10 @@
      "dest_id": "604",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x010b"
     },
     {
      "commit_off": "0x4aaa",
@@ -1646,7 +2044,10 @@
      "dest_id": "604",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x010b"
     }
    ]
   },
@@ -1661,7 +2062,10 @@
      "dest_id": "603",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x000a"
     },
     {
      "commit_off": "0x2ef8",
@@ -1671,7 +2075,10 @@
      "dest_id": "605",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0149"
     }
    ]
   },
@@ -1686,7 +2093,10 @@
      "dest_id": "603",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0412"
     },
     {
      "commit_off": "0x112b6",
@@ -1696,7 +2106,10 @@
      "dest_id": "604",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0048"
     },
     {
      "commit_off": "0x14362",
@@ -1706,7 +2119,10 @@
      "dest_id": "606",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0318"
     }
    ]
   },
@@ -1721,7 +2137,10 @@
      "dest_id": "607",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0452"
     },
     {
      "commit_off": "0xf126",
@@ -1731,7 +2150,10 @@
      "dest_id": "605",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0318"
     }
    ]
   },
@@ -1746,7 +2168,10 @@
      "dest_id": "606",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0453"
     },
     {
      "commit_off": "0xe586",
@@ -1756,7 +2181,10 @@
      "dest_id": "700",
      "dest_mode": 0,
      "slot": "0xd",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x06",
+     "built_state": "blocked",
+     "door_type": "0x0f42"
     }
    ]
   },
@@ -1775,7 +2203,10 @@
      "dest_id": "701",
      "dest_mode": 0,
      "slot": "0x5",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0540"
     }
    ]
   },
@@ -1790,7 +2221,10 @@
      "dest_id": "700",
      "dest_mode": 0,
      "slot": "0x5",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0540"
     },
     {
      "commit_off": "0x394c",
@@ -1800,7 +2234,10 @@
      "dest_id": "702",
      "dest_mode": 0,
      "slot": "0x6",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x053f"
     }
    ]
   },
@@ -1815,7 +2252,10 @@
      "dest_id": "701",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x053e"
     },
     {
      "commit_off": "0x2680",
@@ -1825,7 +2265,10 @@
      "dest_id": "703",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x055b"
     }
    ]
   },
@@ -1840,7 +2283,10 @@
      "dest_id": "702",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x055a"
     },
     {
      "commit_off": "0x6ac0",
@@ -1850,7 +2296,10 @@
      "dest_id": "704",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x053d"
     },
     {
      "commit_off": "0x6b14",
@@ -1860,7 +2309,10 @@
      "dest_id": "704",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0556"
     }
    ]
   },
@@ -1875,7 +2327,10 @@
      "dest_id": "703",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x053c"
     },
     {
      "commit_off": "0xaeb4",
@@ -1885,7 +2340,10 @@
      "dest_id": "705",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0502"
     },
     {
      "commit_off": "0xaf08",
@@ -1895,7 +2353,10 @@
      "dest_id": "703",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0556"
     }
    ]
   },
@@ -1910,7 +2371,10 @@
      "dest_id": "704",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0503"
     },
     {
      "commit_off": "0x544a",
@@ -1920,7 +2384,10 @@
      "dest_id": "706",
      "dest_mode": 0,
      "slot": "0x5",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0540"
     }
    ]
   },
@@ -1935,7 +2402,10 @@
      "dest_id": "705",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0540"
     },
     {
      "commit_off": "0x10894",
@@ -1945,7 +2415,10 @@
      "dest_id": "800",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0318"
     }
    ]
   },
@@ -1964,7 +2437,10 @@
      "dest_id": "005",
      "dest_mode": 0,
      "slot": "0x5",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0e4e"
     },
     {
      "commit_off": "0x18610",
@@ -1974,7 +2450,10 @@
      "dest_id": "801",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x040c"
     },
     {
      "commit_off": "0x1a0b0",
@@ -1984,7 +2463,10 @@
      "dest_id": "005",
      "dest_mode": 0,
      "slot": "0x5",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0e4e"
     },
     {
      "commit_off": "0x1a138",
@@ -1994,7 +2476,10 @@
      "dest_id": "801",
      "dest_mode": 0,
      "slot": "0x4",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x040c"
     },
     {
      "commit_off": "0x1a952",
@@ -2004,7 +2489,10 @@
      "dest_id": "706",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0544"
     }
    ]
   },
@@ -2020,6 +2508,9 @@
      "dest_mode": 0,
      "slot": "0x1",
      "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006",
      "lock_index": 2,
      "unlock_flag_id": 53
     },
@@ -2031,7 +2522,10 @@
      "dest_id": "802",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0048"
     },
     {
      "commit_off": "0x475e",
@@ -2041,7 +2535,10 @@
      "dest_id": "800",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x040c"
     }
    ],
    "key_use": [
@@ -2065,7 +2562,10 @@
      "dest_id": "801",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0149"
     }
    ]
   },
@@ -2080,7 +2580,10 @@
      "dest_id": "804",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x010f"
     },
     {
      "commit_off": "0x8a34",
@@ -2090,7 +2593,10 @@
      "dest_id": "801",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107"
     }
    ]
   },
@@ -2105,7 +2611,10 @@
      "dest_id": "805",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0006"
     },
     {
      "commit_off": "0x1cec",
@@ -2115,7 +2624,10 @@
      "dest_id": "803",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x000e"
     }
    ]
   },
@@ -2130,7 +2642,10 @@
      "dest_id": "804",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0107"
     },
     {
      "commit_off": "0x789e",
@@ -2140,7 +2655,10 @@
      "dest_id": "80B",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0800"
     }
    ]
   },
@@ -2155,7 +2673,10 @@
      "dest_id": "80B",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x1301"
     },
     {
      "commit_off": "0xb8c8",
@@ -2165,7 +2686,10 @@
      "dest_id": "807",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0201"
     }
    ]
   },
@@ -2180,7 +2704,10 @@
      "dest_id": "806",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0200"
     },
     {
      "commit_off": "0x586e",
@@ -2190,7 +2717,10 @@
      "dest_id": "808",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x1129"
     }
    ]
   },
@@ -2205,7 +2735,10 @@
      "dest_id": "807",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x1128"
     },
     {
      "commit_off": "0xfca6",
@@ -2215,7 +2748,10 @@
      "dest_id": "809",
      "dest_mode": 0,
      "slot": "0x2",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0205"
     }
    ]
   },
@@ -2230,7 +2766,10 @@
      "dest_id": "80A",
      "dest_mode": 0,
      "slot": "0x7",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0059"
     }
    ]
   },
@@ -2245,7 +2784,10 @@
      "dest_id": "900",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x00",
+     "built_state": "usable",
+     "door_type": "0x0058"
     }
    ]
   },
@@ -2260,7 +2802,10 @@
      "dest_id": "805",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x1301"
     },
     {
      "commit_off": "0x31f2",
@@ -2270,7 +2815,10 @@
      "dest_id": "806",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0800"
     }
    ]
   },
@@ -2285,7 +2833,10 @@
      "dest_id": "901",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x004a"
     },
     {
      "commit_off": "0x3950",
@@ -2295,7 +2846,10 @@
      "dest_id": "902",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0146"
     }
    ]
   },
@@ -2310,7 +2864,10 @@
      "dest_id": "900",
      "dest_mode": 0,
      "slot": "0x3",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x014b"
     }
    ]
   },
@@ -2325,7 +2882,10 @@
      "dest_id": "900",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0046"
     },
     {
      "commit_off": "0x1b40",
@@ -2335,7 +2895,10 @@
      "dest_id": "903",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x014d"
     },
     {
      "commit_off": "0x1d80",
@@ -2345,7 +2908,10 @@
      "dest_id": "903",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x014d"
     }
    ]
   },
@@ -2360,7 +2926,10 @@
      "dest_id": "904",
      "dest_mode": 0,
      "slot": "0x0",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x06",
+     "built_state": "blocked",
+     "door_type": "0x1050"
     }
    ]
   },
@@ -2375,7 +2944,10 @@
      "dest_id": "003",
      "dest_mode": 0,
      "slot": "0x1",
-     "confidence": "high"
+     "confidence": "high",
+     "flags": "0x02",
+     "built_state": "usable",
+     "door_type": "0x0058"
     }
    ]
   },
@@ -2390,10 +2962,12 @@
  },
  "_stats": {
   "rooms": 89,
-  "rooms_with_doors": 83,
-  "total_doors": 179,
-  "high_conf_doors": 178,
+  "rooms_with_doors": 84,
+  "total_doors": 181,
+  "high_conf_doors": 180,
   "locked_doors": 17,
-  "key_use_records": 14
+  "key_use_records": 14,
+  "built_blocked_doors": 3,
+  "warp_notify_doors": 2
  }
 }

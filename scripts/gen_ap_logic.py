@@ -360,7 +360,9 @@ def check_dc2(data: dict) -> None:
     assert data["startRoom"] == "000" and data["goalRoom"] == "904", (
         data["startRoom"], data["goalRoom"])
     assert len(data["regions"]) == 89, len(data["regions"])
-    assert len(data["locations"]) == 165, len(data["locations"])
+    # 168 since the 2026-07-10 slot-5 routine-directory fix (decode_script.subprograms):
+    # +3 op-0x31 items recovered from previously capped tail routines (ST003, ST402 x2).
+    assert len(data["locations"]) == 168, len(data["locations"])
     assert len(names) == 9, names  # the op-0x31 field-type space (K77)
     # Known K78 gates present: the ST101<->ST102 crank pair and the ST302->ST303 keycard door.
     assert any(e["from"] == "101" and e["to"] == "102" for e in data["edges"])

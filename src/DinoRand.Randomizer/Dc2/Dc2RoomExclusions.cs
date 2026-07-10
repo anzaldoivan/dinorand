@@ -25,9 +25,20 @@ public static class Dc2RoomExclusions
     /// <summary>Set-piece room <c>st_id</c>s skipped by the enemy randomizer (hand-curated).</summary>
     public static IReadOnlySet<string> Setpiece { get; } = new HashSet<string>
     {
+        "001", // ST001 — the opening TURRET set-piece (maintainer ID 2026-07-11): scripted around its
+               // specific enemies (op-0x23-preloaded 0x0c wave). Its only prior guard was the water-native
+               // wave skip in Dc2CrossSpeciesPlanner, which Dc2AllowWaterLevelEnemySwaps LIFTS — so the
+               // water toggle unmasked it. Must be an unconditional set-piece exclusion, like ST407.
+               // (DC2-ST001-PRELOAD-STRIP-CRASH-RCA.md §6: promote 001 from the uncertain tier.)
         "407", // ST407 — the TURRET set-piece (maintainer ID 2026-06-30): its 2 hardcoded raptors are
                // scripted into the turret sequence; a cross-species swap would break it. (Also why ST407
                // is NOT a candidate for the file-path validation — it must be excluded, not edited.)
+        "408", // ST408 — escort set-piece with an NPC (maintainer ID 2026-07-11): scripted around its
+               // enemies; blocked for now.
+        "409", // ST409 — escort set-piece with an NPC (maintainer ID 2026-07-11): scripted around its
+               // enemies; blocked for now.
+        "808", // ST808 — Allosaurus set-piece (maintainer ID 2026-07-11): scripted around its specific
+               // enemy; must not be remixed.
         "905", // ST905 — Extra Crisis bonus level (detected 2026-07-04): must stay vanilla.
     };
 

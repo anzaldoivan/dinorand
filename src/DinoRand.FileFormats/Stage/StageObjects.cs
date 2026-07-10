@@ -244,6 +244,16 @@ public sealed class EnemyRecord
     /// <summary>Byte offset of the "already killed" GetFlag(group 4) id (<c>0x20</c> only; a
     /// <c>0x59</c> record's kill-flag lives in its instance-table entry).</summary>
     public const int KillFlagOffset = 0x04;
+    /// <summary>Byte offset of the per-entity <b>AI parameter</b> byte in a <c>0x20</c> record — copied to
+    /// entity <c>+0x2F</c> and consumed across every category bank (cat-2 birth derives
+    /// <c>obj+0x18E</c> bit 5 from <c>+3 % 3</c>). 0 = the corpus norm / proven-neutral value.
+    /// STATIC-SCD-RE cont.51.</summary>
+    public const int AiParamOffset = 0x03;
+    /// <summary>Byte offset of the <b>birth-behavior bitfield</b> in a <c>0x20</c> record — copied to
+    /// entity <c>+0x18E</c>; its low 2 bits select the initial behavior code <c>+0x3D</c> at the cat-2
+    /// birth (<c>0x4C10A2–C8</c>: mode 0 → 1, mode 1 → 0x19, else 0x1A). 0 = default behavior.
+    /// STATIC-SCD-RE cont.51.</summary>
+    public const int BirthModeOffset = 0x05;
     /// <summary>Byte offset of the preset <b>maxHP</b> word in a <c>0x20</c> record. The handler copies
     /// it into entity <c>+0x11A</c> (<c>DINO.exe 0x42656A</c>); <c>0</c> ⇒ the per-category birth-init
     /// random-rolls <c>{750,850,1000}</c>, nonzero ⇒ that value is kept (DC1-G2, live-confirmed
@@ -375,6 +385,19 @@ public sealed class EnemyRecord
     /// </summary>
     public bool IsRandomizableDino =>
         SpeciesMatchesCategory && Species != DinoSpecies.Tyrannosaurus && !IsNpcSceneActor;
+
+    /// <summary>
+    /// True when this species' birth-init <b>keeps</b> a nonzero preset <see cref="MaxHp"/> — i.e. the
+    /// <c>+6</c> HP override actually takes effect in-game. Per-category, from the PC birth handlers
+    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.48): cat-2 RaptorHeavy (<c>0x4C0FED</c>:
+    /// <c>test maxHP; jne keep</c> at <c>0x4C10D2</c>, else the PSX-standard roll <c>0x5E5ECC</c>) and
+    /// cat-7 Pteranodon (<c>0x599CDC</c>, guard <c>0x599D92</c>) kept the PSX keep-if-nonzero idiom.
+    /// cat-1 Velociraptor (<c>0x4DBB3D</c>, stores at <c>0x4DBB7F/0x4DBB8B</c>) and cat-5 Swarm
+    /// (<c>0x4F83D5</c> family) write <c>1000/1000</c> <b>unconditionally</b> — a preset is clobbered at
+    /// birth, so writing <c>+6</c> for them is a silent no-op the HP pass must not claim.
+    /// </summary>
+    public bool IsHpPresettable =>
+        Species is DinoSpecies.RaptorHeavy or DinoSpecies.Pteranodon;
 
     /// <summary>
     /// True when this <c>0x20</c> record is an <b>NPC-scene actor</b> (Rick/Gail/Kirk placed in a scene

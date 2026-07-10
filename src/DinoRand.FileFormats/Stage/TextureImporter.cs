@@ -505,6 +505,32 @@ public static class TextureImporter
         return outBuf;
     }
 
+    /// <summary>
+    /// Copy a species' <b>palette only</b> from <paramref name="donor"/> into <paramref name="target"/> —
+    /// the "tint an enemy" lever (STATIC-SCD-RE cont.51: the Blue Raptor is nothing but the stage-5 rooms'
+    /// recoloured type-2 palette entry; same CLUT code, same VRAM rect, 255/256 entries differ). Both rooms
+    /// must carry a <see cref="GianEntryType.Palette"/> entry at the <paramref name="clutCode"/>'s VRAM
+    /// coords with the same rect and payload size (raw 16bpp, typically 256×u16 = 512 bytes); the donor
+    /// payload is copied verbatim in place, so no header or downstream offset moves. Returns the patched
+    /// copy of <paramref name="target"/>.
+    /// </summary>
+    public static byte[] CopySpeciesPalette(ReadOnlySpan<byte> target, ReadOnlySpan<byte> donor, ushort clutCode)
+    {
+        var (clX, clY) = ClutOrigin(clutCode);
+        var tgtPal = FindPalEntry(RawEntries(target), clX, clY, "target");
+        var donPal = FindPalEntry(RawEntries(donor), clX, clY, "donor");
+        if (tgtPal.Dst != donPal.Dst)
+            throw new InvalidOperationException(
+                $"palette rects differ (target {tgtPal.Dst} vs donor {donPal.Dst}); the species' CLUT must live at the same VRAM coords");
+        if (donPal.Size != tgtPal.Size)
+            throw new InvalidOperationException(
+                $"palette sizes differ (target 0x{tgtPal.Size:X} vs donor 0x{donPal.Size:X})");
+
+        var patched = target.ToArray();
+        donor.Slice(donPal.PayloadOffset, donPal.Size).CopyTo(patched.AsSpan(tgtPal.PayloadOffset, donPal.Size));
+        return patched;
+    }
+
     private static RawEntry FindTexEntry(List<RawEntry> es, int px, int py, string which)
     {
         foreach (var e in es)

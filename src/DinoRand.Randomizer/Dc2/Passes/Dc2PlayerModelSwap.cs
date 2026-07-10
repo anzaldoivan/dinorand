@@ -343,13 +343,23 @@ public sealed class Dc2PlayerModelSwap : IDc2RandomizationPass
     /// Read a graft donor's <b>pristine</b> bytes: prefer the installer backup
     /// (<c>.dinorand_backup\name</c>), then a tools-style <c>name.dinorand-bak</c> sibling, then the
     /// live file — so re-rolling over an installed swap always grafts the vanilla files, never
-    /// compounds. Validates the bytes parse as a DC2 Gian package (content check, never size).
+    /// compounds. Refuses when the two backups disagree (a poisoned capture, K82). Validates the
+    /// bytes parse as a DC2 Gian package (content check, never size).
     /// </summary>
     private static byte[] ReadPristineValidated(string dataDir, string fileName)
     {
         string live = Path.Combine(dataDir, fileName);
         string installerBackup = Path.Combine(dataDir, GameInstaller.BackupDirName, fileName);
-        string siblingBackup = live + ".dinorand-bak";
+        string siblingBackup = live + GameInstaller.SiblingBackupSuffix;
+
+        // Poisoned-capture guard: if the two pristine sources disagree, one of them is a capture of an
+        // already-modded file and we cannot tell which — refuse rather than graft from poison (the
+        // ST001 backup-poisoning recurrence, K82).
+        if (File.Exists(installerBackup) && File.Exists(siblingBackup)
+            && !File.ReadAllBytes(installerBackup).AsSpan().SequenceEqual(File.ReadAllBytes(siblingBackup)))
+            throw new InvalidDataException(
+                $"pristine sources disagree for {fileName}: '{installerBackup}' vs '{siblingBackup}' — "
+                + "one is a poisoned capture; repair them to match before swapping");
 
         string source = File.Exists(installerBackup) ? installerBackup
                       : File.Exists(siblingBackup) ? siblingBackup

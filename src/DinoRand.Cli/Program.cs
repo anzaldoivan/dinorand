@@ -33,10 +33,14 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
                    [--disable-weapons handgun,shotgun,grenade] [--install-to-data]
                    [--no-spoiler]      (skip SPOILER.md; game files identical either way)
           dinorand --install <gameDir> --restore
+          dinorand --install <gameDir> --verify-backup   (read-only: audit .dinorand_backup for poisoned captures; works for dc1 and dc2)
           dinorand --install <gameDir> --swap-species <roomCode> [--species <name>]
           dinorand --install <gameDir> --fix-sound <roomCode>
           dinorand --install <gameDir> --add-enemy <roomCode> [--species <name>] [--at x,y,z[,rot]] [--kill-flag <n>] [--seed <n>]
+                   [--hp <n>] [--ai-param <n>] [--birth-mode <n>] [--slot <n>] [--activate <behavior>[:<blobHex16>[:<b3>]]]
           dinorand --install <gameDir> --add-enemy-at <roomCode>:<rdtOffset> [--species <name>] [--at x,y,z[,rot]] [--kill-flag <n>] [--seed <n>]
+                   [--hp <n>] [--ai-param <n>] [--birth-mode <n>] [--slot <n>] [--activate <behavior>[:<blobHex16>[:<b3>]]]
+          dinorand --install <gameDir> --copy-enemy-palette <srcRoom>:<dstRoom> [--species <name>]
           dinorand --install <gameDir> --exe-patch <targetStage>:<donorStage>
           dinorand --install <gameDir> --set-door <room>:<fromDest>:<toDest>
           dinorand --install <gameDir> --set-item <room>:<x,z>:<id>
@@ -113,11 +117,13 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             Inherently DC2 (no --game needed). docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.
           - --dc1-enemy-hp (dc1, off by default) overrides each eligible enemy's maxHP per placement:
             it writes a seeded, --difficulty-scaled value into the 0x20 spawn record's +6 word (entity
-            +0x11A), bypassing the game's {750,850,1000} birth roll. A plain room-file edit (no DINO.exe
-            patch, no Cheat Engine). Eligibility matches the enemy permute (positively-decoded dinosaurs
-            only; scripted T-Rex and cutscene rooms skipped; 0x59-placed enemies untouched). Higher
-            --difficulty widens the band upward; HP gates no progression, so seeds stay beatable.
-            docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
+            +0x11A), bypassing the game's birth roll. A plain room-file edit (no DINO.exe patch, no
+            Cheat Engine). Eligible = RaptorHeavy (cat-2) and Pteranodon (cat-7) 0x20 records only —
+            the only PC birth-inits that KEEP a nonzero preset; Velociraptor and Swarm births overwrite
+            maxHP with 1000 unconditionally, so they are skipped rather than silently no-op'd
+            (STATIC-SCD-RE cont.48). Scripted T-Rex and cutscene rooms skipped; 0x59-placed enemies
+            untouched. Higher --difficulty widens the band upward; HP gates no progression, so seeds
+            stay beatable. docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
           - --game selects the target (default dc1). dc2 is an early scaffold: it loads the
             Dino Crisis 2 (Rebirth) rooms but its passes are no-ops until the room-record
             decoders land (docs/parity/BIORAND-REUSE-VALIDATION.md). The DC1-only targeted
@@ -168,6 +174,25 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             (docs/decisions/dc1/spawn/ADD-ENEMY-EVENT-INJECTION-CRASH-RCA.md). The offset must be a clean,
             4-aligned opcode boundary; the tool reports which sub it lands in and warns if
             it's the inert init sub-0. The event sub must already load the species' resources.
+          - --add-enemy/--add-enemy-at authored record fields (all default 0 = the proven-neutral
+            template, STATIC-SCD-RE cont.48/51): --hp <n> presets maxHP (record +6; only cat-2
+            RaptorHeavy / cat-7 Pteranodon births KEEP it); --ai-param <n> sets the per-entity AI
+            byte (+3 -> entity +0x2F); --birth-mode <n> selects the birth behavior (+5 low 2 bits:
+            0=default, 1=behavior 0x19, 2/3=0x1A — cat-2 semantics, CE-gated).
+          - --activate <behavior>[:<blobHex16>[:<b3>]] (CE-gate lab, cont.49) EMITS the script
+            activation pair right after the injected record: op 0x22 binding the record's slot +
+            op 0x3a installing <behavior>. This is what wakes a cat-1 (Velociraptor) placed by init;
+            cat-2 self-activates without it. blobHex16 = the 0x3a's 8 operand bytes (16 hex chars);
+            b3 = the 0x3a's byte[3] (semantics unmapped; retail behavior-1 installs carry 0x1F..0x21).
+            Omitted = both copied together from the room's first native 0x3a, preferring a matching
+            behavior code (zeros if the room has none).
+          - --slot <n> forces the injected record's large-entity slot. The auto-pick dedupes only
+            against parsed 0x20/0x59 records -- it cannot see natively-installed occupants (cont.18's
+            0102 slot-0 collision); pass a known-free slot when the room has native enemies.
+          - --copy-enemy-palette <srcRoom>:<dstRoom> copies the --species (default raptorheavy)
+            palette — the room's type-2 CLUT entry, 512 bytes at the same VRAM rect — from src into
+            dst, tinting dst's enemies with src's colours (e.g. 511:102 = Blue Raptor into the Mgmt
+            Office hall; STATIC-SCD-RE cont.51). Room-file only, same backup/--restore contract.
           - --set-door <room>:<fromDest>:<toDest> retargets one door (3-hex room codes),
             e.g. 103:102:511 sends Management Office's hall door to the Stabilizer
             Experiment Room. It carries a valid arrival pose for the destination from an
@@ -278,6 +303,36 @@ if (GuardNotDrmProtected(install) is { } drmExit)
 
 // Game selector (default dc1). DC2 is wired as a parallel stack (Dc2RandomizerRunner / DinoCrisis2)
 // so DC1 stays byte-for-byte unchanged — see docs/parity/BIORAND-REUSE-VALIDATION.md Q3.
+// Read-only poisoned-backup audit (K82): compare every .dinorand_backup capture against the
+// manifest hash / .dinorand-bak sibling / live file. Game-agnostic (runs before the --game split);
+// exit 1 when anything is Poisoned/Suspect.
+if (argv.Contains("--verify-backup"))
+{
+    // Both game defs may claim a Data dir under the same root (their room patterns overlap);
+    // audit the one that actually holds a backup, falling back to the first hit.
+    var candidates = new[] { new DinoCrisis1().GetDataDir(install), new DinoCrisis2().GetDataDir(install) }
+        .Where(d => d is not null).Distinct().ToList();
+    var dataDir = candidates.FirstOrDefault(d => GameInstaller.HasBackup(d!)) ?? candidates.FirstOrDefault();
+    if (dataDir is null)
+    {
+        Console.Error.WriteLine($"error: could not locate a Data folder under {install}");
+        return 1;
+    }
+    var findings = GameInstaller.VerifyBackups(dataDir);
+    if (findings.Count == 0)
+    {
+        Console.WriteLine($"no DinoRand backup found in {dataDir} — nothing to verify");
+        return 0;
+    }
+    foreach (var f in findings.OrderByDescending(f => f.Status))
+        Console.WriteLine($"{f.Status,-11} {f.Name}  ({f.Detail})");
+    int bad = findings.Count(f => f.Status is BackupVerifyStatus.Poisoned or BackupVerifyStatus.Suspect);
+    Console.WriteLine(bad == 0
+        ? $"OK: {findings.Count} backup(s) verified, none poisoned"
+        : $"FAIL: {bad} of {findings.Count} backup(s) poisoned or suspect");
+    return bad == 0 ? 0 : 1;
+}
+
 string gameId = (GetOpt("--game") ?? "dc1").ToLowerInvariant();
 if (gameId is not ("dc1" or "dc2"))
 {
@@ -318,10 +373,18 @@ if (GetOpt("--add-enemy-at") is { } addAtSpec)
         return 1;
     }
     return AddEnemy(install, parts[0], GetOpt("--species") ?? "raptorheavy", GetOpt("--at"),
-                    GetOpt("--kill-flag"), GetOpt("--seed"), parts[1]);
+                    GetOpt("--kill-flag"), GetOpt("--seed"), parts[1],
+                    GetOpt("--hp"), GetOpt("--ai-param"), GetOpt("--birth-mode"), GetOpt("--activate"), GetOpt("--slot"));
 }
 if (GetOpt("--add-enemy") is { } addRoom)
-    return AddEnemy(install, addRoom, GetOpt("--species") ?? "raptorheavy", GetOpt("--at"), GetOpt("--kill-flag"), GetOpt("--seed"));
+    return AddEnemy(install, addRoom, GetOpt("--species") ?? "raptorheavy", GetOpt("--at"), GetOpt("--kill-flag"), GetOpt("--seed"),
+                    null, GetOpt("--hp"), GetOpt("--ai-param"), GetOpt("--birth-mode"), GetOpt("--activate"), GetOpt("--slot"));
+
+// Palette-copy lab (STATIC-SCD-RE cont.51): copy one species' type-2 CLUT entry (512 B, same VRAM
+// rect) from a donor room into a target room — the "tint an enemy" lever (Blue Raptor = st511's
+// recoloured palette row). Room-file only; same backup/--restore contract as the other room ops.
+if (GetOpt("--copy-enemy-palette") is { } palSpec)
+    return CopyEnemyPalette(install, palSpec, GetOpt("--species") ?? "raptorheavy");
 
 // Targeted door retarget (docs/decisions/dc1/doors/DOOR-RANDOMIZER-PLAN.md): change one door's destination. spec is
 // room:fromDest:toDest as 3-hex room codes, e.g. 103:102:511 = in Management Office (0103) change the
@@ -733,7 +796,7 @@ int RunDc2(string installDir)
 {
     string[] dc1Only =
     {
-        "--swap-species", "--add-enemy", "--add-enemy-at", "--set-door", "--set-item", "--exe-patch",
+        "--swap-species", "--add-enemy", "--add-enemy-at", "--copy-enemy-palette", "--set-door", "--set-item", "--exe-patch",
         "--fix-hitdeath", "--fix-sound", "--shuffle-bgm", "--shuffle-boxes", "--reroll-boxes", "--starting-items", "--starting-weapon", "--analyze-scripts", "--install-to-data", "--restore",
     };
     if (dc1Only.FirstOrDefault(o => argv.Contains(o)) is { } op)
@@ -1913,7 +1976,8 @@ static int SwapSpecies(string installDir, string roomArg, string speciesName, in
 // (backed up to .dinorand_backup so --restore undoes it). Mirrors SwapSpecies. Spawn position comes
 // from --at x,y,z[,rot]; if omitted, it is harvested from an existing enemy in the room (a known-good
 // floor point) — a truly-empty room therefore requires --at. CE is the real validator of the spot.
-static int AddEnemy(string installDir, string roomArg, string speciesName, string? atArg, string? killFlagArg = null, string? seedArg = null, string? offsetArg = null)
+static int AddEnemy(string installDir, string roomArg, string speciesName, string? atArg, string? killFlagArg = null, string? seedArg = null, string? offsetArg = null,
+                    string? hpArg = null, string? aiParamArg = null, string? birthModeArg = null, string? activateArg = null, string? slotArg = null)
 {
     var game = new DinoCrisis1();
     var dataDir = game.GetDataDir(installDir);
@@ -2039,6 +2103,56 @@ static int AddEnemy(string installDir, string roomArg, string speciesName, strin
         killFlag = kf;
     }
 
+    // Authored record fields (+6 maxHP / +3 AI param / +5 birth mode, cont.48/51) and the optional
+    // op-0x22 + op-0x3a activation-pair emission (cont.49). All default to the zero template.
+    static bool ParseByte(string s, out byte v) => s.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+        ? byte.TryParse(s.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out v)
+        : byte.TryParse(s, out v);
+    var authoring = new EnemyAuthoring();
+    if (hpArg is not null)
+    {
+        if (!ushort.TryParse(hpArg, out var hp) || hp == 0)
+        { Console.Error.WriteLine($"error: --hp must be 1..65535, got '{hpArg}'"); return 1; }
+        authoring = authoring with { MaxHp = hp };
+        if (species is not (DinoSpecies.RaptorHeavy or DinoSpecies.Pteranodon))
+            Console.WriteLine($"warning : --hp on a {species} is a provable no-op — only cat-2/cat-7 births "
+                + "keep a preset (STATIC-SCD-RE cont.48); the byte is written anyway for the record.");
+    }
+    if (aiParamArg is not null)
+    {
+        if (!ParseByte(aiParamArg, out var ap))
+        { Console.Error.WriteLine($"error: --ai-param must be a byte 0..255, got '{aiParamArg}'"); return 1; }
+        authoring = authoring with { AiParam = ap };
+    }
+    if (birthModeArg is not null)
+    {
+        if (!ParseByte(birthModeArg, out var bm))
+        { Console.Error.WriteLine($"error: --birth-mode must be a byte 0..255 (low 2 bits select), got '{birthModeArg}'"); return 1; }
+        authoring = authoring with { BirthMode = bm };
+    }
+    if (activateArg is not null)
+    {
+        var ap = activateArg.Split(':', StringSplitOptions.TrimEntries);
+        if (ap.Length > 3 || !ParseByte(ap[0], out var behavior))
+        { Console.Error.WriteLine($"error: --activate must be <behavior>[:<blobHex16>[:<b3>]], got '{activateArg}'"); return 1; }
+        byte[]? blob = null;
+        byte? b3 = null;
+        if (ap.Length >= 2 && ap[1].Length > 0)
+        {
+            if (ap[1].Length != 16)
+            { Console.Error.WriteLine($"error: --activate blob must be 16 hex chars (8 bytes), got '{ap[1]}'"); return 1; }
+            try { blob = Convert.FromHexString(ap[1]); }
+            catch (FormatException) { Console.Error.WriteLine($"error: --activate blob is not valid hex: '{ap[1]}'"); return 1; }
+        }
+        if (ap.Length == 3)
+        {
+            if (!ParseByte(ap[2], out var b3v))
+            { Console.Error.WriteLine($"error: --activate b3 must be a byte, got '{ap[2]}'"); return 1; }
+            b3 = b3v;
+        }
+        authoring = authoring with { ActivateBehavior = behavior, ActivateBlob = blob, ActivateB3 = b3 };
+    }
+
     // For --add-enemy-at, validate the offset up front and resolve which subroutine it lands in, so the
     // user can confirm it's an EVENT sub (the activation path) and not the inert init sub-0.
     int targetSub = -1;
@@ -2062,13 +2176,24 @@ static int AddEnemy(string installDir, string roomArg, string speciesName, strin
                 + "INERT (never hunts). Use an offset inside an event subroutine for an active enemy.");
     }
 
+    // --slot: explicit large-entity slot. The auto-pick only dedupes against parsed 0x20/0x59 records
+    // -- it cannot see natively-installed occupants (cont.18's 0102 slot-0 collision); pass a known-free
+    // slot when the room has native enemies.
+    byte? slot = null;
+    if (slotArg is not null)
+    {
+        if (!ParseByte(slotArg, out var sl))
+        { Console.Error.WriteLine($"error: --slot must be a byte 0..255, got '{slotArg}'"); return 1; }
+        slot = sl;
+    }
+
     EnemyRecord added;
     RoomFile.TexturedImportResult texResult;
     try
     {
         (added, texResult) = injectOffset is int io
-            ? target.AddEnemyAtTextured(donor, io, x, y, z, rot, killFlag: killFlag)
-            : target.AddEnemyTextured(donor, x, y, z, rot, killFlag: killFlag);
+            ? target.AddEnemyAtTextured(donor, io, x, y, z, rot, slot: slot, killFlag: killFlag, authoring: authoring)
+            : target.AddEnemyTextured(donor, x, y, z, rot, slot: slot, killFlag: killFlag, authoring: authoring);
     }
     catch (Exception ex)
     {
@@ -2086,6 +2211,13 @@ static int AddEnemy(string installDir, string roomArg, string speciesName, strin
                 : "geometry only — no free VRAM region in target (may be mis-coloured)");
     Console.WriteLine($"ST{code:X3}: added {species} at ({x},{y},{z}) rot {rot}  "
         + $"slot {added.Slot}, kill-flag {added.KillFlag}  ({modelNote})");
+    if (authoring != default)
+        Console.WriteLine($"authored: maxHP {authoring.MaxHp} (+6), ai-param {authoring.AiParam} (+3), "
+            + $"birth-mode {authoring.BirthMode} (+5)"
+            + (authoring.ActivateBehavior is byte ab
+                ? $", activation pair EMITTED (op 0x22 slot {added.Slot} + op 0x3a behavior 0x{ab:x2}, "
+                  + (authoring.ActivateBlob is null ? "blob copied from the room's native 0x3a / zeros)" : "explicit blob)")
+                : ""));
     if (injectOffset is int io3)
         Console.WriteLine("        injected at RDT 0x" + $"{io3:x} in "
             + (targetSub == 0 ? "init sub-0 (inert)" : $"event sub{targetSub} (activation path)")
@@ -2329,13 +2461,17 @@ static int SetEnemyHp(string installDir, string spec)
     var backupPath = hp is null ? targetRef.Path : GameInstaller.BackupOnce(dataDir, targetRef.Path);
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
 
-    var eligible = target.Enemies.Where(e => e.Opcode == DcOpcodes.Enemy && e.IsRandomizableDino).ToList();
+    var eligible = target.Enemies
+        .Where(e => e.Opcode == DcOpcodes.Enemy && e.IsRandomizableDino && e.IsHpPresettable).ToList();
     Console.WriteLine($"ST{code:X3}: {target.Enemies.Count} enemy record(s), {eligible.Count} eligible 0x20 dino(s):");
     foreach (var e in target.Enemies)
     {
+        string tag = e.Opcode != DcOpcodes.Enemy || !e.IsRandomizableDino ? ""
+            : e.IsHpPresettable ? "  [eligible]"
+            : "  [birth-frozen: this species' init overwrites maxHP — preset would be a no-op]";
         Console.WriteLine($"  op=0x{e.Opcode:X2} cat={e.Category} species={e.Species} bones={e.SpeciesBoneCount} "
             + $"model=0x{e.OriginalModelPtr:X8} motion=0x{e.OriginalMotionPtr:X8} maxHp(+6)={e.MaxHp} @0x{e.FileOffset:X}"
-            + (e.Opcode == DcOpcodes.Enemy && e.IsRandomizableDino ? "  [eligible]" : ""));
+            + tag);
         Console.WriteLine($"    raw: {BitConverter.ToString(e.Raw)}");
     }
 
@@ -2346,14 +2482,15 @@ static int SetEnemyHp(string installDir, string spec)
     }
     if (eligible.Count == 0)
     {
-        Console.Error.WriteLine($"error: ST{code:X3} has no eligible 0x20 dino to patch (0x59-placed enemies are excluded).");
+        Console.Error.WriteLine($"error: ST{code:X3} has no eligible 0x20 dino to patch "
+            + "(0x59-placed enemies and birth-frozen species [Velociraptor/Swarm] are excluded).");
         return 1;
     }
 
     foreach (var e in eligible) e.MaxHp = (ushort)hp.Value;
     File.WriteAllBytes(targetRef.Path, target.Write());
 
-    Console.WriteLine($"set maxHP(+6) = {hp} on {eligible.Count} record(s) (was rolling {{750,850,1000}})");
+    Console.WriteLine($"set maxHP(+6) = {hp} on {eligible.Count} record(s) (was rolling {{850,1000,750}}; the cat-2/cat-7 birth keeps a nonzero preset)");
     Console.WriteLine($"wrote   : {targetRef.Path}");
     Console.WriteLine($"backup  : {backupPath}");
     Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
@@ -2367,6 +2504,77 @@ static int SetEnemyHp(string installDir, string spec)
         if (s.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) s = s.Substring(2);
         return int.TryParse(s, System.Globalization.NumberStyles.HexNumber, null, out val);
     }
+}
+
+// Palette-copy lab (STATIC-SCD-RE cont.51): copy the --species type-2 CLUT entry (raw 16bpp, 512 B,
+// matched by the model's CLUT VRAM rect) from srcRoom into dstRoom — the file-only "tint an enemy"
+// lever (Blue Raptor = st511's recoloured row). The CLUT code is read from dst's own model (falling
+// back to src's) so the copy targets exactly the entry the species samples. Backup contract on dst.
+static int CopyEnemyPalette(string installDir, string spec, string speciesName)
+{
+    var game = new DinoCrisis1();
+    var dataDir = game.GetDataDir(installDir);
+    if (dataDir is null)
+    {
+        Console.Error.WriteLine($"error: could not locate a Data folder under {installDir}");
+        return 1;
+    }
+    if (!TryParseSpecies(speciesName, out var species))
+    {
+        Console.Error.WriteLine($"error: unknown species '{speciesName}'");
+        return 1;
+    }
+    var parts = spec.Split(':', StringSplitOptions.TrimEntries);
+    int srcCode = 0, dstCode = 0;
+    bool ok = parts.Length == 2;
+    if (ok) { try { srcCode = Convert.ToInt32(parts[0], 16); dstCode = Convert.ToInt32(parts[1], 16); } catch { ok = false; } }
+    if (!ok)
+    {
+        Console.Error.WriteLine($"error: --copy-enemy-palette expects <srcRoom>:<dstRoom> (e.g. 511:102), got '{spec}'");
+        return 1;
+    }
+
+    var refs = game.EnumerateRooms(installDir).ToList();
+    var srcRef = refs.FirstOrDefault(r => r.Stage == srcCode >> 8 && r.Room == (srcCode & 0xff));
+    var dstRef = refs.FirstOrDefault(r => r.Stage == dstCode >> 8 && r.Room == (dstCode & 0xff));
+    if (srcRef is null || dstRef is null)
+    {
+        Console.Error.WriteLine($"error: room ST{(srcRef is null ? srcCode : dstCode):X3} not found under {dataDir}");
+        return 1;
+    }
+
+    // The species' CLUT code, read from the model the rooms actually render: prefer dst's own record
+    // (that is the raptor being tinted), fall back to src's. Same CLUT across rooms per cont.51.
+    var srcRoom = RoomFile.ReadFromFile(srcCode >> 8, srcCode & 0xff, srcRef.Path);
+    var backupPath = GameInstaller.BackupOnce(dataDir, dstRef.Path);
+    var dstBytes = File.ReadAllBytes(backupPath);
+    var dstRoom = RoomFile.Read(dstCode >> 8, dstCode & 0xff, dstBytes);
+    var rec = dstRoom.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == species)
+           ?? srcRoom.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == species);
+    if (rec is null)
+    {
+        Console.Error.WriteLine($"error: neither ST{dstCode:X3} nor ST{srcCode:X3} places a {species} — no model to read the CLUT from");
+        return 1;
+    }
+    var host = dstRoom.Enemies.Contains(rec) ? dstRoom : srcRoom;
+    ushort clut = TextureImporter.ReadModelTextureCodes(host.RdtBuffer, rec.OriginalModelPtr).Clut;
+
+    byte[] patched;
+    try { patched = TextureImporter.CopySpeciesPalette(dstBytes, File.ReadAllBytes(srcRef.Path), clut); }
+    catch (InvalidOperationException ex)
+    {
+        Console.Error.WriteLine($"error: {ex.Message}");
+        return 1;
+    }
+    File.WriteAllBytes(dstRef.Path, patched);
+
+    var (clX, clY) = TextureImporter.ClutOrigin(clut);
+    Console.WriteLine($"ST{dstCode:X3}: {species} palette (CLUT 0x{clut:X4} @ VRAM {clX},{clY}, 512 B) replaced with ST{srcCode:X3}'s");
+    Console.WriteLine($"wrote   : {dstRef.Path}");
+    Console.WriteLine($"backup  : {backupPath}");
+    Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
+    Console.WriteLine("verify  : re-enter the room in-game — the species renders in the donor room's colours; nothing else changes.");
+    return 0;
 }
 
 // Repoint a stage's enemy-set record to another stage's, patching DINO.exe in place (backed up once

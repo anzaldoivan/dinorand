@@ -411,6 +411,18 @@
       "collectedFlag": null
     },
     {
+      "key": "003:5:152296",
+      "name": "003 (ST003) - Med Pak S @slot5/0x252e8",
+      "room": "003",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        152296,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
       "key": "005:9:30448",
       "name": "005 (ST005) - Field item 3 @slot9/0x76f0",
       "room": "005",
@@ -1222,6 +1234,30 @@
       "itemName": "Field item 4",
       "pos": [
         100078,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:8:120764",
+      "name": "402 (ST402) - Field item 4 @slot8/0x1d7bc",
+      "room": "402",
+      "itemId": 4,
+      "itemName": "Field item 4",
+      "pos": [
+        120764,
+        0
+      ],
+      "collectedFlag": null
+    },
+    {
+      "key": "402:7:121816",
+      "name": "402 (ST402) - Med Pak S @slot7/0x1dbd8",
+      "room": "402",
+      "itemId": 1,
+      "itemName": "Med Pak S",
+      "pos": [
+        121816,
         0
       ],
       "collectedFlag": null
@@ -2277,7 +2313,7 @@
       {
         "id": 1,
         "name": "Med Pak S",
-        "weight": 95.0
+        "weight": 97.0
       },
       {
         "id": 2,
@@ -2292,7 +2328,7 @@
       {
         "id": 4,
         "name": "Field item 4",
-        "weight": 6.0
+        "weight": 7.0
       },
       {
         "id": 5,

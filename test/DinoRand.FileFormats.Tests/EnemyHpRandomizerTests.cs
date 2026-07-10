@@ -9,9 +9,11 @@ namespace DinoRand.FileFormats.Tests;
 
 /// <summary>
 /// Unit tests for the gated DC1 enemy-HP pass: it writes a seeded, difficulty-scaled maxHP into each
-/// eligible <c>0x20</c> record's <c>+6</c> word, leaves <c>0x59</c> records and non-dinosaurs alone, is
-/// deterministic per seed, and scales with <c>--difficulty</c>. No game files needed — rooms are in memory,
-/// plus one end-to-end synthetic-file round-trip proving the HP lands at <c>+6</c> on disk.
+/// eligible <c>0x20</c> record's <c>+6</c> word, leaves <c>0x59</c> records, non-dinosaurs, and
+/// birth-frozen species (cat-1/cat-5, whose inits overwrite maxHP unconditionally — STATIC-SCD-RE
+/// cont.48) alone, is deterministic per seed, and scales with <c>--difficulty</c>. No game files
+/// needed — rooms are in memory, plus one end-to-end synthetic-file round-trip proving the HP lands
+/// at <c>+6</c> on disk.
 /// </summary>
 public class EnemyHpRandomizerTests
 {
@@ -52,8 +54,8 @@ public class EnemyHpRandomizerTests
     public void SetsNonZeroMaxHp_OnEligibleDinos()
     {
         var room = new RoomFile(5, 0x03); // plain (non-scripted, non-cutscene) room
-        room.Enemies.Add(Enemy(0x01, 0x80124d28, 0x80146d10));
-        room.Enemies.Add(Enemy(0x02, 0x80128868, 0x80148fb4));
+        room.Enemies.Add(Enemy(0x02, 0x80124d28, 0x80146d10)); // RaptorHeavy — guarded birth
+        room.Enemies.Add(Enemy(0x07, 0x80128868, 0x80148fb4)); // Pteranodon — guarded birth
 
         Run(room, difficulty: 0.5); // band 680..2040
 
@@ -71,8 +73,8 @@ public class EnemyHpRandomizerTests
         var b = new RoomFile(5, 0x03);
         for (int i = 0; i < 2; i++)
         {
-            a.Enemies.Add(Enemy(0x01, 0x80124d28, 0x80146d10));
-            b.Enemies.Add(Enemy(0x01, 0x80124d28, 0x80146d10));
+            a.Enemies.Add(Enemy(0x02, 0x80124d28, 0x80146d10));
+            b.Enemies.Add(Enemy(0x02, 0x80124d28, 0x80146d10));
         }
 
         Run(a, seed: 4242);
@@ -88,7 +90,7 @@ public class EnemyHpRandomizerTests
         var room = new RoomFile(5, 0x03);
         var theri = Enemy(0x08, 0x80130000, 0x80140000, DcOpcodes.Enemy2);
         room.Enemies.Add(theri);
-        room.Enemies.Add(Enemy(0x01, 0x80124d28, 0x80146d10)); // an eligible 0x20 alongside it
+        room.Enemies.Add(Enemy(0x02, 0x80124d28, 0x80146d10)); // an eligible 0x20 alongside it
 
         Run(room);
 
@@ -102,7 +104,7 @@ public class EnemyHpRandomizerTests
     {
         // Non-dino (undecodable) in a plain room: never edited.
         var plain = new RoomFile(3, 0x05);
-        var nonDino = Enemy(0x01, 0x80abcdef, 0x80fedcba);
+        var nonDino = Enemy(0x02, 0x80abcdef, 0x80fedcba);
         nonDino.SpeciesBoneCount = 0; // IsRandomizableDino == false
         plain.Enemies.Add(nonDino);
         Run(plain);
@@ -111,14 +113,38 @@ public class EnemyHpRandomizerTests
 
         // Scripted T-Rex room (0x610) and cutscene room (0x10d) are skipped wholesale.
         var scripted = new RoomFile(6, 0x10);
-        scripted.Enemies.Add(Enemy(0x01, 0x80111244, 0x8011f780));
+        scripted.Enemies.Add(Enemy(0x02, 0x80111244, 0x8011f780));
         Run(scripted);
         Assert.All(scripted.Enemies, e => Assert.False(e.IsEdited));
 
         var cutscene = new RoomFile(1, 0x0d);
-        cutscene.Enemies.Add(Enemy(0x01, 0x8011b43c, 0x801399b4));
+        cutscene.Enemies.Add(Enemy(0x02, 0x8011b43c, 0x801399b4));
         Run(cutscene);
         Assert.All(cutscene.Enemies, e => Assert.False(e.IsEdited));
+    }
+
+    [Fact]
+    public void BirthFrozenSpecies_AreSkipped()
+    {
+        // cat-1 Velociraptor and cat-5 Swarm births overwrite maxHP with 1000 unconditionally on the PC
+        // build (STATIC-SCD-RE cont.48) — a +6 preset would be clobbered, so the pass must not write or
+        // report one. The eligible cat-2 in the same room proves the pass itself ran.
+        var room = new RoomFile(5, 0x03);
+        var velo = Enemy(0x01, 0x80124d28, 0x80146d10);
+        var swarm = Enemy(0x05, 0x80125000, 0x80147000);
+        var heavy = Enemy(0x02, 0x80128868, 0x80148fb4);
+        room.Enemies.Add(velo);
+        room.Enemies.Add(swarm);
+        room.Enemies.Add(heavy);
+
+        Run(room);
+
+        Assert.False(velo.IsEdited);
+        Assert.Equal(0, velo.MaxHp);
+        Assert.False(swarm.IsEdited);
+        Assert.Equal(0, swarm.MaxHp);
+        Assert.True(heavy.IsEdited);
+        Assert.NotEqual(0, heavy.MaxHp);
     }
 
     [Fact]
@@ -129,8 +155,8 @@ public class EnemyHpRandomizerTests
         var hard = new RoomFile(5, 0x03);
         for (int i = 0; i < 3; i++)
         {
-            easy.Enemies.Add(Enemy(0x01, (uint)(0x80124d28 + i), 0x80146d10));
-            hard.Enemies.Add(Enemy(0x01, (uint)(0x80124d28 + i), 0x80146d10));
+            easy.Enemies.Add(Enemy(0x02, (uint)(0x80124d28 + i), 0x80146d10));
+            hard.Enemies.Add(Enemy(0x02, (uint)(0x80124d28 + i), 0x80146d10));
         }
 
         Run(easy, difficulty: 0.0);
@@ -148,8 +174,8 @@ public class EnemyHpRandomizerTests
         // +6 word of each edited 0x20 record on disk.
         var enemies = new[]
         {
-            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15),
             new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21),
+            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 7, 18),
         };
         var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(),
                                         Array.Empty<SyntheticRoom.Door>(), enemies);

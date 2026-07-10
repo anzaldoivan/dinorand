@@ -117,6 +117,12 @@ def render_logic(rec):
         parts.append(f"trigger: 0x28 subtype-3 enter-zone @[{aoffs}] -> run sub{rec['sub']}")
     elif trig.get("kind") in ("init_gosub", "gosub"):
         parts.append(f"trigger: gosub from sub{trig.get('called_from_subs')}")
+    elif trig.get("kind") == "task_spawn":
+        parts.append(f"trigger: op 0x01 task-spawn from sub{trig.get('called_from_subs')}"
+                     f" (rooted: {trig.get('rooted') or 'unrooted'})")
+    elif trig.get("kind") == "goto_sub":
+        parts.append(f"trigger: op 0x05 goto-sub from sub{trig.get('called_from_subs')}"
+                     f" (rooted: {trig.get('rooted') or 'unrooted'})")
     elif trig.get("kind") == "unresolved":
         parts.append("trigger: no static invoker (vestigial/cutscene?)")
     if _is_item(rec):
@@ -144,6 +150,10 @@ def render_summary(rec, room_id, room_name, labels, latch_subs, room_native):
         trigger = f"entering the {room_name} trigger zone"
     elif tk == "gosub":
         trigger = "an in-room event"
+    elif tk in ("task_spawn", "goto_sub"):
+        trigger = "room entry" if trig.get("rooted") == "init" else (
+            f"entering the {room_name} trigger zone" if str(trig.get("rooted")).startswith("aot_zone")
+            else "an in-room event")
     elif tk == "unresolved":
         trigger = "no known trigger"
     else:

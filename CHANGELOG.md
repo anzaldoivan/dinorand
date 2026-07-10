@@ -9,6 +9,35 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+### Added
+
+- **DC1 edition-aware puzzle-code document sync**: the keypad-code scramble now detects the install
+  edition and keeps the on-screen safe/keypad documents in sync on Classic REbirth English installs
+  too — REbirth injects its English text from a 7z diff archive embedded in `ddraw.dll`, and DinoRand
+  now rewrites the code digits there (both region variants), rebuilds the archive, and re-embeds it as
+  an appended PE section (version-locked, verify-before-write, reversible via `--restore`). GOG
+  European installs keep the room-file text lever; REbirth-Japanese installs skip with a warning
+  (codes stay stock); unclassifiable installs refuse rather than desync.
+
+- **`--verify-backup`** (both games, read-only): audits every `.dinorand_backup` capture against the
+  manifest's recorded pristine hash, any `<file>.dinorand-bak` sibling, and the live file, reporting
+  each as Ok / Installed / Suspect / Poisoned / LiveMissing (exit 1 on Suspect/Poisoned) — detects a
+  poisoned capture before it can be reinstalled by a restore or re-roll.
+
+### Fixed
+
+- **Installer backup capture can no longer be poisoned by a prior out-of-band edit**: a first-time
+  backup capture now validates the live file against a tools-style `<file>.dinorand-bak` sibling and
+  captures the sibling when they differ (previously the already-edited live file was captured as
+  "pristine", so every later install/restore reinstalled the foreign edit — the DC2 ST001 Patrol-Ship
+  turret crash recurrence). The DC2 character-skin graft likewise refuses to read a pristine source
+  when its two backup copies disagree.
+
+- **DC1 puzzle-code scramble refuses European GOG executables** instead of writing the JP-master
+  keypad-table offsets into unrelated `.data` bytes (the European builds have a different, undecoded
+  table layout), and re-running with a new seed now re-derives from the pristine backup
+  (pristine-source + transplant, non-compounding).
+
 ## [0.4.0] — 2026-07-09
 
 ### Added

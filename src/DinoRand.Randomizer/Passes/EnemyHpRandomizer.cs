@@ -9,12 +9,14 @@ namespace DinoRand.Randomizer.Passes;
 /// <c>{750,850,1000}</c> birth roll (DC1-G2, live-confirmed 2026-07-08 — EXE-SYMBOLS <c>0x42656A</c>;
 /// docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED"). A plain SCD file edit; no EXE/CE.
 ///
-/// <para><b>Eligibility</b> mirrors <see cref="EnemyRandomizer"/> exactly: only records that positively
-/// decode as a dinosaur (<see cref="EnemyRecord.IsRandomizableDino"/> — excludes the scripted
-/// Tyrannosaurus and rig-sharing non-dinos), scripted T-Rex + choreographed cutscene rooms skipped
-/// entirely, and <b><c>0x20</c> records only</b> — a <c>0x59</c> record's <c>+6</c> is model-pointer
-/// bytes, so it is never touched. HP gates no progression (key/door logic ignores it), so beatability is
-/// unaffected; the drawn value is clamped to a ushort-safe, never-zero band.</para>
+/// <para><b>Eligibility</b> starts from <see cref="EnemyRandomizer"/>'s filter (positively-decoded
+/// dinosaurs via <see cref="EnemyRecord.IsRandomizableDino"/>; scripted T-Rex + cutscene rooms skipped;
+/// <b><c>0x20</c> records only</b> — a <c>0x59</c> record's <c>+6</c> is model-pointer bytes) and then
+/// requires <see cref="EnemyRecord.IsHpPresettable"/>: only cat-2 RaptorHeavy and cat-7 Pteranodon births
+/// keep a nonzero preset — cat-1 Velociraptor and cat-5 Swarm births overwrite maxHP with 1000
+/// unconditionally on the PC build, so editing them would be a silent no-op (STATIC-SCD-RE cont.48).
+/// HP gates no progression (key/door logic ignores it), so beatability is unaffected; the drawn value is
+/// clamped to a ushort-safe, never-zero band.</para>
 /// </summary>
 public sealed class EnemyHpRandomizer : IRandomizationPass
 {
@@ -52,7 +54,7 @@ public sealed class EnemyHpRandomizer : IRandomizationPass
             int roomEdits = 0, roomLo = int.MaxValue, roomHi = 0;
             foreach (var e in room.Enemies)
             {
-                if (e.Opcode != DcOpcodes.Enemy || !e.IsRandomizableDino) continue;
+                if (e.Opcode != DcOpcodes.Enemy || !e.IsRandomizableDino || !e.IsHpPresettable) continue;
                 int hp = Math.Clamp(rng.Next(lo, hi + 1), MinHp, MaxHp);
                 e.MaxHp = (ushort)hp;
                 if (e.IsEdited)

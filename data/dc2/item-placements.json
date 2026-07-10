@@ -1,6 +1,6 @@
 {
-  "_source": "decode_script.item_commits() (init-routine fix 2026-06-27 p2). ONE item path: op 0x31 in per-room slot-5. id byte (block+0x04) is the randomizer lever.",
-  "_fields": "id=block+0x04 (editable item-id byte = THE randomizer lever, always mode-0 literal); param=block+0x00 (the 0x48bf20 `param` arg = rec+0x18; a x4 INDEX into the [scene_mgr+0xa54] scene-object array, NOT an item quantity -- do NOT shuffle it, it binds the item to its pickup location); slot=block+0x30 (AOT array slot); id_blob_off=byte offset of the id literal in the DECOMPRESSED room blob; op_blob_off=offset of the op-0x31 byte. See docs/dc2/AOT-SYSTEM-RE.md (SAT-1 handler).",
+  "_source": "decode_script.item_commits() (init-routine fix 2026-06-27 p2). ONE item path: op 0x31 in per-room slot-5. K77 (2026-07-10): the id byte is the SAT-1 VM-THREAD SLOT, not a catalog item id -- its item correlation is empirical and the 'randomizer lever' status is UNVERIFIED pending the give-path decode / F1 witness (ITEMS-KEYITEMS-RE-PLAN Phase 2).",
+  "_fields": "id=block+0x04 (mode-0 literal = 0x48bf20 `type` = the VM-thread slot; empirically 1:1 with the field item type, mechanism unproven -- K77); param=block+0x00 (the 0x48bf20 `param` arg = rec+0x18 = a ROUTINE INDEX into the slot-5 routine table; routine[param] is the pickup program that decides the granted item -- do NOT shuffle it); slot=block+0x30 (AOT array slot); id_blob_off=byte offset of the id literal in the DECOMPRESSED room blob; op_blob_off=offset of the op-0x31 byte. See docs/reference/dc2/doors/AOT-SYSTEM-RE.md (UPDATE banner) + K77/K80.",
   "_named_ids": {
     "1": "Med Pak S",
     "2": "Resusc Pack",
@@ -100,6 +100,14 @@
         "slot": 4,
         "id_blob_off": 149276,
         "op_blob_off": 149282
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 24,
+        "slot": 5,
+        "id_blob_off": 152296,
+        "op_blob_off": 152302
       }
     ],
     "ST005": [
@@ -690,6 +698,22 @@
         "slot": 5,
         "id_blob_off": 100078,
         "op_blob_off": 100084
+      },
+      {
+        "id": 4,
+        "name": null,
+        "param": 27,
+        "slot": 8,
+        "id_blob_off": 120764,
+        "op_blob_off": 120770
+      },
+      {
+        "id": 1,
+        "name": "Med Pak S",
+        "param": 10,
+        "slot": 7,
+        "id_blob_off": 121816,
+        "op_blob_off": 121822
       }
     ],
     "ST403": [
@@ -1437,6 +1461,6 @@
       }
     ]
   },
-  "_total_items": 165,
+  "_total_items": 168,
   "_total_rooms": 54
 }

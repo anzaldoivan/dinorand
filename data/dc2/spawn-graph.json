@@ -357,7 +357,7 @@
    ]
   },
   "003": {
-   "spawn_count": 15,
+   "spawn_count": 18,
    "spawns": [
     {
      "routine": 5,
@@ -1028,6 +1028,141 @@
        "value": 3,
        "mode": 0,
        "value_off": 149032,
+       "editable": true
+      }
+     },
+     "species": "(model from spawn-block / non-enemy)",
+     "type_literal": 16
+    },
+    {
+     "routine": 21,
+     "index": 0,
+     "spawn_off": 150984,
+     "fields": {
+      "VARIANT": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 150974,
+       "editable": true
+      },
+      "posZ": {
+       "value": 2364,
+       "mode": 0,
+       "value_off": 150962,
+       "editable": true
+      },
+      "posY": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 150958,
+       "editable": true
+      },
+      "posX": {
+       "value": 133,
+       "mode": 6,
+       "value_off": 150954,
+       "editable": false
+      },
+      "TYPE": {
+       "value": 16,
+       "mode": 0,
+       "value_off": 150950,
+       "editable": true
+      },
+      "SLOT": {
+       "value": 2,
+       "mode": 0,
+       "value_off": 150946,
+       "editable": true
+      }
+     },
+     "species": "(model from spawn-block / non-enemy)",
+     "type_literal": 16
+    },
+    {
+     "routine": 23,
+     "index": 0,
+     "spawn_off": 152170,
+     "fields": {
+      "VARIANT": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 152160,
+       "editable": true
+      },
+      "posZ": {
+       "value": 2379,
+       "mode": 0,
+       "value_off": 152148,
+       "editable": true
+      },
+      "posY": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 152144,
+       "editable": true
+      },
+      "posX": {
+       "value": 140,
+       "mode": 6,
+       "value_off": 152140,
+       "editable": false
+      },
+      "TYPE": {
+       "value": 16,
+       "mode": 0,
+       "value_off": 152136,
+       "editable": true
+      },
+      "SLOT": {
+       "value": 2,
+       "mode": 0,
+       "value_off": 152132,
+       "editable": true
+      }
+     },
+     "species": "(model from spawn-block / non-enemy)",
+     "type_literal": 16
+    },
+    {
+     "routine": 24,
+     "index": 0,
+     "spawn_off": 153316,
+     "fields": {
+      "VARIANT": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 153306,
+       "editable": true
+      },
+      "posZ": {
+       "value": 1624,
+       "mode": 0,
+       "value_off": 153294,
+       "editable": true
+      },
+      "posY": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 153290,
+       "editable": true
+      },
+      "posX": {
+       "value": 143,
+       "mode": 6,
+       "value_off": 153286,
+       "editable": false
+      },
+      "TYPE": {
+       "value": 16,
+       "mode": 0,
+       "value_off": 153282,
+       "editable": true
+      },
+      "SLOT": {
+       "value": 1,
+       "mode": 0,
+       "value_off": 153278,
        "editable": true
       }
      },
@@ -12543,7 +12678,7 @@
    ]
   },
   "503": {
-   "spawn_count": 9,
+   "spawn_count": 10,
    "spawns": [
     {
      "routine": 7,
@@ -12944,6 +13079,51 @@
        "value": 2,
        "mode": 0,
        "value_off": 105220,
+       "editable": true
+      }
+     },
+     "species": "(model from spawn-block / non-enemy)",
+     "type_literal": 16
+    },
+    {
+     "routine": 24,
+     "index": 0,
+     "spawn_off": 108544,
+     "fields": {
+      "VARIANT": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 108534,
+       "editable": true
+      },
+      "posZ": {
+       "value": 124,
+       "mode": 6,
+       "value_off": 108522,
+       "editable": false
+      },
+      "posY": {
+       "value": 0,
+       "mode": 0,
+       "value_off": 108518,
+       "editable": true
+      },
+      "posX": {
+       "value": 123,
+       "mode": 6,
+       "value_off": 108514,
+       "editable": false
+      },
+      "TYPE": {
+       "value": 16,
+       "mode": 0,
+       "value_off": 108510,
+       "editable": true
+      },
+      "SLOT": {
+       "value": 2,
+       "mode": 0,
+       "value_off": 108506,
        "editable": true
       }
      },
@@ -19868,7 +20048,7 @@
  "_stats": {
   "rooms": 89,
   "rooms_with_spawns": 65,
-  "total_spawns": 437,
-  "literal_type_spawns": 431
+  "total_spawns": 441,
+  "literal_type_spawns": 435
  }
 }

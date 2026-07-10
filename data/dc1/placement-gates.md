@@ -34,16 +34,24 @@ missing.
 The audit confirms the overlay is **complete** for monotonic placement gates — no missing gate. The
 lock-axis external gate `0108→0113` (type-1, flag `9:6`) lives in `map-requirements.md`, not here.
 
-## Deferred — toggled elevator gate (NOT authored)
+## Resolved — Large-Size Elevator edges are FREE (CE-witnessed 2026-07-10, NOT authored)
 
-| Door room | Dest | Flag | Why deferred |
+| Door room | Dest | Flag | Verdict |
 |---|---|---|---|
-| 0405 | 060F | 2:6 | Large-Size Elevator stage-4↔B3. `2:6` is a §8c **toggled** state register (elevator mini state-machine), and the §8d live capture read all door-gate flags 0 at new-game — the elevator bridges are genuinely open at start and can be driven from the other side (native setters like `7:44`'s `0x44A411` are invisible to the SCD scan). A monotonic `requiresRoom=[030B]` would wrongly gate a free passage, so it is **not** authored; it needs per-case CE resolution (§8c/§8d). It remains a known `CrossRegionFreeBridges` phantom (§8e) — accepted until the elevator state machine is modeled. |
+| 0405 | 060F | 2:6 | **FREE** — live CE capture (STATIC-SCD-RE cont.46): user rode `0405→060F→030C` and back with `2:4/2:5/2:6 == 0` the whole time, without entering 030B, and the ride set none of them. The door is **present at `2:6==0`** ⇒ skip-if-**true** (open at start), refuting the `door_catalog.py` "skip-if-false `2:6`" decode as a passability constraint and confirming §8d. `2:4/2:5/2:6` are runtime UI/cursor registers (`0x446664` menu object writes grp2 b4–7 from input) + the elevator's own state is byte `[0x677F5D]`, **not** the g2 bank — so no monotonic progression to gate on. Verdict (a) impossible; `requiresRoom=[030B]` NOT authored (would gate a free passage). |
+| 060F | 030C | 2:5/2:4 | **FREE** — same capture; both `060F→030C` and reciprocal `030C→060F` traversed at `2:x==0`, both directions, no 030B, no flag written. |
+
+These are no longer `CrossRegionFreeBridges` phantoms *to resolve* — they are confirmed genuinely-free topology (§8e), matching §8d. Left unauthored by design.
 
 ## Excluded as broad-flag noise (NOT gates)
 
-21 doors gated on flag **`2:4`** (set in `030B`, fan-out ~13) or a toggled register: both directions of
-`0102↔0110`, `0105↔0110`, `0110↔010A`, `0101↔0111`, `0108↔0111`, `0300→030C`, `0106↔0205`, `0501↔0502`,
-`0509↔050A`, `0405↔060F`, … A single room-init guard / elevator register, not a per-door lock — these
-doors are walkable from game start, long before `030B`. Kept as data only; promoting any requires CE
-validation of what the flag actually gates in-game (STATIC-SCD-RE cont.42, GRAPH-LOGIC-PARITY §8c/§8d).
+21 doors gated on flag **`2:4`** (set in `030B`, fan-out ~13) or another native-writer register: both
+directions of `0102↔0110`, `0105↔0110`, `0110↔010A`, `0101↔0111`, `0108↔0111`, `0300→030C`, `0106↔0205`,
+`0501↔0502`, `0509↔050A`, `0405↔060F`, plus `0306→0304` (`0:119`, fan-out 4). A single room-init guard /
+elevator register, not a per-door lock — these doors are walkable from game start, long before `030B`.
+Since cont.47 the toggled/runtime exclusion is **derived, not hand-coded**: `door_catalog.py --audit`
+excludes any candidate flag with a NATIVE `SetFlag 0x40752B` writer (static census,
+`tools/scd_re/flag_writers.py`) — this reproduces the old `{2:4,2:5,2:6,3:33,3:34,3:57}` denylist
+exactly (all six are exact native-writer flags) and found **no new door-gate flag** to queue for CE.
+Kept as data only; promoting any requires CE validation of what the flag actually gates in-game
+(STATIC-SCD-RE cont.42/47, GRAPH-LOGIC-PARITY §8c/§8d).

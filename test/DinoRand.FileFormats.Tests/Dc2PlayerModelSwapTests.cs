@@ -3,6 +3,7 @@ using DinoRand.Randomizer;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Definitions;
+using DinoRand.Randomizer.Install;
 using DinoRand.Randomizer.Spoiler;
 using Xunit;
 
@@ -102,6 +103,27 @@ public class Dc2PlayerModelSwapTests
             foreach (var (_, donor) in Dc2PlayerModelSwap.SkinDonors[Dc2CharacterSkin.Gail])
                 File.WriteAllBytes(Path.Combine(dir, donor), new byte[64]); // not a Gian package
             Assert.Throws<InvalidDataException>(() => Dc2PlayerModelSwap.Plan(dir, Dc2CharacterSkin.Gail));
+        }
+        finally { Directory.Delete(dir, recursive: true); }
+    }
+
+    [Fact]
+    public void Plan_refuses_when_the_two_pristine_sources_disagree()
+    {
+        // Poisoned-capture guard (K82): if .dinorand_backup\<file> and <file>.dinorand-bak disagree,
+        // one of them was captured from an already-modded file — refuse instead of grafting poison.
+        var dir = Path.Combine(Path.GetTempPath(), "dinorand-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(Path.Combine(dir, GameInstaller.BackupDirName));
+        try
+        {
+            foreach (var (_, donor) in Dc2PlayerModelSwap.SkinDonors[Dc2CharacterSkin.Gail])
+            {
+                File.WriteAllBytes(Path.Combine(dir, donor), new byte[64]);
+                File.WriteAllBytes(Path.Combine(dir, GameInstaller.BackupDirName, donor), new byte[] { 1, 1 });
+                File.WriteAllBytes(Path.Combine(dir, donor + GameInstaller.SiblingBackupSuffix), new byte[] { 2, 2 });
+            }
+            var ex = Assert.Throws<InvalidDataException>(() => Dc2PlayerModelSwap.Plan(dir, Dc2CharacterSkin.Gail));
+            Assert.Contains("disagree", ex.Message);
         }
         finally { Directory.Delete(dir, recursive: true); }
     }

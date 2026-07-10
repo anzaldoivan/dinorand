@@ -108,22 +108,41 @@ public class GameInstallerExeTests : IDisposable
         Assert.Equal(ExePatcher.SetupFnStage2, ExePatcher.ReadSetupFn(exe, 2));
     }
 
+    /// <summary>Write the full stock JP-master keypad table (all rows, both region halves) into the
+    /// synthetic exe — <see cref="DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.VerifyStockKeypadTable"/>
+    /// requires it before any scramble.</summary>
+    private static void WriteStockKeypadTable(byte[] exe)
+    {
+        foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
+            foreach (int copy in MgmtOfficeSafeCode.JpRow0FileOffsets)
+                foreach (bool us in new[] { false, true })
+                {
+                    int fo = MgmtOfficeSafeCode.RowFileOffset(copy, lk.Row, us);
+                    int[] stock = us ? lk.UsDigits : lk.OriginalDigits;
+                    for (int i = 0; i < MgmtOfficeSafeCode.DigitCount; i++)
+                        exe[fo + i] = MgmtOfficeSafeCode.EncodeDigit(stock[i]);
+                }
+    }
+
     [Fact]
     public void PatchExeSyncPuzzleCodes_WritesSeedCodes_AndRestoreReverses()
     {
-        // Seed the synthetic exe's code table with the shipped JP codes, and drop the real document rooms
-        // in beside it when the game data is available in this checkout.
+        // Needs an inline-text (GOG European) install for the document rooms; the temp tree then
+        // classifies GogInlineText and routes through the RDT document lever.
+        string? srcData = Dc1EditionDetectorTests.FindInlineTextDataDir();
+        if (srcData is null) return; // no inline-text install in this checkout — skip silently
+
+        // Seed the synthetic exe's code table with the full shipped stock codes.
         var exe0 = File.ReadAllBytes(ExePath);
-        foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
-            MgmtOfficeSafeCode.WriteRow(exe0, lk.Row, lk.OriginalDigits, bothRegions: true);
+        WriteStockKeypadTable(exe0);
         File.WriteAllBytes(ExePath, exe0);
 
         var docFiles = new List<string>();
         foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
         {
             if (lk.DocFile is null) continue;
-            var src = FindGameFile(Path.Combine("english", "Data", lk.DocFile));
-            if (src is not null) { File.Copy(src, Path.Combine(DataDir, lk.DocFile)); docFiles.Add(lk.DocFile); }
+            var src = Path.Combine(srcData, lk.DocFile);
+            if (File.Exists(src)) { File.Copy(src, Path.Combine(DataDir, lk.DocFile)); docFiles.Add(lk.DocFile); }
         }
 
         var pristineExe = File.ReadAllBytes(ExePath);
@@ -165,6 +184,82 @@ public class GameInstallerExeTests : IDisposable
             if (File.Exists(Path.Combine(dir.FullName, "DinoRand.sln"))) break;
         }
         return null;
+    }
+
+    /// <summary>The real REbirth ddraw.dll (version-lock verified), or null to skip.</summary>
+    private static string? FindRebirthDdraw()
+    {
+        string? data = Dc1EditionDetectorTests.FindGameDir("english");
+        if (data is null) return null;
+        string p = Path.Combine(Path.GetDirectoryName(data)!, "ddraw.dll");
+        return Dc1EditionDetector.IsRebirthDdraw(p) ? p : null;
+    }
+
+    /// <summary>Unknown edition (no REbirth DLL, no inline Latin text) must refuse loudly — an EXE-only
+    /// scramble would leave the document showing a code the keypad rejects.</summary>
+    [Fact]
+    public void PatchExeSyncPuzzleCodes_UnknownEdition_Throws()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 1));
+        Assert.Contains("classify", ex.Message);
+        // and nothing was written
+        Assert.False(File.Exists(Path.Combine(DataDir, GameInstaller.BackupDirName, GameInstaller.ExeName)));
+    }
+
+    /// <summary>REbirth-Japanese: the JP document text has no rewrite lever, so the whole scramble is
+    /// skipped (codes stay stock — displayed == checked trivially). Real-DLL; skips if absent.</summary>
+    [Fact]
+    public void PatchExeSyncPuzzleCodes_RebirthJapanese_SkipsWithoutWriting()
+    {
+        string? ddraw = FindRebirthDdraw();
+        if (ddraw is null) return;
+        File.Copy(ddraw, Path.Combine(_root, "ddraw.dll"));
+        File.WriteAllText(Path.Combine(_root, "config.ini"), "[DLL]\nJapaneseEnable = 1\n");
+
+        byte[] exeBefore = File.ReadAllBytes(ExePath);
+        var res = GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 1);
+        Assert.Contains(res.Repoints, r => r.Contains("SKIPPED", StringComparison.Ordinal));
+        Assert.Equal(exeBefore, File.ReadAllBytes(ExePath)); // untouched
+    }
+
+    /// <summary>REbirth-English end-to-end: exe rows scrambled AND ddraw.dll's embedded diff archive
+    /// rebuilt with the same codes; Restore reverses both byte-identical. Real-DLL; skips if absent.</summary>
+    [Fact]
+    public void PatchExeSyncPuzzleCodes_RebirthEnglish_PatchesDdrawAndRestores()
+    {
+        string? ddraw = FindRebirthDdraw();
+        if (ddraw is null) return;
+        string liveDdraw = Path.Combine(_root, "ddraw.dll");
+        File.Copy(ddraw, liveDdraw);
+        File.WriteAllText(Path.Combine(_root, "config.ini"), "[DLL]\nJapaneseEnable = 0\n");
+
+        var exe0 = File.ReadAllBytes(ExePath);
+        WriteStockKeypadTable(exe0);
+        File.WriteAllBytes(ExePath, exe0);
+        byte[] ddraw0 = File.ReadAllBytes(liveDdraw);
+
+        var res = GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 777);
+        Assert.Contains(res.Repoints, r => r.Contains("ddraw.dll", StringComparison.Ordinal));
+
+        // exe rows hold the seed codes (both halves), and the DLL carries the text patch.
+        var exe = File.ReadAllBytes(ExePath);
+        foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
+        {
+            int[] want = DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row);
+            Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: false));
+            Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: true));
+        }
+        Assert.True(RebirthTextPatcher.IsPuzzleCodeTextPatched(File.ReadAllBytes(liveDdraw)));
+
+        // Re-running with another seed re-derives from the pristine backup (non-compounding).
+        GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 778);
+        Assert.True(RebirthTextPatcher.IsPuzzleCodeTextPatched(File.ReadAllBytes(liveDdraw)));
+
+        // Restore puts the pristine ddraw.dll (loose backup) and exe back, byte-identical.
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(exe0, File.ReadAllBytes(ExePath));
+        Assert.Equal(ddraw0, File.ReadAllBytes(liveDdraw));
     }
 
     [Fact]

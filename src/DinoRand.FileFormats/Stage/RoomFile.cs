@@ -4,6 +4,41 @@ using DinoRand.FileFormats.Compression;
 namespace DinoRand.FileFormats.Stage;
 
 /// <summary>
+/// Optional authored fields for an injected <c>0x20</c> enemy record — everything defaults to the
+/// zero template proven neutral by cont.51 ("zeros ⇒ mode 0 ⇒ the default behavior") — plus the
+/// optional op-<c>0x22</c>/op-<c>0x3a</c> activation-pair emission (cont.49). The CE-gate labs
+/// (<c>--add-enemy</c>/<c>--add-enemy-at</c>) drive these; nothing in the bulk randomizer sets them.
+/// </summary>
+public readonly record struct EnemyAuthoring
+{
+    /// <summary>Preset maxHP word (record <c>+6</c> → entity <c>+0x11A</c> at <c>0x42656A</c>).
+    /// 0 = keep the birth roll. Only cat-2/cat-7 births keep a preset (<see cref="EnemyRecord.IsHpPresettable"/>,
+    /// cont.48).</summary>
+    public ushort MaxHp { get; init; }
+
+    /// <summary>Per-entity AI parameter (record <c>+3</c> → entity <c>+0x2F</c>, cont.51). 0 = corpus norm.</summary>
+    public byte AiParam { get; init; }
+
+    /// <summary>Birth-behavior bitfield (record <c>+5</c> → entity <c>+0x18E</c>; low 2 bits select the
+    /// initial behavior code <c>+0x3D</c> — cat-2: 0→1, 1→0x19, else 0x1A; cont.51). 0 = default.</summary>
+    public byte BirthMode { get; init; }
+
+    /// <summary>When non-null, emit the activation pair right after the injected record: op <c>0x22</c>
+    /// binding the record's slot + op <c>0x3a</c> installing this behavior code (top state 4 —
+    /// cont.49). Required for a cat-1 to hunt from an init placement; cat-2 self-activates without it.</summary>
+    public byte? ActivateBehavior { get; init; }
+
+    /// <summary>The emitted op <c>0x3a</c>'s 8 operand bytes. Null = copy the first native <c>0x3a</c>'s
+    /// blob in the target room, falling back to zeros (a retail-legal value — st102 sub6, cont.52).</summary>
+    public byte[]? ActivateBlob { get; init; }
+
+    /// <summary>The emitted op <c>0x3a</c>'s byte <c>[3]</c> (semantics unmapped; retail behavior-1
+    /// installs carry 0x1F/0x20/0x21 there, behavior-5 installs carry 0 — st10e/st102). Null = copy it
+    /// from the same native <c>0x3a</c> the blob comes from (0 when the blob is explicit or absent).</summary>
+    public byte? ActivateB3 { get; init; }
+}
+
+/// <summary>
 /// One Dino Crisis 1 room — physically one <c>stNXX.dat</c> file (N = stage 1–9/A/B/C,
 /// XX = room number in hex), e.g. <c>st10a.dat</c> = stage&#160;1, room&#160;0x0A.
 /// This is the DC analogue of Resident Evil's per-room RDT, so the engine treats it the
@@ -362,9 +397,10 @@ public sealed class RoomFile
     /// model's codes (<see cref="StageTexture"/>). Returns the new record and the texture outcome;
     /// call <see cref="Write"/> for the final bytes.</summary>
     public (EnemyRecord Enemy, TexturedImportResult Texture) AddEnemyTextured(
-        SpeciesDonor donor, short x, short y, short z, short rotation, byte? slot = null, byte? killFlag = null)
+        SpeciesDonor donor, short x, short y, short z, short rotation, byte? slot = null, byte? killFlag = null,
+        EnemyAuthoring authoring = default)
     {
-        var added = AddEnemy(donor, x, y, z, rotation, slot, killFlag);
+        var added = AddEnemy(donor, x, y, z, rotation, slot, killFlag, authoring);
         return (added, StageTexture(donor.Texture, added.ModelPtr));
     }
 
@@ -388,7 +424,7 @@ public sealed class RoomFile
     /// </summary>
     /// <returns>The new enemy record, surfaced in <see cref="Enemies"/> at its injected offset.</returns>
     public EnemyRecord AddEnemy(SpeciesDonor donor, short x, short y, short z, short rotation,
-                               byte? slot = null, byte? killFlag = null)
+                               byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
     {
         if (Script is not { ParsedCleanly: true })
             throw new InvalidOperationException("room script did not parse cleanly; cannot inject");
@@ -409,7 +445,12 @@ public sealed class RoomFile
 
         // 3. Author the record and inject it (ScriptInjector does all relocation).
         var record = BuildEnemyRecord(donor.Category, chosenSlot, chosenKill, x, y, z, rotation,
-                                      imp.ModelPtr, imp.MotionPtr);
+                                      imp.ModelPtr, imp.MotionPtr, authoring);
+        if (authoring.ActivateBehavior is byte behavior)
+        {
+            var (b3, blob) = ResolveActivation(behavior, authoring);
+            record = AppendActivationPair(record, chosenSlot, behavior, b3, blob);
+        }
         RdtBuffer = ScriptInjector.Insert(RdtBuffer, o, record);
 
         _structurallyEdited = true;
@@ -436,8 +477,8 @@ public sealed class RoomFile
     /// <exception cref="InvalidOperationException">When the script is unparsed, or the offset is not a
     /// clean opcode boundary in any subroutine.</exception>
     public EnemyRecord AddEnemyAt(SpeciesDonor donor, int rdtOffset, short x, short y, short z, short rotation,
-                                  byte? slot = null, byte? killFlag = null)
-        => InjectAt(donor, rdtOffset, x, y, z, rotation, slot, killFlag);
+                                  byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
+        => InjectAt(donor, rdtOffset, x, y, z, rotation, slot, killFlag, authoring);
 
     /// <summary>The shared splice core behind <see cref="AddEnemyAt"/>, <see cref="AddEnemyStanding"/> and
     /// <see cref="AddEnemyEncounter"/>: resolve the model (reuse an already-loaded one, else import),
@@ -445,7 +486,7 @@ public sealed class RoomFile
     /// via <see cref="ScriptInjector"/>. Site SELECTION is the callers' job (see
     /// <see cref="InjectionSiteClassifier"/>); this places at a given, validated offset.</summary>
     private EnemyRecord InjectAt(SpeciesDonor donor, int rdtOffset, short x, short y, short z, short rotation,
-                                byte? slot = null, byte? killFlag = null)
+                                byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
     {
         if (Script is not { ParsedCleanly: true })
             throw new InvalidOperationException("room script did not parse cleanly; cannot inject");
@@ -487,7 +528,12 @@ public sealed class RoomFile
         // 3. Author the record and inject it (ScriptInjector relocates the function table, file-form
         //    pointers and pc-relative branches around the shift).
         var record = BuildEnemyRecord(donor.Category, chosenSlot, chosenKill, x, y, z, rotation,
-                                      modelPtr, motionPtr);
+                                      modelPtr, motionPtr, authoring);
+        if (authoring.ActivateBehavior is byte behavior)
+        {
+            var (b3, blob) = ResolveActivation(behavior, authoring);
+            record = AppendActivationPair(record, chosenSlot, behavior, b3, blob);
+        }
         RdtBuffer = ScriptInjector.Insert(RdtBuffer, rdtOffset, record);
 
         _structurallyEdited = true;
@@ -514,11 +560,11 @@ public sealed class RoomFile
     /// </summary>
     public (EnemyRecord Enemy, TexturedImportResult Texture) AddEnemyAtTextured(
         SpeciesDonor donor, int rdtOffset, short x, short y, short z, short rotation,
-        byte? slot = null, byte? killFlag = null)
+        byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
     {
         // When AddEnemyAt reuses an already-loaded model, the texture is already resident — no staging.
         bool reused = LoadedModelFor(donor.Species) is not null;
-        var added = AddEnemyAt(donor, rdtOffset, x, y, z, rotation, slot, killFlag);
+        var added = AddEnemyAt(donor, rdtOffset, x, y, z, rotation, slot, killFlag, authoring);
         return reused
             ? (added, new TexturedImportResult(TextureImportOutcome.Reused, null, null))
             : (added, StageTexture(donor.Texture, added.ModelPtr));
@@ -620,13 +666,16 @@ public sealed class RoomFile
 
     private static byte[] BuildEnemyRecord(byte category, byte slot, byte killFlag,
                                            short x, short y, short z, short rotation,
-                                           uint modelPtr, uint motionPtr)
+                                           uint modelPtr, uint motionPtr, EnemyAuthoring authoring = default)
     {
         var r = new byte[DcOpcodes.EnemyLength]; // 24, zero-filled (matches the corpus template)
         r[0] = DcOpcodes.Enemy;
         r[EnemyRecord.SlotOffset] = slot;
         r[EnemyRecord.CategoryOffset] = category;
+        r[EnemyRecord.AiParamOffset] = authoring.AiParam;
         r[EnemyRecord.KillFlagOffset] = killFlag;
+        r[EnemyRecord.BirthModeOffset] = authoring.BirthMode;
+        BinaryPrimitives.WriteUInt16LittleEndian(r.AsSpan(EnemyRecord.MaxHpOffset, 2), authoring.MaxHp);
         BinaryPrimitives.WriteInt16LittleEndian(r.AsSpan(EnemyRecord.PosXOffset, 2), x);
         BinaryPrimitives.WriteInt16LittleEndian(r.AsSpan(EnemyRecord.PosYOffset, 2), y);
         BinaryPrimitives.WriteInt16LittleEndian(r.AsSpan(EnemyRecord.PosZOffset, 2), z);
@@ -634,6 +683,62 @@ public sealed class RoomFile
         BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(EnemyRecord.ModelOffset, 4), modelPtr);
         BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(EnemyRecord.MotionOffset, 4), motionPtr);
         return r;
+    }
+
+    /// <summary>
+    /// Append the script activation pair after an authored <c>0x20</c> record (STATIC-SCD-RE cont.49):
+    /// op <c>0x22</c> (<c>22 02 &lt;slot&gt; 00</c> — bind the running task's implicit entity,
+    /// <c>ctx+0xB = slot</c>) then op <c>0x3a</c> (<c>3a 00 &lt;behavior&gt; &lt;b3&gt;</c> + 8 operand
+    /// bytes — the "brain install": <c>entity+0x190 ← ptr(rec+4)</c>, <c>+0x18F = 1</c>,
+    /// <c>dword +0x3C ← (behavior&lt;&lt;8)|4</c>). This is what wakes a cat-1 placed by init (cat-2
+    /// self-activates without it). Total emitted insert = 24 + 4 + 12 = 40 bytes (4-aligned).
+    /// </summary>
+    private static byte[] AppendActivationPair(byte[] record, byte slot, byte behavior, byte b3, byte[] blob)
+    {
+        if (blob.Length != 8)
+            throw new ArgumentException($"op 0x3a operand blob must be 8 bytes, got {blob.Length}", nameof(blob));
+        var r = new byte[record.Length + 16];
+        record.CopyTo(r, 0);
+        int o = record.Length;
+        r[o] = 0x22; r[o + 1] = 0x02; r[o + 2] = slot;      // 22 02 <slot> 00
+        r[o + 4] = 0x3a; r[o + 6] = behavior; r[o + 7] = b3; // 3a 00 <behavior> <b3> <blob8>
+        blob.CopyTo(r, o + 8);
+        return r;
+    }
+
+    /// <summary>Resolve the emitted op <c>0x3a</c>'s byte[3] + 8 operand bytes from
+    /// <paramref name="authoring"/>: explicit values win; otherwise both are copied together from the
+    /// first native <c>0x3a</c> in this room (preferring one whose behavior code matches — retail
+    /// pairs b3/blob with the behavior, e.g. st10e's behavior-1 installs carry b3 0x1F/0x21 + what
+    /// look like target coords, while behavior-5 installs are all-zero); zeros when the room has none
+    /// (a retail-legal value — st102 sub6, cont.52).</summary>
+    private (byte B3, byte[] Blob) ResolveActivation(byte behavior, EnemyAuthoring authoring)
+    {
+        if (authoring.ActivateBlob is { } explicitBlob)
+            return (authoring.ActivateB3 ?? 0, explicitBlob);
+        var native = FindNative3a(behavior) ?? FindNative3a(null);
+        return (authoring.ActivateB3 ?? native?.B3 ?? 0, native?.Blob ?? new byte[8]);
+    }
+
+    /// <summary>The (byte[3], operand blob) of the first native op <c>0x3a</c> in this room's script —
+    /// filtered to <paramref name="behavior"/> when given — or null. The operands reference
+    /// script-embedded behavior data (format unmapped — cont.49), so a same-room copy keeps them valid.</summary>
+    private (byte B3, byte[] Blob)? FindNative3a(byte? behavior)
+    {
+        if (!ScriptInjector.TryReadFuncTable(RdtBuffer, out _, out var starts)) return null;
+        for (int i = 0; i < starts.Count; i++)
+        {
+            int s = starts[i], e = i + 1 < starts.Count ? starts[i + 1] : RdtBuffer.Length;
+            for (int pos = s; pos < e;)
+            {
+                int len = DcOpcodes.Length(RdtBuffer, pos);
+                if (len <= 0 || pos + len > e) break; // trailing data / derail
+                if (RdtBuffer[pos] == 0x3a && (behavior is null || RdtBuffer[pos + 2] == behavior))
+                    return (RdtBuffer[pos + 3], RdtBuffer.AsSpan(pos + 4, 8).ToArray());
+                pos += len;
+            }
+        }
+        return null;
     }
 
     /// <summary>Re-walk the (grown) <see cref="RdtBuffer"/> and refresh the record lists / script.</summary>
