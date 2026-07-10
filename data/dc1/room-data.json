@@ -2215,8 +2215,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -2227,15 +2231,15 @@
               -4120
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Backyard of the Facility, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x3f048 in sub10 (event(sub10)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x3f048 in sub10 (event(sub10)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x400cc",
@@ -2252,8 +2256,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -2264,15 +2272,15 @@
               -9698
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Raptor (heavy rig)",
               "oneShot": false,
-              "plain": "This Raptor (heavy rig) placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Backyard of the Facility, spawn a Raptor (heavy rig) (until it has been killed)."
             },
-            "logic": "0x20 placement @0x400cc in sub22 (event(sub22)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x400cc in sub22 (event(sub22)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -2610,8 +2618,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -2622,15 +2634,15 @@
               -2493
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter The Backyard, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4f1c0 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4f1c0 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x4f1d8",
@@ -2647,8 +2659,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -2659,15 +2675,15 @@
               -1260
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter The Backyard, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4f1d8 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4f1d8 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x4fea8",
@@ -2684,8 +2700,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -2696,15 +2716,15 @@
               -2493
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter The Backyard, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4fea8 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4fea8 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -3221,6 +3241,10 @@
           }
         ]
       },
+      "scripted_enemy": true,
+      "special_properties": [
+        "Scripted T-Rex window-smash (ScriptedEnemyRoomCode 0x202): cat-4 T-Rex (Chief's Room rig) placed in event sub14 (dominated); a velociraptor 0x20 at init is gated by 0x26 @0x4fb2c"
+      ],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -3523,10 +3547,6 @@
           }
         ]
       },
-      "scripted_enemy": true,
-      "special_properties": [
-        "Scripted T-Rex window-smash (ScriptedEnemyRoomCode 0x202): cat-4 T-Rex (Chief's Room rig) placed in event sub14 (dominated); a velociraptor 0x20 at init is gated by 0x26 @0x4fb2c"
-      ],
       "id": "0202",
       "name": "Chief's Room",
       "jp_name": "所長室",
@@ -4343,6 +4363,8 @@
           }
         ]
       },
+      "scripted_enemy": false,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -4740,8 +4762,6 @@
           }
         ]
       },
-      "scripted_enemy": false,
-      "special_properties": [],
       "id": "0303",
       "name": "Gas Experiment Room",
       "jp_name": "ガス実験室",
@@ -4909,8 +4929,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                11
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -4921,18 +4945,20 @@
               4616
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Computer Room, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x263ac in sub12 (event(sub12)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x263ac in sub12 (event(sub12)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[11] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
+      "scripted_enemy": false,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -5078,8 +5104,6 @@
           }
         ]
       },
-      "scripted_enemy": false,
-      "special_properties": [],
       "id": "0304",
       "name": "Computer Room",
       "jp_name": "コンピュータ室",
@@ -5234,6 +5258,8 @@
           }
         ]
       },
+      "scripted_enemy": false,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -5487,8 +5513,6 @@
           }
         ]
       },
-      "scripted_enemy": false,
-      "special_properties": [],
       "id": "0305",
       "name": "Library Room",
       "jp_name": "資料室",
@@ -5832,8 +5856,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                6
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -5844,15 +5872,15 @@
               -1618
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Medical Room, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x42844 in sub7 (event(sub7)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x42844 in sub7 (event(sub7)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[6] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x42994",
@@ -5869,8 +5897,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -5881,15 +5913,15 @@
               -123
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Medical Room, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x42994 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x42994 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x429ac",
@@ -5906,8 +5938,12 @@
               "bit": 17
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -5918,15 +5954,15 @@
               1016
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Raptor (heavy rig)",
               "oneShot": false,
-              "plain": "This Raptor (heavy rig) placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Medical Room, spawn a Raptor (heavy rig) (until it has been killed)."
             },
-            "logic": "0x20 placement @0x429ac in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,17).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x429ac in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,17).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -6084,23 +6120,27 @@
               "bit": null
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                17
+              ],
+              "rooted": null,
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
               "note": "record post-dominates sub entry; runs on every entry of this sub"
             },
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "an in-room event",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a RaptorHeavy",
               "oneShot": false,
-              "plain": "This RaptorHeavy placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Hall B1, spawn a RaptorHeavy (until it has been killed)."
             },
-            "logic": "0x59 reloc @0x3e91c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?).",
-            "confidence": "unknown"
+            "logic": "0x59 reloc @0x3e91c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[17] (rooted: unrooted).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -6314,7 +6354,7 @@
             "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x4a700",
+            "rec_offset": "0x4a770",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -6328,8 +6368,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -6340,18 +6384,18 @@
               -1559
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4a700 in sub16 (event(sub16)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4a770 in sub16 (event(sub16)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x4a744",
+            "rec_offset": "0x4a7b4",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -6365,8 +6409,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -6377,18 +6425,18 @@
               -1477
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4a744 in sub16 (event(sub16)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4a7b4 in sub16 (event(sub16)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x4af2c",
+            "rec_offset": "0x4af9c",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -6402,8 +6450,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -6414,18 +6466,18 @@
               -1680
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4af2c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4af9c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x4b148",
+            "rec_offset": "0x4b1b8",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -6439,8 +6491,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -6451,18 +6507,18 @@
               -960
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4b148 in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4b1b8 in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x4b318",
+            "rec_offset": "0x4b388",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -6476,8 +6532,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -6488,18 +6548,18 @@
               -1787
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4b318 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4b388 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x4b330",
+            "rec_offset": "0x4b3a0",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -6513,8 +6573,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -6525,15 +6589,15 @@
               -1728
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x4b330 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x4b3a0 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -6904,8 +6968,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -6916,15 +6984,15 @@
               8344
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Pteranodon",
               "oneShot": false,
-              "plain": "This Pteranodon placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Front Area of Entrance, spawn a Pteranodon (until it has been killed)."
             },
-            "logic": "0x20 placement @0x2cebc in sub25 (event(sub25)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x2cebc in sub25 (event(sub25)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -7373,8 +7441,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                18
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -7385,15 +7457,15 @@
               -7773
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Heliport, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x558c4 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x558c4 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[18] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -7771,8 +7843,12 @@
               "bit": 34
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -7783,15 +7859,15 @@
               -3252
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Pteranodon",
               "oneShot": false,
-              "plain": "This Pteranodon placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Large Size Elevator, spawn a Pteranodon (until it has been killed)."
             },
-            "logic": "0x20 placement @0x5584c in sub12 (event(sub12)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,34).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x5584c in sub12 (event(sub12)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,34).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x55d7c",
@@ -7808,8 +7884,12 @@
               "bit": 35
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "branch_only",
@@ -7826,15 +7906,15 @@
               2513
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "gated by an unresolved predicate",
               "condition_flag": null,
               "effect": "spawn a Pteranodon",
               "oneShot": false,
-              "plain": "This Pteranodon placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Large Size Elevator, spawn a Pteranodon (until it has been killed)."
             },
-            "logic": "0x20 placement @0x55d7c in sub12 (event(sub12)); reachable=True dominated=False. gate: branch_only @0x55c00 ([unconfirmed] branch reached without an adjacent test op (gate set earlier/elsewhere)). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,35).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x55d7c in sub12 (event(sub12)); reachable=True dominated=False. gate: branch_only @0x55c00 ([unconfirmed] branch reached without an adjacent test op (gate set earlier/elsewhere)). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,35).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x5653c",
@@ -7851,8 +7931,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                18
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -7863,15 +7947,15 @@
               9149
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Large Size Elevator, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x5653c in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x5653c in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[18] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -8301,6 +8385,8 @@
           }
         ]
       },
+      "scripted_enemy": false,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -8469,8 +8555,6 @@
           }
         ]
       },
-      "scripted_enemy": false,
-      "special_properties": [],
       "id": "0406",
       "name": "Large Size Elevator Control Room",
       "jp_name": "大型エレベータ制御室",
@@ -8630,8 +8714,12 @@
               "bit": 60
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -8642,15 +8730,15 @@
               -8424
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Pteranodon",
               "oneShot": true,
-              "plain": "This Pteranodon placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Passageway to the Power Room, spawn a Pteranodon (until it has been killed)."
             },
-            "logic": "0x20 placement @0x35930 in sub13 (event(sub13)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,60).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x35930 in sub13 (event(sub13)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,60).",
+            "confidence": "confirmed"
           },
           {
             "rec_offset": "0x35b38",
@@ -8667,8 +8755,12 @@
               "bit": 61
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "test_branch",
@@ -8740,15 +8832,15 @@
               2080
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "only until the T-Rex boss-scene phase flag (3:35) has happened",
               "condition_flag": "3:35",
               "effect": "spawn a Pteranodon",
               "oneShot": true,
-              "plain": "This Pteranodon placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Spawn a Pteranodon on entry only until the T-Rex boss-scene phase flag (3:35) has happened; afterwards it never spawns here again."
             },
-            "logic": "0x20 placement @0x35b38 in sub13 (event(sub13)); reachable=True dominated=False. gate: 0x26 GetFlag(group 3, index 35) @0x359cc -> 0x0e skip-if-true @0x359d0; flag 3:35 set_by [0106/sub16=0, 0106/sub19=1, 0201/sub7=1, 0202/sub14=1, 0202/sub14=1, 0202/sub14=0, 0303/sub15=1, 0407/sub13=1, 0407/sub13=1, 050B/sub18=0]. trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,61).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x35b38 in sub13 (event(sub13)); reachable=True dominated=False. gate: 0x26 GetFlag(group 3, index 35) @0x359cc -> 0x0e skip-if-true @0x359d0; flag 3:35 set_by [0106/sub16=0, 0106/sub19=1, 0201/sub7=1, 0202/sub14=1, 0202/sub14=1, 0202/sub14=0, 0303/sub15=1, 0407/sub13=1, 0407/sub13=1, 050B/sub18=0]. trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,61).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -9569,9 +9661,9 @@
                   "zone_polygon": [
                     -9472,
                     3840,
-                    -8064,
+                    -7808,
                     3840,
-                    -8064,
+                    -7808,
                     1152,
                     -9472,
                     1152
@@ -9595,7 +9687,7 @@
             "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x48894",
+            "rec_offset": "0x4888c",
             "opcode": "0x59",
             "species": "RaptorHeavy",
             "category": 2,
@@ -9609,23 +9701,27 @@
               "bit": null
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                14
+              ],
+              "rooted": "aot_zone(sub14)",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
               "note": "record post-dominates sub entry; runs on every entry of this sub"
             },
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "entering the Experiment Room Hall trigger zone",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a RaptorHeavy",
               "oneShot": false,
-              "plain": "This RaptorHeavy placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Experiment Room Hall, spawn a RaptorHeavy (until it has been killed)."
             },
-            "logic": "0x59 reloc @0x48894 in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?).",
-            "confidence": "unknown"
+            "logic": "0x59 reloc @0x4888c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[14] (rooted: aot_zone(sub14)).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -12077,6 +12173,8 @@
           }
         ]
       },
+      "scripted_enemy": false,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -12184,8 +12282,6 @@
           }
         ]
       },
-      "scripted_enemy": false,
-      "special_properties": [],
       "id": "050C",
       "name": "Power Freq. Room",
       "jp_name": "サードエナジー配電室",
@@ -12550,6 +12646,8 @@
           }
         ]
       },
+      "scripted_enemy": false,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -12710,8 +12808,6 @@
           }
         ]
       },
-      "scripted_enemy": false,
-      "special_properties": [],
       "id": "050E",
       "name": "Dr. Kirk's Personal Lab",
       "jp_name": "カーク博士私室",
@@ -12767,9 +12863,9 @@
             "gate": {
               "type": "test_branch",
               "test_op": "0x26",
-              "test_offset": "0x2c6d8",
+              "test_offset": "0x2c6f8",
               "branch_op": "0x0e",
-              "branch_offset": "0x2c6dc",
+              "branch_offset": "0x2c6fc",
               "branch_sense": "skip-if-true",
               "flag": {
                 "group": 0,
@@ -12796,7 +12892,7 @@
               "oneShot": false,
               "plain": "Spawn a Velociraptor on entry only until the Third Energy Control event (armed in 0510) has happened; afterwards it never spawns here again."
             },
-            "logic": "0x20 placement @0x2c748 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 168) @0x2c6d8 -> 0x0e skip-if-true @0x2c6dc; flag 0:168 set_by [0510/sub9=1]. kill_flag GetFlag(4,0).",
+            "logic": "0x20 placement @0x2c748 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 168) @0x2c6f8 -> 0x0e skip-if-true @0x2c6fc; flag 0:168 set_by [0510/sub9=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
           },
           {
@@ -12820,9 +12916,9 @@
             "gate": {
               "type": "test_branch",
               "test_op": "0x26",
-              "test_offset": "0x2c6d8",
+              "test_offset": "0x2c6f8",
               "branch_op": "0x0e",
-              "branch_offset": "0x2c6dc",
+              "branch_offset": "0x2c6fc",
               "branch_sense": "skip-if-true",
               "flag": {
                 "group": 0,
@@ -12849,7 +12945,7 @@
               "oneShot": false,
               "plain": "Spawn a Velociraptor on entry only until the Third Energy Control event (armed in 0510) has happened; afterwards it never spawns here again."
             },
-            "logic": "0x20 placement @0x2c778 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 168) @0x2c6d8 -> 0x0e skip-if-true @0x2c6dc; flag 0:168 set_by [0510/sub9=1]. kill_flag GetFlag(4,0).",
+            "logic": "0x20 placement @0x2c778 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 168) @0x2c6f8 -> 0x0e skip-if-true @0x2c6fc; flag 0:168 set_by [0510/sub9=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
           },
           {
@@ -13026,8 +13122,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -13038,15 +13138,15 @@
               -450
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Dr. Kirk's Library Room, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x2ce6c in sub10 (event(sub10)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x2ce6c in sub10 (event(sub10)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -13434,7 +13534,7 @@
         "confidence": "high",
         "records": [
           {
-            "rec_offset": "0x545ac",
+            "rec_offset": "0x545a4",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -13454,9 +13554,9 @@
             "gate": {
               "type": "test_branch",
               "test_op": "0x26",
-              "test_offset": "0x54580",
+              "test_offset": "0x54578",
               "branch_op": "0x0e",
-              "branch_offset": "0x54584",
+              "branch_offset": "0x5457c",
               "branch_sense": "skip-if-true",
               "flag": {
                 "group": 0,
@@ -13483,11 +13583,11 @@
               "oneShot": true,
               "plain": "Spawn a Velociraptor on entry only until the Carrying Out Room B3 velociraptor encounter has happened; afterwards it never spawns here again."
             },
-            "logic": "0x20 placement @0x545ac in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 211) @0x54580 -> 0x0e skip-if-true @0x54584; flag 0:211 set_by [0600/sub16=1]. kill_flag GetFlag(4,0).",
+            "logic": "0x20 placement @0x545a4 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 211) @0x54578 -> 0x0e skip-if-true @0x5457c; flag 0:211 set_by [0600/sub16=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x55880",
+            "rec_offset": "0x55878",
             "opcode": "0x20",
             "species": "Tyrannosaurus (boss rig)",
             "category": 3,
@@ -13505,7 +13605,7 @@
               "via": "0x28 subtype-3 enter-zone (target sub at +len-6)",
               "aots": [
                 {
-                  "aot_offset": "0x54644",
+                  "aot_offset": "0x5463c",
                   "zone_polygon": [
                     5552,
                     -480,
@@ -13535,11 +13635,11 @@
               "oneShot": false,
               "plain": "When you enter the Carrying Out Room B3 trigger zone, spawn a Tyrannosaurus (boss rig)."
             },
-            "logic": "0x20 placement @0x55880 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x54644] -> run sub20. kill_flag GetFlag(4,0).",
+            "logic": "0x20 placement @0x55878 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x5463c] -> run sub20. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x55c1c",
+            "rec_offset": "0x55c14",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -13557,7 +13657,7 @@
               "via": "0x28 subtype-3 enter-zone (target sub at +len-6)",
               "aots": [
                 {
-                  "aot_offset": "0x54644",
+                  "aot_offset": "0x5463c",
                   "zone_polygon": [
                     5552,
                     -480,
@@ -13587,11 +13687,11 @@
               "oneShot": false,
               "plain": "When you enter the Carrying Out Room B3 trigger zone, spawn a Velociraptor."
             },
-            "logic": "0x20 placement @0x55c1c in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x54644] -> run sub20. kill_flag GetFlag(4,0).",
+            "logic": "0x20 placement @0x55c14 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x5463c] -> run sub20. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x5682c",
+            "rec_offset": "0x56824",
             "opcode": "0x20",
             "species": "Tyrannosaurus (boss rig)",
             "category": 3,
@@ -13605,8 +13705,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -13617,18 +13721,18 @@
               6754
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Tyrannosaurus (boss rig)",
               "oneShot": false,
-              "plain": "This Tyrannosaurus (boss rig) placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B3, spawn a Tyrannosaurus (boss rig) (until it has been killed)."
             },
-            "logic": "0x20 placement @0x5682c in sub31 (event(sub31)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x56824 in sub31 (event(sub31)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x56a14",
+            "rec_offset": "0x56a0c",
             "opcode": "0x20",
             "species": "Velociraptor",
             "category": 1,
@@ -13642,8 +13746,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -13654,18 +13762,18 @@
               2434
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "This Velociraptor placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B3, spawn a Velociraptor (until it has been killed)."
             },
-            "logic": "0x20 placement @0x56a14 in sub31 (event(sub31)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x56a0c in sub31 (event(sub31)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           },
           {
-            "rec_offset": "0x56bbc",
+            "rec_offset": "0x56bb4",
             "opcode": "0x20",
             "species": "Tyrannosaurus (boss rig)",
             "category": 3,
@@ -13679,8 +13787,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
@@ -13691,18 +13803,20 @@
               3088
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Tyrannosaurus (boss rig)",
               "oneShot": false,
-              "plain": "This Tyrannosaurus (boss rig) placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter Carrying Out Room B3, spawn a Tyrannosaurus (boss rig) (until it has been killed)."
             },
-            "logic": "0x20 placement @0x56bbc in sub32 (event(sub32)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x56bb4 in sub32 (event(sub32)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
+      "scripted_enemy": true,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -13864,8 +13978,6 @@
           }
         ]
       },
-      "scripted_enemy": true,
-      "special_properties": [],
       "id": "0600",
       "name": "Carrying Out Room B3",
       "jp_name": "B3搬出室",
@@ -14394,23 +14506,27 @@
               "bit": null
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                13
+              ],
+              "rooted": "aot_zone(sub13)",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "unconditional",
               "note": "record post-dominates sub entry; runs on every entry of this sub"
             },
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "entering the General Weapons Storage trigger zone",
               "condition": "none",
               "condition_flag": null,
               "effect": "spawn a Therizinosaurus",
               "oneShot": false,
-              "plain": "This Therizinosaurus placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Every time you enter General Weapons Storage, spawn a Therizinosaurus (until it has been killed)."
             },
-            "logic": "0x59 reloc @0x5b0ec in sub14 (event(sub14)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: no static invoker (vestigial/cutscene?).",
-            "confidence": "unknown"
+            "logic": "0x59 reloc @0x5b0ec in sub14 (event(sub14)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[13] (rooted: aot_zone(sub13)).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -14824,8 +14940,12 @@
               "bit": 0
             },
             "trigger": {
-              "kind": "unresolved",
-              "note": "[unconfirmed] no invoker found: not reached from init sub0, no AOT of any subtype targets it (action/subtype map decoded), no gosub, and the room has no 2nd script table. Likely vestigial or cutscene/engine-main invoked; the room's functioning enemies come from its other subs."
+              "kind": "task_spawn",
+              "called_from_subs": [
+                0
+              ],
+              "rooted": "init",
+              "note": "op 0x01 spawns a parallel VM task running this sub (handler 0x4A3103, task array 0x6B4660 stride 0xB0, gated on GetFlag(10,9)); rooted=init means it effectively runs at room load (cont.50)"
             },
             "gate": {
               "type": "test_branch",
@@ -14852,15 +14972,15 @@
               -4845
             ],
             "summary": {
-              "trigger": "no known trigger",
+              "trigger": "room entry",
               "condition": "only after the Port T-Rex encounter",
               "condition_flag": "0:187",
               "effect": "spawn a Tyrannosaurus (boss rig)",
               "oneShot": true,
-              "plain": "This Tyrannosaurus (boss rig) placement sits in a subroutine with no statically-resolved invoker, so whether or when it spawns is unknown (possibly vestigial, or triggered by a path the static decoder does not model)."
+              "plain": "Spawn a Tyrannosaurus (boss rig) only after the Port T-Rex encounter; otherwise this spot stays empty."
             },
-            "logic": "0x20 placement @0x2b19c in sub14 (event(sub14)); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 187) @0x2b168 -> 0x0e skip-if-false @0x2b16c; flag 0:187 set_by [060A/sub15=1]. trigger: no static invoker (vestigial/cutscene?). kill_flag GetFlag(4,0).",
-            "confidence": "unknown"
+            "logic": "0x20 placement @0x2b19c in sub14 (event(sub14)); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 187) @0x2b168 -> 0x0e skip-if-false @0x2b16c; flag 0:187 set_by [060A/sub15=1]. trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
+            "confidence": "confirmed"
           }
         ]
       },
@@ -15129,6 +15249,8 @@
           }
         ]
       },
+      "scripted_enemy": false,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -15544,8 +15666,6 @@
           }
         ]
       },
-      "scripted_enemy": false,
-      "special_properties": [],
       "id": "060D",
       "name": "Underground Heliport",
       "jp_name": "地下ヘリポート",
@@ -15740,6 +15860,8 @@
           }
         ]
       },
+      "scripted_enemy": true,
+      "special_properties": [],
       "item_control": {
         "decoded_utc": "2026-06-22T00:00:00Z",
         "method": "static",
@@ -16184,8 +16306,6 @@
           }
         ]
       },
-      "scripted_enemy": true,
-      "special_properties": [],
       "id": "0610",
       "name": "Hovercraft Storage",
       "jp_name": "ホバークラフト庫",

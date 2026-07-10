@@ -83,11 +83,11 @@
  "_counts": {
   "rooms": 89,
   "rooms_with_spawns": 65,
-  "rooms_with_doors": 83,
+  "rooms_with_doors": 84,
   "rooms_with_items": 54,
   "rooms_with_runtime_enemies": 15,
-  "total_spawns": 437,
-  "total_items": 165,
+  "total_spawns": 441,
+  "total_items": 168,
   "zones_resolved": 89
  },
  "rooms": {
@@ -107,6 +107,12 @@
       "index": 0,
       "spawn_off": 32750,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 32740,
+        "editable": true
+       },
        "posZ": {
         "value": 12553,
         "mode": 0,
@@ -154,7 +160,10 @@
       "dest_id": "003",
       "dest_mode": 0,
       "slot": "0x8",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x011c"
      },
      {
       "commit_off": "0x7ed4",
@@ -164,7 +173,10 @@
       "dest_id": "100",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0204"
      }
     ]
    },
@@ -214,6 +226,12 @@
       "index": 0,
       "spawn_off": 8176,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8166,
+        "editable": true
+       },
        "posZ": {
         "value": 20942,
         "mode": 0,
@@ -233,6 +251,12 @@
       "index": 1,
       "spawn_off": 8328,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8318,
+        "editable": true
+       },
        "posZ": {
         "value": 20942,
         "mode": 0,
@@ -252,6 +276,12 @@
       "index": 2,
       "spawn_off": 8480,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8470,
+        "editable": true
+       },
        "posZ": {
         "value": 20942,
         "mode": 0,
@@ -271,6 +301,12 @@
       "index": 3,
       "spawn_off": 8632,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8622,
+        "editable": true
+       },
        "posZ": {
         "value": 20942,
         "mode": 0,
@@ -298,7 +334,10 @@
       "dest_id": "003",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x00",
+      "built_state": "usable",
+      "door_type": "0x0058"
      }
     ]
    },
@@ -335,6 +374,12 @@
       "index": 0,
       "spawn_off": 70804,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 70794,
+        "editable": true
+       },
        "posZ": {
         "value": 299,
         "mode": 0,
@@ -374,6 +419,12 @@
       "index": 1,
       "spawn_off": 71116,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 71106,
+        "editable": true
+       },
        "posZ": {
         "value": 299,
         "mode": 0,
@@ -413,6 +464,12 @@
       "index": 0,
       "spawn_off": 72424,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 72414,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -452,6 +509,12 @@
       "index": 1,
       "spawn_off": 72524,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 72514,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -499,7 +562,10 @@
       "dest_id": "003",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x011f"
      }
     ]
    },
@@ -554,13 +620,19 @@
    "zone_area_id": 0,
    "zone_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)",
    "spawns": {
-    "spawn_count": 15,
+    "spawn_count": 18,
     "spawns": [
      {
       "routine": 5,
       "index": 0,
       "spawn_off": 135086,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 135076,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -600,6 +672,12 @@
       "index": 1,
       "spawn_off": 135186,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 135176,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -639,6 +717,12 @@
       "index": 2,
       "spawn_off": 135650,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 135640,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -678,6 +762,12 @@
       "index": 0,
       "spawn_off": 136876,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 136866,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -717,6 +807,12 @@
       "index": 1,
       "spawn_off": 137000,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 136990,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -756,6 +852,12 @@
       "index": 0,
       "spawn_off": 140140,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 140130,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -795,6 +897,12 @@
       "index": 1,
       "spawn_off": 140584,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 140574,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -834,6 +942,12 @@
       "index": 0,
       "spawn_off": 143574,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 143564,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -873,6 +987,12 @@
       "index": 1,
       "spawn_off": 143814,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 143804,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -912,6 +1032,12 @@
       "index": 2,
       "spawn_off": 144110,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 144100,
+        "editable": true
+       },
        "posZ": {
         "value": 96,
         "mode": 6,
@@ -951,6 +1077,12 @@
       "index": 3,
       "spawn_off": 144186,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 144176,
+        "editable": true
+       },
        "posZ": {
         "value": 100,
         "mode": 6,
@@ -990,6 +1122,12 @@
       "index": 4,
       "spawn_off": 144450,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 144440,
+        "editable": true
+       },
        "posZ": {
         "value": 106,
         "mode": 6,
@@ -1029,6 +1167,12 @@
       "index": 0,
       "spawn_off": 146074,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 146064,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -1068,6 +1212,12 @@
       "index": 0,
       "spawn_off": 146968,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 146958,
+        "editable": true
+       },
        "posZ": {
         "value": 193,
         "mode": 0,
@@ -1107,6 +1257,12 @@
       "index": 0,
       "spawn_off": 149070,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 149060,
+        "editable": true
+       },
        "posZ": {
         "value": 2244,
         "mode": 0,
@@ -1140,6 +1296,141 @@
       },
       "species": "(model from spawn-block / non-enemy)",
       "type_literal": 16
+     },
+     {
+      "routine": 21,
+      "index": 0,
+      "spawn_off": 150984,
+      "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 150974,
+        "editable": true
+       },
+       "posZ": {
+        "value": 2364,
+        "mode": 0,
+        "value_off": 150962,
+        "editable": true
+       },
+       "posY": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 150958,
+        "editable": true
+       },
+       "posX": {
+        "value": 133,
+        "mode": 6,
+        "value_off": 150954,
+        "editable": false
+       },
+       "TYPE": {
+        "value": 16,
+        "mode": 0,
+        "value_off": 150950,
+        "editable": true
+       },
+       "SLOT": {
+        "value": 2,
+        "mode": 0,
+        "value_off": 150946,
+        "editable": true
+       }
+      },
+      "species": "(model from spawn-block / non-enemy)",
+      "type_literal": 16
+     },
+     {
+      "routine": 23,
+      "index": 0,
+      "spawn_off": 152170,
+      "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 152160,
+        "editable": true
+       },
+       "posZ": {
+        "value": 2379,
+        "mode": 0,
+        "value_off": 152148,
+        "editable": true
+       },
+       "posY": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 152144,
+        "editable": true
+       },
+       "posX": {
+        "value": 140,
+        "mode": 6,
+        "value_off": 152140,
+        "editable": false
+       },
+       "TYPE": {
+        "value": 16,
+        "mode": 0,
+        "value_off": 152136,
+        "editable": true
+       },
+       "SLOT": {
+        "value": 2,
+        "mode": 0,
+        "value_off": 152132,
+        "editable": true
+       }
+      },
+      "species": "(model from spawn-block / non-enemy)",
+      "type_literal": 16
+     },
+     {
+      "routine": 24,
+      "index": 0,
+      "spawn_off": 153316,
+      "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 153306,
+        "editable": true
+       },
+       "posZ": {
+        "value": 1624,
+        "mode": 0,
+        "value_off": 153294,
+        "editable": true
+       },
+       "posY": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 153290,
+        "editable": true
+       },
+       "posX": {
+        "value": 143,
+        "mode": 6,
+        "value_off": 153286,
+        "editable": false
+       },
+       "TYPE": {
+        "value": 16,
+        "mode": 0,
+        "value_off": 153282,
+        "editable": true
+       },
+       "SLOT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 153278,
+        "editable": true
+       }
+      },
+      "species": "(model from spawn-block / non-enemy)",
+      "type_literal": 16
      }
     ]
    },
@@ -1154,7 +1445,10 @@
       "dest_id": "002",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x001e"
      },
      {
       "commit_off": "0x20c52",
@@ -1164,7 +1458,15 @@
       "dest_id": "00F",
       "dest_mode": 2,
       "slot": "0x0",
-      "confidence": "low"
+      "confidence": "low",
+      "conditional_dests": [
+       "005",
+       "000",
+       "004"
+      ],
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x001d"
      },
      {
       "commit_off": "0x21356",
@@ -1174,7 +1476,10 @@
       "dest_id": "002",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x001e"
      },
      {
       "commit_off": "0x239e2",
@@ -1184,7 +1489,10 @@
       "dest_id": "001",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0059"
      }
     ]
    },
@@ -1268,6 +1576,14 @@
      "slot": 4,
      "id_blob_off": 149276,
      "op_blob_off": 149282
+    },
+    {
+     "id": 1,
+     "name": "Med Pak S",
+     "param": 24,
+     "slot": 5,
+     "id_blob_off": 152296,
+     "op_blob_off": 152302
     }
    ],
    "enemies_runtime": null
@@ -1295,7 +1611,10 @@
       "dest_id": "003",
       "dest_mode": 0,
       "slot": "0x8",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x011c"
      },
      {
       "commit_off": "0x1514",
@@ -1305,7 +1624,10 @@
       "dest_id": "600",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0e4e"
      }
     ]
    },
@@ -1346,6 +1668,12 @@
       "index": 0,
       "spawn_off": 30220,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30210,
+        "editable": true
+       },
        "posZ": {
         "value": 3,
         "mode": 6,
@@ -1393,7 +1721,10 @@
       "dest_id": "003",
       "dest_mode": 0,
       "slot": "0x8",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x011c"
      },
      {
       "commit_off": "0x7570",
@@ -1403,7 +1734,10 @@
       "dest_id": "800",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0e4e"
      }
     ]
    },
@@ -1453,6 +1787,12 @@
       "index": 0,
       "spawn_off": 13718,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 13708,
+        "editable": true
+       },
        "posZ": {
         "value": 6812,
         "mode": 0,
@@ -1492,6 +1832,12 @@
       "index": 1,
       "spawn_off": 13770,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 13760,
+        "editable": true
+       },
        "posZ": {
         "value": 5,
         "mode": 6,
@@ -1531,6 +1877,12 @@
       "index": 2,
       "spawn_off": 13822,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 13812,
+        "editable": true
+       },
        "posZ": {
         "value": 10660,
         "mode": 0,
@@ -1570,6 +1922,12 @@
       "index": 3,
       "spawn_off": 13874,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 13864,
+        "editable": true
+       },
        "posZ": {
         "value": 10660,
         "mode": 0,
@@ -1609,6 +1967,12 @@
       "index": 0,
       "spawn_off": 16066,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 16056,
+        "editable": true
+       },
        "posZ": {
         "value": 10660,
         "mode": 0,
@@ -1656,7 +2020,10 @@
       "dest_id": "110",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107"
      },
      {
       "commit_off": "0x37e4",
@@ -1666,7 +2033,10 @@
       "dest_id": "000",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0205"
      },
      {
       "commit_off": "0x39d8",
@@ -1676,7 +2046,12 @@
       "dest_id": "109",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0009",
+      "lock_index": 1,
+      "unlock_flag_id": 37
      },
      {
       "commit_off": "0x3a2c",
@@ -1686,7 +2061,28 @@
       "dest_id": "101",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006",
+      "lock_index": 1,
+      "unlock_flag_id": 32
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 32,
+      "subtype": 1,
+      "actor_index": 0,
+      "slot": 4,
+      "op_off": "0x3a70"
+     },
+     {
+      "flag8_id": 37,
+      "subtype": 1,
+      "actor_index": 1,
+      "slot": 5,
+      "op_off": "0x3aec"
      }
     ]
    },
@@ -1748,6 +2144,12 @@
       "index": 0,
       "spawn_off": 44444,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 44434,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -1787,6 +2189,12 @@
       "index": 1,
       "spawn_off": 44544,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 44534,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -1834,7 +2242,12 @@
       "dest_id": "102",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107",
+      "lock_index": 2,
+      "unlock_flag_id": 48
      },
      {
       "commit_off": "0xa8f4",
@@ -1844,7 +2257,28 @@
       "dest_id": "100",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107",
+      "lock_index": 1,
+      "unlock_flag_id": 32
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 48,
+      "subtype": 2,
+      "actor_index": 6,
+      "slot": 2,
+      "op_off": "0xa844"
+     },
+     {
+      "flag8_id": 32,
+      "subtype": 1,
+      "actor_index": 1,
+      "slot": 3,
+      "op_off": "0xaa02"
      }
     ]
    },
@@ -1895,6 +2329,12 @@
       "index": 0,
       "spawn_off": 46512,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 46502,
+        "editable": true
+       },
        "posZ": {
         "value": 12,
         "mode": 6,
@@ -1934,6 +2374,12 @@
       "index": 1,
       "spawn_off": 47364,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 47354,
+        "editable": true
+       },
        "posZ": {
         "value": 21,
         "mode": 6,
@@ -1973,6 +2419,12 @@
       "index": 2,
       "spawn_off": 47856,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 47846,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -2012,6 +2464,12 @@
       "index": 0,
       "spawn_off": 49184,
       "fields": {
+       "VARIANT": {
+        "value": 16,
+        "mode": 0,
+        "value_off": 49174,
+        "editable": true
+       },
        "posZ": {
         "value": 36,
         "mode": 6,
@@ -2051,6 +2509,12 @@
       "index": 1,
       "spawn_off": 49232,
       "fields": {
+       "VARIANT": {
+        "value": 16,
+        "mode": 0,
+        "value_off": 49222,
+        "editable": true
+       },
        "posZ": {
         "value": 37,
         "mode": 6,
@@ -2090,6 +2554,12 @@
       "index": 2,
       "spawn_off": 49280,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 49270,
+        "editable": true
+       },
        "posZ": {
         "value": 38,
         "mode": 6,
@@ -2137,7 +2607,12 @@
       "dest_id": "101",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006",
+      "lock_index": 2,
+      "unlock_flag_id": 48
      },
      {
       "commit_off": "0xaf3a",
@@ -2147,7 +2622,10 @@
       "dest_id": "105",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0201"
      },
      {
       "commit_off": "0xafe6",
@@ -2157,7 +2635,19 @@
       "dest_id": "110",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006"
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 48,
+      "subtype": 2,
+      "actor_index": 1,
+      "slot": 6,
+      "op_off": "0xaea2"
      }
     ]
    },
@@ -2223,18 +2713,54 @@
     "spawns": []
    },
    "doors": {
-    "door_count": 0,
-    "doors": []
+    "door_count": 2,
+    "doors": [
+     {
+      "commit_off": "0x1d10",
+      "dest_push_off": 7426,
+      "dest_va": "0x5e1d02",
+      "dest_word": "0x0105",
+      "dest_id": "105",
+      "dest_mode": 0,
+      "slot": "0x0",
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0200"
+     },
+     {
+      "commit_off": "0x1d64",
+      "dest_push_off": 7510,
+      "dest_va": "0x5e1d56",
+      "dest_word": "0x0104",
+      "dest_id": "104",
+      "dest_mode": 0,
+      "slot": "0x1",
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0201"
+     }
+    ]
    },
    "connectivity": {
-    "outbound": [],
+    "outbound": [
+     {
+      "dest": "104",
+      "bidirectional": true
+     },
+     {
+      "dest": "105",
+      "bidirectional": true
+     }
+    ],
     "inbound": [
      "104",
      "105"
     ],
-    "out_degree": 0,
+    "out_degree": 2,
     "in_degree": 2,
-    "dead_end": true
+    "dead_end": false
    },
    "items": [],
    "enemies_runtime": {
@@ -2275,7 +2801,10 @@
       "dest_id": "103",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0200"
      },
      {
       "commit_off": "0x33ac",
@@ -2285,7 +2814,10 @@
       "dest_id": "106",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0420"
      }
     ]
    },
@@ -2293,7 +2825,7 @@
     "outbound": [
      {
       "dest": "103",
-      "bidirectional": false
+      "bidirectional": true
      },
      {
       "dest": "106",
@@ -2301,10 +2833,11 @@
      }
     ],
     "inbound": [
+     "103",
      "106"
     ],
     "out_degree": 2,
-    "in_degree": 1,
+    "in_degree": 2,
     "dead_end": false
    },
    "items": [],
@@ -2339,6 +2872,12 @@
       "index": 0,
       "spawn_off": 36024,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36014,
+        "editable": true
+       },
        "posZ": {
         "value": 6737,
         "mode": 0,
@@ -2378,6 +2917,12 @@
       "index": 0,
       "spawn_off": 37324,
       "fields": {
+       "VARIANT": {
+        "value": 14,
+        "mode": 6,
+        "value_off": 37314,
+        "editable": false
+       },
        "posZ": {
         "value": 12,
         "mode": 6,
@@ -2417,6 +2962,12 @@
       "index": 1,
       "spawn_off": 37464,
       "fields": {
+       "VARIANT": {
+        "value": 18,
+        "mode": 6,
+        "value_off": 37454,
+        "editable": false
+       },
        "posZ": {
         "value": 16,
         "mode": 6,
@@ -2456,6 +3007,12 @@
       "index": 2,
       "spawn_off": 37678,
       "fields": {
+       "VARIANT": {
+        "value": 20,
+        "mode": 6,
+        "value_off": 37668,
+        "editable": false
+       },
        "posZ": {
         "value": -1853,
         "mode": 0,
@@ -2495,6 +3052,12 @@
       "index": 3,
       "spawn_off": 37844,
       "fields": {
+       "VARIANT": {
+        "value": 22,
+        "mode": 6,
+        "value_off": 37834,
+        "editable": false
+       },
        "posZ": {
         "value": -1853,
         "mode": 0,
@@ -2542,7 +3105,10 @@
       "dest_id": "102",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x0a",
+      "built_state": "usable",
+      "door_type": "0x0200"
      },
      {
       "commit_off": "0x88d4",
@@ -2552,7 +3118,10 @@
       "dest_id": "103",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x0a",
+      "built_state": "usable",
+      "door_type": "0x0201"
      }
     ]
    },
@@ -2564,14 +3133,15 @@
      },
      {
       "dest": "103",
-      "bidirectional": false
+      "bidirectional": true
      }
     ],
     "inbound": [
-     "102"
+     "102",
+     "103"
     ],
     "out_degree": 2,
-    "in_degree": 1,
+    "in_degree": 2,
     "dead_end": false
    },
    "items": [],
@@ -2606,6 +3176,12 @@
       "index": 0,
       "spawn_off": 43444,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43434,
+        "editable": true
+       },
        "posZ": {
         "value": -2934,
         "mode": 0,
@@ -2645,6 +3221,12 @@
       "index": 1,
       "spawn_off": 43620,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43610,
+        "editable": true
+       },
        "posZ": {
         "value": -3134,
         "mode": 0,
@@ -2684,6 +3266,12 @@
       "index": 2,
       "spawn_off": 43796,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43786,
+        "editable": true
+       },
        "posZ": {
         "value": -2834,
         "mode": 0,
@@ -2723,6 +3311,12 @@
       "index": 3,
       "spawn_off": 43972,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43962,
+        "editable": true
+       },
        "posZ": {
         "value": -3034,
         "mode": 0,
@@ -2762,6 +3356,12 @@
       "index": 4,
       "spawn_off": 44148,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 44138,
+        "editable": true
+       },
        "posZ": {
         "value": -2634,
         "mode": 0,
@@ -2801,6 +3401,12 @@
       "index": 5,
       "spawn_off": 44324,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 44314,
+        "editable": true
+       },
        "posZ": {
         "value": -3034,
         "mode": 0,
@@ -2840,6 +3446,12 @@
       "index": 0,
       "spawn_off": 45922,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 45912,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -2879,6 +3491,12 @@
       "index": 1,
       "spawn_off": 46126,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 46116,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -2926,7 +3544,10 @@
       "dest_id": "107",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x000a"
      },
      {
       "commit_off": "0x9fbc",
@@ -2936,7 +3557,10 @@
       "dest_id": "10E",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0048"
      },
      {
       "commit_off": "0xa050",
@@ -2946,7 +3570,10 @@
       "dest_id": "104",
       "dest_mode": 0,
       "slot": "0x5",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0420"
      }
     ]
    },
@@ -3018,6 +3645,12 @@
       "index": 0,
       "spawn_off": 20980,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 20970,
+        "editable": true
+       },
        "posZ": {
         "value": 13,
         "mode": 6,
@@ -3057,6 +3690,12 @@
       "index": 1,
       "spawn_off": 21158,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 21148,
+        "editable": true
+       },
        "posZ": {
         "value": 17,
         "mode": 6,
@@ -3096,6 +3735,12 @@
       "index": 2,
       "spawn_off": 21418,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 21408,
+        "editable": true
+       },
        "posZ": {
         "value": 20,
         "mode": 6,
@@ -3135,6 +3780,12 @@
       "index": 3,
       "spawn_off": 21596,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 21586,
+        "editable": true
+       },
        "posZ": {
         "value": 23,
         "mode": 6,
@@ -3174,6 +3825,12 @@
       "index": 0,
       "spawn_off": 22026,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 22016,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -3213,6 +3870,12 @@
       "index": 1,
       "spawn_off": 23054,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 23044,
+        "editable": true
+       },
        "posZ": {
         "value": 30,
         "mode": 6,
@@ -3252,6 +3915,12 @@
       "index": 2,
       "spawn_off": 23246,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 23236,
+        "editable": true
+       },
        "posZ": {
         "value": 33,
         "mode": 6,
@@ -3291,6 +3960,12 @@
       "index": 3,
       "spawn_off": 23438,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 23428,
+        "editable": true
+       },
        "posZ": {
         "value": 36,
         "mode": 6,
@@ -3330,6 +4005,12 @@
       "index": 4,
       "spawn_off": 23922,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 23912,
+        "editable": true
+       },
        "posZ": {
         "value": 1157,
         "mode": 0,
@@ -3369,6 +4050,12 @@
       "index": 5,
       "spawn_off": 24126,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 24116,
+        "editable": true
+       },
        "posZ": {
         "value": 1157,
         "mode": 0,
@@ -3408,6 +4095,12 @@
       "index": 6,
       "spawn_off": 24330,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 24320,
+        "editable": true
+       },
        "posZ": {
         "value": 1157,
         "mode": 0,
@@ -3447,6 +4140,12 @@
       "index": 7,
       "spawn_off": 24722,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 24712,
+        "editable": true
+       },
        "posZ": {
         "value": 1157,
         "mode": 0,
@@ -3486,6 +4185,12 @@
       "index": 8,
       "spawn_off": 24962,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 24952,
+        "editable": true
+       },
        "posZ": {
         "value": 1157,
         "mode": 0,
@@ -3525,6 +4230,12 @@
       "index": 9,
       "spawn_off": 25234,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25224,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -3564,6 +4275,12 @@
       "index": 10,
       "spawn_off": 25322,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25312,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -3611,7 +4328,10 @@
       "dest_id": "108",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0109"
      },
      {
       "commit_off": "0x4e02",
@@ -3621,7 +4341,10 @@
       "dest_id": "106",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x010b"
      }
     ]
    },
@@ -3686,6 +4409,12 @@
       "index": 0,
       "spawn_off": 30602,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30592,
+        "editable": true
+       },
        "posZ": {
         "value": 15417,
         "mode": 0,
@@ -3725,6 +4454,12 @@
       "index": 1,
       "spawn_off": 30780,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30770,
+        "editable": true
+       },
        "posZ": {
         "value": 15417,
         "mode": 0,
@@ -3772,7 +4507,10 @@
       "dest_id": "107",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0108"
      },
      {
       "commit_off": "0x745a",
@@ -3782,7 +4520,10 @@
       "dest_id": "200",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x040c"
      }
     ]
    },
@@ -3824,6 +4565,12 @@
       "index": 0,
       "spawn_off": 35348,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 35338,
+        "editable": true
+       },
        "posZ": {
         "value": -4000,
         "mode": 0,
@@ -3863,6 +4610,12 @@
       "index": 0,
       "spawn_off": 35902,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 35892,
+        "editable": true
+       },
        "posZ": {
         "value": 14,
         "mode": 6,
@@ -3902,6 +4655,12 @@
       "index": 1,
       "spawn_off": 36002,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 35992,
+        "editable": true
+       },
        "posZ": {
         "value": 18,
         "mode": 6,
@@ -3941,6 +4700,12 @@
       "index": 2,
       "spawn_off": 36102,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36092,
+        "editable": true
+       },
        "posZ": {
         "value": 22,
         "mode": 6,
@@ -3980,6 +4745,12 @@
       "index": 3,
       "spawn_off": 36202,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36192,
+        "editable": true
+       },
        "posZ": {
         "value": 26,
         "mode": 6,
@@ -4019,6 +4790,12 @@
       "index": 0,
       "spawn_off": 37752,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 37742,
+        "editable": true
+       },
        "posZ": {
         "value": 8,
         "mode": 2,
@@ -4066,7 +4843,10 @@
       "dest_id": "10A",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x010f"
      },
      {
       "commit_off": "0x8448",
@@ -4076,7 +4856,21 @@
       "dest_id": "100",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0108",
+      "lock_index": 1,
+      "unlock_flag_id": 37
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 37,
+      "subtype": 1,
+      "actor_index": 3,
+      "slot": 2,
+      "op_off": "0x848c"
      }
     ]
    },
@@ -4147,6 +4941,12 @@
       "index": 0,
       "spawn_off": 10264,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 10254,
+        "editable": true
+       },
        "posZ": {
         "value": -9574,
         "mode": 0,
@@ -4186,6 +4986,12 @@
       "index": 1,
       "spawn_off": 10480,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 10470,
+        "editable": true
+       },
        "posZ": {
         "value": -10574,
         "mode": 0,
@@ -4233,7 +5039,10 @@
       "dest_id": "10B",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0200"
      },
      {
       "commit_off": "0x2740",
@@ -4243,7 +5052,10 @@
       "dest_id": "109",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0d0e"
      }
     ]
    },
@@ -4285,6 +5097,12 @@
       "index": 0,
       "spawn_off": 15394,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 15384,
+        "editable": true
+       },
        "posZ": {
         "value": 2304,
         "mode": 0,
@@ -4332,7 +5150,10 @@
       "dest_id": "10D",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0148"
      },
      {
       "commit_off": "0x3ae0",
@@ -4342,7 +5163,10 @@
       "dest_id": "10A",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0201"
      },
      {
       "commit_off": "0x3b34",
@@ -4352,7 +5176,10 @@
       "dest_id": "10C",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0007"
      }
     ]
    },
@@ -4399,6 +5226,12 @@
       "index": 0,
       "spawn_off": 70544,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 70534,
+        "editable": true
+       },
        "posZ": {
         "value": 9717,
         "mode": 0,
@@ -4438,6 +5271,12 @@
       "index": 1,
       "spawn_off": 70640,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 70630,
+        "editable": true
+       },
        "posZ": {
         "value": 3571,
         "mode": 0,
@@ -4477,6 +5316,12 @@
       "index": 2,
       "spawn_off": 70692,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 70682,
+        "editable": true
+       },
        "posZ": {
         "value": -3467,
         "mode": 0,
@@ -4516,6 +5361,12 @@
       "index": 3,
       "spawn_off": 70880,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 70870,
+        "editable": true
+       },
        "posZ": {
         "value": 9717,
         "mode": 0,
@@ -4555,6 +5406,12 @@
       "index": 4,
       "spawn_off": 70976,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 70966,
+        "editable": true
+       },
        "posZ": {
         "value": 3571,
         "mode": 0,
@@ -4594,6 +5451,12 @@
       "index": 5,
       "spawn_off": 71028,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 71018,
+        "editable": true
+       },
        "posZ": {
         "value": -3467,
         "mode": 0,
@@ -4633,6 +5496,12 @@
       "index": 0,
       "spawn_off": 71288,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 71278,
+        "editable": true
+       },
        "posZ": {
         "value": 3147,
         "mode": 0,
@@ -4672,6 +5541,12 @@
       "index": 1,
       "spawn_off": 71504,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 71494,
+        "editable": true
+       },
        "posZ": {
         "value": 3147,
         "mode": 0,
@@ -4711,6 +5586,12 @@
       "index": 2,
       "spawn_off": 71720,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 71710,
+        "editable": true
+       },
        "posZ": {
         "value": 2871,
         "mode": 0,
@@ -4750,6 +5631,12 @@
       "index": 3,
       "spawn_off": 71936,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 71926,
+        "editable": true
+       },
        "posZ": {
         "value": 3416,
         "mode": 0,
@@ -4789,6 +5676,12 @@
       "index": 0,
       "spawn_off": 72922,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 72912,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -4828,6 +5721,12 @@
       "index": 1,
       "spawn_off": 73208,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 73198,
+        "editable": true
+       },
        "posZ": {
         "value": 6408,
         "mode": 0,
@@ -4867,6 +5766,12 @@
       "index": 2,
       "spawn_off": 73256,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 73246,
+        "editable": true
+       },
        "posZ": {
         "value": 7112,
         "mode": 0,
@@ -4906,6 +5811,12 @@
       "index": 3,
       "spawn_off": 73304,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 73294,
+        "editable": true
+       },
        "posZ": {
         "value": 7214,
         "mode": 0,
@@ -4945,6 +5856,12 @@
       "index": 4,
       "spawn_off": 73352,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 73342,
+        "editable": true
+       },
        "posZ": {
         "value": 7752,
         "mode": 0,
@@ -4984,6 +5901,12 @@
       "index": 5,
       "spawn_off": 73400,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 73390,
+        "editable": true
+       },
        "posZ": {
         "value": 6574,
         "mode": 0,
@@ -5023,6 +5946,12 @@
       "index": 6,
       "spawn_off": 73448,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 73438,
+        "editable": true
+       },
        "posZ": {
         "value": 6799,
         "mode": 0,
@@ -5062,6 +5991,12 @@
       "index": 7,
       "spawn_off": 73496,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 73486,
+        "editable": true
+       },
        "posZ": {
         "value": 7837,
         "mode": 0,
@@ -5101,6 +6036,12 @@
       "index": 8,
       "spawn_off": 74028,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 74018,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -5140,6 +6081,12 @@
       "index": 9,
       "spawn_off": 76680,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 76670,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -5179,6 +6126,12 @@
       "index": 0,
       "spawn_off": 78826,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 78816,
+        "editable": true
+       },
        "posZ": {
         "value": 11564,
         "mode": 0,
@@ -5226,7 +6179,10 @@
       "dest_id": "10B",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006"
      },
      {
       "commit_off": "0x110aa",
@@ -5236,7 +6192,10 @@
       "dest_id": "300",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x012b"
      }
     ]
    },
@@ -5287,6 +6246,12 @@
       "index": 0,
       "spawn_off": 59042,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59032,
+        "editable": true
+       },
        "posZ": {
         "value": 13,
         "mode": 6,
@@ -5326,6 +6291,12 @@
       "index": 1,
       "spawn_off": 59202,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59192,
+        "editable": true
+       },
        "posZ": {
         "value": 19,
         "mode": 6,
@@ -5365,6 +6336,12 @@
       "index": 2,
       "spawn_off": 59362,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59352,
+        "editable": true
+       },
        "posZ": {
         "value": 25,
         "mode": 6,
@@ -5404,6 +6381,12 @@
       "index": 3,
       "spawn_off": 59522,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59512,
+        "editable": true
+       },
        "posZ": {
         "value": 31,
         "mode": 6,
@@ -5443,6 +6426,12 @@
       "index": 4,
       "spawn_off": 59682,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59672,
+        "editable": true
+       },
        "posZ": {
         "value": 37,
         "mode": 6,
@@ -5482,6 +6471,12 @@
       "index": 5,
       "spawn_off": 59842,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59832,
+        "editable": true
+       },
        "posZ": {
         "value": 7398,
         "mode": 0,
@@ -5521,6 +6516,12 @@
       "index": 6,
       "spawn_off": 60002,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59992,
+        "editable": true
+       },
        "posZ": {
         "value": 11700,
         "mode": 0,
@@ -5560,6 +6561,12 @@
       "index": 7,
       "spawn_off": 60162,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60152,
+        "editable": true
+       },
        "posZ": {
         "value": 52,
         "mode": 6,
@@ -5599,6 +6606,12 @@
       "index": 8,
       "spawn_off": 60322,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60312,
+        "editable": true
+       },
        "posZ": {
         "value": 3569,
         "mode": 0,
@@ -5638,6 +6651,12 @@
       "index": 9,
       "spawn_off": 60482,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60472,
+        "editable": true
+       },
        "posZ": {
         "value": 3965,
         "mode": 0,
@@ -5677,6 +6696,12 @@
       "index": 10,
       "spawn_off": 60642,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60632,
+        "editable": true
+       },
        "posZ": {
         "value": 67,
         "mode": 6,
@@ -5716,6 +6741,12 @@
       "index": 11,
       "spawn_off": 60802,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60792,
+        "editable": true
+       },
        "posZ": {
         "value": 15004,
         "mode": 0,
@@ -5755,6 +6786,12 @@
       "index": 12,
       "spawn_off": 60962,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60952,
+        "editable": true
+       },
        "posZ": {
         "value": 76,
         "mode": 6,
@@ -5802,7 +6839,10 @@
       "dest_id": "10B",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0149"
      },
      {
       "commit_off": "0xe448",
@@ -5812,7 +6852,10 @@
       "dest_id": "10E",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006"
      },
      {
       "commit_off": "0xe4c0",
@@ -5822,7 +6865,10 @@
       "dest_id": "10F",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0201"
      }
     ]
    },
@@ -5869,6 +6915,12 @@
       "index": 0,
       "spawn_off": 52922,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 52912,
+        "editable": true
+       },
        "posZ": {
         "value": 1455,
         "mode": 0,
@@ -5908,6 +6960,12 @@
       "index": 1,
       "spawn_off": 53082,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 53072,
+        "editable": true
+       },
        "posZ": {
         "value": 12195,
         "mode": 0,
@@ -5947,6 +7005,12 @@
       "index": 2,
       "spawn_off": 53242,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 53232,
+        "editable": true
+       },
        "posZ": {
         "value": 12415,
         "mode": 0,
@@ -5986,6 +7050,12 @@
       "index": 3,
       "spawn_off": 53402,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 53392,
+        "editable": true
+       },
        "posZ": {
         "value": 2908,
         "mode": 0,
@@ -6025,6 +7095,12 @@
       "index": 4,
       "spawn_off": 53562,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 53552,
+        "editable": true
+       },
        "posZ": {
         "value": 104,
         "mode": 0,
@@ -6064,6 +7140,12 @@
       "index": 5,
       "spawn_off": 53722,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 53712,
+        "editable": true
+       },
        "posZ": {
         "value": 34,
         "mode": 6,
@@ -6103,6 +7185,12 @@
       "index": 6,
       "spawn_off": 53882,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 53872,
+        "editable": true
+       },
        "posZ": {
         "value": 40,
         "mode": 6,
@@ -6142,6 +7230,12 @@
       "index": 7,
       "spawn_off": 54042,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 54032,
+        "editable": true
+       },
        "posZ": {
         "value": 45,
         "mode": 6,
@@ -6181,6 +7275,12 @@
       "index": 8,
       "spawn_off": 54202,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 54192,
+        "editable": true
+       },
        "posZ": {
         "value": 50,
         "mode": 6,
@@ -6220,6 +7320,12 @@
       "index": 9,
       "spawn_off": 54362,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 54352,
+        "editable": true
+       },
        "posZ": {
         "value": 55,
         "mode": 6,
@@ -6259,6 +7365,12 @@
       "index": 10,
       "spawn_off": 54522,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 54512,
+        "editable": true
+       },
        "posZ": {
         "value": 13116,
         "mode": 0,
@@ -6306,7 +7418,10 @@
       "dest_id": "106",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0149"
      },
      {
       "commit_off": "0xccc0",
@@ -6316,7 +7431,10 @@
       "dest_id": "10D",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107"
      },
      {
       "commit_off": "0xce6e",
@@ -6326,7 +7444,10 @@
       "dest_id": "106",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0149"
      }
     ]
    },
@@ -6377,6 +7498,12 @@
       "index": 0,
       "spawn_off": 25208,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25198,
+        "editable": true
+       },
        "posZ": {
         "value": -4216,
         "mode": 0,
@@ -6416,6 +7543,12 @@
       "index": 1,
       "spawn_off": 25296,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25286,
+        "editable": true
+       },
        "posZ": {
         "value": -3970,
         "mode": 0,
@@ -6455,6 +7588,12 @@
       "index": 2,
       "spawn_off": 25384,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25374,
+        "editable": true
+       },
        "posZ": {
         "value": -3880,
         "mode": 0,
@@ -6494,6 +7633,12 @@
       "index": 3,
       "spawn_off": 25472,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25462,
+        "editable": true
+       },
        "posZ": {
         "value": -4048,
         "mode": 0,
@@ -6533,6 +7678,12 @@
       "index": 4,
       "spawn_off": 25560,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25550,
+        "editable": true
+       },
        "posZ": {
         "value": -3957,
         "mode": 0,
@@ -6572,6 +7723,12 @@
       "index": 5,
       "spawn_off": 25648,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25638,
+        "editable": true
+       },
        "posZ": {
         "value": -4305,
         "mode": 0,
@@ -6611,6 +7768,12 @@
       "index": 6,
       "spawn_off": 25736,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25726,
+        "editable": true
+       },
        "posZ": {
         "value": -3949,
         "mode": 0,
@@ -6650,6 +7813,12 @@
       "index": 7,
       "spawn_off": 25824,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25814,
+        "editable": true
+       },
        "posZ": {
         "value": -4114,
         "mode": 0,
@@ -6689,6 +7858,12 @@
       "index": 8,
       "spawn_off": 25912,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25902,
+        "editable": true
+       },
        "posZ": {
         "value": -4172,
         "mode": 0,
@@ -6728,6 +7903,12 @@
       "index": 9,
       "spawn_off": 26000,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25990,
+        "editable": true
+       },
        "posZ": {
         "value": -4172,
         "mode": 0,
@@ -6775,7 +7956,10 @@
       "dest_id": "10D",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0200"
      },
      {
       "commit_off": "0x61ca",
@@ -6785,7 +7969,10 @@
       "dest_id": "40B",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0446"
      }
     ]
    },
@@ -6844,6 +8031,12 @@
       "index": 0,
       "spawn_off": 12364,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 12354,
+        "editable": true
+       },
        "posZ": {
         "value": 4132,
         "mode": 0,
@@ -6891,7 +8084,10 @@
       "dest_id": "100",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006"
      },
      {
       "commit_off": "0x2e38",
@@ -6901,7 +8097,10 @@
       "dest_id": "102",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107"
      }
     ]
    },
@@ -6960,6 +8159,12 @@
       "index": 0,
       "spawn_off": 62812,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 62802,
+        "editable": true
+       },
        "posZ": {
         "value": 2379,
         "mode": 0,
@@ -6999,6 +8204,12 @@
       "index": 1,
       "spawn_off": 62894,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 62884,
+        "editable": true
+       },
        "posZ": {
         "value": 2379,
         "mode": 0,
@@ -7038,6 +8249,12 @@
       "index": 0,
       "spawn_off": 63542,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 63532,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -7077,6 +8294,12 @@
       "index": 1,
       "spawn_off": 63642,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 63632,
+        "editable": true
+       },
        "posZ": {
         "value": 4966,
         "mode": 0,
@@ -7116,6 +8339,12 @@
       "index": 2,
       "spawn_off": 64598,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 64588,
+        "editable": true
+       },
        "posZ": {
         "value": 8954,
         "mode": 0,
@@ -7155,6 +8384,12 @@
       "index": 0,
       "spawn_off": 65862,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 65852,
+        "editable": true
+       },
        "posZ": {
         "value": 31,
         "mode": 6,
@@ -7194,6 +8429,12 @@
       "index": 0,
       "spawn_off": 67944,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 67934,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -7233,6 +8474,12 @@
       "index": 1,
       "spawn_off": 68044,
       "fields": {
+       "VARIANT": {
+        "value": 38,
+        "mode": 6,
+        "value_off": 68034,
+        "editable": false
+       },
        "posZ": {
         "value": 6146,
         "mode": 0,
@@ -7272,6 +8519,12 @@
       "index": 2,
       "spawn_off": 68160,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 68150,
+        "editable": true
+       },
        "posZ": {
         "value": 383,
         "mode": 0,
@@ -7311,6 +8564,12 @@
       "index": 3,
       "spawn_off": 68792,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 68782,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -7350,6 +8609,12 @@
       "index": 4,
       "spawn_off": 69100,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 69090,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -7389,6 +8654,12 @@
       "index": 5,
       "spawn_off": 70148,
       "fields": {
+       "VARIANT": {
+        "value": 57,
+        "mode": 6,
+        "value_off": 70138,
+        "editable": false
+       },
        "posZ": {
         "value": 6146,
         "mode": 0,
@@ -7428,6 +8699,12 @@
       "index": 6,
       "spawn_off": 70444,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 70434,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -7475,7 +8752,10 @@
       "dest_id": "108",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x040d"
      },
      {
       "commit_off": "0xf2a0",
@@ -7485,7 +8765,10 @@
       "dest_id": "201",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0022"
      },
      {
       "commit_off": "0xf2f4",
@@ -7495,7 +8778,10 @@
       "dest_id": "205",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0446"
      }
     ]
    },
@@ -7564,6 +8850,12 @@
       "index": 0,
       "spawn_off": 9106,
       "fields": {
+       "VARIANT": {
+        "value": 10,
+        "mode": 6,
+        "value_off": 9096,
+        "editable": false
+       },
        "posZ": {
         "value": 2617,
         "mode": 0,
@@ -7603,6 +8895,12 @@
       "index": 1,
       "spawn_off": 9210,
       "fields": {
+       "VARIANT": {
+        "value": 13,
+        "mode": 6,
+        "value_off": 9200,
+        "editable": false
+       },
        "posZ": {
         "value": 3754,
         "mode": 0,
@@ -7642,6 +8940,12 @@
       "index": 2,
       "spawn_off": 9314,
       "fields": {
+       "VARIANT": {
+        "value": 17,
+        "mode": 6,
+        "value_off": 9304,
+        "editable": false
+       },
        "posZ": {
         "value": 3214,
         "mode": 0,
@@ -7681,6 +8985,12 @@
       "index": 3,
       "spawn_off": 9418,
       "fields": {
+       "VARIANT": {
+        "value": 21,
+        "mode": 6,
+        "value_off": 9408,
+        "editable": false
+       },
        "posZ": {
         "value": 3856,
         "mode": 0,
@@ -7728,7 +9038,10 @@
       "dest_id": "200",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0123"
      },
      {
       "commit_off": "0x20ec",
@@ -7738,7 +9051,10 @@
       "dest_id": "202",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x042d"
      }
     ]
    },
@@ -7801,6 +9117,12 @@
       "index": 0,
       "spawn_off": 5726,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 5716,
+        "editable": false
+       },
        "posZ": {
         "value": 3542,
         "mode": 0,
@@ -7840,6 +9162,12 @@
       "index": 1,
       "spawn_off": 5774,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 5764,
+        "editable": false
+       },
        "posZ": {
         "value": 6,
         "mode": 6,
@@ -7879,6 +9207,12 @@
       "index": 2,
       "spawn_off": 5938,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 5928,
+        "editable": false
+       },
        "posZ": {
         "value": 8,
         "mode": 6,
@@ -7918,6 +9252,12 @@
       "index": 3,
       "spawn_off": 5986,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 5976,
+        "editable": false
+       },
        "posZ": {
         "value": 1828,
         "mode": 0,
@@ -7957,6 +9297,12 @@
       "index": 4,
       "spawn_off": 6102,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 6092,
+        "editable": true
+       },
        "posZ": {
         "value": 7043,
         "mode": 0,
@@ -7996,6 +9342,12 @@
       "index": 5,
       "spawn_off": 6250,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 6240,
+        "editable": false
+       },
        "posZ": {
         "value": 5827,
         "mode": 0,
@@ -8035,6 +9387,12 @@
       "index": 6,
       "spawn_off": 6298,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 6288,
+        "editable": false
+       },
        "posZ": {
         "value": 12,
         "mode": 6,
@@ -8074,6 +9432,12 @@
       "index": 7,
       "spawn_off": 6414,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 6404,
+        "editable": true
+       },
        "posZ": {
         "value": 7085,
         "mode": 0,
@@ -8113,6 +9477,12 @@
       "index": 8,
       "spawn_off": 6526,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 6516,
+        "editable": false
+       },
        "posZ": {
         "value": 14,
         "mode": 6,
@@ -8152,6 +9522,12 @@
       "index": 9,
       "spawn_off": 6574,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 6564,
+        "editable": false
+       },
        "posZ": {
         "value": 16,
         "mode": 6,
@@ -8191,6 +9567,12 @@
       "index": 10,
       "spawn_off": 6738,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 6728,
+        "editable": false
+       },
        "posZ": {
         "value": 7352,
         "mode": 0,
@@ -8230,6 +9612,12 @@
       "index": 11,
       "spawn_off": 6786,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 6776,
+        "editable": false
+       },
        "posZ": {
         "value": 18,
         "mode": 6,
@@ -8269,6 +9657,12 @@
       "index": 12,
       "spawn_off": 6970,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 6960,
+        "editable": false
+       },
        "posZ": {
         "value": 3676,
         "mode": 0,
@@ -8308,6 +9702,12 @@
       "index": 13,
       "spawn_off": 7018,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 7008,
+        "editable": false
+       },
        "posZ": {
         "value": 6495,
         "mode": 0,
@@ -8347,6 +9747,12 @@
       "index": 14,
       "spawn_off": 7198,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 7188,
+        "editable": false
+       },
        "posZ": {
         "value": 3037,
         "mode": 0,
@@ -8386,6 +9792,12 @@
       "index": 15,
       "spawn_off": 7246,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 7236,
+        "editable": false
+       },
        "posZ": {
         "value": 7261,
         "mode": 0,
@@ -8425,6 +9837,12 @@
       "index": 16,
       "spawn_off": 7410,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 7400,
+        "editable": false
+       },
        "posZ": {
         "value": 22,
         "mode": 6,
@@ -8464,6 +9882,12 @@
       "index": 17,
       "spawn_off": 7458,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 2,
+        "value_off": 7448,
+        "editable": false
+       },
        "posZ": {
         "value": 4717,
         "mode": 0,
@@ -8503,6 +9927,12 @@
       "index": 18,
       "spawn_off": 7678,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 7668,
+        "editable": true
+       },
        "posZ": {
         "value": 7111,
         "mode": 0,
@@ -8542,6 +9972,12 @@
       "index": 19,
       "spawn_off": 7726,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 7716,
+        "editable": true
+       },
        "posZ": {
         "value": 26,
         "mode": 6,
@@ -8581,6 +10017,12 @@
       "index": 20,
       "spawn_off": 7774,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 7764,
+        "editable": true
+       },
        "posZ": {
         "value": 28,
         "mode": 6,
@@ -8620,6 +10062,12 @@
       "index": 21,
       "spawn_off": 7870,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 7860,
+        "editable": true
+       },
        "posZ": {
         "value": 30,
         "mode": 6,
@@ -8659,6 +10107,12 @@
       "index": 22,
       "spawn_off": 7918,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 7908,
+        "editable": true
+       },
        "posZ": {
         "value": 32,
         "mode": 6,
@@ -8698,6 +10152,12 @@
       "index": 23,
       "spawn_off": 7966,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 7956,
+        "editable": true
+       },
        "posZ": {
         "value": 3432,
         "mode": 0,
@@ -8737,6 +10197,12 @@
       "index": 24,
       "spawn_off": 8014,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8004,
+        "editable": true
+       },
        "posZ": {
         "value": 6726,
         "mode": 0,
@@ -8776,6 +10242,12 @@
       "index": 25,
       "spawn_off": 8162,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8152,
+        "editable": true
+       },
        "posZ": {
         "value": 5451,
         "mode": 0,
@@ -8815,6 +10287,12 @@
       "index": 26,
       "spawn_off": 8210,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8200,
+        "editable": true
+       },
        "posZ": {
         "value": 6826,
         "mode": 0,
@@ -8854,6 +10332,12 @@
       "index": 27,
       "spawn_off": 8258,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8248,
+        "editable": true
+       },
        "posZ": {
         "value": 38,
         "mode": 6,
@@ -8893,6 +10377,12 @@
       "index": 28,
       "spawn_off": 8370,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8360,
+        "editable": true
+       },
        "posZ": {
         "value": 6667,
         "mode": 0,
@@ -8932,6 +10422,12 @@
       "index": 29,
       "spawn_off": 8418,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8408,
+        "editable": true
+       },
        "posZ": {
         "value": 7461,
         "mode": 0,
@@ -8971,6 +10467,12 @@
       "index": 30,
       "spawn_off": 8466,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8456,
+        "editable": true
+       },
        "posZ": {
         "value": 40,
         "mode": 6,
@@ -9010,6 +10512,12 @@
       "index": 31,
       "spawn_off": 8514,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8504,
+        "editable": true
+       },
        "posZ": {
         "value": 42,
         "mode": 6,
@@ -9049,6 +10557,12 @@
       "index": 32,
       "spawn_off": 8610,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8600,
+        "editable": true
+       },
        "posZ": {
         "value": 6898,
         "mode": 0,
@@ -9088,6 +10602,12 @@
       "index": 33,
       "spawn_off": 8658,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8648,
+        "editable": true
+       },
        "posZ": {
         "value": 45,
         "mode": 6,
@@ -9127,6 +10647,12 @@
       "index": 34,
       "spawn_off": 8774,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8764,
+        "editable": true
+       },
        "posZ": {
         "value": 7162,
         "mode": 0,
@@ -9166,6 +10692,12 @@
       "index": 35,
       "spawn_off": 8822,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8812,
+        "editable": true
+       },
        "posZ": {
         "value": 488,
         "mode": 0,
@@ -9205,6 +10737,12 @@
       "index": 36,
       "spawn_off": 8870,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8860,
+        "editable": true
+       },
        "posZ": {
         "value": 6202,
         "mode": 0,
@@ -9244,6 +10782,12 @@
       "index": 37,
       "spawn_off": 8982,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 8972,
+        "editable": true
+       },
        "posZ": {
         "value": 4329,
         "mode": 0,
@@ -9283,6 +10827,12 @@
       "index": 38,
       "spawn_off": 9030,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 9020,
+        "editable": true
+       },
        "posZ": {
         "value": 5791,
         "mode": 0,
@@ -9322,6 +10872,12 @@
       "index": 39,
       "spawn_off": 9078,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 9068,
+        "editable": true
+       },
        "posZ": {
         "value": 6972,
         "mode": 0,
@@ -9361,6 +10917,12 @@
       "index": 40,
       "spawn_off": 9126,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 9116,
+        "editable": true
+       },
        "posZ": {
         "value": 51,
         "mode": 6,
@@ -9400,6 +10962,12 @@
       "index": 41,
       "spawn_off": 9222,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 9212,
+        "editable": true
+       },
        "posZ": {
         "value": 554,
         "mode": 0,
@@ -9439,6 +11007,12 @@
       "index": 42,
       "spawn_off": 9270,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 9260,
+        "editable": true
+       },
        "posZ": {
         "value": 901,
         "mode": 0,
@@ -9478,6 +11052,12 @@
       "index": 43,
       "spawn_off": 9318,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 9308,
+        "editable": true
+       },
        "posZ": {
         "value": 4793,
         "mode": 0,
@@ -9517,6 +11097,12 @@
       "index": 0,
       "spawn_off": 9974,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 9964,
+        "editable": true
+       },
        "posZ": {
         "value": 8025,
         "mode": 0,
@@ -9556,6 +11142,12 @@
       "index": 1,
       "spawn_off": 10150,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 10140,
+        "editable": true
+       },
        "posZ": {
         "value": 8025,
         "mode": 0,
@@ -9595,6 +11187,12 @@
       "index": 2,
       "spawn_off": 10326,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 10316,
+        "editable": true
+       },
        "posZ": {
         "value": 8025,
         "mode": 0,
@@ -9634,6 +11232,12 @@
       "index": 3,
       "spawn_off": 10502,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 10492,
+        "editable": true
+       },
        "posZ": {
         "value": 8025,
         "mode": 0,
@@ -9681,7 +11285,10 @@
       "dest_id": "201",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x042c"
      },
      {
       "commit_off": "0x251c",
@@ -9691,7 +11298,10 @@
       "dest_id": "203",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0424"
      },
      {
       "commit_off": "0x25a4",
@@ -9701,7 +11311,21 @@
       "dest_id": "204",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0426",
+      "lock_index": 1,
+      "unlock_flag_id": 33
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 33,
+      "subtype": 1,
+      "actor_index": 0,
+      "slot": 2,
+      "op_off": "0x25e8"
      }
     ]
    },
@@ -9762,6 +11386,12 @@
       "index": 0,
       "spawn_off": 11194,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 11184,
+        "editable": true
+       },
        "posZ": {
         "value": 2389,
         "mode": 0,
@@ -9801,6 +11431,12 @@
       "index": 1,
       "spawn_off": 11370,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 11360,
+        "editable": true
+       },
        "posZ": {
         "value": 2521,
         "mode": 0,
@@ -9840,6 +11476,12 @@
       "index": 2,
       "spawn_off": 11546,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 11536,
+        "editable": true
+       },
        "posZ": {
         "value": 2268,
         "mode": 0,
@@ -9879,6 +11521,12 @@
       "index": 3,
       "spawn_off": 11722,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 11712,
+        "editable": true
+       },
        "posZ": {
         "value": 2498,
         "mode": 0,
@@ -9926,7 +11574,10 @@
       "dest_id": "202",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0425"
      }
     ]
    },
@@ -9987,7 +11638,10 @@
       "dest_id": "202",
       "dest_mode": 0,
       "slot": "0xb",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0426"
      }
     ]
    },
@@ -10049,6 +11703,12 @@
       "index": 0,
       "spawn_off": 57434,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 57424,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10088,6 +11748,12 @@
       "index": 1,
       "spawn_off": 58430,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 58420,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10127,6 +11793,12 @@
       "index": 0,
       "spawn_off": 62416,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 62406,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10166,6 +11838,12 @@
       "index": 1,
       "spawn_off": 62668,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 62658,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10213,7 +11891,10 @@
       "dest_id": "200",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0446"
      },
      {
       "commit_off": "0xedac",
@@ -10223,7 +11904,10 @@
       "dest_id": "100",
       "dest_mode": 0,
       "slot": "0x12",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0000"
      },
      {
       "commit_off": "0xf784",
@@ -10233,7 +11917,10 @@
       "dest_id": "003",
       "dest_mode": 0,
       "slot": "0x13",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0058"
      }
     ]
    },
@@ -10314,6 +12001,12 @@
       "index": 0,
       "spawn_off": 22230,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 22220,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10353,6 +12046,12 @@
       "index": 1,
       "spawn_off": 22452,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 22442,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10392,6 +12091,12 @@
       "index": 2,
       "spawn_off": 23010,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 23000,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10431,6 +12136,12 @@
       "index": 3,
       "spawn_off": 23766,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 23756,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10470,6 +12181,12 @@
       "index": 4,
       "spawn_off": 25464,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25454,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10509,6 +12226,12 @@
       "index": 5,
       "spawn_off": 25540,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25530,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10548,6 +12271,12 @@
       "index": 6,
       "spawn_off": 25616,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25606,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10587,6 +12316,12 @@
       "index": 7,
       "spawn_off": 27536,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 27526,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10634,7 +12369,10 @@
       "dest_id": "10C",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x002a"
      },
      {
       "commit_off": "0x50e8",
@@ -10644,7 +12382,10 @@
       "dest_id": "301",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x000a"
      },
      {
       "commit_off": "0x513c",
@@ -10654,7 +12395,21 @@
       "dest_id": "302",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0048",
+      "lock_index": 2,
+      "unlock_flag_id": 49
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 49,
+      "subtype": 2,
+      "actor_index": 6,
+      "slot": 9,
+      "op_off": "0x5180"
      }
     ]
    },
@@ -10701,6 +12456,12 @@
       "index": 0,
       "spawn_off": 39168,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 39158,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10740,6 +12501,12 @@
       "index": 1,
       "spawn_off": 39268,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 39258,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10779,6 +12546,12 @@
       "index": 0,
       "spawn_off": 40902,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 40892,
+        "editable": true
+       },
        "posZ": {
         "value": 3295,
         "mode": 0,
@@ -10826,7 +12599,10 @@
       "dest_id": "300",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x010b"
      }
     ]
    },
@@ -10880,6 +12656,12 @@
       "index": 0,
       "spawn_off": 25948,
       "fields": {
+       "VARIANT": {
+        "value": 9,
+        "mode": 6,
+        "value_off": 25938,
+        "editable": false
+       },
        "posZ": {
         "value": 8,
         "mode": 2,
@@ -10919,6 +12701,12 @@
       "index": 0,
       "spawn_off": 27006,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 26996,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -10958,6 +12746,12 @@
       "index": 0,
       "spawn_off": 29162,
       "fields": {
+       "VARIANT": {
+        "value": 38,
+        "mode": 6,
+        "value_off": 29152,
+        "editable": false
+       },
        "posZ": {
         "value": 4826,
         "mode": 0,
@@ -10997,6 +12791,12 @@
       "index": 1,
       "spawn_off": 29210,
       "fields": {
+       "VARIANT": {
+        "value": 41,
+        "mode": 6,
+        "value_off": 29200,
+        "editable": false
+       },
        "posZ": {
         "value": 1558,
         "mode": 0,
@@ -11036,6 +12836,12 @@
       "index": 2,
       "spawn_off": 29258,
       "fields": {
+       "VARIANT": {
+        "value": 44,
+        "mode": 6,
+        "value_off": 29248,
+        "editable": false
+       },
        "posZ": {
         "value": 1710,
         "mode": 0,
@@ -11075,6 +12881,12 @@
       "index": 0,
       "spawn_off": 30352,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30342,
+        "editable": true
+       },
        "posZ": {
         "value": 3037,
         "mode": 0,
@@ -11114,6 +12926,12 @@
       "index": 1,
       "spawn_off": 30440,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30430,
+        "editable": true
+       },
        "posZ": {
         "value": 3312,
         "mode": 0,
@@ -11153,6 +12971,12 @@
       "index": 2,
       "spawn_off": 30528,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30518,
+        "editable": true
+       },
        "posZ": {
         "value": 2779,
         "mode": 0,
@@ -11192,6 +13016,12 @@
       "index": 3,
       "spawn_off": 30616,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30606,
+        "editable": true
+       },
        "posZ": {
         "value": 3886,
         "mode": 0,
@@ -11239,7 +13069,12 @@
       "dest_id": "300",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0149",
+      "lock_index": 2,
+      "unlock_flag_id": 49
      },
      {
       "commit_off": "0x6324",
@@ -11249,7 +13084,21 @@
       "dest_id": "303",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0426",
+      "lock_index": 3,
+      "unlock_flag_id": 1
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 49,
+      "subtype": 2,
+      "actor_index": 2,
+      "slot": 6,
+      "op_off": "0x620c"
      }
     ]
    },
@@ -11324,6 +13173,12 @@
       "index": 0,
       "spawn_off": 22002,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 21992,
+        "editable": true
+       },
        "posZ": {
         "value": 5309,
         "mode": 0,
@@ -11363,6 +13218,12 @@
       "index": 0,
       "spawn_off": 25080,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25070,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -11402,6 +13263,12 @@
       "index": 1,
       "spawn_off": 25452,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 25442,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -11441,6 +13308,12 @@
       "index": 0,
       "spawn_off": 26752,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 26742,
+        "editable": true
+       },
        "posZ": {
         "value": 5309,
         "mode": 0,
@@ -11488,7 +13361,12 @@
       "dest_id": "304",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0646",
+      "lock_index": 2,
+      "unlock_flag_id": 50
      },
      {
       "commit_off": "0x4f86",
@@ -11498,7 +13376,10 @@
       "dest_id": "305",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0612"
      },
      {
       "commit_off": "0x4fda",
@@ -11508,7 +13389,12 @@
       "dest_id": "302",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0626",
+      "lock_index": 3,
+      "unlock_flag_id": 1
      },
      {
       "commit_off": "0x50aa",
@@ -11518,7 +13404,21 @@
       "dest_id": "306",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0614",
+      "lock_index": 3,
+      "unlock_flag_id": 2
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 50,
+      "subtype": 2,
+      "actor_index": 1,
+      "slot": 15,
+      "op_off": "0x4efe"
      }
     ]
    },
@@ -11595,6 +13495,12 @@
       "index": 0,
       "spawn_off": 32858,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 32848,
+        "editable": true
+       },
        "posZ": {
         "value": 5309,
         "mode": 0,
@@ -11642,7 +13548,12 @@
       "dest_id": "303",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0646",
+      "lock_index": 2,
+      "unlock_flag_id": 50
      },
      {
       "commit_off": "0x74bc",
@@ -11652,7 +13563,28 @@
       "dest_id": "305",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x062d",
+      "lock_index": 2,
+      "unlock_flag_id": 51
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 50,
+      "subtype": 2,
+      "actor_index": 6,
+      "slot": 22,
+      "op_off": "0x7434"
+     },
+     {
+      "flag8_id": 51,
+      "subtype": 2,
+      "actor_index": 9,
+      "slot": 23,
+      "op_off": "0x7500"
      }
     ]
    },
@@ -11823,6 +13755,12 @@
       "index": 0,
       "spawn_off": 17758,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 17748,
+        "editable": true
+       },
        "posZ": {
         "value": 5309,
         "mode": 0,
@@ -11870,7 +13808,10 @@
       "dest_id": "303",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0612"
      },
      {
       "commit_off": "0x3fd6",
@@ -11880,7 +13821,21 @@
       "dest_id": "304",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x062c",
+      "lock_index": 2,
+      "unlock_flag_id": 51
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 51,
+      "subtype": 2,
+      "actor_index": 1,
+      "slot": 15,
+      "op_off": "0x401a"
      }
     ]
    },
@@ -11978,7 +13933,10 @@
       "dest_id": "303",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0414"
      }
     ]
    },
@@ -12032,6 +13990,12 @@
       "index": 0,
       "spawn_off": 54282,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 54272,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12071,6 +14035,12 @@
       "index": 1,
       "spawn_off": 54442,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 54432,
+        "editable": true
+       },
        "posZ": {
         "value": 5028,
         "mode": 0,
@@ -12110,6 +14080,12 @@
       "index": 2,
       "spawn_off": 54968,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 54958,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12149,6 +14125,12 @@
       "index": 0,
       "spawn_off": 62128,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 62118,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12188,6 +14170,12 @@
       "index": 1,
       "spawn_off": 62370,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 62360,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12235,7 +14223,10 @@
       "dest_id": "401",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0449"
      },
      {
       "commit_off": "0xc644",
@@ -12245,7 +14236,10 @@
       "dest_id": "40B",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x014b"
      }
     ]
    },
@@ -12304,6 +14298,12 @@
       "index": 0,
       "spawn_off": 27108,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 27098,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12343,6 +14343,12 @@
       "index": 1,
       "spawn_off": 27384,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 27374,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12390,7 +14396,10 @@
       "dest_id": "402",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x06",
+      "built_state": "blocked",
+      "door_type": "0x0330"
      },
      {
       "commit_off": "0x7f2e",
@@ -12400,7 +14409,10 @@
       "dest_id": "400",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0048"
      }
     ]
    },
@@ -12466,6 +14478,12 @@
       "index": 0,
       "spawn_off": 91982,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 91972,
+        "editable": true
+       },
        "posZ": {
         "value": 4,
         "mode": 6,
@@ -12503,6 +14521,12 @@
       "index": 1,
       "spawn_off": 92122,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 92112,
+        "editable": true
+       },
        "posZ": {
         "value": 7,
         "mode": 6,
@@ -12540,6 +14564,12 @@
       "index": 2,
       "spawn_off": 93770,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 93760,
+        "editable": true
+       },
        "posZ": {
         "value": -8780,
         "mode": 0,
@@ -12579,6 +14609,12 @@
       "index": 0,
       "spawn_off": 95108,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 95098,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12618,6 +14654,12 @@
       "index": 1,
       "spawn_off": 95654,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 95644,
+        "editable": true
+       },
        "posZ": {
         "value": 7526,
         "mode": 0,
@@ -12657,6 +14699,12 @@
       "index": 0,
       "spawn_off": 100392,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 100382,
+        "editable": true
+       },
        "posZ": {
         "value": -8780,
         "mode": 0,
@@ -12696,6 +14744,12 @@
       "index": 0,
       "spawn_off": 105428,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 105418,
+        "editable": true
+       },
        "posZ": {
         "value": -6347,
         "mode": 0,
@@ -12735,6 +14789,12 @@
       "index": 1,
       "spawn_off": 105716,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 105706,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12782,7 +14842,10 @@
       "dest_id": "403",
       "dest_mode": 0,
       "slot": "0x7",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0058"
      }
     ]
    },
@@ -12864,6 +14927,22 @@
      "slot": 5,
      "id_blob_off": 100078,
      "op_blob_off": 100084
+    },
+    {
+     "id": 4,
+     "name": null,
+     "param": 27,
+     "slot": 8,
+     "id_blob_off": 120764,
+     "op_blob_off": 120770
+    },
+    {
+     "id": 1,
+     "name": "Med Pak S",
+     "param": 10,
+     "slot": 7,
+     "id_blob_off": 121816,
+     "op_blob_off": 121822
     }
    ],
    "enemies_runtime": null
@@ -12884,6 +14963,12 @@
       "index": 0,
       "spawn_off": 82420,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 82410,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -12931,7 +15016,10 @@
       "dest_id": "404",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0725"
      }
     ]
    },
@@ -13001,7 +15089,10 @@
       "dest_id": "403",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0724"
      },
      {
       "commit_off": "0x307c",
@@ -13011,7 +15102,10 @@
       "dest_id": "405",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0410"
      }
     ]
    },
@@ -13060,7 +15154,10 @@
       "dest_id": "404",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0710"
      },
      {
       "commit_off": "0x2cbc",
@@ -13070,7 +15167,10 @@
       "dest_id": "406",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x122e"
      }
     ]
    },
@@ -13111,6 +15211,12 @@
       "index": 0,
       "spawn_off": 43166,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43156,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13150,6 +15256,12 @@
       "index": 1,
       "spawn_off": 43370,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43360,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13189,6 +15301,12 @@
       "index": 2,
       "spawn_off": 43522,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43512,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13236,7 +15354,10 @@
       "dest_id": "407",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x00",
+      "built_state": "usable",
+      "door_type": "0x0058"
      }
     ]
    },
@@ -13273,6 +15394,12 @@
       "index": 0,
       "spawn_off": 93100,
       "fields": {
+       "VARIANT": {
+        "value": 5,
+        "mode": 6,
+        "value_off": 93090,
+        "editable": false
+       },
        "posZ": {
         "value": 7852,
         "mode": 0,
@@ -13310,6 +15437,12 @@
       "index": 1,
       "spawn_off": 93148,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 93138,
+        "editable": true
+       },
        "posZ": {
         "value": 11485,
         "mode": 0,
@@ -13349,6 +15482,12 @@
       "index": 0,
       "spawn_off": 94342,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 94332,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13388,6 +15527,12 @@
       "index": 1,
       "spawn_off": 94390,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 94380,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13427,6 +15572,12 @@
       "index": 2,
       "spawn_off": 94438,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 94428,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13466,6 +15617,12 @@
       "index": 3,
       "spawn_off": 96322,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 96312,
+        "editable": true
+       },
        "posZ": {
         "value": 15082,
         "mode": 0,
@@ -13505,6 +15662,12 @@
       "index": 0,
       "spawn_off": 96966,
       "fields": {
+       "VARIANT": {
+        "value": 44,
+        "mode": 6,
+        "value_off": 96956,
+        "editable": false
+       },
        "posZ": {
         "value": 7852,
         "mode": 0,
@@ -13542,6 +15705,12 @@
       "index": 1,
       "spawn_off": 97026,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 97016,
+        "editable": true
+       },
        "posZ": {
         "value": 11485,
         "mode": 0,
@@ -13581,6 +15750,12 @@
       "index": 0,
       "spawn_off": 98974,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 98964,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13620,6 +15795,12 @@
       "index": 1,
       "spawn_off": 99306,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99296,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13659,6 +15840,12 @@
       "index": 2,
       "spawn_off": 99714,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99704,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13698,6 +15885,12 @@
       "index": 3,
       "spawn_off": 101598,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 101588,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13745,7 +15938,10 @@
       "dest_id": "408",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x00",
+      "built_state": "usable",
+      "door_type": "0x0058"
      }
     ]
    },
@@ -13782,6 +15978,12 @@
       "index": 0,
       "spawn_off": 75608,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 6,
+        "value_off": 75598,
+        "editable": false
+       },
        "posZ": {
         "value": 15114,
         "mode": 0,
@@ -13819,6 +16021,12 @@
       "index": 0,
       "spawn_off": 77958,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 77948,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13858,6 +16066,12 @@
       "index": 1,
       "spawn_off": 78134,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 78124,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -13897,6 +16111,12 @@
       "index": 0,
       "spawn_off": 79058,
       "fields": {
+       "VARIANT": {
+        "value": 33,
+        "mode": 6,
+        "value_off": 79048,
+        "editable": false
+       },
        "posZ": {
         "value": 15114,
         "mode": 0,
@@ -13934,6 +16154,12 @@
       "index": 0,
       "spawn_off": 80102,
       "fields": {
+       "VARIANT": {
+        "value": 39,
+        "mode": 6,
+        "value_off": 80092,
+        "editable": false
+       },
        "posZ": {
         "value": 37,
         "mode": 6,
@@ -13981,7 +16207,10 @@
       "dest_id": "409",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0432"
      },
      {
       "commit_off": "0x12874",
@@ -13991,7 +16220,10 @@
       "dest_id": "409",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0432"
      },
      {
       "commit_off": "0x13a4c",
@@ -14001,7 +16233,11 @@
       "dest_id": "409",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x80",
+      "built_state": "usable",
+      "warp_notify": true,
+      "door_type": "0x0432"
      },
      {
       "commit_off": "0x13b0e",
@@ -14011,7 +16247,11 @@
       "dest_id": "409",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x80",
+      "built_state": "usable",
+      "warp_notify": true,
+      "door_type": "0x0432"
      }
     ]
    },
@@ -14058,6 +16298,12 @@
       "index": 0,
       "spawn_off": 75116,
       "fields": {
+       "VARIANT": {
+        "value": 7,
+        "mode": 6,
+        "value_off": 75106,
+        "editable": false
+       },
        "posZ": {
         "value": 15852,
         "mode": 0,
@@ -14095,6 +16341,12 @@
       "index": 0,
       "spawn_off": 76126,
       "fields": {
+       "VARIANT": {
+        "value": 22,
+        "mode": 6,
+        "value_off": 76116,
+        "editable": false
+       },
        "posZ": {
         "value": 20,
         "mode": 6,
@@ -14142,7 +16394,10 @@
       "dest_id": "40A",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x0a",
+      "built_state": "usable",
+      "door_type": "0x0416"
      },
      {
       "commit_off": "0x12484",
@@ -14152,7 +16407,10 @@
       "dest_id": "408",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x0a",
+      "built_state": "usable",
+      "door_type": "0x0432"
      },
      {
       "commit_off": "0x12600",
@@ -14162,7 +16420,10 @@
       "dest_id": "40A",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x0a",
+      "built_state": "usable",
+      "door_type": "0x0416"
      },
      {
       "commit_off": "0x12654",
@@ -14172,7 +16433,10 @@
       "dest_id": "408",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x0a",
+      "built_state": "usable",
+      "door_type": "0x0432"
      },
      {
       "commit_off": "0x12ac4",
@@ -14182,7 +16446,10 @@
       "dest_id": "40A",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0416"
      },
      {
       "commit_off": "0x12b9a",
@@ -14192,7 +16459,10 @@
       "dest_id": "40A",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0416"
      }
     ]
    },
@@ -14243,6 +16513,12 @@
       "index": 0,
       "spawn_off": 60030,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60020,
+        "editable": true
+       },
        "posZ": {
         "value": 43,
         "mode": 6,
@@ -14290,7 +16566,10 @@
       "dest_id": "409",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0416"
      },
      {
       "commit_off": "0xcbc0",
@@ -14300,7 +16579,10 @@
       "dest_id": "500",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0454"
      }
     ]
    },
@@ -14406,7 +16688,10 @@
       "dest_id": "10F",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0446"
      },
      {
       "commit_off": "0x11bc",
@@ -14416,7 +16701,10 @@
       "dest_id": "400",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x044a"
      }
     ]
    },
@@ -14474,7 +16762,10 @@
       "dest_id": "40A",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0454"
      },
      {
       "commit_off": "0x21e4",
@@ -14484,7 +16775,10 @@
       "dest_id": "501",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0b34"
      }
     ]
    },
@@ -14533,7 +16827,10 @@
       "dest_id": "500",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0434"
      },
      {
       "commit_off": "0x2ac4",
@@ -14543,7 +16840,10 @@
       "dest_id": "502",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0432"
      }
     ]
    },
@@ -14594,6 +16894,12 @@
       "index": 0,
       "spawn_off": 160624,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 160614,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -14633,6 +16939,12 @@
       "index": 0,
       "spawn_off": 161998,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 161988,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -14672,6 +16984,12 @@
       "index": 1,
       "spawn_off": 162238,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 162228,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -14711,6 +17029,12 @@
       "index": 2,
       "spawn_off": 162522,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 162512,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -14758,7 +17082,10 @@
       "dest_id": "503",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0934"
      },
      {
       "commit_off": "0x26848",
@@ -14768,7 +17095,10 @@
       "dest_id": "501",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0932"
      }
     ]
    },
@@ -14851,13 +17181,19 @@
    "zone_area_id": 6,
    "zone_provenance": "byte (Dino2.exe 0x491c70 + 0x49d770; see ZONE-MAPPING-RE.md)",
    "spawns": {
-    "spawn_count": 9,
+    "spawn_count": 10,
     "spawns": [
      {
       "routine": 7,
       "index": 0,
       "spawn_off": 96786,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 96776,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -14897,6 +17233,12 @@
       "index": 1,
       "spawn_off": 97060,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 97050,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -14936,6 +17278,12 @@
       "index": 2,
       "spawn_off": 97762,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 97752,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -14975,6 +17323,12 @@
       "index": 3,
       "spawn_off": 98952,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 98942,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15014,6 +17368,12 @@
       "index": 4,
       "spawn_off": 100068,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 100058,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15053,6 +17413,12 @@
       "index": 5,
       "spawn_off": 100144,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 100134,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15092,6 +17458,12 @@
       "index": 6,
       "spawn_off": 100220,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 100210,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15131,6 +17503,12 @@
       "index": 0,
       "spawn_off": 103464,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 103454,
+        "editable": true
+       },
        "posZ": {
         "value": 677,
         "mode": 0,
@@ -15170,6 +17548,12 @@
       "index": 0,
       "spawn_off": 105258,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 105248,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15203,6 +17587,51 @@
       },
       "species": "(model from spawn-block / non-enemy)",
       "type_literal": 16
+     },
+     {
+      "routine": 24,
+      "index": 0,
+      "spawn_off": 108544,
+      "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 108534,
+        "editable": true
+       },
+       "posZ": {
+        "value": 124,
+        "mode": 6,
+        "value_off": 108522,
+        "editable": false
+       },
+       "posY": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 108518,
+        "editable": true
+       },
+       "posX": {
+        "value": 123,
+        "mode": 6,
+        "value_off": 108514,
+        "editable": false
+       },
+       "TYPE": {
+        "value": 16,
+        "mode": 0,
+        "value_off": 108510,
+        "editable": true
+       },
+       "SLOT": {
+        "value": 2,
+        "mode": 0,
+        "value_off": 108506,
+        "editable": true
+       }
+      },
+      "species": "(model from spawn-block / non-enemy)",
+      "type_literal": 16
      }
     ]
    },
@@ -15217,7 +17646,10 @@
       "dest_id": "504",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x0a",
+      "built_state": "usable",
+      "door_type": "0x0c36"
      }
     ]
    },
@@ -15303,6 +17735,12 @@
       "index": 0,
       "spawn_off": 13318,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 13308,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15342,6 +17780,12 @@
       "index": 1,
       "spawn_off": 13366,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 13356,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15381,6 +17825,12 @@
       "index": 2,
       "spawn_off": 13814,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 13804,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15420,6 +17870,12 @@
       "index": 3,
       "spawn_off": 14610,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 14600,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15459,6 +17915,12 @@
       "index": 4,
       "spawn_off": 14658,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 14648,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15498,6 +17960,12 @@
       "index": 5,
       "spawn_off": 14918,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 14908,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -15573,7 +18041,10 @@
       "dest_id": "601",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x013b"
      },
      {
       "commit_off": "0x2174",
@@ -15583,7 +18054,10 @@
       "dest_id": "004",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0e4e"
      }
     ]
    },
@@ -15632,7 +18106,10 @@
       "dest_id": "600",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x003a"
      },
      {
       "commit_off": "0x214c",
@@ -15642,7 +18119,10 @@
       "dest_id": "602",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107"
      }
     ]
    },
@@ -15691,7 +18171,10 @@
       "dest_id": "601",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006"
      },
      {
       "commit_off": "0x1dc0",
@@ -15701,7 +18184,10 @@
       "dest_id": "603",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0139"
      }
     ]
    },
@@ -15743,6 +18229,12 @@
       "index": 0,
       "spawn_off": 19574,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 19564,
+        "editable": true
+       },
        "posZ": {
         "value": 35,
         "mode": 6,
@@ -15780,6 +18272,12 @@
       "index": 1,
       "spawn_off": 19750,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 19740,
+        "editable": true
+       },
        "posZ": {
         "value": 39,
         "mode": 6,
@@ -15817,6 +18315,12 @@
       "index": 2,
       "spawn_off": 19926,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 19916,
+        "editable": true
+       },
        "posZ": {
         "value": 43,
         "mode": 6,
@@ -15854,6 +18358,12 @@
       "index": 3,
       "spawn_off": 20102,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 20092,
+        "editable": true
+       },
        "posZ": {
         "value": 47,
         "mode": 6,
@@ -15899,7 +18409,10 @@
       "dest_id": "602",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0038"
      },
      {
       "commit_off": "0x3c78",
@@ -15909,7 +18422,10 @@
       "dest_id": "605",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0412"
      },
      {
       "commit_off": "0x3cf0",
@@ -15919,7 +18435,10 @@
       "dest_id": "604",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x010b"
      },
      {
       "commit_off": "0x4aaa",
@@ -15929,7 +18448,10 @@
       "dest_id": "604",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x010b"
      }
     ]
    },
@@ -16000,7 +18522,10 @@
       "dest_id": "603",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x000a"
      },
      {
       "commit_off": "0x2ef8",
@@ -16010,7 +18535,10 @@
       "dest_id": "605",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0149"
      }
     ]
    },
@@ -16059,7 +18587,10 @@
       "dest_id": "603",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0412"
      },
      {
       "commit_off": "0x112b6",
@@ -16069,7 +18600,10 @@
       "dest_id": "604",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0048"
      },
      {
       "commit_off": "0x14362",
@@ -16079,7 +18613,10 @@
       "dest_id": "606",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0318"
      }
     ]
    },
@@ -16198,7 +18735,10 @@
       "dest_id": "607",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0452"
      },
      {
       "commit_off": "0xf126",
@@ -16208,7 +18748,10 @@
       "dest_id": "605",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0318"
      }
     ]
    },
@@ -16275,6 +18818,12 @@
       "index": 0,
       "spawn_off": 48976,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48966,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -16314,6 +18863,12 @@
       "index": 0,
       "spawn_off": 53738,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 53728,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -16353,6 +18908,12 @@
       "index": 0,
       "spawn_off": 55904,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 55894,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -16400,7 +18961,10 @@
       "dest_id": "606",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0453"
      },
      {
       "commit_off": "0xe586",
@@ -16410,7 +18974,10 @@
       "dest_id": "700",
       "dest_mode": 0,
       "slot": "0xd",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x06",
+      "built_state": "blocked",
+      "door_type": "0x0f42"
      }
     ]
    },
@@ -16511,6 +19078,12 @@
       "index": 0,
       "spawn_off": 19790,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 19780,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -16550,6 +19123,12 @@
       "index": 1,
       "spawn_off": 20042,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 20032,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -16589,6 +19168,12 @@
       "index": 2,
       "spawn_off": 21334,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 21324,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -16628,6 +19213,12 @@
       "index": 0,
       "spawn_off": 22946,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 22936,
+        "editable": true
+       },
        "posZ": {
         "value": 183,
         "mode": 0,
@@ -16667,6 +19258,12 @@
       "index": 1,
       "spawn_off": 22994,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 22984,
+        "editable": true
+       },
        "posZ": {
         "value": 37,
         "mode": 6,
@@ -16714,7 +19311,10 @@
       "dest_id": "701",
       "dest_mode": 0,
       "slot": "0x5",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0540"
      }
     ]
    },
@@ -16759,7 +19359,10 @@
       "dest_id": "700",
       "dest_mode": 0,
       "slot": "0x5",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0540"
      },
      {
       "commit_off": "0x394c",
@@ -16769,7 +19372,10 @@
       "dest_id": "702",
       "dest_mode": 0,
       "slot": "0x6",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x053f"
      }
     ]
    },
@@ -16835,7 +19441,10 @@
       "dest_id": "701",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x053e"
      },
      {
       "commit_off": "0x2680",
@@ -16845,7 +19454,10 @@
       "dest_id": "703",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x055b"
      }
     ]
    },
@@ -16887,6 +19499,12 @@
       "index": 0,
       "spawn_off": 33514,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 33504,
+        "editable": true
+       },
        "posZ": {
         "value": 32,
         "mode": 6,
@@ -16924,6 +19542,12 @@
       "index": 1,
       "spawn_off": 33722,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 33712,
+        "editable": true
+       },
        "posZ": {
         "value": 2617,
         "mode": 0,
@@ -16961,6 +19585,12 @@
       "index": 2,
       "spawn_off": 33930,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 33920,
+        "editable": true
+       },
        "posZ": {
         "value": 3889,
         "mode": 0,
@@ -16998,6 +19628,12 @@
       "index": 3,
       "spawn_off": 34218,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 34208,
+        "editable": true
+       },
        "posZ": {
         "value": 6247,
         "mode": 0,
@@ -17035,6 +19671,12 @@
       "index": 4,
       "spawn_off": 34426,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 34416,
+        "editable": true
+       },
        "posZ": {
         "value": 4461,
         "mode": 0,
@@ -17072,6 +19714,12 @@
       "index": 5,
       "spawn_off": 34634,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 34624,
+        "editable": true
+       },
        "posZ": {
         "value": 4817,
         "mode": 0,
@@ -17109,6 +19757,12 @@
       "index": 6,
       "spawn_off": 34922,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 34912,
+        "editable": true
+       },
        "posZ": {
         "value": 1050,
         "mode": 0,
@@ -17146,6 +19800,12 @@
       "index": 7,
       "spawn_off": 35130,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 35120,
+        "editable": true
+       },
        "posZ": {
         "value": 2102,
         "mode": 0,
@@ -17183,6 +19843,12 @@
       "index": 8,
       "spawn_off": 35338,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 35328,
+        "editable": true
+       },
        "posZ": {
         "value": 1598,
         "mode": 0,
@@ -17220,6 +19886,12 @@
       "index": 9,
       "spawn_off": 35812,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 35802,
+        "editable": true
+       },
        "posZ": {
         "value": 1747,
         "mode": 0,
@@ -17257,6 +19929,12 @@
       "index": 10,
       "spawn_off": 36020,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36010,
+        "editable": true
+       },
        "posZ": {
         "value": 3824,
         "mode": 0,
@@ -17294,6 +19972,12 @@
       "index": 11,
       "spawn_off": 36228,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36218,
+        "editable": true
+       },
        "posZ": {
         "value": 81,
         "mode": 6,
@@ -17331,6 +20015,12 @@
       "index": 12,
       "spawn_off": 36516,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36506,
+        "editable": true
+       },
        "posZ": {
         "value": 6369,
         "mode": 0,
@@ -17368,6 +20058,12 @@
       "index": 13,
       "spawn_off": 36724,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36714,
+        "editable": true
+       },
        "posZ": {
         "value": 4295,
         "mode": 0,
@@ -17405,6 +20101,12 @@
       "index": 14,
       "spawn_off": 36932,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36922,
+        "editable": true
+       },
        "posZ": {
         "value": 4127,
         "mode": 0,
@@ -17442,6 +20144,12 @@
       "index": 15,
       "spawn_off": 37220,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 37210,
+        "editable": true
+       },
        "posZ": {
         "value": 6247,
         "mode": 0,
@@ -17479,6 +20187,12 @@
       "index": 16,
       "spawn_off": 37428,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 37418,
+        "editable": true
+       },
        "posZ": {
         "value": 4461,
         "mode": 0,
@@ -17516,6 +20230,12 @@
       "index": 17,
       "spawn_off": 37636,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 37626,
+        "editable": true
+       },
        "posZ": {
         "value": 4817,
         "mode": 0,
@@ -17553,6 +20273,12 @@
       "index": 18,
       "spawn_off": 37924,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 37914,
+        "editable": true
+       },
        "posZ": {
         "value": 1050,
         "mode": 0,
@@ -17590,6 +20316,12 @@
       "index": 19,
       "spawn_off": 38132,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 38122,
+        "editable": true
+       },
        "posZ": {
         "value": 2102,
         "mode": 0,
@@ -17627,6 +20359,12 @@
       "index": 20,
       "spawn_off": 38340,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 38330,
+        "editable": true
+       },
        "posZ": {
         "value": 1598,
         "mode": 0,
@@ -17672,7 +20410,10 @@
       "dest_id": "702",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x055a"
      },
      {
       "commit_off": "0x6ac0",
@@ -17682,7 +20423,10 @@
       "dest_id": "704",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x053d"
      },
      {
       "commit_off": "0x6b14",
@@ -17692,7 +20436,10 @@
       "dest_id": "704",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0556"
      }
     ]
    },
@@ -17759,6 +20506,12 @@
       "index": 0,
       "spawn_off": 46024,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 46014,
+        "editable": true
+       },
        "posZ": {
         "value": 10,
         "mode": 6,
@@ -17798,6 +20551,12 @@
       "index": 0,
       "spawn_off": 49192,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 49182,
+        "editable": true
+       },
        "posZ": {
         "value": 16,
         "mode": 6,
@@ -17835,6 +20594,12 @@
       "index": 1,
       "spawn_off": 49400,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 49390,
+        "editable": true
+       },
        "posZ": {
         "value": 25,
         "mode": 6,
@@ -17872,6 +20637,12 @@
       "index": 2,
       "spawn_off": 49688,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 49678,
+        "editable": true
+       },
        "posZ": {
         "value": 31,
         "mode": 6,
@@ -17909,6 +20680,12 @@
       "index": 3,
       "spawn_off": 49896,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 49886,
+        "editable": true
+       },
        "posZ": {
         "value": 630,
         "mode": 0,
@@ -17946,6 +20723,12 @@
       "index": 4,
       "spawn_off": 50104,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 50094,
+        "editable": true
+       },
        "posZ": {
         "value": 548,
         "mode": 0,
@@ -17983,6 +20766,12 @@
       "index": 5,
       "spawn_off": 50392,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 50382,
+        "editable": true
+       },
        "posZ": {
         "value": 5512,
         "mode": 0,
@@ -18020,6 +20809,12 @@
       "index": 6,
       "spawn_off": 50600,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 50590,
+        "editable": true
+       },
        "posZ": {
         "value": 5725,
         "mode": 0,
@@ -18057,6 +20852,12 @@
       "index": 7,
       "spawn_off": 50888,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 50878,
+        "editable": true
+       },
        "posZ": {
         "value": 3648,
         "mode": 0,
@@ -18094,6 +20895,12 @@
       "index": 8,
       "spawn_off": 51176,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 51166,
+        "editable": true
+       },
        "posZ": {
         "value": 4080,
         "mode": 0,
@@ -18131,6 +20938,12 @@
       "index": 9,
       "spawn_off": 51384,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 51374,
+        "editable": true
+       },
        "posZ": {
         "value": 65,
         "mode": 6,
@@ -18168,6 +20981,12 @@
       "index": 10,
       "spawn_off": 51592,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 51582,
+        "editable": true
+       },
        "posZ": {
         "value": 2707,
         "mode": 0,
@@ -18213,7 +21032,10 @@
       "dest_id": "703",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x053c"
      },
      {
       "commit_off": "0xaeb4",
@@ -18223,7 +21045,10 @@
       "dest_id": "705",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0502"
      },
      {
       "commit_off": "0xaf08",
@@ -18233,7 +21058,10 @@
       "dest_id": "703",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0556"
      }
     ]
    },
@@ -18306,7 +21134,10 @@
       "dest_id": "704",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0503"
      },
      {
       "commit_off": "0x544a",
@@ -18316,7 +21147,10 @@
       "dest_id": "706",
       "dest_mode": 0,
       "slot": "0x5",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0540"
      }
     ]
    },
@@ -18407,6 +21241,12 @@
       "index": 0,
       "spawn_off": 56624,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 56614,
+        "editable": true
+       },
        "posZ": {
         "value": -14517,
         "mode": 0,
@@ -18446,6 +21286,12 @@
       "index": 0,
       "spawn_off": 60954,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 60944,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -18485,6 +21331,12 @@
       "index": 1,
       "spawn_off": 61286,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 61276,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -18524,6 +21376,12 @@
       "index": 0,
       "spawn_off": 64356,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 64346,
+        "editable": true
+       },
        "posZ": {
         "value": -14517,
         "mode": 0,
@@ -18571,7 +21429,10 @@
       "dest_id": "705",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0540"
      },
      {
       "commit_off": "0x10894",
@@ -18581,7 +21442,10 @@
       "dest_id": "800",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0318"
      }
     ]
    },
@@ -18731,6 +21595,12 @@
       "index": 0,
       "spawn_off": 104088,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 104078,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -18770,6 +21640,12 @@
       "index": 1,
       "spawn_off": 104328,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 104318,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -18817,7 +21693,10 @@
       "dest_id": "005",
       "dest_mode": 0,
       "slot": "0x5",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0e4e"
      },
      {
       "commit_off": "0x18610",
@@ -18827,7 +21706,10 @@
       "dest_id": "801",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x040c"
      },
      {
       "commit_off": "0x1a0b0",
@@ -18837,7 +21719,10 @@
       "dest_id": "005",
       "dest_mode": 0,
       "slot": "0x5",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0e4e"
      },
      {
       "commit_off": "0x1a138",
@@ -18847,7 +21732,10 @@
       "dest_id": "801",
       "dest_mode": 0,
       "slot": "0x4",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x040c"
      },
      {
       "commit_off": "0x1a952",
@@ -18857,7 +21745,10 @@
       "dest_id": "706",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0544"
      }
     ]
    },
@@ -18937,6 +21828,12 @@
       "index": 0,
       "spawn_off": 17050,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 17040,
+        "editable": true
+       },
        "posZ": {
         "value": 15941,
         "mode": 0,
@@ -18976,6 +21873,12 @@
       "index": 1,
       "spawn_off": 17098,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 17088,
+        "editable": true
+       },
        "posZ": {
         "value": 16350,
         "mode": 0,
@@ -19015,6 +21918,12 @@
       "index": 2,
       "spawn_off": 17146,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 17136,
+        "editable": true
+       },
        "posZ": {
         "value": 15999,
         "mode": 0,
@@ -19054,6 +21963,12 @@
       "index": 3,
       "spawn_off": 17194,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 17184,
+        "editable": true
+       },
        "posZ": {
         "value": 16319,
         "mode": 0,
@@ -19093,6 +22008,12 @@
       "index": 4,
       "spawn_off": 17242,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 17232,
+        "editable": true
+       },
        "posZ": {
         "value": 16441,
         "mode": 0,
@@ -19132,6 +22053,12 @@
       "index": 0,
       "spawn_off": 18580,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 18570,
+        "editable": true
+       },
        "posZ": {
         "value": 15941,
         "mode": 0,
@@ -19171,6 +22098,12 @@
       "index": 1,
       "spawn_off": 18628,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 18618,
+        "editable": true
+       },
        "posZ": {
         "value": 16350,
         "mode": 0,
@@ -19210,6 +22143,12 @@
       "index": 2,
       "spawn_off": 18676,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 18666,
+        "editable": true
+       },
        "posZ": {
         "value": 15999,
         "mode": 0,
@@ -19249,6 +22188,12 @@
       "index": 3,
       "spawn_off": 18724,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 18714,
+        "editable": true
+       },
        "posZ": {
         "value": 16319,
         "mode": 0,
@@ -19288,6 +22233,12 @@
       "index": 4,
       "spawn_off": 18772,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 18762,
+        "editable": true
+       },
        "posZ": {
         "value": 16441,
         "mode": 0,
@@ -19335,7 +22286,12 @@
       "dest_id": "803",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006",
+      "lock_index": 2,
+      "unlock_flag_id": 53
      },
      {
       "commit_off": "0x470a",
@@ -19345,7 +22301,10 @@
       "dest_id": "802",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0048"
      },
      {
       "commit_off": "0x475e",
@@ -19355,7 +22314,19 @@
       "dest_id": "800",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x040c"
+     }
+    ],
+    "key_use": [
+     {
+      "flag8_id": 53,
+      "subtype": 2,
+      "actor_index": 26,
+      "slot": 3,
+      "op_off": "0x46b6"
      }
     ]
    },
@@ -19419,6 +22390,12 @@
       "index": 0,
       "spawn_off": 12432,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 12422,
+        "editable": true
+       },
        "posZ": {
         "value": -11690,
         "mode": 0,
@@ -19458,6 +22435,12 @@
       "index": 1,
       "spawn_off": 12528,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 12518,
+        "editable": true
+       },
        "posZ": {
         "value": -207,
         "mode": 0,
@@ -19497,6 +22480,12 @@
       "index": 2,
       "spawn_off": 12580,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 12570,
+        "editable": true
+       },
        "posZ": {
         "value": 10536,
         "mode": 0,
@@ -19536,6 +22525,12 @@
       "index": 0,
       "spawn_off": 12776,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 12766,
+        "editable": true
+       },
        "posZ": {
         "value": 14179,
         "mode": 0,
@@ -19583,7 +22578,10 @@
       "dest_id": "801",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0149"
      }
     ]
    },
@@ -19629,6 +22627,12 @@
       "index": 0,
       "spawn_off": 36904,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 36894,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -19668,6 +22672,12 @@
       "index": 1,
       "spawn_off": 37112,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 37102,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -19715,7 +22725,10 @@
       "dest_id": "804",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x010f"
      },
      {
       "commit_off": "0x8a34",
@@ -19725,7 +22738,10 @@
       "dest_id": "801",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107"
      }
     ]
    },
@@ -19783,7 +22799,10 @@
       "dest_id": "805",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0006"
      },
      {
       "commit_off": "0x1cec",
@@ -19793,7 +22812,10 @@
       "dest_id": "803",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x000e"
      }
     ]
    },
@@ -19835,6 +22857,12 @@
       "index": 0,
       "spawn_off": 30262,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30252,
+        "editable": true
+       },
        "posZ": {
         "value": -3615,
         "mode": 0,
@@ -19872,6 +22900,12 @@
       "index": 1,
       "spawn_off": 30446,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 30436,
+        "editable": true
+       },
        "posZ": {
         "value": -3615,
         "mode": 0,
@@ -19909,6 +22943,12 @@
       "index": 2,
       "spawn_off": 30546,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30536,
+        "editable": true
+       },
        "posZ": {
         "value": -6245,
         "mode": 0,
@@ -19946,6 +22986,12 @@
       "index": 3,
       "spawn_off": 30710,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 30700,
+        "editable": true
+       },
        "posZ": {
         "value": -6245,
         "mode": 0,
@@ -19983,6 +23029,12 @@
       "index": 0,
       "spawn_off": 32682,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 32672,
+        "editable": true
+       },
        "posZ": {
         "value": -3615,
         "mode": 0,
@@ -20020,6 +23072,12 @@
       "index": 1,
       "spawn_off": 33010,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 33000,
+        "editable": true
+       },
        "posZ": {
         "value": -6245,
         "mode": 0,
@@ -20065,7 +23123,10 @@
       "dest_id": "804",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0107"
      },
      {
       "commit_off": "0x789e",
@@ -20075,7 +23136,10 @@
       "dest_id": "80B",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0800"
      }
     ]
    },
@@ -20117,6 +23181,12 @@
       "index": 0,
       "spawn_off": 47524,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 47514,
+        "editable": true
+       },
        "posZ": {
         "value": 10,
         "mode": 6,
@@ -20154,6 +23224,12 @@
       "index": 1,
       "spawn_off": 47688,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 47678,
+        "editable": true
+       },
        "posZ": {
         "value": 17,
         "mode": 6,
@@ -20191,6 +23267,12 @@
       "index": 0,
       "spawn_off": 48540,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 48530,
+        "editable": true
+       },
        "posZ": {
         "value": 23,
         "mode": 6,
@@ -20236,7 +23318,10 @@
       "dest_id": "80B",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x1301"
      },
      {
       "commit_off": "0xb8c8",
@@ -20246,7 +23331,10 @@
       "dest_id": "807",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0201"
      }
     ]
    },
@@ -20288,6 +23376,12 @@
       "index": 0,
       "spawn_off": 22798,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 22788,
+        "editable": true
+       },
        "posZ": {
         "value": 6,
         "mode": 6,
@@ -20325,6 +23419,12 @@
       "index": 1,
       "spawn_off": 22942,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 22932,
+        "editable": true
+       },
        "posZ": {
         "value": 11,
         "mode": 6,
@@ -20362,6 +23462,12 @@
       "index": 2,
       "spawn_off": 23062,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 23052,
+        "editable": true
+       },
        "posZ": {
         "value": 14,
         "mode": 6,
@@ -20399,6 +23505,12 @@
       "index": 3,
       "spawn_off": 23206,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 23196,
+        "editable": true
+       },
        "posZ": {
         "value": 19,
         "mode": 6,
@@ -20436,6 +23548,12 @@
       "index": 4,
       "spawn_off": 23326,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 23316,
+        "editable": true
+       },
        "posZ": {
         "value": 1584,
         "mode": 0,
@@ -20473,6 +23591,12 @@
       "index": 5,
       "spawn_off": 23470,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 23460,
+        "editable": true
+       },
        "posZ": {
         "value": 1584,
         "mode": 0,
@@ -20510,6 +23634,12 @@
       "index": 0,
       "spawn_off": 24328,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 24318,
+        "editable": true
+       },
        "posZ": {
         "value": 31,
         "mode": 6,
@@ -20547,6 +23677,12 @@
       "index": 1,
       "spawn_off": 24636,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 24626,
+        "editable": true
+       },
        "posZ": {
         "value": 35,
         "mode": 6,
@@ -20584,6 +23720,12 @@
       "index": 2,
       "spawn_off": 24944,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 24934,
+        "editable": true
+       },
        "posZ": {
         "value": 1584,
         "mode": 0,
@@ -20629,7 +23771,10 @@
       "dest_id": "806",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0200"
      },
      {
       "commit_off": "0x586e",
@@ -20639,7 +23784,10 @@
       "dest_id": "808",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x1129"
      }
     ]
    },
@@ -20681,6 +23829,12 @@
       "index": 0,
       "spawn_off": 52706,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 52696,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -20720,6 +23874,12 @@
       "index": 1,
       "spawn_off": 52870,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 52860,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -20759,6 +23919,12 @@
       "index": 2,
       "spawn_off": 53600,
       "fields": {
+       "VARIANT": {
+        "value": 22,
+        "mode": 6,
+        "value_off": 53590,
+        "editable": false
+       },
        "posZ": {
         "value": 9498,
         "mode": 0,
@@ -20798,6 +23964,12 @@
       "index": 3,
       "spawn_off": 56128,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 56118,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -20837,6 +24009,12 @@
       "index": 0,
       "spawn_off": 57970,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 57960,
+        "editable": true
+       },
        "posZ": {
         "value": 5236,
         "mode": 0,
@@ -20876,6 +24054,12 @@
       "index": 0,
       "spawn_off": 59584,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 59574,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -20915,6 +24099,12 @@
       "index": 0,
       "spawn_off": 61372,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 61362,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -20954,6 +24144,12 @@
       "index": 0,
       "spawn_off": 63962,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 63952,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -20993,6 +24189,12 @@
       "index": 1,
       "spawn_off": 64038,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 64028,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21032,6 +24234,12 @@
       "index": 2,
       "spawn_off": 64334,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 64324,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21079,7 +24287,10 @@
       "dest_id": "807",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x1128"
      },
      {
       "commit_off": "0xfca6",
@@ -21089,7 +24300,10 @@
       "dest_id": "809",
       "dest_mode": 0,
       "slot": "0x2",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0205"
      }
     ]
    },
@@ -21171,6 +24385,12 @@
       "index": 0,
       "spawn_off": 97782,
       "fields": {
+       "VARIANT": {
+        "value": 17,
+        "mode": 6,
+        "value_off": 97772,
+        "editable": false
+       },
        "posZ": {
         "value": 6876,
         "mode": 0,
@@ -21208,6 +24428,12 @@
       "index": 0,
       "spawn_off": 98992,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 98982,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21247,6 +24473,12 @@
       "index": 1,
       "spawn_off": 99044,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99034,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21286,6 +24518,12 @@
       "index": 2,
       "spawn_off": 99144,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99134,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21325,6 +24563,12 @@
       "index": 3,
       "spawn_off": 99304,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99294,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21364,6 +24608,12 @@
       "index": 4,
       "spawn_off": 99404,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99394,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21403,6 +24653,12 @@
       "index": 5,
       "spawn_off": 99480,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99470,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21442,6 +24698,12 @@
       "index": 6,
       "spawn_off": 99556,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99546,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21481,6 +24743,12 @@
       "index": 7,
       "spawn_off": 99632,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 99622,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21520,6 +24788,12 @@
       "index": 8,
       "spawn_off": 101582,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 101572,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21559,6 +24833,12 @@
       "index": 0,
       "spawn_off": 106750,
       "fields": {
+       "VARIANT": {
+        "value": 80,
+        "mode": 6,
+        "value_off": 106740,
+        "editable": false
+       },
        "posZ": {
         "value": 8868,
         "mode": 0,
@@ -21604,7 +24884,10 @@
       "dest_id": "80A",
       "dest_mode": 0,
       "slot": "0x7",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0059"
      }
     ]
    },
@@ -21666,6 +24949,12 @@
       "index": 0,
       "spawn_off": 321562,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 321552,
+        "editable": true
+       },
        "posZ": {
         "value": 10000,
         "mode": 0,
@@ -21705,6 +24994,12 @@
       "index": 0,
       "spawn_off": 321920,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 321910,
+        "editable": true
+       },
        "posZ": {
         "value": 25000,
         "mode": 0,
@@ -21744,6 +25039,12 @@
       "index": 1,
       "spawn_off": 321968,
       "fields": {
+       "VARIANT": {
+        "value": 1,
+        "mode": 0,
+        "value_off": 321958,
+        "editable": true
+       },
        "posZ": {
         "value": 25000,
         "mode": 0,
@@ -21783,6 +25084,12 @@
       "index": 0,
       "spawn_off": 323310,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 323300,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21822,6 +25129,12 @@
       "index": 1,
       "spawn_off": 323438,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 323428,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21861,6 +25174,12 @@
       "index": 2,
       "spawn_off": 323942,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 323932,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21908,7 +25227,10 @@
       "dest_id": "900",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x00",
+      "built_state": "usable",
+      "door_type": "0x0058"
      }
     ]
    },
@@ -21945,6 +25267,12 @@
       "index": 0,
       "spawn_off": 15862,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 15852,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -21992,7 +25320,10 @@
       "dest_id": "805",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x1301"
      },
      {
       "commit_off": "0x31f2",
@@ -22002,7 +25333,10 @@
       "dest_id": "806",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0800"
      }
     ]
    },
@@ -22044,6 +25378,12 @@
       "index": 0,
       "spawn_off": 16396,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 16386,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -22083,6 +25423,12 @@
       "index": 1,
       "spawn_off": 16496,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 16486,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -22122,6 +25468,12 @@
       "index": 2,
       "spawn_off": 16596,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 16586,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -22169,7 +25521,10 @@
       "dest_id": "901",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x004a"
      },
      {
       "commit_off": "0x3950",
@@ -22179,7 +25534,10 @@
       "dest_id": "902",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0146"
      }
     ]
    },
@@ -22238,7 +25596,10 @@
       "dest_id": "900",
       "dest_mode": 0,
       "slot": "0x3",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x014b"
      }
     ]
    },
@@ -22299,7 +25660,10 @@
       "dest_id": "900",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0046"
      },
      {
       "commit_off": "0x1b40",
@@ -22309,7 +25673,10 @@
       "dest_id": "903",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x014d"
      },
      {
       "commit_off": "0x1d80",
@@ -22319,7 +25686,10 @@
       "dest_id": "903",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x014d"
      }
     ]
    },
@@ -22360,6 +25730,12 @@
       "index": 0,
       "spawn_off": 42850,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 42840,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -22399,6 +25775,12 @@
       "index": 1,
       "spawn_off": 43220,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43210,
+        "editable": true
+       },
        "posZ": {
         "value": 3444,
         "mode": 0,
@@ -22438,6 +25820,12 @@
       "index": 2,
       "spawn_off": 43428,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43418,
+        "editable": true
+       },
        "posZ": {
         "value": 2400,
         "mode": 0,
@@ -22475,6 +25863,12 @@
       "index": 3,
       "spawn_off": 43476,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 43466,
+        "editable": true
+       },
        "posZ": {
         "value": 4400,
         "mode": 0,
@@ -22512,6 +25906,12 @@
       "index": 0,
       "spawn_off": 46812,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 46802,
+        "editable": true
+       },
        "posZ": {
         "value": 24067,
         "mode": 0,
@@ -22551,6 +25951,12 @@
       "index": 1,
       "spawn_off": 47866,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 47856,
+        "editable": true
+       },
        "posZ": {
         "value": 14100,
         "mode": 0,
@@ -22588,6 +25994,12 @@
       "index": 2,
       "spawn_off": 47914,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 47904,
+        "editable": true
+       },
        "posZ": {
         "value": 14100,
         "mode": 0,
@@ -22625,6 +26037,12 @@
       "index": 3,
       "spawn_off": 47976,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 47966,
+        "editable": true
+       },
        "posZ": {
         "value": 2200,
         "mode": 0,
@@ -22662,6 +26080,12 @@
       "index": 4,
       "spawn_off": 48024,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48014,
+        "editable": true
+       },
        "posZ": {
         "value": 2200,
         "mode": 0,
@@ -22699,6 +26123,12 @@
       "index": 5,
       "spawn_off": 48086,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48076,
+        "editable": true
+       },
        "posZ": {
         "value": -9800,
         "mode": 0,
@@ -22736,6 +26166,12 @@
       "index": 6,
       "spawn_off": 48134,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48124,
+        "editable": true
+       },
        "posZ": {
         "value": -9800,
         "mode": 0,
@@ -22773,6 +26209,12 @@
       "index": 7,
       "spawn_off": 48196,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48186,
+        "editable": true
+       },
        "posZ": {
         "value": -17300,
         "mode": 0,
@@ -22810,6 +26252,12 @@
       "index": 8,
       "spawn_off": 48244,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48234,
+        "editable": true
+       },
        "posZ": {
         "value": -17300,
         "mode": 0,
@@ -22847,6 +26295,12 @@
       "index": 9,
       "spawn_off": 48306,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48296,
+        "editable": true
+       },
        "posZ": {
         "value": -22500,
         "mode": 0,
@@ -22884,6 +26338,12 @@
       "index": 10,
       "spawn_off": 48354,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 48344,
+        "editable": true
+       },
        "posZ": {
         "value": -24500,
         "mode": 0,
@@ -22921,6 +26381,12 @@
       "index": 0,
       "spawn_off": 48618,
       "fields": {
+       "VARIANT": {
+        "value": 10,
+        "mode": 0,
+        "value_off": 48608,
+        "editable": true
+       },
        "posZ": {
         "value": 44,
         "mode": 6,
@@ -22958,6 +26424,12 @@
       "index": 1,
       "spawn_off": 48666,
       "fields": {
+       "VARIANT": {
+        "value": 10,
+        "mode": 0,
+        "value_off": 48656,
+        "editable": true
+       },
        "posZ": {
         "value": 47,
         "mode": 6,
@@ -22995,6 +26467,12 @@
       "index": 0,
       "spawn_off": 50222,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 50212,
+        "editable": true
+       },
        "posZ": {
         "value": 5322,
         "mode": 0,
@@ -23042,7 +26520,10 @@
       "dest_id": "904",
       "dest_mode": 0,
       "slot": "0x0",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x06",
+      "built_state": "blocked",
+      "door_type": "0x1050"
      }
     ]
    },
@@ -23088,6 +26569,12 @@
       "index": 0,
       "spawn_off": 28792,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 28782,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23127,6 +26614,12 @@
       "index": 1,
       "spawn_off": 28986,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 28976,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23166,6 +26659,12 @@
       "index": 2,
       "spawn_off": 30992,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 30982,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23205,6 +26704,12 @@
       "index": 3,
       "spawn_off": 31278,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 31268,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23244,6 +26749,12 @@
       "index": 0,
       "spawn_off": 33084,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 33074,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23283,6 +26794,12 @@
       "index": 1,
       "spawn_off": 33330,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 33320,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23322,6 +26839,12 @@
       "index": 2,
       "spawn_off": 34728,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 34718,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23369,7 +26892,10 @@
       "dest_id": "003",
       "dest_mode": 0,
       "slot": "0x1",
-      "confidence": "high"
+      "confidence": "high",
+      "flags": "0x02",
+      "built_state": "usable",
+      "door_type": "0x0058"
      }
     ]
    },
@@ -23406,6 +26932,12 @@
       "index": 0,
       "spawn_off": 77820,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 77810,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23443,6 +26975,12 @@
       "index": 1,
       "spawn_off": 77902,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 77892,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23480,6 +27018,12 @@
       "index": 2,
       "spawn_off": 77950,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 77940,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23546,6 +27090,12 @@
       "index": 0,
       "spawn_off": 31612,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 31602,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23585,6 +27135,12 @@
       "index": 1,
       "spawn_off": 31660,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 31650,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,
@@ -23624,6 +27180,12 @@
       "index": 2,
       "spawn_off": 31708,
       "fields": {
+       "VARIANT": {
+        "value": 0,
+        "mode": 0,
+        "value_off": 31698,
+        "editable": true
+       },
        "posZ": {
         "value": 0,
         "mode": 0,

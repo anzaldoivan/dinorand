@@ -24,9 +24,21 @@ public class MgmtOfficeSafeCodeSyncTests
         foreach (int fo in MgmtOfficeSafeCode.JpRow0FileOffsets)
             size = System.Math.Max(size, fo + tableSpan);
         var exe = new byte[size];
-        byte[] jp0375 = { 0x01, 0x04, 0x08, 0x06 }; // "0375" stored = displayed+1
-        foreach (int fo in MgmtOfficeSafeCode.JpRow0FileOffsets)
-            jp0375.CopyTo(exe, fo);
+        // Full stock table (all 6 rows, JP + US halves) in every copy — the shipped JP-master layout,
+        // which Dc1PuzzleCodeSync.VerifyStockKeypadTable requires before any scramble.
+        foreach (var lk in Dc1PuzzleCodeSync.Family)
+        {
+            foreach (int copy in MgmtOfficeSafeCode.JpRow0FileOffsets)
+            {
+                foreach (bool us in new[] { false, true })
+                {
+                    int fo = MgmtOfficeSafeCode.RowFileOffset(copy, lk.Row, us);
+                    int[] stock = us ? lk.UsDigits : lk.OriginalDigits;
+                    for (int i = 0; i < MgmtOfficeSafeCode.DigitCount; i++)
+                        exe[fo + i] = MgmtOfficeSafeCode.EncodeDigit(stock[i]);
+                }
+            }
+        }
         return exe;
     }
 
@@ -109,15 +121,17 @@ public class MgmtOfficeSafeCodeSyncTests
     }
 
     /// <summary>
-    /// Ground truth: the real <c>english/Data/st100.dat</c> document decodes to <c>0375</c> through the same
-    /// lever, proving the glyph-token decode (§16) is correct against the shipped file — not just synthetic
-    /// data. No-ops if the game files are not present in this checkout.
+    /// Ground truth: a real inline-text (GOG European) <c>st100.dat</c> document decodes to <c>0375</c>
+    /// through the same lever, proving the glyph-token decode (§16) is correct against a shipped file — not
+    /// just synthetic data. Edition-aware: skips when no inline-text install is present (e.g. only the
+    /// REbirth-English install, whose document text lives in ddraw.dll, not the room files).
     /// </summary>
     [Fact]
     public void DocumentCode_RealSt100_DecodesTo0375()
     {
-        string? st100 = FindGameFile(Path.Combine("english", "Data", "st100.dat"));
-        if (st100 is null) return; // game data not in this checkout — skip silently
+        string? dataDir = FindInlineTextDataDir();
+        if (dataDir is null) return; // no inline-text install in this checkout — skip silently
+        string st100 = Path.Combine(dataDir, "st100.dat");
 
         var room = RoomFile.ReadFromFile(stage: 1, room: 0, st100);
         Assert.True(
@@ -135,8 +149,10 @@ public class MgmtOfficeSafeCodeSyncTests
     [InlineData("st302.dat", 3, 2, new[] { 5, 0, 3, 7 })] // Computer Room gas code, non-quoted
     public void DocumentCode_FamilyCode_LocatedAndRewrittenInRealRoom(string file, int stage, int room, int[] original)
     {
-        string? path = FindGameFile(Path.Combine("english", "Data", file));
-        if (path is null) return; // game data not in this checkout
+        string? dataDir = FindInlineTextDataDir();
+        if (dataDir is null) return; // no inline-text install in this checkout
+        string path = Path.Combine(dataDir, file);
+        if (!File.Exists(path)) return;
 
         var rf = RoomFile.ReadFromFile(stage, room, path);
         var rdt = (byte[])rf.RdtBuffer.Clone();
@@ -166,21 +182,21 @@ public class MgmtOfficeSafeCodeSyncTests
     }
 
     /// <summary>
-    /// End-to-end on-disk repack: scramble the family, and for each documented lock re-read the repacked room
-    /// file from scratch (LZSS decompress + package parse) and confirm the document now shows the new code and
-    /// the EXE row matches it. Proves the re-LZSS + package repack is game-valid (round-trips through the real
-    /// reader). No-ops if game data is absent.
+    /// End-to-end on-disk repack against a real inline-text (GOG European) install: scramble the family, and
+    /// for each documented lock re-read the repacked room file from scratch (LZSS decompress + package parse)
+    /// and confirm the document now shows the new code and the EXE row matches it. Proves the re-LZSS +
+    /// package repack is game-valid (round-trips through the real reader). The EXE buffer is synthetic:
+    /// <see cref="MgmtOfficeSafeCode"/>'s offsets are the JP-master build's — the European exes are different
+    /// builds without that table layout, so patching a real European exe would be meaningless. Skips when no
+    /// inline-text install is present.
     /// </summary>
     [Fact]
     public void Family_ScrambleAndRepack_DocumentAndExeAgree_RealFiles()
     {
-        string? st100 = FindGameFile(Path.Combine("english", "Data", "st100.dat"));
-        if (st100 is null) return; // game data not in this checkout
-        string dataDir = Path.GetDirectoryName(st100)!;
-        string? exePath = FindGameFile(Path.Combine("english", "DINO.exe"));
-        if (exePath is null) return;
+        string? dataDir = FindInlineTextDataDir();
+        if (dataDir is null) return; // no inline-text install in this checkout
 
-        byte[] exe = File.ReadAllBytes(exePath);
+        byte[] exe = BuildExeWithDefaultCode();
         var results = Dc1PuzzleCodeSync.Scramble(
             exe,
             lk => { var p = Path.Combine(dataDir, lk.DocFile!); return File.Exists(p) ? File.ReadAllBytes(p) : null; },
@@ -207,17 +223,73 @@ public class MgmtOfficeSafeCodeSyncTests
     }
 
     /// <summary>
+    /// The European-GOG guard: an exe that does not hold the stock JP-master keypad table (the French/
+    /// German/… executables are different builds — the offsets land on unrelated bytes) must be refused
+    /// BEFORE anything is written; scrambling blindly would corrupt random <c>.data</c> AND desync
+    /// displayed != checked. Pure: no game files needed.
+    /// </summary>
+    [Fact]
+    public void Scramble_ExeWithoutStockKeypadTable_RefusesBeforeWriting()
+    {
+        var exe = BuildExeWithDefaultCode();
+        exe[MgmtOfficeSafeCode.Room0103TableFileOffset] = 0xFA; // garbage where JP row0 should be
+        var before = (byte[])exe.Clone();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            Dc1PuzzleCodeSync.Scramble(exe, _ => null, _ => new[] { 6, 7, 6, 7 }));
+        Assert.Contains("JP-master", ex.Message);
+        Assert.Equal(before, exe); // refused before touching a single byte
+
+        // Same guard, callable directly.
+        Assert.Throws<InvalidOperationException>(() => Dc1PuzzleCodeSync.VerifyStockKeypadTable(exe));
+        Dc1PuzzleCodeSync.VerifyStockKeypadTable(BuildExeWithDefaultCode()); // stock table passes
+    }
+
+    /// <summary>
+    /// FAIL-LOUD guard: a documented lock (<c>DocFile != null</c>) whose document bytes are unavailable must
+    /// abort the whole scramble — never silently ship an EXE-only change (safe accepts the new code while the
+    /// document still shows the old one, <b>displayed != checked</b>). Pure: no game files needed.
+    /// </summary>
+    [Fact]
+    public void Scramble_DocumentedLock_MissingDoc_ThrowsInsteadOfSilentDesync()
+    {
+        var exe = BuildExeWithDefaultCode();
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            Dc1PuzzleCodeSync.Scramble(exe, _ => null, _ => new[] { 6, 7, 6, 7 }));
+        Assert.Contains("st100.dat", ex.Message);      // first documented lock (row 0)
+        Assert.Contains("displayed != checked", ex.Message);
+    }
+
+    /// <summary>
+    /// FAIL-LOUD guard, present-but-unlocatable branch: a documented lock whose room bytes exist but do NOT
+    /// contain its code run (the corrupted/altered-install case) must also abort. Feeds row 0 the wrong room's
+    /// bytes so its <c>0375</c> run is absent. Real-file (skips if game data absent).
+    /// </summary>
+    [Fact]
+    public void Scramble_DocumentedLock_CodeRunAbsent_ThrowsInsteadOfSilentDesync()
+    {
+        string? dataDir = FindInlineTextDataDir();
+        if (dataDir is null) return; // no inline-text install in this checkout
+        byte[] wrongRoom = File.ReadAllBytes(Path.Combine(dataDir, "st302.dat")); // has 5037, not row 0's 0375
+
+        var exe = BuildExeWithDefaultCode();
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            Dc1PuzzleCodeSync.Scramble(exe, _ => wrongRoom, _ => new[] { 6, 7, 6, 7 }));
+        Assert.Contains("0375", ex.Message);           // the code it could not locate
+    }
+
+    /// <summary>
     /// Exercises the real disk-write + backup path (<see cref="Dc1PuzzleCodeSync.ApplyToInstall"/>) in an
-    /// isolated temp copy of the game files: writes patched files, makes one-time <c>.dinorand-codebak</c>
-    /// backups, and the patched st100 re-reads to the new code. No-ops if game data is absent.
+    /// isolated temp copy: room files from a real inline-text (GOG European) install, plus a synthetic
+    /// JP-table exe (the European exes are different builds without the JP-master table layout). Writes
+    /// patched files, makes one-time <c>.dinorand-codebak</c> backups, and the patched st100 re-reads to the
+    /// new code. Skips when no inline-text install is present.
     /// </summary>
     [Fact]
     public void ApplyToInstall_WritesPatchedFilesAndBackup_TempCopy()
     {
-        string? st100 = FindGameFile(Path.Combine("english", "Data", "st100.dat"));
-        string? exeSrc = FindGameFile(Path.Combine("english", "DINO.exe"));
-        if (st100 is null || exeSrc is null) return;
-        string srcData = Path.GetDirectoryName(st100)!;
+        string? srcData = FindInlineTextDataDir();
+        if (srcData is null) return; // no inline-text install in this checkout
 
         string tmp = Path.Combine(Path.GetTempPath(), "dinorand_codesync_" + Guid.NewGuid().ToString("N"));
         string tmpData = Path.Combine(tmp, "Data");
@@ -225,7 +297,7 @@ public class MgmtOfficeSafeCodeSyncTests
         try
         {
             string exePath = Path.Combine(tmp, "DINO.exe");
-            File.Copy(exeSrc, exePath);
+            File.WriteAllBytes(exePath, BuildExeWithDefaultCode());
             foreach (var lk in Dc1PuzzleCodeSync.Family)
             {
                 if (lk.DocFile is null) continue;
@@ -263,16 +335,7 @@ public class MgmtOfficeSafeCodeSyncTests
         return d;
     }
 
-    private static string? FindGameFile(string relative)
-    {
-        for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
-        {
-            var p = Path.Combine(dir.FullName, relative);
-            if (File.Exists(p)) return p;
-            if (File.Exists(Path.Combine(dir.FullName, "DinoRand.sln"))) break;
-        }
-        return null;
-    }
+    private static string? FindInlineTextDataDir() => Dc1EditionDetectorTests.FindInlineTextDataDir();
 
     /// <summary>
     /// THE INVARIANT. A seed derives the safe code; the randomizer writes it to the EXE keypad table AND the

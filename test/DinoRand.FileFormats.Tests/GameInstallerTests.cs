@@ -233,6 +233,39 @@ public sealed class GameInstallerTests : IDisposable
     }
 
     [Fact]
+    public void Install_captures_the_pristine_sibling_when_the_live_file_was_edited_outside_the_installer()
+    {
+        // The ST001 poisoned-backup recurrence (K82): a tool edited the live file (leaving a
+        // .dinorand-bak sibling) BEFORE the first install captured a backup. The capture must take
+        // the pristine sibling, never the already-modded live file — or Restore reinstalls the edit.
+        var pristine = new byte[] { 1, 1, 1 };
+        var toolEdited = new byte[] { 4, 4, 4 };
+        WriteData("st001.dat", toolEdited);
+        WriteData("st001.dat" + GameInstaller.SiblingBackupSuffix, pristine);
+        WriteMod("st001.dat", new byte[] { 9, 9, 9 });
+
+        GameInstaller.Install(_dataDir, _modDir, "seed-1");
+
+        Assert.Equal(pristine, ReadBackup("st001.dat"));
+        Assert.Equal(Sha(pristine), GameInstaller.ReadManifest(_dataDir)!.OriginalHashes!["st001.dat"]);
+
+        GameInstaller.Restore(_dataDir);
+        Assert.Equal(pristine, ReadData("st001.dat")); // restore yields vanilla, not the tool edit
+    }
+
+    [Fact]
+    public void BackupOnce_captures_the_pristine_sibling_when_the_live_file_was_edited_outside_the_installer()
+    {
+        var pristine = new byte[] { 1, 2, 3 };
+        WriteData("st001.dat", new byte[] { 4, 4, 4 });                          // tool-modded live
+        WriteData("st001.dat" + GameInstaller.SiblingBackupSuffix, pristine);    // tool's own pristine capture
+
+        var backupPath = GameInstaller.BackupOnce(_dataDir, Path.Combine(_dataDir, "st001.dat"));
+
+        Assert.Equal(pristine, File.ReadAllBytes(backupPath));
+    }
+
+    [Fact]
     public void Restore_without_an_install_is_a_no_op()
     {
         WriteData("st100.dat", new byte[] { 1 });
@@ -241,6 +274,108 @@ public sealed class GameInstallerTests : IDisposable
 
         Assert.Equal(0, restore.Restored);
         Assert.Equal(new byte[] { 1 }, ReadData("st100.dat"));
+    }
+
+    // ---- VerifyBackups: bulk poisoned-capture detector (the ST001 recurrence, K82) ----
+
+    [Fact]
+    public void VerifyBackups_returns_empty_when_no_backup_exists()
+    {
+        WriteData("st100.dat", new byte[] { 1 });
+        Assert.Empty(GameInstaller.VerifyBackups(_dataDir));
+    }
+
+    [Fact]
+    public void VerifyBackups_reports_ok_after_a_restore()
+    {
+        WriteData("st100.dat", new byte[] { 1, 1, 1 });
+        WriteMod("st100.dat", new byte[] { 9, 9, 9 });
+        GameInstaller.Install(_dataDir, _modDir, "seed-1");
+        GameInstaller.Restore(_dataDir);
+
+        var r = Assert.Single(GameInstaller.VerifyBackups(_dataDir));
+        Assert.Equal("st100.dat", r.Name);
+        Assert.Equal(BackupVerifyStatus.Ok, r.Status);
+    }
+
+    [Fact]
+    public void VerifyBackups_reports_installed_not_poisoned_while_a_seed_is_applied()
+    {
+        WriteData("st100.dat", new byte[] { 1, 1, 1 });
+        WriteMod("st100.dat", new byte[] { 9, 9, 9 });
+        GameInstaller.Install(_dataDir, _modDir, "seed-1");
+
+        var r = Assert.Single(GameInstaller.VerifyBackups(_dataDir));
+        Assert.Equal(BackupVerifyStatus.Installed, r.Status);
+    }
+
+    [Fact]
+    public void VerifyBackups_flags_suspect_when_backup_differs_from_live_and_nothing_is_installed()
+    {
+        // The user's scenario: live files hand-restored to vanilla, no install applied. A backup
+        // that still differs from its live counterpart is a poisoned capture (or a stray edit).
+        WriteData("st001.dat", new byte[] { 1, 1, 1 });                        // vanilla
+        Directory.CreateDirectory(Path.Combine(_dataDir, GameInstaller.BackupDirName));
+        File.WriteAllBytes(Path.Combine(_dataDir, GameInstaller.BackupDirName, "st001.dat"),
+                           new byte[] { 4, 4, 4 });                            // poisoned capture
+
+        var r = Assert.Single(GameInstaller.VerifyBackups(_dataDir));
+        Assert.Equal(BackupVerifyStatus.Suspect, r.Status);
+    }
+
+    [Fact]
+    public void VerifyBackups_proves_poison_by_manifest_hash_even_while_installed()
+    {
+        WriteData("st100.dat", new byte[] { 1, 1, 1 });
+        WriteMod("st100.dat", new byte[] { 9, 9, 9 });
+        GameInstaller.Install(_dataDir, _modDir, "seed-1");   // records pristine hash, stays applied
+        File.WriteAllBytes(Path.Combine(_dataDir, GameInstaller.BackupDirName, "st100.dat"),
+                           new byte[] { 4, 4, 4 });           // tamper the backup
+
+        var r = Assert.Single(GameInstaller.VerifyBackups(_dataDir));
+        Assert.Equal(BackupVerifyStatus.Poisoned, r.Status);
+    }
+
+    [Fact]
+    public void VerifyBackups_proves_poison_by_pristine_sibling_disagreement()
+    {
+        // The exact pre-repair ST001 shape: live == backup (both carry the foreign edit) but the
+        // tools-style .dinorand-bak sibling holds vanilla — live agreement must NOT mask the poison.
+        WriteData("st001.dat", new byte[] { 4, 4, 4 });
+        WriteData("st001.dat" + GameInstaller.SiblingBackupSuffix, new byte[] { 1, 1, 1 });
+        Directory.CreateDirectory(Path.Combine(_dataDir, GameInstaller.BackupDirName));
+        File.WriteAllBytes(Path.Combine(_dataDir, GameInstaller.BackupDirName, "st001.dat"),
+                           new byte[] { 4, 4, 4 });
+
+        var r = Assert.Single(GameInstaller.VerifyBackups(_dataDir));
+        Assert.Equal(BackupVerifyStatus.Poisoned, r.Status);
+    }
+
+    [Fact]
+    public void VerifyBackups_reports_a_backup_with_no_live_counterpart()
+    {
+        Directory.CreateDirectory(Path.Combine(_dataDir, GameInstaller.BackupDirName));
+        File.WriteAllBytes(Path.Combine(_dataDir, GameInstaller.BackupDirName, "st999.dat"), new byte[] { 1 });
+
+        var r = Assert.Single(GameInstaller.VerifyBackups(_dataDir));
+        Assert.Equal(BackupVerifyStatus.LiveMissing, r.Status);
+    }
+
+    [Fact]
+    public void VerifyBackups_checks_loose_backups_against_the_game_root()
+    {
+        // Loose overlays (voice banks) back up under <backup>\loose mirroring the game root.
+        var gameRoot = Path.GetDirectoryName(_dataDir)!;
+        var speech = Path.Combine(gameRoot, "Speech");
+        Directory.CreateDirectory(speech);
+        File.WriteAllBytes(Path.Combine(speech, "0001.dat"), new byte[] { 1, 1 });   // vanilla live
+        var looseBackup = Path.Combine(_dataDir, GameInstaller.BackupDirName, "loose", "Speech");
+        Directory.CreateDirectory(looseBackup);
+        File.WriteAllBytes(Path.Combine(looseBackup, "0001.dat"), new byte[] { 4, 4 }); // poisoned
+
+        var r = Assert.Single(GameInstaller.VerifyBackups(_dataDir));
+        Assert.Equal("Speech/0001.dat", r.Name);
+        Assert.Equal(BackupVerifyStatus.Suspect, r.Status);
     }
 
     [Fact]

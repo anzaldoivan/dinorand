@@ -198,6 +198,15 @@ public sealed class Dc2PlayerModelSwap : IDc2RandomizationPass
     private const int PlateColumnCount = 16;
     private const int PlateRowCount = 8;
 
+    // The CORE menu-atlas texture is 4 strips of 0x4000 B (128px × 256 rows, 4bpp). Strip 0 carries the
+    // PORTRAIT + name + team-plate art; strips 1-3 carry the PER-CHARACTER WEAPON ICONS (the cells the
+    // item-catalog (U,V) at 0x704260 index into) plus shared labels. The skin swap must take ONLY the
+    // donor's strip 0 and keep the TARGET's strips 1-3 (and the TARGET's PALETTE), or the weapon-select
+    // menu renders the donor's icons for the target's weapons — root-caused live 2026-07-10 via CE +
+    // CORE-texture bisection (Regina-as-Gail showed Gail's icons; the earlier whole-texture copy on the
+    // false "only the face/plate art differs" premise was the bug). DC2-INVENTORY-UI-SWAP-PLAN.md.
+    private const int PortraitStripBytes = 0x4000;
+
     // Menu NAME text: the inventory/status header name is 4bpp art in the same strip 0 — one glyph
     // run "REGINADYLAN" at pixel rows 40..45 (REGINA cols 24..56, DYLAN cols 57..85; 2 px/byte,
     // low nibble = even column). It is byte-identical in ALL CORE files (the EC donors CORE05/06
@@ -279,8 +288,10 @@ public sealed class Dc2PlayerModelSwap : IDc2RandomizationPass
     {
         var target = ReadPristineValidated(dataDir, targetName);
         var donor = ReadPristineValidated(dataDir, donorName);
-        var texOff = CopyEntry(GianEntryType.Texture);
-        CopyEntry(GianEntryType.Palette);
+        // Take ONLY the donor's portrait strip (strip 0); keep the target's weapon-icon strips 1-3 and
+        // the target's PALETTE (see PortraitStripBytes). Copying the whole texture + donor palette was
+        // the icon-corruption bug.
+        var texOff = CopyEntry(GianEntryType.Texture, PortraitStripBytes);
 
         for (int y = 0; y < PlateRowCount; y++)
             Array.Copy(target, texOff + y * PlateRowStride + PlateColumnStart,
@@ -303,7 +314,7 @@ public sealed class Dc2PlayerModelSwap : IDc2RandomizationPass
             target, GianEntryType.Sound,
             donor.AsSpan(donorSound[0].PayloadOffset, (int)donorSound[0].DeclaredSize));
 
-        int CopyEntry(GianEntryType type)
+        int CopyEntry(GianEntryType type, int? bytes = null)
         {
             // ReadPristineValidated already proved both parse as DC2 packages.
             var targetEntry = Single(GianPackage.TryParse(target)!, targetName);
@@ -313,7 +324,7 @@ public sealed class Dc2PlayerModelSwap : IDc2RandomizationPass
                     $"{donorName} {type} entry is {donorEntry.DeclaredSize} B but {targetName}'s is "
                     + $"{targetEntry.DeclaredSize} B — refusing the menu-atlas swap");
             Array.Copy(donor, donorEntry.PayloadOffset,
-                       target, targetEntry.PayloadOffset, (int)targetEntry.DeclaredSize);
+                       target, targetEntry.PayloadOffset, bytes ?? (int)targetEntry.DeclaredSize);
             return targetEntry.PayloadOffset;
 
             GianEntry Single(GianPackage pkg, string name)
@@ -332,13 +343,23 @@ public sealed class Dc2PlayerModelSwap : IDc2RandomizationPass
     /// Read a graft donor's <b>pristine</b> bytes: prefer the installer backup
     /// (<c>.dinorand_backup\name</c>), then a tools-style <c>name.dinorand-bak</c> sibling, then the
     /// live file — so re-rolling over an installed swap always grafts the vanilla files, never
-    /// compounds. Validates the bytes parse as a DC2 Gian package (content check, never size).
+    /// compounds. Refuses when the two backups disagree (a poisoned capture, K82). Validates the
+    /// bytes parse as a DC2 Gian package (content check, never size).
     /// </summary>
     private static byte[] ReadPristineValidated(string dataDir, string fileName)
     {
         string live = Path.Combine(dataDir, fileName);
         string installerBackup = Path.Combine(dataDir, GameInstaller.BackupDirName, fileName);
-        string siblingBackup = live + ".dinorand-bak";
+        string siblingBackup = live + GameInstaller.SiblingBackupSuffix;
+
+        // Poisoned-capture guard: if the two pristine sources disagree, one of them is a capture of an
+        // already-modded file and we cannot tell which — refuse rather than graft from poison (the
+        // ST001 backup-poisoning recurrence, K82).
+        if (File.Exists(installerBackup) && File.Exists(siblingBackup)
+            && !File.ReadAllBytes(installerBackup).AsSpan().SequenceEqual(File.ReadAllBytes(siblingBackup)))
+            throw new InvalidDataException(
+                $"pristine sources disagree for {fileName}: '{installerBackup}' vs '{siblingBackup}' — "
+                + "one is a poisoned capture; repair them to match before swapping");
 
         string source = File.Exists(installerBackup) ? installerBackup
                       : File.Exists(siblingBackup) ? siblingBackup

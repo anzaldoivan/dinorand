@@ -41,7 +41,11 @@ public class _ZZ_ApplyDc2St001CharSwap
     private const int CaveOff = PristineBlobLen;           // 0x2648, 4-aligned from OpBase
     private const uint CaveInitOff = CaveOff + 4 - OpBase; // 0x142C: init entry -> cave code
 
-    [Fact]
+    // K82: this probe ran on every full `dotnet test` and re-injected the splice into the live
+    // install — the ST001 turret-crash recurrence vector. Its edit is live-crash-confirmed twice
+    // (2026-07-04, 2026-07-10: the op-0x19 restart does not run the op-0x23 preload before the wave
+    // spawner fires). Run manually by removing the Skip; never leave it armed.
+    [Fact(Skip = "manual probe — writes the op-0x29 splice into the LIVE game install (crash-confirmed; see DC2-ST001-PRELOAD-STRIP-CRASH-RCA.md)")]
     public void Inject_op29_char_swap_into_ST001_init()
     {
         if (!File.Exists(RoomPath)) return; // gated: no install at the Windows path on this machine

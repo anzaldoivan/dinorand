@@ -13,7 +13,8 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class _ZZ_ApplyRebirthVertexLift
 {
-    [Fact]
+    // Disarmed with the K82 sweep: manual probes must never auto-fire on a full test run.
+    [Fact(Skip = "manual probe — writes to the LIVE english/ddraw.dll; run by removing this Skip")]
     public void Apply_vertex_table_lift_to_installed_ddraw()
     {
         var dllPath = @"C:\Games\dinorand\english\ddraw.dll";

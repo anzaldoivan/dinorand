@@ -13,7 +13,9 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class _ZZ_ApplyDc1VertexLift
 {
-    [Fact]
+    // Disarmed with the K82 sweep: manual probes must never auto-fire on a full test run.
+    // The lift is already applied on disk (idempotent skip); re-run by removing the Skip.
+    [Fact(Skip = "manual probe — writes to the LIVE english/DINO.exe; run by removing this Skip")]
     public void Apply_vertex_table_lift_to_installed_exe()
     {
         var exePath = @"C:\Games\dinorand\english\DINO.exe";

@@ -34,6 +34,19 @@
     {"row": 5, "jp": "1281", "us": "1281", "lock": "Stabilizer Experiment Room safe (optional)", "room": null, "keypad_stage_file": "EXE .data",
      "document": null, "note": "no readable document mention found"}
   ],
+  "rebirth_english_document_store": {
+    "_doc": "Classic REbirth english install (ddraw.dll 3536384 B SHA256 249F1B8F...) injects English document text at runtime from per-room diff files in a 7z archive embedded as PE resource DATA/107 (file 0x295BC0, size 0xB9CE3, DataEntry 0x2949D8). Diff record = u24 destWord + u16 count + u8 pad0 + count*u32, applied as memcpy to loadedRDT + destWord*4; terminator dest 0xFFFFFF. AST* = US-region variant (byte[DINO.exe 0x6DD8F8]&0x80), ST* = JP. Digits are plain glyph tokens. Decoded 2026-07-10; sync lever RebirthTextPatcher SHIPPED + LIVE-CONFIRMED in-game same day (rebuilt archive appended as .dinotxt section, Copy-codec streams accepted by REbirth's extractor); see docs/reference/dc1/puzzle/REBIRTH-DDRAW-TEXT-STORE-RE.md.",
+    "applier_dll_va": "0x10073930",
+    "loader_dll_va": "0x100453F0 (CRC-named in-memory VFS from resource 107; no disk fallback for diff/)",
+    "digit_runs": [
+      {"row": 0, "file": "diff/ST100.diff",  "offset": "0x594", "stock": "6A 80 70 80 78 80 74 80", "code": "0375"},
+      {"row": 0, "file": "diff/AST100.diff", "offset": "0x594", "stock": "6A 80 72 80 6E 80 76 80", "code": "0426"},
+      {"row": 1, "file": "diff/ST200.diff",  "offset": "0x610", "stock": "78 80 76 80 7A 80 78 80", "code": "7687"},
+      {"row": 1, "file": "diff/AST200.diff", "offset": "0x610", "stock": "7A 80 6C 80 74 80 7C 80", "code": "8159"},
+      {"row": 2, "file": "diff/ST302.diff",  "offset": "0x5CE", "stock": "74 80 6A 80 70 80 78 80", "code": "5037"},
+      {"row": 2, "file": "diff/AST302.diff", "offset": "0x5CE", "stock": "78 80 6E 80 72 80 7A 80", "code": "7248"}
+    ]
+  },
   "excluded_other_formats": {
     "_doc": "Detected by the same scan but NOT part of the keypad-table common function; a randomizer for those needs a different lever.",
     "id_card_fingerprint_panels": {"format": "5-key/2-row object type 0x1a, RAW-digit encoding (no +1), separate comparators 0x800eddc8/0x800edf98", "codes_jp_us": {"paul_baker": ["46907", "58104"], "mark_doyle": ["47812", "57036"], "doctor_kirk": ["78814", "31415"]}, "document_hits": ["st10b.dat 46907", "st400.dat 47812", "st50c.dat 78814", "stA0b.dat 58104"]},

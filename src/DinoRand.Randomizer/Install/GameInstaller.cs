@@ -32,6 +32,10 @@ public static class GameInstaller
     /// <summary>Backup sub-folder created inside the game's <c>Data\</c> directory.</summary>
     public const string BackupDirName = ".dinorand_backup";
 
+    /// <summary>Tools-style pristine-sibling suffix (<c>&lt;file&gt;.dinorand-bak</c>) written by the
+    /// CLI/RE single-file edit flows. <see cref="CapturePristine"/> validates captures against it.</summary>
+    public const string SiblingBackupSuffix = ".dinorand-bak";
+
     /// <summary>The game executable, which lives beside <c>Data\</c> in the game root (the language
     /// dir for the GOG/Steam multi-language layout). The cross-species patch lever lives here, so it
     /// joins the backup/restore surface (docs/decisions/dc1/exe/EXE-PATCH-PER-ROOM-PLAN.md, Decision 3).</summary>
@@ -121,7 +125,7 @@ public static class GameInstaller
             var backupPath = Path.Combine(backupDir, targetName);
             if (!File.Exists(backupPath))
             {
-                File.Copy(targetPath, backupPath);     // capture pristine original once
+                CapturePristine(targetPath, backupPath); // capture pristine original once (sibling-validated)
                 hashes[targetName] = HashFile(backupPath);
                 backedUp++;
             }
@@ -181,7 +185,7 @@ public static class GameInstaller
             if (!File.Exists(backupPath))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
-                File.Copy(target, backupPath);             // capture pristine original once
+                CapturePristine(target, backupPath);       // capture pristine original once (sibling-validated)
                 hashes[rel] = HashFile(backupPath);
                 backedUp++;
             }
@@ -293,8 +297,96 @@ public static class GameInstaller
         Directory.CreateDirectory(backupDir);
         var backupPath = Path.Combine(backupDir, Path.GetFileName(originalPath));
         if (!File.Exists(backupPath))
-            File.Copy(originalPath, backupPath); // capture the pristine original once (for Restore)
+            CapturePristine(originalPath, backupPath); // capture the pristine original once (for Restore)
         return backupPath;
+    }
+
+    /// <summary>
+    /// Read-only bulk audit of every <c>.dinorand_backup</c> capture (rooms + <c>loose\</c> subtree,
+    /// excluding the manifest) against the strongest available pristine oracle, to detect poisoned
+    /// captures — backups taken from an already-modded file (the ST001 turret-crash recurrence,
+    /// docs/decisions/dc2/crash-rcas/DC2-ST001-PRELOAD-STRIP-CRASH-RCA.md, K82). Proof order per file:
+    /// manifest pristine hash, then a <c>.dinorand-bak</c> sibling, then the live file (which is
+    /// vanilla ground truth only while no install is applied — hence <see cref="BackupVerifyStatus.Suspect"/>,
+    /// not <see cref="BackupVerifyStatus.Poisoned"/>, on a live mismatch alone).
+    /// </summary>
+    public static IReadOnlyList<BackupVerifyResult> VerifyBackups(string dataDir)
+    {
+        var results = new List<BackupVerifyResult>();
+        var backupDir = Path.Combine(dataDir, BackupDirName);
+        if (!Directory.Exists(backupDir))
+            return results;
+
+        var manifest = ReadManifest(dataDir);
+        bool applied = manifest?.Applied == true;
+        var hashes = manifest?.OriginalHashes;
+
+        foreach (var backupPath in Directory.EnumerateFiles(backupDir, "*", SearchOption.AllDirectories))
+        {
+            var rel = Path.GetRelativePath(backupDir, backupPath).Replace('\\', '/');
+            if (string.Equals(rel, ManifestName, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            bool loose = rel.StartsWith(LooseBackupSubdir + "/", StringComparison.OrdinalIgnoreCase);
+            var name = loose ? rel[(LooseBackupSubdir.Length + 1)..] : rel;
+            var livePath = loose
+                ? Path.Combine(GameRoot(dataDir), name.Replace('/', Path.DirectorySeparatorChar))
+                : Path.Combine(dataDir, name);
+
+            if (hashes is not null && hashes.TryGetValue(name, out var expected)
+                && !string.Equals(HashFile(backupPath), expected, StringComparison.OrdinalIgnoreCase))
+            {
+                results.Add(new(name, BackupVerifyStatus.Poisoned,
+                    "backup does not match the manifest's recorded pristine hash"));
+                continue;
+            }
+
+            var sibling = livePath + SiblingBackupSuffix;
+            if (File.Exists(sibling) && !FilesEqual(backupPath, sibling))
+            {
+                results.Add(new(name, BackupVerifyStatus.Poisoned,
+                    $"backup disagrees with the pristine sibling {Path.GetFileName(sibling)}"));
+                continue;
+            }
+
+            if (!File.Exists(livePath))
+            {
+                results.Add(new(name, BackupVerifyStatus.LiveMissing, "no live counterpart for this backup"));
+                continue;
+            }
+
+            if (FilesEqual(backupPath, livePath))
+                results.Add(new(name, BackupVerifyStatus.Ok, "backup matches the live file"));
+            else if (applied)
+                results.Add(new(name, BackupVerifyStatus.Installed,
+                    "live file differs (a randomizer install is applied — expected)"));
+            else
+                results.Add(new(name, BackupVerifyStatus.Suspect,
+                    "backup differs from the live file while no install is applied — "
+                    + "a poisoned capture, or an un-manifested in-place edit"));
+        }
+        return results;
+    }
+
+    private static bool FilesEqual(string a, string b) =>
+        string.Equals(HashFile(a), HashFile(b), StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Capture a first-time pristine backup of <paramref name="originalPath"/> at
+    /// <paramref name="backupPath"/>. If a tools-style <c>&lt;file&gt;.dinorand-bak</c> sibling exists
+    /// and differs from the live file, the live file has already been edited OUTSIDE the installer, so
+    /// the sibling (captured before that edit) is the pristine original and is copied instead —
+    /// capturing the live file would poison the backup and make Restore reinstall the foreign edit
+    /// (the ST001 turret-room crash recurrence: docs/decisions/dc2/crash-rcas/DC2-ST001-PRELOAD-STRIP-CRASH-RCA.md, K82).
+    /// </summary>
+    private static void CapturePristine(string originalPath, string backupPath)
+    {
+        var sibling = originalPath + SiblingBackupSuffix;
+        var source = File.Exists(sibling)
+                     && !string.Equals(HashFile(sibling), HashFile(originalPath), StringComparison.OrdinalIgnoreCase)
+            ? sibling
+            : originalPath;
+        File.Copy(source, backupPath);
     }
 
     /// <summary>
@@ -782,19 +874,44 @@ public static class GameInstaller
     /// Scramble the DC1 keypad-code puzzle family (Management Office / Lounge / Computer-Room-gas safes +
     /// the Stabilizer codes) so each lock's accepted 4-digit code is seed-derived, and keep the in-game
     /// document that states the code in sync — the <b>displayed == checked</b> invariant
-    /// (<see cref="Dc1PuzzleCodeSync"/>, docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md §17).
+    /// (<see cref="Dc1PuzzleCodeSync"/>, docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md §17–18).
     ///
-    /// <para>Writes the new codes into every recompiled copy of the DINO.exe keypad table (both region
-    /// halves) and repacks the three room files that show a code (<c>st100/st200/st302.dat</c>). The EXE
-    /// edit touches only the ~0.4&#160;KB code-table region, so it is additive w.r.t. any other exe patch
-    /// (BGM/boxes/enemy). Non-compounding: document runs are located in the <b>pristine</b> room backups, so
-    /// re-running any seed re-derives from the original codes. Same backup-once + manifest contract as
-    /// <see cref="PatchExeShuffleBgm"/> — <see cref="Restore"/> reverses the exe and all three rooms. Codes are
-    /// read at load time, so the change is seen after the next launch.</para>
+    /// <para><b>Edition-aware</b> (<see cref="Dc1EditionDetector"/>): the keypad-CHECK table edit is common
+    /// (every recompiled DINO.exe copy, both region halves — scrambled on the <b>pristine</b> backup image,
+    /// then only the ~0.4&#160;KB table region is transplanted into the live exe, so it is additive w.r.t.
+    /// any other exe patch and non-compounding across re-runs), but the DOCUMENT side routes per install:
+    /// <c>GogInlineText</c> → repack the three room files (<c>st100/st200/st302.dat</c>) from pristine
+    /// backups; <c>RebirthEnglish</c> → rebuild the English diff archive inside <c>ddraw.dll</c>
+    /// (<see cref="RebirthTextPatcher"/>, live-confirmed in-game 2026-07-10); <c>RebirthJapanese</c> → skip
+    /// with a warning (codes stay stock — no JP text lever yet); <c>Unknown</c> → refuse. The European GOG
+    /// executables do not carry the JP-master table and are refused by the stock verification.
+    /// Same backup-once + manifest contract as <see cref="PatchExeShuffleBgm"/> — <see cref="Restore"/>
+    /// reverses the exe, rooms and ddraw.dll. Codes are read at load time (seen after the next launch).</para>
     /// </summary>
     public static ExePatchResult PatchExeSyncPuzzleCodes(string dataDir, int seed, string? seedLabel = null)
     {
+        // Route by install edition: the keypad-CHECK lever (exe table) is build-independent among the
+        // JP-master ports, but the DOCUMENT the player reads lives in a different place per edition —
+        // inline RDT glyphs (GOG European), REbirth's ddraw.dll diff archive (REbirth-English), or JP
+        // room text we cannot rewrite (REbirth-Japanese / plain JP). Never ship displayed != checked.
+        var edition = Dc1EditionDetector.Detect(dataDir);
         var exePath = ResolveExeForPatch(dataDir);
+
+        if (edition == Dc1Edition.RebirthJapanese)
+        {
+            // JP text in the room files needs a JP char-table lever that does not exist yet; scrambling
+            // the exe alone would desync displayed != checked, so leave the codes stock — consistent.
+            return new ExePatchResult(exePath, string.Empty, new[]
+            {
+                "puzzle codes SKIPPED: REbirth-Japanese install — the JP document text has no rewrite " +
+                "lever yet, so the codes stay stock (displayed == checked either way).",
+            });
+        }
+        if (edition == Dc1Edition.Unknown)
+            throw new InvalidOperationException(
+                "Puzzle-code scramble refused: could not classify this DC1 install (no REbirth ddraw.dll " +
+                "version-lock match and no inline Latin document text in st100.dat). Scrambling blindly " +
+                "could leave the document showing a code the keypad rejects (displayed != checked).");
 
         var backupDir = Path.Combine(dataDir, BackupDirName);
         Directory.CreateDirectory(backupDir);
@@ -802,24 +919,58 @@ public static class GameInstaller
         if (!File.Exists(exeBackup))
             File.Copy(exePath, exeBackup); // capture the pristine exe once (for Restore)
 
-        // Back up each document room once, and read the code runs from the PRISTINE backup (non-compounding).
-        foreach (var lk in Dc1PuzzleCodeSync.Family)
-            if (lk.DocFile is not null && File.Exists(Path.Combine(dataDir, lk.DocFile)))
-                BackupOnce(dataDir, Path.Combine(dataDir, lk.DocFile));
+        bool viaRebirthDll = edition == Dc1Edition.RebirthEnglish;
+        byte[]? patchedDll = null;
+        string? ddrawPath = null;
 
-        // Edit the LIVE exe (additive — only the code-table bytes change).
-        byte[] exe = File.ReadAllBytes(exePath);
+        if (viaRebirthDll)
+        {
+            // Documents live in ddraw.dll's embedded diff archive (REBIRTH-DDRAW-TEXT-STORE-RE.md).
+            // Patch from the pristine backup (non-compounding across seeds); written only after the exe
+            // scramble also succeeds, so nothing is ever half-applied.
+            ddrawPath = Path.Combine(GameRoot(dataDir), "ddraw.dll");
+            var ddrawBackup = Path.Combine(backupDir, LooseBackupSubdir, "ddraw.dll");
+            if (!File.Exists(ddrawBackup))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(ddrawBackup)!);
+                File.Copy(ddrawPath, ddrawBackup); // pristine once; Restore reverses it to the game root
+            }
+            patchedDll = RebirthTextPatcher.PatchPuzzleCodeText(
+                File.ReadAllBytes(ddrawBackup), row => Dc1PuzzleCodeSync.DeriveRowCode(seed, row));
+        }
+        else
+        {
+            // GOG inline-text path: back up each document room once; code runs are read from the
+            // PRISTINE backup (non-compounding).
+            foreach (var lk in Dc1PuzzleCodeSync.Family)
+                if (lk.DocFile is not null && File.Exists(Path.Combine(dataDir, lk.DocFile)))
+                    BackupOnce(dataDir, Path.Combine(dataDir, lk.DocFile));
+        }
+
+        // Scramble the PRISTINE exe image (verifies the stock JP-master keypad table — throws for the
+        // differently-laid-out European executables and never derives from an already-scrambled table),
+        // then transplant only the table region into the LIVE exe so the edit stays additive w.r.t.
+        // other exe patches (same pristine-source + transplant contract as PatchExeShuffleBgm).
+        byte[] pristineExe = File.ReadAllBytes(exeBackup);
         var results = Dc1PuzzleCodeSync.Scramble(
-            exe,
+            pristineExe,
             lk =>
             {
                 var bak = Path.Combine(backupDir, lk.DocFile!);
                 return File.Exists(bak) ? File.ReadAllBytes(bak) : null;
             },
-            lk => Dc1PuzzleCodeSync.DeriveRowCode(seed, lk.Row));
+            lk => Dc1PuzzleCodeSync.DeriveRowCode(seed, lk.Row),
+            requireDocuments: !viaRebirthDll);
 
+        byte[] exe = File.ReadAllBytes(exePath);
+        Dc1PuzzleCodeSync.CopyTableRegion(pristineExe, exe);
         File.WriteAllBytes(exePath, exe);
         var entries = new List<string>();
+        if (patchedDll is not null && ddrawPath is not null)
+        {
+            File.WriteAllBytes(ddrawPath, patchedDll);
+            entries.Add("ddraw.dll: REbirth English document text re-synced (diff archive rebuilt)");
+        }
         foreach (var r in results)
         {
             string code = string.Concat(r.NewCode);
@@ -830,7 +981,8 @@ public static class GameInstaller
             }
             else
             {
-                entries.Add($"{r.Lock.Name}: {code} (exe row {r.Lock.Row})");
+                entries.Add($"{r.Lock.Name}: {code} (exe row {r.Lock.Row}" +
+                            (viaRebirthDll && r.Lock.DocFile is not null ? " + ddraw diff)" : ")"));
             }
         }
 
@@ -1103,6 +1255,27 @@ public sealed record InstallResult(int BackedUp, int Overlaid, string BackupDir)
 
 /// <summary>Outcome of a <see cref="GameInstaller.Restore"/>.</summary>
 public sealed record RestoreResult(int Restored);
+
+/// <summary>Per-file verdict of <see cref="GameInstaller.VerifyBackups"/>.</summary>
+public enum BackupVerifyStatus
+{
+    /// <summary>Backup matches the live file (and every pristine oracle present).</summary>
+    Ok,
+    /// <summary>Live file differs but a randomizer install is applied — expected, not judged.</summary>
+    Installed,
+    /// <summary>Backup differs from the live file while nothing is installed: a poisoned capture,
+    /// or an in-place edit that never went through the manifest. Investigate before trusting Restore.</summary>
+    Suspect,
+    /// <summary>Proven not pristine: the backup contradicts the manifest's recorded hash or a
+    /// <c>.dinorand-bak</c> sibling.</summary>
+    Poisoned,
+    /// <summary>The backup has no live counterpart file.</summary>
+    LiveMissing,
+}
+
+/// <summary>One <see cref="GameInstaller.VerifyBackups"/> finding. <see cref="Name"/> is the
+/// data-dir-relative file name (game-root-relative for loose files, '/'-separated).</summary>
+public sealed record BackupVerifyResult(string Name, BackupVerifyStatus Status, string Detail);
 
 /// <summary>One executable patch: give <paramref name="TargetStage"/>'s rooms the enemy set that
 /// <paramref name="DonorStage"/>'s rooms use, by repointing the target record's setup-fn ptr.</summary>

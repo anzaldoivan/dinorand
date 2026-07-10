@@ -1,325 +1,91 @@
 {
-  "_source": "Cached GameFAQs walkthrough/weapon tables (docs/dc2/dc2-rooms-faq.md, JL Lee v1.0). GUIDE-SOURCED. No DC2 item-record byte decode exists yet (ITEM.DAT is a global catalog only; per-room placement is in the undecoded room blob).",
-  "_comment": "DC2 has NO numeric item id table decoded from bytes (unlike DC1 items.json whose ids came from the residentevil123 forum + file cross-check). All ids below are PLACEHOLDER (null). Currency is 'Extinct Points' (called 'Vital Credits' in this FAQ). Names are guide-sourced; weapon owner/type single-source.",
-  "_provenance_legend": "confirmed = FAQ + Wikipedia/other; single-source = FAQ only; placeholder = unknown (e.g. all numeric ids).",
-  "_runtime_decoded_ids": {
-    "_source": "CE live capture 2026-06-27 (Dino2.exe @0x400000). FIRST byte-grounded DC2 item ids. AOT SAT-1 record (0x752388+slot*0x28): item-id = rec+0x14 (ctor 0x48bf20 `type` arg, sourced from slot-5 op-0x31 builder 0x489880 <- block+0x04). NOTE (p2 correction): rec+0x18 (<- block+0x00) is NOT the count -- static decode of 0x48bf20 shows it is a x4 index into the [scene_mgr+0xa54] scene-object array; the earlier 'count' matches were coincidental small values. Only rec+0x14 (id) is the editable lever. See docs/dc2/AOT-SYSTEM-RE.md (SAT-1 handler).",
-    "ids": {
-      "0x01": "Med Pak S (in-game name; healing). count 2 -> inv 2/2",
-      "0x02": "Resusc Pack (in-game name; healing/revival). count 2 -> inv 2/2",
-      "0x05": "Dino File (collectible; routes to dino-file log, not item inventory). count 1",
-      "0x07": "UNNAMED -- captured ST109 with count 7 (likely ammo); confirm name from inventory. Static-confirmed in ST109 script (decode_script op-0x31, id=7 count=7)",
-      "0x09": "CONFIRMED REAL 2026-06-27 (p2) -- NO LONGER stale. The corrected decode_script.py finds op-0x31 id=9 count=1 slot=6 in ST109's init-area routine (previously skipped by the routine-discovery bug); slot 6 matches the runtime AOT read. Name still unknown.",
-      "0x04": "UNNAMED -- static decode (ST402 + ST403/701 op-0x31). count field unreliable (block+0x00 is likely an AOT index, not qty); confirm name",
-      "0x06": "UNNAMED -- static decode (ST706/800/605 op-0x31); confirm name",
-      "0x03": "UNNAMED -- static decode (14 occurrences, e.g. ST000/002/204/408/802); confirm name",
-      "0x08": "UNNAMED -- static decode (ST402, ST603 op-0x31); confirm name"
-    },
-    "_static_decode_note": "decode_script.py reads scripted item ids straight from room files. CORRECTED 2026-06-27 (p2): a routine-discovery bug skipped the INIT routine (offset @ section+0x1c) of every multi-routine room -- exactly where most door/item commits live. After the fix: 165 op-0x31 items across 54 rooms (was 25/17). id=block+0x04 literal = randomizer lever (the byte at script+offset that decode_script prints). The 'separate s7/s8 / CORE0x path' for ST104/ST106 is REFUTED -- there is ONE item path (op 0x31 in per-room slot-5); ST106's items were in the skipped init routine and now match the live capture exactly (id5/slot12, id2/slot7). ST104 is the lone holdout (true 1-routine room, 0 op-0x31) -> its live Med Pak S is likely a stale record. Id histogram: 1=95,2=31,3=14,4=6,5=8,6=5,7=3,8=2,9=1. See docs/dc2/AOT-SYSTEM-RE.md (CORRECTION p2)."
-  },
+  "_source": "BYTE-GROUNDED catalog decoded 2026-07-10 from the ORIGINAL US PSX disc EXE (SLUS_012.79, name/desc glyph strings via catalog table RAM 0x80019770) cross-checked against the PC port table Dino2.exe VA 0x704260 (same 12-byte records, same flags/iconUV, JP glyph strings at ptr+0/ptr+4). Authored RE knowledge (offsets + names as identifiers), no game bytes. Supersedes the earlier guide-sourced placeholder file. See docs/decisions/dc2/ITEMS-KEYITEMS-RE-PLAN.md and K75.",
+  "_encoding_note": "US SLUS names are word-per-glyph strings: glyph/2 -> 1..26=A..Z, 27..52=a..z, 0=space, 0x6a+2n=digit n, 0x82='?', 0x90='-', 0x9a='.', 0x9c=',', 0x9e=apostrophe; 0xf000=line break, 0x4000=end. PC port carries the same table with JAPANESE katakana/kanji glyph strings (0x7244c4 region).",
+  "_id_spaces": "TWO DISTINCT id spaces. (1) THIS catalog id = the INVENTORY item id (record scene_mgr+0x10bc + slot*12, byte+1; equipped main/sub at scene_mgr+0x10b4/+0x10b5, sub stored as id|0x10; ITEM.DAT icon block index == this id, loader 0x403ed0). (2) The op-0x31 room-script byte (data/dc2/item-placements.json, ids 1..9) is the AOT SAT-1 VM-THREAD SLOT, param = routine index -- NOT this catalog id (see K77). The field-type -> catalog-id give mapping is the open decode.",
   "currency": {
     "name": "Extinct Points",
     "alias": "Vital Credits",
     "provenance": "confirmed (FAQ + Wikipedia)"
   },
-  "weapons": [
-    {
-      "id": null,
-      "name": "Handgun",
-      "owner": "Regina",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Shotgun",
-      "owner": "Dylan",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Solid Cannon",
-      "owner": "Dylan",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Anti-Tank Rifle",
-      "owner": "Dylan",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Rocket Launcher",
-      "owner": "Dylan",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Submachine Gun",
-      "owner": "Regina",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Heavy Machine Gun",
-      "owner": "Regina",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Missile Pod",
-      "owner": "Regina",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Needle Gun",
-      "owner": "Regina",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Aqua Grenade",
-      "owner": "Regina",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Flame Launcher",
-      "owner": "Both",
-      "type": "main",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Machete",
-      "owner": "Dylan",
-      "type": "sub",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Large Stun Gun",
-      "owner": "Regina",
-      "type": "sub",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Shock Wave",
-      "owner": "Regina",
-      "type": "sub",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Chain Mine",
-      "owner": "Both",
-      "type": "sub",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Fire Wall",
-      "owner": "Both",
-      "type": "sub",
-      "provenance": "single-source (FAQ)"
-    }
+  "catalog": [
+    { "id": "0x00", "name": "(placeholder '???' row)", "category": "meta", "flags": "0x004b" },
+    { "id": "0x01", "name": "Shotgun", "category": "weapon-main", "owner": ["D"], "flags": "0x004a" },
+    { "id": "0x02", "name": "Hand gun", "category": "weapon-main", "owner": ["R"], "flags": "0x0049" },
+    { "id": "0x03", "name": "Rocket Launcher", "category": "weapon-main", "owner": ["D"], "flags": "0x002a" },
+    { "id": "0x04", "name": "Solid Cannon", "category": "weapon-main", "owner": ["D"], "flags": "0x004a" },
+    { "id": "0x05", "name": "Flame Launcher", "category": "weapon-main", "owner": ["R", "D"], "flags": "0x002b" },
+    { "id": "0x06", "name": "Submachine gun", "category": "weapon-main", "owner": ["R"], "flags": "0x0029" },
+    { "id": "0x07", "name": "Heavy Machine gun", "category": "weapon-main", "owner": ["R"], "flags": "0x0049" },
+    { "id": "0x08", "name": "Missile Pod", "category": "weapon-main", "owner": ["R"], "flags": "0x0029" },
+    { "id": "0x09", "name": "Antitank Rifle", "category": "weapon-main", "owner": ["D"], "flags": "0x004a" },
+    { "id": "0x0a", "name": "Needle gun", "category": "weapon-main", "owner": ["V"], "flags": "0x00cc" },
+    { "id": "0x0b", "name": "Aquagrenade", "category": "weapon-main", "owner": ["V"], "flags": "0x004c" },
+    { "id": "0x0c", "name": null, "category": "empty", "flags": "0x0000" },
+    { "id": "0x0d", "name": null, "category": "empty", "flags": "0x0000" },
+    { "id": "0x0e", "name": null, "category": "empty", "flags": "0x0000" },
+    { "id": "0x0f", "name": null, "category": "empty", "flags": "0x0000" },
+    { "id": "0x10", "name": "(placeholder '???' row)", "category": "meta", "flags": "0x0053" },
+    { "id": "0x11", "name": "Machete", "category": "weapon-sub", "owner": ["D"], "flags": "0x00d2" },
+    { "id": "0x12", "name": "Large Stungun", "category": "weapon-sub", "owner": ["R"], "flags": "0x00d1" },
+    { "id": "0x13", "name": "Firewall", "category": "weapon-sub", "owner": ["R", "D"], "flags": "0x0053" },
+    { "id": "0x14", "name": "Shockwave", "category": "weapon-sub", "owner": ["R", "D"], "flags": "0x0053", "note": "name string prefixed by two blank lines in the source table" },
+    { "id": "0x15", "name": "Shockwave", "category": "weapon-sub", "owner": ["V"], "flags": "0x00d4" },
+    { "id": "0x16", "name": "Chainmine", "category": "weapon-sub", "flags": "0x0053" },
+    { "id": "0x17", "name": "Machete Improved", "category": "weapon-sub", "owner": ["D"], "flags": "0x00d2", "note": "native transform target: EXE 0x40ceaf rewrites inventory id 0x11 -> 0x17" },
+    { "id": "0x18", "name": "Large Stungun (improved)", "category": "weapon-sub", "owner": ["R"], "flags": "0x00d1", "note": "native transform target: EXE 0x40cf57 rewrites inventory id 0x12 -> 0x18; US name string identical to 0x12" },
+    { "id": "0x19", "name": "Signal bullet", "category": "weapon-sub", "flags": "0x00d3" },
+    { "id": "0x1a", "name": "Hemostat", "category": "health", "flags": "0x0000" },
+    { "id": "0x1b", "name": "Med Pak S", "category": "health", "flags": "0x0000" },
+    { "id": "0x1c", "name": "Med Pak M", "category": "health", "flags": "0x0000" },
+    { "id": "0x1d", "name": "Med Pak L", "category": "health", "flags": "0x0000" },
+    { "id": "0x1e", "name": "Resusc. Pak", "category": "health", "flags": "0x0000" },
+    { "id": "0x1f", "name": "Food", "category": "health", "flags": "0x0000" },
+    { "id": "0x20", "name": "(placeholder '???' row)", "category": "meta", "flags": "0x0000" },
+    { "id": "0x21", "name": "Plug", "category": "key", "flags": "0x0000" },
+    { "id": "0x22", "name": "City Keycard", "category": "key", "flags": "0x0000" },
+    { "id": "0x23", "name": "Research Facility Keycard", "category": "key", "flags": "0x0000" },
+    { "id": "0x24", "name": "Living quarters key", "category": "key", "flags": "0x0000" },
+    { "id": "0x25", "name": "Key plate", "category": "key", "flags": "0x0000", "note": "ids 0x25-0x2a are six Key plate rows sharing one name/desc string (US ptr 0x8008c528)" },
+    { "id": "0x26", "name": "Key plate", "category": "key", "flags": "0x0000" },
+    { "id": "0x27", "name": "Key plate", "category": "key", "flags": "0x0000" },
+    { "id": "0x28", "name": "Key plate", "category": "key", "flags": "0x0000" },
+    { "id": "0x29", "name": "Key plate", "category": "key", "flags": "0x0000" },
+    { "id": "0x2a", "name": "Key plate", "category": "key", "flags": "0x0000" },
+    { "id": "0x2b", "name": "Starter Battery", "category": "key", "flags": "0x0000" },
+    { "id": "0x2c", "name": "3rd Energy Disk", "category": "key", "flags": "0x0000" },
+    { "id": "0x2d", "name": "Diving Suit", "category": "key", "flags": "0x0000" },
+    { "id": "0x2e", "name": "Gas Mask", "category": "key", "flags": "0x0000" },
+    { "id": "0x2f", "name": "Signal Bullet", "category": "key", "flags": "0x0000", "note": "key-item duplicate of sub 0x19 (same display name, capital B)" },
+    { "id": "0x30", "name": "Mechanic's ID Card", "category": "key", "flags": "0x0000" },
+    { "id": "0x31", "name": "Key for the box", "category": "key", "flags": "0x0000" },
+    { "id": "0x32", "name": "3rd Energy Facility Keycard", "category": "key", "flags": "0x0000" },
+    { "id": "0x33", "name": "Light-weight Armor", "category": "key-equip", "flags": "0x0000" },
+    { "id": "0x34", "name": "Inner suit", "category": "key-equip", "flags": "0x0000" },
+    { "id": "0x35", "name": "EPS Platinum Card", "category": "shop-perk", "flags": "0x0000" },
+    { "id": "0x36", "name": "EPS Gold Card", "category": "shop-perk", "flags": "0x0000" },
+    { "id": "0x37", "name": "Heavy Blade", "category": "shop-perk", "flags": "0x0000" },
+    { "id": "0x38", "name": "Power Battery", "category": "shop-perk", "flags": "0x0000" },
+    { "id": "0x39", "name": "EPS Silver Card", "category": "shop-perk", "flags": "0x0000" }
   ],
-  "keyItems": [
-    {
-      "id": null,
-      "name": "Research Facility Keycard",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
+  "keyItemIds": ["0x21", "0x22", "0x23", "0x24", "0x25", "0x26", "0x27", "0x28", "0x29", "0x2a", "0x2b", "0x2c", "0x2d", "0x2e", "0x2f", "0x30", "0x31", "0x32", "0x33", "0x34"],
+  "_owner_flags_note": "flags word (rec+0xA, PSX-truth per data/dc2/weapon-catalog.json): 0x01 Regina / 0x02 Dylan / 0x04 David owner bits + 0x08 MAIN / 0x10 SUB class + 0x20 wide-icon. Weapon rows carry the weapon-catalog.json values; item rows (0x1a+) are flags 0x0000.",
+  "_field_pickup_types": {
+    "_source": "CE live capture 2026-06-27 + decode_script op-0x31 census (165 items / 54 rooms, data/dc2/item-placements.json). This is the SEPARATE op-0x31 id space (SAT-1 VM-thread slot, K77) whose item correlation is empirical, id histogram 1=95,2=31,3=14,4=6,5=8,6=5,7=3,8=2,9=1.",
+    "types": {
+      "1": "Med Pak S (live-witnessed; catalog 0x1b)",
+      "2": "Resusc. Pak (live-witnessed; catalog 0x1e)",
+      "3": "unnamed (14 occurrences)",
+      "4": "unnamed",
+      "5": "Dino File (live-witnessed; dino-file log, NOT an inventory catalog row)",
+      "6": "unnamed",
+      "7": "ammo pickup (live qty 7; ammo merges into the weapon record +8, no catalog row)",
+      "8": "unnamed",
+      "9": "unnamed"
     },
-    {
-      "id": null,
-      "name": "Box Key",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "ID Card",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Shutter Control Plug",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Living Area Key",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Energy Disc",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "City Keycard",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Blue Keyplate",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Keyplate",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Signal Shooter",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Battery",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Diver Suit",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Inner Suit",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Light Armour",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    },
-    {
-      "id": null,
-      "name": "Gas Mask",
-      "category": "key",
-      "provenance": "single-source (FAQ walkthrough pickups)"
-    }
-  ],
-  "dinoFiles": [
-    {
-      "id": null,
-      "name": "Velociraptor Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Oviraptor Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Pteranodon Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Plesiosaurus Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Inostrancevia Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Mosasaurus Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Allosaurus Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Triceratops Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Compsognathus Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    },
-    {
-      "id": null,
-      "name": "Giganotosaurus Dino File",
-      "category": "collectible",
-      "provenance": "single-source (FAQ); 10 of the FAQ-stated 11 located"
-    }
-  ],
-  "healing": [
-    {
-      "id": null,
-      "name": "Hemostat",
-      "category": "health",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Recovery (Small)",
-      "category": "health",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Recovery (Large)",
-      "category": "health",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Complete Recovery",
-      "category": "health",
-      "provenance": "single-source (FAQ)"
-    },
-    {
-      "id": null,
-      "name": "Med Pack",
-      "category": "health",
-      "provenance": "single-source (FAQ)"
-    }
-  ]
+    "_mapping_open": "field-type -> catalog-id give mapping + quantity source = the open give-path decode (ITEMS-KEYITEMS-RE-PLAN Phase 2). Do NOT assume type == catalog id."
+  },
+  "dinoFiles": {
+    "_source": "guide-sourced (FAQ); dino files route to the log, not inventory -- no catalog rows",
+    "names": ["Velociraptor", "Oviraptor", "Pteranodon", "Plesiosaurus", "Inostrancevia", "Mosasaurus", "Allosaurus", "Triceratops", "Compsognathus", "Giganotosaurus"]
+  }
 }

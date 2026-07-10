@@ -1,5 +1,5 @@
 {
- "_source": "tools/dc2_re/gen_connectivity.py over data/dc2/door-graph.json (178 high-conf op-0x30 doors / 83 rooms). Room-level directed warp graph. Only literal mode-0 doors mapping to a real room form edges; the lone low-confidence computed door (ST003, mode-2) is in _low_confidence_doors, NOT an edge. dest_id = f'{w:03X}' (DOOR-ROUTING-RE identity encoding).",
+ "_source": "tools/dc2_re/gen_connectivity.py over data/dc2/door-graph.json (180 high-conf op-0x30 doors / 84 rooms, K81). Room-level directed warp graph. Only literal mode-0 doors mapping to a real room form edges; the lone low-confidence computed door (ST003, mode-2) is in _low_confidence_doors, NOT an edge. dest_id = f'{w:03X}' (DOOR-ROUTING-RE identity encoding).",
  "_validation": {
   "room_ids_count": 89,
   "matches_rooms_json": true,
@@ -9,13 +9,12 @@
  },
  "summary": {
   "total_rooms": 89,
-  "rooms_with_outbound": 83,
+  "rooms_with_outbound": 84,
   "rooms_with_inbound": 85,
-  "total_directed_edges": 163,
-  "bidirectional_edge_dirs": 142,
-  "oneway_edge_dirs": 21,
+  "total_directed_edges": 165,
+  "bidirectional_edge_dirs": 146,
+  "oneway_edge_dirs": 19,
   "dead_end_rooms_no_outbound": [
-   "103",
    "504",
    "608",
    "707",
@@ -267,20 +266,29 @@
    "dead_end": false
   },
   "103": {
-   "outbound": [],
+   "outbound": [
+    {
+     "dest": "104",
+     "bidirectional": true
+    },
+    {
+     "dest": "105",
+     "bidirectional": true
+    }
+   ],
    "inbound": [
     "104",
     "105"
    ],
-   "out_degree": 0,
+   "out_degree": 2,
    "in_degree": 2,
-   "dead_end": true
+   "dead_end": false
   },
   "104": {
    "outbound": [
     {
      "dest": "103",
-     "bidirectional": false
+     "bidirectional": true
     },
     {
      "dest": "106",
@@ -288,10 +296,11 @@
     }
    ],
    "inbound": [
+    "103",
     "106"
    ],
    "out_degree": 2,
-   "in_degree": 1,
+   "in_degree": 2,
    "dead_end": false
   },
   "105": {
@@ -302,14 +311,15 @@
     },
     {
      "dest": "103",
-     "bidirectional": false
+     "bidirectional": true
     }
    ],
    "inbound": [
-    "102"
+    "102",
+    "103"
    ],
    "out_degree": 2,
-   "in_degree": 1,
+   "in_degree": 2,
    "dead_end": false
   },
   "106": {

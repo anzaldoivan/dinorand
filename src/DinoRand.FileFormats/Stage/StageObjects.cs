@@ -4,19 +4,19 @@ namespace DinoRand.FileFormats.Stage;
 /// Byte layout of the <b>entry pose</b> inside the 48-B door record — the position/orientation the
 /// engine drops the player at when they walk through a door into its <i>destination</i> room.
 ///
-/// <para><b>UNDECODED — HARD GATE (docs/decisions/dc1/doors/DOOR-RANDOMIZER-PLAN.md §3.2, Increment A).</b> Unlike the
-/// destination word (<c>+0x1c</c>) and lock/type bytes, the pose offsets are <i>not</i> proven: the
-/// <c>+0x1e..</c> region is an explicit guess and the RE-vs-destination-driven model is unresolved.
-/// Resolving it needs Cheat-Engine / in-game observation that cannot be done from source. Until then
-/// <see cref="IsDecoded"/> is <c>false</c> and every offset is the <see cref="Unknown"/> sentinel, so
-/// <b>no pose byte is ever written</b>: <see cref="RoomScript.ApplyDoorEdits"/> throws if asked to
-/// write a pose while undecoded, and the door pass refuses to commit re-pointed doors. This makes it
-/// impossible to silently patch a wrong byte. When CE supplies the real offsets, flip
-/// <see cref="IsDecoded"/> to <c>true</c> and fill the four constants — nothing else changes.</para>
+/// <para><b>DECODED — CE-validated 2026-06-20 (docs/decisions/dc1/doors/DOOR-RANDOMIZER-PLAN.md §3.2, Increment A).</b>
+/// The four pose offsets are proven: the pose is RE-style, living in the <i>source</i> door record as
+/// four consecutive signed words immediately after the destination word (<c>+0x1c</c>) — see
+/// <see cref="IsDecoded"/> for the byte-cited proof. So <see cref="IsDecoded"/> is <c>true</c> and
+/// re-pointed doors carry their arrival pose. The safety machinery around the gate is retained: while
+/// <see cref="IsDecoded"/> is <c>false</c> the offsets fall back to the <see cref="Unknown"/> sentinel
+/// and <see cref="RoomScript.ApplyDoorEdits"/> throws rather than write a guessed byte, so the class
+/// can be reverted to the undecoded state without touching call sites.</para>
 /// </summary>
 public static class DoorPoseLayout
 {
-    /// <summary>Sentinel for an offset that Increment A has not yet established.</summary>
+    /// <summary>Sentinel for an unestablished offset — used only in the reverted/undecoded state
+    /// (offsets are CE-established today; see <see cref="IsDecoded"/>).</summary>
     public const int Unknown = -1;
 
     /// <summary>
@@ -114,9 +114,9 @@ public sealed class DoorRecord
     /// <summary>
     /// Entry pose the player arrives at in the <i>destination</i> room: position
     /// (<see cref="EntryX"/>/<see cref="EntryY"/>/<see cref="EntryZ"/>) and facing (<see cref="EntryD"/>).
-    /// <b>Undecoded</b> — only populated/written once <see cref="DoorPoseLayout.IsDecoded"/> is true
-    /// (HARD GATE, plan §3.2). While undecoded these stay 0 and equal their <c>Original*</c> mirrors,
-    /// so <see cref="PoseEdited"/> is false and nothing is written.
+    /// Populated/written when <see cref="DoorPoseLayout.IsDecoded"/> is true (CE-decoded today, plan
+    /// §3.2). Should the gate ever be reverted to undecoded, these stay 0 and equal their
+    /// <c>Original*</c> mirrors, so <see cref="PoseEdited"/> is false and nothing is written.
     /// </summary>
     public short EntryX { get; set; }
     /// <summary>Entry-pose Y (height) word — see <see cref="EntryX"/>.</summary>
@@ -244,6 +244,16 @@ public sealed class EnemyRecord
     /// <summary>Byte offset of the "already killed" GetFlag(group 4) id (<c>0x20</c> only; a
     /// <c>0x59</c> record's kill-flag lives in its instance-table entry).</summary>
     public const int KillFlagOffset = 0x04;
+    /// <summary>Byte offset of the per-entity <b>AI parameter</b> byte in a <c>0x20</c> record — copied to
+    /// entity <c>+0x2F</c> and consumed across every category bank (cat-2 birth derives
+    /// <c>obj+0x18E</c> bit 5 from <c>+3 % 3</c>). 0 = the corpus norm / proven-neutral value.
+    /// STATIC-SCD-RE cont.51.</summary>
+    public const int AiParamOffset = 0x03;
+    /// <summary>Byte offset of the <b>birth-behavior bitfield</b> in a <c>0x20</c> record — copied to
+    /// entity <c>+0x18E</c>; its low 2 bits select the initial behavior code <c>+0x3D</c> at the cat-2
+    /// birth (<c>0x4C10A2–C8</c>: mode 0 → 1, mode 1 → 0x19, else 0x1A). 0 = default behavior.
+    /// STATIC-SCD-RE cont.51.</summary>
+    public const int BirthModeOffset = 0x05;
     /// <summary>Byte offset of the preset <b>maxHP</b> word in a <c>0x20</c> record. The handler copies
     /// it into entity <c>+0x11A</c> (<c>DINO.exe 0x42656A</c>); <c>0</c> ⇒ the per-category birth-init
     /// random-rolls <c>{750,850,1000}</c>, nonzero ⇒ that value is kept (DC1-G2, live-confirmed
@@ -375,6 +385,19 @@ public sealed class EnemyRecord
     /// </summary>
     public bool IsRandomizableDino =>
         SpeciesMatchesCategory && Species != DinoSpecies.Tyrannosaurus && !IsNpcSceneActor;
+
+    /// <summary>
+    /// True when this species' birth-init <b>keeps</b> a nonzero preset <see cref="MaxHp"/> — i.e. the
+    /// <c>+6</c> HP override actually takes effect in-game. Per-category, from the PC birth handlers
+    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.48): cat-2 RaptorHeavy (<c>0x4C0FED</c>:
+    /// <c>test maxHP; jne keep</c> at <c>0x4C10D2</c>, else the PSX-standard roll <c>0x5E5ECC</c>) and
+    /// cat-7 Pteranodon (<c>0x599CDC</c>, guard <c>0x599D92</c>) kept the PSX keep-if-nonzero idiom.
+    /// cat-1 Velociraptor (<c>0x4DBB3D</c>, stores at <c>0x4DBB7F/0x4DBB8B</c>) and cat-5 Swarm
+    /// (<c>0x4F83D5</c> family) write <c>1000/1000</c> <b>unconditionally</b> — a preset is clobbered at
+    /// birth, so writing <c>+6</c> for them is a silent no-op the HP pass must not claim.
+    /// </summary>
+    public bool IsHpPresettable =>
+        Species is DinoSpecies.RaptorHeavy or DinoSpecies.Pteranodon;
 
     /// <summary>
     /// True when this <c>0x20</c> record is an <b>NPC-scene actor</b> (Rick/Gail/Kirk placed in a scene

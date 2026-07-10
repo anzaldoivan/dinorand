@@ -152,22 +152,138 @@ def build_dc1() -> dict:
     }
 
 
+DC2 = REPO / "data" / "dc2"
+
+# op-0x31 field-pickup type names (data/dc2/items.json _field_pickup_types; K75/K77 —
+# this is the SEPARATE field-type space, NOT the catalog id space).
+DC2_FIELD_TYPES = {
+    1: "Med Pak S", 2: "Resusc. Pak", 3: "Field item 3", 4: "Field item 4",
+    5: "Dino File", 6: "Field item 6", 7: "Ammo pickup", 8: "Field item 8",
+    9: "Field item 9",
+}
+
+
+def _dc2_unlock_rooms(gate: dict, gating: dict, dest: str) -> list[list[str]]:
+    """OR-alternatives of room sets that satisfy one locked door's unlock flag(8,K).
+
+    Each unlock source (K78: an op-0x3a key_use record, or a script SetFlag(8,K,1) routine)
+    yields one alternative = {source room} ∪ the transitive rooms of its guard-flag setters.
+    Sources in the door's DEST room are dropped (can't have been used before first entry)."""
+    rooms = gating["rooms"]
+
+    def flag_setter_rooms(grp: int, fid: int, seen: set) -> set[str]:
+        """Rooms whose visit is REQUIRED for flag(grp,fid): only meaningful when the flag
+        has exactly ONE setting room — several setters mean OR, which an AND-semantics
+        requiresRooms list cannot express, so those are treated as satisfiable-open
+        (the per-source OR-alternative edges carry the real disjunction)."""
+        key = (grp, fid)
+        if key in seen:
+            return set()
+        seen.add(key)
+        setters = [
+            (st, f) for st, rfacts in rooms.items() for f in rfacts
+            if any((g, i, v) == (grp, fid, 1) for g, i, v in f["sets"])
+        ]
+        if len({st for st, _ in setters}) != 1:
+            return set()
+        st, f = setters[0]
+        out = {st}
+        for tg, ti in f["tests"]:
+            out |= flag_setter_rooms(tg, ti, seen)
+        return out
+
+    alts: list[list[str]] = []
+    for src in gate["unlocked_by"]:
+        if src["room"] == dest:
+            continue
+        req = {src["room"]}
+        for tg, ti in src.get("routine_guards", []):
+            req |= flag_setter_rooms(tg, ti, set())
+        alts.append(sorted(req))
+    return alts
+
+
 def build_dc2() -> dict:
-    """Empty-but-schema-valid DC2 stub. Same shape as DC1 so populating it later (a real DC2
-    builder over data/dc2's door-graph + item spots, once key-item ids and door→key gating are
-    decoded — KaQ OPEN #2/#5) is data, not a world rewrite. The world adds a free 'Victory' event
-    so AP still generates a (trivially beatable) DC2 seed."""
+    """Populated DC2 contract (ITEMS-KEYITEMS-RE-PLAN Phase 4) from the byte-grounded
+    data/dc2 artifacts: door-graph.json (op-0x30 doors + K78 gate fields), door-gating.json
+    (flag-dataflow facts + resolved unlock sources) and item-placements.json (165 op-0x31
+    field pickups). Star topology + gated-edge overlay, same model as DC1: only gated
+    targets' edges are emitted; every other room hangs off Menu.
+
+    v1 scope (until the Phase-2 give-path decode): progression is ROOM-VISIT gates only
+    (requiresRooms); requiresItems stays empty because key items are not yet relocatable —
+    DC2 progression is flag-driven (K78) and the field-pickup lever is unverified (K77)."""
+    doors = json.loads((DC2 / "door-graph.json").read_text(encoding="utf-8"))["rooms"]
+    gating = json.loads((DC2 / "door-gating.json").read_text(encoding="utf-8"))
+    placements = json.loads((DC2 / "item-placements.json").read_text(encoding="utf-8"))["rooms"]
+    room_data = json.loads((DC2 / "room-data.json").read_text(encoding="utf-8"))
+
+    regions = {st: room_data.get(st, {}).get("zone", st) for st in doors}
+
+    # Gated edges: one edge per unlock ALTERNATIVE (multiple edges same from->to = OR).
+    edges: list[dict] = []
+    gated_targets: set[str] = set()
+    for st, entry in doors.items():
+        for dr in entry["doors"]:
+            if "lock_index" not in dr or dr["dest_id"] not in regions:
+                continue
+            dest = dr["dest_id"]
+            gate = gating["locked_doors"].get(f"{st}->{dest}")
+            alts = _dc2_unlock_rooms(gate, gating, dest) if gate else []
+            gated_targets.add(dest)
+            for req in (alts or [[]]):
+                edges.append({
+                    "from": st, "to": dest, "requiresItems": [],
+                    # a requirement equal to the edge's own source room is vacuous
+                    "requiresRooms": [r for r in req if r not in (st, dest)],
+                })
+    # Overlay: UNLOCKED doors into gated-target rooms (so an alternate free path in the
+    # real graph is not modelled as locked).
+    for st, entry in doors.items():
+        for dr in entry["doors"]:
+            if "lock_index" in dr or dr["dest_id"] not in gated_targets:
+                continue
+            edges.append({"from": st, "to": dr["dest_id"],
+                          "requiresItems": [], "requiresRooms": []})
+
+    locs = []
+    for st_room, items in placements.items():
+        code = st_room[2:]  # "ST304" -> "304"
+        zone = regions.get(code, code)
+        for it in items:
+            tname = DC2_FIELD_TYPES.get(it["id"], f"Field item {it['id']}")
+            locs.append({
+                "key": f"{code}:{it['slot']}:{it['id_blob_off']}",
+                "name": f"{zone} (ST{code}) - {tname} @slot{it['slot']}/0x{it['id_blob_off']:x}",
+                "room": code,
+                "itemId": it["id"],
+                "itemName": tname,
+                "pos": [it["id_blob_off"], 0],
+                "collectedFlag": None,
+            })
+
+    from collections import Counter
+    hist = Counter(loc["itemId"] for loc in locs)
+    pool = [{"id": i, "name": DC2_FIELD_TYPES[i], "weight": float(n)}
+            for i, n in sorted(hist.items())]
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
-        "_source": "stub — DC2 has a decoded door-graph + item spots (data/dc2) but no key-item ids "
-        "or door→key gating yet (KaQ OPEN #2/#5); locations/items/edges intentionally empty.",
+        "_source": "data/dc2/{door-graph,door-gating,item-placements,room-data}.json (byte-grounded, "
+        "K74-K78). v1: visit-gated edges only; key items are flag-driven and not yet relocatable "
+        "(requiresItems empty until the Phase-2 give-path decode) — see "
+        "docs/decisions/dc2/ITEMS-KEYITEMS-RE-PLAN.md.",
         "version": 1,
-        "startRoom": "0000",
-        "goalRoom": "0000",
-        "regions": {},
-        "edges": [],
-        "locations": [],
-        "items": {"names": {}, "keyItemIds": [], "progressionItemIds": [], "pool": []},
+        "startRoom": "000",
+        "goalRoom": "904",
+        "regions": regions,
+        "edges": edges,
+        "locations": locs,
+        "items": {
+            "names": {str(i): DC2_FIELD_TYPES[i] for i in sorted(hist)},
+            "keyItemIds": [],
+            "progressionItemIds": [],
+            "pool": pool,
+        },
     }
 
 
@@ -241,11 +357,28 @@ def _check_common(data: dict) -> dict:
 
 def check_dc2(data: dict) -> None:
     names = _check_common(data)
-    # DC2 is a stub: empty until key-item ids + door→key gating are decoded (KaQ OPEN #2/#5).
-    # When that data lands, replace these emptiness asserts with real solvability checks (see check_dc1).
-    assert not data["locations"] and not data["edges"] and not data["regions"], "DC2 stub must be empty"
-    assert not names, "DC2 stub carries no item names yet"
-    print("OK: DC2 stub (empty schema-valid contract; world adds a free Victory event)")
+    assert data["startRoom"] == "000" and data["goalRoom"] == "904", (
+        data["startRoom"], data["goalRoom"])
+    assert len(data["regions"]) == 89, len(data["regions"])
+    # 168 since the 2026-07-10 slot-5 routine-directory fix (decode_script.subprograms):
+    # +3 op-0x31 items recovered from previously capped tail routines (ST003, ST402 x2).
+    assert len(data["locations"]) == 168, len(data["locations"])
+    assert len(names) == 9, names  # the op-0x31 field-type space (K77)
+    # Known K78 gates present: the ST101<->ST102 crank pair and the ST302->ST303 keycard door.
+    assert any(e["from"] == "101" and e["to"] == "102" for e in data["edges"])
+    assert any(e["from"] == "302" and e["to"] == "303" for e in data["edges"])
+    # v1 progression = visit gates only; solvability: everything (incl. the goal and every
+    # location's room) must be reachable with NO items.
+    reach = _reachable_rooms(data, set())
+    assert data["goalRoom"] in reach, "goal unreachable"
+    unreachable = {loc["room"] for loc in data["locations"]} - reach
+    assert not unreachable, f"locations in unreachable rooms: {sorted(unreachable)}"
+    print(
+        f"OK: {len(data['regions'])} regions, {len(data['edges'])} edges "
+        f"({sum(1 for e in data['edges'] if e['requiresRooms'])} with visit-gates), "
+        f"{len(data['locations'])} locations, {len(names)} field-type names, "
+        f"goal {data['goalRoom']} reachable (visit-gated model, no key-item shuffle yet)"
+    )
 
 
 def check_dc1(data: dict) -> None:
