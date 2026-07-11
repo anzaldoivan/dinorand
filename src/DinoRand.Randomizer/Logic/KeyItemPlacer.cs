@@ -31,7 +31,17 @@ public sealed class KeyItemPlacer
     public sealed record PlacementResult(
         bool Success,
         IReadOnlyList<(Spot Spot, int KeyItem)> Placements,
-        IReadOnlyList<string> Log);
+        IReadOnlyList<string> Log,
+        IReadOnlyList<SphereStep>? Spheres = null);
+
+    /// <summary>One round of the <see cref="Verify"/> fixpoint, in the randomizer-community "sphere"
+    /// convention (Archipelago / OoTR spoiler playthroughs): sphere 0 is what the start reaches
+    /// empty-handed; sphere N is opened by the keys collected in spheres &lt; N. <see cref="Collected"/>
+    /// lists the keys picked up <i>within</i> this sphere's reach (they open the next one).</summary>
+    public sealed record SphereStep(
+        int Index,
+        IReadOnlyList<(int KeyItem, int RoomCode)> Collected,
+        int RoomsReachable);
 
     /// <summary>
     /// Rooms reachable from <paramref name="start"/> crossing every ungated door plus every
@@ -111,24 +121,31 @@ public sealed class KeyItemPlacer
         // Assumed-fill to a fixpoint: collect every key reachable with the keys held so far, re-flood,
         // repeat. Unlike a goal-only check this keeps collecting *past* the goal, so the result can also
         // prove no door key was left stranded (BioRand's "every item reachable", not just the win).
+        // Each round is one playthrough "sphere" (SphereStep) — recorded for the spoiler log.
+        var spheres = new List<SphereStep>();
         HashSet<int> reach;
         while (true)
         {
             reach = Reachable(graph, game, start, held);
-            bool grew = false;
+            var collected = new List<(int KeyItem, int RoomCode)>();
             foreach (var room in reach)
                 if (keysByRoom.TryGetValue(room, out var keys))
                     foreach (var key in keys)
                         if (PickupReachable(byCode, room, key, held, reach) && held.Add(key))
-                            grew = true;
-            if (!grew) break;
+                            collected.Add((key, room));
+            // Record every productive round, the first round (baseline reach), and the terminal round
+            // after progress (it shows what the last keys unlocked). A terminal round with no prior
+            // progress would duplicate the baseline, so it is skipped.
+            if (collected.Count > 0 || spheres.Count == 0 || spheres[^1].Collected.Count > 0)
+                spheres.Add(new SphereStep(spheres.Count, collected, reach.Count));
+            if (collected.Count == 0) break;
         }
 
         if (!reach.Contains(goal))
         {
             log.Add($"[progression] UNSOLVABLE: goal {goal:X4} unreachable; " +
                     $"reached {reach.Count} rooms; door keys held: {Fmt(held)}");
-            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log);
+            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log, spheres);
         }
 
         // Every door key that exists in the playable world must be collectable; one stranded behind its
@@ -139,11 +156,11 @@ public sealed class KeyItemPlacer
         {
             log.Add($"[progression] UNSOLVABLE: goal {goal:X4} reachable but door key(s) stranded " +
                     $"(in-world yet uncollectable): {Fmt(stranded)}");
-            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log);
+            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log, spheres);
         }
 
         log.Add($"[progression] goal {goal:X4} reachable; all door keys collectable; held: {Fmt(held)}");
-        return new PlacementResult(true, Array.Empty<(Spot, int)>(), log);
+        return new PlacementResult(true, Array.Empty<(Spot, int)>(), log, spheres);
     }
 
     /// <summary>

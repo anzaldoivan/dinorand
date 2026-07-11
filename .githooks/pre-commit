@@ -63,12 +63,34 @@ if [ "$ap_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
   }
 fi
 
+# Generated-docs contract (DOCS-AUDIENCE-PLAN.md §5/§5a): the generated REACHABILITY.md and
+# DATA-REFERENCE.md pages must stay in sync with the authored data they render (docs/ is
+# local-only, so this hook is the only gate that can catch content drift; CI still runs the
+# generators' invariants).
+gendocs_touched=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    data/dc1/*.json|data/dc2/*.json|scripts/gen_ap_logic.py|scripts/gen_reachability.py|scripts/gen_data_reference.py)
+      gendocs_touched=1; break ;;
+  esac
+done
+if [ "$gendocs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
+  python3 "$root/scripts/gen_reachability.py" --check || {
+    echo "pre-commit: reachability docs contract failed — run 'python3 scripts/gen_reachability.py --apply'" >&2
+    exit 1
+  }
+  python3 "$root/scripts/gen_data_reference.py" --check || {
+    echo "pre-commit: data-reference docs contract failed — run 'python3 scripts/gen_data_reference.py --apply'" >&2
+    exit 1
+  }
+fi
+
 # Docs index contract: if any corpus doc (or the generator) is staged, every
 # docs/*.md must carry frontmatter and the generated docs/index.md must be in sync.
 docs_touched=0
 for f in "${staged[@]}"; do
   case "$f" in
-    docs/*.md|scripts/gen_docs_index.py) docs_touched=1; break ;;
+    docs/*.md|scripts/gen_docs_index.py|README.md|CONTRIBUTING.md|USER-GUIDE.md|MODDING.md) docs_touched=1; break ;;
   esac
 done
 if [ "$docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then

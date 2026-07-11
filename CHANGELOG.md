@@ -9,6 +9,8 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.4.2] — 2026-07-12
+
 ### Added
 
 - **DC1 cutscene-safe enemy randomization (`--dc1-cutscene-safe`, off by default).** A derived
@@ -214,6 +216,7 @@ Initial feature set — everything prior to the voice randomizer.
   backed up with SHA256, `--restore` returns the install byte-identical.
 - Self-contained single-file release builds (`scripts/publish-release.sh`).
 
+[0.4.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.2
 [0.4.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.1
 [0.4.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.0
 [0.2.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.2.0

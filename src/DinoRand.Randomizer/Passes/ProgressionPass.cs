@@ -44,7 +44,31 @@ public sealed class ProgressionPass : IRandomizationPass
                     ? "seed verified beatable under door-graph key logic"
                     : "WARNING: seed is not provably beatable under door-graph logic");
 
+        RecordSpheres(context, result);
+
         LogPlugEconomy(context, graph, game);
+    }
+
+    /// <summary>
+    /// The sphere playthrough (DOCS-AUDIENCE-PLAN.md §5a): one row per <see cref="KeyItemPlacer.SphereStep"/>
+    /// of the final layout's Verify fixpoint — the Archipelago/OoTR spoiler convention (sphere 0 =
+    /// empty-handed reach; sphere N opened by keys collected in spheres &lt; N). Pure projection of
+    /// what Verify already computed; recorded whenever this pass ran, shuffle or not.
+    /// </summary>
+    private static void RecordSpheres(RandomizationContext context, KeyItemPlacer.PlacementResult result)
+    {
+        if (result.Spheres is not { Count: > 0 } spheres) return;
+        var section = context.Spoiler.Section("Playthrough (DC1 spheres)",
+                                              "Sphere", "Rooms reachable", "Keys collected in this sphere");
+        foreach (var step in spheres)
+            section.AddRow(step.Index.ToString(), step.RoomsReachable.ToString(),
+                step.Collected.Count == 0
+                    ? "—"
+                    : string.Join("; ", step.Collected.Select(c =>
+                          $"{Spoiler.Dc1ItemNames.NameOf(c.KeyItem)} @ {Spoiler.Dc1RoomNames.Describe(c.RoomCode)}")));
+        section.AddNote(result.Success
+            ? $"goal reachable after {spheres.Count} sphere(s)"
+            : "WARNING: fixpoint ended without proving the goal reachable");
     }
 
     /// <summary>

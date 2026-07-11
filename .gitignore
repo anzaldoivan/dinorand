@@ -31,6 +31,8 @@
 # Top-level project files
 !/.gitignore
 !/README.md
+!/USER-GUIDE.md
+!/MODDING.md
 !/CONTRIBUTING.md
 !/.env.example
 !/LICENSE

@@ -160,6 +160,36 @@ public class KeyItemPlacerTests
     }
 
     [Fact]
+    public void Verify_ReportsSpherePlaythrough()
+    {
+        // Two-gate chain: sphere 0 reaches 010d+0100 and collects the Entrance Key there; sphere 1
+        // opens 0200 and collects the BG Area Key; sphere 2 opens the goal. The recorded SphereSteps
+        // must mirror that order (DOCS-AUDIENCE-PLAN.md §5a — the spoiler playthrough projection).
+        var g = new RoomGraph();
+        Link(g, 0x010d, 0x0100, 0x00);
+        Link(g, 0x0100, 0x0200, 0x2e);   // needs Entrance Key
+        Link(g, 0x0200, 0x0300, 0x30);   // needs BG Area Key
+
+        var keys = new Dictionary<int, IReadOnlyList<int>>
+        {
+            [0x0100] = new[] { 0x2e },
+            [0x0200] = new[] { 0x30 },
+        };
+        var res = KeyItemPlacer.Verify(g, Game, 0x010d, 0x0300, keys);
+
+        Assert.True(res.Success);
+        Assert.NotNull(res.Spheres);
+        Assert.Equal(3, res.Spheres!.Count);
+        Assert.Equal(new[] { 0, 1, 2 }, res.Spheres.Select(s => s.Index));
+        Assert.Equal((0x2e, 0x0100), Assert.Single(res.Spheres[0].Collected));
+        Assert.Equal((0x30, 0x0200), Assert.Single(res.Spheres[1].Collected));
+        Assert.Empty(res.Spheres[2].Collected);                       // final sphere: goal opens, no new keys
+        Assert.Equal(2, res.Spheres[0].RoomsReachable);               // 010d + 0100
+        Assert.Equal(4, res.Spheres[2].RoomsReachable);               // all rooms
+        Assert.True(res.Spheres[1].RoomsReachable == 3);
+    }
+
+    [Fact]
     public void Verify_GoalBehindStrandedType1Shortcut_IsRejected()
     {
         // The exact door-rando softlock DoorRandomizer.IsBeatable must catch: a shuffle strands the

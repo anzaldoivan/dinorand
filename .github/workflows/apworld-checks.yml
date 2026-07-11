@@ -30,3 +30,9 @@ jobs:
         run: python3 apworld/dino_crisis_1/selfcheck.py
       - name: DC2 apworld generation wiring self-check
         run: python3 apworld/dino_crisis_2/selfcheck.py
+      # docs/ is publish-held-back (absent from this checkout), so this degrades to the logic
+      # invariants — it still fails the build if the distilled model stops being solvable.
+      - name: reachability docs generator invariants (DOCS-AUDIENCE-PLAN.md §5a)
+        run: python3 scripts/gen_reachability.py --check
+      - name: data-reference docs generator (DOCS-AUDIENCE-PLAN.md §6.4)
+        run: python3 scripts/gen_data_reference.py --check
