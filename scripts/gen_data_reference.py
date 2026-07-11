@@ -63,7 +63,7 @@ def build_dc1_doc():
     items = _load(DATA1, "items.json")
     species = _load(DATA1, "enemies.json")["species"]
     room_data = _load(DATA1, "room-data.json")["rooms"]
-    locs = ap.build_dc1()["locations"]
+    locs = ap.load_locations(ap.load_items()["names"])  # full row set incl. runtime-armed slots
 
     lines = [_frontmatter("DC1 data reference — items, enemies, rooms, pickups (generated)",
                           "dc1-data-reference-generated", "dc1"),
@@ -90,10 +90,17 @@ def build_dc1_doc():
 
     lines += ["## Vanilla pickup locations", "",
               "One row per logical pickup (`item_control` record; relocation twins collapsed). "
-              "Coordinates are the placement quad's first corner.", ""]
-    lines += _table(["Room", "Room name", "Item id", "Item", "X,Z"],
+              "Coordinates are the placement quad's first corner. Source: `static` = placed at "
+              "room load; `runtime-armed (trigger)` = slot whose item id a trigger/native code "
+              "sets at runtime (id unknowable statically; gating flag shown when decoded); "
+              "`event-granted` = placed by a non-load event subroutine. Emergency-box contents "
+              "(`emergency-boxes.json`) and keys granted with no placement record are separate "
+              "systems, not rows here.", ""]
+    lines += _table(["Room", "Room name", "Item id", "Item", "X,Z", "Source"],
                     [(l["room"], l["name"].split(" (")[0], f"0x{l['itemId']:02x}",
-                      l["itemName"], f"{l['pos'][0]},{l['pos'][1]}") for l in locs])
+                      l["itemName"], f"{l['pos'][0]},{l['pos'][1]}",
+                      l["source"] + (f" gate {l['gateFlag']}" if l.get("gateFlag") else ""))
+                     for l in locs])
 
     rooms = sorted(room_data.items())
     lines += ["", "## Rooms", ""]

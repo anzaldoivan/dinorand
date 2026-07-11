@@ -27,12 +27,31 @@
     "0100": {
       "category": "Segment",
       "floor": "1F",
-      "name": "Locker Room"
+      "name": "Locker Room",
+      "itemPriorities": [
+        {
+          "at": "1808,-1104",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0101": {
       "category": "Segment",
       "floor": "1F",
-      "name": "Toilet"
+      "name": "Toilet",
+      "itemPriorities": [
+        {
+          "at": "-2480,-448",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "1648,1664",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0102": {
       "category": "Bridge",
@@ -64,7 +83,14 @@
     "0105": {
       "category": "Bridge",
       "floor": "1F",
-      "name": "Control Room Hall"
+      "name": "Control Room Hall",
+      "itemPriorities": [
+        {
+          "at": "-6432,-6240",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0106": {
       "category": "Segment",
@@ -74,7 +100,19 @@
     "0107": {
       "category": "Bridge",
       "floor": "Unknown",
-      "name": "Main Entrance"
+      "name": "Main Entrance",
+      "itemPriorities": [
+        {
+          "at": "-5856,7584",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "4240,7376",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0108": {
       "category": "Bridge",
@@ -122,6 +160,13 @@
       "name": "Lecture Room",
       "staticTargets": [
         "0108"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-1920,-48",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
       ]
     },
     "010A": {
@@ -172,7 +217,14 @@
     "0111": {
       "category": "Segment",
       "floor": "1F",
-      "name": "Piping Check Passageway B 1F"
+      "name": "Piping Check Passageway B 1F",
+      "itemPriorities": [
+        {
+          "at": "10480,2352",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0112": {
       "category": "Bridge",
@@ -195,7 +247,14 @@
     "0113": {
       "category": "Bridge",
       "floor": "Unknown",
-      "name": "Elevator Hall"
+      "name": "Elevator Hall",
+      "itemPriorities": [
+        {
+          "at": "1600,2128",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0114": {
       "category": "Segment",
@@ -210,7 +269,19 @@
     "0201": {
       "category": "Bridge",
       "floor": "2F",
-      "name": "Passageway to the Communication Area"
+      "name": "Passageway to the Communication Area",
+      "itemPriorities": [
+        {
+          "at": "-3300,1400",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "10200,5400",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0202": {
       "category": "Segment",
@@ -232,7 +303,14 @@
     "0203": {
       "category": "Bridge",
       "floor": "2F",
-      "name": "Hall 2F"
+      "name": "Hall 2F",
+      "itemPriorities": [
+        {
+          "at": "-8500,-2300",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0204": {
       "category": "Segment",
@@ -266,7 +344,19 @@
     "0206": {
       "category": "Segment",
       "floor": "Unknown",
-      "name": "Main Entrance"
+      "name": "Main Entrance",
+      "itemPriorities": [
+        {
+          "at": "-1900,-300",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "200,-300",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0300": {
       "category": "Segment",
@@ -279,7 +369,19 @@
     "0301": {
       "category": "Bridge",
       "floor": "B1",
-      "name": "Research Area Hall"
+      "name": "Research Area Hall",
+      "itemPriorities": [
+        {
+          "at": "-13232,7216",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "10416,7072",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0302": {
       "category": "Segment",
@@ -372,17 +474,69 @@
     "0307": {
       "category": "Bridge",
       "floor": "B1",
-      "name": "Medical Room Hallway"
+      "name": "Medical Room Hallway",
+      "itemPriorities": [
+        {
+          "at": "3152,1024",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0308": {
       "category": "Segment",
       "floor": "Unknown",
-      "name": "Medical Room"
+      "name": "Medical Room",
+      "itemPriorities": [
+        {
+          "at": "-3536,2960",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "-1185,1451",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Med. Pak M"
+        },
+        {
+          "at": "1536,-2464",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Med. Pak M"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "1d",
+          "_why": "relocation-twin \u00d74 \u2014 Med. Pak M"
+        }
+      ]
     },
     "0309": {
       "category": "Bridge",
       "floor": "B1",
-      "name": "Hall B1"
+      "name": "Hall B1",
+      "itemPriorities": [
+        {
+          "at": "-7968,-7232",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "1824,2704",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "3760,2720",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "10112,7040",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "030A": {
       "category": "Bridge",
@@ -428,7 +582,14 @@
             "0205"
           ]
         }
-      }
+      },
+      "itemPriorities": [
+        {
+          "at": "-12240,-944",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0401": {
       "category": "Bridge",
@@ -436,6 +597,18 @@
       "name": "Passageway to the Heliport",
       "staticTargets": [
         "0403"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-12400,-8100",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "-1380,12320",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
       ]
     },
     "0402": {
@@ -444,6 +617,29 @@
       "name": "Hangar",
       "staticTargets": [
         "040D"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-4352,-12992",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Grenade Bullets"
+        },
+        {
+          "at": "-2864,-11488",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "5888,-12960",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Grenade Bullets"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "18",
+          "_why": "relocation-twin \u00d72 \u2014 Grenade Bullets"
+        }
       ]
     },
     "0403": {
@@ -452,17 +648,64 @@
       "name": "Heliport",
       "staticTargets": [
         "0409"
+      ],
+      "itemPriorities": [
+        {
+          "at": "-13300,-13200",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "-5800,14200",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "12300,-7800",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
       ]
     },
     "0404": {
       "category": "Segment",
       "floor": "Outdoors",
-      "name": "Large Size Elevator Passageway"
+      "name": "Large Size Elevator Passageway",
+      "itemPriorities": [
+        {
+          "at": "-4200,3200",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Slag Bullets"
+        },
+        {
+          "at": "5300,3000",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Slag Bullets"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "11",
+          "_why": "relocation-twin \u00d72 \u2014 Slag Bullets"
+        }
+      ]
     },
     "0405": {
       "category": "Bridge",
       "floor": "Unknown",
-      "name": "Large Size Elevator"
+      "name": "Large Size Elevator",
+      "itemPriorities": [
+        {
+          "at": "-7684,-8104",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "-160,11032",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0406": {
       "category": "Segment",
@@ -495,12 +738,31 @@
     "0407": {
       "category": "Segment",
       "floor": "Outdoors",
-      "name": "Passageway to the Power Room"
+      "name": "Passageway to the Power Room",
+      "itemPriorities": [
+        {
+          "at": "-7008,-9012",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "2656,11347",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0408": {
       "category": "Segment",
       "floor": "Outdoors",
-      "name": "Elevator Power Room"
+      "name": "Elevator Power Room",
+      "itemPriorities": [
+        {
+          "at": "-544,-5987",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0409": {
       "category": "Segment",
@@ -541,7 +803,14 @@
     "0501": {
       "category": "Segment",
       "floor": "B3",
-      "name": "Piping Check Passageway B2"
+      "name": "Piping Check Passageway B2",
+      "itemPriorities": [
+        {
+          "at": "-11232,-480",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0502": {
       "category": "Bridge",
@@ -615,7 +884,19 @@
     "0505": {
       "category": "Segment",
       "floor": "B2",
-      "name": "Researcher Rest Room"
+      "name": "Researcher Rest Room",
+      "itemPriorities": [
+        {
+          "at": "-5300,-1000",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "-4200,5700",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0506": {
       "category": "Segment",
@@ -784,12 +1065,26 @@
             58
           ]
         }
-      }
+      },
+      "itemPriorities": [
+        {
+          "at": "1536,-768",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0603": {
       "category": "Segment",
       "floor": "B3",
-      "name": "Passageway to the Carrying Out Room"
+      "name": "Passageway to the Carrying Out Room",
+      "itemPriorities": [
+        {
+          "at": "-10800,12192",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0604": {
       "category": "Bridge",
@@ -821,7 +1116,25 @@
             58
           ]
         }
-      }
+      },
+      "itemPriorities": [
+        {
+          "at": "6144,-2560",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Plug"
+        },
+        {
+          "at": "6912,-11392",
+          "priority": "Fixed",
+          "_why": "relocation-twin \u2014 Plug"
+        }
+      ],
+      "itemLinks": [
+        {
+          "id": "2b",
+          "_why": "relocation-twin \u00d72 \u2014 Plug"
+        }
+      ]
     },
     "0607": {
       "category": "Box",
@@ -970,7 +1283,19 @@
     "0614": {
       "category": "Segment",
       "floor": "B3",
-      "name": "Port Transport Passageway"
+      "name": "Port Transport Passageway",
+      "itemPriorities": [
+        {
+          "at": "-3232,-14192",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        },
+        {
+          "at": "1776,3904",
+          "priority": "Fixed",
+          "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ]
     },
     "0615": {
       "category": "Box",

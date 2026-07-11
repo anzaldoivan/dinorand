@@ -36,6 +36,7 @@
     "0:160": { "label": "the Immigration Office event (armed in 0609)", "event_room": "0609" },
     "0:168": { "label": "the Third Energy Control event (armed in 0510)", "event_room": "0510" },
     "0:169": { "label": "the Dr. Kirk's Library velociraptor encounter (B)", "event_room": "050F" },
+    "0:184": { "label": "the Carrying Out Room B3 event (armed in 0600)", "event_room": "0600" },
     "0:187": { "label": "the Port T-Rex encounter", "event_room": "060A" },
     "0:197": { "label": "the Third Energy Control event (armed in 050B)", "event_room": "050B" },
     "0:200": { "label": "the Experiment Simulation Room event (armed in 0300)", "event_room": "0300" },

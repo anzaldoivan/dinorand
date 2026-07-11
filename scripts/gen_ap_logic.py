@@ -93,7 +93,20 @@ def load_map() -> dict:
     return {"regions": regions, "edges": edges, "startRoom": start, "goalRoom": end}
 
 
+def _source(rec) -> str:
+    """Classify how a pickup record materialises (STATIC-SCD-RE cont.60): a real id placed at
+    room load = static; id 0xff = runtime-armed slot (a trigger/native code sets the id later,
+    TRIGGER-DECODE item-gate layer — never guess the id); a real id placed by a non-load event
+    sub = event-granted."""
+    if _item_id(rec["item_id"]) == EMPTY_SLOT_ID:
+        return "runtime-armed (trigger)"
+    kind = (rec.get("trigger") or {}).get("kind")
+    return "static" if kind in ("init", "init_gosub", "aot_zone") else "event-granted"
+
+
 def load_locations(item_names: dict[int, str]) -> list[dict]:
+    """ALL decoded pickup rows, each tagged `source` — nothing is silently dropped here;
+    build_dc1 filters what the AP contract can actually place."""
     raw = json.loads((DC1 / "room-data.json").read_text(encoding="utf-8"))
     rooms = raw["rooms"]
     room_name = {_code(c): r.get("name", c) for c, r in rooms.items()}
@@ -106,8 +119,6 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
         c = _code(code)
         for rec in ic["records"]:
             iid = _item_id(rec["item_id"])
-            if iid == EMPTY_SLOT_ID:
-                continue
             pos = rec.get("pos") or [0, 0]
             x, y = int(pos[0]), int(pos[1])
             key = f"{c}:{iid:02x}:{x},{y}"
@@ -115,24 +126,37 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
                 continue
             seen.add(key)
             iname = item_names.get(iid, _clean(rec.get("item_name", f"0x{iid:02x}")))
-            locs.append(
-                {
-                    "key": key,
-                    "name": f"{room_name.get(c, c)} ({c}) - {iname} @{x},{y}",
-                    "room": c,
-                    "itemId": iid,
-                    "itemName": iname,
-                    "pos": [x, y],
-                    "collectedFlag": rec.get("collected_flag"),
-                }
-            )
+            loc = {
+                "key": key,
+                "name": f"{room_name.get(c, c)} ({c}) - {iname} @{x},{y}",
+                "room": c,
+                "itemId": iid,
+                "itemName": iname,
+                "pos": [x, y],
+                "collectedFlag": rec.get("collected_flag"),
+                "source": _source(rec),
+            }
+            fl = (rec.get("gate") or {}).get("flag")
+            if fl:
+                loc["gateFlag"] = f"{fl['group']}:{fl['index']}"
+            locs.append(loc)
     return locs
 
 
 def build_dc1() -> dict:
     items = load_items()
     m = load_map()
-    locs = load_locations(items["names"])
+    all_locs = load_locations(items["names"])
+    # AP contract: only real-id pickups in rooms on the door graph are placeable checks.
+    # Runtime-armed 0xff slots (no id to place against) and alt-room copies outside the
+    # graph stay visible in DATA-REFERENCE.md via load_locations' `source` tag.
+    locs = [l for l in all_locs
+            if l["itemId"] != EMPTY_SLOT_ID and l["room"] in m["regions"]]
+    off_graph = sorted({l["room"] for l in all_locs
+                        if l["itemId"] != EMPTY_SLOT_ID and l["room"] not in m["regions"]})
+    if off_graph:
+        print(f"  NOTE: dc1 pickups in {len(off_graph)} room(s) outside the door graph "
+              f"excluded from the AP contract: {off_graph}")
     progression = sorted({i for e in m["edges"] for i in e["requiresItems"]})
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
