@@ -342,6 +342,43 @@ public class DoorRandomizerTests
     public void DoorRandomizer_DefaultConfig_IsDisabled()
         => Assert.False(new DoorRandomizer().IsEnabled(new RandomizerConfig()));
 
+    [Fact]
+    public void DoorRandomizer_ConnectorCannotReachGoal_FallsBackToVanillaAfterMaxAttempts()
+    {
+        // A world that never contains the goal room (060d): every connector attempt fails, and the
+        // pass must exhaust MaxAttempts then fall back to vanilla — an unbeatable seed is never
+        // shipped, and no door record is left half-edited.
+        var rooms = new List<RoomFile>();
+        LinkBoth(rooms, 0x010d, 0x010a);
+        LinkBoth(rooms, 0x010a, 0x010c);
+        var log = new List<string>();
+        var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(11),
+                                           new RandomizerConfig { RandomizeDoors = true }, log.Add);
+
+        new DoorRandomizer().Apply(ctx);
+
+        Assert.Contains(log, l => l.Contains("falling back to vanilla doors"));
+        Assert.Equal(DoorRandomizer.MaxAttempts,
+            log.Count(l => l.Contains("connector could not reach the goal")));
+        Assert.DoesNotContain(rooms.SelectMany(r => r.Doors), d => d.IsEdited);
+    }
+
+    [Fact]
+    public void DoorRandomizer_WithKeyShuffle_StillCommitsWhenNothingIsKeyGated()
+    {
+        // ShuffleKeyItems routes beatability through KeyItemPlacer.Place; with no key-gated doors in
+        // the world the "nothing to seat" arm must accept the layout rather than reroll it.
+        var rooms = ReciprocalWorld();
+        var log = new List<string>();
+        var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(3),
+            new RandomizerConfig { RandomizeDoors = true, ShuffleKeyItems = true }, log.Add);
+
+        new DoorRandomizer().Apply(ctx);
+
+        Assert.Contains(log, l => l.Contains("shuffled"));
+        Assert.DoesNotContain(log, l => l.Contains("falling back"));
+    }
+
     // --- real install: the connector shuffles the real graph and stays beatable ----------------
 
     private static List<RoomFile>? LoadInstall()

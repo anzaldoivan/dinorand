@@ -106,6 +106,62 @@ public class Dc2DoorEditorTests
         Assert.False(Dc2DoorEditor.IsValidDestination(1, 17)); // one past stage 1
         Assert.False(Dc2DoorEditor.IsValidDestination(0, 6));  // stage 0 has 6 rooms (0..5)
         Assert.False(Dc2DoorEditor.IsValidDestination(10, 0)); // no stage 10
+        Assert.False(Dc2DoorEditor.IsValidDestination(-1, 0)); // negative stage
+        Assert.False(Dc2DoorEditor.IsValidDestination(0, -1)); // negative room
     }
 
+    // ---- synthetic package (always runs — no game files needed) ---------------------------------
+
+    [Fact]
+    public void DoorDest_EncodesStIdAndWord()
+    {
+        var dest = new Dc2DoorEditor.DoorDest(2, 1);
+        Assert.Equal("201", dest.StId);
+        Assert.Equal(0x0102, dest.Word);            // low byte = stage, high byte = room
+        Assert.Contains("ST201", dest.ToString());
+
+        var wide = new Dc2DoorEditor.DoorDest(1, 16);
+        Assert.Equal("110", wide.StId);             // room as 2 hex digits: 16 → "10"
+        Assert.Equal(0x1001, wide.Word);
+    }
+
+    [Fact]
+    public void WriteDestination_Synthetic_RoundTripsThroughRepack()
+    {
+        var package = SyntheticRoom.Dc2Room(1);
+        var edited = Dc2DoorEditor.WriteDestination(package, 40, newStage: 4, newRoom: 11);
+
+        var dest = Dc2DoorEditor.ReadDestinationFromPackage(edited, 40);
+        Assert.Equal(4, dest.Stage);
+        Assert.Equal(11, dest.Room);
+        // the input package was not mutated
+        Assert.NotEqual(4, Dc2DoorEditor.ReadDestinationFromPackage(package, 40).Stage);
+    }
+
+    [Fact]
+    public void WriteDestination_RejectsOutOfRangeOffset()
+    {
+        var package = SyntheticRoom.Dc2Room(0);
+        int len = Dc2DoorEditor.DecompressScdBlob(package).Length;
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => Dc2DoorEditor.WriteDestination(package, len - 1, 2, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => Dc2DoorEditor.WriteDestination(package, -1, 2, 1));
+    }
+
+    [Fact]
+    public void ReadDestination_RejectsOutOfRangeOffset()
+    {
+        var blob = new byte[10];
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2DoorEditor.ReadDestination(blob, 9));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2DoorEditor.ReadDestination(blob, -1));
+    }
+
+    [Fact]
+    public void WriteDestination_Synthetic_RejectsInvalidRoom()
+    {
+        // The invalid-dest guard must fire before any blob work — offset 0 is otherwise legal.
+        Assert.Throws<ArgumentException>(
+            () => Dc2DoorEditor.WriteDestination(SyntheticRoom.Dc2Room(0), 0, newStage: 0, newRoom: 6));
+    }
 }

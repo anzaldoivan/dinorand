@@ -174,6 +174,29 @@ public sealed class RandomizerConfig
     public bool Dc2MakeTrexKillable { get; set; }
 
     /// <summary>
+    /// DC2 only (off by default). Make a randomizer-injected Triceratops killable without crashing:
+    /// patches Dino2.exe to remap E70's out-of-range death animation index (8 → 7) so the setpiece
+    /// model's death path binds a valid clip instead of reading past its package table (which crashes).
+    /// Applied in place at install (backup-protected .bak). The remapped instruction only ever runs in
+    /// E70's own death handler, so it is a no-op for every other actor.
+    /// docs/decisions/dc2/crash-rcas/DC2-ST001-TRICERATOPS-WAVE-DEDICATED-BASE-CRASH-RCA.md §7b.
+    /// CLI <c>--dc2-triceratops-killable</c>.
+    /// </summary>
+    public bool Dc2MakeTriceratopsKillable { get; set; }
+
+    /// <summary>
+    /// DC2 only (off by default). Stop a randomizer-injected Inostrancevia (E50, TYPE 0x0e — a DEFAULT
+    /// donor) from crashing when the PSX-recompiled emergence/burst emitter runs in a room that armed no
+    /// spawn-descriptor list for it: patches Dino2.exe with a NULL-cursor guard on the shared emitter's
+    /// tick driver (hook 0x4131d5) so it skips the tick instead of dereferencing the NULL cursor. Applied in
+    /// place at install (backup-protected .bak). The guard is species-agnostic (the driver 0x4131d0 is a
+    /// shared component, ~10 actor-class vtables) and byte-identical whenever the emitter is armed, so it is
+    /// a no-op for every normal spawn. docs/decisions/dc2/crash-rcas/DC2-INOSTRA-SPAWN-DESCRIPTOR-NULL-RCA.md.
+    /// CLI <c>--dc2-inostra-spawn-guard</c>; auto-applied for ANY DC2 cross-species run (zero-cost net).
+    /// </summary>
+    public bool Dc2MakeInostraSpawnSafe { get; set; }
+
+    /// <summary>
     /// DC2 only (Dylan = stock, default). Which character main-game Dylan renders as: his six
     /// per-weapon <c>WP&lt;n&gt;A.DAT</c> slots serve Gail's or Rick's Extra Crisis graft files (the
     /// engine-native re-skin, visual-only — weapon behavior untouched), paired with the WP-gate exe
@@ -255,6 +278,23 @@ public sealed class RandomizerConfig
     public string? VoicePacksRoot { get; set; }
 
     /// <summary>
+    /// Import external, mood-tagged music into the DC1 BGM slots (docs/decisions/cross/BGM-RANDO-PLAN.md).
+    /// When on, <see cref="Bgm.BgmRandomizer"/> draws same-tag donor tracks from <see cref="BgmPacksRoot"/>,
+    /// transcodes them to each <c>Sound/BGM/</c> slot's RIFF format, and installs them with the seed via the
+    /// <c>GameInstaller</c> loose-file backup contract (reversed by Restore). Off by default; a no-op without a
+    /// <see cref="BgmPacksRoot"/> that holds music. Independent of the existing <c>--shuffle-bgm</c> exe lever
+    /// (which permutes the game's own tracks and needs no assets).
+    /// </summary>
+    public bool RandomizeBgm { get; set; } = false;
+
+    /// <summary>
+    /// Filesystem root holding BGM datapacks for import, each pack laid out <c>&lt;pack&gt;/data/bgm/&lt;tag&gt;/*.{ogg,wav}</c>
+    /// (folder = mood tag; docs/decisions/cross/BGM-RANDO-PLAN.md). Loaded via <see cref="Bgm.BgmDataPack.LoadAll"/>.
+    /// <c>null</c> (default) ⇒ no donor source, so <see cref="RandomizeBgm"/> produces nothing.
+    /// </summary>
+    public string? BgmPacksRoot { get; set; }
+
+    /// <summary>
     /// Phase 2 (experimental, off by default). Import a <i>foreign</i> dinosaur species into a room
     /// that did not ship with it, by copying its model+motion into the room's RDT and repointing one
     /// enemy record (docs/decisions/dc1/enemies/CROSS-ROOM-SPECIES-PLAN.md, increment 1: geometry only — imported species may
@@ -262,6 +302,18 @@ public sealed class RandomizerConfig
     /// room, scripted/cutscene rooms excluded. Not yet CE-validated, hence off and experimental.
     /// </summary>
     public bool CrossRoomEnemySpecies { get; set; } = false;
+
+    /// <summary>
+    /// Opt-in (default off; DC1 only). Cutscene-safe enemy randomization: rooms in the derived
+    /// choreography census (<c>data/dc1/cutscene-rooms.json</c> <c>flagged</c> tier — a script
+    /// binds an enemy slot and installs a scripted waypoint/completion-flag behavior on it,
+    /// STATIC-SCD-RE cont.49/59) are excluded from the in-room (model, motion) permute and from
+    /// cross-species imports, and receive the orthogonal <b>palette-tint</b> fallback instead
+    /// (a seeded donor room's type-2 CLUT entry — the cont.51/57 "Blue Raptor" lever). Off keeps
+    /// every existing seed byte-identical. Like <see cref="Dc2AllowWaterLevelEnemySwaps"/>, this
+    /// flag is NOT seed-encoded.
+    /// </summary>
+    public bool Dc1CutsceneSafeEnemies { get; set; } = false;
 
     /// <summary>
     /// Opt-in (default off). Allow the installer to patch <c>DINO.exe</c> (back it up first; reversed

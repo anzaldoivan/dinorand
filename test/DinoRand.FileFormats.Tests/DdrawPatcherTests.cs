@@ -13,7 +13,7 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class DdrawPatcherTests
 {
-    private static byte[] NewStockImage()
+    internal static byte[] NewStockImage()
     {
         var dll = new byte[DdrawPatcher.StockDllLength];
         dll[0] = (byte)'M'; dll[1] = (byte)'Z';

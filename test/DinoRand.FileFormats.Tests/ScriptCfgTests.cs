@@ -101,6 +101,35 @@ public class ScriptCfgTests
     }
 
     [Fact]
+    public void GotoSub05_IsATailCall_SafeInsertStopsBeforeIt()
+    {
+        // The st102 sub0 tail shape (cont.52): payload op, then `05 00 0B 00` (GOTO-SUB, cont.50 —
+        // re-points the RUNNING task to another sub; control never falls through on the normal path),
+        // then dead code. Pre-fix, 0x05 was modelled as plain fall-through: SafeInsertOffset returned
+        // the goto-sub's own offset (displacing the tail-call — the 0x3A16C-by-accident bug) and
+        // cfg.py recommended the dead code past it (0x3A170). The correct site is the last plain
+        // boundary BEFORE the goto-sub (st102's hand-verified 0x3A164 — here 0x28).
+        var rdt = OneSub();
+        rdt[0x24] = 0x01;                              // nop (setup)
+        rdt[0x28] = 0x01;                              // nop — the correct insert site
+        rdt[0x2c] = 0x05; rdt[0x2e] = 0x0b;            // goto-sub 11 (tail-call)
+        rdt[0x30] = 0x01;                              // dead code past the tail-call
+        rdt[0x34] = 0x10;                              // dead return
+        int end = rdt.Length;
+
+        Assert.True(ScriptCfg.IsControlOpcode(0x05));  // a record must not displace the tail-call
+
+        var pdom = ScriptCfg.EntryPostDominators(rdt, 0x24, end)!;
+        // The goto-sub is an exit: everything after it is unreachable dead code.
+        Assert.Equal(new[] { 0x24, 0x28, 0x2c }, pdom.OrderBy(x => x).ToArray());
+        Assert.DoesNotContain(0x30, pdom);
+        Assert.DoesNotContain(0x34, pdom);
+
+        // Latest post-dominated plain boundary: the nop at 0x28, not the 0x05 and not the dead code.
+        Assert.Equal(0x28, ScriptCfg.SafeInsertOffset(rdt, 0x24, end));
+    }
+
+    [Fact]
     public void LoopBody_PostDominatesThroughFallThrough()
     {
         // 0x24 nop ; 0x28 loop-next back to 0x24 ; 0x2c return.

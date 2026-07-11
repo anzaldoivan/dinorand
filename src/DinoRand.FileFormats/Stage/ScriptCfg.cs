@@ -17,31 +17,40 @@ namespace DinoRand.FileFormats.Stage;
 ///
 /// <para><b>Edge semantics (verified from the DINO.exe handlers).</b>
 /// <c>0x04</c>/<c>0x10</c>/<c>0x11</c> are subroutine terminators (no successor);
+/// <c>0x05</c> GOTO-SUB (handler <c>0x4A32F7</c>, cont.50) re-points the <i>running task</i> to
+/// another subroutine (<c>ctx-&gt;pc = [obj+0x268]+table[s16[+2]]</c>, call-stack reset) — control
+/// never falls through on the normal path, so it is a terminator here (its only fall-through is the
+/// <c>GetFlag(10,9)</c> global script-disable no-op gate, modelled as not taken; cont.52 — before
+/// this fix it was treated as a plain fall-through and SafeInsertOffset could return the dead code
+/// past a goto-sub tail-call, e.g. st102 sub0's <c>0x3A170</c>);
 /// <c>0x0c</c> goto has the single target <c>pos + s16[+2]</c>;
 /// <c>0x0e</c> cond-goto has {fall-through, target} — except operand <c>byte[+1]==0</c>, which the
 /// handler makes an unconditional take ({target} only);
 /// <c>0x0a</c> loop-next has {fall-through, back=<c>pos - s16[+2]</c>};
-/// <c>0x0f</c> gosub and every other opcode fall through. A branch target that is not itself a
-/// decoded opcode boundary is dropped (mis-aligned / cross-subroutine), and a walk that runs off the
-/// end without a terminator ends at an implicit exit.</para>
+/// <c>0x0f</c> gosub, <c>0x01</c> task-spawn (a side effect, cont.50) and every other opcode fall
+/// through. A branch target that is not itself a decoded opcode boundary is dropped (mis-aligned /
+/// cross-subroutine), and a walk that runs off the end without a terminator ends at an implicit
+/// exit.</para>
 ///
 /// Clean-room: derived from our own disassembly; pure CFG algorithm over those facts.
 /// </summary>
 public static class ScriptCfg
 {
-    private const byte Goto = 0x0c, CondGoto = 0x0e, LoopNext = 0x0a;
+    private const byte Goto = 0x0c, CondGoto = 0x0e, LoopNext = 0x0a, GotoSub05 = 0x05;
     private const byte Exit04 = 0x04, Return10 = 0x10, End11 = 0x11;
 
     /// <summary>
     /// A control-flow opcode that a record insertion must NOT displace: the terminators <c>0x10</c>/
-    /// <c>0x11</c>, the branches <c>0x0c</c>/<c>0x0e</c>, the loop-next <c>0x0a</c>, and <c>0x04</c> —
-    /// which is <b>not</b> a plain terminator but a <b>counter-gated loop/return</b> (handler
-    /// <c>0x4a3296</c>: ends the subroutine when <c>task+7==0</c>, else decrements and loops back via
-    /// <c>task+0xac</c>). Splicing a record at such a slot derails the SCD VM — 0102 crashed at stage load
-    /// when the auto-init offset landed on sub0's <c>0x04</c> and the VM ran off the subroutine into data,
-    /// dispatching an invalid opcode (docs/reference/dc1/enemies/ENEMY-INJECTION-MODES.md "0102 load-crash RCA").
+    /// <c>0x11</c>, the branches <c>0x0c</c>/<c>0x0e</c>, the loop-next <c>0x0a</c>, the goto-sub
+    /// <c>0x05</c> (a task re-point — displacing it silently rewires the sub's tail-call, cont.52),
+    /// and <c>0x04</c> — which is <b>not</b> a plain terminator but a <b>counter-gated loop/return</b>
+    /// (handler <c>0x4a3296</c>: ends the subroutine when <c>task+7==0</c>, else decrements and loops
+    /// back via <c>task+0xac</c>). Splicing a record at such a slot derails the SCD VM — 0102 crashed
+    /// at stage load when the auto-init offset landed on sub0's <c>0x04</c> and the VM ran off the
+    /// subroutine into data, dispatching an invalid opcode (docs/reference/dc1/enemies/ENEMY-INJECTION-MODES.md
+    /// "0102 load-crash RCA").
     /// </summary>
-    public static bool IsControlOpcode(byte op) => op is 0x04 or 0x0a or 0x0c or 0x0e or 0x10 or 0x11;
+    public static bool IsControlOpcode(byte op) => op is 0x04 or 0x05 or 0x0a or 0x0c or 0x0e or 0x10 or 0x11;
 
     /// <summary>
     /// The latest 4-aligned opcode offset strictly inside <c>[start,end)</c> that post-dominates
@@ -84,12 +93,16 @@ public static class ScriptCfg
                 case Exit04:
                 case Return10:
                 case End11:
+                case GotoSub05:
                     // Treated as exits for post-dominance (each eventually leaves the subroutine). NOTE:
                     // 0x04 is actually a counter-gated loop/return (handler 0x4a3296) whose non-exit branch
                     // loops back to a RUNTIME pc (task+0xac), so no correct static back-edge exists — hence
                     // it stays modelled as an exit here, but is excluded as a splice site by IsControlOpcode
                     // (a record displacing it derails the VM — the 0102 load-crash, ENEMY-INJECTION-MODES.md).
-                    break; // terminator / loop-return: no static successor
+                    // 0x05 GOTO-SUB re-points the running task to ANOTHER sub (cont.50) — its target is not
+                    // an offset in this sub, so it is an exit edge-wise; anything after it is dead code on
+                    // the normal path (its only fall-through is the GetFlag(10,9) global-disable no-op gate).
+                    break; // terminator / loop-return / task re-point: no static successor
                 case Goto:
                 {
                     int tgt = pos + BinaryPrimitives.ReadInt16LittleEndian(rdt.Slice(pos + 2, 2));

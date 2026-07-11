@@ -23,6 +23,11 @@
     <EmbeddedResource Include="..\..\data\dc2\cutscene-rooms.json" LogicalName="DinoRand.Randomizer.Data.dc2.cutscene-rooms.json" />
     <!-- DC2 raptor tier/variant table (RAPTOR-TIER-RE.md) so Dc2RaptorTierTable.LoadEmbedded finds it. -->
     <EmbeddedResource Include="..\..\data\dc2\raptor-tiers.json" LogicalName="DinoRand.Randomizer.Data.dc2.raptor-tiers.json" />
+    <!-- DC1 cutscene/choreography census (tools/scd_re/cutscene_catalog.py) so Dc1RoomExclusions finds it. -->
+    <EmbeddedResource Include="..\..\data\dc1\cutscene-rooms.json" LogicalName="DinoRand.Randomizer.Data.dc1.cutscene-rooms.json" />
+    <!-- BGM mood-tag manifests (BGM-RANDO-PLAN.md) so BgmManifest.LoadDefault finds them. -->
+    <EmbeddedResource Include="..\..\data\dc1\bgm.json" LogicalName="DinoRand.Randomizer.Data.dc1.bgm.json" />
+    <EmbeddedResource Include="..\..\data\dc2\bgm.json" LogicalName="DinoRand.Randomizer.Data.dc2.bgm.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NVorbis" Version="0.10.5" />

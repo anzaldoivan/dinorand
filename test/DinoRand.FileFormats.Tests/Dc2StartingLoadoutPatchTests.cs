@@ -10,7 +10,7 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class Dc2StartingLoadoutPatchTests
 {
-    private static byte[] MakeExe()
+    internal static byte[] MakeExe()
     {
         var exe = new byte[Dc2WpGatePatch.ExpectedLength];
         new byte[] { 0xBA, 0x01, 0x01, 0x00, 0x00 }.CopyTo(exe, 0x50D68);                          // Dylan

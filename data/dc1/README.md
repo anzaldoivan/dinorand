@@ -37,3 +37,8 @@ are upstream research or content tables. `RoomDataConsistencyTests` locks them t
   key-item progression chain for `Logic/KeyItemPlacer`. Used to **validate** decoded SCD `0x4C`
   records (their `+0x1A` item id should match this map). Human-playthrough ground truth — see the
   status/caveats note at the top of that file.
+- `cutscene-rooms.json` — **GENERATED** by `tools/scd_re/cutscene_catalog.py --apply` (needs the
+  game install; do NOT hand-edit `flagged`). Choreography-involvement census: rooms whose enemy
+  records are op-0x22-bound + op-0x3a/0x5a-scripted (STATIC-SCD-RE cont.49/59, cont.58 policy),
+  plus the hand-curated `scripted_enemy`/`cutscene` exclusion tiers the enemy pass ships
+  (moved out of C#). Embedded resource consumed by `DinoCrisis1` / the DC1 enemy pass.

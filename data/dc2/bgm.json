@@ -1,0 +1,10 @@
+{
+  "_comment": "DC2 BGM mood-tag manifest: tag -> [Dc2MusicTablePatch.CanonicalNames entries, e.g. MS_0000.DAT]. Used to composite a mood dimension into the --dc2-shuffle-bgm like-class key (tag|trackIndexKey), so only same-tag AND same-track-index slots swap. Any name not listed defaults to the 'all' tag (behaviourally identical to today's track-index-only shuffle). DC2 external import is deferred (MS_ payload codec [OPEN]). v1 ships NO mood curation. See docs/decisions/cross/BGM-RANDO-PLAN.md.",
+  "safe": [],
+  "calm": [],
+  "creepy": [],
+  "danger": [],
+  "boss": [],
+  "countdown": [],
+  "results": []
+}

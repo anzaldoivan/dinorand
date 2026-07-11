@@ -45,6 +45,10 @@ public sealed class AppSettings
     /// <c>RandomizerConfig.VoicePacksRoot</c> (docs/decisions/dc1/voice/VOICE-RANDO-PLAN.md §12.1).</summary>
     public string? VoicePacksRoot { get; set; }
 
+    /// <summary>BGM import: filesystem root of the BGM datapacks (folder = mood tag). Feeds
+    /// <c>RandomizerConfig.BgmPacksRoot</c> (docs/decisions/cross/BGM-RANDO-PLAN.md).</summary>
+    public string? BgmPacksRoot { get; set; }
+
     /// <summary>Voice rando: the "Randomize Cutscene Voices" master toggle (shared)
     /// (<c>RandomizerConfig.RandomizeVoices</c>).</summary>
     public bool RandomizeCutsceneVoices { get; set; }

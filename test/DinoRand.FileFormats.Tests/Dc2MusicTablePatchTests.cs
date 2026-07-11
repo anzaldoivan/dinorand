@@ -14,7 +14,7 @@ public class Dc2MusicTablePatchTests
 {
     /// <summary>Build a recognizable synthetic exe: canonical strings packed after the table,
     /// each slice slot pointing at its canonical name.</summary>
-    private static byte[] MakeExe()
+    internal static byte[] MakeExe()
     {
         var exe = new byte[Dc2WpGatePatch.ExpectedLength];
         int strOff = Dc2MusicTablePatch.TableBaseOffset + 0x1000; // inside .data, clear of the table
