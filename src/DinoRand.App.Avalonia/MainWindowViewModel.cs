@@ -108,6 +108,7 @@ namespace DinoRand.App
             VoicePacksRoot = _settings.VoicePacksRoot ?? "";
             IsVoicesChecked = _settings.RandomizeCutsceneVoices;
             CrossGameVoices = _settings.IncludeCrossGameVoices;
+            BgmPacksRoot = _settings.BgmPacksRoot ?? "";
             _suspend = false;
 
             if (slice.LastSeed is { } last && AppSeed.TryParse(last, out var parsed))
@@ -323,6 +324,9 @@ namespace DinoRand.App
         public bool CanRandomizeStartingInventory => SelectedGame.Supports(GameFeature.StartingInventory);
         public bool CanRandomizeVoices => SelectedGame.Supports(GameFeature.Voices);
         public bool CanShuffleBgm => SelectedGame.Supports(GameFeature.Bgm);
+        // External BGM import is DC1-only for now (DC2 music lives in undecoded MS_ container payloads —
+        // docs/decisions/cross/BGM-RANDO-PLAN.md).
+        public bool CanImportBgm => CanShuffleBgm && SelectedGame.Id == "dc1";
         public bool CanRandomizeBoxes => SelectedGame.Supports(GameFeature.EmergencyBoxes);
         public bool CanScramblePuzzleCodes => SelectedGame.Supports(GameFeature.PuzzleCodes);
 
@@ -366,6 +370,7 @@ namespace DinoRand.App
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
             if (!CanRandomizeVoices) IsVoicesChecked = false;
             if (!CanShuffleBgm) ShuffleBgm = false;
+            if (!CanImportBgm) ImportBgm = false;
             if (!CanRandomizeBoxes) RandomizeBoxes = false;
             if (!CanScramblePuzzleCodes) ScramblePuzzleCodes = false;
             _suspend = prevSuspend;
@@ -382,6 +387,7 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(ShowDc1VoiceCast));
             OnPropertyChanged(nameof(ShowDc2VoiceCast));
             OnPropertyChanged(nameof(CanShuffleBgm));
+            OnPropertyChanged(nameof(CanImportBgm));
             OnPropertyChanged(nameof(CanRandomizeBoxes));
             OnPropertyChanged(nameof(CanScramblePuzzleCodes));
             OnPropertyChanged(nameof(GameContentPlaceholder));
@@ -463,6 +469,10 @@ namespace DinoRand.App
         // --- Install options (bound) -------------------------------------------
 
         [ObservableProperty] private bool _shuffleBgm;
+
+        // External BGM import (DC1): overwrite Sound/BGM/ slots with tagged donor tracks from BgmPacksRoot.
+        [ObservableProperty] private bool _importBgm;
+        [ObservableProperty] private string _bgmPacksRoot = "";
 
         [ObservableProperty] private bool _scramblePuzzleCodes;
 
@@ -746,6 +756,8 @@ namespace DinoRand.App
                 IncludeCrossGameVoices = CrossGameVoices,
                 VoicePacksRoot = string.IsNullOrWhiteSpace(VoicePacksRoot) ? null : VoicePacksRoot.Trim(),
                 VoiceDonors = voiceDonors.Count > 0 ? voiceDonors : null,
+                RandomizeBgm = ImportBgm && CanImportBgm,
+                BgmPacksRoot = string.IsNullOrWhiteSpace(BgmPacksRoot) ? null : BgmPacksRoot.Trim(),
                 EnemyDifficulty = Difficulty / 31.0,
                 ReplaceItemPool = ReplaceItemPool,
                 RatioAmmo = (byte)Ammo,
@@ -761,6 +773,7 @@ namespace DinoRand.App
             };
             // Voice donor settings are shared across games (cross-game datapacks).
             _settings.VoicePacksRoot = config.VoicePacksRoot;
+            _settings.BgmPacksRoot = config.BgmPacksRoot;
             _settings.RandomizeCutsceneVoices = config.RandomizeVoices;
             _settings.IncludeCrossGameVoices = config.IncludeCrossGameVoices;
             _settings.VoiceDonors = voiceDonors.Count > 0 ? voiceDonors : null;
@@ -914,6 +927,16 @@ namespace DinoRand.App
         {
             PopulateVoiceDonors();
             UpdateSeedFromUi();
+        }
+
+        [RelayCommand]
+        private async Task BrowseBgmPacks()
+        {
+            var path = await _filePicker.PickFolderAsync(new FolderPickerRequest(
+                "Select the folder holding the BGM datapacks (each with data/bgm/<tag>/*.ogg|wav)",
+                SuggestedStartPath: Directory.Exists(BgmPacksRoot) ? BgmPacksRoot : null));
+            if (path is not null)
+                BgmPacksRoot = path;
         }
 
         private void PopulateVoiceDonors()
@@ -1395,6 +1418,23 @@ namespace DinoRand.App
                         {
                             try { tn += $" trex-killable:{Dc2TrexKillableInstaller.Apply(gamePath, restore: false)}"; }
                             catch (Exception tex) { tn += $" (killable-T-Rex exe patch skipped: {tex.Message})"; }
+                        }
+                        // Killable injected Triceratops: auto-applied whenever the run can inject an E70
+                        // (setpiece enemies / fixed-Triceratops pin), remapping its out-of-range death
+                        // animation index so it dies instead of crashing (RCA §7b).
+                        if (Dc2TriceratopsKillableInstaller.WantedFor(config))
+                        {
+                            try { tn += $" triceratops-killable:{Dc2TriceratopsKillableInstaller.Apply(gamePath, restore: false)}"; }
+                            catch (Exception cex) { tn += $" (killable-Triceratops exe patch skipped: {cex.Message})"; }
+                        }
+                        // Inostra spawn guard: a NULL-cursor guard on the shared PSX-recompiled emergence
+                        // emitter's tick driver. Auto-applied for ANY cross-species run — byte-identical
+                        // when the emitter is armed, so it only ever no-ops the un-armed crash path an
+                        // injected donor can trigger (docs/decisions/dc2/crash-rcas/DC2-INOSTRA-SPAWN-DESCRIPTOR-NULL-RCA.md).
+                        if (Dc2InostraSpawnGuardInstaller.WantedFor(config))
+                        {
+                            try { tn += $" inostra-spawn-guard:{Dc2InostraSpawnGuardInstaller.Apply(gamePath, restore: false)}"; }
+                            catch (Exception iex) { tn += $" (inostra-spawn-guard exe patch skipped: {iex.Message})"; }
                         }
                         // Shop shuffle: prices + stock-unlock masks inside Dino2.exe (shared .bak
                         // contract, so the Restore button's full-exe restore reverts it too).

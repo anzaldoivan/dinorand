@@ -32,10 +32,18 @@ public sealed class RandomizerRunner
         // into eligible rooms, declaring the EXE patches they need on the context (the installer applies them).
         // docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.
         new CrossSpeciesEnemyPass(),
+        // Gated off by default (Dc1CutsceneSafeEnemies): palette-tint fallback for choreography-census
+        // rooms the two enemy passes above refuse to touch. Must run AFTER every room-record-mutating
+        // pass — its room-output override freezes the serialized bytes.
+        new Dc1CutscenePalettePass(),
         // Phase 4, experimental + hard-gated off (VoiceManifestLayout.IsDecoded=false): cutscene
         // character-voice rando. Wired in but emits nothing until the DC1 voice addressing is decoded.
         // docs/decisions/dc1/voice/VOICE-RANDO-PLAN.md.
         new VoiceRandomizer(),
+        // External BGM import (off by default; no-op without a BgmPacksRoot). Overwrites Sound/BGM/ slots
+        // with transcoded same-tag donor tracks — a pure loose-file overlay, reversed by Restore.
+        // docs/decisions/cross/BGM-RANDO-PLAN.md.
+        new Bgm.BgmRandomizer(),
     };
 
     public RandomizerRunner(GameDefinition game) => _game = game;

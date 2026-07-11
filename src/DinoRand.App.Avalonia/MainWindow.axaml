@@ -388,6 +388,19 @@
                               IsEnabled="{Binding CanShuffleBgm}"
                               IsChecked="{Binding ShuffleBgm, Mode=TwoWay}"
                               ToolTip.Tip="Also patch DINO.exe so every track plays a different cue (within its stream/loop class), seeded from the same seed. Reversed by Restore. CLOSE the game first — it edits the executable, and the change is heard after the next launch." />
+                    <!-- External BGM import (DC1 only; DC2 music is in undecoded MS_ container payloads). -->
+                    <StackPanel Margin="0,0,0,6" IsVisible="{Binding CanImportBgm}">
+                        <CheckBox Content="Import external music (DC1)" Margin="0,0,0,2"
+                                  IsChecked="{Binding ImportBgm, Mode=TwoWay}"
+                                  ToolTip.Tip="Overwrite each Sound/BGM slot with a transcoded same-mood track drawn from your BGM datapacks. Installed with the seed and reversed by Restore. Composes with 'Shuffle music'." />
+                        <Grid ColumnDefinitions="*,Auto" Margin="20,0,0,0" IsEnabled="{Binding ImportBgm}">
+                            <TextBox Grid.Column="0" Margin="0,0,4,0" VerticalContentAlignment="Center"
+                                     Text="{Binding BgmPacksRoot, Mode=TwoWay}"
+                                     ToolTip.Tip="Folder of BGM datapacks laid out &lt;pack&gt;/data/bgm/&lt;tag&gt;/*.ogg|wav (tag = mood folder; 'all' = catch-all)." />
+                            <Button Grid.Column="1" Content="Browse..." Padding="10,2"
+                                    Command="{Binding BrowseBgmPacksCommand}" />
+                        </Grid>
+                    </StackPanel>
                     <CheckBox Content="Scramble puzzle codes (safes)" Margin="0,0,0,6"
                               IsEnabled="{Binding CanScramblePuzzleCodes}"
                               IsChecked="{Binding ScramblePuzzleCodes, Mode=TwoWay}"

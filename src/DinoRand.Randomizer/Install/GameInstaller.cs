@@ -53,10 +53,10 @@ public static class GameInstaller
 
     /// <summary>
     /// Mod-dir subtrees overlaid as loose files into the game <b>root</b> (the parent of <c>Data\</c>),
-    /// keyed in the manifest by their forward-slash relative path. Scoped to known voice paths so an
-    /// overlay can never clobber an arbitrary game file.
+    /// keyed in the manifest by their forward-slash relative path. Scoped to known audio paths (voice banks,
+    /// speech, BGM slots) so an overlay can never clobber an arbitrary game file.
     /// </summary>
-    private static readonly string[] LooseSubtrees = { "Sound/VOICE/", "Speech/" };
+    private static readonly string[] LooseSubtrees = { "Sound/VOICE/", "Sound/BGM/", "Speech/" };
 
     /// <summary>The game root (parent of <c>Data\</c>) — where the exe and <c>Sound\VOICE\</c> live.</summary>
     private static string GameRoot(string dataDir) => Path.GetDirectoryName(Path.GetFullPath(
@@ -302,6 +302,20 @@ public static class GameInstaller
     }
 
     /// <summary>
+    /// True when the live file already differs from its pristine backup — i.e. a previous single-file
+    /// edit is present. Because every such edit reads FROM the backup (see <see cref="BackupOnce"/>),
+    /// edits do <b>not</b> stack: the next edit silently replaces the prior one (the cont.57
+    /// false-handoff RCA — a <c>--copy-enemy-palette</c> after <c>--add-enemy-at</c> dropped the
+    /// enemy record). Callers use this to make that replacement explicit to the user.
+    /// </summary>
+    public static bool HasPriorEdit(string backupPath, string livePath)
+    {
+        if (!File.Exists(backupPath) || !File.Exists(livePath)) return false;
+        if (new FileInfo(backupPath).Length != new FileInfo(livePath).Length) return true;
+        return !File.ReadAllBytes(backupPath).AsSpan().SequenceEqual(File.ReadAllBytes(livePath));
+    }
+
+    /// <summary>
     /// Read-only bulk audit of every <c>.dinorand_backup</c> capture (rooms + <c>loose\</c> subtree,
     /// excluding the manifest) against the strongest available pristine oracle, to detect poisoned
     /// captures — backups taken from an already-modded file (the ST001 turret-crash recurrence,
@@ -470,7 +484,39 @@ public static class GameInstaller
             File.WriteAllText(Path.Combine(backupDir, ManifestName),
                 JsonSerializer.Serialize(manifest with { Applied = false }, JsonOpts));
 
-        return new RestoreResult(restored);
+        return new RestoreResult(restored, ReapplyDc1VertexLiftIfDdrawLifted(dataDir));
+    }
+
+    /// <summary>
+    /// The DC1 vertex-ceiling lift is a PAIRED patch ("apply both or neither"): the backup holds the
+    /// pre-lift <c>DINO.exe</c>, but the lifted <c>ddraw.dll</c> lives outside the backup contract, so
+    /// a plain restore used to leave the DLL writing into the missing <c>.dinovtx</c> section —
+    /// write-AV at 0x6FD000 on the next character render
+    /// (docs/decisions/dc1/crash-rcas/VTXLIFT-RESTORE-PAIRING-RCA.md). Re-lift the exe whenever the
+    /// installed ddraw.dll is lifted and the exe is not. Returns true when the lift was re-applied.
+    /// </summary>
+    private static bool ReapplyDc1VertexLiftIfDdrawLifted(string dataDir)
+    {
+        var exePath = ExePath(dataDir);
+        var dllPath = Path.Combine(GameRoot(dataDir), "ddraw.dll");
+        if (!File.Exists(exePath) || !File.Exists(dllPath))
+            return false;
+        if (!DdrawPatcher.IsRebirthVertexTablesExpanded(File.ReadAllBytes(dllPath)))
+            return false;
+        var exe = File.ReadAllBytes(exePath);
+        if (ExePatcher.IsDc1CharacterVertexTablesExpanded(exe))
+            return false;
+        byte[] lifted;
+        try
+        {
+            lifted = ExePatcher.ExpandDc1CharacterVertexTables(exe); // validates every byte first
+        }
+        catch (InvalidOperationException)
+        {
+            return false; // not the liftable stock build — restore it untouched rather than fail
+        }
+        File.WriteAllBytes(exePath, lifted);
+        return true;
     }
 
     /// <summary>Absolute path of <c>DINO.exe</c> for the install whose <c>Data\</c> is
@@ -1253,8 +1299,10 @@ public static class GameInstaller
 /// <summary>Outcome of an <see cref="GameInstaller.Install"/>.</summary>
 public sealed record InstallResult(int BackedUp, int Overlaid, string BackupDir);
 
-/// <summary>Outcome of a <see cref="GameInstaller.Restore"/>.</summary>
-public sealed record RestoreResult(int Restored);
+/// <summary>Outcome of a <see cref="GameInstaller.Restore"/>. <paramref name="Dc1VertexLiftReapplied"/>
+/// is true when the restored stock <c>DINO.exe</c> was re-lifted to match an installed vertex-lifted
+/// <c>ddraw.dll</c> (VTXLIFT-RESTORE-PAIRING-RCA).</summary>
+public sealed record RestoreResult(int Restored, bool Dc1VertexLiftReapplied = false);
 
 /// <summary>Per-file verdict of <see cref="GameInstaller.VerifyBackups"/>.</summary>
 public enum BackupVerifyStatus

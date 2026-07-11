@@ -19,6 +19,7 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
         Usage:
           dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]
                    [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--exotic-enemies]
+                   [--dc1-cutscene-safe]                                    (dc1)
                    [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps]
                    [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]
                    [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)
@@ -26,7 +27,7 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
                    [--dc2-regina-skin stock|gail|rick|random]              (dc2)
                    [--dc2-raptor-tiers] [--dc2-raptor-weight <0..7>=<0..15>]...
                    [--dc2-raptor-colour room|mixed] [--dc2-blue-combo <1..20>]   (dc2)
-                   [--dc2-trex-killable]                                        (dc2)
+                   [--dc2-trex-killable] [--dc2-inostra-spawn-guard]            (dc2)
                    [--difficulty <0..1>] [--ratio-ammo <0..31>] [--ratio-health <0..31>]
                    [--ammo-quantity <0..7>] [--weapon-upgrade-chance <0..1>]
                    [--pre-upgraded-weapon-chance <0..1>]
@@ -56,6 +57,8 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
           dinorand --dc2-swap-enemies <roomCode> --install <dc2GameDir> --species <name|0xNN> [--allow-unsafe] [--force]
           dinorand --dc2-swap-enemies <roomCode> --install <dc2GameDir> --restore
           dinorand --dc2-shuffle-bgm --install <dc2GameDir> [--seed <n>] [--restore]
+          dinorand --dc2-export-bgm --install <dc2GameDir> --out <dir>
+          dinorand --dc2-import-bgm --install <dc2GameDir> --bgm-packs <dir> --out <dir> [--seed <n>]
 
         Notes:
           - --dc2-edit-door retargets Dino Crisis 2's ST101 ST201-door to ST102. With --install it
@@ -67,6 +70,11 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             default) widen the cross-species donor pool: setpiece adds the no-damage Triceratops
             (0x09) + Giganotosaurus (0x06); boss adds the LAND boss Tyrannosaurus (0x03). Both keep
             their own scale/HP, so they make degenerate trash mobs — opt-in only. They compose.
+          - --dc1-cutscene-safe (dc1 enemy rando, off) cutscene-safe mode: rooms in the derived
+            choreography census (data/dc1/cutscene-rooms.json flagged tier — a script binds an
+            enemy slot and drives it through authored waypoints, STATIC-SCD-RE cont.49/59) are
+            excluded from the in-room permute and from --exotic-enemies imports, and get a seeded
+            palette tint instead (the cont.51/57 "Blue Raptor" lever). Off = byte-identical.
           - --dc2-allow-water-swaps (dc2 enemy rando, off; EXPERIMENTAL) "Allow Enemy swaps in the
             Water Levels": lifts the aquatic-room block (ST700/702/703/704 take land donors on their
             wave descriptors) AND admits aquatic donors, all wave-only (Mosasaurus at low weight; the
@@ -169,11 +177,12 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             "already dead" (no entity) — pass a high/unused id (e.g. 0x60) to rule it out.
           - --add-enemy-at <room>:<rdtOffset> is the same as --add-enemy but injects at a
             CALLER-CHOSEN RDT offset (hex, from the room's decoded script) instead of the
-            init script. Targeting an EVENT subroutine (one reached by an AOT zone / gosub)
-            makes the enemy spawn ACTIVE and hunt, where an init placement spawns it inert
-            (docs/decisions/dc1/spawn/ADD-ENEMY-EVENT-INJECTION-CRASH-RCA.md). The offset must be a clean,
-            4-aligned opcode boundary; the tool reports which sub it lands in and warns if
-            it's the inert init sub-0. The event sub must already load the species' resources.
+            init script. Activation is PER-CATEGORY (cont.49/57): a cat-2 enemy (raptorheavy)
+            self-activates and hunts from ANY reached offset — init sub-0 included; a cat-1
+            enemy (velociraptor) parks in passive state-1 unless a script activates it —
+            use --activate or an event-sub offset. The offset must be a clean, 4-aligned
+            opcode boundary; the tool reports which sub it lands in and the category's
+            activation behavior. The sub must already load the species' resources.
           - --add-enemy/--add-enemy-at authored record fields (all default 0 = the proven-neutral
             template, STATIC-SCD-RE cont.48/51): --hp <n> presets maxHP (record +6; only cat-2
             RaptorHeavy / cat-7 Pteranodon births KEEP it); --ai-param <n> sets the per-entity AI
@@ -215,6 +224,11 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             behaviour stays correct; the music still follows the scene, just plays a different
             cue. The catalog is read at game init, so CLOSE the game first and relaunch to hear
             it. Backs the exe up once to .dinorand_backup (so --restore reverses it too).
+          - --bgm-import --bgm-packs <dir> IMPORTS external music into DC1: each Sound/BGM/ slot is
+            overwritten with a transcoded same-mood donor track drawn from the datapacks under <dir>
+            (layout <pack>/data/bgm/<tag>/*.ogg|wav; tag = mood folder, 'all' = catch-all). Rides the
+            main --install run and installs with the seed (reversed by --restore). Distinct from
+            --shuffle-bgm (own-track exe shuffle) and composes with it. No-op without --bgm-packs.
           - --shuffle-boxes PATCHES DINO.exe (EXPERIMENTAL): shuffles emergency-box contents so
             every box holds a different (still valid, difficulty-appropriate) loadout, within
             each International difficulty block, deterministically from --seed. Records are moved
@@ -263,6 +277,15 @@ if (GetOpt("--dc2-swap-enemies") is { } swapEnemiesRoom)
 // --restore rewrites the slice to canonical order (leaves other exe patches intact).
 if (argv.Contains("--dc2-shuffle-bgm"))
     return ShuffleDc2Bgm(GetOpt("--install"), GetOpt("--seed"), argv.Contains("--restore"));
+
+// DC2 music EXPORT/IMPORT (docs/decisions/dc2/audio/DC2-BGM-IMPORT-FEASIBILITY.md): the container payload is
+// standard MP3, so --dc2-export-bgm unpacks every Data/M[SEF]_*.DAT track to a playable .mp3 under --out, and
+// --dc2-import-bgm rebuilds those containers from a BioRand-layout donor pack (.mp3 verbatim; .ogg/.wav via
+// ffmpeg) into --out for the user to copy back into Data\. Both are read-only on the install.
+if (argv.Contains("--dc2-export-bgm"))
+    return ExportDc2Bgm(GetOpt("--install"), GetOpt("--out"));
+if (argv.Contains("--dc2-import-bgm"))
+    return ImportDc2Bgm(GetOpt("--install"), GetOpt("--bgm-packs"), GetOpt("--out"), GetOpt("--seed"));
 
 // DC2 shop shuffle (docs/decisions/dc2/shop/DC2-SHOP-RANDO-PLAN.md I1+I2; I3 live witness PENDING): permute the
 // Dino2.exe shop economy — retail prices (master table 0x71DCB8) and stock-unlock bitmasks
@@ -469,6 +492,9 @@ if (argv.Contains("--restore"))
     Console.WriteLine(restore.Restored > 0
         ? $"restored {restore.Restored} original room files in {dataDir}"
         : $"nothing to restore (no DinoRand backup found in {dataDir})");
+    if (restore.Dc1VertexLiftReapplied)
+        Console.WriteLine("re-applied the DC1 vertex-ceiling lift to DINO.exe (ddraw.dll is lifted; "
+            + "a stock exe would crash at 0x6FD000 — VTXLIFT-RESTORE-PAIRING-RCA)");
     return 0;
 }
 
@@ -492,6 +518,10 @@ var config = new RandomizerConfig
     // DC2 EXPERIMENTAL (off): allow enemy swaps in the water levels — lifts the aquatic-room block and
     // admits aquatic (wave-only) donors (K72). Default off = byte-identical. docs/decisions/dc2/enemies/DC2-AQUATIC-LAND-UNLOCK-FEASIBILITY.md.
     Dc2AllowWaterLevelEnemySwaps = argv.Contains("--dc2-allow-water-swaps"),
+    // DC1 (off): cutscene-safe enemy rando — choreography-census rooms (data/dc1/cutscene-rooms.json
+    // flagged tier, STATIC-SCD-RE cont.49/59) refuse permutes/species imports and get the palette-tint
+    // fallback instead. Off = byte-identical. Not seed-encoded.
+    Dc1CutsceneSafeEnemies = argv.Contains("--dc1-cutscene-safe"),
     ShuffleKeyItems = argv.Contains("--shuffle-keys"),
     // Experimental: import foreign species (cat8 Theri + grounded RaptorHeavy) into eligible rooms and queue
     // the EXE patches they need. Off unless asked; with --install-to-data it patches DINO.exe (game must be
@@ -506,6 +536,11 @@ var config = new RandomizerConfig
     RandomizeVoices = argv.Contains("--voice"),
     IncludeCrossGameVoices = argv.Contains("--voice-cross-game"),
     VoicePacksRoot = GetOpt("--voice-packs"),
+    // External BGM import (docs/decisions/cross/BGM-RANDO-PLAN.md): --bgm-import overwrites Sound/BGM/ slots
+    // with transcoded same-tag donor tracks from --bgm-packs. Distinct from --shuffle-bgm (own-track exe
+    // shuffle); the two compose. A no-op without --bgm-packs.
+    RandomizeBgm = argv.Contains("--bgm-import"),
+    BgmPacksRoot = GetOpt("--bgm-packs"),
 };
 if (GetOpt("--difficulty") is { } d && double.TryParse(d, out var diff))
     config.EnemyDifficulty = Math.Clamp(diff, 0, 1);
@@ -636,6 +671,18 @@ string? GetOpt(string name)
 }
 
 // Parse a hex (0x..) or decimal integer token; null if malformed.
+// cont.57 false-handoff RCA: every single-file edit rebuilds the file FROM the pristine backup, so
+// edits do NOT stack — a second edit silently replaced the first. Make the replacement explicit.
+static string BackupOnceWarned(string dataDir, string originalPath)
+{
+    var backupPath = GameInstaller.BackupOnce(dataDir, originalPath);
+    if (GameInstaller.HasPriorEdit(backupPath, originalPath))
+        Console.WriteLine($"warning : {Path.GetFileName(originalPath)} already differs from its pristine "
+            + "backup — single-file edits rebuild FROM the backup and do NOT stack, so this edit "
+            + "REPLACES the previous edit(s) on this file (one witness = one deploy).");
+    return backupPath;
+}
+
 static int? ParseItemInt(string t) =>
     t.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
         ? (int.TryParse(t.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out var h) ? h : null)
@@ -718,7 +765,7 @@ static int EditDc2Door(string? installDir, string? inPath, string? outDir, bool 
 
         // Back the pristine original up once (shared GameInstaller contract) and ALWAYS edit FROM that
         // pristine copy, so re-running is non-compounding and --restore reverses it.
-        var backupPath = GameInstaller.BackupOnce(dataDir, targetPath);
+        var backupPath = BackupOnceWarned(dataDir, targetPath);
         if (!TryEdit(File.ReadAllBytes(backupPath), st201DoorOffset, out var before, out var after, out var edited))
             return 1;
         File.WriteAllBytes(targetPath, edited);
@@ -935,6 +982,16 @@ int RunDc2(string installDir)
     // Dino2.exe so a randomized T-Rex dies normally, EXCEPT in the two vanilla boss rooms (ST200/ST903).
     dc2Config.Dc2MakeTrexKillable = argv.Contains("--dc2-trex-killable");
 
+    // Killable injected Triceratops (RCA §7b): --dc2-triceratops-killable remaps E70's out-of-range
+    // death animation index (8 -> 7) in Dino2.exe so an injected Triceratops dies with a real
+    // animation instead of crashing.
+    dc2Config.Dc2MakeTriceratopsKillable = argv.Contains("--dc2-triceratops-killable");
+
+    // Inostra spawn-descriptor NULL guard: --dc2-inostra-spawn-guard forces on the Dino2.exe emitter
+    // NULL-cursor guard so an injected Inostrancevia (E50, a DEFAULT donor) doesn't crash the
+    // emergence emitter. Auto-applied below whenever a run can inject E50.
+    dc2Config.Dc2MakeInostraSpawnSafe = argv.Contains("--dc2-inostra-spawn-guard");
+
     bool dc2EmitSpoiler = !argv.Contains("--no-spoiler");
     var dc2Result = new Dc2RandomizerRunner(dc2Game).Run(installDir, dc2Out, dc2Seed, dc2Config,
                                                          dc2EmitSpoiler);
@@ -976,6 +1033,41 @@ int RunDc2(string installDir)
         catch (IOException)
         {
             Console.Error.WriteLine("killable-T-Rex exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+        }
+    }
+
+    // Killable injected Triceratops exe lever (single-byte death-anim remap) — same in-place,
+    // .bak-protected contract. Auto-applied whenever the run can inject a Triceratops (setpiece
+    // enemies / fixed-Triceratops pin), or forced on by --dc2-triceratops-killable. Harmless no-op
+    // when no Triceratops is actually placed (RCA §7b).
+    if (Dc2TriceratopsKillableInstaller.WantedFor(dc2Config))
+    {
+        try
+        {
+            var outcome = Dc2TriceratopsKillableInstaller.Apply(installDir, restore: false, Console.WriteLine);
+            Console.WriteLine($"killable-Triceratops exe patch: {outcome}");
+        }
+        catch (IOException)
+        {
+            Console.Error.WriteLine("killable-Triceratops exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+        }
+    }
+
+    // Inostra spawn-descriptor NULL guard exe lever (hook + code cave) — same in-place, .bak-protected
+    // contract. The guard patches a SHARED emitter tick driver (0x4131d0, ~10 actor-class vtables) and is
+    // byte-identical when the emitter is armed, so it auto-applies for ANY cross-species run (any injected
+    // donor can drive the emitter into its un-armed NULL-cursor crash), or forced on by
+    // --dc2-inostra-spawn-guard. Harmless no-op otherwise (fires only on the un-armed tick).
+    if (Dc2InostraSpawnGuardInstaller.WantedFor(dc2Config))
+    {
+        try
+        {
+            var outcome = Dc2InostraSpawnGuardInstaller.Apply(installDir, restore: false, Console.WriteLine);
+            Console.WriteLine($"inostra-spawn-guard exe patch: {outcome}");
+        }
+        catch (IOException)
+        {
+            Console.Error.WriteLine("inostra-spawn-guard exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
         }
     }
 
@@ -1128,6 +1220,41 @@ static int SwapDc2Enemies(string? installDir, string roomCode, string? species, 
     Console.WriteLine($"undo    : dinorand --dc2-swap-enemies {code} --install \"{installDir}\" --restore");
     Console.WriteLine($"verify  : launch the game, enter ST{code}, and confirm the {donor.Creature} spawns "
         + "(no crash = land/flyer; visual species ID; a crash on entry = aquatic/unloadable).");
+
+    // A Triceratops (E70) is a setpiece model whose standard death path requests an out-of-range
+    // animation clip → crash on kill (RCA §7b). Apply the killability lever so the injected donor dies
+    // with a real animation instead of crashing. In-place, .bak-protected; reverse via
+    //   dinorand --dc2-swap-enemies <room> --install <dir> --restore   (rooms) and Dino2.exe.bak (exe).
+    if (donor.Type == 0x09)
+    {
+        try
+        {
+            var outcome = Dc2TriceratopsKillableInstaller.Apply(installDir, restore: false, Console.WriteLine);
+            Console.WriteLine($"killable-Triceratops exe patch: {outcome}");
+        }
+        catch (IOException)
+        {
+            Console.Error.WriteLine("killable-Triceratops exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+        }
+    }
+
+    // An Inostrancevia (E50) can be driven into the PSX-recompiled emergence/burst emitter, which
+    // dereferences its spawn-descriptor cursor with no NULL check → crash in a room that armed no
+    // descriptor list for it (witnessed live in ST902; RCA). Apply the emitter NULL-guard so it spawns
+    // nothing instead of crashing. In-place, .bak-protected; reverse via
+    //   dinorand --dc2-swap-enemies <room> --install <dir> --restore   (rooms) and Dino2.exe.bak (exe).
+    if (donor.Type == 0x0e)
+    {
+        try
+        {
+            var outcome = Dc2InostraSpawnGuardInstaller.Apply(installDir, restore: false, Console.WriteLine);
+            Console.WriteLine($"inostra-spawn-guard exe patch: {outcome}");
+        }
+        catch (IOException)
+        {
+            Console.Error.WriteLine("inostra-spawn-guard exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+        }
+    }
     return 0;
 }
 
@@ -1157,6 +1284,36 @@ static int ShuffleDc2Bgm(string? installDir, string? seedArg, bool restore)
         default:
             return 1;
     }
+}
+
+// DC2 music export: unpack every container's tracks to .mp3 under --out (default bgm-export/dc2/_all).
+static int ExportDc2Bgm(string? installDir, string? outDir)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-export-bgm requires --install <dc2GameDir>.");
+        return 1;
+    }
+    outDir ??= Path.Combine("bgm-export", "dc2", "_all");
+    int n = Dc2BgmExportInstaller.Export(installDir, outDir, Console.WriteLine);
+    if (n == 0) { Console.Error.WriteLine("no music exported (no DC2 Data dir or no M[SEF]_*.DAT)."); return 1; }
+    Console.WriteLine("next    : play/sort the .mp3s, drop favourites into <pack>/data/bgm/<tag>/, then --dc2-import-bgm.");
+    return 0;
+}
+
+// DC2 music import: rebuild containers from a donor pack into --out (the user copies them into Data\).
+static int ImportDc2Bgm(string? installDir, string? packsRoot, string? outDir, string? seedArg)
+{
+    if (installDir is null || packsRoot is null || outDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-import-bgm requires --install <dc2GameDir> --bgm-packs <dir> --out <dir>.");
+        return 1;
+    }
+    var seed = seedArg is { } s ? Seed.Parse(s) : Seed.Random();
+    int n = Dc2BgmImportInstaller.Import(installDir, packsRoot, outDir, seed.Value, Console.WriteLine);
+    if (n == 0) { Console.Error.WriteLine("no containers written (no DC2 Data dir, empty pack, or ffmpeg missing for non-mp3 donors)."); return 1; }
+    Console.WriteLine($"seed    : {seed}");
+    return 0;
 }
 
 // DC2 shop shuffle (docs/decisions/dc2/shop/DC2-SHOP-RANDO-PLAN.md I1+I2; I3 live witness PENDING): permute the
@@ -1320,7 +1477,7 @@ static int SwapTherizinosaurus(string installDir, string dataDir, int code, int 
     }
 
     // Back up pristine + read the target from the pristine copy (re-runnable / non-compounding).
-    var backupPath = GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
 
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
     var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
@@ -1540,7 +1697,7 @@ static int SwapTyrannosaurus(string installDir, string dataDir, int code, int st
     }
 
     // Back up pristine + read the target from the pristine copy (re-runnable / non-compounding).
-    var backupPath = GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
 
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
     var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
@@ -1683,7 +1840,7 @@ static int SwapSwarm(string installDir, string dataDir, int code, int stage, int
     }
 
     // Back up pristine + read the target from the pristine copy (re-runnable / non-compounding).
-    var backupPath = GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
 
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
     var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
@@ -1933,7 +2090,7 @@ static int SwapSpecies(string installDir, string roomArg, string speciesName, in
 
     // Back up the pristine original (once) to the shared backup folder. Always edit FROM the pristine
     // copy so re-running with a different species starts clean (no compounding imports).
-    var backupPath = GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
 
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
     var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
@@ -2037,7 +2194,7 @@ static int AddEnemy(string installDir, string roomArg, string speciesName, strin
     }
 
     // Edit from the pristine backup (re-runnable / non-compounding).
-    var backupPath = GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
 
     // Spawn position: --at x,y,z[,rot], else harvest from an existing enemy in the room.
@@ -2171,9 +2328,21 @@ static int AddEnemy(string installDir, string roomArg, string speciesName, strin
                 + "(e.g. tools/scd_re/spawn_catalog.py). Injecting there would split an instruction.");
             return 1;
         }
+        // Per-category activation truth (cont.49, live-witnessed cont.57 row 1 — the old blanket
+        // "init sub-0 => INERT" warning is retired): cat-2 behavior-0 self-drives; cat-1 state-1
+        // is passive until a script (or --activate's emitted 0x22/0x3a pair) installs a behavior.
         if (targetSub == 0)
-            Console.WriteLine($"warning : 0x{io0:x} is in the INIT sub-0 — an enemy injected here spawns "
-                + "INERT (never hunts). Use an offset inside an event subroutine for an active enemy.");
+            Console.WriteLine(donor.Category switch
+            {
+                2 => $"note    : 0x{io0:x} is in the INIT sub-0 — a category-2 enemy ({species}) "
+                     + "SELF-ACTIVATES and hunts from any reached offset (behavior-0 default, cont.57).",
+                1 => $"warning : 0x{io0:x} is in the INIT sub-0 — a category-1 enemy ({species}) PARKS "
+                     + "in passive state-1 until a script installs its behavior (cont.49). Pass "
+                     + "--activate (emits the op-0x22/0x3a pair) or use an event-sub offset.",
+                _ => $"warning : 0x{io0:x} is in the INIT sub-0 — category-{donor.Category} init "
+                     + "activation is UNVERIFIED (only cat-2 self-activation and cat-1 parking are "
+                     + "decoded, cont.49/57); prefer an event-sub offset or --activate.",
+            });
     }
 
     // --slot: explicit large-entity slot. The auto-pick only dedupes against parsed 0x20/0x59 records
@@ -2220,7 +2389,14 @@ static int AddEnemy(string installDir, string roomArg, string speciesName, strin
                 : ""));
     if (injectOffset is int io3)
         Console.WriteLine("        injected at RDT 0x" + $"{io3:x} in "
-            + (targetSub == 0 ? "init sub-0 (inert)" : $"event sub{targetSub} (activation path)")
+            + (targetSub == 0
+                ? donor.Category switch
+                {
+                    2 => "init sub-0 (cat-2: self-activates)",
+                    1 => "init sub-0 (cat-1: parks unless --activate)",
+                    _ => $"init sub-0 (cat-{donor.Category}: activation unverified)",
+                }
+                : $"event sub{targetSub} (activation path)")
             + " — confirm the sub loads this species' resources before it runs.");
     Console.WriteLine($"wrote   : {targetRef.Path}");
     Console.WriteLine($"backup  : {backupPath}");
@@ -2297,7 +2473,7 @@ static int SetDoor(string installDir, string spec)
     }
 
     // Edit from the pristine backup (re-runnable / non-compounding).
-    var backupPath = GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
 
     var doors = target.Doors
@@ -2381,7 +2557,7 @@ static int SetItem(string installDir, string spec)
     }
 
     // Edit from the pristine backup (re-runnable / non-compounding).
-    var backupPath = GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
 
     // Match the pickup by its placement quad's first corner (X@+0x04, Z@+0x06).
@@ -2458,7 +2634,7 @@ static int SetEnemyHp(string installDir, string spec)
 
     // Read from the pristine backup so a patch is re-runnable (non-compounding) and --restore reverts it;
     // a dry inspect reads the live file (no backup created).
-    var backupPath = hp is null ? targetRef.Path : GameInstaller.BackupOnce(dataDir, targetRef.Path);
+    var backupPath = hp is null ? targetRef.Path : BackupOnceWarned(dataDir, targetRef.Path);
     var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
 
     var eligible = target.Enemies
@@ -2546,7 +2722,7 @@ static int CopyEnemyPalette(string installDir, string spec, string speciesName)
     // The species' CLUT code, read from the model the rooms actually render: prefer dst's own record
     // (that is the raptor being tinted), fall back to src's. Same CLUT across rooms per cont.51.
     var srcRoom = RoomFile.ReadFromFile(srcCode >> 8, srcCode & 0xff, srcRef.Path);
-    var backupPath = GameInstaller.BackupOnce(dataDir, dstRef.Path);
+    var backupPath = BackupOnceWarned(dataDir, dstRef.Path);
     var dstBytes = File.ReadAllBytes(backupPath);
     var dstRoom = RoomFile.Read(dstCode >> 8, dstCode & 0xff, dstBytes);
     var rec = dstRoom.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == species)

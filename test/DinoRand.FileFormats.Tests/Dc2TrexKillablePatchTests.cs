@@ -78,7 +78,7 @@ public class Dc2TrexKillablePatchTests
 
     /// <summary>A synthetic buffer that looks exactly like the pristine rebirth Dino2.exe to the
     /// recognizer: correct length, original hook bytes at their offset, cave region zeroed.</summary>
-    private static byte[] NewPristine()
+    internal static byte[] NewPristine()
     {
         var exe = new byte[Dc2WpGatePatch.ExpectedLength];
         HookOriginal.CopyTo(exe.AsSpan(Dc2TrexKillablePatch.HookOffset));

@@ -52,6 +52,13 @@ public sealed class EnemyRandomizer : IRandomizationPass
         var rng = context.Seed.RngFor(Name);
         var scripted = context.Game.ScriptedEnemyRoomCodes;
         var cutscene = context.Game.CutsceneRoomCodes;
+        // Opt-in third tier (default OFF so existing seeds stay byte-identical): the derived
+        // choreography census — a script binds these rooms' enemy slots and drives them through
+        // scripted waypoint behaviors (cont.49/59), which a (model, motion) permute can desync.
+        // Dc1CutscenePalettePass gives these rooms visual variety instead.
+        var choreography = context.Config.Dc1CutsceneSafeEnemies
+            ? context.Game.ChoreographyRoomCodes
+            : (IReadOnlySet<int>)new HashSet<int>();
 
         // Spoiler section (docs/decisions/cross/SPOILER-LOG-PLAN.md §4). DC1 permutes same-species (model, motion)
         // variants within a room, so the meaningful diff is per-room counts, not species names.
@@ -65,6 +72,7 @@ public sealed class EnemyRandomizer : IRandomizationPass
             // Scripted T-Rex set-pieces and choreographed cutscenes are both off-limits: the former
             // are hand-placed, the latter bind a dinosaur's (model, motion) to a scripted animation.
             if (scripted.Contains(code) || cutscene.Contains(code)) continue;
+            if (choreography.Contains(code)) continue;
 
             bool any = false;
             int roomEdits = 0, roomVariants = 0;

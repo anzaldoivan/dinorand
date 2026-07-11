@@ -39,9 +39,11 @@ public class ScriptCfgInsertSafetyTests
     public void IsControlOpcode_CoversTerminatorsBranchesAndTheLoopReturn()
     {
         // 0x04 is a counter-gated loop/return (handler 0x4a3296), not a plain terminator — the 0102 bug.
-        foreach (byte op in new byte[] { 0x04, 0x0a, 0x0c, 0x0e, 0x10, 0x11 })
+        // 0x05 is the GOTO-SUB tail-call (handler 0x4A32F7, cont.50): displacing it rewires the sub,
+        // so it joined the control set (cont.52 — the pre-cont.50 model treated it as plain).
+        foreach (byte op in new byte[] { 0x04, 0x05, 0x0a, 0x0c, 0x0e, 0x10, 0x11 })
             Assert.True(ScriptCfg.IsControlOpcode(op), $"0x{op:x2} should be a control opcode");
-        foreach (byte op in new byte[] { 0x20, 0x59, 0x22, 0x05, 0x58, 0x26, 0x23 })
+        foreach (byte op in new byte[] { 0x20, 0x59, 0x22, 0x58, 0x26, 0x23, 0x01, 0x0f })
             Assert.False(ScriptCfg.IsControlOpcode(op), $"0x{op:x2} should NOT be a control opcode");
     }
 }

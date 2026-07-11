@@ -122,6 +122,76 @@ public static class WavAudio
         return BuildRiff(data, channels: 1, sampleRate: a.SampleRate, bits: 8);
     }
 
+    /// <summary>
+    /// Parse a RIFF/WAVE PCM buffer <b>preserving channels</b> — interleaved float samples plus the
+    /// channel count and sample rate. Unlike <see cref="ReadPcm"/> (which downmixes to mono for the voice
+    /// codec), this keeps stereo intact for BGM. Throws on a non-PCM / malformed buffer.
+    /// </summary>
+    public static (float[] Interleaved, int Channels, int SampleRate) ReadPcmInterleaved(byte[] wav)
+    {
+        if (wav.Length < 44 ||
+            wav[0] != (byte)'R' || wav[1] != (byte)'I' || wav[2] != (byte)'F' || wav[3] != (byte)'F' ||
+            wav[8] != (byte)'W' || wav[9] != (byte)'A' || wav[10] != (byte)'V' || wav[11] != (byte)'E')
+            throw new InvalidDataException("Not a RIFF/WAVE buffer.");
+
+        int channels = 0, sampleRate = 0, bits = 0, format = 0;
+        int dataOffset = -1, dataLen = 0;
+
+        int pos = 12;
+        while (pos + 8 <= wav.Length)
+        {
+            string id = System.Text.Encoding.ASCII.GetString(wav, pos, 4);
+            int size = BitConverter.ToInt32(wav, pos + 4);
+            int body = pos + 8;
+            if (id == "fmt ")
+            {
+                format = BitConverter.ToUInt16(wav, body + 0);
+                channels = BitConverter.ToUInt16(wav, body + 2);
+                sampleRate = BitConverter.ToInt32(wav, body + 4);
+                bits = BitConverter.ToUInt16(wav, body + 14);
+            }
+            else if (id == "data")
+            {
+                dataOffset = body;
+                dataLen = Math.Min(size, wav.Length - body);
+            }
+            pos = body + size + (size & 1);
+        }
+
+        if (format != 1) throw new InvalidDataException($"Unsupported WAVE format tag {format} (PCM only).");
+        if (channels < 1 || sampleRate < 1 || dataOffset < 0)
+            throw new InvalidDataException("Malformed WAVE: missing fmt/data.");
+
+        int bytesPerSample = bits / 8;
+        int total = dataLen / bytesPerSample;
+        var samples = new float[total];
+        for (int i = 0; i < total; i++)
+        {
+            int s = dataOffset + i * bytesPerSample;
+            samples[i] = bits switch
+            {
+                8 => (wav[s] - 128) / 128f,
+                16 => BitConverter.ToInt16(wav, s) / 32768f,
+                _ => throw new InvalidDataException($"Unsupported bit depth {bits}."),
+            };
+        }
+        return (samples, channels, sampleRate);
+    }
+
+    /// <summary>Write interleaved 16-bit signed PCM at <paramref name="channels"/>/<paramref name="sampleRate"/>
+    /// (the BGM on-disk form). <paramref name="interleaved"/> length must be a multiple of the channel count.</summary>
+    public static byte[] WritePcm16(float[] interleaved, int channels, int sampleRate)
+    {
+        var data = new byte[interleaved.Length * 2];
+        for (int i = 0; i < interleaved.Length; i++)
+        {
+            short v = (short)Math.Clamp((int)MathF.Round(interleaved[i] * 32767f), short.MinValue, short.MaxValue);
+            data[i * 2] = (byte)(v & 0xff);
+            data[i * 2 + 1] = (byte)((v >> 8) & 0xff);
+        }
+        return BuildRiff(data, channels, sampleRate, bits: 16);
+    }
+
     /// <summary>Assemble a canonical 44-byte-header RIFF/WAVE PCM file around <paramref name="data"/>.</summary>
     private static byte[] BuildRiff(byte[] data, int channels, int sampleRate, int bits)
     {

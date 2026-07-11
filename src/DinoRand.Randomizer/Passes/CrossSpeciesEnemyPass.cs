@@ -34,6 +34,12 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
         var rng = context.Seed.RngFor(Name);
         var scripted = context.Game.ScriptedEnemyRoomCodes;
         var cutscene = context.Game.CutsceneRoomCodes;
+        // Opt-in third tier (Dc1CutsceneSafeEnemies, default OFF — existing seeds byte-identical):
+        // choreography-census rooms refuse foreign-species imports; the scripted behavior walks the
+        // native actor through authored waypoints and fires its completion flag (cont.49/59/58).
+        var choreography = context.Config.Dc1CutsceneSafeEnemies
+            ? context.Game.ChoreographyRoomCodes
+            : (IReadOnlySet<int>)new HashSet<int>();
         double chance = 0.25 + 0.5 * Math.Clamp(context.Config.EnemyDifficulty, 0, 1);
 
         var corpus = context.AllRooms().ToList();
@@ -53,7 +59,8 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
         {
             int code = room.Stage * 0x100 + room.Room;
             byCode[code] = room;
-            bool eligible = room.Enemies.Count > 0 && !scripted.Contains(code) && !cutscene.Contains(code);
+            bool eligible = room.Enemies.Count > 0 && !scripted.Contains(code) && !cutscene.Contains(code)
+                            && !choreography.Contains(code);
             bool hasVictim = eligible && room.Enemies.Any(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
             var present = room.Enemies.Select(e => e.Species).ToHashSet();
             candidates.Add(new RoomCandidate(room.Stage, room.Room, hasVictim, present));

@@ -101,4 +101,95 @@ public class Dc2SpawnEditorTests
         Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.ReadOperand(blob, -1));
     }
 
+    // ---- synthetic package (always runs — no game files needed) ---------------------------------
+
+    private static byte[] SyntheticPackage() => SyntheticRoom.Dc2Room(0); // 300-byte SCD blob
+
+    [Fact]
+    public void WriteOperand_Synthetic_RoundTripsThroughRepack()
+    {
+        var package = SyntheticPackage();
+        var edited = Dc2SpawnEditor.WriteOperand(package, 100, -12345);
+
+        Assert.Equal(-12345, Dc2SpawnEditor.ReadOperandFromPackage(edited, 100));
+        // only the 2 operand bytes changed
+        var before = Dc2DoorEditor.DecompressScdBlob(package);
+        var after = Dc2DoorEditor.DecompressScdBlob(edited);
+        Assert.Equal(before.Length, after.Length);
+        for (int i = 0; i < before.Length; i++)
+            if (i != 100 && i != 101)
+                Assert.Equal(before[i], after[i]);
+    }
+
+    [Fact]
+    public void WriteByte_Synthetic_ChangesExactlyOneByte()
+    {
+        var package = SyntheticPackage();
+        var edited = Dc2SpawnEditor.WriteByte(package, 55, 0xEE);
+
+        Assert.Equal(0xEE, Dc2SpawnEditor.ReadByteFromPackage(edited, 55));
+        var before = Dc2DoorEditor.DecompressScdBlob(package);
+        var after = Dc2DoorEditor.DecompressScdBlob(edited);
+        for (int i = 0; i < before.Length; i++)
+            if (i != 55)
+                Assert.Equal(before[i], after[i]);
+    }
+
+    [Fact]
+    public void OperandBounds_AreExact()
+    {
+        var package = SyntheticPackage();
+        int len = Dc2DoorEditor.DecompressScdBlob(package).Length; // 300
+
+        // word: off+2 <= len is the boundary
+        Assert.Equal(Dc2SpawnEditor.ReadOperandFromPackage(package, len - 2),
+                     Dc2SpawnEditor.ReadOperandFromPackage(package, len - 2)); // len-2 legal
+        _ = Dc2SpawnEditor.WriteOperand(package, len - 2, 7);
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.WriteOperand(package, len - 1, 7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.WriteOperand(package, -1, 7));
+
+        // byte: off < len is the boundary
+        _ = Dc2SpawnEditor.WriteByte(package, len - 1, 1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.WriteByte(package, len, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.ReadByteFromPackage(package, len));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.ReadByteFromPackage(package, -1));
+    }
+
+    [Fact]
+    public void ApplyEdits_BatchesWordsAndBytes_InOneRepack()
+    {
+        var package = SyntheticPackage();
+        var edited = Dc2SpawnEditor.ApplyEdits(package,
+            wordEdits: new[] { (10, (short)1234), (20, (short)-1) },
+            byteEdits: new[] { (30, (byte)0x7F) });
+
+        Assert.Equal(1234, Dc2SpawnEditor.ReadOperandFromPackage(edited, 10));
+        Assert.Equal(-1, Dc2SpawnEditor.ReadOperandFromPackage(edited, 20));
+        Assert.Equal(0x7F, Dc2SpawnEditor.ReadByteFromPackage(edited, 30));
+    }
+
+    [Fact]
+    public void ApplyEdits_RejectsAnyOutOfRangeEdit()
+    {
+        var package = SyntheticPackage();
+        int len = Dc2DoorEditor.DecompressScdBlob(package).Length;
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.ApplyEdits(package,
+            new[] { (len - 1, (short)0) }, Array.Empty<(int, byte)>()));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Dc2SpawnEditor.ApplyEdits(package,
+            Array.Empty<(int, short)>(), new[] { (len, (byte)0) }));
+    }
+
+    [Fact]
+    public void Editors_RejectNonGianAndBlobLessPackages()
+    {
+        // Dc2ScdBlob's two refusal branches, via the public editor surface:
+        // not a Gian package at all…
+        Assert.Throws<InvalidDataException>(() => Dc2SpawnEditor.WriteOperand(new byte[64], 0, 1));
+        // …and a Gian package with no LZSS0 SCD blob entry (a DC1-shaped room).
+        var noBlob = SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(), Array.Empty<SyntheticRoom.Enemy>());
+        Assert.Throws<InvalidDataException>(() => Dc2SpawnEditor.WriteOperand(noBlob, 0, 1));
+        Assert.Throws<InvalidDataException>(() => Dc2DoorEditor.DecompressScdBlob(noBlob));
+    }
 }

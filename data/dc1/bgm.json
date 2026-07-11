@@ -1,0 +1,10 @@
+{
+  "_comment": "DC1 BGM mood-tag manifest: tag -> [Sound/BGM/<stem>.dat slot stems]. Any slot not listed falls back to the 'all' pool at import time; donor tracks live in <pack>/data/bgm/<tag>/*.{ogg,wav} with an 'all' fallback. v1 ships NO mood curation (arrays empty) — DC track->mood is not yet decoded; fill these as a data-only refinement. See docs/decisions/cross/BGM-RANDO-PLAN.md.",
+  "safe": [],
+  "calm": [],
+  "creepy": [],
+  "danger": [],
+  "boss": [],
+  "countdown": [],
+  "results": []
+}

@@ -160,7 +160,7 @@ public class Dc2RaptorTierTests
     // --- exe patch ----------------------------------------------------------
 
     /// <summary>A synthetic pristine-build buffer carrying both patch sites.</summary>
-    private static byte[] FakeExe()
+    internal static byte[] FakeExe()
     {
         var exe = new byte[Dc2WpGatePatch.ExpectedLength];
         new byte[] { 0x66, 0x83, 0xB8, 0x24, 0x0C, 0x00, 0x00, 0x13, 0x76 }

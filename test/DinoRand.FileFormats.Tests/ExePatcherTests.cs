@@ -1214,7 +1214,7 @@ public class ExePatcherTests
 
     /// <summary>Synthetic stock image: only the fields the expansion validates/patches, at their
     /// verified offsets (docs/dc1/VERTEX-CEILING-LIFT-PLAN.md).</summary>
-    private static byte[] NewStockImageForVertexTables()
+    internal static byte[] NewStockImageForVertexTables()
     {
         var exe = new byte[ExePatcher.Dc1StockExeLength];
         exe[0] = (byte)'M'; exe[1] = (byte)'Z';

@@ -10,7 +10,7 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class Dc2ShopTablePatchTests
 {
-    private static byte[] MakeExe()
+    internal static byte[] MakeExe()
     {
         var exe = new byte[Dc2WpGatePatch.ExpectedLength];
         // every shop-slice id gets the not-for-sale sentinel, then the for-sale ids get retail

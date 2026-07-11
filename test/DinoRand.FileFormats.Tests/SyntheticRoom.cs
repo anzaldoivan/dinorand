@@ -167,7 +167,7 @@ internal static class SyntheticRoom
     /// <summary>Emit a Gian package: 2048-byte entry table (stride <paramref name="entrySize"/>) then each
     /// payload sector-aligned to 2048, tiling the file exactly. Entry fields beyond type+size stay zero — for
     /// DC2 that keeps the offset-16..31 probe all-zero so the 32-byte layout is detected.</summary>
-    private static byte[] Package(int entrySize, params (GianEntryType type, byte[] payload)[] entries)
+    internal static byte[] Package(int entrySize, params (GianEntryType type, byte[] payload)[] entries)
     {
         static int Align(int v) => (v + GianPackage.SectorSize - 1) & ~(GianPackage.SectorSize - 1);
 

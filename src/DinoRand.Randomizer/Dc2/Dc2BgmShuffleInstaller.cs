@@ -75,14 +75,18 @@ public static class Dc2BgmShuffleInstaller
             return Dc2BgmShuffleOutcome.Restored;
         }
 
-        // Like-class grouping from the install's own containers; unparseable/missing files get no
-        // class and therefore never move.
+        // Like-class grouping from the install's own containers, composited with the BGM mood tag
+        // (docs/decisions/cross/BGM-RANDO-PLAN.md): the class key is "<tag>|<trackIndexKey>", so a slot only
+        // swaps with another of the SAME mood AND the same track-index set. With the v1 all-'all' manifest the
+        // tag prefix is constant, so this is byte-equivalent to the prior track-index-only grouping until mood
+        // tags are authored (data-only refinement). Unparseable/missing files get no class and never move.
+        var manifest = Bgm.BgmManifest.LoadDefault("dc2");
         var classOf = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (string name in Dc2MusicTablePatch.CanonicalNames)
         {
             string path = Path.Combine(dataDir, name);
             if (File.Exists(path) && Dc2MusicContainer.ReadTrackIndexKey(path) is { } key)
-                classOf[name] = key;
+                classOf[name] = $"{manifest.TagOf(name)}|{key}";
         }
 
         // Capture the pristine original exactly once (same contract as the skin/wpgate installer).

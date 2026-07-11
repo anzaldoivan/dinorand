@@ -230,4 +230,176 @@ public static class Dc2MusicContainer
         if (idxs.Count == 0 || total != f.Length) return null;
         return string.Join(",", idxs.Order());
     }
+
+    // ── Full read/write (payload framing) ────────────────────────────────────────────────────────
+    // The whole-container model for DC2 export/import. Framing (byte-validated, docs/decisions/dc2/audio/
+    // DC2-BGM-IMPORT-FEASIBILITY.md): the 0x800 header sector is 64 x 32-byte slots — N real records
+    // {u32 4, payloadBytes, trackIndex, flag, 16x0}, the rest each "dummy header    " + 16x0 — then the N
+    // payloads, each 2048-aligned (zero tail-pad). Each payload is a standard MPEG-1 L3 (MP3) stream: the
+    // "[OPEN] codec" was Classic REbirth's re-encode to MP3, so there is nothing proprietary to decode.
+
+    private const int HeaderSectorSize = 0x800;
+    private const int RecordSize = 32;
+    private const int PayloadAlign = 2048;
+    private const int MaxTracks = HeaderSectorSize / RecordSize; // 64 slots
+    private static readonly byte[] DummySlotMagic = Encoding.ASCII.GetBytes("dummy header    "); // 16 bytes
+
+    /// <summary>Read a whole container into its ordered tracks (each = its header record fields + the raw
+    /// MP3 payload). Inverse of <see cref="WriteTracks"/>. Throws on a container that is not the decoded
+    /// framing.</summary>
+    public static IReadOnlyList<Dc2MusicTrack> ReadTracks(byte[] container)
+    {
+        ArgumentNullException.ThrowIfNull(container);
+        if (container.Length < HeaderSectorSize)
+            throw new InvalidOperationException("DC2 music container shorter than its 0x800 header sector.");
+
+        var recs = new List<(uint Size, int TrackIndex, uint Flag)>();
+        for (int off = 0; off + RecordSize <= HeaderSectorSize; off += RecordSize)
+        {
+            uint magic = BinaryPrimitives.ReadUInt32LittleEndian(container.AsSpan(off));
+            if (magic != 4) break; // reached the "dummy header" filler slots
+            uint size = BinaryPrimitives.ReadUInt32LittleEndian(container.AsSpan(off + 4));
+            uint tidx = BinaryPrimitives.ReadUInt32LittleEndian(container.AsSpan(off + 8));
+            uint flag = BinaryPrimitives.ReadUInt32LittleEndian(container.AsSpan(off + 12));
+            recs.Add((size, (int)tidx, flag));
+        }
+        if (recs.Count == 0)
+            throw new InvalidOperationException("DC2 music container has no track records (magic 4).");
+
+        var tracks = new Dc2MusicTrack[recs.Count];
+        int payloadOff = HeaderSectorSize;
+        for (int i = 0; i < recs.Count; i++)
+        {
+            var (size, tidx, flag) = recs[i];
+            if (payloadOff + size > container.Length)
+                throw new InvalidOperationException($"DC2 music container track {i} payload runs past end of file.");
+            tracks[i] = new Dc2MusicTrack(tidx, flag, container.AsSpan(payloadOff, (int)size).ToArray());
+            payloadOff += Align(size);
+        }
+        return tracks;
+    }
+
+    /// <summary>Reassemble a container (0x800 header sector + 2048-aligned payloads) from
+    /// <paramref name="tracks"/>. Round-trips byte-identically for tracks read unmodified.</summary>
+    public static byte[] WriteTracks(IReadOnlyList<Dc2MusicTrack> tracks)
+    {
+        ArgumentNullException.ThrowIfNull(tracks);
+        if (tracks.Count == 0 || tracks.Count > MaxTracks)
+            throw new InvalidOperationException($"DC2 music container needs 1..{MaxTracks} tracks (got {tracks.Count}).");
+
+        long total = HeaderSectorSize;
+        foreach (var t in tracks) total += Align((uint)t.Payload.Length);
+        var outBuf = new byte[total];
+
+        int payloadOff = HeaderSectorSize;
+        for (int i = 0; i < tracks.Count; i++)
+        {
+            var t = tracks[i];
+            int rec = i * RecordSize;
+            BinaryPrimitives.WriteUInt32LittleEndian(outBuf.AsSpan(rec), 4);
+            BinaryPrimitives.WriteUInt32LittleEndian(outBuf.AsSpan(rec + 4), (uint)t.Payload.Length);
+            BinaryPrimitives.WriteUInt32LittleEndian(outBuf.AsSpan(rec + 8), (uint)t.TrackIndex);
+            BinaryPrimitives.WriteUInt32LittleEndian(outBuf.AsSpan(rec + 12), t.Flag);
+            // pad[16] stays zero
+            t.Payload.CopyTo(outBuf.AsSpan(payloadOff));
+            payloadOff += Align((uint)t.Payload.Length);
+        }
+        // Fill the remaining header slots with the "dummy header    " + 16x0 filler the game writes.
+        for (int off = tracks.Count * RecordSize; off + RecordSize <= HeaderSectorSize; off += RecordSize)
+            DummySlotMagic.CopyTo(outBuf.AsSpan(off));
+        return outBuf;
+    }
+
+    private static int Align(uint n) => (int)((n + (PayloadAlign - 1)) & ~(uint)(PayloadAlign - 1));
+}
+
+/// <summary>One track inside a DC2 music container: its bank slot index, the per-track flag (0/1, a
+/// loop/stream marker — preserved for a byte-faithful rewrite), and the raw MP3 payload bytes.</summary>
+public readonly record struct Dc2MusicTrack(int TrackIndex, uint Flag, byte[] Payload);
+
+/// <summary>
+/// The DC2 music-payload audio codec. Classic REbirth re-encoded the PSX streams to <b>standard MPEG-1
+/// Layer III (MP3)</b> — 141/141 corpus payloads are clean CBR MP3 (docs/decisions/dc2/audio/
+/// DC2-BGM-IMPORT-FEASIBILITY.md), so a payload IS a playable <c>.mp3</c>; there is no proprietary codec.
+/// Decode/encode to PCM (for transcoding foreign ogg/wav donors on import) shells out to <c>ffmpeg</c>
+/// on PATH — no new managed dependency (mirrors <see cref="Dc2MusicContainer"/> staying format-only).
+/// </summary>
+public static class Dc2MusicCodec
+{
+    /// <summary>Sample rate / channel count the game's MP3 streams use — import conforms to these.</summary>
+    public const int GameSampleRate = 44100;
+    public const int GameChannels = 2;
+
+    /// <summary>True if <c>ffmpeg</c> is invokable on PATH (import/PCM-transcode requires it; raw MP3
+    /// export and passthrough import do not). Callers skip the ffmpeg path when false.</summary>
+    public static bool FfmpegAvailable => _ffmpegAvailable ??= ProbeFfmpeg();
+    private static bool? _ffmpegAvailable;
+
+    /// <summary>Decode an MP3 payload to interleaved 16-bit-range float PCM at the game format
+    /// (<see cref="GameChannels"/> ch, <see cref="GameSampleRate"/> Hz). Requires ffmpeg.</summary>
+    public static (float[] Interleaved, int Channels, int SampleRate) DecodePayload(byte[] payload)
+    {
+        ArgumentNullException.ThrowIfNull(payload);
+        byte[] pcm = RunFfmpeg(
+            $"-hide_banner -loglevel error -i pipe:0 -f f32le -acodec pcm_f32le -ac {GameChannels} -ar {GameSampleRate} pipe:1",
+            payload);
+        var samples = new float[pcm.Length / 4];
+        Buffer.BlockCopy(pcm, 0, samples, 0, samples.Length * 4);
+        return (samples, GameChannels, GameSampleRate);
+    }
+
+    /// <summary>Encode interleaved float PCM into an MP3 container payload (inverse of
+    /// <see cref="DecodePayload"/>, lossy) at the game format. Requires ffmpeg.</summary>
+    public static byte[] EncodePayload(float[] interleaved, int channels, int sampleRate)
+    {
+        ArgumentNullException.ThrowIfNull(interleaved);
+        var pcm = new byte[interleaved.Length * 4];
+        Buffer.BlockCopy(interleaved, 0, pcm, 0, pcm.Length);
+        return RunFfmpeg(
+            $"-hide_banner -loglevel error -f f32le -ac {channels} -ar {sampleRate} -i pipe:0 " +
+            $"-f mp3 -codec:a libmp3lame -b:a 128k -ar {GameSampleRate} -ac {GameChannels} pipe:1",
+            pcm);
+    }
+
+    private static bool ProbeFfmpeg()
+    {
+        try
+        {
+            using var p = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                "ffmpeg", "-hide_banner -version") { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false });
+            if (p is null) return false;
+            p.WaitForExit(5000);
+            return true;
+        }
+        catch { return false; }
+    }
+
+    // Feed `stdin` to ffmpeg and return its stdout. Writes stdin on a background task to avoid the
+    // classic pipe deadlock when both streams exceed a pipe buffer.
+    private static byte[] RunFfmpeg(string args, byte[] stdin)
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo("ffmpeg", args)
+        {
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+        using var p = System.Diagnostics.Process.Start(psi)
+            ?? throw new InvalidOperationException("ffmpeg not found on PATH — required for DC2 music transcode.");
+
+        var feeder = Task.Run(() =>
+        {
+            using var s = p.StandardInput.BaseStream;
+            s.Write(stdin, 0, stdin.Length);
+        });
+        using var outMs = new MemoryStream();
+        p.StandardOutput.BaseStream.CopyTo(outMs);
+        string err = p.StandardError.ReadToEnd();
+        feeder.Wait();
+        p.WaitForExit();
+        if (p.ExitCode != 0)
+            throw new InvalidOperationException($"ffmpeg failed (exit {p.ExitCode}): {err}");
+        return outMs.ToArray();
+    }
 }

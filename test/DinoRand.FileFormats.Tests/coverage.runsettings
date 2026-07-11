@@ -5,7 +5,11 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <ExcludeByFile>**/*.g.cs,**/*.designer.cs</ExcludeByFile>
+          <!-- UI plumbing (views/App/Program/controls), Avalonia-generated XAML types, and the vendored
+               LZMA decoder are excluded so the tracked number reflects randomizer/format logic.
+               MainWindowViewModel stays IN: its command/validation logic is real decision code. -->
+          <ExcludeByFile>**/*.g.cs,**/*.designer.cs,**/DinoRand.App.Avalonia/App.axaml.cs,**/DinoRand.App.Avalonia/MainWindow.axaml.cs,**/DinoRand.App.Avalonia/Program.cs,**/DinoRand.App.Avalonia/Controls/*.cs,**/DinoRand.App.Avalonia/Templates/*.cs,**/SevenZip/Lzma.cs</ExcludeByFile>
+          <Exclude>[*]CompiledAvaloniaXaml.*</Exclude>
         </Configuration>
       </DataCollector>
     </DataCollectors>

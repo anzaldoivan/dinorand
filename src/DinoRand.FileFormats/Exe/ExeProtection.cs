@@ -92,7 +92,10 @@ public static class ExeProtection
         if (exe.Length < 0x40 || exe[0] != (byte)'M' || exe[1] != (byte)'Z')
             return false;
         int eLfanew = BinaryPrimitives.ReadInt32LittleEndian(exe.Slice(0x3C));
-        if (eLfanew <= 0 || eLfanew + 0x18 > exe.Length)
+        // Subtract-form bound: `eLfanew + 0x2C` overflows int for a corrupt e_lfanew near
+        // int.MaxValue and would index past the span. 0x2C covers the deepest fixed-header read
+        // below (entry-point RVA at PE+0x28..0x2C), so a truncated header is also rejected here.
+        if (eLfanew <= 0 || eLfanew > exe.Length - 0x2C)
             return false;
         if (exe[eLfanew] != (byte)'P' || exe[eLfanew + 1] != (byte)'E' || exe[eLfanew + 2] != 0 || exe[eLfanew + 3] != 0)
             return false;

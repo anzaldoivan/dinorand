@@ -74,8 +74,9 @@ public sealed class DinoCrisis1 : GameDefinition
     // of these whose ordinary enemies (two distinct raptor models) would otherwise be eligible
     // for the in-room permute, so excluding it by code matters; the rest are belt-and-braces
     // (their enemies are singletons per AI category). See docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.11.
-    public override IReadOnlySet<int> ScriptedEnemyRoomCodes { get; } =
-        new HashSet<int> { 0x200, 0x202, 0x600, 0x610 };
+    // The list itself lives in data/dc1/cutscene-rooms.json (scripted_enemy tier) so no room list
+    // is hardcoded here; Dc1RoomExclusionsTests locks the values.
+    public override IReadOnlySet<int> ScriptedEnemyRoomCodes => Dc1RoomExclusions.ScriptedEnemy;
 
     // --- Item-metadata layer (mirrors data/dc1/items.json; locked by ItemTableTests). docs/decisions/cross/ITEM-RANDO-PLAN.md.
     // Weapons 0x01-0x0a, parts 0x0b-0x0f (categories in items.json). Regina starts with the Handgun.
@@ -182,11 +183,11 @@ public sealed class DinoCrisis1 : GameDefinition
         new EmergencyBox(0x0612, 1, "Hovercraft"),
     };
 
-    // Scripted CUTSCENE rooms — their 0x20 entities are dinosaurs (NOT NPCs; the NPC characters are
-    // not 0x20 entities — see docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.15), but each scene choreographs those
-    // dinosaurs by slot, so permuting their (model, motion) — even within one species — can desync the
-    // animation the scene plays. Each room is a documented scripted scene with ≥2 distinct same-
-    // category pairs (so it would otherwise be permuted):
+    // Scripted CUTSCENE rooms — each scene choreographs its dinosaur entities by slot, so permuting
+    // their (model, motion) — even within one species — can desync the animation the scene plays.
+    // (Live NPC characters ARE also 0x20 entities — cont.41, refuting cont.15 — but they are handled
+    // by EnemyRecord.IsNpcSceneActor, not this list.) Each room is a documented scripted scene with
+    // ≥2 distinct same-category pairs (so it would otherwise be permuted):
     //   0x010d Backyard of the Facility   — opening "Gail intro" scene (placements.md), Cooper/raptor.
     //   0x0112 The Backyard               — the paired backyard scene room (forum room list).
     //   0x0109 Lecture Room               — the Gail-scripted raptor kill (placements.md).
@@ -194,8 +195,15 @@ public sealed class DinoCrisis1 : GameDefinition
     //   0x030e Hall B1 (beta)             — the "Gail catches Kirk" cutscene room (forum).
     // The lone humanoid 0x20 entity in the game (the st50c "Researcher" corpse) is a singleton, so the
     // pass's ≥2-records rule already leaves it untouched; it needs no entry here.
-    public override IReadOnlySet<int> CutsceneRoomCodes { get; } =
-        new HashSet<int> { 0x010d, 0x0112, 0x0109, 0x030a, 0x030e };
+    // The list itself lives in data/dc1/cutscene-rooms.json (cutscene tier); the derived census
+    // (flagged tier, cont.49/59) independently reproduces all five rooms.
+    public override IReadOnlySet<int> CutsceneRoomCodes => Dc1RoomExclusions.Cutscene;
+
+    // Derived choreography census (cutscene-rooms.json flagged tier): rooms where a script sub
+    // op-0x22-binds an enemy-record slot and op-0x3a/0x5a-installs a scripted behavior on it
+    // (STATIC-SCD-RE cont.49/59; policy cont.58 — e.g. 010E's intro raptor ambush). Consulted by
+    // the enemy passes only when RandomizerConfig.Dc1CutsceneSafeEnemies is on.
+    public override IReadOnlySet<int> ChoreographyRoomCodes => Dc1RoomExclusions.Choreography;
 
     // Grenade Launcher set-piece rooms — kept entirely vanilla by the item pass. In each, the Grenade
     // Gun (0x09) sits clustered with its Grenade rounds (0x18) at one pickup quad as a progression-

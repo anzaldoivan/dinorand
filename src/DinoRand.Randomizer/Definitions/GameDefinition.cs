@@ -86,6 +86,17 @@ public abstract class GameDefinition
     public virtual IReadOnlySet<int> CutsceneRoomCodes => new HashSet<int>();
 
     /// <summary>
+    /// Rooms where a room script <b>choreographs</b> an enemy record (binds its slot and installs a
+    /// scripted behavior — waypoint walk + completion flag; STATIC-SCD-RE cont.49/59), keyed by room
+    /// code (<c>Stage*0x100 + Room</c>). A superset-style third tier beside
+    /// <see cref="ScriptedEnemyRoomCodes"/>/<see cref="CutsceneRoomCodes"/>, derived by census rather
+    /// than hand-curated, and consulted by the enemy passes only when
+    /// <see cref="RandomizerConfig.Dc1CutsceneSafeEnemies"/> is enabled (default seeds stay
+    /// byte-identical). Default empty.
+    /// </summary>
+    public virtual IReadOnlySet<int> ChoreographyRoomCodes => new HashSet<int>();
+
+    /// <summary>
     /// Rooms whose item pickups must stay <b>vanilla</b> (never rerolled or pool-placed), keyed by room
     /// code (<c>Stage*0x100 + Room</c>). For set-piece spots whose specific item is progression-critical
     /// — e.g. the Grenade Launcher finale caches — so <see cref="Passes.ItemRandomizer"/> skips the whole
