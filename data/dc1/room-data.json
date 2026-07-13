@@ -299,7 +299,7 @@
       ]
     },
     "0:132": {
-      "label": "the Large Elevator Control Room velociraptor encounter (A)",
+      "label": "the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62)",
       "event_room": "0406",
       "set_by": [
         {
@@ -343,7 +343,7 @@
       ]
     },
     "0:137": {
-      "label": "the Researcher Rest Room velociraptor encounter",
+      "label": "the Researcher Rest Room velociraptor encounter (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62)",
       "event_room": "0505",
       "set_by": [
         {
@@ -479,7 +479,7 @@
       ]
     },
     "0:200": {
-      "label": "the Experiment Simulation Room event (armed in 0300)",
+      "label": "the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62)",
       "event_room": "0300",
       "set_by": [
         {
@@ -6554,11 +6554,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Experiment Simulation Room event (armed in 0300) has happened",
+              "condition": "only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened",
               "condition_flag": "0:200",
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Experiment Simulation Room event (armed in 0300) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x25934 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 200) @0x2592c -> 0x0e skip-if-true @0x25930; flag 0:200 set_by [0300/sub16=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -6607,11 +6607,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Experiment Simulation Room event (armed in 0300) has happened",
+              "condition": "only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened",
               "condition_flag": "0:200",
               "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Experiment Simulation Room event (armed in 0300) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x25974 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 200) @0x2592c -> 0x0e skip-if-true @0x25930; flag 0:200 set_by [0300/sub16=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -11585,11 +11585,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Large Elevator Control Room velociraptor encounter (A) has happened",
+              "condition": "only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened",
               "condition_flag": "0:132",
               "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (A) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x376fc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 132) @0x376ec -> 0x0e skip-if-true @0x376f0; flag 0:132 set_by [0406/sub12=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -11638,11 +11638,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Large Elevator Control Room velociraptor encounter (A) has happened",
+              "condition": "only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened",
               "condition_flag": "0:132",
               "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (A) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x37714 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 132) @0x376ec -> 0x0e skip-if-true @0x376f0; flag 0:132 set_by [0406/sub12=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -15108,11 +15108,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Researcher Rest Room velociraptor encounter has happened",
+              "condition": "only until the Researcher Rest Room velociraptor encounter (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62) has happened",
               "condition_flag": "0:137",
               "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Researcher Rest Room velociraptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Researcher Rest Room velociraptor encounter (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x47f30 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 137) @0x47f28 -> 0x0e skip-if-true @0x47f2c; flag 0:137 set_by [0505/sub0=0, 0505/sub17=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"

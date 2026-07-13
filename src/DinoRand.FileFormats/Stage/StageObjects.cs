@@ -147,6 +147,13 @@ public sealed class DoorRecord
     /// <summary>The destination as a <c>SSRR</c> code (<c>stage&lt;&lt;8 | room</c>).</summary>
     public int TargetCode => ((TargetStage & 0xff) << 8) | (TargetRoom & 0xff);
 
+    /// <summary>The <i>vanilla</i> destination as a <c>SSRR</c> code — the physical doorway's stable
+    /// identity, unchanged by door-rando's <c>Repoint</c> (which mutates only <see cref="TargetStage"/>/
+    /// <see cref="TargetRoom"/>). Used to bind an intra-room laser-fence region gate to the doorway
+    /// itself, so the gate travels with the door under a shuffle instead of floating to whatever edge
+    /// now points at the vanilla destination (docs/decisions/dc1/doors/REGION-SCHEMA-PLAN.md).</summary>
+    public int OriginalTargetCode => ((OriginalTargetStage & 0xff) << 8) | (OriginalTargetRoom & 0xff);
+
     /// <summary>True when this door reads a group-9 story latch that a partner door must set first
     /// (<see cref="StoryLatchReaderType"/>): passable only after some same-<see cref="LockId"/>
     /// <see cref="StoryLatchSetterType"/> door has been traversed.</summary>

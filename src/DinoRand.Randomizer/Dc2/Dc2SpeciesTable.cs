@@ -123,6 +123,21 @@ public static class Dc2SpeciesTable
     /// half of the non-land skip the water flag never lifts (land replacement spawns outside the hitbox).</summary>
     public static bool IsFlyerNativeType(int type) => ForType(type)?.Habitat is Dc2Habitat.Flyer;
 
+    /// <summary>The Plesiosaurus GRUNT native types (0x0b=E31 / 0x0c=E32). Their native rooms
+    /// (ST001/600/601/604) have invisible colliders that let a swapped donor attack the player THROUGH
+    /// walls (playtest 2026-07-12), so — exactly like <see cref="IsFlyerNativeType"/> — they are unfit
+    /// swap targets whatever the water flag says. Split out from the swap-SAFE Mosasaurus (0x0a) wave
+    /// rooms (ST700/702/703/704), which the water flag legitimately opens. The Plesiosaurus BOSS (0x05)
+    /// is generic-delivered (TYPE-0x10), never a native wave/spawn type, so it never reaches here.</summary>
+    public static bool IsPlesiosaurusGruntNativeType(int type) => type is 0x0b or 0x0c;
+
+    /// <summary>Native types whose room the wave planner leaves vanilla UNCONDITIONALLY — the water flag
+    /// never lifts it: <see cref="IsFlyerNativeType"/> (donor spawns outside the hitbox) and
+    /// <see cref="IsPlesiosaurusGruntNativeType"/> (donor attacks through the room's invisible colliders).
+    /// The remaining water natives (Mosasaurus 0x0a) stay flag-gated via <see cref="IsWaterNativeType"/>.</summary>
+    public static bool IsUnconditionalSkipNativeType(int type) =>
+        IsFlyerNativeType(type) || IsPlesiosaurusGruntNativeType(type);
+
     /// <summary>True iff <paramref name="donor"/> is an aquatic/non-land species — crash-safe as a land
     /// spawn ONLY on the op-0x4f wave / op-0x23 preload path (K72), never an op-0x1a record (K62b).</summary>
     public static bool IsWaterDonor(Dc2Species donor) => IsWaterHabitat(donor.Habitat);

@@ -25,9 +25,13 @@ are upstream research or content tables. `RoomDataConsistencyTests` locks them t
 
 - `map.json` — see the ownership table above and its own `_derivation` block.
 - `room-data.json` — see the ownership table above.
-- `map-requirements.md` — provenance ledger for the hand-authored progression gates in `map.json`
-  (`requires` / `requiresRoom`). Each authored gate records the CE finding / wiki route it came
-  from, so the logic is auditable rather than folklore. Populated as gates are authored.
+- `map-requirements.md` — provenance ledger for the progression gates in `map.json`
+  (`requires` / `requiresRoom`), **GENERATED** by `tools/scd_re/extract_logic.py --apply` (lock
+  axis: type-1/3 doors + the op58-subtype-3 DDK disc-pair gates, STATIC-SCD-RE cont.61 §C); do
+  not hand-edit. Each gate records the decode it came from, so the logic is auditable.
+- `placement-gates.md` — provenance ledger for the **placement-axis** gates (type-0 doors whose
+  record is script-flag-gated, e.g. `010D→010A`, STATIC-SCD-RE cont.61 §A), audited by
+  `tools/scd_re/door_catalog.py --audit`.
 - `items.json` — full item table (116 entries) with categories, the key-item set
   (ids `0x2B–0x6F`), and the non-key shuffle pool (ammo + health) with weights.
 - `enemies.json` — enemy ids grouped by placement class (indoor/outdoor/boss/scripted).

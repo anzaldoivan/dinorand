@@ -139,6 +139,31 @@ def build_dc2_doc():
         lines += _table(["Type", "Meaning"], sorted(ft.items(), key=lambda kv: int(kv[0])))
         lines += [""]
 
+    placements = _load(DATA2, "item-placements.json")["rooms"]
+    room_name = {r["id"]: r.get("name") or r.get("zone") or r["id"] for r in rooms}
+    lines += ["## Vanilla pickup locations", "",
+              "One row per op-0x31 field pickup (the ONE DC2 item path — SAT-1 touch trigger "
+              "in the room's slot-5 script; `data/dc2/item-placements.json` is canonical). "
+              "X,Z = the trigger quad's first corner (signed; rec+4/rec+6). `Type` is the "
+              "op-0x31 id byte = the VM-thread slot, empirically 1:1 with the nominal item "
+              "class (K77) — it is NOT the granted catalog id: the grant is produced at "
+              "runtime by `routine[param]` + native code and is difficulty-remapped for "
+              "health items (K98/K99; e.g. a type-1 \"Med Pak S\" pickup granted catalog "
+              "0x1c Med Pak M on Normal). Types 3/4/6/8/9 have no witnessed name yet. "
+              "Shop stock, emergency boxes and cutscene awards are separate systems, not "
+              "rows here.", ""]
+    prows = []
+    for st, its in sorted(placements.items()):
+        code = st[2:]
+        for it in sorted(its, key=lambda i: i["slot"]):
+            pos = it.get("pos") or ["?", "?"]
+            prows.append((code, room_name.get(code, code), it["id"],
+                          it.get("name") or ft.get(str(it["id"]), "—").split(" (")[0],
+                          f"{pos[0]},{pos[1]}", it["slot"], it["param"]))
+    lines += _table(["Room", "Room name", "Type", "Nominal item", "X,Z", "Slot", "Routine"],
+                    prows)
+    lines += [""]
+
     lines += ["## Enemy roster", ""]
     lines += _table(["Creature", "Size", "Role", "Model files", "Provenance"],
                     [(r["name"], r.get("size", "—"), r.get("role", "—"),

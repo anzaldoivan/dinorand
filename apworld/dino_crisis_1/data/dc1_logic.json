@@ -104,9 +104,79 @@
   },
   "edges": [
     {
+      "from": "0102",
+      "to": "0101",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0202",
+        "0107"
+      ]
+    },
+    {
+      "from": "0102",
+      "to": "0104",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0202",
+        "0107"
+      ]
+    },
+    {
+      "from": "0102",
+      "to": "0107",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106"
+      ]
+    },
+    {
+      "from": "0105",
+      "to": "0307",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "0107",
+      "to": "0113",
+      "requiresItems": [
+        99,
+        106
+      ],
+      "requiresRooms": []
+    },
+    {
       "from": "0108",
       "to": "0113",
       "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "0107",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0202"
+      ]
+    },
+    {
+      "from": "010d",
+      "to": "010a",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0114"
+      ]
+    },
+    {
+      "from": "010d",
+      "to": "030b",
+      "requiresItems": [
+        47
+      ],
       "requiresRooms": []
     },
     {
@@ -118,12 +188,47 @@
       "requiresRooms": []
     },
     {
+      "from": "0112",
+      "to": "0404",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106"
+      ]
+    },
+    {
+      "from": "0203",
+      "to": "0202",
+      "requiresItems": [
+        98,
+        105
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresItems": [
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
       "from": "0306",
       "to": "0304",
       "requiresItems": [],
       "requiresRooms": [
         "030c"
       ]
+    },
+    {
+      "from": "0309",
+      "to": "0306",
+      "requiresItems": [
+        100,
+        107
+      ],
+      "requiresRooms": []
     },
     {
       "from": "0400",
@@ -138,6 +243,24 @@
       "to": "060d",
       "requiresItems": [
         58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0506",
+      "to": "0507",
+      "requiresItems": [
+        103,
+        110
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0507",
+      "to": "0508",
+      "requiresItems": [
+        104,
+        111
       ],
       "requiresRooms": []
     },
@@ -178,6 +301,15 @@
       "to": "0615",
       "requiresItems": [
         58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0609",
+      "requiresItems": [
+        102,
+        109
       ],
       "requiresRooms": []
     },
@@ -2924,9 +3056,24 @@
       111
     ],
     "progressionItemIds": [
+      47,
       48,
       49,
-      58
+      58,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111
     ],
     "pool": [
       {

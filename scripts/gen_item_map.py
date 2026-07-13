@@ -104,6 +104,68 @@ def room_pins(records):
     return pins
 
 
+# --- Scatter-target classification (docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md) --------
+# A LEGAL key-item scatter target: a genuinely-static ammo/health slot a shuffled door key can safely
+# land in. STRICTER than the Fixed pin (which relaxes timing-only flags) and than gen_ap_logic's
+# `source` tag (which reads only trigger.kind, calling the 060F aot_zone+branch_only Poison Dart
+# "static"). Fails closed on any non-unconditional gate, so a key is never seated behind a missable
+# predicate.
+_AMMO_LO, _AMMO_HI = 0x10, 0x1A
+_HEALTH_LO, _HEALTH_HI = 0x1B, 0x23
+_STATIC_TRIGGER_KINDS = {"init", "init_gosub", "aot_zone"}
+
+
+def _is_consumable(iid):
+    if iid == "0xff":
+        return False
+    v = int(iid, 16)
+    return _AMMO_LO <= v <= _AMMO_HI or _HEALTH_LO <= v <= _HEALTH_HI
+
+
+def is_scatter_target(rec, twin_ids):
+    """True iff this record is a legal key-item scatter target: an ammo/health pickup that is static
+    (placed at load / by an always-present enter-zone), appears UNCONDITIONALLY (no test_branch or
+    branch_only gate), and is not a relocation twin."""
+    iid = rec.get("item_id")
+    if not _is_consumable(iid) or iid in twin_ids:
+        return False
+    if (rec.get("trigger") or {}).get("kind") not in _STATIC_TRIGGER_KINDS:
+        return False
+    return (rec.get("gate") or {}).get("type") == "unconditional"
+
+
+def room_scatter(records):
+    """Compute the `scatterTargets` entries for one room: `[ { "at": "X,Z", "_why": "..." } ]`, one per
+    legal scatter target, sorted by position for a stable diff. A position occupied by MORE THAN ONE
+    record (e.g. 0103's An. Aid co-located with the Entrance Key at -2576,3008) is dropped: the overlay
+    is position-keyed, so it cannot address one of a co-located pair unambiguously, and scattering a key
+    there would collide two field pickups at one coordinate."""
+    counts = {}
+    pos_counts = {}
+    for r in records:
+        iid = r.get("item_id")
+        if iid != "0xff":
+            counts[iid] = counts.get(iid, 0) + 1
+        pos = r.get("pos")
+        if pos and len(pos) == 2:
+            pos_counts[(int(pos[0]), int(pos[1]))] = pos_counts.get((int(pos[0]), int(pos[1])), 0) + 1
+    twin_ids = {iid for iid, n in counts.items() if n > 1}
+
+    out = {}
+    for r in records:
+        if not is_scatter_target(r, twin_ids):
+            continue
+        pos = r.get("pos")
+        if not pos or len(pos) != 2:
+            continue
+        key = (int(pos[0]), int(pos[1]))
+        if pos_counts.get(key, 0) > 1:
+            continue  # co-located with another record — ambiguous, not a scatter target
+        out[key] = r.get("item_name") or r.get("item_id")
+    return [{"at": f"{x},{z}", "_why": f"static ammo/health scatter target — {name}"}
+            for (x, z), name in sorted(out.items())]
+
+
 def room_links(records):
     """Compute the `itemLinks` entries for one room: the hex ids (no `0x`) that occur in more than one
     record (relocation twins). Every record of a linked id shares one assignment downstream, so a
@@ -152,30 +214,72 @@ def compute_links(doc):
     return out
 
 
+def compute_scatter(doc):
+    """room_id -> scatterTargets list, for every item_control room with >=1 legal scatter target."""
+    out = {}
+    for rid, room in doc["rooms"].items():
+        ic = room.get("item_control")
+        if not ic:
+            continue
+        st = room_scatter(ic.get("records", []))
+        if st:
+            out[rid] = st
+    return out
+
+
+# A gen-computed itemPriorities entry leads its `_why` with a hazard-reason token (see hazard_reasons);
+# a hand-authored pin uses free-form prose the generator never produces. This lets regenerate_map keep
+# hand-authored pins instead of clobbering them, and integrity_violations skip them in the SPURIOUS check.
+_GEN_PIN_REASONS = ("flag-gated", "relocation-twin", "runtime-armed", "unresolved-trigger")
+
+
+def _is_computed_pin(entry):
+    return str(entry.get("_why", "")).startswith(_GEN_PIN_REASONS)
+
+
 def regenerate_map(roomdoc, mapdoc):
-    """Return a NEW map doc with itemPriorities + itemLinks set on every in-scope item_control room.
-    Pure function. Rooms with item_control but not in map.json are reported, not invented."""
+    """Return a NEW map doc with itemPriorities + itemLinks + scatterTargets set on every in-scope
+    item_control room. Pure function. Rooms with item_control but not in map.json are reported, not
+    invented."""
     pins = compute(roomdoc)
     links = compute_links(roomdoc)
+    scatter = compute_scatter(roomdoc)
     out = json.loads(json.dumps(mapdoc))  # deep copy
     rooms = out["rooms"]
+    # map.json keys rooms in UPPERCASE hex (010C, 030C, …). Resolve the room-data id case-INSENSITIVELY
+    # so hex-letter rooms get their computed pins/links too — matching a room-data id straight against a
+    # lowercased key silently skipped every A–F room (cont.68; was a latent quirk, now fixed).
+    ci = {k.lower(): k for k in rooms}
     missing = []
-    # set/refresh pins+links for in-scope rooms; clear our keys on item_control rooms with none
-    item_rooms = {rid.lower() for rid, r in roomdoc["rooms"].items() if r.get("item_control")}
-    for rid in sorted(item_rooms):
-        mkey = rid.lower()
-        if mkey not in rooms:
-            if rid in pins or rid in links:
+    for rid, room in roomdoc["rooms"].items():
+        if not room.get("item_control"):
+            continue
+        mkey = ci.get(rid.lower())
+        if mkey is None:
+            if rid in pins or rid in links or rid in scatter:
                 missing.append(rid)
             continue
-        if rid in pins:
-            rooms[mkey]["itemPriorities"] = pins[rid]
+        # Merge computed pins with any HAND-AUTHORED pin already in the room (a human `_why` the
+        # generator never emits — e.g. 010C's BG Area Key softlock-safety pin). Computed pins own
+        # their positions; a hand-authored pin at an un-computed position is preserved. All-digit
+        # rooms carry no hand-authored pins, so this stays byte-identical there.
+        computed = pins.get(rid, [])
+        computed_at = {e["at"] for e in computed}
+        handauth = [e for e in rooms[mkey].get("itemPriorities", [])
+                    if not _is_computed_pin(e) and e.get("at") not in computed_at]
+        merged = handauth + computed
+        if merged:
+            rooms[mkey]["itemPriorities"] = merged
         else:
             rooms[mkey].pop("itemPriorities", None)
         if rid in links:
             rooms[mkey]["itemLinks"] = links[rid]
         else:
             rooms[mkey].pop("itemLinks", None)
+        if rid in scatter:
+            rooms[mkey]["scatterTargets"] = scatter[rid]
+        else:
+            rooms[mkey].pop("scatterTargets", None)
     return out, missing
 
 
@@ -191,11 +295,13 @@ def cmd_apply():
     text = serialize_map(new)
     json.loads(text)
     open(MAP_FP, "w", encoding="utf-8", newline="\n").write(text)
-    pins, links = compute(roomdoc), compute_links(roomdoc)
+    pins, links, scatter = compute(roomdoc), compute_links(roomdoc), compute_scatter(roomdoc)
     npins = sum(len(v) for v in pins.values())
     nlinks = sum(len(v) for v in links.values())
+    nscatter = sum(len(v) for v in scatter.values())
     print(f"applied: {npins} Fixed item pins across {len(pins)} rooms; "
-          f"{nlinks} itemLinks across {len(links)} rooms; map.json valid")
+          f"{nlinks} itemLinks across {len(links)} rooms; "
+          f"{nscatter} scatterTargets across {len(scatter)} rooms; map.json valid")
     if missing:
         print(f"  NOTE: {len(missing)} item_control room(s) not in map.json (out of door-rando scope): {missing}")
 
@@ -204,11 +310,15 @@ def integrity_violations(roomdoc, mapdoc):
     v = []
     pins = compute(roomdoc)
     links = compute_links(roomdoc)
+    scatter = compute_scatter(roomdoc)
     rooms = mapdoc["rooms"]
+    # Resolve every room-data id onto map.json's UPPERCASE hex key (010C, 030C, …); the same
+    # case-insensitive resolver regenerate_map uses, so hex-letter rooms are validated too (cont.68).
+    ci = {k.lower(): k for k in rooms}
     # every computed pin present in map.json with priority Fixed
     for rid, plist in pins.items():
-        mkey = rid.lower()
-        if mkey not in rooms:
+        mkey = ci.get(rid.lower())
+        if mkey is None:
             continue  # out-of-scope, reported by --apply
         have = {(e.get("at"), e.get("priority")) for e in rooms[mkey].get("itemPriorities", [])}
         for p in plist:
@@ -216,35 +326,43 @@ def integrity_violations(roomdoc, mapdoc):
                 v.append(f"COVERAGE: {rid} missing Fixed pin at {p['at']} ({p['_why']})")
     # every computed relocation-twin link present in map.json
     for rid, llist in links.items():
-        mkey = rid.lower()
-        if mkey not in rooms:
+        mkey = ci.get(rid.lower())
+        if mkey is None:
             continue
         have = {e.get("id") for e in rooms[mkey].get("itemLinks", [])}
         for l in llist:
             if l["id"] not in have:
                 v.append(f"COVERAGE: {rid} missing itemLink for id {l['id']} ({l['_why']})")
-    # no spurious itemPriorities / itemLinks in an item_control room (every entry must be computed)
-    item_rooms = {rid.lower() for rid, r in roomdoc["rooms"].items() if r.get("item_control")}
-    for rid in item_rooms:
-        if rid not in rooms:
+    # every computed scatter target present in map.json
+    for rid, slist in scatter.items():
+        mkey = ci.get(rid.lower())
+        if mkey is None:
             continue
-        # pins/links are keyed by the original room-id casing; normalise to the lowercase map key
-        want_at = {p["at"] for p in pins.get(_orig_key(pins, rid), [])}
-        for e in rooms[rid].get("itemPriorities", []):
-            if e.get("at") not in want_at:
+        have = {e.get("at") for e in rooms[mkey].get("scatterTargets", [])}
+        for s in slist:
+            if s["at"] not in have:
+                v.append(f"COVERAGE: {rid} missing scatterTarget at {s['at']} ({s['_why']})")
+    # no spurious itemPriorities / itemLinks / scatterTargets in an item_control room (every entry computed)
+    for rid, r in roomdoc["rooms"].items():
+        if not r.get("item_control"):
+            continue
+        mkey = ci.get(rid.lower())
+        if mkey is None:
+            continue
+        want_at = {p["at"] for p in pins.get(rid, [])}
+        for e in rooms[mkey].get("itemPriorities", []):
+            # hand-authored pins (a human `_why`) are legitimately outside the computed set — skip them.
+            if _is_computed_pin(e) and e.get("at") not in want_at:
                 v.append(f"SPURIOUS: {rid} has itemPriorities at {e.get('at')} with no item_control hazard")
-        want_id = {l["id"] for l in links.get(_orig_key(links, rid), [])}
-        for e in rooms[rid].get("itemLinks", []):
+        want_id = {l["id"] for l in links.get(rid, [])}
+        for e in rooms[mkey].get("itemLinks", []):
             if e.get("id") not in want_id:
                 v.append(f"SPURIOUS: {rid} has itemLink for id {e.get('id')} that is not a relocation twin")
+        want_st = {s["at"] for s in scatter.get(rid, [])}
+        for e in rooms[mkey].get("scatterTargets", []):
+            if e.get("at") not in want_st:
+                v.append(f"SPURIOUS: {rid} has scatterTarget at {e.get('at')} that is not a legal static target")
     return v
-
-
-def _orig_key(pins, lower_rid):
-    for k in pins:
-        if k.lower() == lower_rid:
-            return k
-    return lower_rid
 
 
 def cmd_check():

@@ -83,7 +83,7 @@
       "9": "unnamed"
     },
     "_give_path": "RESOLVED (LIVE, K98, 2026-07-12). The granted catalog id = word[itemRec+2] set by the pickup routine[param] (K77), NOT the op-0x31 id byte (byte=1 != granted 0x1c). Give core 0x40CE70: SetFlag(9, word[itemRec+2], 1) @0x40CE79 = ownership (bank 9 = 0x878098). Consumables (health 0x1a-0x1f) ALSO get a bag count record via 0x49F900 (bag = scene+0x11AC; find-in-bag 0x496010). Key items (0x21-0x34) = ownership flag ONLY, no record (live: City Keycard = catalog 0x22 -> flag(9,0x22), both banks byte-identical). Dino files (type 5) = flag/log only. Lever for a shuffler = the routine's granted catalog id (word[itemRec+2]); health is difficulty-scaled at give time.",
-    "_mapping_open": "The type->catalog mapping is per-routine (and difficulty-dependent for health), not a fixed table; the op-0x31 id byte is a VM-thread slot (K77), NOT the item lever."
+    "_mapping_open": "The type->catalog mapping is per-routine (and difficulty-dependent for health), not a fixed table; the op-0x31 id byte is a VM-thread slot (K77), NOT the item lever. K99 (2026-07-12): the routines themselves carry NO catalog-id operand (K98's op-0x05-operand claim refuted); the give runs through the item-card state machine (0x71d740 state 0x10 = 0x40CDF0) and the per-pickup catalog-id record source is still OPEN -- one CE write-BP on the card records (ent+0x50/+0x10) closes it."
   },
   "dinoFiles": {
     "_source": "guide-sourced (FAQ); dino files route to the log, not inventory -- no catalog rows",

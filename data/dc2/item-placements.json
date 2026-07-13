@@ -1,6 +1,6 @@
 {
   "_source": "decode_script.item_commits() (init-routine fix 2026-06-27 p2). ONE item path: op 0x31 in per-room slot-5. K77 (2026-07-10): the id byte is the SAT-1 VM-THREAD SLOT, not a catalog item id -- its item correlation is empirical and the 'randomizer lever' status is UNVERIFIED pending the give-path decode / F1 witness (ITEMS-KEYITEMS-RE-PLAN Phase 2).",
-  "_fields": "id=block+0x04 (mode-0 literal = 0x48bf20 `type` = the VM-thread slot; empirically 1:1 with the field item type, mechanism unproven -- K77); param=block+0x00 (the 0x48bf20 `param` arg = rec+0x18 = a ROUTINE INDEX into the slot-5 routine table; routine[param] is the pickup program that decides the granted item -- do NOT shuffle it); slot=block+0x30 (AOT array slot); id_blob_off=byte offset of the id literal in the DECOMPRESSED room blob; op_blob_off=offset of the op-0x31 byte. See docs/reference/dc2/doors/AOT-SYSTEM-RE.md (UPDATE banner) + K77/K80.",
+  "_fields": "id=block+0x04 (mode-0 literal = 0x48bf20 `type` = the VM-thread slot; empirically 1:1 with the field item type, mechanism unproven -- K77); param=block+0x00 (the 0x48bf20 `param` arg = rec+0x18 = a ROUTINE INDEX into the slot-5 routine table; routine[param] is the pickup program that decides the granted item -- do NOT shuffle it); slot=block+0x30 (AOT array slot); id_blob_off=byte offset of the id literal in the DECOMPRESSED room blob; op_blob_off=offset of the op-0x31 byte; pos=[X,Z] first corner of the SAT-1 trigger quad (rec+4/rec+6 = block+0x24/+0x20 mode-0 literals; builder 0x489880 maps rec+4..rec+0x12 = 4 signed (X,Z) corners; 2026-07-12). See docs/reference/dc2/doors/AOT-SYSTEM-RE.md (UPDATE banner) + K77/K80.",
   "_named_ids": {
     "1": "Med Pak S",
     "2": "Resusc Pack",
@@ -15,7 +15,11 @@
         "param": 2,
         "slot": 9,
         "id_blob_off": 32926,
-        "op_blob_off": 32932
+        "op_blob_off": 32932,
+        "pos": [
+          2680,
+          12800
+        ]
       }
     ],
     "ST002": [
@@ -25,7 +29,11 @@
         "param": 6,
         "slot": 0,
         "id_blob_off": 70910,
-        "op_blob_off": 70916
+        "op_blob_off": 70916,
+        "pos": [
+          1600,
+          0
+        ]
       },
       {
         "id": 2,
@@ -33,7 +41,11 @@
         "param": 8,
         "slot": 0,
         "id_blob_off": 71322,
-        "op_blob_off": 71328
+        "op_blob_off": 71328,
+        "pos": [
+          1600,
+          0
+        ]
       },
       {
         "id": 3,
@@ -41,7 +53,11 @@
         "param": 4,
         "slot": 5,
         "id_blob_off": 71490,
-        "op_blob_off": 71496
+        "op_blob_off": 71496,
+        "pos": [
+          640,
+          -560
+        ]
       }
     ],
     "ST003": [
@@ -51,7 +67,11 @@
         "param": 4,
         "slot": 0,
         "id_blob_off": 131198,
-        "op_blob_off": 131204
+        "op_blob_off": 131204,
+        "pos": [
+          2800,
+          3100
+        ]
       },
       {
         "id": 1,
@@ -59,7 +79,11 @@
         "param": 17,
         "slot": 2,
         "id_blob_off": 131442,
-        "op_blob_off": 131448
+        "op_blob_off": 131448,
+        "pos": [
+          2500,
+          1000
+        ]
       },
       {
         "id": 1,
@@ -67,7 +91,11 @@
         "param": 3,
         "slot": 3,
         "id_blob_off": 132106,
-        "op_blob_off": 132112
+        "op_blob_off": 132112,
+        "pos": [
+          400,
+          -1200
+        ]
       },
       {
         "id": 1,
@@ -75,7 +103,11 @@
         "param": 11,
         "slot": 3,
         "id_blob_off": 132278,
-        "op_blob_off": 132284
+        "op_blob_off": 132284,
+        "pos": [
+          400,
+          -1200
+        ]
       },
       {
         "id": 1,
@@ -83,7 +115,11 @@
         "param": 11,
         "slot": 3,
         "id_blob_off": 141632,
-        "op_blob_off": 141638
+        "op_blob_off": 141638,
+        "pos": [
+          400,
+          -1200
+        ]
       },
       {
         "id": 1,
@@ -91,7 +127,11 @@
         "param": 14,
         "slot": 3,
         "id_blob_off": 145800,
-        "op_blob_off": 145806
+        "op_blob_off": 145806,
+        "pos": [
+          600,
+          0
+        ]
       },
       {
         "id": 1,
@@ -99,7 +139,11 @@
         "param": 21,
         "slot": 4,
         "id_blob_off": 149276,
-        "op_blob_off": 149282
+        "op_blob_off": 149282,
+        "pos": [
+          -1200,
+          3200
+        ]
       },
       {
         "id": 1,
@@ -107,7 +151,11 @@
         "param": 24,
         "slot": 5,
         "id_blob_off": 152296,
-        "op_blob_off": 152302
+        "op_blob_off": 152302,
+        "pos": [
+          -1200,
+          3200
+        ]
       }
     ],
     "ST005": [
@@ -117,7 +165,11 @@
         "param": 2,
         "slot": 9,
         "id_blob_off": 30448,
-        "op_blob_off": 30454
+        "op_blob_off": 30454,
+        "pos": [
+          2700,
+          -7400
+        ]
       }
     ],
     "ST102": [
@@ -127,7 +179,11 @@
         "param": 2,
         "slot": 5,
         "id_blob_off": 45450,
-        "op_blob_off": 45456
+        "op_blob_off": 45456,
+        "pos": [
+          16000,
+          -12400
+        ]
       }
     ],
     "ST106": [
@@ -137,7 +193,11 @@
         "param": 1,
         "slot": 12,
         "id_blob_off": 41446,
-        "op_blob_off": 41452
+        "op_blob_off": 41452,
+        "pos": [
+          200,
+          -3600
+        ]
       },
       {
         "id": 2,
@@ -145,7 +205,11 @@
         "param": 2,
         "slot": 7,
         "id_blob_off": 41510,
-        "op_blob_off": 41516
+        "op_blob_off": 41516,
+        "pos": [
+          -1000,
+          -4000
+        ]
       }
     ],
     "ST107": [
@@ -155,7 +219,11 @@
         "param": 2,
         "slot": 5,
         "id_blob_off": 20522,
-        "op_blob_off": 20528
+        "op_blob_off": 20528,
+        "pos": [
+          9700,
+          9100
+        ]
       }
     ],
     "ST109": [
@@ -165,7 +233,11 @@
         "param": 1,
         "slot": 6,
         "id_blob_off": 34332,
-        "op_blob_off": 34338
+        "op_blob_off": 34338,
+        "pos": [
+          11210,
+          -1700
+        ]
       },
       {
         "id": 7,
@@ -173,7 +245,11 @@
         "param": 7,
         "slot": 8,
         "id_blob_off": 36312,
-        "op_blob_off": 36318
+        "op_blob_off": 36318,
+        "pos": [
+          4500,
+          2000
+        ]
       }
     ],
     "ST10C": [
@@ -183,7 +259,11 @@
         "param": 2,
         "slot": 3,
         "id_blob_off": 70142,
-        "op_blob_off": 70148
+        "op_blob_off": 70148,
+        "pos": [
+          -3800,
+          8200
+        ]
       }
     ],
     "ST10E": [
@@ -193,7 +273,11 @@
         "param": 2,
         "slot": 0,
         "id_blob_off": 52326,
-        "op_blob_off": 52332
+        "op_blob_off": 52332,
+        "pos": [
+          6650,
+          15100
+        ]
       }
     ],
     "ST10F": [
@@ -203,7 +287,11 @@
         "param": 2,
         "slot": 0,
         "id_blob_off": 24334,
-        "op_blob_off": 24340
+        "op_blob_off": 24340,
+        "pos": [
+          800,
+          20700
+        ]
       },
       {
         "id": 1,
@@ -211,7 +299,11 @@
         "param": 3,
         "slot": 1,
         "id_blob_off": 24394,
-        "op_blob_off": 24400
+        "op_blob_off": 24400,
+        "pos": [
+          -100,
+          -24900
+        ]
       }
     ],
     "ST110": [
@@ -221,7 +313,11 @@
         "param": 1,
         "slot": 2,
         "id_blob_off": 12034,
-        "op_blob_off": 12040
+        "op_blob_off": 12040,
+        "pos": [
+          -3200,
+          13800
+        ]
       },
       {
         "id": 1,
@@ -229,7 +325,11 @@
         "param": 4,
         "slot": 3,
         "id_blob_off": 12162,
-        "op_blob_off": 12168
+        "op_blob_off": 12168,
+        "pos": [
+          -4500,
+          2600
+        ]
       }
     ],
     "ST200": [
@@ -239,7 +339,11 @@
         "param": 4,
         "slot": 3,
         "id_blob_off": 66190,
-        "op_blob_off": 66196
+        "op_blob_off": 66196,
+        "pos": [
+          -12400,
+          7900
+        ]
       }
     ],
     "ST201": [
@@ -249,7 +353,11 @@
         "param": 3,
         "slot": 0,
         "id_blob_off": 8834,
-        "op_blob_off": 8840
+        "op_blob_off": 8840,
+        "pos": [
+          -2000,
+          -2700
+        ]
       }
     ],
     "ST203": [
@@ -259,7 +367,11 @@
         "param": 4,
         "slot": 1,
         "id_blob_off": 9820,
-        "op_blob_off": 9826
+        "op_blob_off": 9826,
+        "pos": [
+          -3300,
+          -1100
+        ]
       }
     ],
     "ST204": [
@@ -269,7 +381,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 13356,
-        "op_blob_off": 13362
+        "op_blob_off": 13362,
+        "pos": [
+          -902,
+          5100
+        ]
       },
       {
         "id": 2,
@@ -277,7 +393,11 @@
         "param": 2,
         "slot": 1,
         "id_blob_off": 13416,
-        "op_blob_off": 13422
+        "op_blob_off": 13422,
+        "pos": [
+          -990,
+          5000
+        ]
       },
       {
         "id": 3,
@@ -285,7 +405,11 @@
         "param": 3,
         "slot": 2,
         "id_blob_off": 13476,
-        "op_blob_off": 13482
+        "op_blob_off": 13482,
+        "pos": [
+          -3600,
+          400
+        ]
       }
     ],
     "ST205": [
@@ -295,7 +419,11 @@
         "param": 12,
         "slot": 2,
         "id_blob_off": 53832,
-        "op_blob_off": 53838
+        "op_blob_off": 53838,
+        "pos": [
+          -5300,
+          -500
+        ]
       },
       {
         "id": 2,
@@ -303,7 +431,11 @@
         "param": 25,
         "slot": 3,
         "id_blob_off": 55498,
-        "op_blob_off": 55504
+        "op_blob_off": 55504,
+        "pos": [
+          1600,
+          -400
+        ]
       },
       {
         "id": 2,
@@ -311,7 +443,11 @@
         "param": 23,
         "slot": 17,
         "id_blob_off": 55630,
-        "op_blob_off": 55636
+        "op_blob_off": 55636,
+        "pos": [
+          4200,
+          -700
+        ]
       }
     ],
     "ST301": [
@@ -321,7 +457,11 @@
         "param": 8,
         "slot": 4,
         "id_blob_off": 37716,
-        "op_blob_off": 37722
+        "op_blob_off": 37722,
+        "pos": [
+          -5200,
+          3300
+        ]
       },
       {
         "id": 1,
@@ -329,7 +469,11 @@
         "param": 6,
         "slot": 5,
         "id_blob_off": 41132,
-        "op_blob_off": 41138
+        "op_blob_off": 41138,
+        "pos": [
+          2600,
+          4200
+        ]
       }
     ],
     "ST302": [
@@ -339,7 +483,11 @@
         "param": 4,
         "slot": 3,
         "id_blob_off": 25206,
-        "op_blob_off": 25212
+        "op_blob_off": 25212,
+        "pos": [
+          -3800,
+          -6300
+        ]
       },
       {
         "id": 1,
@@ -347,7 +495,11 @@
         "param": 2,
         "slot": 2,
         "id_blob_off": 25662,
-        "op_blob_off": 25668
+        "op_blob_off": 25668,
+        "pos": [
+          4200,
+          7200
+        ]
       },
       {
         "id": 2,
@@ -355,7 +507,11 @@
         "param": 7,
         "slot": 4,
         "id_blob_off": 30710,
-        "op_blob_off": 30716
+        "op_blob_off": 30716,
+        "pos": [
+          4300,
+          7100
+        ]
       },
       {
         "id": 2,
@@ -363,7 +519,11 @@
         "param": 7,
         "slot": 5,
         "id_blob_off": 30770,
-        "op_blob_off": 30776
+        "op_blob_off": 30776,
+        "pos": [
+          -2400,
+          8000
+        ]
       }
     ],
     "ST303": [
@@ -373,7 +533,11 @@
         "param": 3,
         "slot": 11,
         "id_blob_off": 20828,
-        "op_blob_off": 20834
+        "op_blob_off": 20834,
+        "pos": [
+          6300,
+          6400
+        ]
       },
       {
         "id": 2,
@@ -381,7 +545,11 @@
         "param": 4,
         "slot": 12,
         "id_blob_off": 20888,
-        "op_blob_off": 20894
+        "op_blob_off": 20894,
+        "pos": [
+          -9300,
+          7100
+        ]
       },
       {
         "id": 2,
@@ -389,7 +557,11 @@
         "param": 5,
         "slot": 13,
         "id_blob_off": 20948,
-        "op_blob_off": 20954
+        "op_blob_off": 20954,
+        "pos": [
+          -100,
+          400
+        ]
       }
     ],
     "ST304": [
@@ -399,7 +571,11 @@
         "param": 10,
         "slot": 21,
         "id_blob_off": 30058,
-        "op_blob_off": 30064
+        "op_blob_off": 30064,
+        "pos": [
+          -9300,
+          5300
+        ]
       },
       {
         "id": 1,
@@ -407,7 +583,11 @@
         "param": 3,
         "slot": 6,
         "id_blob_off": 30254,
-        "op_blob_off": 30260
+        "op_blob_off": 30260,
+        "pos": [
+          -5900,
+          600
+        ]
       },
       {
         "id": 1,
@@ -415,7 +595,11 @@
         "param": 2,
         "slot": 7,
         "id_blob_off": 30434,
-        "op_blob_off": 30440
+        "op_blob_off": 30440,
+        "pos": [
+          -2600,
+          6700
+        ]
       },
       {
         "id": 1,
@@ -423,7 +607,11 @@
         "param": 4,
         "slot": 8,
         "id_blob_off": 30558,
-        "op_blob_off": 30564
+        "op_blob_off": 30564,
+        "pos": [
+          900,
+          3600
+        ]
       },
       {
         "id": 1,
@@ -431,7 +619,11 @@
         "param": 5,
         "slot": 9,
         "id_blob_off": 30618,
-        "op_blob_off": 30624
+        "op_blob_off": 30624,
+        "pos": [
+          3500,
+          9500
+        ]
       },
       {
         "id": 1,
@@ -439,7 +631,11 @@
         "param": 6,
         "slot": 10,
         "id_blob_off": 30678,
-        "op_blob_off": 30684
+        "op_blob_off": 30684,
+        "pos": [
+          4400,
+          -900
+        ]
       },
       {
         "id": 1,
@@ -447,7 +643,11 @@
         "param": 7,
         "slot": 15,
         "id_blob_off": 30798,
-        "op_blob_off": 30804
+        "op_blob_off": 30804,
+        "pos": [
+          12500,
+          3900
+        ]
       },
       {
         "id": 1,
@@ -455,7 +655,11 @@
         "param": 8,
         "slot": 16,
         "id_blob_off": 30858,
-        "op_blob_off": 30864
+        "op_blob_off": 30864,
+        "pos": [
+          4400,
+          -5000
+        ]
       },
       {
         "id": 1,
@@ -463,7 +667,11 @@
         "param": 8,
         "slot": 17,
         "id_blob_off": 30918,
-        "op_blob_off": 30924
+        "op_blob_off": 30924,
+        "pos": [
+          6000,
+          -7700
+        ]
       },
       {
         "id": 1,
@@ -471,7 +679,11 @@
         "param": 9,
         "slot": 12,
         "id_blob_off": 30978,
-        "op_blob_off": 30984
+        "op_blob_off": 30984,
+        "pos": [
+          11500,
+          -1000
+        ]
       },
       {
         "id": 1,
@@ -479,7 +691,11 @@
         "param": 12,
         "slot": 11,
         "id_blob_off": 31342,
-        "op_blob_off": 31348
+        "op_blob_off": 31348,
+        "pos": [
+          9900,
+          -5200
+        ]
       },
       {
         "id": 1,
@@ -487,7 +703,11 @@
         "param": 14,
         "slot": 18,
         "id_blob_off": 31402,
-        "op_blob_off": 31408
+        "op_blob_off": 31408,
+        "pos": [
+          6300,
+          9200
+        ]
       },
       {
         "id": 1,
@@ -495,7 +715,11 @@
         "param": 16,
         "slot": 5,
         "id_blob_off": 31462,
-        "op_blob_off": 31468
+        "op_blob_off": 31468,
+        "pos": [
+          -9300,
+          2800
+        ]
       },
       {
         "id": 1,
@@ -503,7 +727,11 @@
         "param": 17,
         "slot": 13,
         "id_blob_off": 32464,
-        "op_blob_off": 32470
+        "op_blob_off": 32470,
+        "pos": [
+          9700,
+          9400
+        ]
       },
       {
         "id": 1,
@@ -511,7 +739,11 @@
         "param": 18,
         "slot": 13,
         "id_blob_off": 32540,
-        "op_blob_off": 32546
+        "op_blob_off": 32546,
+        "pos": [
+          9700,
+          9400
+        ]
       },
       {
         "id": 1,
@@ -519,7 +751,11 @@
         "param": 17,
         "slot": 13,
         "id_blob_off": 38044,
-        "op_blob_off": 38050
+        "op_blob_off": 38050,
+        "pos": [
+          9700,
+          9400
+        ]
       }
     ],
     "ST305": [
@@ -529,7 +765,11 @@
         "param": 5,
         "slot": 2,
         "id_blob_off": 16516,
-        "op_blob_off": 16522
+        "op_blob_off": 16522,
+        "pos": [
+          -1100,
+          6400
+        ]
       },
       {
         "id": 1,
@@ -537,7 +777,11 @@
         "param": 6,
         "slot": 3,
         "id_blob_off": 16576,
-        "op_blob_off": 16582
+        "op_blob_off": 16582,
+        "pos": [
+          -3500,
+          500
+        ]
       },
       {
         "id": 1,
@@ -545,7 +789,11 @@
         "param": 7,
         "slot": 4,
         "id_blob_off": 16676,
-        "op_blob_off": 16682
+        "op_blob_off": 16682,
+        "pos": [
+          5000,
+          -3500
+        ]
       },
       {
         "id": 1,
@@ -553,7 +801,11 @@
         "param": 8,
         "slot": 6,
         "id_blob_off": 16920,
-        "op_blob_off": 16926
+        "op_blob_off": 16926,
+        "pos": [
+          -4500,
+          -8100
+        ]
       },
       {
         "id": 1,
@@ -561,7 +813,11 @@
         "param": 9,
         "slot": 7,
         "id_blob_off": 16980,
-        "op_blob_off": 16986
+        "op_blob_off": 16986,
+        "pos": [
+          -4900,
+          8500
+        ]
       },
       {
         "id": 1,
@@ -569,7 +825,11 @@
         "param": 4,
         "slot": 10,
         "id_blob_off": 17200,
-        "op_blob_off": 17206
+        "op_blob_off": 17206,
+        "pos": [
+          -2200,
+          9400
+        ]
       }
     ],
     "ST306": [
@@ -579,7 +839,11 @@
         "param": 1,
         "slot": 3,
         "id_blob_off": 11210,
-        "op_blob_off": 11216
+        "op_blob_off": 11216,
+        "pos": [
+          1700,
+          5800
+        ]
       },
       {
         "id": 2,
@@ -587,7 +851,11 @@
         "param": 2,
         "slot": 2,
         "id_blob_off": 11430,
-        "op_blob_off": 11436
+        "op_blob_off": 11436,
+        "pos": [
+          1200,
+          -3700
+        ]
       }
     ],
     "ST400": [
@@ -597,7 +865,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 50522,
-        "op_blob_off": 50528
+        "op_blob_off": 50528,
+        "pos": [
+          -7800,
+          -9900
+        ]
       },
       {
         "id": 1,
@@ -605,7 +877,11 @@
         "param": 2,
         "slot": 1,
         "id_blob_off": 50582,
-        "op_blob_off": 50588
+        "op_blob_off": 50588,
+        "pos": [
+          -8200,
+          -7700
+        ]
       }
     ],
     "ST401": [
@@ -615,7 +891,11 @@
         "param": 8,
         "slot": 3,
         "id_blob_off": 22832,
-        "op_blob_off": 22838
+        "op_blob_off": 22838,
+        "pos": [
+          -1699,
+          5601
+        ]
       },
       {
         "id": 1,
@@ -623,7 +903,11 @@
         "param": 2,
         "slot": 5,
         "id_blob_off": 22992,
-        "op_blob_off": 22998
+        "op_blob_off": 22998,
+        "pos": [
+          2000,
+          2900
+        ]
       },
       {
         "id": 1,
@@ -631,7 +915,11 @@
         "param": 6,
         "slot": 2,
         "id_blob_off": 23428,
-        "op_blob_off": 23434
+        "op_blob_off": 23434,
+        "pos": [
+          2800,
+          5100
+        ]
       }
     ],
     "ST402": [
@@ -641,7 +929,11 @@
         "param": 11,
         "slot": 0,
         "id_blob_off": 91868,
-        "op_blob_off": 91874
+        "op_blob_off": 91874,
+        "pos": [
+          397,
+          10209
+        ]
       },
       {
         "id": 8,
@@ -649,7 +941,11 @@
         "param": 12,
         "slot": 1,
         "id_blob_off": 91928,
-        "op_blob_off": 91934
+        "op_blob_off": 91934,
+        "pos": [
+          397,
+          10209
+        ]
       },
       {
         "id": 5,
@@ -657,7 +953,11 @@
         "param": 13,
         "slot": 2,
         "id_blob_off": 92068,
-        "op_blob_off": 92074
+        "op_blob_off": 92074,
+        "pos": [
+          -9100,
+          -16400
+        ]
       },
       {
         "id": 6,
@@ -665,7 +965,11 @@
         "param": 14,
         "slot": 3,
         "id_blob_off": 92208,
-        "op_blob_off": 92214
+        "op_blob_off": 92214,
+        "pos": [
+          13700,
+          -14100
+        ]
       },
       {
         "id": 4,
@@ -673,7 +977,11 @@
         "param": 15,
         "slot": 5,
         "id_blob_off": 93252,
-        "op_blob_off": 93258
+        "op_blob_off": 93258,
+        "pos": [
+          9600,
+          19700
+        ]
       },
       {
         "id": 4,
@@ -681,7 +989,11 @@
         "param": 25,
         "slot": 8,
         "id_blob_off": 93520,
-        "op_blob_off": 93526
+        "op_blob_off": 93526,
+        "pos": [
+          -1200,
+          5100
+        ]
       },
       {
         "id": 4,
@@ -689,7 +1001,11 @@
         "param": 26,
         "slot": 9,
         "id_blob_off": 93580,
-        "op_blob_off": 93586
+        "op_blob_off": 93586,
+        "pos": [
+          3700,
+          2400
+        ]
       },
       {
         "id": 4,
@@ -697,7 +1013,11 @@
         "param": 15,
         "slot": 5,
         "id_blob_off": 100078,
-        "op_blob_off": 100084
+        "op_blob_off": 100084,
+        "pos": [
+          9600,
+          19700
+        ]
       },
       {
         "id": 4,
@@ -705,7 +1025,11 @@
         "param": 27,
         "slot": 8,
         "id_blob_off": 120764,
-        "op_blob_off": 120770
+        "op_blob_off": 120770,
+        "pos": [
+          -1200,
+          5100
+        ]
       },
       {
         "id": 1,
@@ -713,7 +1037,11 @@
         "param": 10,
         "slot": 7,
         "id_blob_off": 121816,
-        "op_blob_off": 121822
+        "op_blob_off": 121822,
+        "pos": [
+          2500,
+          3500
+        ]
       }
     ],
     "ST403": [
@@ -723,7 +1051,11 @@
         "param": 2,
         "slot": 0,
         "id_blob_off": 77536,
-        "op_blob_off": 77542
+        "op_blob_off": 77542,
+        "pos": [
+          4000,
+          -3600
+        ]
       },
       {
         "id": 1,
@@ -731,7 +1063,11 @@
         "param": 3,
         "slot": 1,
         "id_blob_off": 77596,
-        "op_blob_off": 77602
+        "op_blob_off": 77602,
+        "pos": [
+          4100,
+          -400
+        ]
       },
       {
         "id": 4,
@@ -739,7 +1075,11 @@
         "param": 9,
         "slot": 3,
         "id_blob_off": 77656,
-        "op_blob_off": 77662
+        "op_blob_off": 77662,
+        "pos": [
+          2200,
+          7600
+        ]
       }
     ],
     "ST408": [
@@ -749,7 +1089,11 @@
         "param": 4,
         "slot": 0,
         "id_blob_off": 75726,
-        "op_blob_off": 75732
+        "op_blob_off": 75732,
+        "pos": [
+          4500,
+          -16500
+        ]
       }
     ],
     "ST409": [
@@ -759,7 +1103,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 74942,
-        "op_blob_off": 74948
+        "op_blob_off": 74948,
+        "pos": [
+          3000,
+          -14500
+        ]
       }
     ],
     "ST40A": [
@@ -769,7 +1117,11 @@
         "param": 10,
         "slot": 8,
         "id_blob_off": 52920,
-        "op_blob_off": 52926
+        "op_blob_off": 52926,
+        "pos": [
+          3400,
+          11400
+        ]
       },
       {
         "id": 1,
@@ -777,7 +1129,11 @@
         "param": 5,
         "slot": 3,
         "id_blob_off": 53384,
-        "op_blob_off": 53390
+        "op_blob_off": 53390,
+        "pos": [
+          -4000,
+          9000
+        ]
       },
       {
         "id": 1,
@@ -785,7 +1141,11 @@
         "param": 6,
         "slot": 4,
         "id_blob_off": 53444,
-        "op_blob_off": 53450
+        "op_blob_off": 53450,
+        "pos": [
+          6500,
+          9000
+        ]
       },
       {
         "id": 1,
@@ -793,7 +1153,11 @@
         "param": 7,
         "slot": 5,
         "id_blob_off": 53504,
-        "op_blob_off": 53510
+        "op_blob_off": 53510,
+        "pos": [
+          -12500,
+          6900
+        ]
       },
       {
         "id": 1,
@@ -801,7 +1165,11 @@
         "param": 8,
         "slot": 6,
         "id_blob_off": 53564,
-        "op_blob_off": 53570
+        "op_blob_off": 53570,
+        "pos": [
+          14300,
+          7100
+        ]
       },
       {
         "id": 1,
@@ -809,7 +1177,11 @@
         "param": 9,
         "slot": 7,
         "id_blob_off": 53624,
-        "op_blob_off": 53630
+        "op_blob_off": 53630,
+        "pos": [
+          -1100,
+          9200
+        ]
       },
       {
         "id": 1,
@@ -817,7 +1189,11 @@
         "param": 11,
         "slot": 8,
         "id_blob_off": 53956,
-        "op_blob_off": 53962
+        "op_blob_off": 53962,
+        "pos": [
+          3400,
+          11400
+        ]
       }
     ],
     "ST40B": [
@@ -827,7 +1203,11 @@
         "param": 1,
         "slot": 2,
         "id_blob_off": 5030,
-        "op_blob_off": 5036
+        "op_blob_off": 5036,
+        "pos": [
+          -1200,
+          -3400
+        ]
       }
     ],
     "ST501": [
@@ -837,7 +1217,11 @@
         "param": 1,
         "slot": 10,
         "id_blob_off": 11658,
-        "op_blob_off": 11664
+        "op_blob_off": 11664,
+        "pos": [
+          -4100,
+          -3600
+        ]
       }
     ],
     "ST502": [
@@ -847,7 +1231,11 @@
         "param": 3,
         "slot": 2,
         "id_blob_off": 157822,
-        "op_blob_off": 157828
+        "op_blob_off": 157828,
+        "pos": [
+          3300,
+          3700
+        ]
       },
       {
         "id": 1,
@@ -855,7 +1243,11 @@
         "param": 5,
         "slot": 3,
         "id_blob_off": 157882,
-        "op_blob_off": 157888
+        "op_blob_off": 157888,
+        "pos": [
+          4500,
+          4500
+        ]
       },
       {
         "id": 1,
@@ -863,7 +1255,11 @@
         "param": 4,
         "slot": 4,
         "id_blob_off": 157942,
-        "op_blob_off": 157948
+        "op_blob_off": 157948,
+        "pos": [
+          3000,
+          12600
+        ]
       },
       {
         "id": 1,
@@ -871,7 +1267,11 @@
         "param": 6,
         "slot": 5,
         "id_blob_off": 158002,
-        "op_blob_off": 158008
+        "op_blob_off": 158008,
+        "pos": [
+          2600,
+          12100
+        ]
       },
       {
         "id": 5,
@@ -879,7 +1279,11 @@
         "param": 10,
         "slot": 16,
         "id_blob_off": 160810,
-        "op_blob_off": 160816
+        "op_blob_off": 160816,
+        "pos": [
+          2000,
+          -15300
+        ]
       },
       {
         "id": 5,
@@ -887,7 +1291,11 @@
         "param": 10,
         "slot": 16,
         "id_blob_off": 183222,
-        "op_blob_off": 183228
+        "op_blob_off": 183228,
+        "pos": [
+          2000,
+          -15300
+        ]
       }
     ],
     "ST503": [
@@ -897,7 +1305,11 @@
         "param": 2,
         "slot": 1,
         "id_blob_off": 88202,
-        "op_blob_off": 88208
+        "op_blob_off": 88208,
+        "pos": [
+          19800,
+          -18800
+        ]
       },
       {
         "id": 2,
@@ -905,7 +1317,11 @@
         "param": 1,
         "slot": 7,
         "id_blob_off": 88262,
-        "op_blob_off": 88268
+        "op_blob_off": 88268,
+        "pos": [
+          4400,
+          15550
+        ]
       },
       {
         "id": 2,
@@ -913,7 +1329,11 @@
         "param": 4,
         "slot": 2,
         "id_blob_off": 88342,
-        "op_blob_off": 88348
+        "op_blob_off": 88348,
+        "pos": [
+          -16200,
+          14100
+        ]
       },
       {
         "id": 2,
@@ -921,7 +1341,11 @@
         "param": 5,
         "slot": 3,
         "id_blob_off": 88402,
-        "op_blob_off": 88408
+        "op_blob_off": 88408,
+        "pos": [
+          10600,
+          -11500
+        ]
       },
       {
         "id": 2,
@@ -929,7 +1353,11 @@
         "param": 6,
         "slot": 4,
         "id_blob_off": 88462,
-        "op_blob_off": 88468
+        "op_blob_off": 88468,
+        "pos": [
+          1100,
+          16100
+        ]
       },
       {
         "id": 2,
@@ -937,7 +1365,11 @@
         "param": 24,
         "slot": 6,
         "id_blob_off": 104050,
-        "op_blob_off": 104056
+        "op_blob_off": 104056,
+        "pos": [
+          4300,
+          -7700
+        ]
       }
     ],
     "ST603": [
@@ -947,7 +1379,11 @@
         "param": 10,
         "slot": 7,
         "id_blob_off": 16106,
-        "op_blob_off": 16112
+        "op_blob_off": 16112,
+        "pos": [
+          2900,
+          -1500
+        ]
       },
       {
         "id": 2,
@@ -955,7 +1391,11 @@
         "param": 3,
         "slot": 4,
         "id_blob_off": 16410,
-        "op_blob_off": 16416
+        "op_blob_off": 16416,
+        "pos": [
+          -2000,
+          -3800
+        ]
       }
     ],
     "ST605": [
@@ -965,7 +1405,11 @@
         "param": 1,
         "slot": 4,
         "id_blob_off": 70380,
-        "op_blob_off": 70386
+        "op_blob_off": 70386,
+        "pos": [
+          7500,
+          -1500
+        ]
       },
       {
         "id": 1,
@@ -973,7 +1417,11 @@
         "param": 2,
         "slot": 5,
         "id_blob_off": 70440,
-        "op_blob_off": 70446
+        "op_blob_off": 70446,
+        "pos": [
+          5700,
+          -1700
+        ]
       },
       {
         "id": 1,
@@ -981,7 +1429,11 @@
         "param": 3,
         "slot": 6,
         "id_blob_off": 70500,
-        "op_blob_off": 70506
+        "op_blob_off": 70506,
+        "pos": [
+          4100,
+          -1300
+        ]
       },
       {
         "id": 1,
@@ -989,7 +1441,11 @@
         "param": 4,
         "slot": 7,
         "id_blob_off": 70560,
-        "op_blob_off": 70566
+        "op_blob_off": 70566,
+        "pos": [
+          4500,
+          1200
+        ]
       },
       {
         "id": 3,
@@ -997,7 +1453,11 @@
         "param": 6,
         "slot": 13,
         "id_blob_off": 70620,
-        "op_blob_off": 70626
+        "op_blob_off": 70626,
+        "pos": [
+          1000,
+          -5300
+        ]
       },
       {
         "id": 6,
@@ -1005,7 +1465,11 @@
         "param": 9,
         "slot": 10,
         "id_blob_off": 71270,
-        "op_blob_off": 71276
+        "op_blob_off": 71276,
+        "pos": [
+          -900,
+          -2100
+        ]
       },
       {
         "id": 5,
@@ -1013,7 +1477,11 @@
         "param": 8,
         "slot": 21,
         "id_blob_off": 71774,
-        "op_blob_off": 71780
+        "op_blob_off": 71780,
+        "pos": [
+          -500,
+          3800
+        ]
       },
       {
         "id": 5,
@@ -1021,7 +1489,11 @@
         "param": 8,
         "slot": 21,
         "id_blob_off": 78624,
-        "op_blob_off": 78630
+        "op_blob_off": 78630,
+        "pos": [
+          -500,
+          3800
+        ]
       }
     ],
     "ST606": [
@@ -1031,7 +1503,11 @@
         "param": 3,
         "slot": 6,
         "id_blob_off": 58226,
-        "op_blob_off": 58232
+        "op_blob_off": 58232,
+        "pos": [
+          500,
+          10800
+        ]
       },
       {
         "id": 1,
@@ -1039,7 +1515,11 @@
         "param": 1,
         "slot": 2,
         "id_blob_off": 58486,
-        "op_blob_off": 58492
+        "op_blob_off": 58492,
+        "pos": [
+          649,
+          7800
+        ]
       },
       {
         "id": 1,
@@ -1047,7 +1527,11 @@
         "param": 2,
         "slot": 3,
         "id_blob_off": 58546,
-        "op_blob_off": 58552
+        "op_blob_off": 58552,
+        "pos": [
+          349,
+          5800
+        ]
       }
     ],
     "ST607": [
@@ -1057,7 +1541,11 @@
         "param": 18,
         "slot": 12,
         "id_blob_off": 45674,
-        "op_blob_off": 45680
+        "op_blob_off": 45680,
+        "pos": [
+          4000,
+          -6200
+        ]
       },
       {
         "id": 1,
@@ -1065,7 +1553,11 @@
         "param": 3,
         "slot": 4,
         "id_blob_off": 46238,
-        "op_blob_off": 46244
+        "op_blob_off": 46244,
+        "pos": [
+          -8500,
+          -6000
+        ]
       },
       {
         "id": 1,
@@ -1073,7 +1565,11 @@
         "param": 20,
         "slot": 10,
         "id_blob_off": 47060,
-        "op_blob_off": 47066
+        "op_blob_off": 47066,
+        "pos": [
+          8200,
+          -4000
+        ]
       }
     ],
     "ST608": [
@@ -1083,7 +1579,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 674,
-        "op_blob_off": 680
+        "op_blob_off": 680,
+        "pos": [
+          -500,
+          -900
+        ]
       }
     ],
     "ST701": [
@@ -1093,7 +1593,11 @@
         "param": 6,
         "slot": 3,
         "id_blob_off": 14014,
-        "op_blob_off": 14020
+        "op_blob_off": 14020,
+        "pos": [
+          -6300,
+          2900
+        ]
       },
       {
         "id": 1,
@@ -1101,7 +1605,11 @@
         "param": 1,
         "slot": 2,
         "id_blob_off": 14370,
-        "op_blob_off": 14376
+        "op_blob_off": 14376,
+        "pos": [
+          -3600,
+          -1500
+        ]
       }
     ],
     "ST703": [
@@ -1111,7 +1619,11 @@
         "param": 1,
         "slot": 4,
         "id_blob_off": 27978,
-        "op_blob_off": 27984
+        "op_blob_off": 27984,
+        "pos": [
+          7300,
+          3700
+        ]
       },
       {
         "id": 1,
@@ -1119,7 +1631,11 @@
         "param": 2,
         "slot": 6,
         "id_blob_off": 28094,
-        "op_blob_off": 28100
+        "op_blob_off": 28100,
+        "pos": [
+          5500,
+          7600
+        ]
       },
       {
         "id": 1,
@@ -1127,7 +1643,11 @@
         "param": 1,
         "slot": 4,
         "id_blob_off": 31156,
-        "op_blob_off": 31162
+        "op_blob_off": 31162,
+        "pos": [
+          7300,
+          3700
+        ]
       }
     ],
     "ST704": [
@@ -1137,7 +1657,11 @@
         "param": 1,
         "slot": 6,
         "id_blob_off": 45058,
-        "op_blob_off": 45064
+        "op_blob_off": 45064,
+        "pos": [
+          -11400,
+          1800
+        ]
       },
       {
         "id": 2,
@@ -1145,7 +1669,11 @@
         "param": 2,
         "slot": 7,
         "id_blob_off": 45118,
-        "op_blob_off": 45124
+        "op_blob_off": 45124,
+        "pos": [
+          -10900,
+          5500
+        ]
       }
     ],
     "ST705": [
@@ -1155,7 +1683,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 21632,
-        "op_blob_off": 21638
+        "op_blob_off": 21638,
+        "pos": [
+          7700,
+          -3900
+        ]
       },
       {
         "id": 1,
@@ -1163,7 +1695,11 @@
         "param": 2,
         "slot": 1,
         "id_blob_off": 21692,
-        "op_blob_off": 21698
+        "op_blob_off": 21698,
+        "pos": [
+          7700,
+          -3900
+        ]
       },
       {
         "id": 1,
@@ -1171,7 +1707,11 @@
         "param": 3,
         "slot": 2,
         "id_blob_off": 21752,
-        "op_blob_off": 21758
+        "op_blob_off": 21758,
+        "pos": [
+          -6300,
+          4100
+        ]
       },
       {
         "id": 1,
@@ -1179,7 +1719,11 @@
         "param": 4,
         "slot": 3,
         "id_blob_off": 21812,
-        "op_blob_off": 21818
+        "op_blob_off": 21818,
+        "pos": [
+          -6300,
+          4100
+        ]
       },
       {
         "id": 2,
@@ -1187,7 +1731,11 @@
         "param": 5,
         "slot": 6,
         "id_blob_off": 21872,
-        "op_blob_off": 21878
+        "op_blob_off": 21878,
+        "pos": [
+          9400,
+          -4900
+        ]
       },
       {
         "id": 3,
@@ -1195,7 +1743,11 @@
         "param": 7,
         "slot": 8,
         "id_blob_off": 22780,
-        "op_blob_off": 22786
+        "op_blob_off": 22786,
+        "pos": [
+          -7400,
+          8000
+        ]
       }
     ],
     "ST706": [
@@ -1205,7 +1757,11 @@
         "param": 15,
         "slot": 14,
         "id_blob_off": 54302,
-        "op_blob_off": 54308
+        "op_blob_off": 54308,
+        "pos": [
+          -6000,
+          25300
+        ]
       },
       {
         "id": 6,
@@ -1213,7 +1769,11 @@
         "param": 10,
         "slot": 13,
         "id_blob_off": 54426,
-        "op_blob_off": 54432
+        "op_blob_off": 54432,
+        "pos": [
+          -7000,
+          25300
+        ]
       },
       {
         "id": 2,
@@ -1221,7 +1781,11 @@
         "param": 4,
         "slot": 7,
         "id_blob_off": 55616,
-        "op_blob_off": 55622
+        "op_blob_off": 55622,
+        "pos": [
+          -6100,
+          16600
+        ]
       },
       {
         "id": 2,
@@ -1229,7 +1793,11 @@
         "param": 4,
         "slot": 8,
         "id_blob_off": 55676,
-        "op_blob_off": 55682
+        "op_blob_off": 55682,
+        "pos": [
+          -6100,
+          16600
+        ]
       },
       {
         "id": 2,
@@ -1237,7 +1805,11 @@
         "param": 4,
         "slot": 9,
         "id_blob_off": 55736,
-        "op_blob_off": 55742
+        "op_blob_off": 55742,
+        "pos": [
+          -6100,
+          16600
+        ]
       },
       {
         "id": 3,
@@ -1245,7 +1817,11 @@
         "param": 5,
         "slot": 10,
         "id_blob_off": 56154,
-        "op_blob_off": 56160
+        "op_blob_off": 56160,
+        "pos": [
+          -6100,
+          19900
+        ]
       },
       {
         "id": 3,
@@ -1253,7 +1829,11 @@
         "param": 5,
         "slot": 11,
         "id_blob_off": 56214,
-        "op_blob_off": 56220
+        "op_blob_off": 56220,
+        "pos": [
+          -6100,
+          19900
+        ]
       },
       {
         "id": 3,
@@ -1261,7 +1841,11 @@
         "param": 5,
         "slot": 12,
         "id_blob_off": 56274,
-        "op_blob_off": 56280
+        "op_blob_off": 56280,
+        "pos": [
+          -6100,
+          19900
+        ]
       },
       {
         "id": 6,
@@ -1269,7 +1853,11 @@
         "param": 10,
         "slot": 13,
         "id_blob_off": 73812,
-        "op_blob_off": 73818
+        "op_blob_off": 73818,
+        "pos": [
+          -7000,
+          25300
+        ]
       }
     ],
     "ST707": [
@@ -1279,7 +1867,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 674,
-        "op_blob_off": 680
+        "op_blob_off": 680,
+        "pos": [
+          -500,
+          -900
+        ]
       }
     ],
     "ST800": [
@@ -1289,7 +1881,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 99974,
-        "op_blob_off": 99980
+        "op_blob_off": 99980,
+        "pos": [
+          2300,
+          3400
+        ]
       },
       {
         "id": 2,
@@ -1297,7 +1893,11 @@
         "param": 2,
         "slot": 1,
         "id_blob_off": 100034,
-        "op_blob_off": 100040
+        "op_blob_off": 100040,
+        "pos": [
+          -2400,
+          4000
+        ]
       },
       {
         "id": 6,
@@ -1305,7 +1905,11 @@
         "param": 7,
         "slot": 10,
         "id_blob_off": 100162,
-        "op_blob_off": 100168
+        "op_blob_off": 100168,
+        "pos": [
+          6100,
+          4400
+        ]
       },
       {
         "id": 3,
@@ -1313,7 +1917,11 @@
         "param": 3,
         "slot": 2,
         "id_blob_off": 100434,
-        "op_blob_off": 100440
+        "op_blob_off": 100440,
+        "pos": [
+          -1200,
+          1800
+        ]
       }
     ],
     "ST801": [
@@ -1323,7 +1931,11 @@
         "param": 4,
         "slot": 8,
         "id_blob_off": 16920,
-        "op_blob_off": 16926
+        "op_blob_off": 16926,
+        "pos": [
+          -1000,
+          16600
+        ]
       },
       {
         "id": 5,
@@ -1331,7 +1943,11 @@
         "param": 4,
         "slot": 8,
         "id_blob_off": 19510,
-        "op_blob_off": 19516
+        "op_blob_off": 19516,
+        "pos": [
+          -1000,
+          16600
+        ]
       }
     ],
     "ST802": [
@@ -1341,7 +1957,11 @@
         "param": 3,
         "slot": 7,
         "id_blob_off": 11822,
-        "op_blob_off": 11828
+        "op_blob_off": 11828,
+        "pos": [
+          9500,
+          14100
+        ]
       }
     ],
     "ST803": [
@@ -1351,7 +1971,11 @@
         "param": 3,
         "slot": 2,
         "id_blob_off": 35676,
-        "op_blob_off": 35682
+        "op_blob_off": 35682,
+        "pos": [
+          12200,
+          -2200
+        ]
       }
     ],
     "ST808": [
@@ -1361,7 +1985,11 @@
         "param": 18,
         "slot": 7,
         "id_blob_off": 49696,
-        "op_blob_off": 49702
+        "op_blob_off": 49702,
+        "pos": [
+          -20100,
+          13300
+        ]
       },
       {
         "id": 1,
@@ -1369,7 +1997,11 @@
         "param": 1,
         "slot": 0,
         "id_blob_off": 50234,
-        "op_blob_off": 50240
+        "op_blob_off": 50240,
+        "pos": [
+          -15500,
+          17100
+        ]
       },
       {
         "id": 1,
@@ -1377,7 +2009,11 @@
         "param": 3,
         "slot": 1,
         "id_blob_off": 50294,
-        "op_blob_off": 50300
+        "op_blob_off": 50300,
+        "pos": [
+          6300,
+          600
+        ]
       },
       {
         "id": 1,
@@ -1385,7 +2021,11 @@
         "param": 5,
         "slot": 2,
         "id_blob_off": 50354,
-        "op_blob_off": 50360
+        "op_blob_off": 50360,
+        "pos": [
+          13200,
+          -17700
+        ]
       },
       {
         "id": 1,
@@ -1393,7 +2033,11 @@
         "param": 7,
         "slot": 1,
         "id_blob_off": 62364,
-        "op_blob_off": 62370
+        "op_blob_off": 62370,
+        "pos": [
+          13200,
+          -17700
+        ]
       }
     ],
     "ST809": [
@@ -1403,7 +2047,11 @@
         "param": 6,
         "slot": 0,
         "id_blob_off": 96744,
-        "op_blob_off": 96750
+        "op_blob_off": 96750,
+        "pos": [
+          -13100,
+          6500
+        ]
       },
       {
         "id": 2,
@@ -1411,7 +2059,11 @@
         "param": 3,
         "slot": 8,
         "id_blob_off": 97252,
-        "op_blob_off": 97258
+        "op_blob_off": 97258,
+        "pos": [
+          -13800,
+          4300
+        ]
       },
       {
         "id": 1,
@@ -1419,7 +2071,11 @@
         "param": 1,
         "slot": 9,
         "id_blob_off": 97652,
-        "op_blob_off": 97658
+        "op_blob_off": 97658,
+        "pos": [
+          -3700,
+          10300
+        ]
       }
     ],
     "ST900": [
@@ -1429,7 +2085,11 @@
         "param": 2,
         "slot": 10,
         "id_blob_off": 15334,
-        "op_blob_off": 15340
+        "op_blob_off": 15340,
+        "pos": [
+          -5900,
+          6800
+        ]
       }
     ],
     "ST901": [
@@ -1439,7 +2099,11 @@
         "param": 1,
         "slot": 9,
         "id_blob_off": 7602,
-        "op_blob_off": 7608
+        "op_blob_off": 7608,
+        "pos": [
+          4100,
+          2100
+        ]
       },
       {
         "id": 1,
@@ -1447,7 +2111,11 @@
         "param": 2,
         "slot": 6,
         "id_blob_off": 8038,
-        "op_blob_off": 8044
+        "op_blob_off": 8044,
+        "pos": [
+          -3600,
+          -900
+        ]
       }
     ],
     "ST903": [
@@ -1457,7 +2125,11 @@
         "param": 9,
         "slot": 0,
         "id_blob_off": 47322,
-        "op_blob_off": 47328
+        "op_blob_off": 47328,
+        "pos": [
+          21100,
+          7500
+        ]
       }
     ]
   },

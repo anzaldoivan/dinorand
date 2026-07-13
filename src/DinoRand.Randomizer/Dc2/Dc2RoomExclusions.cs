@@ -37,6 +37,11 @@ public static class Dc2RoomExclusions
                // enemies; blocked for now.
         "409", // ST409 — escort set-piece with an NPC (maintainer ID 2026-07-11): scripted around its
                // enemies; blocked for now.
+        // NOTE: the broken-geometry Plesiosaurus-grunt water rooms (ST600/601/604, native 0x0b/0x0c —
+        // swapped donors attack through invisible colliders) are NOT listed here. They are skipped
+        // unconditionally by native type via Dc2SpeciesTable.IsPlesiosaurusGruntNativeType (the wave-planner
+        // guard, mirroring the flyer skip), so they need no per-room entry. ST001 stays below on its own
+        // turret-set-piece merits (it also happens to be a native 0x0c wave room).
         "808", // ST808 — Allosaurus set-piece (maintainer ID 2026-07-11): scripted around its specific
                // enemy; must not be remixed.
         "905", // ST905 — Extra Crisis bonus level (detected 2026-07-04): must stay vanilla.

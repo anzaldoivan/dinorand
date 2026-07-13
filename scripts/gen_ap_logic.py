@@ -82,6 +82,29 @@ def load_map() -> dict:
                     "requiresRooms": req_rooms,
                 }
             )
+        # Laser-fence sub-room regions (REGION-SCHEMA-PLAN.md): each non-primary region's accessFrom
+        # rule gates the edges to that region's door destinations — the room-granular AP analog of the
+        # doorway-keyed gate the C# stamps (the two fence gates 0102/010A migrated here from door-level).
+        # Primary regions (no accessFrom) and always-open fences (empty rule) emit nothing. 0606's
+        # item-only segment is gated at the item layer (Key Card C, not a progression item), not an edge.
+        for region in (room.get("regions") or {}).values():
+            af = region.get("accessFrom")
+            if not af:
+                continue
+            req_items = [_item_id(i) for r in af.values() for i in (r.get("requires") or [])]
+            gate_rooms = [_code(r) for rr in af.values() for r in (rr.get("requiresRoom") or [])]
+            if not req_items and not gate_rooms:
+                continue  # always-open fence — no gate
+            for target in (region.get("doors") or []):
+                tc = _code(target)
+                edges.append(
+                    {
+                        "from": c,
+                        "to": tc,
+                        "requiresItems": req_items,
+                        "requiresRooms": [r for r in gate_rooms if r != tc],
+                    }
+                )
     # Ensure every referenced room exists as a region (targets/gates may point outside the keyset).
     for e in edges:
         for c in [e["to"], *e["requiresRooms"]]:
@@ -282,7 +305,8 @@ def build_dc2() -> dict:
                 "room": code,
                 "itemId": it["id"],
                 "itemName": tname,
-                "pos": [it["id_blob_off"], 0],
+                # trigger-quad first corner (item-placements pos, 2026-07-12); old blob-off fallback
+                "pos": it.get("pos") or [it["id_blob_off"], 0],
                 "collectedFlag": None,
             })
 

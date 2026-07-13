@@ -176,6 +176,23 @@ public class Dc2AquaticEnemyTests
         Assert.True(plan.IsEmpty, "the water flag must not lift flyer-native protection");
     }
 
+    [Theory]
+    [InlineData(0x0b)] // Plesiosaurus grunt E31 — native to ST600/601/604
+    [InlineData(0x0c)] // Plesiosaurus grunt E32 — native to ST001
+    public void D4_PlesiosaurusGruntNativeWaveRoom_StaysBlocked_EvenWithWaterOn(int nativeType)
+    {
+        // Plesiosaurus-grunt water rooms (ST001/600/601/604) have invisible colliders a swapped donor
+        // attacks the player through (playtest 2026-07-12). Like the flyer skip, the water flag must NOT
+        // lift them — a full LAND donor pool + water on must still leave the room vanilla. This replaces
+        // the per-room ST600/601 hard-block: coverage is by native type, so ST604 is caught for free.
+        var plan = Dc2CrossSpeciesPlanner.PlanRoomWithWaves(
+            Array.Empty<Dc2SpawnRecord>(), WaveOnly(nativeType), new Random(1),
+            Dc2SpeciesTable.DefaultDonors, null, allowWaterLevels: true);
+        Assert.True(plan.IsEmpty, "the water flag must not lift Plesiosaurus-grunt-native protection");
+        Assert.True(Dc2SpeciesTable.IsPlesiosaurusGruntNativeType(nativeType));
+        Assert.True(Dc2SpeciesTable.IsUnconditionalSkipNativeType(nativeType));
+    }
+
     [Fact]
     public void D4_Config_WaterFlag_DefaultsOff() =>
         Assert.False(new RandomizerConfig().Dc2AllowWaterLevelEnemySwaps);

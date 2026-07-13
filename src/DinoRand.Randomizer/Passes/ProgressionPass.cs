@@ -111,16 +111,36 @@ public sealed class ProgressionPass : IRandomizationPass
         var doorKeys = new HashSet<int>();
         foreach (var node in graph.Nodes)
             foreach (var edge in node.Edges)
+            {
                 foreach (var k in game.KeyItemsForDoor(edge.Door.DoorType))
                     doorKeys.Add(k);
+                // Opt-in: also relocate the in-scope progression keys that gate via the map.json overlay
+                // `requires` (edge item AND-gates) rather than the door TYPE byte — the DDK Input/Code disc
+                // PAIRS (game.OverlayRelocationKeyIds; PROGRESSION-KEY-RELOCATION-RESEARCH.md). Restricted to
+                // that game-supplied band so it excludes B1 Room Key 0x2F (also a requires gate, out of scope)
+                // and the panel keys (which gate no edge). The pair-aware forward-fill (FrontierKeys surfaces
+                // edge.Requires.Items) seats both discs before the gate; Fixed/twin/reachable exclusions below
+                // are shared with door keys. In the product this rides on ShuffleKeyItems (GUI/CLI couple it);
+                // the flag stays independent so tests can exercise it in isolation.
+                if (context.Config.RelocateDdkDiscs)
+                    foreach (var k in edge.Requires.Items ?? Array.Empty<int>())
+                        if (game.OverlayRelocationKeyIds.Contains(k)) doorKeys.Add(k);
+            }
 
-        // The relocatable spots: records holding one of those keys, in a room reachable in the
-        // playable world (full-key reachability excludes the demo / Wipe-Out copies). A relocation
-        // twin (records sharing a room + non-null Link) is ONE logical pickup the game duplicates
-        // across script states, so it contributes a single spot/key; its sibling records are mirrored
-        // onto the canonical's assignment afterwards, never seated independently (which would desync or
-        // duplicate the key). See docs/reference/dc1/spawn/TRIGGER-DECODE.md + NodeItem.Link.
-        var reachable = KeyItemPlacer.Reachable(graph, game, game.StartRoomCode, doorKeys);
+        // The relocatable spots: records holding one of those door keys, in a room reachable in the
+        // playable world (full-key reachability — holding every key item that physically exists —
+        // excludes the demo / Wipe-Out copies). A relocation twin (records sharing a room + non-null
+        // Link) is ONE logical pickup the game duplicates across script states, so it contributes a
+        // single spot/key; its sibling records are mirrored onto the canonical's assignment afterwards,
+        // never seated independently (which would desync or duplicate the key). See
+        // docs/reference/dc1/spawn/TRIGGER-DECODE.md + NodeItem.Link. The non-relocated progression items
+        // (DDK discs, B1 Room Key, …) are NOT assumed held — Place now collects them in logic at their
+        // fixed spots, symmetric with Verify (KEY-ITEM-RANDO-RESEARCH.md §3(b)).
+        var playableKeys = new HashSet<int>();
+        foreach (var node in graph.Nodes)
+            foreach (var ni in node.Items)
+                if (game.KeyItemIds.Contains(ni.Record.ItemId)) playableKeys.Add(ni.Record.ItemId);
+        var reachable = KeyItemPlacer.Reachable(graph, game, game.StartRoomCode, playableKeys);
         var spots = new List<KeyItemPlacer.Spot>();
         var keys = new List<int>();
         var canonical = new Dictionary<(int, string), ItemRecord>();
@@ -151,6 +171,28 @@ public sealed class ProgressionPass : IRandomizationPass
             }
         }
 
+        // Scatter (opt-in): also admit static ammo/health pickups as spots, so a door key may spread into
+        // one. They carry no key to place — just extra homes — so a chosen scatter slot's vanilla
+        // consumable is DISPLACED and redistributed after placement to conserve the item multiset.
+        // Predicate-gated to static/unconditional/non-twin slots (KEY-ITEM-SCATTER-DATA-AUDIT.md), never
+        // runtime-armed/flag-gated/missable. Off ⇒ byte-identical to the door-key-only shuffle.
+        var scatterRecords = new List<ItemRecord>();
+        if (context.Config.ShuffleKeyItemsIntoPickups)
+            foreach (var node in graph.Nodes)
+            {
+                if (!reachable.Contains(node.Code)) continue;
+                foreach (var ni in node.Items)
+                {
+                    // Skip a key-item record even if the position-keyed overlay stamped it (a consumable
+                    // co-located at the same quad corner) — a scatter target is never a key item; the data
+                    // also drops co-located positions, this is the belt to that suspenders.
+                    if (!ni.IsScatterTarget || ni.Record.IsEmptySlot
+                        || game.KeyItemIds.Contains(ni.Record.ItemId)) continue;
+                    spots.Add(new KeyItemPlacer.Spot(node.Code, ni.Record, ni.Requires));
+                    scatterRecords.Add(ni.Record);
+                }
+            }
+
         if (spots.Count == 0)
         {
             context.Log("[keyshuffle] no door keys present to shuffle");
@@ -159,8 +201,16 @@ public sealed class ProgressionPass : IRandomizationPass
             return;
         }
 
+        // Records this shuffle will overwrite (chosen canonical spots + their mirrored twin siblings):
+        // Place must NOT collect these as fixed progression (their id is moving), while every OTHER key
+        // item stays put and is collected in logic.
+        var relocating = new HashSet<ItemRecord>();
+        foreach (var s in spots) relocating.Add(s.Record);
+        foreach (var sibs in siblings.Values)
+            foreach (var sib in sibs) relocating.Add(sib);
+
         var placement = new KeyItemPlacer().Place(graph, game, game.StartRoomCode, game.GoalRoomCode,
-                                                  spots, keys, context.Seed);
+                                                  spots, keys, context.Seed, relocating);
         if (!placement.Success)
         {
             // Should not happen for vanilla geometry (every key spot is reachable empty-handed), but
@@ -172,14 +222,25 @@ public sealed class ProgressionPass : IRandomizationPass
             return;
         }
 
-        var spoiler = context.Spoiler.Section(KeySpoilerTitle, KeySpoilerColumns);
+        // Conservation for scatter: a door key placed into a scatter slot DISPLACES that slot's consumable,
+        // and a door key's own vanilla slot that did NOT receive a key would otherwise keep the key it lost
+        // (duplication). Move each displaced consumable (from a CHOSEN scatter slot) into a VACATED door-key
+        // slot (an un-chosen door-key spot) — counts match by construction (a chosen scatter slot exists iff
+        // a door-key slot went un-chosen). Un-chosen scatter slots keep their own consumable, untouched.
+        // Captured BEFORE mutation: OriginalItemId is the vanilla consumable, Amount its vanilla count.
+        var placedRecords = placement.Placements.Select(p => p.Spot.Record).ToHashSet();
+        var scatterSet = new HashSet<ItemRecord>(scatterRecords);
+        var displacedConsumables = scatterRecords.Where(placedRecords.Contains)
+            .Select(r => (Id: r.OriginalItemId, Amount: Math.Max(1, r.Amount))).ToList();
+        var vacatedDoorKeySlots = spots.Select(s => s.Record)
+            .Where(r => !scatterSet.Contains(r) && !placedRecords.Contains(r)).Distinct().ToList();
+
+        // Apply the placement, capturing each record's original (id, amount) so it can be reverted.
+        // OriginalItemId is never mutated, so the spoiler's vanilla-id column stays correct post-mutation.
+        var original = new Dictionary<ItemRecord, (int Id, int Amount)>();
         foreach (var (spot, key) in placement.Placements)
         {
-            // Recorded per placement (one row per relocated spot, matching the pass's own count),
-            // BEFORE the mutation so the vanilla id is still readable (SPOILER-LOG-PLAN.md §4).
-            spoiler.AddRow(Spoiler.Dc1RoomNames.Describe(spot.RoomCode),
-                           Spoiler.Dc1ItemNames.NameOf(spot.Record.OriginalItemId),
-                           Spoiler.Dc1ItemNames.NameOf(key));
+            original.TryAdd(spot.Record, (spot.Record.ItemId, spot.Record.Amount));
             spot.Record.ItemId = key;
             spot.Record.Amount = Math.Max(1, spot.Record.Amount);
         }
@@ -188,9 +249,37 @@ public sealed class ProgressionPass : IRandomizationPass
         foreach (var (canon, sibs) in siblings)
             foreach (var sib in sibs)
             {
+                original.TryAdd(sib, (sib.ItemId, sib.Amount));
                 sib.ItemId = canon.ItemId;
                 sib.Amount = Math.Max(1, sib.Amount);
             }
+        for (int i = 0; i < vacatedDoorKeySlots.Count && i < displacedConsumables.Count; i++)
+        {
+            original.TryAdd(vacatedDoorKeySlots[i], (vacatedDoorKeySlots[i].ItemId, vacatedDoorKeySlots[i].Amount));
+            vacatedDoorKeySlots[i].ItemId = displacedConsumables[i].Id;
+            vacatedDoorKeySlots[i].Amount = displacedConsumables[i].Amount;
+        }
+
+        // Enforced gate (mirror the Place-fails branch): Place is symmetric with Verify, so a produced
+        // layout should always verify — but never SHIP an unbeatable one. Verify the committed layout; on
+        // failure revert every mutated record to vanilla and keep the vanilla placement. GRAPH-LOGIC-PARITY §8l.
+        var check = KeyItemPlacer.Verify(graph, game, game.StartRoomCode, game.GoalRoomCode,
+                                         KeysByRoom(graph, game));
+        if (!check.Success)
+        {
+            foreach (var (rec, (id, amt)) in original) { rec.ItemId = id; rec.Amount = amt; }
+            foreach (var line in check.Log) context.Log(line);
+            context.Log("[keyshuffle] produced layout failed verification; reverted to vanilla placement");
+            context.Spoiler.Section(KeySpoilerTitle, KeySpoilerColumns)
+                .AddNote("produced layout failed verification; kept vanilla placement");
+            return;
+        }
+
+        var spoiler = context.Spoiler.Section(KeySpoilerTitle, KeySpoilerColumns);
+        foreach (var (spot, key) in placement.Placements)
+            spoiler.AddRow(Spoiler.Dc1RoomNames.Describe(spot.RoomCode),
+                           Spoiler.Dc1ItemNames.NameOf(spot.Record.OriginalItemId),
+                           Spoiler.Dc1ItemNames.NameOf(key));
         context.Log($"[keyshuffle] relocated {placement.Placements.Count} door keys across " +
                     $"{placement.Placements.Select(p => p.Spot.RoomCode).Distinct().Count()} rooms");
         spoiler.AddNote($"relocated {placement.Placements.Count} door key(s) across " +

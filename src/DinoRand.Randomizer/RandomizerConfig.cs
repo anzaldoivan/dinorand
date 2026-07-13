@@ -174,6 +174,42 @@ public sealed class RandomizerConfig
     public bool Dc2MakeTrexKillable { get; set; }
 
     /// <summary>
+    /// DC2 only (off by default). Keep a randomizer-injected E80 Mosasaurus's grab IN-BOUNDS in land
+    /// rooms: patches Dino2.exe with hooks + code caves that skip only the player-Y write of the mosa's
+    /// grab (states 19/20) for any TYPE-0x0a actor whose current room is NOT a native Mosasaurus room
+    /// (ST700/702/703/704). The horizontal grab is preserved; only the out-of-bounds vertical launch is
+    /// removed, and the four native aquatic encounters are left byte-identical. Applied in place at
+    /// install (backup-protected .bak). docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md.
+    /// CLI <c>--dc2-mosa-no-grab</c>.
+    /// </summary>
+    public bool Dc2SuppressMosaGrab { get; set; }
+
+    /// <summary>
+    /// DC2 only (off by default). Stop a randomizer-injected E80 Mosasaurus from knocking the player OUT
+    /// OF BOUNDS in land rooms: patches Dino2.exe with a hook + code cave that skips the shared knockback
+    /// applicator (VA 0x452D84) only when the shoved actor is the player, the attacker is a TYPE-0x0a
+    /// Mosasaurus, and the room is NOT a native Mosasaurus room (ST700/702/703/704). Enemy↔enemy
+    /// separation, non-aquatic knockback, and the four native aquatic encounters are left byte-identical.
+    /// Applied in place at install (backup-protected .bak). Distinct from the grab lever
+    /// (<see cref="Dc2SuppressMosaGrab"/>) — a separate OOB channel, decoded live 2026-07-13 (K105).
+    /// docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md §8.5. CLI <c>--dc2-mosa-no-knockback</c>.
+    /// </summary>
+    public bool Dc2SuppressMosaKnockback { get; set; }
+
+    /// <summary>
+    /// DC2 only (off by default). Stop a randomizer-injected E80 Mosasaurus from flinging the player OUT OF
+    /// BOUNDS in land rooms by changing WHICH behavior it runs: patches Dino2.exe with a hook + code cave at
+    /// the E80 attack-pattern hub (state-1 <c>0x43fc80</c>) that, for a TYPE-0x0a actor outside the native
+    /// Mosasaurus rooms (ST700/702/703/704), redirects the wide-turn tail strike (attack-pattern
+    /// <c>byte[esi+0x55]==2</c>) to the narrow bite (pattern 0), so the mosa never performs the OOB move.
+    /// Touches no player-movement code; the four native aquatic encounters stay byte-identical. Applied in
+    /// place at install (backup-protected .bak). Distinct from the grab (<see cref="Dc2SuppressMosaGrab"/>)
+    /// and knockback (<see cref="Dc2SuppressMosaKnockback"/>) levers — the behavior-layer approach, K106.
+    /// docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md §9. CLI <c>--dc2-mosa-tail-to-bite</c>.
+    /// </summary>
+    public bool Dc2RedirectMosaTail { get; set; }
+
+    /// <summary>
     /// DC2 only (off by default). Make a randomizer-injected Triceratops killable without crashing:
     /// patches Dino2.exe to remap E70's out-of-range death animation index (8 → 7) so the setpiece
     /// model's death path binds a valid clip instead of reading past its package table (which crashes).
@@ -237,6 +273,34 @@ public sealed class RandomizerConfig
     /// Card Lv A) among their spots via the progression flood-fill, keeping every seed beatable.
     /// Off by default — when off, key items stay in their vanilla, flag-stable spots.</summary>
     public bool ShuffleKeyItems { get; set; } = false;
+
+    /// <summary>
+    /// DC1 (off by default). Widen the <see cref="ShuffleKeyItems"/> pool so a relocated door key may
+    /// also land in a <b>static ammo/health pickup</b>, not only another door-key spot — the map.json
+    /// <c>scatterTargets</c> slots (<see cref="Graph.NodeItem.IsScatterTarget"/>), which exclude every
+    /// runtime-armed / flag-gated / unresolved-trigger / relocation-twin slot so a key is never seated
+    /// behind a missable condition (docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md). Needs
+    /// <see cref="ShuffleKeyItems"/> on. Placement stays progression-safe (the symmetric
+    /// <see cref="Logic.KeyItemPlacer.Place"/>); displaced consumables are conserved. Off ⇒ byte-identical
+    /// to the door-key-only shuffle. CLI <c>--scatter-key-items</c>.
+    /// </summary>
+    public bool ShuffleKeyItemsIntoPickups { get; set; } = false;
+
+    /// <summary>
+    /// DC1. Widen the <see cref="ShuffleKeyItems"/> pool with the in-scope progression keys that gate via
+    /// the map.json overlay <c>requires</c> (edge item AND-gates) rather than the door TYPE byte — the
+    /// <b>DDK Input/Code disc pairs</b> (<see cref="Definitions.GameDefinition.OverlayRelocationKeyIds"/> =
+    /// ids 0x62–0x6f), the 7 disc-pair-gated edges. The band excludes B1 Room Key 0x2F (also a requires
+    /// gate, out of scope) and panel keys (which gate an unmodeled container, no edge); Fixed/twin/co-located
+    /// records stay excluded by the same machinery as door-TYPE keys. Placement stays progression-safe (the
+    /// pair-aware <see cref="Logic.KeyItemPlacer.Place"/>) and every disc is conserved.
+    /// <para><b>Product default: on whenever key items are shuffled.</b> The GUI and CLI config-build set
+    /// <c>RelocateDdkDiscs = ShuffleKeyItems</c> (no separate GUI toggle) — so with the key shuffle off this
+    /// is off and byte-identical to before. The flag stays independent (default false) so tests can exercise
+    /// DDK relocation in isolation. Not seed-encoded (byte 4 is full; it is derived from the shuffle bit).</para>
+    /// docs/decisions/dc1/items/PROGRESSION-KEY-RELOCATION-RESEARCH.md.
+    /// </summary>
+    public bool RelocateDdkDiscs { get; set; } = false;
 
     /// <summary>Phase 3. Off until the door-graph pass lands.</summary>
     public bool RandomizeDoors { get; set; } = false;

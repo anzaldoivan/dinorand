@@ -63,6 +63,16 @@ public abstract class GameDefinition
     /// <summary>Item ids the player progresses through; must never be lost/duplicated.</summary>
     public abstract IReadOnlySet<int> KeyItemIds { get; }
 
+    /// <summary>Progression keys the opt-in <see cref="RandomizerConfig.RelocateDdkDiscs"/> flag adds to
+    /// the key-shuffle pool: the ones that gate via the map.json overlay <c>requires</c> (edge item
+    /// AND-gates) and are in scope for that flag — the DC1 DDK Input/Code disc band. Empty (default) ⇒
+    /// the game has no such extension, so the flag is a no-op. Kept as game data so the generic
+    /// <see cref="Passes.ProgressionPass"/> carries no id literals.
+    /// docs/decisions/dc1/items/PROGRESSION-KEY-RELOCATION-RESEARCH.md.</summary>
+    public virtual IReadOnlySet<int> OverlayRelocationKeyIds => EmptyIds;
+
+    private static readonly IReadOnlySet<int> EmptyIds = new HashSet<int>();
+
     /// <summary>Non-key items eligible for the pool, with relative weights.</summary>
     public abstract IReadOnlyList<ItemPoolEntry> ItemPool { get; }
 

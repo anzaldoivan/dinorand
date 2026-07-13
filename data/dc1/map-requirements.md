@@ -15,15 +15,28 @@ Exactly one *external* producer room; written to `rooms[src].doors[dest].require
 |---|---|---|---|---|---|
 | 0108 | 0113 | type 1 | 9/6 | 0113 | door@0x3d708 |
 
-## Same-room item-gated puzzles (increment 2 — NOT activated)
+## Same-room item-gated puzzles (LIVE in map.json as door `requires`)
 
-Unlocked by an in-room `SetFlag(9,…)` guarded by a held-item check (`GetFlag(11,item)`) — a
-real item gate. These would become door `requires:[item]` once the item-USE event decode lands
-(DATA-BACKFILL-PLAN §7.2). **Currently none** in the DC1 corpus.
+Unlocked by an in-room `SetFlag(9,…)` guarded by a held-item check — either an SCD
+`GetFlag(11,item)` or the NATIVE DDK disc gate (`op-0x58` type-3 screen; `0x4B182A` requires
+the Input disc AND the Code disc = id+7 — STATIC-SCD-RE cont.61 §C). Written to
+`rooms[src].doors[dest].requires = [items…]` (AND semantics).
 
 | Door room | Dest | Door type | Flag (grp/idx) | Held item(s) | Provenance |
 |---|---|---|---|---|---|
-| _(none)_ | | | | | |
+| 0107 | 0113 | type 3 | 9/4 | 0x63, 0x6a | door@0x13888 |
+| 0203 | 0202 | type 3 | 9/12 | 0x62, 0x69 | door@0x3ce5c |
+| 0304 | 0300 | type 3 | 9/38 | 0x65, 0x6c | door@0x2589c |
+| 0304 | 0300 | type 3 | 9/38 | 0x65, 0x6c | door@0x2599c |
+| 0304 | 0300 | type 3 | 9/38 | 0x65, 0x6c | door@0x25a40 |
+| 0304 | 0300 | type 3 | 9/38 | 0x65, 0x6c | door@0x25b18 |
+| 0304 | 0300 | type 3 | 9/38 | 0x65, 0x6c | door@0x25bd8 |
+| 0304 | 0300 | type 3 | 9/38 | 0x65, 0x6c | door@0x266a8 |
+| 0304 | 0300 | type 3 | 9/38 | 0x65, 0x6c | door@0x276fc |
+| 0309 | 0306 | type 3 | 9/14 | 0x64, 0x6b | door@0x3dd30 |
+| 0506 | 0507 | type 3 | 9/23 | 0x67, 0x6e | door@0x23a04 |
+| 0507 | 0508 | type 3 | 9/24 | 0x68, 0x6f | door@0x414bc |
+| 0604 | 0609 | type 3 | 9/29 | 0x66, 0x6d | door@0x3fc20 |
 
 ## Free in-room switches (NOT a logic gate — no action needed)
 
@@ -33,20 +46,7 @@ permissive type-1/3 handling already models these correctly (free once reachable
 
 | Door room | Dest | Door type | Flag (grp/idx) | Self event | Provenance |
 |---|---|---|---|---|---|
-| 0107 | 0113 | type 3 | 9/4 | — | door@0x13888 |
-| 0203 | 0202 | type 3 | 9/12 | — | door@0x3ce5c |
-| 0304 | 0300 | type 3 | 9/38 | — | door@0x2589c |
-| 0304 | 0300 | type 3 | 9/38 | — | door@0x2599c |
-| 0304 | 0300 | type 3 | 9/38 | — | door@0x25a40 |
-| 0304 | 0300 | type 3 | 9/38 | — | door@0x25b18 |
-| 0304 | 0300 | type 3 | 9/38 | — | door@0x25bd8 |
-| 0304 | 0300 | type 3 | 9/38 | — | door@0x266a8 |
-| 0304 | 0300 | type 3 | 9/38 | — | door@0x276fc |
-| 0309 | 0306 | type 3 | 9/14 | — | door@0x3dd30 |
 | 0403 | 0402 | type 1 | 9/18 | — | door@0x54fd4 |
-| 0506 | 0507 | type 3 | 9/23 | — | door@0x23a04 |
-| 0507 | 0508 | type 3 | 9/24 | — | door@0x414bc |
-| 0604 | 0609 | type 3 | 9/29 | — | door@0x3fc20 |
 
 ## Door↔door shortcuts (latch-modeled — NOT a map.json gate)
 
@@ -59,6 +59,7 @@ the lock; a type-1 door is passable only once latched), the single source of tru
 
 | Door room | Dest | Door type | Flag (grp/idx) | Type-2 setter room(s) | Provenance |
 |---|---|---|---|---|---|
+| 0502 | 0507 | type 1 | 9/21 | 0507 | door@0x47ee4 |
 | 010a | 010b | type 1 | 9/7 | 010b | door@0x486f8 |
 | 0201 | 0205 | type 1 | 9/11 | 0205 | door@0x4250c |
 | 030a | 030c | type 1 | 9/16 | 030c | door@0x54ddc |

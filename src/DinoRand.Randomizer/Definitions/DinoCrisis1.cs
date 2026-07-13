@@ -49,6 +49,13 @@ public sealed class DinoCrisis1 : GameDefinition
     public override IReadOnlySet<int> KeyItemIds { get; } =
         new HashSet<int>(Enumerable.Range(0x2B, 0x6F - 0x2B + 1));
 
+    // The DDK Input (0x62–0x68) + Code (0x69–0x6f) disc band — the overlay-`requires` progression keys the
+    // opt-in RelocateDdkDiscs flag adds to the shuffle pool. Deliberately NOT the whole KeyItemIds ∩ requires
+    // set: it excludes B1 Room Key 0x2F (also a `requires` gate) so the flag's scope matches its name, and the
+    // panel keys 0x3d/0x3e (which gate no modeled edge). docs/decisions/dc1/items/PROGRESSION-KEY-RELOCATION-RESEARCH.md.
+    public override IReadOnlySet<int> OverlayRelocationKeyIds { get; } =
+        new HashSet<int>(Enumerable.Range(0x62, 0x6f - 0x62 + 1));
+
     // Shuffleable consumables = ammo (0x10–0x1A) + health (0x1B–0x23). Real ids/names
     // from data/dc1/items.json; weights bias ammo over healing.
     public override IReadOnlyList<ItemPoolEntry> ItemPool { get; } = new[]

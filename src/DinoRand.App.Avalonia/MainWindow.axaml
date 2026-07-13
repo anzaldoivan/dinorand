@@ -87,13 +87,13 @@
                               IsChecked="{Binding RandomizeEnemies, Mode=TwoWay}" />
                     <!-- DC2-only cross-species donor-pool sub-options; shown only for DC2 with enemy rando on. -->
                     <StackPanel Margin="20,0,0,0" IsVisible="{Binding Dc2EnemyOptionsVisible}">
-                        <CheckBox Content="Include setpiece enemies (Triceratops)" Margin="0,2"
+                        <CheckBox Content="Include setpiece enemies (Triceratops / Giganotosaurus)" Margin="0,2"
                                   ToolTip.Tip="Add the no-damage setpiece Triceratops to the DC2 cross-species donor pool. Off by default (makes a degenerate trash mob)."
                                   IsChecked="{Binding IncludeDc2SetpieceEnemies, Mode=TwoWay}" />
-                        <CheckBox Content="Include boss enemies (T-Rex / Giganotosaurus)" Margin="0,2"
+                        <CheckBox Content="Include boss enemies (T-Rex)" Margin="0,2"
                                   ToolTip.Tip="Add the LAND bosses to the DC2 cross-species donor pool. Off by default — they keep boss-scale models/HP, so they make degenerate trash mobs."
                                   IsChecked="{Binding IncludeDc2BossEnemies, Mode=TwoWay}" />
-                        <CheckBox Content="Allow Enemy swaps in the Water Levels" Margin="0,2"
+                        <CheckBox Content="Allow Enemy swaps in the Water Levels (EXPERIMENTAL/UNSAFE)" Margin="0,2"
                                   ToolTip.Tip="EXPERIMENTAL. Lets the water levels (ST700/702/703/704) take land donors on their wave descriptors AND admits aquatic donors (Mosasaurus, and the Plesiosaurus set-pieces with the setpiece toggle) — all wave-only, non-functional on land. Off by default (identical to today)."
                                   IsChecked="{Binding Dc2AllowWaterLevelEnemySwaps, Mode=TwoWay}" />
                         <!-- Donor distribution (docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md): weighted vs fixed. -->
@@ -222,6 +222,10 @@
                               IsEnabled="{Binding CanShuffleKeyItems}"
                               ToolTip.Tip="Relocate the door-gating key items (Entrance / BG Area / C.O. Area keys, Key Card Lv A) to new spots, kept provably beatable."
                               IsChecked="{Binding ShuffleKeyItems, Mode=TwoWay}" />
+                    <CheckBox Content="…also into ammo/health pickups" Margin="16,2,0,2"
+                              IsEnabled="{Binding CanScatterKeyItems}"
+                              ToolTip.Tip="Widen the key shuffle so a door key may also land in a static ammo/health pickup, not only another key-item spot. Progression-safe; items conserved. Needs Shuffle Key Items on."
+                              IsChecked="{Binding ShuffleKeyItemsIntoPickups, Mode=TwoWay}" />
                     <CheckBox Content="Randomize starting inventory (EXPERIMENTAL)" Margin="0,2"
                               IsEnabled="{Binding CanRandomizeStartingInventory}"
                               ToolTip.Tip="EXPERIMENTAL — patches DINO.exe so a new game starts with a randomized supply kit (the Handgun and its ammo are always granted, so it stays beatable). Seen on the next new game after relaunch."

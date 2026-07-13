@@ -20,7 +20,8 @@ namespace DinoRand.Randomizer.Spoiler;
 /// non-default):
 ///   bytes 0–3  Seed.Value (int, little-endian)
 ///   byte 4     config flags — bit0=Items, bit1=Enemies, bit2=Doors, bit3=StartingInventory,
-///              bit4=ShuffleKeyItems, bit5=ReplaceItemPool, bit6=EnemyHp (DC1)
+///              bit4=ShuffleKeyItems, bit5=ReplaceItemPool, bit6=EnemyHp (DC1),
+///              bit7=ShuffleKeyItemsIntoPickups (DC1 key-item scatter)
 ///   byte 5     EnemyDifficulty scaled to 0–255
 ///   byte 6     RatioAmmo (0–31)
 ///   byte 7     RatioHealth in bits 0–4 (0–31), AmmoQuantity in bits 5–7 (0–7)
@@ -99,7 +100,8 @@ public static class SeedString
             (config.RandomizeStartingInventory ? 8 : 0) |
             (config.ShuffleKeyItems            ? 16 : 0) |
             (config.ReplaceItemPool            ? 32 : 0) |
-            (config.RandomizeEnemyHp           ? 64 : 0));
+            (config.RandomizeEnemyHp           ? 64 : 0) |
+            (config.ShuffleKeyItemsIntoPickups ? 128 : 0));
         bytes[5] = (byte)Math.Round(Math.Clamp(config.EnemyDifficulty, 0, 1) * 255);
         bytes[6] = Math.Min((byte)31, config.RatioAmmo);
         bytes[7] = (byte)((Math.Min((byte)31, config.RatioHealth)) |
@@ -274,6 +276,7 @@ public static class SeedString
                 RandomizeStartingInventory = (flags & 8) != 0,
                 ShuffleKeyItems            = (flags & 16) != 0,
                 RandomizeEnemyHp           = (flags & 64) != 0,
+                ShuffleKeyItemsIntoPickups = (flags & 128) != 0,
                 ReplaceItemPool            = replacePool,
                 EnemyDifficulty            = diff,
                 RatioAmmo                  = ratioAmmo,

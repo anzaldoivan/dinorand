@@ -6,10 +6,15 @@ namespace DinoRand.Randomizer.Graph;
 /// The world as a graph of rooms connected by doors. Built from the parsed stages and
 /// consumed by key-item logic (Phase 1+) and door randomization (Phase 3). Also
 /// exportable to DGML for visual debugging, like BioRand's maps.
+///
+/// <para>Nodes are keyed by <see cref="RoomNode.NodeCode"/>, not room code: an atomic room is one
+/// node (<c>NodeCode == Code</c>), while a room with an intra-room entry-direction partition splits
+/// into one node per sub-region (REGION-SCHEMA-PLAN.md §2). Un-split rooms are byte-identical to the
+/// pre-split graph.</para>
 /// </summary>
 public sealed class RoomGraph
 {
-    private readonly Dictionary<(int stage, int room), RoomNode> _nodes = new();
+    private readonly Dictionary<int, RoomNode> _nodes = new(); // keyed by NodeCode
 
     public IReadOnlyCollection<RoomNode> Nodes => _nodes.Values;
 
@@ -17,43 +22,110 @@ public sealed class RoomGraph
                                   IRequirementOverlay? requirements = null)
     {
         var graph = new RoomGraph();
+        var splits = requirements?.NodeSplits ?? EmptySplits;
 
         foreach (var room in rooms)
         {
-            var node = graph.GetOrAdd(room.Stage, room.Room);
-            // Attach the live item records so the passes read them off the node (plan §4.4) and so
-            // an item guard can be stamped per pickup by the overlay.
-            foreach (var item in room.Items)
-                node.Items.Add(new NodeItem(item));
-        }
-
-        foreach (var room in rooms)
-        {
-            var from = graph.GetOrAdd(room.Stage, room.Room);
-            foreach (var door in room.Doors)
+            int code = ((room.Stage & 0xff) << 8) | (room.Room & 0xff);
+            if (splits.TryGetValue(code, out var split))
             {
-                var to = graph.GetOrAdd(door.TargetStage, door.TargetRoom);
-                from.Edges.Add(new RoomEdge(to, door));
+                // One node per sub-region. Item records live on the primary region (index 0) — no split
+                // room ships an item behind its partition, so this keeps keysByRoom/PickupReachable correct
+                // (REGION-SCHEMA-PLAN.md §2); revisit if a future split room hides a gated pickup.
+                foreach (var rd in split.Regions)
+                    graph.GetOrAddRegion(room.Stage, room.Room, rd.Index, rd.Name);
+                var primary = graph.GetOrAddRegion(room.Stage, room.Room, 0, split.Regions[0].Name);
+                foreach (var item in room.Items)
+                    primary.Items.Add(new NodeItem(item));
+            }
+            else
+            {
+                var node = graph.GetOrAdd(room.Stage, room.Room);
+                foreach (var item in room.Items)
+                    node.Items.Add(new NodeItem(item));
             }
         }
 
-        // Stamp hand-authored progression logic (puzzle gates / room-state / item-guards) onto the
-        // graph. Absent ⇒ pure door-type gating (today's behaviour, byte-for-byte).
-        requirements?.ApplyTo(graph);
+        foreach (var room in rooms)
+        {
+            int code = ((room.Stage & 0xff) << 8) | (room.Room & 0xff);
+            foreach (var door in room.Doors)
+            {
+                var source = OwningRegion(graph, splits, room.Stage, room.Room, door.TargetCode);
+                var target = LandingRegion(graph, splits, door.TargetStage, door.TargetRoom, code);
+                source.Edges.Add(new RoomEdge(target, door));
+            }
+        }
 
+        // Intra-room crossing edges (REGION-SCHEMA-PLAN.md §2 accessFrom). Absent for 0309 (the shuttle
+        // crossing predicate is [uncertain — needs CE]); wired here for future fence migration.
+        foreach (var (code, split) in splits)
+            foreach (var rd in split.Regions)
+                if (rd.Internal is { } ie)
+                {
+                    var from = graph.GetRegion(code, ie.FromIndex);
+                    var to = graph.GetRegion(code, rd.Index);
+                    if (from is null || to is null) continue;
+                    var synthetic = new DoorRecord { TargetStage = to.Stage, TargetRoom = to.Room, DoorType = 0 };
+                    from.Edges.Add(new RoomEdge(to, synthetic) { Requires = ie.Rule });
+                }
+
+        requirements?.ApplyTo(graph);
         return graph;
     }
 
-    public RoomNode GetOrAdd(int stage, int room)
+    /// <summary>The region node of <paramref name="destStage"/>/<paramref name="destRoom"/> a traversal
+    /// <i>from</i> <paramref name="fromCode"/> lands in: the destination's sub-region that owns the
+    /// reciprocal door back to the source (entry-direction landing). Atomic destination ⇒ its single
+    /// node; no reciprocal match ⇒ the primary region.</summary>
+    private static RoomNode LandingRegion(RoomGraph g, IReadOnlyDictionary<int, RegionSplit> splits,
+                                          int destStage, int destRoom, int fromCode)
     {
-        var key = (stage, room);
-        if (!_nodes.TryGetValue(key, out var node))
+        int destCode = ((destStage & 0xff) << 8) | (destRoom & 0xff);
+        if (splits.TryGetValue(destCode, out var split))
         {
-            node = new RoomNode(stage, room);
-            _nodes[key] = node;
+            var region = split.Regions.FirstOrDefault(r => r.DoorDests.Contains(fromCode))
+                         ?? split.Regions[0];
+            return g.GetOrAddRegion(destStage, destRoom, region.Index, region.Name);
+        }
+        return g.GetOrAdd(destStage, destRoom);
+    }
+
+    /// <summary>The region node of a split source room that owns the door to <paramref name="destCode"/>
+    /// (the door sits physically on that sub-region's side). Atomic source ⇒ its single node; no owner
+    /// match ⇒ the primary region.</summary>
+    private static RoomNode OwningRegion(RoomGraph g, IReadOnlyDictionary<int, RegionSplit> splits,
+                                         int stage, int room, int destCode)
+    {
+        int code = ((stage & 0xff) << 8) | (room & 0xff);
+        if (splits.TryGetValue(code, out var split))
+        {
+            var region = split.Regions.FirstOrDefault(r => r.DoorDests.Contains(destCode))
+                         ?? split.Regions[0];
+            return g.GetOrAddRegion(stage, room, region.Index, region.Name);
+        }
+        return g.GetOrAdd(stage, room);
+    }
+
+    public RoomNode GetOrAdd(int stage, int room) => GetOrAddRegion(stage, room, 0, null);
+
+    public RoomNode GetOrAddRegion(int stage, int room, int regionIndex, string? regionName)
+    {
+        int nodeCode = (regionIndex << 16) | ((stage & 0xff) << 8) | (room & 0xff);
+        if (!_nodes.TryGetValue(nodeCode, out var node))
+        {
+            node = new RoomNode(stage, room, regionIndex, regionName);
+            _nodes[nodeCode] = node;
         }
         return node;
     }
+
+    /// <summary>The region node for <paramref name="code"/> (SSRR) at <paramref name="regionIndex"/>, or
+    /// <c>null</c> if not present.</summary>
+    public RoomNode? GetRegion(int code, int regionIndex) =>
+        _nodes.TryGetValue((regionIndex << 16) | code, out var n) ? n : null;
+
+    private static readonly IReadOnlyDictionary<int, RegionSplit> EmptySplits = new Dictionary<int, RegionSplit>();
 
     /// <summary>Export a DGML graph for inspection (BioRand-style diagnostics).</summary>
     public string ToDgml()
