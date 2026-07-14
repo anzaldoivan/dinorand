@@ -54,6 +54,9 @@ public class MainWindowViewModelTests
 
         Assert.True(vm.CurrentConfig.RandomizeDoors);
         Assert.True(vm.CurrentConfig.ShuffleKeyItems);
+        // "Shuffle Key Items" now also scatters into ammo/health pickups with no separate toggle — the
+        // scatter rides on the shuffle (config-built ShuffleKeyItemsIntoPickups = ShuffleKeyItems).
+        Assert.True(vm.CurrentConfig.ShuffleKeyItemsIntoPickups);
         var seed = vm.SeedText;
 
         // Pasting that seed into a fresh VM reproduces the same run (BioRand-style share string).
@@ -62,6 +65,7 @@ public class MainWindowViewModelTests
 
         Assert.True(pasted.CurrentConfig.RandomizeDoors);
         Assert.True(pasted.CurrentConfig.ShuffleKeyItems);
+        Assert.True(pasted.CurrentConfig.ShuffleKeyItemsIntoPickups);
         Assert.Equal(seed, pasted.SeedText);
     }
 

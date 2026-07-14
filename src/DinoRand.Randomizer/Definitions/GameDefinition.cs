@@ -114,6 +114,16 @@ public abstract class GameDefinition
     /// </summary>
     public virtual IReadOnlySet<int> ItemProtectedRoomCodes => new HashSet<int>();
 
+    /// <summary>
+    /// One-way ending "sink" rooms — reachable in the graph but, once entered, with no path back to the
+    /// main map or the goal (the escape-sequence dead ends). The key shuffle must never seat a
+    /// progression key here: reachability logic (<see cref="Logic.KeyItemPlacer"/>) models them as normal
+    /// reachable rooms and cannot see the no-return property, so a key placed here verifies "beatable" yet
+    /// can never be collected in time. Excluded from the placement spot pool, not gated (they gate
+    /// nothing). Default empty.
+    /// </summary>
+    public virtual IReadOnlySet<int> EndingZoneRoomCodes => new HashSet<int>();
+
     /// <summary>Room code (<c>stage&lt;&lt;8 | room</c>) the player starts in — the flood-fill root.</summary>
     public abstract int StartRoomCode { get; }
 

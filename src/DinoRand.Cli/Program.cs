@@ -143,11 +143,11 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             folder, backing up the pristine originals to Data\.dinorand_backup first.
           - --restore copies those originals back and removes the backup.
           - --shuffle-keys relocates the door-gating key items (Entrance / BG Area /
-            C.O. Area keys, Key Card Lv A) to new spots, kept provably beatable. It also
-            relocates the DDK Input/Code disc pairs (overlay-requires gated), discs conserved.
-          - --scatter-key-items widens --shuffle-keys so a door key may also land in a
-            static ammo/health pickup (not only another door-key spot); progression-safe,
-            items conserved. No effect without --shuffle-keys.
+            C.O. Area keys, Key Card Lv A) to new spots, kept provably beatable. It does all
+            three key-shuffle behaviors together: it also relocates the DDK Input/Code disc
+            pairs (overlay-requires gated) AND scatters keys into static ammo/health pickups
+            (not only other door-key spots); discs/items conserved. (The old --scatter-key-items
+            flag is now redundant — scatter is on by default with --shuffle-keys.)
           - --exotic-enemies (EXPERIMENTAL, off by default) imports FOREIGN species into
             eligible rooms — the cat8 Therizinosaurus (stages 1-2) and the grounded
             RaptorHeavy — and, with --install-to-data, applies the EXE patches they need
@@ -527,10 +527,11 @@ var config = new RandomizerConfig
     // fallback instead. Off = byte-identical. Not seed-encoded.
     Dc1CutsceneSafeEnemies = argv.Contains("--dc1-cutscene-safe"),
     ShuffleKeyItems = argv.Contains("--shuffle-keys"),
-    // DC1 (off): widen --shuffle-keys so a door key may also land in a static ammo/health pickup, not only
-    // another door-key spot. Progression-safe (symmetric Place), items conserved. Needs --shuffle-keys.
-    // docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md.
-    ShuffleKeyItemsIntoPickups = argv.Contains("--scatter-key-items"),
+    // DC1: key-item scatter (a door key may also land in a static ammo/health pickup, not only another
+    // door-key spot) rides on --shuffle-keys by default, like the DDK relocation below — the product does
+    // all three key-shuffle behaviors together. Progression-safe (symmetric Place), items conserved. The
+    // legacy --scatter-key-items flag is now a redundant no-op. docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md.
+    ShuffleKeyItemsIntoPickups = argv.Contains("--shuffle-keys"),
     // DC1: DDK Input/Code disc relocation (0x62–0x6f, overlay-`requires` PAIR-gated, not door-TYPE) rides on
     // --shuffle-keys by default — the product does all three key-shuffle behaviors together. Progression-safe
     // (pair-aware Place), discs conserved. The RandomizerConfig.RelocateDdkDiscs flag stays independent so

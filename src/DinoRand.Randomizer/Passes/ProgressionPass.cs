@@ -147,7 +147,10 @@ public sealed class ProgressionPass : IRandomizationPass
         var siblings = new Dictionary<ItemRecord, List<ItemRecord>>();
         foreach (var node in graph.Nodes)
         {
-            if (!reachable.Contains(node.Code)) continue;
+            // Reachable, and not a one-way ending sink: a key seated in an escape-ride dead end
+            // (game.EndingZoneRoomCodes) verifies "beatable" but can never be collected in time — the
+            // reachability engine can't see the no-return property. Exclude from the spot pool.
+            if (!reachable.Contains(node.Code) || game.EndingZoneRoomCodes.Contains(node.Code)) continue;
             foreach (var ni in node.Items)
             {
                 if (ni.Record.IsEmptySlot || !doorKeys.Contains(ni.Record.ItemId)) continue;
@@ -180,7 +183,7 @@ public sealed class ProgressionPass : IRandomizationPass
         if (context.Config.ShuffleKeyItemsIntoPickups)
             foreach (var node in graph.Nodes)
             {
-                if (!reachable.Contains(node.Code)) continue;
+                if (!reachable.Contains(node.Code) || game.EndingZoneRoomCodes.Contains(node.Code)) continue;
                 foreach (var ni in node.Items)
                 {
                     // Skip a key-item record even if the position-keyed overlay stamped it (a consumable

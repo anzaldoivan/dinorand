@@ -220,6 +220,16 @@ public sealed class DinoCrisis1 : GameDefinition
     public override IReadOnlySet<int> ItemProtectedRoomCodes { get; } =
         new HashSet<int> { 0x060d, 0x0610, 0x0612 };
 
+    // One-way ending sinks: the hovercraft/port escape ride and the heliport film. Reached only via
+    // decoded one-way static doors (0610->0612/0613, 0612->060C, 0402->040D) and, per the all-keys
+    // directed graph, they can reach neither the goal 060D nor back to the main map. The reachability
+    // engine still models them as reachable (you can stand in them), so a shuffled progression key here
+    // verifies "beatable" but is an uncollectable softlock — vanilla places no required key in any of
+    // them (unlike the returnable port cluster 060A/060B/0609/0615, which hold vanilla DDK discs / key
+    // chips). The key shuffle excludes these from the placement spot pool (ProgressionPass.ShuffleDoorKeys).
+    public override IReadOnlySet<int> EndingZoneRoomCodes { get; } =
+        new HashSet<int> { 0x0612, 0x0613, 0x060c, 0x040d };
+
     // Backyard of the Facility — the game's opening room (BFS root for progression logic).
     public override int StartRoomCode => 0x010d;
 

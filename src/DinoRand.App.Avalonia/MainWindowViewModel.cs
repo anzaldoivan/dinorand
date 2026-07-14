@@ -259,7 +259,6 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _randomizeDoors;
         [ObservableProperty] private bool _shuffleKeyItems;
-        [ObservableProperty] private bool _shuffleKeyItemsIntoPickups;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CustomSupplyEnabled))]
@@ -323,13 +322,11 @@ namespace DinoRand.App
         public bool CanRandomizeDoors => SelectedGame.Supports(GameFeature.Doors);
         public bool CanShuffleKeyItems => SelectedGame.Supports(GameFeature.KeyItems);
 
-        /// <summary>The key-item scatter is a sub-option of the key shuffle — enabled only when the game
-        /// supports key items AND <see cref="ShuffleKeyItems"/> is on. docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md.</summary>
-        public bool CanScatterKeyItems => CanShuffleKeyItems && ShuffleKeyItems;
-
-        // DDK Input/Code disc relocation has no toggle: it rides on the key shuffle (config-built as
-        // RelocateDdkDiscs = ShuffleKeyItems), so "Shuffle Key Items" turns it on automatically. The
-        // RandomizerConfig.RelocateDdkDiscs flag stays independent for tests. PROGRESSION-KEY-RELOCATION-RESEARCH.md.
+        // The key-item scatter (into ammo/health pickups) and the DDK Input/Code disc relocation have no
+        // toggles: both ride on the key shuffle, config-built as ShuffleKeyItemsIntoPickups = ShuffleKeyItems
+        // and RelocateDdkDiscs = ShuffleKeyItems, so "Shuffle Key Items" does all three key-shuffle behaviors
+        // at once. The RandomizerConfig flags stay independent for tests. PROGRESSION-KEY-RELOCATION-RESEARCH.md /
+        // docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md.
         public bool CanRandomizeStartingInventory => SelectedGame.Supports(GameFeature.StartingInventory);
         public bool CanRandomizeVoices => SelectedGame.Supports(GameFeature.Voices);
         public bool CanShuffleBgm => SelectedGame.Supports(GameFeature.Bgm);
@@ -376,7 +373,6 @@ namespace DinoRand.App
             if (!CanSwapDc2PlayerCharacters) { Dc2CharacterSkinIndex = 0; Dc2ReginaSkinIndex = 0; }
             if (!CanRandomizeDoors) RandomizeDoors = false;
             if (!CanShuffleKeyItems) ShuffleKeyItems = false;
-            if (!CanShuffleKeyItems) ShuffleKeyItemsIntoPickups = false;
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
             if (!CanRandomizeVoices) IsVoicesChecked = false;
             if (!CanShuffleBgm) ShuffleBgm = false;
@@ -392,7 +388,6 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanSwapDc2PlayerCharacters));
             OnPropertyChanged(nameof(CanRandomizeDoors));
             OnPropertyChanged(nameof(CanShuffleKeyItems));
-            OnPropertyChanged(nameof(CanScatterKeyItems));
             OnPropertyChanged(nameof(CanRandomizeStartingInventory));
             OnPropertyChanged(nameof(CanRandomizeVoices));
             OnPropertyChanged(nameof(ShowDc1VoiceCast));
@@ -586,18 +581,9 @@ namespace DinoRand.App
         partial void OnDc2CharacterSkinIndexChanged(int value) => UpdateSeedFromUi();
         partial void OnDc2ReginaSkinIndexChanged(int value) => UpdateSeedFromUi();
         partial void OnRandomizeDoorsChanged(bool value) => UpdateSeedFromUi();
-        partial void OnShuffleKeyItemsChanged(bool value)
-        {
-            // Turning the key shuffle on enables scatter alongside it (all three key-shuffle behaviors on
-            // by default); turning it off clears scatter (it needs the shuffle on). Only on a USER action,
-            // not a seed load (_suspend) — a loaded seed reproduces its own encoded scatter bit faithfully.
-            // DDK relocation is not a toggle: it is config-built as RelocateDdkDiscs = ShuffleKeyItems.
-            if (!value) ShuffleKeyItemsIntoPickups = false;
-            else if (!_suspend) ShuffleKeyItemsIntoPickups = true;
-            OnPropertyChanged(nameof(CanScatterKeyItems));
-            UpdateSeedFromUi();
-        }
-        partial void OnShuffleKeyItemsIntoPickupsChanged(bool value) => UpdateSeedFromUi();
+        // Key shuffle is a single toggle: scatter (into ammo/health) and DDK-disc relocation ride on it,
+        // config-built as ShuffleKeyItemsIntoPickups = RelocateDdkDiscs = ShuffleKeyItems.
+        partial void OnShuffleKeyItemsChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeStartingInventoryChanged(bool value) => UpdateSeedFromUi();
         partial void OnReplaceItemPoolChanged(bool value) => UpdateSeedFromUi();
         partial void OnPreUpgradedWeaponsChanged(bool value) => UpdateSeedFromUi();
@@ -691,7 +677,6 @@ namespace DinoRand.App
                     row.Weight = effTierWeights.GetValueOrDefault(row.Type);
                 RandomizeDoors = _appSeed.Config.RandomizeDoors;
                 ShuffleKeyItems = _appSeed.Config.ShuffleKeyItems;
-                ShuffleKeyItemsIntoPickups = _appSeed.Config.ShuffleKeyItemsIntoPickups;
                 RandomizeStartingInventory = _appSeed.Config.RandomizeStartingInventory;
                 Difficulty = Math.Round(_appSeed.Config.EnemyDifficulty * 31);
 
@@ -774,9 +759,10 @@ namespace DinoRand.App
                 Dc2BlueRaptorComboThreshold = (int)Math.Round(Dc2BlueRaptorCombo),
                 RandomizeDoors = RandomizeDoors,
                 ShuffleKeyItems = ShuffleKeyItems,
-                ShuffleKeyItemsIntoPickups = ShuffleKeyItemsIntoPickups,
-                // DDK disc relocation rides on the key shuffle (no separate GUI toggle — the product
-                // default is "shuffle keys ⇒ relocate DDK discs too"). PROGRESSION-KEY-RELOCATION-RESEARCH.md.
+                // Scatter (into ammo/health pickups) and DDK disc relocation ride on the key shuffle — no
+                // separate GUI toggles; "Shuffle Key Items" turns on all three key-shuffle behaviors.
+                // PROGRESSION-KEY-RELOCATION-RESEARCH.md / KEY-ITEM-SCATTER-DATA-AUDIT.md.
+                ShuffleKeyItemsIntoPickups = ShuffleKeyItems,
                 RelocateDdkDiscs = ShuffleKeyItems,
                 RandomizeStartingInventory = RandomizeStartingInventory,
                 RandomizeVoices = voicesOn,

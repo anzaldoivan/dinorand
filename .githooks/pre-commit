@@ -44,7 +44,7 @@ fi
 ap_touched=0
 for f in "${staged[@]}"; do
   case "$f" in
-    data/dc1/map.json|data/dc1/items.json|data/dc1/room-data.json|scripts/gen_ap_logic.py|apworld/*)
+    data/dc1/map.json|data/dc1/items.json|data/dc1/room-data.json|data/dc1/reachability-oracle.json|scripts/gen_ap_logic.py|apworld/*)
       ap_touched=1; break ;;
   esac
 done

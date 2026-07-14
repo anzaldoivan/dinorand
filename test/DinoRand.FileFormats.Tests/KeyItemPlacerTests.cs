@@ -586,6 +586,54 @@ public class KeyItemPlacerTests
         Assert.True(res.Success, string.Join("\n", res.Log));
     }
 
+    /// <summary>
+    /// The B3 endgame (and the goal 060d) is reachable ONLY through the heliport, i.e. the Entrance Key
+    /// (0x2e) is a hard B3 requirement: 0107→0400 (Entrance Key) → 0401 → the heliport transport / the
+    /// heliport-powered elevators are the only real descent. Every other apparent descent is an
+    /// intra-facility shortcut that unlocks only after the heliport route:
+    ///  • the Large Size Elevator B3 stop 060F→0600 requires the heliport (reqRoom 0401);
+    ///  • the 0309 shuttle deep stops 0309→050B / 0309→0604 require Third Energy Control 050B, which is
+    ///    itself reachable only via the heliport — so the facility elevator (0107→0113, DDK-N discs) can
+    ///    reach B1 but NOT teleport into the B2/B3 hub.
+    /// So dropping the Entrance Key must make the goal UNREACHABLE even while every other key (incl. the
+    /// DDK-N pair 0x63/0x6a) is held. Dropping only the DDK-N discs must NOT — the heliport + Large
+    /// Elevator still descend — which guards against over-gating. See the entrance-key / phantom-descent findings.
+    /// </summary>
+    [Fact]
+    public void RealInstall_DeepFacility_RequiresTheEntranceKey()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return; // no game files (CI) — skip
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        var all = new HashSet<int>();
+        foreach (var rm in rooms)
+            if ((rm.Stage & 0xff) != 0x0A)
+                foreach (var it in rm.Items)
+                    if (!it.IsEmptySlot && Game.KeyItemIds.Contains(it.ItemId)) all.Add(it.ItemId);
+
+        HashSet<int> Without(params int[] drop)
+        { var h = new HashSet<int>(all); foreach (var d in drop) h.Remove(d); return h; }
+        bool GoalReachable(HashSet<int> held) =>
+            KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, held).Contains(Game.GoalRoomCode);
+
+        const int entranceKey = 0x2e, ddkInputN = 0x63, ddkCodeN = 0x6a;
+
+        // Vanilla stays beatable, and dropping only the DDK-N discs still descends via the heliport +
+        // Large Elevator (guards against over-gating the deep facility):
+        Assert.True(GoalReachable(Without()), "all keys held: goal must be reachable");
+        Assert.True(GoalReachable(Without(ddkInputN, ddkCodeN)),
+            "goal must stay reachable via the heliport + Large Elevator when only the DDK-N discs are missing");
+
+        // THE INVARIANT — the Entrance Key is a hard B3 requirement. Even holding every other key (incl.
+        // the DDK-N pair), the goal must be UNREACHABLE without it: the facility elevator + 0309 shuttle
+        // reach B1 but the B2/B3 deep stops require 050B, which is heliport-only. RED until the shuttle
+        // deep stops are gated.
+        Assert.False(GoalReachable(Without(entranceKey)),
+            "goal must be UNREACHABLE without the Entrance Key — B3 is heliport-only; the 0309 shuttle deep " +
+            "stops (0309→050B / 0309→0604) must not teleport into the B2/B3 hub without the heliport");
+    }
+
     [Theory]
     [InlineData(1)]
     [InlineData(42)]
@@ -953,6 +1001,46 @@ public class KeyItemPlacerTests
         }
     }
 
+    /// <summary>A shuffled progression key must never land in a one-way ending sink
+    /// (<see cref="DinoCrisis1.EndingZoneRoomCodes"/> — the hovercraft/port escape dead ends). Such a
+    /// placement verifies "beatable" (the reachability engine can't see the no-return property) but is an
+    /// uncollectable softlock. Full product config (shuffle + scatter + DDK) over the seed range that
+    /// reproduced it: pre-fix, seed 2 seated the Entrance Key in 0x613 Port and ~1 seed in 3 seated some
+    /// key there. See the ending-sink findings.</summary>
+    [Fact]
+    public void RealInstall_KeyShuffle_NeverSeatsKeyInEndingSink()
+    {
+        if (LoadInstall() is null) return;
+        var sinks = Game.EndingZoneRoomCodes;
+        Assert.NotEmpty(sinks); // guard against a silently-empty set making this vacuous
+        for (int seed = 1; seed <= 50; seed++)
+        {
+            var rooms = LoadInstall()!;
+            var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms, Game.Requirements),
+                new Seed(seed),
+                new RandomizerConfig
+                {
+                    ShuffleKeyItems = true,
+                    ShuffleKeyItemsIntoPickups = true,
+                    RelocateDdkDiscs = true,
+                }, _ => { });
+            new ProgressionPass().Apply(ctx);
+
+            foreach (var room in rooms)
+            {
+                int code = ((room.Stage & 0xff) << 8) | (room.Room & 0xff);
+                if (!sinks.Contains(code)) continue;
+                foreach (var item in room.Items)
+                    // Only a key the shuffle RELOCATED here is a defect (ItemId != OriginalItemId); a
+                    // vanilla Fixed key that always sat here — e.g. the optional Plug in 0x612 — ships
+                    // beatable and is never moved, so it is not the softlock class.
+                    Assert.False(!item.IsEmptySlot && Game.KeyItemIds.Contains(item.ItemId)
+                                 && item.ItemId != item.OriginalItemId,
+                        $"seed {seed}: relocated key 0x{item.ItemId:X2} seated in ending sink 0x{code:X3}");
+            }
+        }
+    }
+
     /// <summary>(ii) Place↔Verify agree with DDK discs in the pool: whenever Place returns a layout, Verify
     /// accepts it (or the pass reverted to vanilla, which is sound) — never ships an unbeatable seed.</summary>
     [Fact]
@@ -1118,7 +1206,10 @@ public class KeyItemPlacerTests
         AssertEdgeRequires(graph, 0x0113, 0x0604, items: System.Array.Empty<int>(), rooms: new[] { 0x0506 });
         AssertEdgeRequires(graph, 0x0405, 0x060F, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
         AssertEdgeRequires(graph, 0x060F, 0x030C, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
-        AssertEdgeRequires(graph, 0x060F, 0x0600, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
+        // 060F→0600 (Large Elevator B3 stop) also requires the heliport waypoint 0401: 030B alone is
+        // reachable from the start (B1 Room Key), which left a phantom descent into the whole B3 endgame
+        // that bypassed the Entrance Key. See RealInstall_DeepFacility_RequiresARealSurfaceDescent.
+        AssertEdgeRequires(graph, 0x060F, 0x0600, items: System.Array.Empty<int>(), rooms: new[] { 0x030B, 0x0401 });
     }
 
     /// <summary>

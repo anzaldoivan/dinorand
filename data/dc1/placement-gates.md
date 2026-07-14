@@ -51,7 +51,17 @@ not on a refuted item/register. Two static native traces this session settled bo
   but its output flags `0:55/0:56` are **read by nothing** — the check is native/CE-only. So it is modelled
   on the forge ROOM per the decoded chain (`DC1-ELEVATOR-ID-CARD-GATE.md`).
 - **Big/cargo elevator (`0405↔060F↔030C/0600`) — power, native.** Gated on the generator-power producer
-  room `030B` (power restored via BG Room B1 Key `0x2F`, `010D→030B`).
+  room `030B` (power restored via BG Room B1 Key `0x2F`, `010D→030B`). **Erratum (2026-07-15, user-directed):**
+  the B3 stop `060F→0600` needs an ADDITIONAL gate. `030B` is reachable from the start (`010D→030B` via the
+  B1 Room Key `0x2F`), so `requiresRoom:[030B]` alone did NOT require the Entrance Key — leaving a **phantom
+  descent**: the engine reached Carrying Out Room B3 `0600` (and the whole B3 endgame + goal `060D`) with only
+  `0x2F`, no Entrance Key, no DDK discs (measured: goal reachable holding all keys minus `{2E,63,6A}`). In the
+  real game the Large Elevator's B3 stop only works after the **heliport descent** (Entrance Key → `0400` →
+  `0401` → transport, the excluded `0401↔060D` link) powers the B3 backup generator (`0601`). Since the
+  transport link is excluded from the graph and the B3-generator flag is armed inside `0600`/`0601` (circular
+  — `0:184` "Carrying Out Room B3 event" set by `0600` sub20/31; `0601` sets no readable flag), the descent is
+  modelled on the heliport waypoint `0401` (Entrance-Key-gated, the entry to the transport descent). Same shape
+  as the elevator-hall forge gates: a free-looking door gated on its producer/prerequisite ROOM.
 
 | Door room | Dest | Real gate | Authored | Provenance |
 |---|---|---|---|---|
@@ -60,7 +70,7 @@ not on a refuted item/register. Two static native traces this session settled bo
 | 0113 | 0604 (B3) | Kirk-card forge | ✅ `requiresRoom:[0506]` | same endgame forge |
 | 0405 | 060F | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
 | 060F | 030C | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
-| 060F | 0600 | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
+| 060F | 0600 | generator power **+ heliport descent** | ✅ `requiresRoom:[030B, 0401]` | power @`030B`; B3 stop only unlocks after the heliport descent (Entrance Key → `0400` → `0401`) powers the B3 generator — closes the phantom bypass (see erratum above) |
 
 Only the `0113→floor` **descent** edges are gated; the inter-floor elevator edges (`0309↔050B↔0604`) are
 left to their door-record logic — gating them **breaks the vanilla key ordering** (measured: `Verify`
@@ -68,8 +78,10 @@ fails). All six gates are reachability-**inert** (the lab keeps non-elevator ent
 free-bridge EDGE (matters for door-rando / model soundness). This **deliberately supersedes** the
 §8c/§8d "author nothing yet" deferral **for these specific edges** (user-directed, 2026-07-14): the
 deferral was about the `2:x/3:x` toggled FLAGS; these gate the producer ROOM instead (monotonic
-room-visit, the same shape as `0400→0401`). Guard:
-`KeyItemPlacerTests.RealInstall_ElevatorDescent_GatedByForgeAndPowerRooms`.
+room-visit, the same shape as `0400→0401`). Guards:
+`KeyItemPlacerTests.RealInstall_ElevatorDescent_GatedByForgeAndPowerRooms` (edge requirements) +
+`KeyItemPlacerTests.RealInstall_DeepFacility_RequiresARealSurfaceDescent` (the goal needs a real surface
+descent — heliport or DDK-N elevator hall — so the Large Elevator B3 stop can't be a free third route).
 
 ## Endgame goal-lock — Key Card A only (re-audit 2026-07-14)
 
@@ -204,3 +216,19 @@ vanilla stays beatable via the `0113` elevator). The pre-existing `0309→0306` 
 > heliport / large-elevator route (or the `0113` elevator once `0506` is reached). Vanilla still beatable;
 > shuffle-OFF byte-identical (overlay-only). Guard: `KeyItemPlacerTests.RealInstall_HallB1ShuttleSplit_
 > GeneratorStairsCannotReachB2B3Hub` (RED on atomic `0309`, GREEN with the split).
+
+> **REFINEMENT (2026-07-15, user-directed) — the `0309` shuttle deep stops are heliport-only.** The split
+> above still let the **facility elevator** be a phantom descent: `0107→0113` (DDK-N disc pair `0x63+0x6a`)
+> lands in the `0309` shuttle region, and the shuttle stops `0309→050B` (B2) and `0309→0604` (B3) were
+> **free** — so with the DDK-N discs (whose `0x6a` the shuffle can relocate out of the Entrance-Key zone
+> `0400`) the engine reached the whole B2/B3 hub and the goal **without the Entrance Key** (measured: goal
+> reachable holding all keys minus `0x2e`). Real game: the shuttle only reaches the deep floors after the
+> heliport route — the giant elevator's B3 stop needs `0401` power, and the Third Energy Control Room
+> `050B` (the shuttle's B2 stop) is itself reachable only via the heliport. Same shape as the big-elevator
+> fix. **AUTHORED**: `0309→050B` requiresRoom `[0401]` (shuttle B2 stop needs the heliport) and
+> `0309→0604` requiresRoom `[050B]` (shuttle B3 stop needs Third Energy Control). Post-fix the whole B2/B3
+> deep facility (incl. `050B/0604/0600/0608/0609/060D`) leaves every single-key oracle probe — it appears
+> only when the Entrance Key is held. So the Entrance Key is now a hard B3 requirement. The `0113→050B` /
+> `0113→0604` forge edges (reqRoom `0506`) need no change: `0506` is itself inside the now-gated hub.
+> Vanilla still beatable (`0401` reachable with the Entrance Key). Guard:
+> `KeyItemPlacerTests.RealInstall_DeepFacility_RequiresTheEntranceKey`.

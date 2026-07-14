@@ -214,6 +214,17 @@ def compute_links(doc):
     return out
 
 
+# Design-authored scatter exclusions — NOT a hazard finding (the position still passes the §4 legal-
+# target predicate), a deliberate opt-out. `010E`/`0114` are both named "Passageway to the Backup
+# Generator" (two distinct rooms, same wiki_title); a shuffled key landing in either reads identically
+# in the spoiler log/UI, so a player can't tell which corridor to search. Keyed by room id -> set of
+# `"X,Z"` positions (matches `room_scatter`'s `at`). KEY-ITEM-SCATTER-DATA-AUDIT.md §7.
+_SCATTER_EXCLUDED = {
+    "010E": {"-9024,-7760"},  # An. Aid — duplicate room name with 0114
+    "0114": {"5632,3184"},    # An. Aid — duplicate room name with 010E
+}
+
+
 def compute_scatter(doc):
     """room_id -> scatterTargets list, for every item_control room with >=1 legal scatter target."""
     out = {}
@@ -222,6 +233,8 @@ def compute_scatter(doc):
         if not ic:
             continue
         st = room_scatter(ic.get("records", []))
+        excluded = _SCATTER_EXCLUDED.get(rid, set())
+        st = [e for e in st if e["at"] not in excluded]
         if st:
             out[rid] = st
     return out

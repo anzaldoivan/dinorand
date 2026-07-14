@@ -257,6 +257,22 @@
       "requiresRooms": []
     },
     {
+      "from": "0309",
+      "to": "050b",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0401"
+      ]
+    },
+    {
+      "from": "0309",
+      "to": "0604",
+      "requiresItems": [],
+      "requiresRooms": [
+        "050b"
+      ]
+    },
+    {
       "from": "0400",
       "to": "0401",
       "requiresItems": [],
@@ -400,7 +416,8 @@
       "to": "0600",
       "requiresItems": [],
       "requiresRooms": [
-        "030b"
+        "030b",
+        "0401"
       ]
     },
     {

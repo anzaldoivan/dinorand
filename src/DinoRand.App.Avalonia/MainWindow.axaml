@@ -214,21 +214,17 @@
                             <ComboBoxItem Content="Random" />
                         </ComboBox>
                     </StackPanel>
-                    <CheckBox Content="Randomize Doors (EXPERIMENTAL/Soft-Lock Risk)" Margin="0,2"
+                    <CheckBox Content="Randomize Doors (BROKEN)" Margin="0,2"
                               IsEnabled="{Binding CanRandomizeDoors}"
                               ToolTip.Tip="Shuffle where doors lead (reciprocal, kept provably beatable; scripted/cutscene doors left vanilla)."
                               IsChecked="{Binding RandomizeDoors, Mode=TwoWay}" />
-                    <CheckBox Content="Shuffle Key Items (EXPERIMENTAL/Soft-Lock Risk)" Margin="0,2"
+                    <CheckBox Content="Shuffle Key Items" Margin="0,2"
                               IsEnabled="{Binding CanShuffleKeyItems}"
-                              ToolTip.Tip="Relocate the door-gating key items (Entrance / BG Area / C.O. Area keys, Key Card Lv A) to new spots, kept provably beatable."
+                              ToolTip.Tip="Relocate the door-gating key items (Entrance / BG Area / C.O. Area keys, Key Card Lv. A) plus the DDK disc pairs to new spots, and also into static ammo/health pickups — kept provably beatable under the door-graph logic (a layout that can't be proven beatable reverts to vanilla); progression keys are never seated in one-way ending rooms; items conserved."
                               IsChecked="{Binding ShuffleKeyItems, Mode=TwoWay}" />
-                    <CheckBox Content="…also into ammo/health pickups" Margin="16,2,0,2"
-                              IsEnabled="{Binding CanScatterKeyItems}"
-                              ToolTip.Tip="Widen the key shuffle so a door key may also land in a static ammo/health pickup, not only another key-item spot. Progression-safe; items conserved. Needs Shuffle Key Items on."
-                              IsChecked="{Binding ShuffleKeyItemsIntoPickups, Mode=TwoWay}" />
-                    <CheckBox Content="Randomize starting inventory (EXPERIMENTAL)" Margin="0,2"
+                    <CheckBox Content="Randomize starting inventory" Margin="0,2"
                               IsEnabled="{Binding CanRandomizeStartingInventory}"
-                              ToolTip.Tip="EXPERIMENTAL — patches DINO.exe so a new game starts with a randomized supply kit (the Handgun and its ammo are always granted, so it stays beatable). Seen on the next new game after relaunch."
+                              ToolTip.Tip="New game starts with a randomized supply kit (the Handgun and its ammo are always granted). Seen on the next new game after relaunch."
                               IsChecked="{Binding RandomizeStartingInventory, Mode=TwoWay}" />
 
                     <!-- Randomize Cutscene Voices. The header checkbox is the master enable; children disable
