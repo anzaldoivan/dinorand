@@ -4,9 +4,11 @@ name: apworld-checks
 # hooks can be skipped with --no-verify, this cannot. Verifies the derived DC1 logic contract is in
 # sync with the authored data/dc1 sources and that the apworld's generation logic wires up.
 #
-# NOTE: the AP-side WorldTestBase tests (apworld/dino_crisis_1/test/) are NOT run here — they need
-# a full Archipelago checkout (Python <=3.13 + deps). Run them manually per apworld/dino_crisis_1/README.md.
-# Make this a REQUIRED check in branch protection for `main` alongside no-copyrighted-files.
+# The `apworld` job is the AP-INDEPENDENT tier (no AP checkout). The `apworld-ap-integration` job runs the
+# real AP-side WorldTestBase tests against a pinned Archipelago release — end-to-end validation of the
+# shipped world (fill, reachability, beatability, gate dependencies), the AP way. Together they are the
+# enforceable backstop; client pre-commit hooks can be --no-verify'd, these cannot.
+# Make both REQUIRED checks in branch protection for `main` alongside no-copyrighted-files.
 
 on:
   push:
@@ -30,3 +32,41 @@ jobs:
         run: python3 apworld/dino_crisis_1/selfcheck.py
       - name: DC2 apworld generation wiring self-check
         run: python3 apworld/dino_crisis_2/selfcheck.py
+      # docs/ is publish-held-back (absent from this checkout), so this degrades to the logic
+      # invariants — it still fails the build if the distilled model stops being solvable.
+      - name: reachability docs generator invariants (DOCS-AUDIENCE-PLAN.md §5a)
+        run: python3 scripts/gen_reachability.py --check
+      - name: data-reference docs generator (DOCS-AUDIENCE-PLAN.md §6.4)
+        run: python3 scripts/gen_data_reference.py --check
+
+  # AP-side end-to-end: generate/fill the actual shipped world under a real Archipelago, running the
+  # WorldTestBase suite (test_fill, test_all_state_can_reach_everything, …) plus the DinoRand gate/beatability
+  # tests. Catches AP-model drift the star re-simulation can't — the true OoTR/AP validation.
+  apworld-ap-integration:
+    runs-on: ubuntu-latest
+    env:
+      # Pinned Archipelago release. Must be >= apworld/*/archipelago.json minimum_ap_version (0.6.0).
+      # Bump deliberately (a new AP release can change WorldTestBase); tags: github.com/ArchipelagoMW/Archipelago.
+      AP_REF: "0.6.7"
+    steps:
+      - name: Checkout DinoRand
+        uses: actions/checkout@v4
+        with:
+          path: dinorand
+      - name: Checkout Archipelago (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: ArchipelagoMW/Archipelago
+          ref: ${{ env.AP_REF }}
+          path: Archipelago
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Archipelago dependencies
+        working-directory: Archipelago
+        run: python ModuleUpdate.py --yes
+      - name: Drop the DC1 world into the Archipelago checkout
+        run: cp -r dinorand/apworld/dino_crisis_1 Archipelago/worlds/dino_crisis_1
+      - name: Run the DC1 world tests (fill / reachability / beatability / gate dependencies)
+        working-directory: Archipelago
+        run: python -m pytest worlds/dino_crisis_1/test -q

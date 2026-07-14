@@ -268,6 +268,45 @@ public class DoorRandomizerTests
         Assert.DoesNotContain(start.Edges, e => e.Target.Code == 0x0100);
     }
 
+    // --- laser-fence region gate survives a shuffle (REGION-SCHEMA-PLAN.md I3) ------------------
+
+    [Fact]
+    public void FenceRegionGate_SurvivesDoorShuffle_ViaRebuildGraph()
+    {
+        // 0102's fence gate (regions.accessFrom, migrated from door-level) binds to the physical
+        // doorway (OriginalTargetCode 0107), NOT the destination. Simulate the connector repointing that
+        // doorway elsewhere AND an unrelated 0102 doorway landing on the vanilla dest 0107, then rebuild
+        // through the real overlay path (Game.Requirements). The gate must travel with the fence doorway
+        // and must NOT float onto the intruder — the door-rando gate-floating bug the region model fixes.
+        var rooms = new List<RoomFile>
+        {
+            Room(0x0102, (0x0107, 0), (0x0110, 0)),   // fence doorway (vanilla→0107) + a main doorway
+            Room(0x0107), Room(0x0110), Room(0x0500),
+        };
+        var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms, Game.Requirements),
+                                           new Seed(1), new RandomizerConfig(), _ => { });
+
+        // vanilla: the fence doorway carries requiresRoom [0106]
+        var before = ctx.Graph.Nodes.Single(n => n.Code == 0x0102)
+                        .Edges.Single(e => e.Door.OriginalTargetCode == 0x0107);
+        Assert.Equal(new[] { 0x0106 }, before.Requires.RoomsVisited);
+
+        // connector repoints: fence doorway 0107→0500; the main doorway 0110→0107 (now targets the
+        // vanilla fence destination). OriginalTargetCode of each door is unchanged.
+        var fenceDoor = rooms[0].Doors.Single(d => d.OriginalTargetCode == 0x0107);
+        var mainDoor = rooms[0].Doors.Single(d => d.OriginalTargetCode == 0x0110);
+        Repoint(fenceDoor, 0x0500);
+        Repoint(mainDoor, 0x0107);
+        ctx.RebuildGraph();
+
+        var node = ctx.Graph.Nodes.Single(n => n.Code == 0x0102);
+        // gate travelled with the fence doorway to its new target 0500
+        Assert.Equal(new[] { 0x0106 },
+            node.Edges.Single(e => e.Door.OriginalTargetCode == 0x0107).Requires.RoomsVisited);
+        // the intruder now pointing at 0107 did NOT inherit the fence gate
+        Assert.True(node.Edges.Single(e => e.Door.OriginalTargetCode == 0x0110).Requires.IsEmpty);
+    }
+
     // --- pose carry: decoded + live (Increment A, CE-validated 2026-06-20) ----------------------
 
     [Fact]

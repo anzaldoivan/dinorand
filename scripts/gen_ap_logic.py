@@ -32,6 +32,56 @@ DC1 = REPO / "data" / "dc1"
 
 EMPTY_SLOT_ID = 0xFF  # DC1 empty item slot sentinel
 
+# Constructs the AP star-topology model CANNOT faithfully represent (GRAPH-LOGIC-PARITY "parity
+# contract"). Today: rooms with an entry-direction node-split ("nodeSplit": true) — the star model has
+# no door topology, so it cannot see the sub-region partition (the 0309 shuttle fence). Each such room is
+# a DECLARED, bounded debt, deferred to the apworld region-graph follow-up (REGION-SCHEMA-PLAN §2). The
+# distiller FAILS CLOSED if map.json grows a node-split not listed here, so a new inexpressible construct
+# can never be silently dropped the way 0309 was for weeks. Must equal the live map.json node-split set.
+AP_UNREPRESENTABLE: set[str] = {"0309"}
+
+ORACLE = DC1 / "reachability-oracle.json"  # engine-truth golden snapshot (Dc1ReachabilityOracleTests)
+
+
+def _dc1_node_split_rooms() -> set[str]:
+    """The canonical codes of every map.json room declaring \"nodeSplit\": true."""
+    raw = json.loads((DC1 / "map.json").read_text(encoding="utf-8"))
+    return {_code(c) for c, room in raw["rooms"].items() if room.get("nodeSplit") is True}
+
+
+def _assert_dc1_parity(require_oracle: bool) -> None:
+    """Gap B (fail-closed) + Gap C (oracle↔source) tripwire — no game install needed, so it runs on CI.
+
+    Errors (loudly, with the offending rooms) when the AP star model would silently misrepresent the
+    authored graph: a node-split not on AP_UNREPRESENTABLE, a stale allow-list entry, or a
+    reachability-oracle that no longer agrees with map.json's node-split set (i.e. the golden snapshot
+    went stale — e.g. someone removed the 0309 split from map.json but did not regenerate the oracle)."""
+    live = _dc1_node_split_rooms()
+    if live != AP_UNREPRESENTABLE:
+        added = sorted(live - AP_UNREPRESENTABLE)
+        removed = sorted(AP_UNREPRESENTABLE - live)
+        raise SystemExit(
+            "gen_ap_logic: map.json node-split set != AP_UNREPRESENTABLE allow-list.\n"
+            + (f"  NEW node-split(s) the AP star model cannot represent: {added} — either author the "
+               "apworld region-graph for them or add them to AP_UNREPRESENTABLE with a rationale.\n" if added else "")
+            + (f"  allow-list has stale ent(s) no longer in map.json: {removed} — shrink AP_UNREPRESENTABLE.\n" if removed else "")
+            + "  (GRAPH-LOGIC-PARITY parity contract.)"
+        )
+    if require_oracle:
+        if not ORACLE.exists():
+            raise SystemExit(
+                f"gen_ap_logic: {ORACLE.relative_to(REPO)} missing — regenerate it with "
+                "DINORAND_UPDATE_ORACLE=1 dotnet test --filter Dc1ReachabilityOracleTests and stage it."
+            )
+        oracle = json.loads(ORACLE.read_text(encoding="utf-8"))
+        oset = {_code(c) for c in oracle.get("nodeSplitRooms", [])}
+        if oset != live:
+            raise SystemExit(
+                f"gen_ap_logic: {ORACLE.relative_to(REPO)} is STALE — its nodeSplitRooms {sorted(oset)} "
+                f"!= map.json {sorted(live)}. Regenerate with DINORAND_UPDATE_ORACLE=1 "
+                "dotnet test --filter Dc1ReachabilityOracleTests and stage it. (Gap C oracle↔source.)"
+            )
+
 
 def _code(s: str) -> str:
     """Canonicalise a room code to lowercase 4-hex (map.json mixes '030C' and '010d')."""
@@ -82,6 +132,29 @@ def load_map() -> dict:
                     "requiresRooms": req_rooms,
                 }
             )
+        # Laser-fence sub-room regions (REGION-SCHEMA-PLAN.md): each non-primary region's accessFrom
+        # rule gates the edges to that region's door destinations — the room-granular AP analog of the
+        # doorway-keyed gate the C# stamps (the two fence gates 0102/010A migrated here from door-level).
+        # Primary regions (no accessFrom) and always-open fences (empty rule) emit nothing. 0606's
+        # item-only segment is gated at the item layer (Key Card C, not a progression item), not an edge.
+        for region in (room.get("regions") or {}).values():
+            af = region.get("accessFrom")
+            if not af:
+                continue
+            req_items = [_item_id(i) for r in af.values() for i in (r.get("requires") or [])]
+            gate_rooms = [_code(r) for rr in af.values() for r in (rr.get("requiresRoom") or [])]
+            if not req_items and not gate_rooms:
+                continue  # always-open fence — no gate
+            for target in (region.get("doors") or []):
+                tc = _code(target)
+                edges.append(
+                    {
+                        "from": c,
+                        "to": tc,
+                        "requiresItems": req_items,
+                        "requiresRooms": [r for r in gate_rooms if r != tc],
+                    }
+                )
     # Ensure every referenced room exists as a region (targets/gates may point outside the keyset).
     for e in edges:
         for c in [e["to"], *e["requiresRooms"]]:
@@ -93,7 +166,20 @@ def load_map() -> dict:
     return {"regions": regions, "edges": edges, "startRoom": start, "goalRoom": end}
 
 
+def _source(rec) -> str:
+    """Classify how a pickup record materialises (STATIC-SCD-RE cont.60): a real id placed at
+    room load = static; id 0xff = runtime-armed slot (a trigger/native code sets the id later,
+    TRIGGER-DECODE item-gate layer — never guess the id); a real id placed by a non-load event
+    sub = event-granted."""
+    if _item_id(rec["item_id"]) == EMPTY_SLOT_ID:
+        return "runtime-armed (trigger)"
+    kind = (rec.get("trigger") or {}).get("kind")
+    return "static" if kind in ("init", "init_gosub", "aot_zone") else "event-granted"
+
+
 def load_locations(item_names: dict[int, str]) -> list[dict]:
+    """ALL decoded pickup rows, each tagged `source` — nothing is silently dropped here;
+    build_dc1 filters what the AP contract can actually place."""
     raw = json.loads((DC1 / "room-data.json").read_text(encoding="utf-8"))
     rooms = raw["rooms"]
     room_name = {_code(c): r.get("name", c) for c, r in rooms.items()}
@@ -106,8 +192,6 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
         c = _code(code)
         for rec in ic["records"]:
             iid = _item_id(rec["item_id"])
-            if iid == EMPTY_SLOT_ID:
-                continue
             pos = rec.get("pos") or [0, 0]
             x, y = int(pos[0]), int(pos[1])
             key = f"{c}:{iid:02x}:{x},{y}"
@@ -115,24 +199,38 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
                 continue
             seen.add(key)
             iname = item_names.get(iid, _clean(rec.get("item_name", f"0x{iid:02x}")))
-            locs.append(
-                {
-                    "key": key,
-                    "name": f"{room_name.get(c, c)} ({c}) - {iname} @{x},{y}",
-                    "room": c,
-                    "itemId": iid,
-                    "itemName": iname,
-                    "pos": [x, y],
-                    "collectedFlag": rec.get("collected_flag"),
-                }
-            )
+            loc = {
+                "key": key,
+                "name": f"{room_name.get(c, c)} ({c}) - {iname} @{x},{y}",
+                "room": c,
+                "itemId": iid,
+                "itemName": iname,
+                "pos": [x, y],
+                "collectedFlag": rec.get("collected_flag"),
+                "source": _source(rec),
+            }
+            fl = (rec.get("gate") or {}).get("flag")
+            if fl:
+                loc["gateFlag"] = f"{fl['group']}:{fl['index']}"
+            locs.append(loc)
     return locs
 
 
 def build_dc1() -> dict:
+    _assert_dc1_parity(require_oracle=False)  # fail closed: never silently drop an unrepresentable construct
     items = load_items()
     m = load_map()
-    locs = load_locations(items["names"])
+    all_locs = load_locations(items["names"])
+    # AP contract: only real-id pickups in rooms on the door graph are placeable checks.
+    # Runtime-armed 0xff slots (no id to place against) and alt-room copies outside the
+    # graph stay visible in DATA-REFERENCE.md via load_locations' `source` tag.
+    locs = [l for l in all_locs
+            if l["itemId"] != EMPTY_SLOT_ID and l["room"] in m["regions"]]
+    off_graph = sorted({l["room"] for l in all_locs
+                        if l["itemId"] != EMPTY_SLOT_ID and l["room"] not in m["regions"]})
+    if off_graph:
+        print(f"  NOTE: dc1 pickups in {len(off_graph)} room(s) outside the door graph "
+              f"excluded from the AP contract: {off_graph}")
     progression = sorted({i for e in m["edges"] for i in e["requiresItems"]})
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
@@ -258,7 +356,8 @@ def build_dc2() -> dict:
                 "room": code,
                 "itemId": it["id"],
                 "itemName": tname,
-                "pos": [it["id_blob_off"], 0],
+                # trigger-quad first corner (item-placements pos, 2026-07-12); old blob-off fallback
+                "pos": it.get("pos") or [it["id_blob_off"], 0],
                 "collectedFlag": None,
             })
 
@@ -382,6 +481,7 @@ def check_dc2(data: dict) -> None:
 
 
 def check_dc1(data: dict) -> None:
+    _assert_dc1_parity(require_oracle=True)  # + oracle golden snapshot still agrees with the source
     names = _check_common(data)
     assert data["startRoom"] == "010d", data["startRoom"]
     assert data["goalRoom"] == "060d", data["goalRoom"]

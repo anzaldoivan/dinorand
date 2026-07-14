@@ -49,6 +49,13 @@ public sealed class DinoCrisis1 : GameDefinition
     public override IReadOnlySet<int> KeyItemIds { get; } =
         new HashSet<int>(Enumerable.Range(0x2B, 0x6F - 0x2B + 1));
 
+    // The DDK Input (0x62–0x68) + Code (0x69–0x6f) disc band — the overlay-`requires` progression keys the
+    // opt-in RelocateDdkDiscs flag adds to the shuffle pool. Deliberately NOT the whole KeyItemIds ∩ requires
+    // set: it excludes B1 Room Key 0x2F (also a `requires` gate) so the flag's scope matches its name, and the
+    // panel keys 0x3d/0x3e (which gate no modeled edge). docs/decisions/dc1/items/PROGRESSION-KEY-RELOCATION-RESEARCH.md.
+    public override IReadOnlySet<int> OverlayRelocationKeyIds { get; } =
+        new HashSet<int>(Enumerable.Range(0x62, 0x6f - 0x62 + 1));
+
     // Shuffleable consumables = ammo (0x10–0x1A) + health (0x1B–0x23). Real ids/names
     // from data/dc1/items.json; weights bias ammo over healing.
     public override IReadOnlyList<ItemPoolEntry> ItemPool { get; } = new[]
@@ -212,6 +219,16 @@ public sealed class DinoCrisis1 : GameDefinition
     // standalone pickup in 0x0402, so it stays randomizable and keeps its ammo linked. docs/decisions/cross/ITEM-RANDO-PLAN.md.
     public override IReadOnlySet<int> ItemProtectedRoomCodes { get; } =
         new HashSet<int> { 0x060d, 0x0610, 0x0612 };
+
+    // One-way ending sinks: the hovercraft/port escape ride and the heliport film. Reached only via
+    // decoded one-way static doors (0610->0612/0613, 0612->060C, 0402->040D) and, per the all-keys
+    // directed graph, they can reach neither the goal 060D nor back to the main map. The reachability
+    // engine still models them as reachable (you can stand in them), so a shuffled progression key here
+    // verifies "beatable" but is an uncollectable softlock — vanilla places no required key in any of
+    // them (unlike the returnable port cluster 060A/060B/0609/0615, which hold vanilla DDK discs / key
+    // chips). The key shuffle excludes these from the placement spot pool (ProgressionPass.ShuffleDoorKeys).
+    public override IReadOnlySet<int> EndingZoneRoomCodes { get; } =
+        new HashSet<int> { 0x0612, 0x0613, 0x060c, 0x040d };
 
     // Backyard of the Facility — the game's opening room (BFS root for progression logic).
     public override int StartRoomCode => 0x010d;

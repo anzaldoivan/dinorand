@@ -202,9 +202,16 @@ shuffle is enabled.
 - `0x4C` Stabilizer + `0x4D` Initializer → Third Energy (B2↔B3) → required for all endings.
 - `0x58` Pulse Receiver → locate Kirk (third ending); `0x54` Energy Tank → Rick-ending hovercraft.
 
-**DDK disc pairs** (each `Input`+`Code` pair solves one door-decode puzzle; gate a specific door):
-H `0x62`/`0x69` · N `0x63`/`0x6A` · L `0x64`/`0x6B` · E `0x65`/`0x6C` · W `0x66`/`0x6D` ·
-S `0x67`/`0x6E` · D `0x68`/`0x6F`.
+**DDK disc pairs** — each `Input`+`Code` pair (Code id = Input id + 7) is checked by the NATIVE
+DDK screen disc-pair gate (`0x4B182A`, op58 subtype-3; STATIC-SCD-RE.md cont.61 §C) and unlocks
+exactly one door:
+- H `0x62`/`0x69` → `0203`→`0202` (Chief's Room)
+- N `0x63`/`0x6A` → `0107`→`0113` (Elevator Hall)
+- L `0x64`/`0x6B` → `0309`→`0306` (Main Hallway)
+- E `0x65`/`0x6C` → `0304`→`0300` (Experiment Simulation Room)
+- W `0x66`/`0x6D` → `0604`→`0609` (Immigration Office)
+- S `0x67`/`0x6E` → `0506`→`0507` (Parts Storage)
+- D `0x68`/`0x6F` → `0507`→`0508` (Passageway)
 
 **Plug `0x2B`** is a repeated consumable-style key (many copies across rooms) used to power panels — not
 a single-instance gate; safe to treat as a non-progression key.

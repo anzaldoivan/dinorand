@@ -6,8 +6,16 @@ The index is GENERATED — never hand-edit docs/index.md; run this with --apply.
     --apply   (re)write docs/index.md from every corpus:true doc's frontmatter.
     --check   fail (exit 1) if any docs/**/*.md lacks frontmatter, or if
               docs/index.md is stale vs a fresh regeneration (i.e. a corpus doc
-              was added/renamed/removed without regenerating). Used by the
-              pre-commit hook so the index can never silently drift again.
+              was added/renamed/removed without regenerating), or if any doc
+              carries a dangling relative markdown link (link integrity —
+              DOCS-AUDIENCE-PLAN.md §2). Used by the pre-commit hook so the
+              index and the link graph can never silently drift again.
+
+Link integrity scans docs/**/*.md (excluding the corpus:false scaffolding dirs)
+plus the root-published pages (README, CONTRIBUTING, USER-GUIDE, MODDING) — the
+audience layer is links-only, so a dangling link there is rot by definition.
+External URLs, mailto:, pure #anchors and [[memory-slug]] wiki links are ignored;
+fenced/inline code is stripped before scanning.
 
 One line per corpus doc:  `- [title](path) — status · hook`
 where title/status come from frontmatter and hook is the doc's first body line.
@@ -142,6 +150,42 @@ def render(corpus):
     return "\n".join(out).rstrip() + "\n"
 
 
+# Link integrity (DOCS-AUDIENCE-PLAN.md §2) ---------------------------------------------------
+
+LINK_RE = re.compile(r'\[[^\]]*\]\(([^)\s]+)\)')
+LINK_SKIP_DIRS = ("_prompts", "_reference-dumps", "DOCS-REFACTOR", ".git")
+ROOT_PAGES = ("README.md", "CONTRIBUTING.md", "USER-GUIDE.md", "MODDING.md")
+
+
+def _strip_code(text):
+    text = re.sub(r'```.*?```', '', text, flags=re.S)
+    return re.sub(r'`[^`\n]*`', '', text)
+
+
+def check_links():
+    """Dangling relative markdown links in docs/ (sans scaffolding dirs) + the root pages."""
+    files = []
+    for dirpath, dirnames, filenames in os.walk(DOCS):
+        dirnames[:] = [d for d in dirnames if d not in LINK_SKIP_DIRS]
+        files += [os.path.join(dirpath, f) for f in filenames if f.endswith(".md")]
+    files += [p for p in (os.path.join(ROOT, name) for name in ROOT_PAGES)
+              if os.path.exists(p)]
+    dangling = []
+    for p in sorted(files):
+        with open(p, encoding="utf-8") as fh:
+            text = _strip_code(fh.read())
+        for target in LINK_RE.findall(text):
+            if target.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            frag = target.split("#", 1)[0]
+            if not frag:
+                continue
+            resolved = os.path.normpath(os.path.join(os.path.dirname(p), frag))
+            if not os.path.exists(resolved):
+                dangling.append(f"{os.path.relpath(p, ROOT)} -> {target}")
+    return dangling
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "--check"
     corpus, missing = collect()
@@ -157,6 +201,13 @@ def main():
         return 0
     # --check
     ok = True
+    dangling = check_links()
+    if dangling:
+        ok = False
+        print("gen_docs_index: dangling relative links (fix the path or the target):",
+              file=sys.stderr)
+        for d in dangling:
+            print(f"  - {d}", file=sys.stderr)
     if missing:
         ok = False
         print("gen_docs_index: these docs/ files lack YAML frontmatter:", file=sys.stderr)

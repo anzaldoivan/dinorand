@@ -104,9 +104,79 @@
   },
   "edges": [
     {
+      "from": "0102",
+      "to": "0101",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0202",
+        "0107"
+      ]
+    },
+    {
+      "from": "0102",
+      "to": "0104",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0202",
+        "0107"
+      ]
+    },
+    {
+      "from": "0102",
+      "to": "0107",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106"
+      ]
+    },
+    {
+      "from": "0105",
+      "to": "0307",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "0107",
+      "to": "0113",
+      "requiresItems": [
+        99,
+        106
+      ],
+      "requiresRooms": []
+    },
+    {
       "from": "0108",
       "to": "0113",
       "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "0107",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0202"
+      ]
+    },
+    {
+      "from": "010d",
+      "to": "010a",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0114"
+      ]
+    },
+    {
+      "from": "010d",
+      "to": "030b",
+      "requiresItems": [
+        47
+      ],
       "requiresRooms": []
     },
     {
@@ -114,6 +184,58 @@
       "to": "0114",
       "requiresItems": [
         48
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "0404",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "0309",
+      "requiresItems": [
+        65
+      ],
+      "requiresRooms": [
+        "010b"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "050b",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0506"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "0604",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0506"
+      ]
+    },
+    {
+      "from": "0203",
+      "to": "0202",
+      "requiresItems": [
+        98,
+        105
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresItems": [
+        101,
+        108
       ],
       "requiresRooms": []
     },
@@ -126,6 +248,31 @@
       ]
     },
     {
+      "from": "0309",
+      "to": "0306",
+      "requiresItems": [
+        100,
+        107
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309",
+      "to": "050b",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0401"
+      ]
+    },
+    {
+      "from": "0309",
+      "to": "0604",
+      "requiresItems": [],
+      "requiresRooms": [
+        "050b"
+      ]
+    },
+    {
       "from": "0400",
       "to": "0401",
       "requiresItems": [],
@@ -134,10 +281,36 @@
       ]
     },
     {
+      "from": "0405",
+      "to": "060f",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
       "from": "0503",
       "to": "060d",
       "requiresItems": [
         58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0506",
+      "to": "0507",
+      "requiresItems": [
+        103,
+        110
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0507",
+      "to": "0508",
+      "requiresItems": [
+        104,
+        111
       ],
       "requiresRooms": []
     },
@@ -182,6 +355,15 @@
       "requiresRooms": []
     },
     {
+      "from": "0604",
+      "to": "0609",
+      "requiresItems": [
+        102,
+        109
+      ],
+      "requiresRooms": []
+    },
+    {
       "from": "0606",
       "to": "0605",
       "requiresItems": [
@@ -222,6 +404,23 @@
       "requiresRooms": []
     },
     {
+      "from": "060f",
+      "to": "030c",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "0600",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b",
+        "0401"
+      ]
+    },
+    {
       "from": "0611",
       "to": "0505",
       "requiresItems": [
@@ -231,6 +430,38 @@
     }
   ],
   "locations": [
+    {
+      "key": "0100:12:-1712,-2528",
+      "name": "Locker Room (0100) - An. Darts S @-1712,-2528",
+      "room": "0100",
+      "itemId": 18,
+      "itemName": "An. Darts S",
+      "pos": [
+        -1712,
+        -2528
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 18
+      },
+      "source": "static"
+    },
+    {
+      "key": "0100:69:-1088,2976",
+      "name": "Locker Room (0100) - DDK Code Disc H @-1088,2976",
+      "room": "0100",
+      "itemId": 105,
+      "itemName": "DDK Code Disc H",
+      "pos": [
+        -1088,
+        2976
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 105
+      },
+      "source": "static"
+    },
     {
       "key": "0103:01:2288,-2224",
       "name": "Management Office (0103) - Shotgun \"Model PA3\" (pump-action) @2288,-2224",
@@ -244,7 +475,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 1
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0103:3e:-2800,992",
@@ -259,7 +491,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 62
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0103:62:-512,1072",
@@ -274,7 +507,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 98
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "7:84"
     },
     {
       "key": "0103:2b:-544,640",
@@ -289,7 +524,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "event-granted"
     },
     {
       "key": "0103:20:-2576,3008",
@@ -304,7 +540,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 32
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0103:2e:-2576,3008",
@@ -319,7 +556,88 @@
       "collectedFlag": {
         "group": 8,
         "bit": 46
-      }
+      },
+      "source": "static"
+    },
+    {
+      "key": "0104:41:-2352,-272",
+      "name": "Strategy Room (0104) - F. C. Device \" without FingerPrint \" @-2352,-272",
+      "room": "0104",
+      "itemId": 65,
+      "itemName": "F. C. Device \" without FingerPrint \"",
+      "pos": [
+        -2352,
+        -272
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 65
+      },
+      "source": "static"
+    },
+    {
+      "key": "0104:6c:-528,1280",
+      "name": "Strategy Room (0104) - DDK Code Disc E @-528,1280",
+      "room": "0104",
+      "itemId": 108,
+      "itemName": "DDK Code Disc E",
+      "pos": [
+        -528,
+        1280
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 108
+      },
+      "source": "static"
+    },
+    {
+      "key": "0104:2b:-2880,-2032",
+      "name": "Strategy Room (0104) - Plug @-2880,-2032",
+      "room": "0104",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -2880,
+        -2032
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0105:16:-4096,3072",
+      "name": "Control Room Hall (0105) - 9mm Parabellum @-4096,3072",
+      "room": "0105",
+      "itemId": 22,
+      "itemName": "9mm Parabellum",
+      "pos": [
+        -4096,
+        3072
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 22
+      },
+      "source": "static"
+    },
+    {
+      "key": "0107:20:2384,-2208",
+      "name": "Main Entrance (0107) - An. Aid @2384,-2208",
+      "room": "0107",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        2384,
+        -2208
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
     },
     {
       "key": "0108:2b:-8256,-7904",
@@ -334,7 +652,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0108:2b:-8240,-7904",
@@ -349,7 +668,153 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "7:99"
+    },
+    {
+      "key": "0109:2f:2560,-1632",
+      "name": "Lecture Room (0109) - BG Room B1 Key @2560,-1632",
+      "room": "0109",
+      "itemId": 47,
+      "itemName": "BG Room B1 Key",
+      "pos": [
+        2560,
+        -1632
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 47
+      },
+      "source": "static"
+    },
+    {
+      "key": "010b:36:5008,-840",
+      "name": "Office (010b) - ID Card Type \" Researcher \" @5008,-840",
+      "room": "010b",
+      "itemId": 54,
+      "itemName": "ID Card Type \" Researcher \"",
+      "pos": [
+        5008,
+        -840
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 54
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "010c:1d:704,2928",
+      "name": "Material Storage (010c) - Med. Pak M @704,2928",
+      "room": "010c",
+      "itemId": 29,
+      "itemName": "Med. Pak M",
+      "pos": [
+        704,
+        2928
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 29
+      },
+      "source": "static"
+    },
+    {
+      "key": "010c:30:-2992,2720",
+      "name": "Material Storage (010c) - BG Area Key @-2992,2720",
+      "room": "010c",
+      "itemId": 48,
+      "itemName": "BG Area Key",
+      "pos": [
+        -2992,
+        2720
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 48
+      },
+      "source": "static"
+    },
+    {
+      "key": "010d:20:-6144,768",
+      "name": "Backyard of the Facility (010d) - An. Aid @-6144,768",
+      "room": "010d",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        -6144,
+        768
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
+    },
+    {
+      "key": "010e:20:-9024,-7760",
+      "name": "Passageway to the Backup Generator (010e) - An. Aid @-9024,-7760",
+      "room": "010e",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        -9024,
+        -7760
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
+    },
+    {
+      "key": "010f:40:-5120,3584",
+      "name": "Backup Generator Room 1F (010f) - Startup Battery. R \" Charged \" @-5120,3584",
+      "room": "010f",
+      "itemId": 64,
+      "itemName": "Startup Battery. R \" Charged \"",
+      "pos": [
+        -5120,
+        3584
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 64
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "0113:2b:-7008,2928",
+      "name": "Elevator Hall (0113) - Plug @-7008,2928",
+      "room": "0113",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -7008,
+        2928
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0114:20:5632,3184",
+      "name": "Passageway to the Backup Generator (0114) - An. Aid @5632,3184",
+      "room": "0114",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        5632,
+        3184
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
     },
     {
       "key": "0202:63:-3568,720",
@@ -364,7 +829,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 99
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0202:10:2020,-1392",
@@ -379,7 +845,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 16
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0202:3d:-1792,1792",
@@ -394,7 +861,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 61
-      }
+      },
+      "source": "event-granted"
     },
     {
       "key": "0202:47:-3468,2768",
@@ -409,7 +877,25 @@
       "collectedFlag": {
         "group": 8,
         "bit": 71
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "2:11"
+    },
+    {
+      "key": "0203:10:4800,4100",
+      "name": "Hall 2F (0203) - SG Bullets @4800,4100",
+      "room": "0203",
+      "itemId": 16,
+      "itemName": "SG Bullets",
+      "pos": [
+        4800,
+        4100
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 16
+      },
+      "source": "static"
     },
     {
       "key": "0204:13:3800,2800",
@@ -424,7 +910,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 19
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0204:0e:2000,-3000",
@@ -439,7 +926,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 14
-      }
+      },
+      "source": "static",
+      "gateFlag": "2:11"
     },
     {
       "key": "0205:11:-208,-1248",
@@ -454,7 +943,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 17
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0205:45:-2032,1632",
@@ -469,7 +959,89 @@
       "collectedFlag": {
         "group": 8,
         "bit": 69
-      }
+      },
+      "source": "static",
+      "gateFlag": "7:38"
+    },
+    {
+      "key": "0206:20:-656,-3168",
+      "name": "Main Entrance (0206) - An. Aid @-656,-3168",
+      "room": "0206",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        -656,
+        -3168
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
+    },
+    {
+      "key": "0300:0c:4512,-944",
+      "name": "Experiment Simulation Room (0300) - Shotgun Stock @4512,-944",
+      "room": "0300",
+      "itemId": 12,
+      "itemName": "Shotgun Stock",
+      "pos": [
+        4512,
+        -944
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 12
+      },
+      "source": "static"
+    },
+    {
+      "key": "0300:14:-8048,4560",
+      "name": "Experiment Simulation Room (0300) - An. Darts L @-8048,4560",
+      "room": "0300",
+      "itemId": 20,
+      "itemName": "An. Darts L",
+      "pos": [
+        -8048,
+        4560
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 20
+      },
+      "source": "static"
+    },
+    {
+      "key": "0302:2b:2880,-3056",
+      "name": "Research Meeting Room (0302) - Plug @2880,-3056",
+      "room": "0302",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        2880,
+        -3056
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0302:65:-1280,1152",
+      "name": "Research Meeting Room (0302) - DDK Input Disc E @-1280,1152",
+      "room": "0302",
+      "itemId": 101,
+      "itemName": "DDK Input Disc E",
+      "pos": [
+        -1280,
+        1152
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 101
+      },
+      "source": "static"
     },
     {
       "key": "0303:21:512,-2048",
@@ -484,7 +1056,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 33
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0303:2d:3088,-1008",
@@ -499,7 +1072,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 45
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:90"
     },
     {
       "key": "0303:46:3088,-1008",
@@ -514,7 +1089,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 70
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:86"
     },
     {
       "key": "0303:46:3328,-2560",
@@ -529,7 +1106,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 70
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:86"
     },
     {
       "key": "0304:2b:-4700,6100",
@@ -544,7 +1123,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0304:44:-1500,0",
@@ -559,7 +1139,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 68
-      }
+      },
+      "source": "static",
+      "gateFlag": "7:37"
     },
     {
       "key": "0305:1d:-6864,5888",
@@ -574,7 +1156,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 29
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0305:0d:-2176,2032",
@@ -589,7 +1172,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 13
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0305:5e:-6400,-4864",
@@ -604,7 +1188,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 94
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "0:96"
     },
     {
       "key": "0305:48:2304,2560",
@@ -619,7 +1205,312 @@
       "collectedFlag": {
         "group": 8,
         "bit": 72
-      }
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "0308:1d:1536,-2464",
+      "name": "Medical Room (0308) - Med. Pak M @1536,-2464",
+      "room": "0308",
+      "itemId": 29,
+      "itemName": "Med. Pak M",
+      "pos": [
+        1536,
+        -2464
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 29
+      },
+      "source": "static"
+    },
+    {
+      "key": "0308:2b:-368,2512",
+      "name": "Medical Room (0308) - Plug @-368,2512",
+      "room": "0308",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -368,
+        2512
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0308:34:-128,-1792",
+      "name": "Medical Room (0308) - ID Card Type \" Colonel \" @-128,-1792",
+      "room": "0308",
+      "itemId": 52,
+      "itemName": "ID Card Type \" Colonel \"",
+      "pos": [
+        -128,
+        -1792
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 52
+      },
+      "source": "static"
+    },
+    {
+      "key": "0308:23:-1185,1451",
+      "name": "Medical Room (0308) - Multiplier @-1185,1451",
+      "room": "0308",
+      "itemId": 35,
+      "itemName": "Multiplier",
+      "pos": [
+        -1185,
+        1451
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 35
+      },
+      "source": "static"
+    },
+    {
+      "key": "0308:1d:-1185,1451",
+      "name": "Medical Room (0308) - Med. Pak M @-1185,1451",
+      "room": "0308",
+      "itemId": 29,
+      "itemName": "Med. Pak M",
+      "pos": [
+        -1185,
+        1451
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 29
+      },
+      "source": "static"
+    },
+    {
+      "key": "0308:1f:-1185,1451",
+      "name": "Medical Room (0308) - Resuscitation @-1185,1451",
+      "room": "0308",
+      "itemId": 31,
+      "itemName": "Resuscitation",
+      "pos": [
+        -1185,
+        1451
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 31
+      },
+      "source": "static"
+    },
+    {
+      "key": "030b:2b:-4272,-1296",
+      "name": "Backup Generator Room B1 (030b) - Plug @-4272,-1296",
+      "room": "030b",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -4272,
+        -1296
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "030b:40:-5120,3584",
+      "name": "Backup Generator Room B1 (030b) - Startup Battery. R \" Charged \" @-5120,3584",
+      "room": "030b",
+      "itemId": 64,
+      "itemName": "Startup Battery. R \" Charged \"",
+      "pos": [
+        -5120,
+        3584
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 64
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "030c:13:-7700,6900",
+      "name": "Carrying Out Room B1 (030c) - An. Darts M @-7700,6900",
+      "room": "030c",
+      "itemId": 19,
+      "itemName": "An. Darts M",
+      "pos": [
+        -7700,
+        6900
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 19
+      },
+      "source": "static"
+    },
+    {
+      "key": "030c:35:-7700,6900",
+      "name": "Carrying Out Room B1 (030c) - ID Card Type \" Communicator \" @-7700,6900",
+      "room": "030c",
+      "itemId": 53,
+      "itemName": "ID Card Type \" Communicator \"",
+      "pos": [
+        -7700,
+        6900
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 53
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "0400:6a:13264,1792",
+      "name": "Front Area of Entrance (0400) - DDK Code Disc N @13264,1792",
+      "room": "0400",
+      "itemId": 106,
+      "itemName": "DDK Code Disc N",
+      "pos": [
+        13264,
+        1792
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 106
+      },
+      "source": "static"
+    },
+    {
+      "key": "0400:20:12576,1328",
+      "name": "Front Area of Entrance (0400) - An. Aid @12576,1328",
+      "room": "0400",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        12576,
+        1328
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
+    },
+    {
+      "key": "0400:10:7984,1104",
+      "name": "Front Area of Entrance (0400) - SG Bullets @7984,1104",
+      "room": "0400",
+      "itemId": 16,
+      "itemName": "SG Bullets",
+      "pos": [
+        7984,
+        1104
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 16
+      },
+      "source": "static"
+    },
+    {
+      "key": "0402:18:5888,-12960",
+      "name": "Hangar (0402) - Grenade Bullets @5888,-12960",
+      "room": "0402",
+      "itemId": 24,
+      "itemName": "Grenade Bullets",
+      "pos": [
+        5888,
+        -12960
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 24
+      },
+      "source": "static"
+    },
+    {
+      "key": "0402:18:-4352,-12992",
+      "name": "Hangar (0402) - Grenade Bullets @-4352,-12992",
+      "room": "0402",
+      "itemId": 24,
+      "itemName": "Grenade Bullets",
+      "pos": [
+        -4352,
+        -12992
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 24
+      },
+      "source": "static"
+    },
+    {
+      "key": "0402:09:-5888,-11520",
+      "name": "Hangar (0402) - Grenade Gun (40mmHK) @-5888,-11520",
+      "room": "0402",
+      "itemId": 9,
+      "itemName": "Grenade Gun (40mmHK)",
+      "pos": [
+        -5888,
+        -11520
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 9
+      },
+      "source": "static"
+    },
+    {
+      "key": "0404:11:-4200,3200",
+      "name": "Large Size Elevator Passageway (0404) - Slag Bullets @-4200,3200",
+      "room": "0404",
+      "itemId": 17,
+      "itemName": "Slag Bullets",
+      "pos": [
+        -4200,
+        3200
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 17
+      },
+      "source": "static"
+    },
+    {
+      "key": "0404:11:5300,3000",
+      "name": "Large Size Elevator Passageway (0404) - Slag Bullets @5300,3000",
+      "room": "0404",
+      "itemId": 17,
+      "itemName": "Slag Bullets",
+      "pos": [
+        5300,
+        3000
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 17
+      },
+      "source": "static"
+    },
+    {
+      "key": "0405:2b:1008,11296",
+      "name": "Large Size Elevator (0405) - Plug @1008,11296",
+      "room": "0405",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        1008,
+        11296
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
     },
     {
       "key": "0406:64:-3456,1280",
@@ -634,7 +1525,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 100
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0406:6b:-3956,-1600",
@@ -649,7 +1541,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 107
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:1"
     },
     {
       "key": "0406:6b:-4352,224",
@@ -664,7 +1558,120 @@
       "collectedFlag": {
         "group": 8,
         "bit": 107
-      }
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "0408:43:-2576,-5568",
+      "name": "Elevator Power Room (0408) - B1 Crane Card @-2576,-5568",
+      "room": "0408",
+      "itemId": 67,
+      "itemName": "B1 Crane Card",
+      "pos": [
+        -2576,
+        -5568
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 67
+      },
+      "source": "static"
+    },
+    {
+      "key": "040b:20:240,-2266",
+      "name": "Materials Room (040b) - An. Aid @240,-2266",
+      "room": "040b",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        240,
+        -2266
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
+    },
+    {
+      "key": "040b:3c:2816,-2496",
+      "name": "Materials Room (040b) - C. O. Pass Card @2816,-2496",
+      "room": "040b",
+      "itemId": 60,
+      "itemName": "C. O. Pass Card",
+      "pos": [
+        2816,
+        -2496
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 60
+      },
+      "source": "static"
+    },
+    {
+      "key": "0500:20:-7568,6672",
+      "name": "Passageway to the Experiment Area (0500) - An. Aid @-7568,6672",
+      "room": "0500",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        -7568,
+        6672
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
+    },
+    {
+      "key": "0502:38:-9472,3840",
+      "name": "Experiment Room Hall (0502) - Key Card Lv. C @-9472,3840",
+      "room": "0502",
+      "itemId": 56,
+      "itemName": "Key Card Lv. C",
+      "pos": [
+        -9472,
+        3840
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 56
+      },
+      "source": "static"
+    },
+    {
+      "key": "0502:21:-16384,-4352",
+      "name": "Experiment Room Hall (0502) - Recovery Aid @-16384,-4352",
+      "room": "0502",
+      "itemId": 33,
+      "itemName": "Recovery Aid",
+      "pos": [
+        -16384,
+        -4352
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 33
+      },
+      "source": "static"
+    },
+    {
+      "key": "0502:14:4480,-6656",
+      "name": "Experiment Room Hall (0502) - An. Darts L @4480,-6656",
+      "room": "0502",
+      "itemId": 20,
+      "itemName": "An. Darts L",
+      "pos": [
+        4480,
+        -6656
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 20
+      },
+      "source": "static"
     },
     {
       "key": "0503:4c:-3468,2768",
@@ -679,7 +1686,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 76
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:83"
     },
     {
       "key": "0503:4d:-3468,2768",
@@ -694,7 +1703,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 77
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:83"
     },
     {
       "key": "0503:51:-3468,2768",
@@ -709,7 +1720,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 81
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0503:2b:-10240,-5248",
@@ -724,7 +1736,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0503:6f:-2800,-3088",
@@ -739,7 +1752,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 111
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0503:0b:-10240,4480",
@@ -754,7 +1768,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 11
-      }
+      },
+      "source": "static",
+      "gateFlag": "2:11"
     },
     {
       "key": "0503:5b:-1792,1792",
@@ -769,7 +1785,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 91
-      }
+      },
+      "source": "event-granted"
     },
     {
       "key": "0504:6d:-1632,2304",
@@ -784,7 +1801,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 109
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0504:4f:-2912,3872",
@@ -799,7 +1817,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 79
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "2:11"
     },
     {
       "key": "0504:50:4896,-3840",
@@ -814,7 +1834,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 80
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "2:11"
     },
     {
       "key": "0504:4e:2256,-3840",
@@ -829,7 +1851,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 78
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "2:11"
     },
     {
       "key": "0504:4f:4896,-3840",
@@ -844,7 +1868,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 79
-      }
+      },
+      "source": "static",
+      "gateFlag": "7:49"
     },
     {
       "key": "0504:50:-2912,3872",
@@ -859,7 +1885,24 @@
       "collectedFlag": {
         "group": 8,
         "bit": 80
-      }
+      },
+      "source": "static"
+    },
+    {
+      "key": "0505:2b:-1100,1800",
+      "name": "Researcher Rest Room (0505) - Plug @-1100,1800",
+      "room": "0505",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -1100,
+        1800
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
     },
     {
       "key": "0506:56:-5696,-1232",
@@ -874,7 +1917,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 86
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0506:67:3840,2592",
@@ -889,7 +1933,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 103
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0506:2b:-6144,128",
@@ -904,7 +1949,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0506:3b:-6912,3328",
@@ -919,7 +1965,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 59
-      }
+      },
+      "source": "static",
+      "gateFlag": "2:4"
     },
     {
       "key": "0507:2b:6144,3088",
@@ -934,7 +1982,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0507:0f:-4352,10000",
@@ -949,7 +1998,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 15
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0507:52:4352,7824",
@@ -964,7 +2014,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 82
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:213"
     },
     {
       "key": "0507:53:4352,9616",
@@ -979,7 +2031,57 @@
       "collectedFlag": {
         "group": 8,
         "bit": 83
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:213"
+    },
+    {
+      "key": "0508:20:-1728,-9456",
+      "name": "Passageway (0508) - An. Aid @-1728,-9456",
+      "room": "0508",
+      "itemId": 32,
+      "itemName": "An. Aid",
+      "pos": [
+        -1728,
+        -9456
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 32
+      },
+      "source": "static"
+    },
+    {
+      "key": "050a:2b:7344,4736",
+      "name": "Third Energy Area B3 (050a) - Plug @7344,4736",
+      "room": "050a",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        7344,
+        4736
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "050b:2b:6656,-3328",
+      "name": "Third Energy Control Room (050b) - Plug @6656,-3328",
+      "room": "050b",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        6656,
+        -3328
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
     },
     {
       "key": "050c:5d:-3328,5616",
@@ -994,7 +2096,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 93
-      }
+      },
+      "source": "static",
+      "gateFlag": "7:162"
     },
     {
       "key": "050e:2b:-2100,-2700",
@@ -1009,7 +2113,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static"
     },
     {
       "key": "050e:3a:-7700,6900",
@@ -1024,7 +2129,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 58
-      }
+      },
+      "source": "static"
     },
     {
       "key": "050e:61:-7700,6900",
@@ -1039,7 +2145,73 @@
       "collectedFlag": {
         "group": 8,
         "bit": 97
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:5"
+    },
+    {
+      "key": "050f:1d:-1100,-2100",
+      "name": "Dr. Kirk's Library Room (050f) - Med. Pak M @-1100,-2100",
+      "room": "050f",
+      "itemId": 29,
+      "itemName": "Med. Pak M",
+      "pos": [
+        -1100,
+        -2100
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 29
+      },
+      "source": "static"
+    },
+    {
+      "key": "050f:58:-7700,6900",
+      "name": "Dr. Kirk's Library Room (050f) - Pulse Receiver @-7700,6900",
+      "room": "050f",
+      "itemId": 88,
+      "itemName": "Pulse Receiver",
+      "pos": [
+        -7700,
+        6900
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 88
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "0510:39:4336,3344",
+      "name": "Third Energy Control Room (0510) - Key Card Lv. B @4336,3344",
+      "room": "0510",
+      "itemId": 57,
+      "itemName": "Key Card Lv. B",
+      "pos": [
+        4336,
+        3344
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 57
+      },
+      "source": "static"
+    },
+    {
+      "key": "0510:22:0,-5280",
+      "name": "Third Energy Control Room (0510) - Intensifier @0,-5280",
+      "room": "0510",
+      "itemId": 34,
+      "itemName": "Intensifier",
+      "pos": [
+        0,
+        -5280
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 34
+      },
+      "source": "static"
     },
     {
       "key": "0511:2b:-10240,-5248",
@@ -1054,7 +2226,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0511:6f:-2800,-3088",
@@ -1069,7 +2242,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 111
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0511:0b:-10240,4480",
@@ -1084,7 +2258,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 11
-      }
+      },
+      "source": "static",
+      "gateFlag": "2:11"
     },
     {
       "key": "0600:18:-1616,4480",
@@ -1099,7 +2275,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 24
-      }
+      },
+      "source": "static"
     },
     {
       "key": "0600:5a:-5120,3584",
@@ -1114,7 +2291,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 90
-      }
+      },
+      "source": "static",
+      "gateFlag": "2:4"
     },
     {
       "key": "0601:5a:-5120,3584",
@@ -1129,7 +2308,185 @@
       "collectedFlag": {
         "group": 8,
         "bit": 90
-      }
+      },
+      "source": "static",
+      "gateFlag": "2:4"
+    },
+    {
+      "key": "0602:2b:1856,4224",
+      "name": "Control Room B3 (0602) - Plug @1856,4224",
+      "room": "0602",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        1856,
+        4224
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0602:49:-3072,4096",
+      "name": "Control Room B3 (0602) - B3 Crane Card 1 @-3072,4096",
+      "room": "0602",
+      "itemId": 73,
+      "itemName": "B3 Crane Card 1",
+      "pos": [
+        -3072,
+        4096
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 73
+      },
+      "source": "static"
+    },
+    {
+      "key": "0602:4a:2608,-32",
+      "name": "Control Room B3 (0602) - B3 Crane Card 2 @2608,-32",
+      "room": "0602",
+      "itemId": 74,
+      "itemName": "B3 Crane Card 2",
+      "pos": [
+        2608,
+        -32
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 74
+      },
+      "source": "static"
+    },
+    {
+      "key": "0604:2b:3024,224",
+      "name": "Rest Station (0604) - Plug @3024,224",
+      "room": "0604",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        3024,
+        224
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0605:1b:12032,384",
+      "name": "General Weapons Storage (0605) - Hemostat @12032,384",
+      "room": "0605",
+      "itemId": 27,
+      "itemName": "Hemostat",
+      "pos": [
+        12032,
+        384
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 27
+      },
+      "source": "static"
+    },
+    {
+      "key": "0605:66:-3072,3328",
+      "name": "General Weapons Storage (0605) - DDK Input Disc W @-3072,3328",
+      "room": "0605",
+      "itemId": 102,
+      "itemName": "DDK Input Disc W",
+      "pos": [
+        -3072,
+        3328
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 102
+      },
+      "source": "static"
+    },
+    {
+      "key": "0606:2b:6144,-2560",
+      "name": "Transport Passageway (0606) - Plug @6144,-2560",
+      "room": "0606",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        6144,
+        -2560
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0606:2b:6912,-11392",
+      "name": "Transport Passageway (0606) - Plug @6912,-11392",
+      "room": "0606",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        6912,
+        -11392
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0606:18:3328,-2560",
+      "name": "Transport Passageway (0606) - Grenade Bullets @3328,-2560",
+      "room": "0606",
+      "itemId": 24,
+      "itemName": "Grenade Bullets",
+      "pos": [
+        3328,
+        -2560
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 24
+      },
+      "source": "static"
+    },
+    {
+      "key": "0606:31:-7648,2880",
+      "name": "Transport Passageway (0606) - C. O. Area Key @-7648,2880",
+      "room": "0606",
+      "itemId": 49,
+      "itemName": "C. O. Area Key",
+      "pos": [
+        -7648,
+        2880
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 49
+      },
+      "source": "static"
+    },
+    {
+      "key": "0606:4b:-7680,3392",
+      "name": "Transport Passageway (0606) - B3 Crane Card 3 @-7680,3392",
+      "room": "0606",
+      "itemId": 75,
+      "itemName": "B3 Crane Card 3",
+      "pos": [
+        -7680,
+        3392
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 75
+      },
+      "source": "static"
     },
     {
       "key": "0607:4d:4480,640",
@@ -1144,7 +2501,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 77
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:4"
     },
     {
       "key": "0607:4c:4480,640",
@@ -1159,7 +2518,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 76
-      }
+      },
+      "source": "static",
+      "gateFlag": "0:4"
     },
     {
       "key": "0607:5b:-1792,1792",
@@ -1174,7 +2535,120 @@
       "collectedFlag": {
         "group": 8,
         "bit": 91
-      }
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "0608:2b:-7936,6400",
+      "name": "Central Stairway (0608) - Plug @-7936,6400",
+      "room": "0608",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        -7936,
+        6400
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "0609:57:-1360,1152",
+      "name": "Disembarkation Immigration Office (0609) - B2 Key Chip 2 @-1360,1152",
+      "room": "0609",
+      "itemId": 87,
+      "itemName": "B2 Key Chip 2",
+      "pos": [
+        -1360,
+        1152
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 87
+      },
+      "source": "static"
+    },
+    {
+      "key": "0609:2b:5760,512",
+      "name": "Disembarkation Immigration Office (0609) - Plug @5760,512",
+      "room": "0609",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        5760,
+        512
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static"
+    },
+    {
+      "key": "060a:21:10064,15104",
+      "name": "Port (060a) - Recovery Aid @10064,15104",
+      "room": "060a",
+      "itemId": 33,
+      "itemName": "Recovery Aid",
+      "pos": [
+        10064,
+        15104
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 33
+      },
+      "source": "static"
+    },
+    {
+      "key": "060a:55:-5120,3584",
+      "name": "Port (060a) - Nucleum @-5120,3584",
+      "room": "060a",
+      "itemId": 85,
+      "itemName": "Nucleum",
+      "pos": [
+        -5120,
+        3584
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 85
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "060b:6e:2736,-6656",
+      "name": "Passageway to the Port (060b) - DDK Code Disc S @2736,-6656",
+      "room": "060b",
+      "itemId": 110,
+      "itemName": "DDK Code Disc S",
+      "pos": [
+        2736,
+        -6656
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 110
+      },
+      "source": "static"
+    },
+    {
+      "key": "060b:23:-4480,5760",
+      "name": "Passageway to the Port (060b) - Multiplier @-4480,5760",
+      "room": "060b",
+      "itemId": 35,
+      "itemName": "Multiplier",
+      "pos": [
+        -4480,
+        5760
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 35
+      },
+      "source": "static"
     },
     {
       "key": "060d:09:-2816,10368",
@@ -1189,7 +2663,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 9
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:10"
     },
     {
       "key": "060d:2b:-2816,10368",
@@ -1204,7 +2680,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:10"
     },
     {
       "key": "060d:18:-2816,10368",
@@ -1219,7 +2697,76 @@
       "collectedFlag": {
         "group": 8,
         "bit": 24
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:10"
+    },
+    {
+      "key": "060f:68:4128,448",
+      "name": "Large Size Elevator (060f) - DDK Input Disc D @4128,448",
+      "room": "060f",
+      "itemId": 104,
+      "itemName": "DDK Input Disc D",
+      "pos": [
+        4128,
+        448
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 104
+      },
+      "source": "static",
+      "gateFlag": "0:184"
+    },
+    {
+      "key": "060f:32:288,-1920",
+      "name": "Large Size Elevator (060f) - Port Card Key @288,-1920",
+      "room": "060f",
+      "itemId": 50,
+      "itemName": "Port Card Key",
+      "pos": [
+        288,
+        -1920
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 50
+      },
+      "source": "static",
+      "gateFlag": "0:184"
+    },
+    {
+      "key": "060f:2b:864,8240",
+      "name": "Large Size Elevator (060f) - Plug @864,8240",
+      "room": "060f",
+      "itemId": 43,
+      "itemName": "Plug",
+      "pos": [
+        864,
+        8240
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 43
+      },
+      "source": "static",
+      "gateFlag": "0:184"
+    },
+    {
+      "key": "060f:15:3344,1264",
+      "name": "Large Size Elevator (060f) - Poison Dart @3344,1264",
+      "room": "060f",
+      "itemId": 21,
+      "itemName": "Poison Dart",
+      "pos": [
+        3344,
+        1264
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 21
+      },
+      "source": "static"
     },
     {
       "key": "0610:54:-1664,-2016",
@@ -1234,7 +2781,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 84
-      }
+      },
+      "source": "static",
+      "gateFlag": "2:18"
     },
     {
       "key": "0610:09:-1024,-2048",
@@ -1249,7 +2798,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 9
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:10"
     },
     {
       "key": "0610:2b:-1024,-2048",
@@ -1264,7 +2815,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:10"
     },
     {
       "key": "0610:18:-1024,-2048",
@@ -1279,7 +2832,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 24
-      }
+      },
+      "source": "static",
+      "gateFlag": "11:10"
     },
     {
       "key": "0612:2b:-896,0",
@@ -1294,7 +2849,8 @@
       "collectedFlag": {
         "group": 8,
         "bit": 43
-      }
+      },
+      "source": "event-granted"
     },
     {
       "key": "0612:09:-896,0",
@@ -1309,7 +2865,9 @@
       "collectedFlag": {
         "group": 8,
         "bit": 9
-      }
+      },
+      "source": "event-granted",
+      "gateFlag": "11:10"
     },
     {
       "key": "0612:18:-896,0",
@@ -1324,7 +2882,56 @@
       "collectedFlag": {
         "group": 8,
         "bit": 24
-      }
+      },
+      "source": "event-granted"
+    },
+    {
+      "key": "0613:21:10064,15104",
+      "name": "Port (0613) - Recovery Aid @10064,15104",
+      "room": "0613",
+      "itemId": 33,
+      "itemName": "Recovery Aid",
+      "pos": [
+        10064,
+        15104
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 33
+      },
+      "source": "static"
+    },
+    {
+      "key": "0615:1b:12032,384",
+      "name": "General Weapons Storage (0615) - Hemostat @12032,384",
+      "room": "0615",
+      "itemId": 27,
+      "itemName": "Hemostat",
+      "pos": [
+        12032,
+        384
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 27
+      },
+      "source": "static"
+    },
+    {
+      "key": "0615:66:-3072,3328",
+      "name": "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328",
+      "room": "0615",
+      "itemId": 102,
+      "itemName": "DDK Input Disc W",
+      "pos": [
+        -3072,
+        3328
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 102
+      },
+      "source": "static"
     }
   ],
   "items": {
@@ -1516,9 +3123,25 @@
       111
     ],
     "progressionItemIds": [
+      47,
       48,
       49,
-      58
+      58,
+      65,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111
     ],
     "pool": [
       {

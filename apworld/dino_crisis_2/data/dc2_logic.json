@@ -285,8 +285,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        32926,
-        0
+        2680,
+        12800
       ],
       "collectedFlag": null
     },
@@ -297,7 +297,7 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        70910,
+        1600,
         0
       ],
       "collectedFlag": null
@@ -309,7 +309,7 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        71322,
+        1600,
         0
       ],
       "collectedFlag": null
@@ -321,8 +321,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        71490,
-        0
+        640,
+        -560
       ],
       "collectedFlag": null
     },
@@ -333,8 +333,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        131198,
-        0
+        2800,
+        3100
       ],
       "collectedFlag": null
     },
@@ -345,8 +345,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        131442,
-        0
+        2500,
+        1000
       ],
       "collectedFlag": null
     },
@@ -357,8 +357,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        132106,
-        0
+        400,
+        -1200
       ],
       "collectedFlag": null
     },
@@ -369,8 +369,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        132278,
-        0
+        400,
+        -1200
       ],
       "collectedFlag": null
     },
@@ -381,8 +381,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        141632,
-        0
+        400,
+        -1200
       ],
       "collectedFlag": null
     },
@@ -393,7 +393,7 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        145800,
+        600,
         0
       ],
       "collectedFlag": null
@@ -405,8 +405,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        149276,
-        0
+        -1200,
+        3200
       ],
       "collectedFlag": null
     },
@@ -417,8 +417,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        152296,
-        0
+        -1200,
+        3200
       ],
       "collectedFlag": null
     },
@@ -429,8 +429,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        30448,
-        0
+        2700,
+        -7400
       ],
       "collectedFlag": null
     },
@@ -441,8 +441,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        45450,
-        0
+        16000,
+        -12400
       ],
       "collectedFlag": null
     },
@@ -453,8 +453,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        41446,
-        0
+        200,
+        -3600
       ],
       "collectedFlag": null
     },
@@ -465,8 +465,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        41510,
-        0
+        -1000,
+        -4000
       ],
       "collectedFlag": null
     },
@@ -477,8 +477,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        20522,
-        0
+        9700,
+        9100
       ],
       "collectedFlag": null
     },
@@ -489,8 +489,8 @@
       "itemId": 9,
       "itemName": "Field item 9",
       "pos": [
-        34332,
-        0
+        11210,
+        -1700
       ],
       "collectedFlag": null
     },
@@ -501,8 +501,8 @@
       "itemId": 7,
       "itemName": "Ammo pickup",
       "pos": [
-        36312,
-        0
+        4500,
+        2000
       ],
       "collectedFlag": null
     },
@@ -513,8 +513,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        70142,
-        0
+        -3800,
+        8200
       ],
       "collectedFlag": null
     },
@@ -525,8 +525,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        52326,
-        0
+        6650,
+        15100
       ],
       "collectedFlag": null
     },
@@ -537,8 +537,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        24334,
-        0
+        800,
+        20700
       ],
       "collectedFlag": null
     },
@@ -549,8 +549,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        24394,
-        0
+        -100,
+        -24900
       ],
       "collectedFlag": null
     },
@@ -561,8 +561,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        12034,
-        0
+        -3200,
+        13800
       ],
       "collectedFlag": null
     },
@@ -573,8 +573,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        12162,
-        0
+        -4500,
+        2600
       ],
       "collectedFlag": null
     },
@@ -585,8 +585,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        66190,
-        0
+        -12400,
+        7900
       ],
       "collectedFlag": null
     },
@@ -597,8 +597,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        8834,
-        0
+        -2000,
+        -2700
       ],
       "collectedFlag": null
     },
@@ -609,8 +609,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        9820,
-        0
+        -3300,
+        -1100
       ],
       "collectedFlag": null
     },
@@ -621,8 +621,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        13356,
-        0
+        -902,
+        5100
       ],
       "collectedFlag": null
     },
@@ -633,8 +633,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        13416,
-        0
+        -990,
+        5000
       ],
       "collectedFlag": null
     },
@@ -645,8 +645,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        13476,
-        0
+        -3600,
+        400
       ],
       "collectedFlag": null
     },
@@ -657,8 +657,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        53832,
-        0
+        -5300,
+        -500
       ],
       "collectedFlag": null
     },
@@ -669,8 +669,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        55498,
-        0
+        1600,
+        -400
       ],
       "collectedFlag": null
     },
@@ -681,8 +681,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        55630,
-        0
+        4200,
+        -700
       ],
       "collectedFlag": null
     },
@@ -693,8 +693,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        37716,
-        0
+        -5200,
+        3300
       ],
       "collectedFlag": null
     },
@@ -705,8 +705,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        41132,
-        0
+        2600,
+        4200
       ],
       "collectedFlag": null
     },
@@ -717,8 +717,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        25206,
-        0
+        -3800,
+        -6300
       ],
       "collectedFlag": null
     },
@@ -729,8 +729,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        25662,
-        0
+        4200,
+        7200
       ],
       "collectedFlag": null
     },
@@ -741,8 +741,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        30710,
-        0
+        4300,
+        7100
       ],
       "collectedFlag": null
     },
@@ -753,8 +753,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        30770,
-        0
+        -2400,
+        8000
       ],
       "collectedFlag": null
     },
@@ -765,8 +765,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        20828,
-        0
+        6300,
+        6400
       ],
       "collectedFlag": null
     },
@@ -777,8 +777,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        20888,
-        0
+        -9300,
+        7100
       ],
       "collectedFlag": null
     },
@@ -789,8 +789,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        20948,
-        0
+        -100,
+        400
       ],
       "collectedFlag": null
     },
@@ -801,8 +801,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30058,
-        0
+        -9300,
+        5300
       ],
       "collectedFlag": null
     },
@@ -813,8 +813,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30254,
-        0
+        -5900,
+        600
       ],
       "collectedFlag": null
     },
@@ -825,8 +825,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30434,
-        0
+        -2600,
+        6700
       ],
       "collectedFlag": null
     },
@@ -837,8 +837,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30558,
-        0
+        900,
+        3600
       ],
       "collectedFlag": null
     },
@@ -849,8 +849,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30618,
-        0
+        3500,
+        9500
       ],
       "collectedFlag": null
     },
@@ -861,8 +861,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30678,
-        0
+        4400,
+        -900
       ],
       "collectedFlag": null
     },
@@ -873,8 +873,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30798,
-        0
+        12500,
+        3900
       ],
       "collectedFlag": null
     },
@@ -885,8 +885,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30858,
-        0
+        4400,
+        -5000
       ],
       "collectedFlag": null
     },
@@ -897,8 +897,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30918,
-        0
+        6000,
+        -7700
       ],
       "collectedFlag": null
     },
@@ -909,8 +909,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        30978,
-        0
+        11500,
+        -1000
       ],
       "collectedFlag": null
     },
@@ -921,8 +921,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        31342,
-        0
+        9900,
+        -5200
       ],
       "collectedFlag": null
     },
@@ -933,8 +933,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        31402,
-        0
+        6300,
+        9200
       ],
       "collectedFlag": null
     },
@@ -945,8 +945,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        31462,
-        0
+        -9300,
+        2800
       ],
       "collectedFlag": null
     },
@@ -957,8 +957,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        32464,
-        0
+        9700,
+        9400
       ],
       "collectedFlag": null
     },
@@ -969,8 +969,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        32540,
-        0
+        9700,
+        9400
       ],
       "collectedFlag": null
     },
@@ -981,8 +981,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        38044,
-        0
+        9700,
+        9400
       ],
       "collectedFlag": null
     },
@@ -993,8 +993,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        16516,
-        0
+        -1100,
+        6400
       ],
       "collectedFlag": null
     },
@@ -1005,8 +1005,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        16576,
-        0
+        -3500,
+        500
       ],
       "collectedFlag": null
     },
@@ -1017,8 +1017,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        16676,
-        0
+        5000,
+        -3500
       ],
       "collectedFlag": null
     },
@@ -1029,8 +1029,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        16920,
-        0
+        -4500,
+        -8100
       ],
       "collectedFlag": null
     },
@@ -1041,8 +1041,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        16980,
-        0
+        -4900,
+        8500
       ],
       "collectedFlag": null
     },
@@ -1053,8 +1053,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        17200,
-        0
+        -2200,
+        9400
       ],
       "collectedFlag": null
     },
@@ -1065,8 +1065,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        11210,
-        0
+        1700,
+        5800
       ],
       "collectedFlag": null
     },
@@ -1077,8 +1077,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        11430,
-        0
+        1200,
+        -3700
       ],
       "collectedFlag": null
     },
@@ -1089,8 +1089,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        50522,
-        0
+        -7800,
+        -9900
       ],
       "collectedFlag": null
     },
@@ -1101,8 +1101,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        50582,
-        0
+        -8200,
+        -7700
       ],
       "collectedFlag": null
     },
@@ -1113,8 +1113,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        22832,
-        0
+        -1699,
+        5601
       ],
       "collectedFlag": null
     },
@@ -1125,8 +1125,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        22992,
-        0
+        2000,
+        2900
       ],
       "collectedFlag": null
     },
@@ -1137,8 +1137,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        23428,
-        0
+        2800,
+        5100
       ],
       "collectedFlag": null
     },
@@ -1149,8 +1149,8 @@
       "itemId": 7,
       "itemName": "Ammo pickup",
       "pos": [
-        91868,
-        0
+        397,
+        10209
       ],
       "collectedFlag": null
     },
@@ -1161,8 +1161,8 @@
       "itemId": 8,
       "itemName": "Field item 8",
       "pos": [
-        91928,
-        0
+        397,
+        10209
       ],
       "collectedFlag": null
     },
@@ -1173,8 +1173,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        92068,
-        0
+        -9100,
+        -16400
       ],
       "collectedFlag": null
     },
@@ -1185,8 +1185,8 @@
       "itemId": 6,
       "itemName": "Field item 6",
       "pos": [
-        92208,
-        0
+        13700,
+        -14100
       ],
       "collectedFlag": null
     },
@@ -1197,8 +1197,8 @@
       "itemId": 4,
       "itemName": "Field item 4",
       "pos": [
-        93252,
-        0
+        9600,
+        19700
       ],
       "collectedFlag": null
     },
@@ -1209,8 +1209,8 @@
       "itemId": 4,
       "itemName": "Field item 4",
       "pos": [
-        93520,
-        0
+        -1200,
+        5100
       ],
       "collectedFlag": null
     },
@@ -1221,8 +1221,8 @@
       "itemId": 4,
       "itemName": "Field item 4",
       "pos": [
-        93580,
-        0
+        3700,
+        2400
       ],
       "collectedFlag": null
     },
@@ -1233,8 +1233,8 @@
       "itemId": 4,
       "itemName": "Field item 4",
       "pos": [
-        100078,
-        0
+        9600,
+        19700
       ],
       "collectedFlag": null
     },
@@ -1245,8 +1245,8 @@
       "itemId": 4,
       "itemName": "Field item 4",
       "pos": [
-        120764,
-        0
+        -1200,
+        5100
       ],
       "collectedFlag": null
     },
@@ -1257,8 +1257,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        121816,
-        0
+        2500,
+        3500
       ],
       "collectedFlag": null
     },
@@ -1269,8 +1269,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        77536,
-        0
+        4000,
+        -3600
       ],
       "collectedFlag": null
     },
@@ -1281,8 +1281,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        77596,
-        0
+        4100,
+        -400
       ],
       "collectedFlag": null
     },
@@ -1293,8 +1293,8 @@
       "itemId": 4,
       "itemName": "Field item 4",
       "pos": [
-        77656,
-        0
+        2200,
+        7600
       ],
       "collectedFlag": null
     },
@@ -1305,8 +1305,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        75726,
-        0
+        4500,
+        -16500
       ],
       "collectedFlag": null
     },
@@ -1317,8 +1317,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        74942,
-        0
+        3000,
+        -14500
       ],
       "collectedFlag": null
     },
@@ -1329,8 +1329,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        52920,
-        0
+        3400,
+        11400
       ],
       "collectedFlag": null
     },
@@ -1341,8 +1341,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        53384,
-        0
+        -4000,
+        9000
       ],
       "collectedFlag": null
     },
@@ -1353,8 +1353,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        53444,
-        0
+        6500,
+        9000
       ],
       "collectedFlag": null
     },
@@ -1365,8 +1365,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        53504,
-        0
+        -12500,
+        6900
       ],
       "collectedFlag": null
     },
@@ -1377,8 +1377,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        53564,
-        0
+        14300,
+        7100
       ],
       "collectedFlag": null
     },
@@ -1389,8 +1389,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        53624,
-        0
+        -1100,
+        9200
       ],
       "collectedFlag": null
     },
@@ -1401,8 +1401,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        53956,
-        0
+        3400,
+        11400
       ],
       "collectedFlag": null
     },
@@ -1413,8 +1413,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        5030,
-        0
+        -1200,
+        -3400
       ],
       "collectedFlag": null
     },
@@ -1425,8 +1425,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        11658,
-        0
+        -4100,
+        -3600
       ],
       "collectedFlag": null
     },
@@ -1437,8 +1437,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        157822,
-        0
+        3300,
+        3700
       ],
       "collectedFlag": null
     },
@@ -1449,8 +1449,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        157882,
-        0
+        4500,
+        4500
       ],
       "collectedFlag": null
     },
@@ -1461,8 +1461,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        157942,
-        0
+        3000,
+        12600
       ],
       "collectedFlag": null
     },
@@ -1473,8 +1473,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        158002,
-        0
+        2600,
+        12100
       ],
       "collectedFlag": null
     },
@@ -1485,8 +1485,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        160810,
-        0
+        2000,
+        -15300
       ],
       "collectedFlag": null
     },
@@ -1497,8 +1497,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        183222,
-        0
+        2000,
+        -15300
       ],
       "collectedFlag": null
     },
@@ -1509,8 +1509,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        88202,
-        0
+        19800,
+        -18800
       ],
       "collectedFlag": null
     },
@@ -1521,8 +1521,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        88262,
-        0
+        4400,
+        15550
       ],
       "collectedFlag": null
     },
@@ -1533,8 +1533,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        88342,
-        0
+        -16200,
+        14100
       ],
       "collectedFlag": null
     },
@@ -1545,8 +1545,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        88402,
-        0
+        10600,
+        -11500
       ],
       "collectedFlag": null
     },
@@ -1557,8 +1557,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        88462,
-        0
+        1100,
+        16100
       ],
       "collectedFlag": null
     },
@@ -1569,8 +1569,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        104050,
-        0
+        4300,
+        -7700
       ],
       "collectedFlag": null
     },
@@ -1581,8 +1581,8 @@
       "itemId": 8,
       "itemName": "Field item 8",
       "pos": [
-        16106,
-        0
+        2900,
+        -1500
       ],
       "collectedFlag": null
     },
@@ -1593,8 +1593,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        16410,
-        0
+        -2000,
+        -3800
       ],
       "collectedFlag": null
     },
@@ -1605,8 +1605,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        70380,
-        0
+        7500,
+        -1500
       ],
       "collectedFlag": null
     },
@@ -1617,8 +1617,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        70440,
-        0
+        5700,
+        -1700
       ],
       "collectedFlag": null
     },
@@ -1629,8 +1629,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        70500,
-        0
+        4100,
+        -1300
       ],
       "collectedFlag": null
     },
@@ -1641,8 +1641,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        70560,
-        0
+        4500,
+        1200
       ],
       "collectedFlag": null
     },
@@ -1653,8 +1653,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        70620,
-        0
+        1000,
+        -5300
       ],
       "collectedFlag": null
     },
@@ -1665,8 +1665,8 @@
       "itemId": 6,
       "itemName": "Field item 6",
       "pos": [
-        71270,
-        0
+        -900,
+        -2100
       ],
       "collectedFlag": null
     },
@@ -1677,8 +1677,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        71774,
-        0
+        -500,
+        3800
       ],
       "collectedFlag": null
     },
@@ -1689,8 +1689,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        78624,
-        0
+        -500,
+        3800
       ],
       "collectedFlag": null
     },
@@ -1701,8 +1701,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        58226,
-        0
+        500,
+        10800
       ],
       "collectedFlag": null
     },
@@ -1713,8 +1713,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        58486,
-        0
+        649,
+        7800
       ],
       "collectedFlag": null
     },
@@ -1725,8 +1725,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        58546,
-        0
+        349,
+        5800
       ],
       "collectedFlag": null
     },
@@ -1737,8 +1737,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        45674,
-        0
+        4000,
+        -6200
       ],
       "collectedFlag": null
     },
@@ -1749,8 +1749,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        46238,
-        0
+        -8500,
+        -6000
       ],
       "collectedFlag": null
     },
@@ -1761,8 +1761,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        47060,
-        0
+        8200,
+        -4000
       ],
       "collectedFlag": null
     },
@@ -1773,8 +1773,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        674,
-        0
+        -500,
+        -900
       ],
       "collectedFlag": null
     },
@@ -1785,8 +1785,8 @@
       "itemId": 4,
       "itemName": "Field item 4",
       "pos": [
-        14014,
-        0
+        -6300,
+        2900
       ],
       "collectedFlag": null
     },
@@ -1797,8 +1797,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        14370,
-        0
+        -3600,
+        -1500
       ],
       "collectedFlag": null
     },
@@ -1809,8 +1809,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        27978,
-        0
+        7300,
+        3700
       ],
       "collectedFlag": null
     },
@@ -1821,8 +1821,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        28094,
-        0
+        5500,
+        7600
       ],
       "collectedFlag": null
     },
@@ -1833,8 +1833,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        31156,
-        0
+        7300,
+        3700
       ],
       "collectedFlag": null
     },
@@ -1845,8 +1845,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        45058,
-        0
+        -11400,
+        1800
       ],
       "collectedFlag": null
     },
@@ -1857,8 +1857,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        45118,
-        0
+        -10900,
+        5500
       ],
       "collectedFlag": null
     },
@@ -1869,8 +1869,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        21632,
-        0
+        7700,
+        -3900
       ],
       "collectedFlag": null
     },
@@ -1881,8 +1881,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        21692,
-        0
+        7700,
+        -3900
       ],
       "collectedFlag": null
     },
@@ -1893,8 +1893,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        21752,
-        0
+        -6300,
+        4100
       ],
       "collectedFlag": null
     },
@@ -1905,8 +1905,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        21812,
-        0
+        -6300,
+        4100
       ],
       "collectedFlag": null
     },
@@ -1917,8 +1917,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        21872,
-        0
+        9400,
+        -4900
       ],
       "collectedFlag": null
     },
@@ -1929,8 +1929,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        22780,
-        0
+        -7400,
+        8000
       ],
       "collectedFlag": null
     },
@@ -1941,8 +1941,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        54302,
-        0
+        -6000,
+        25300
       ],
       "collectedFlag": null
     },
@@ -1953,8 +1953,8 @@
       "itemId": 6,
       "itemName": "Field item 6",
       "pos": [
-        54426,
-        0
+        -7000,
+        25300
       ],
       "collectedFlag": null
     },
@@ -1965,8 +1965,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        55616,
-        0
+        -6100,
+        16600
       ],
       "collectedFlag": null
     },
@@ -1977,8 +1977,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        55676,
-        0
+        -6100,
+        16600
       ],
       "collectedFlag": null
     },
@@ -1989,8 +1989,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        55736,
-        0
+        -6100,
+        16600
       ],
       "collectedFlag": null
     },
@@ -2001,8 +2001,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        56154,
-        0
+        -6100,
+        19900
       ],
       "collectedFlag": null
     },
@@ -2013,8 +2013,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        56214,
-        0
+        -6100,
+        19900
       ],
       "collectedFlag": null
     },
@@ -2025,8 +2025,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        56274,
-        0
+        -6100,
+        19900
       ],
       "collectedFlag": null
     },
@@ -2037,8 +2037,8 @@
       "itemId": 6,
       "itemName": "Field item 6",
       "pos": [
-        73812,
-        0
+        -7000,
+        25300
       ],
       "collectedFlag": null
     },
@@ -2049,8 +2049,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        674,
-        0
+        -500,
+        -900
       ],
       "collectedFlag": null
     },
@@ -2061,8 +2061,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        99974,
-        0
+        2300,
+        3400
       ],
       "collectedFlag": null
     },
@@ -2073,8 +2073,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        100034,
-        0
+        -2400,
+        4000
       ],
       "collectedFlag": null
     },
@@ -2085,8 +2085,8 @@
       "itemId": 6,
       "itemName": "Field item 6",
       "pos": [
-        100162,
-        0
+        6100,
+        4400
       ],
       "collectedFlag": null
     },
@@ -2097,8 +2097,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        100434,
-        0
+        -1200,
+        1800
       ],
       "collectedFlag": null
     },
@@ -2109,8 +2109,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        16920,
-        0
+        -1000,
+        16600
       ],
       "collectedFlag": null
     },
@@ -2121,8 +2121,8 @@
       "itemId": 5,
       "itemName": "Dino File",
       "pos": [
-        19510,
-        0
+        -1000,
+        16600
       ],
       "collectedFlag": null
     },
@@ -2133,8 +2133,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        11822,
-        0
+        9500,
+        14100
       ],
       "collectedFlag": null
     },
@@ -2145,8 +2145,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        35676,
-        0
+        12200,
+        -2200
       ],
       "collectedFlag": null
     },
@@ -2157,8 +2157,8 @@
       "itemId": 7,
       "itemName": "Ammo pickup",
       "pos": [
-        49696,
-        0
+        -20100,
+        13300
       ],
       "collectedFlag": null
     },
@@ -2169,8 +2169,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        50234,
-        0
+        -15500,
+        17100
       ],
       "collectedFlag": null
     },
@@ -2181,8 +2181,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        50294,
-        0
+        6300,
+        600
       ],
       "collectedFlag": null
     },
@@ -2193,8 +2193,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        50354,
-        0
+        13200,
+        -17700
       ],
       "collectedFlag": null
     },
@@ -2205,8 +2205,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        62364,
-        0
+        13200,
+        -17700
       ],
       "collectedFlag": null
     },
@@ -2217,8 +2217,8 @@
       "itemId": 3,
       "itemName": "Field item 3",
       "pos": [
-        96744,
-        0
+        -13100,
+        6500
       ],
       "collectedFlag": null
     },
@@ -2229,8 +2229,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        97252,
-        0
+        -13800,
+        4300
       ],
       "collectedFlag": null
     },
@@ -2241,8 +2241,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        97652,
-        0
+        -3700,
+        10300
       ],
       "collectedFlag": null
     },
@@ -2253,8 +2253,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        15334,
-        0
+        -5900,
+        6800
       ],
       "collectedFlag": null
     },
@@ -2265,8 +2265,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        7602,
-        0
+        4100,
+        2100
       ],
       "collectedFlag": null
     },
@@ -2277,8 +2277,8 @@
       "itemId": 1,
       "itemName": "Med Pak S",
       "pos": [
-        8038,
-        0
+        -3600,
+        -900
       ],
       "collectedFlag": null
     },
@@ -2289,8 +2289,8 @@
       "itemId": 2,
       "itemName": "Resusc. Pak",
       "pos": [
-        47322,
-        0
+        21100,
+        7500
       ],
       "collectedFlag": null
     }

@@ -11,11 +11,11 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read   # least privilege — CI only reads the repo
+  contents: read # least privilege — CI only reads the repo
 
 jobs:
   build-test-coverage:
-    name: build-test-coverage   # stable name — this is a required status check (scripts/setup-rulesets.sh)
+    name: build-test-coverage # stable name — this is a required status check (scripts/setup-rulesets.sh)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,9 +37,9 @@ jobs:
 
       - name: Coverage gate
         run: |
-          # Floor set just below today's ~60% line coverage so the build is green now. RATCHET IT UPWARD as
+          # Floor set just below today's ~70% line coverage so the build is green now. RATCHET IT UPWARD as
           # coverage grows — new features earn coverage via this floor + PR review, never by lowering it.
-          THRESHOLD=59
+          THRESHOLD=70
           PCT=$(python3 -c "import xml.etree.ElementTree as ET; \
             print(round(float(ET.parse('coverage-report/Cobertura.xml').getroot().get('line-rate')) * 100, 2))")
           echo "Overall line coverage: ${PCT}%  (floor: ${THRESHOLD}%)"

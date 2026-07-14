@@ -5,20 +5,39 @@ namespace DinoRand.Randomizer.Graph;
 
 public sealed class RoomNode
 {
-    public RoomNode(int stage, int room)
+    public RoomNode(int stage, int room, int regionIndex = 0, string? regionName = null)
     {
         Stage = stage;
         Room = room;
+        RegionIndex = regionIndex;
+        RegionName = regionName;
     }
 
     public int Stage { get; }
     public int Room { get; }
-    public string Id => $"ST{Stage}:R{Room}";
+
+    /// <summary>Sub-room region index (REGION-SCHEMA-PLAN.md §2). <b>0 = the primary region</b> (or an
+    /// atomic room's only node), so <see cref="NodeCode"/> == <see cref="Code"/> and every un-split room
+    /// behaves byte-identically. A room with an intra-room, entry-direction partition (e.g. the 0309
+    /// shuttle) splits into one node per region, indices 0..N.</summary>
+    public int RegionIndex { get; }
+
+    /// <summary>The region's authored name from <c>map.json</c> (e.g. <c>"west"</c>/<c>"shuttle"</c>), or
+    /// <c>null</c> for an atomic room's single node. Diagnostic only.</summary>
+    public string? RegionName { get; }
+
+    public string Id => RegionIndex == 0 ? $"ST{Stage}:R{Room}" : $"ST{Stage}:R{Room}.{RegionName ?? RegionIndex.ToString()}";
 
     /// <summary>The room as an <c>SSRR</c> code (<c>stage&lt;&lt;8 | room</c>), matching
     /// <see cref="DoorRecord.TargetCode"/> and the room codes used as keys in
-    /// <c>data/dc1/map.json</c> / <c>room-data.json</c>.</summary>
+    /// <c>data/dc1/map.json</c> / <c>room-data.json</c>. Shared by every region node of a split room.</summary>
     public int Code => ((Stage & 0xff) << 8) | (Room & 0xff);
+
+    /// <summary>The unique graph-node identity: <c>(RegionIndex &lt;&lt; 16) | Code</c>
+    /// (REGION-SCHEMA-PLAN.md §2). For the primary region (index 0) this equals <see cref="Code"/>, so the
+    /// reachability layer stays byte-identical for un-split rooms; the room is recovered anywhere with
+    /// <c>NodeCode &amp; 0xFFFF</c>.</summary>
+    public int NodeCode => (RegionIndex << 16) | Code;
 
     public List<RoomEdge> Edges { get; } = new();
 
@@ -53,6 +72,13 @@ public sealed record NodeItem(ItemRecord Record)
     /// <summary>Randomization priority, stamped from the map.json item overlay (default
     /// <see cref="ItemPriority.Normal"/>). <see cref="ItemPriority.Fixed"/> ⇒ the item pass leaves it vanilla.</summary>
     public ItemPriority Priority { get; set; } = ItemPriority.Normal;
+
+    /// <summary>True when this pickup is a legal key-item <b>scatter</b> target — a static ammo/health
+    /// slot a shuffled door key may land in — stamped from the map.json <c>scatterTargets</c> overlay
+    /// (default <c>false</c>). Consulted ONLY by the opt-in key-item scatter
+    /// (<see cref="RandomizerConfig.ShuffleKeyItemsIntoPickups"/>); never read on the default path, so it
+    /// cannot change flag-off output. docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md.</summary>
+    public bool IsScatterTarget { get; set; }
 
     /// <summary>Relocation-twin link key, stamped from the map.json <c>itemLinks</c> overlay (default
     /// <c>null</c> = unlinked). Records in the same room sharing a non-null <see cref="Link"/> are the

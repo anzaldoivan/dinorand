@@ -321,6 +321,12 @@ namespace DinoRand.App
         public bool CanSwapDc2PlayerCharacters => SelectedGame.Supports(GameFeature.PlayerModel);
         public bool CanRandomizeDoors => SelectedGame.Supports(GameFeature.Doors);
         public bool CanShuffleKeyItems => SelectedGame.Supports(GameFeature.KeyItems);
+
+        // The key-item scatter (into ammo/health pickups) and the DDK Input/Code disc relocation have no
+        // toggles: both ride on the key shuffle, config-built as ShuffleKeyItemsIntoPickups = ShuffleKeyItems
+        // and RelocateDdkDiscs = ShuffleKeyItems, so "Shuffle Key Items" does all three key-shuffle behaviors
+        // at once. The RandomizerConfig flags stay independent for tests. PROGRESSION-KEY-RELOCATION-RESEARCH.md /
+        // docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md.
         public bool CanRandomizeStartingInventory => SelectedGame.Supports(GameFeature.StartingInventory);
         public bool CanRandomizeVoices => SelectedGame.Supports(GameFeature.Voices);
         public bool CanShuffleBgm => SelectedGame.Supports(GameFeature.Bgm);
@@ -575,6 +581,8 @@ namespace DinoRand.App
         partial void OnDc2CharacterSkinIndexChanged(int value) => UpdateSeedFromUi();
         partial void OnDc2ReginaSkinIndexChanged(int value) => UpdateSeedFromUi();
         partial void OnRandomizeDoorsChanged(bool value) => UpdateSeedFromUi();
+        // Key shuffle is a single toggle: scatter (into ammo/health) and DDK-disc relocation ride on it,
+        // config-built as ShuffleKeyItemsIntoPickups = RelocateDdkDiscs = ShuffleKeyItems.
         partial void OnShuffleKeyItemsChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeStartingInventoryChanged(bool value) => UpdateSeedFromUi();
         partial void OnReplaceItemPoolChanged(bool value) => UpdateSeedFromUi();
@@ -751,6 +759,11 @@ namespace DinoRand.App
                 Dc2BlueRaptorComboThreshold = (int)Math.Round(Dc2BlueRaptorCombo),
                 RandomizeDoors = RandomizeDoors,
                 ShuffleKeyItems = ShuffleKeyItems,
+                // Scatter (into ammo/health pickups) and DDK disc relocation ride on the key shuffle — no
+                // separate GUI toggles; "Shuffle Key Items" turns on all three key-shuffle behaviors.
+                // PROGRESSION-KEY-RELOCATION-RESEARCH.md / KEY-ITEM-SCATTER-DATA-AUDIT.md.
+                ShuffleKeyItemsIntoPickups = ShuffleKeyItems,
+                RelocateDdkDiscs = ShuffleKeyItems,
                 RandomizeStartingInventory = RandomizeStartingInventory,
                 RandomizeVoices = voicesOn,
                 IncludeCrossGameVoices = CrossGameVoices,
@@ -1418,6 +1431,15 @@ namespace DinoRand.App
                         {
                             try { tn += $" trex-killable:{Dc2TrexKillableInstaller.Apply(gamePath, restore: false)}"; }
                             catch (Exception tex) { tn += $" (killable-T-Rex exe patch skipped: {tex.Message})"; }
+                        }
+                        // In-bounds Mosasaurus grab: auto-applied whenever the run can inject an E80
+                        // (water-level swaps / fixed-mosa pin), so its grab no longer launches the player
+                        // out of bounds in land rooms while ST700/702/703/704 stay untouched
+                        // (docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md).
+                        if (Dc2MosaGrabSuppressInstaller.WantedFor(config))
+                        {
+                            try { tn += $" mosa-no-grab:{Dc2MosaGrabSuppressInstaller.Apply(gamePath, restore: false)}"; }
+                            catch (Exception mex) { tn += $" (mosa-no-grab exe patch skipped: {mex.Message})"; }
                         }
                         // Killable injected Triceratops: auto-applied whenever the run can inject an E70
                         // (setpiece enemies / fixed-Triceratops pin), remapping its out-of-range death

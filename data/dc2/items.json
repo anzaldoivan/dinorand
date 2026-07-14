@@ -72,8 +72,8 @@
   "_field_pickup_types": {
     "_source": "CE live capture 2026-06-27 + decode_script op-0x31 census (165 items / 54 rooms, data/dc2/item-placements.json). This is the SEPARATE op-0x31 id space (SAT-1 VM-thread slot, K77) whose item correlation is empirical, id histogram 1=95,2=31,3=14,4=6,5=8,6=5,7=3,8=2,9=1.",
     "types": {
-      "1": "Med Pak S (live-witnessed; catalog 0x1b)",
-      "2": "Resusc. Pak (live-witnessed; catalog 0x1e)",
+      "1": "Med Pak S (nominal) -- but the GRANTED catalog id is NOT fixed: live 2026-07-12, a type-1 ST102 pickup on Normal (byte[scene+0x108E]=1) granted catalog 0x1c (Med Pak M), NOT 0x1b. type != catalog; health ids are difficulty-remapped at give time (K98).",
+      "2": "Resusc. Pak (nominal; catalog 0x1e -- but see type-1 note: verify per difficulty)",
       "3": "unnamed (14 occurrences)",
       "4": "unnamed",
       "5": "Dino File (live-witnessed; dino-file log, NOT an inventory catalog row)",
@@ -82,7 +82,24 @@
       "8": "unnamed",
       "9": "unnamed"
     },
-    "_mapping_open": "field-type -> catalog-id give mapping + quantity source = the open give-path decode (ITEMS-KEYITEMS-RE-PLAN Phase 2). Do NOT assume type == catalog id."
+    "_give_path": "RESOLVED (LIVE, K98, 2026-07-12). The granted catalog id = word[itemRec+2] set by the pickup routine[param] (K77), NOT the op-0x31 id byte (byte=1 != granted 0x1c). Give core 0x40CE70: SetFlag(9, word[itemRec+2], 1) @0x40CE79 = ownership (bank 9 = 0x878098). Consumables (health 0x1a-0x1f) ALSO get a bag count record via 0x49F900 (bag = scene+0x11AC; find-in-bag 0x496010). Key items (0x21-0x34) = ownership flag ONLY, no record (live: City Keycard = catalog 0x22 -> flag(9,0x22), both banks byte-identical). Dino files (type 5) = flag/log only. Lever for a shuffler = the routine's granted catalog id (word[itemRec+2]); health is difficulty-scaled at give time.",
+    "_mapping_open": "CLOSED as a NEGATIVE (K101/K102, 2026-07-12): the field-CONSUMABLE per-pickup catalog id is genuinely RUNTIME-seeded -- there is NO native per-pickup catalog table and NO field-pickup entry in the give-card screen table 0x71e130 (the give 0x40CE79 is the only variable-id SetFlag(9,.) in .text); the 9 op-0x31 TYPES are categories, not the ~40 catalog ids. K102 confirmed the give-card +0x50 writer via a live data-write BP: the id is difficulty-remapped at give time (type-1 health -> 0x1c on Normal). So item-placements.json is deliberately NOT given a fabricated per-pickup catalogId (guessing a runtime value would be wrong). The ONE statically-resolvable slice is KEY-ITEM ownership: scripted SetFlag(9, literal) grants (door-gating.json rooms[].sets, group 9 id 0x21-0x34) -- see keyItemGrantSites below."
+  },
+  "keyItemGrantSites": {
+    "_source": "BYTE-GROUNDED (K101, 2026-07-12): op-0x1c SetFlag(9, literal, 1) grant sites decoded from the slot-5 SCD script (door-gating.json rooms[].sets, group 9, id 0x21-0x34, value 1), each bound to its source room by the op-0x39 examine record's routine or the op-0x31 pickup mini-routine. This is the ONLY statically-resolvable per-item identity in DC2 (consumable field ids are runtime-seeded -- see _field_pickup_types._mapping_open). value:=0 rows are CLEARS, not grants, and are excluded.",
+    "grants": [
+      { "catalogId": "0x23", "name": "Research Facility Keycard", "rooms": ["302", "303"], "routines": { "302": [5], "303": [6, 7] } },
+      { "catalogId": "0x25", "name": "Key plate", "rooms": ["205"], "routines": { "205": [21] } },
+      { "catalogId": "0x26", "name": "Key plate", "rooms": ["205"], "routines": { "205": [16] } },
+      { "catalogId": "0x27", "name": "Key plate", "rooms": ["205"], "routines": { "205": [14] } },
+      { "catalogId": "0x28", "name": "Key plate", "rooms": ["205"], "routines": { "205": [15] } },
+      { "catalogId": "0x29", "name": "Key plate", "rooms": ["205"], "routines": { "205": [17] } },
+      { "catalogId": "0x2a", "name": "Key plate", "rooms": ["205"], "routines": { "205": [18] } },
+      { "catalogId": "0x2e", "name": "Gas Mask", "rooms": ["10F"], "routines": { "10F": [2, 3] } },
+      { "catalogId": "0x30", "name": "Mechanic's ID Card", "rooms": ["605"], "routines": { "605": [5] } }
+    ],
+    "_runtime_or_native": "City Keycard 0x22 has NO scripted grant (runtime card, K98; room 800 only clears it). All other key ids (Plug 0x21, Living quarters key 0x24, Starter Battery 0x2b, 3rd Energy Disk 0x2c, Diving Suit 0x2d, Signal Bullet 0x2f, Key for the box 0x31, 3E Facility Keycard 0x32, Light-weight Armor 0x33, Inner suit 0x34) have no group-9 :=1 script grant -> granted by native/cutscene code, offline-unverifiable, left unmodelled (Law 2). See K107.",
+    "_no_door_gate": "IMPORTANT (K107): possessing these keys does NOT gate any traceable DOOR. DC2 doors unlock via the equipped-weapon class byte (op-0x3a consumer 0x48b790, scene_mgr+0x10b5) or same-room story flags (groups 6/7), NOT a held-key-item test. The only group-9 held-item TESTS (0x2c/0x2e/0x33/0x38 in rooms 400/10D/808-809/402) are environmental/state, with no CFG proof of blocking a warp. So NO requiresItems door gate is authorable offline; dc2_logic.json stays visit-gated. Mirrors the DC1 gate-authoring outcome."
   },
   "dinoFiles": {
     "_source": "guide-sourced (FAQ); dino files route to the log, not inventory -- no catalog rows",

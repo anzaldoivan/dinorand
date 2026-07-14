@@ -18,7 +18,7 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
 
         Usage:
           dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]
-                   [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--exotic-enemies]
+                   [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items] [--exotic-enemies]
                    [--dc1-cutscene-safe]                                    (dc1)
                    [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps]
                    [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]
@@ -27,7 +27,7 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
                    [--dc2-regina-skin stock|gail|rick|random]              (dc2)
                    [--dc2-raptor-tiers] [--dc2-raptor-weight <0..7>=<0..15>]...
                    [--dc2-raptor-colour room|mixed] [--dc2-blue-combo <1..20>]   (dc2)
-                   [--dc2-trex-killable] [--dc2-inostra-spawn-guard]            (dc2)
+                   [--dc2-trex-killable] [--dc2-mosa-no-grab] [--dc2-mosa-no-knockback] [--dc2-mosa-tail-to-bite] [--dc2-inostra-spawn-guard]  (dc2)
                    [--difficulty <0..1>] [--ratio-ammo <0..31>] [--ratio-health <0..31>]
                    [--ammo-quantity <0..7>] [--weapon-upgrade-chance <0..1>]
                    [--pre-upgraded-weapon-chance <0..1>]
@@ -143,7 +143,11 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             folder, backing up the pristine originals to Data\.dinorand_backup first.
           - --restore copies those originals back and removes the backup.
           - --shuffle-keys relocates the door-gating key items (Entrance / BG Area /
-            C.O. Area keys, Key Card Lv A) to new spots, kept provably beatable.
+            C.O. Area keys, Key Card Lv A) to new spots, kept provably beatable. It does all
+            three key-shuffle behaviors together: it also relocates the DDK Input/Code disc
+            pairs (overlay-requires gated) AND scatters keys into static ammo/health pickups
+            (not only other door-key spots); discs/items conserved. (The old --scatter-key-items
+            flag is now redundant — scatter is on by default with --shuffle-keys.)
           - --exotic-enemies (EXPERIMENTAL, off by default) imports FOREIGN species into
             eligible rooms — the cat8 Therizinosaurus (stages 1-2) and the grounded
             RaptorHeavy — and, with --install-to-data, applies the EXE patches they need
@@ -523,6 +527,16 @@ var config = new RandomizerConfig
     // fallback instead. Off = byte-identical. Not seed-encoded.
     Dc1CutsceneSafeEnemies = argv.Contains("--dc1-cutscene-safe"),
     ShuffleKeyItems = argv.Contains("--shuffle-keys"),
+    // DC1: key-item scatter (a door key may also land in a static ammo/health pickup, not only another
+    // door-key spot) rides on --shuffle-keys by default, like the DDK relocation below — the product does
+    // all three key-shuffle behaviors together. Progression-safe (symmetric Place), items conserved. The
+    // legacy --scatter-key-items flag is now a redundant no-op. docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md.
+    ShuffleKeyItemsIntoPickups = argv.Contains("--shuffle-keys"),
+    // DC1: DDK Input/Code disc relocation (0x62–0x6f, overlay-`requires` PAIR-gated, not door-TYPE) rides on
+    // --shuffle-keys by default — the product does all three key-shuffle behaviors together. Progression-safe
+    // (pair-aware Place), discs conserved. The RandomizerConfig.RelocateDdkDiscs flag stays independent so
+    // tests can exercise it in isolation. docs/decisions/dc1/items/PROGRESSION-KEY-RELOCATION-RESEARCH.md.
+    RelocateDdkDiscs = argv.Contains("--shuffle-keys"),
     // Experimental: import foreign species (cat8 Theri + grounded RaptorHeavy) into eligible rooms and queue
     // the EXE patches they need. Off unless asked; with --install-to-data it patches DINO.exe (game must be
     // CLOSED). docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.
@@ -982,6 +996,23 @@ int RunDc2(string installDir)
     // Dino2.exe so a randomized T-Rex dies normally, EXCEPT in the two vanilla boss rooms (ST200/ST903).
     dc2Config.Dc2MakeTrexKillable = argv.Contains("--dc2-trex-killable");
 
+    // In-bounds injected Mosasaurus grab (docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md):
+    // --dc2-mosa-no-grab patches Dino2.exe so an injected E80 Mosasaurus's grab no longer launches the
+    // player out of bounds in land rooms, EXCEPT in the native aquatic rooms (ST700/702/703/704).
+    dc2Config.Dc2SuppressMosaGrab = argv.Contains("--dc2-mosa-no-grab");
+
+    // In-bounds injected Mosasaurus knockback (DC2-MOSA-GRAB-SUPPRESS-PLAN.md §8.5, K105): a SEPARATE OOB
+    // channel from the grab — --dc2-mosa-no-knockback patches Dino2.exe so an injected E80 Mosasaurus's
+    // tail/proximity knockback can no longer fling the player out of bounds in land rooms, EXCEPT in the
+    // native aquatic rooms (ST700/702/703/704).
+    dc2Config.Dc2SuppressMosaKnockback = argv.Contains("--dc2-mosa-no-knockback");
+
+    // Behavior-layer OOB fix (DC2-MOSA-GRAB-SUPPRESS-PLAN.md §9, K106): rather than gate shared movement,
+    // --dc2-mosa-tail-to-bite patches Dino2.exe so an injected E80 Mosasaurus does its narrow bite instead
+    // of the OOB-causing wide-turn tail strike in land rooms, EXCEPT the native aquatic rooms
+    // (ST700/702/703/704). Changes WHICH behavior the mosa runs; touches no player-movement code.
+    dc2Config.Dc2RedirectMosaTail = argv.Contains("--dc2-mosa-tail-to-bite");
+
     // Killable injected Triceratops (RCA §7b): --dc2-triceratops-killable remaps E70's out-of-range
     // death animation index (8 -> 7) in Dino2.exe so an injected Triceratops dies with a real
     // animation instead of crashing.
@@ -1033,6 +1064,55 @@ int RunDc2(string installDir)
         catch (IOException)
         {
             Console.Error.WriteLine("killable-T-Rex exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+        }
+    }
+
+    // In-bounds Mosasaurus grab exe lever (hooks + code caves) — same in-place, .bak-protected contract.
+    // Auto-applied whenever the run can inject a Mosasaurus (water-level swaps / fixed-mosa pin), or forced
+    // on by --dc2-mosa-no-grab. Harmless no-op when no Mosasaurus is actually placed.
+    if (Dc2MosaGrabSuppressInstaller.WantedFor(dc2Config))
+    {
+        try
+        {
+            var outcome = Dc2MosaGrabSuppressInstaller.Apply(installDir, restore: false, Console.WriteLine);
+            Console.WriteLine($"mosa-no-grab exe patch: {outcome}");
+        }
+        catch (IOException)
+        {
+            Console.Error.WriteLine("mosa-no-grab exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+        }
+    }
+
+    // In-bounds Mosasaurus knockback exe lever (hook + code cave) — same in-place, .bak-protected contract.
+    // Auto-applied whenever the run can inject a Mosasaurus (water-level swaps / fixed-mosa pin), or forced
+    // on by --dc2-mosa-no-knockback. Harmless no-op when no Mosasaurus is actually placed.
+    if (Dc2MosaKnockbackSuppressInstaller.WantedFor(dc2Config))
+    {
+        try
+        {
+            var outcome = Dc2MosaKnockbackSuppressInstaller.Apply(installDir, restore: false, Console.WriteLine);
+            Console.WriteLine($"mosa-no-knockback exe patch: {outcome}");
+        }
+        catch (IOException)
+        {
+            Console.Error.WriteLine("mosa-no-knockback exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+        }
+    }
+
+    // Behavior-layer Mosasaurus tail-redirect exe lever (hook + code cave at the attack-pattern hub) — same
+    // in-place, .bak-protected contract. Auto-applied whenever the run can inject a Mosasaurus (water-level
+    // swaps / fixed-mosa pin), or forced on by --dc2-mosa-tail-to-bite. Harmless no-op when no Mosasaurus is
+    // actually placed.
+    if (Dc2MosaTailRedirectInstaller.WantedFor(dc2Config))
+    {
+        try
+        {
+            var outcome = Dc2MosaTailRedirectInstaller.Apply(installDir, restore: false, Console.WriteLine);
+            Console.WriteLine($"mosa-tail-to-bite exe patch: {outcome}");
+        }
+        catch (IOException)
+        {
+            Console.Error.WriteLine("mosa-tail-to-bite exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
         }
     }
 

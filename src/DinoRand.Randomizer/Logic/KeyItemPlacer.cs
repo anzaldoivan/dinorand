@@ -31,7 +31,17 @@ public sealed class KeyItemPlacer
     public sealed record PlacementResult(
         bool Success,
         IReadOnlyList<(Spot Spot, int KeyItem)> Placements,
-        IReadOnlyList<string> Log);
+        IReadOnlyList<string> Log,
+        IReadOnlyList<SphereStep>? Spheres = null);
+
+    /// <summary>One round of the <see cref="Verify"/> fixpoint, in the randomizer-community "sphere"
+    /// convention (Archipelago / OoTR spoiler playthroughs): sphere 0 is what the start reaches
+    /// empty-handed; sphere N is opened by the keys collected in spheres &lt; N. <see cref="Collected"/>
+    /// lists the keys picked up <i>within</i> this sphere's reach (they open the next one).</summary>
+    public sealed record SphereStep(
+        int Index,
+        IReadOnlyList<(int KeyItem, int RoomCode)> Collected,
+        int RoomsReachable);
 
     /// <summary>
     /// Rooms reachable from <paramref name="start"/> crossing every ungated door plus every
@@ -46,8 +56,13 @@ public sealed class KeyItemPlacer
     public static HashSet<int> Reachable(RoomGraph graph, GameDefinition game, int start,
                                          IReadOnlySet<int> held)
     {
-        var byCode = graph.Nodes.ToDictionary(n => n.Code);
-        var seen = new HashSet<int> { start };
+        // Flood over NodeCode identity (so a split room's sub-regions are distinct — entry-direction
+        // partitions, REGION-SCHEMA-PLAN.md §2), but track and RETURN masked room codes so every caller —
+        // requiresRoom, keysByRoom, goal test, Spot.RoomCode — sees rooms exactly as before. For an atomic
+        // room NodeCode == Code, so `nodes`, `seen`, and `rooms` coincide → byte-identical.
+        var byNode = graph.Nodes.ToDictionary(n => n.NodeCode);
+        var seen = new HashSet<int> { start };               // NodeCodes (start room's primary node)
+        var rooms = new HashSet<int> { start & 0xffff };     // masked room codes (requiresRoom + return)
         // Group-9 story latches (STATIC-SCD-RE.md cont.40): a type-2 door is free to cross, so its lock
         // is set once its source room is reachable; a type-1 reader door is passable only once its lock
         // is in this set. Recomputed from `seen` each fixpoint pass (monotonic, set-once), which is what
@@ -57,26 +72,27 @@ public sealed class KeyItemPlacer
         while (grew)
         {
             grew = false;
-            foreach (var code in seen)
-                if (byCode.TryGetValue(code, out var n))
+            foreach (var nc in seen)
+                if (byNode.TryGetValue(nc, out var n))
                     foreach (var e in n.Edges)
                         if (e.Door.SetsStoryLatch) latches.Add(e.Door.LockId);
 
             var queue = new Queue<int>(seen);
             while (queue.Count > 0)
             {
-                if (!byCode.TryGetValue(queue.Dequeue(), out var node)) continue;
+                if (!byNode.TryGetValue(queue.Dequeue(), out var node)) continue;
                 foreach (var edge in node.Edges)
                 {
-                    if (seen.Contains(edge.Target.Code)) continue;
-                    if (!CanTraverse(game, edge, held, seen, latches)) continue;
-                    seen.Add(edge.Target.Code);
-                    queue.Enqueue(edge.Target.Code);
+                    if (seen.Contains(edge.Target.NodeCode)) continue;
+                    if (!CanTraverse(game, edge, held, rooms, latches)) continue;
+                    seen.Add(edge.Target.NodeCode);
+                    rooms.Add(edge.Target.Code);
+                    queue.Enqueue(edge.Target.NodeCode);
                     grew = true;
                 }
             }
         }
-        return seen;
+        return rooms;
     }
 
     /// <summary>True when the door-type key-set (OR) is open, the group-9 story latch (if this is a
@@ -104,71 +120,86 @@ public sealed class KeyItemPlacer
     public static PlacementResult Verify(RoomGraph graph, GameDefinition game, int start, int goal,
                                          IReadOnlyDictionary<int, IReadOnlyList<int>> keysByRoom)
     {
-        var byCode = graph.Nodes.ToDictionary(n => n.Code);
+        // Keyed by NodeCode (unique across split-room sub-regions). Room-code lookups (`byCode[room]`)
+        // resolve to the primary region (index 0, NodeCode == Code) — the room's item records live there.
+        var byCode = graph.Nodes.ToDictionary(n => n.NodeCode);
         var held = new HashSet<int>();
         var log = new List<string>();
 
         // Assumed-fill to a fixpoint: collect every key reachable with the keys held so far, re-flood,
         // repeat. Unlike a goal-only check this keeps collecting *past* the goal, so the result can also
         // prove no door key was left stranded (BioRand's "every item reachable", not just the win).
+        // Each round is one playthrough "sphere" (SphereStep) — recorded for the spoiler log.
+        var spheres = new List<SphereStep>();
         HashSet<int> reach;
         while (true)
         {
             reach = Reachable(graph, game, start, held);
-            bool grew = false;
+            var collected = new List<(int KeyItem, int RoomCode)>();
             foreach (var room in reach)
                 if (keysByRoom.TryGetValue(room, out var keys))
                     foreach (var key in keys)
                         if (PickupReachable(byCode, room, key, held, reach) && held.Add(key))
-                            grew = true;
-            if (!grew) break;
+                            collected.Add((key, room));
+            // Record every productive round, the first round (baseline reach), and the terminal round
+            // after progress (it shows what the last keys unlocked). A terminal round with no prior
+            // progress would duplicate the baseline, so it is skipped.
+            if (collected.Count > 0 || spheres.Count == 0 || spheres[^1].Collected.Count > 0)
+                spheres.Add(new SphereStep(spheres.Count, collected, reach.Count));
+            if (collected.Count == 0) break;
         }
 
         if (!reach.Contains(goal))
         {
             log.Add($"[progression] UNSOLVABLE: goal {goal:X4} unreachable; " +
                     $"reached {reach.Count} rooms; door keys held: {Fmt(held)}");
-            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log);
+            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log, spheres);
         }
 
-        // Every door key that exists in the playable world must be collectable; one stranded behind its
+        // Every KEY ITEM that exists in the playable world must be collectable; one stranded behind its
         // own (or a later) gate is a soft defect even when the goal does not depend on it — the
-        // Entrance-Key-relocated-to-the-last-area class the key-shuffle preview exposed.
-        var stranded = StrandedDoorKeys(graph, game, start, keysByRoom, held);
+        // Entrance-Key-relocated-to-the-last-area class the key-shuffle preview exposed. Generalized from
+        // door-TYPE keys to all key items (BioRand/AP's "every location reachable"; Phase 4 (i)), so a
+        // non-door progression item stranded behind an authored edge gate is caught too.
+        var stranded = StrandedKeyItems(graph, game, start, keysByRoom, held);
         if (stranded.Count > 0)
         {
-            log.Add($"[progression] UNSOLVABLE: goal {goal:X4} reachable but door key(s) stranded " +
+            log.Add($"[progression] UNSOLVABLE: goal {goal:X4} reachable but key item(s) stranded " +
                     $"(in-world yet uncollectable): {Fmt(stranded)}");
-            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log);
+            return new PlacementResult(false, Array.Empty<(Spot, int)>(), log, spheres);
         }
 
-        log.Add($"[progression] goal {goal:X4} reachable; all door keys collectable; held: {Fmt(held)}");
-        return new PlacementResult(true, Array.Empty<(Spot, int)>(), log);
+        log.Add($"[progression] goal {goal:X4} reachable; all key items collectable; held: {Fmt(held)}");
+        return new PlacementResult(true, Array.Empty<(Spot, int)>(), log, spheres);
     }
 
     /// <summary>
-    /// Door keys that exist in the playable world (rooms reachable while holding <i>every</i> door key)
-    /// but were not <paramref name="collected"/> by the assumed-fill — i.e. every copy is stranded
-    /// behind its own or a later gate. Keys whose only copies sit in areas unreachable even with all
-    /// keys (the Operation Wipe-Out duplicates, e.g. <c>0A03</c>) are excluded: they are out of the
-    /// playable world and never required. Empty ⇒ every door key is obtainable.
+    /// Key items that exist in the playable world (rooms reachable while holding <i>every</i> key item
+    /// present) but were not <paramref name="collected"/> by the assumed-fill — i.e. every copy is
+    /// stranded behind its own or a later gate. Generalized from door-TYPE keys to <b>all</b> key items
+    /// (<see cref="GameDefinition.KeyItemIds"/>) so a non-door progression item stranded behind an
+    /// authored edge/item gate is caught too, not only a <see cref="GameDefinition.KeyItemsForDoor"/> key
+    /// (Phase 4 (i) — BioRand/AP's "every location reachable"). Items whose only copies sit in areas
+    /// unreachable even with all keys (the Operation Wipe-Out duplicates, e.g. <c>0A03</c>) are excluded:
+    /// they are out of the playable world and never required. Empty ⇒ every key item is obtainable.
     /// </summary>
-    private static IReadOnlyList<int> StrandedDoorKeys(RoomGraph graph, GameDefinition game, int start,
+    private static IReadOnlyList<int> StrandedKeyItems(RoomGraph graph, GameDefinition game, int start,
         IReadOnlyDictionary<int, IReadOnlyList<int>> keysByRoom, IReadOnlySet<int> collected)
     {
-        var doorKeys = new HashSet<int>();
-        foreach (var node in graph.Nodes)
-            foreach (var edge in node.Edges)
-                foreach (var k in game.KeyItemsForDoor(edge.Door.DoorType))
-                    doorKeys.Add(k);
-        if (doorKeys.Count == 0) return Array.Empty<int>();
+        // Every key item this placement actually seats somewhere (door + non-door), not just the ones a
+        // door TYPE byte gates on — the full frame of "a key exists, so it must be obtainable".
+        var present = new HashSet<int>();
+        foreach (var keys in keysByRoom.Values)
+            foreach (var k in keys)
+                if (game.KeyItemIds.Contains(k)) present.Add(k);
+        if (present.Count == 0) return Array.Empty<int>();
 
-        var world = Reachable(graph, game, start, doorKeys);
+        var world = Reachable(graph, game, start, present);
         var inWorld = new HashSet<int>();
         foreach (var room in world)
             if (keysByRoom.TryGetValue(room, out var keys))
                 foreach (var k in keys)
-                    if (doorKeys.Contains(k)) inWorld.Add(k);
+                    if (present.Contains(k)) inWorld.Add(k);
 
         inWorld.ExceptWith(collected);
         return inWorld.OrderBy(x => x).ToList();
@@ -184,7 +215,7 @@ public sealed class KeyItemPlacer
     /// </summary>
     public PlacementResult Place(RoomGraph graph, GameDefinition game, int start, int goal,
                                  IReadOnlyList<Spot> spots, IReadOnlyCollection<int> keyItems,
-                                 Seed seed)
+                                 Seed seed, IReadOnlySet<ItemRecord>? relocating = null)
     {
         // The greedy fill can dead-end (seat a key so the last spot lands behind its own gate), so
         // reroll with a fresh stream on failure — the DoorRandomizer retry pattern. Attempt 1 uses
@@ -194,7 +225,7 @@ public sealed class KeyItemPlacer
         for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
             var rng = seed.RngFor(attempt == 1 ? "keyitems" : $"keyitems-{attempt}");
-            result = PlaceOnce(graph, game, start, goal, spots, keyItems, rng);
+            result = PlaceOnce(graph, game, start, goal, spots, keyItems, rng, relocating);
             if (result.Success) return result;
         }
         return result;
@@ -202,8 +233,16 @@ public sealed class KeyItemPlacer
 
     private static PlacementResult PlaceOnce(RoomGraph graph, GameDefinition game, int start, int goal,
                                              IReadOnlyList<Spot> spots, IReadOnlyCollection<int> keyItems,
-                                             Random rng)
+                                             Random rng, IReadOnlySet<ItemRecord>? relocating)
     {
+        // Symmetric with Verify (KEY-ITEM-RANDO-RESEARCH.md §3(b)): the placer does NOT assume the
+        // non-relocated progression items held from t=0. It COLLECTS them the way Verify does — each fixed
+        // key item enters `held` only once its room is reachable and its pickup guard is satisfied — so
+        // `held` grows identically in Place and Verify, and a layout Place accepts, Verify accepts too.
+        // The records this call is itself relocating are excluded (their id is moving, not staying put).
+        // Keyed by NodeCode; a masked room code from `reach` resolves to the primary region (index 0,
+        // NodeCode == Code), where the room's item records live — same convention as Verify/PickupReachable.
+        var byNode = graph.Nodes.ToDictionary(n => n.NodeCode);
         var held = new HashSet<int>();
         var remaining = new List<int>(keyItems);
         var placements = new List<(Spot, int)>();
@@ -212,7 +251,26 @@ public sealed class KeyItemPlacer
 
         while (true)
         {
-            var reach = Reachable(graph, game, start, held);
+            // Assumed-fill sub-fixpoint: expand reach and collect every reachable, guard-clear fixed key
+            // item, until neither grows (BioRand's Search/_haveItems discipline). Without this, gating a
+            // non-relocated item held-from-t=0 lets the fill cross a gate it has not honestly earned and
+            // seat a key Verify then can't reach (the §8l Place↔Verify divergence).
+            HashSet<int> reach;
+            while (true)
+            {
+                reach = Reachable(graph, game, start, held);
+                bool collected = false;
+                foreach (var room in reach)
+                    if (byNode.TryGetValue(room, out var node))
+                        foreach (var ni in node.Items)
+                            if ((relocating is null || !relocating.Contains(ni.Record))
+                                && game.KeyItemIds.Contains(ni.Record.ItemId)
+                                && ni.Requires.SatisfiedBy(held, reach)
+                                && held.Add(ni.Record.ItemId))
+                                collected = true;
+                if (!collected) break;
+            }
+
             bool goalReached = reach.Contains(goal);
 
             if (goalReached && remaining.Count == 0)
@@ -277,7 +335,9 @@ public sealed class KeyItemPlacer
                                              IReadOnlySet<int> reach, IReadOnlySet<int> held,
                                              IReadOnlyCollection<int> remaining)
     {
-        var byCode = graph.Nodes.ToDictionary(n => n.Code);
+        // Keyed by NodeCode (unique across split-room sub-regions). Room-code lookups (`byCode[room]`)
+        // resolve to the primary region (index 0, NodeCode == Code) — the room's item records live there.
+        var byCode = graph.Nodes.ToDictionary(n => n.NodeCode);
         var remainingSet = new HashSet<int>(remaining);
         var result = new HashSet<int>();
 

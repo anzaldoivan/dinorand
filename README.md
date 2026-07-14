@@ -27,6 +27,11 @@ Give it an unmodified Dino Crisis 1 install (the **DRM-free GOG release**) and a
 get back a randomized, still-completable playthrough — items, enemies, loadout, and
 (eventually) the whole door graph.
 
+> **Playing, not building?** Start with the **[User Guide](USER-GUIDE.md)** — install,
+> flags, seeds, spoiler log, and how to undo everything.
+> **Building on top?** The **[Modding & Format Guide](MODDING.md)** maps what's decoded,
+> the data/library surfaces you can use, and the ground rules.
+
 > **Supported edition: GOG (DRM-free) only.** The Steam re-release is wrapped in
 > "The Enigma Protector" DRM; DinoRand does not support patching it. Use the GOG build.
 

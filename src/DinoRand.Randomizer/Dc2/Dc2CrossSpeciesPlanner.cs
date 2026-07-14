@@ -146,13 +146,16 @@ public static class Dc2CrossSpeciesPlanner
         donorPool ??= Dc2SpeciesTable.DefaultDonors;
 
         // Non-land-native skip, extended to the wave path. Two halves:
-        //  • FLYER-native (0x04) rooms are ALWAYS left vanilla — a land replacement spawns outside the
-        //    level hitbox (unreachable, live 2026-07-04); the water flag never lifts this.
-        //  • WATER-native (aquatic/non-land) rooms (ST700/702/703/704, K72) are left vanilla by default,
+        //  • UNCONDITIONAL-skip natives are ALWAYS left vanilla (the water flag never lifts them):
+        //    FLYER (0x04 — a land replacement spawns outside the level hitbox, unreachable, live 2026-07-04)
+        //    and Plesiosaurus GRUNT (0x0b/0x0c — ST001/600/601/604 have invisible colliders a swapped donor
+        //    attacks the player through, playtest 2026-07-12). Data-driven, so a new such room is covered
+        //    by its native type, not a per-room list.
+        //  • WATER-native (Mosasaurus 0x0a wave rooms ST700/702/703/704, K72) are left vanilla by default,
         //    but Dc2AllowWaterLevelEnemySwaps lifts the block: the reverse direction places a LAND donor
         //    onto the crash-safe wave descriptors (live-proven safe).
-        if (wave.Descriptors.Any(d => Dc2SpeciesTable.IsFlyerNativeType(d.NativeType)) ||
-            spawns.Any(s => Dc2SpeciesTable.IsFlyerNativeType(s.Type)))
+        if (wave.Descriptors.Any(d => Dc2SpeciesTable.IsUnconditionalSkipNativeType(d.NativeType)) ||
+            spawns.Any(s => Dc2SpeciesTable.IsUnconditionalSkipNativeType(s.Type)))
             return Dc2RoomPlan.Empty;
         if (!allowWaterLevels &&
             (wave.Descriptors.Any(d => Dc2SpeciesTable.IsWaterNativeType(d.NativeType)) ||
