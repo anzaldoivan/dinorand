@@ -213,7 +213,8 @@ public class RequirementOverlayTests
     public void DoorRequiresRoomGate_BindsToDoorway_SurvivesRepoint()
     {
         // A door `requiresRoom` gate must likewise bind to OriginalTargetCode. Real DC1 gate:
-        // 0400->0401 requiresRoom [0205].
+        // 0400->0401 requiresRoom [0205,0109] (0109 added 2026-07-15, user-directed — closes the
+        // 050B/0604/0609/060B deep-facility chain back to 0101/0202/the H-pair via the heliport).
         var overlay = MapRequirements.LoadDefault();
         var room = new RoomFile(0x04, 0x00);
         // (a) the gated 0400->0401 doorway REPOINTED to 0300 (vanilla dest 0401 preserved).
@@ -231,7 +232,7 @@ public class RequirementOverlayTests
         var node = NodeOf(RoomGraph.Build(new List<RoomFile> { room }, overlay), 0x0400);
 
         var gated = node.Edges.Single(e => e.Door.OriginalTargetCode == 0x0401);
-        Assert.Equal(new[] { 0x0205 }, gated.Requires.RoomsVisited);  // gate travelled with the doorway
+        Assert.Equal(new[] { 0x0205, 0x0109 }, gated.Requires.RoomsVisited);  // gate travelled with the doorway
         var intruder = node.Edges.Single(e => e.Door.OriginalTargetCode == 0x0402);
         Assert.True(intruder.Requires.IsEmpty);                       // no float onto the intruder
     }

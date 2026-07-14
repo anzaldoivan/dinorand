@@ -136,7 +136,8 @@
       "to": "0307",
       "requiresItems": [],
       "requiresRooms": [
-        "030b"
+        "030b",
+        "0109"
       ]
     },
     {
@@ -161,6 +162,14 @@
       "requiresRooms": [
         "0106",
         "0202"
+      ]
+    },
+    {
+      "from": "010b",
+      "to": "010a",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0101"
       ]
     },
     {
@@ -192,7 +201,8 @@
       "to": "0404",
       "requiresItems": [],
       "requiresRooms": [
-        "0106"
+        "0106",
+        "0109"
       ]
     },
     {
@@ -277,7 +287,8 @@
       "to": "0401",
       "requiresItems": [],
       "requiresRooms": [
-        "0205"
+        "0205",
+        "0109"
       ]
     },
     {

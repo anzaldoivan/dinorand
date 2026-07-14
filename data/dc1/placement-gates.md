@@ -232,3 +232,128 @@ vanilla stays beatable via the `0113` elevator). The pre-existing `0309→0306` 
 > `0113→0604` forge edges (reqRoom `0506`) need no change: `0506` is itself inside the now-gated hub.
 > Vanilla still beatable (`0401` reachable with the Entrance Key). Guard:
 > `KeyItemPlacerTests.RealInstall_DeepFacility_RequiresTheEntranceKey`.
+
+## `010D` An. Aid scatter-spot gate (2026-07-15, user-directed, NO code trace)
+
+**Deviation from this ledger's own standing policy** (`[[dc1-gate-authoring-lessons]]`: "never author a
+gate from guides alone — needs a code trace"). Flagged and logged as such for the record.
+
+`010D` ("Backyard of the Facility") is DC1's **start room** (`GameDefinition.StartRoomCode`,
+`REACHABILITY.md: Start 010d`) and its An. Aid pickup at `-6144,768` (item `0x20`) is a legal key-item
+**scatter target** (`KEY-ITEM-SCATTER-DATA-AUDIT.md` §4/§7). The static evidence available in this repo
+— the item's own census record (`gate: unconditional`, `trigger: init`, `data/dc1/room-data.json`), the
+`010D→030B` door gate (`requires:[0x2F]`, i.e. the B1 Room Key gates only the *door down to the
+basement*, not anything inside `010D`), and `REACHABILITY.md`'s sphere table (both `BG Room B1 Key
+@0109` and `BG Area Key @010c` are sphere-0, held-from-t=0) — is **consistent with this item being
+freely reachable from game start**, not gated by the B1 Room Key.
+
+The user asserted from an unspecified source that the position is in fact unreachable without B1 Room
+Key `0x2F` and directed the gate be authored anyway, conservatively, without a code trace. **AUTHORED**:
+`010D.items["20"].requires = [47]` — the pickup's `NodeItem.Requires` now demands holding `0x2F` before
+`KeyItemPlacer` treats that spot as reachable (consumed identically whether the spot is used for a
+door-key or an opt-in scatter placement, `ProgressionPass.cs`). Effect is one-directional-safe: if the
+claim is right, this closes a real softlock; if wrong, it only makes that one spot slightly less
+available to the placer (measured: still used by 15/40 swept seeds for other keys; 0/40 for the tracked
+BG Area Key specifically, vs. landing there in about half of an earlier un-gated 10-seed sample — a
+distribution shift, not a beatability regression, all 40 confirmed beatable). No CE witness taken.
+**Follow-up:** if a future session gets a live capture of `010D`, confirm or retract this gate against
+the CE ground truth. Guard: `Dc1MapContractTests.Map_010D_AnAid_RequiresB1RoomKey` (data-contract only;
+asserts the map.json entry, not the underlying physical claim).
+
+## `0101` Toilet / `0104` Strategy Room — room-level backstops for the `0102` fenceA gate
+## (2026-07-15, user-directed, CODE-TRACED)
+
+Both rooms have a direct byte-cited match already in this ledger's row-A `0102 A` fence (`0x39eac`,
+flag `0:12`, wall `z=-4000`): the fence's keypad-enable flag `0:240` is armed by `0107 sub8 @0x13a60`,
+which requires `0:22` (0106 route) **and** `7:85` — the take-flag for DDK Input Disc N in `0202`
+(Chief's Room). That fence gate already authors `0102→{0101,0104} requiresRoom [0106,0202,0107]` on the
+door edge (via the `fenceA` region overlay, `ParseRegions` → `RegionDoorGates`). The user's claim
+("`0101` requires having visited `0202`", later extended to `0104`) is therefore **already correct and
+evidenced** — the only gap was that the existing gate lives entirely on the `0102→0101`/`0102→0104` door
+edges, so a door-rando repoint of some *other* door straight into either room would silently bypass it.
+
+**AUTHORED**: `0101.requiresRoom = ["0202"]` and `0104.requiresRoom = ["0202"]` — room-level gates
+(`RoomNode.Requires`, applied to every incoming edge regardless of route), layered on top of the
+existing edge-level fence gate as a door-rando-safe backstop, not a replacement.
+
+**Reachability-oracle effect, measured (corrects an earlier mis-citation in this entry — the affected
+pair is the DDK **H** discs, not N):** `0202`'s own reachability is gated by the *pre-existing*
+`0203→0202 requires [0x62,0x69]` door (DDK Input/Code Disc H), unrelated to this session's edits.
+`0101`/`0104`'s new `requiresRoom:[0202]` only re-states "0202 must be reachable" — which the *existing*
+`0102A` fence edge-gate already encoded as one of its three AND-conditions. Net effect on the oracle:
+**zero diff** (confirmed on a from-clean `obj`/`bin` rebuild, so it isn't a stale-embedded-resource
+artifact) — `0101`/`0104`/`0202` are all `False` only in `all-minus-ddk-62`/`all-minus-ddk-69` (count
+96→93, the H pair — this is the *pre-existing* door gate doing its job, not something these two edits
+changed) and `True` in every other DDK probe including the N pair (`all-minus-ddk-63`/`-6a` stay at 96).
+So both room-level gates are, today, pure door-rando-only insurance with no effect on the base graph;
+that is the expected, correct outcome for a defense-in-depth backstop, not a bug. `gen_ap_logic --check`
+/ apworld selfchecks / beatability sweeps all clean both times. Guards:
+`Dc1MapContractTests.Map_0101_Toilet_RequiresVisitingChiefsRoom`,
+`Dc1MapContractTests.Map_0104_StrategyRoom_RequiresVisitingChiefsRoom`.
+
+## DDK Input/Code Disc H circular-relocation safety (2026-07-15, user-raised, VERIFIED, no data change)
+
+Follow-up concern raised after the `0101` fix above: since the `0203→0202` door requires holding BOTH
+DDK Input Disc H (`0x62`) and DDK Code Disc H (`0x69`) (the DDK pair table, `Dc1MapContractTests`), and
+`0202` now gates `0101`, could `RelocateDdkDiscs` ever place either H disc somewhere unreachable without
+already holding it? The rooms first named (`0511` Stabilizer Experiment Room, `0205` Communication Room,
+`050B` Third Energy Control Room) turned out **unrelated to this fence** on inspection — `0511` sits
+behind a *different* fence (`0502`, already safely collocated with a type-6 Key Card door per the fence
+table above); `0205` is not fenced at all; `050B` is gated by the unrelated Entrance-Key/heliport chain.
+
+The room genuinely at risk is **`0104` (Strategy Room)** — it sits behind the same `0102` fenceA
+partition as `0101` (`0102→{0101,0104} requiresRoom [0106,0202,0107]`) and hosts DDK Code Disc E
+(`0x6c`) as its vanilla item, making it a legal `RelocateDdkDiscs` pool spot. Verified empirically
+(`KeyItemPlacer.Verify` on the real graph): forcing **either** DDK Input Disc H (`0x62`, vanilla `0103`)
+**or** DDK Code Disc H (`0x69`, vanilla `0100`) into `0104` — displacing `0x6c` out to the moved disc's
+vanilla room — is correctly rejected as unsolvable (`Success=False`) by the existing sphere-based
+reachability check, for both discs independently. **No map.json change** — the fenceA gate was already
+correctly authored before this session, and `KeyItemPlacer`'s existing safety net (the same mechanism
+that makes every swept seed beatable) already refuses this placement; there was nothing to fix, only to
+prove and lock in. Guard: `KeyItemPlacerTests.RealInstall_DdkDiscRelocation_RejectsEitherHDiscBehindItsOwnFenceGate`
+(`[Theory]`, both discs covered per user direction — an earlier single-disc version only tested `0x69`).
+
+## The 0109/0401 deep chain — closing a real phantom bridge (2026-07-15, user-directed, NO code trace)
+
+Follow-up to the DDK-H entry above: the user pointed out a REAL gap the `0104` check above didn't cover
+— `0107→0113` (needs only the DDK-N pair `0x63`/`0x6a`, unrelated to `0101`/`0202`/H-pair) reaches a
+free, unconditional cluster `{0108,0111,010B,0109}`, and `0109` (Lecture Room) hosts the vanilla `BG
+Room B1 Key 0x2F`. **Empirically confirmed via the reachability oracle** (not just asserted): in
+`all-minus-ddk-62`/`all-minus-ddk-69` (missing an H-pair disc), `0101`/`0202` were correctly `False`,
+but `0109`/`0113`/`0108`/`0111`/`010B` were **all `True`** — the model believed this whole cluster
+(including the B1 Room Key spot) was reachable without the H-pair. A genuine phantom bridge, the same
+class of bug as the `010F`/`0114` heliport gate and the `0309` shuttle flattening (both `[[gitignore]]`-
+adjacent memory entries) — caught this time by deliberately probing the oracle instead of trusting that
+"the code says it's reachable."
+
+**Four gates authored** (all `requiresRoom`, no code trace — same conservative, user-directed pattern as
+the `010D`/`0101`/`0104` entries above):
+
+| Edge/room | Change | Why (user's description) |
+|---|---|---|
+| `010B→010A` door | `requiresRoom:[0101]` | the Office↔Office-Hallway shortcut. **Known incomplete**: `010A` has an independent free entry via `0107→010A`, and the `{0108,0111,010B,0109}` cluster has its own free entry via `0107→0113→0108`, so this edge gate alone does not block either side's overall reachability — user accepted leaving it as-is ("it's okay") rather than pursuing a room-level `010A`/`0113` gate. |
+| `0109` (Lecture Room) | `requiresRoom:[0101]` | "Gail cutscene" trigger site — closes the B1 Room Key phantom-reach directly. |
+| `0105→0307` door | `requiresRoom:[030B,0109]` (was `[030B]`) | Control Room Hall shutter to Medical Room Hallway — the 030B+Gail-cutscene combination. |
+| `0112→0404` door | `requiresRoom:[0106,0109]` (was `[0106]`) | The Backyard → Large Size Elevator Passageway — same combination, the other alternate path. |
+| `0400→0401` door | `requiresRoom:[0205,0109]` (was `[0205]`) | **The decisive one.** `0401` (Passageway to the Heliport) already gates the *entire* B2/B3 deep facility transitively (`0309.doors["050B"].requiresRoom=[0401]`, `.doors["0604"].requiresRoom=[050B]`) per the pre-existing Entrance-Key/heliport work — so adding `0109` here alone closes `050B`/`0604`/`0609`/`060B`/the whole deep facility back to `0101`/`0202`/the H-pair, without touching those downstream edges directly. |
+
+**Measured effect (large):** `all-minus-ddk-62`/`-69` reach count dropped from 96 → **46** (half the map)
+— confirms the DDK H-pair is now a transitive hard requirement for the **goal room `060D` itself**
+(`060d` present in `reach` only when both H discs are held), not just a side room. This is consistent
+with, not a new category from, the pre-existing `gen_ap_logic.py` progression-items list, which already
+carried `0x62`/`0x69` as progression-critical before this session.
+
+**Verified safe despite the scale of the change:** full `KeyItemPlacer`/`Dc1MapContract`/
+`Dc1ReachabilityOracle`/`RequirementOverlay`/`RegionNodeSplit` suite green (one stale hardcoded
+assertion in `RequirementOverlayTests` — pinned the old `0400→0401` gate value — updated to match);
+`gen_ap_logic`/`gen_reachability`/`gen_data_reference` `--apply` + `--check` clean, both apworld
+selfchecks pass; a 50-seed `RelocateDdkDiscs`+scatter sweep tracking DDK Code Disc H specifically shows
+it landing only in shallow/early rooms across every seed (never `060B`/`0406`/`0510`/`050B`), 0/50
+unsolvable. Guards: `Dc1MapContractTests.Map_010B_to_010A_RequiresVisitingToilet`,
+`.Map_0109_LectureRoom_RequiresVisitingToilet`, `.Map_0105_to_0307_RequiresGailCutsceneAtLectureRoom`,
+`.Map_0112_to_0404_RequiresGailCutsceneAtLectureRoom`, `.Map_0400_to_0401_RequiresGailCutsceneAtLectureRoom`.
+
+**Known residual gap:** the `010B↔010A` edge-only gate (row 1 above) doesn't actually close anything on
+its own, per the "known incomplete" note — if a future session wants the `{0108,0111,010B,0109}` cluster
+and `010A` fully sealed against the DDK-N-only `0107→0113` shortcut, that needs a room-level gate on
+`010A` and/or `0113` itself, deliberately left open this session per user direction.

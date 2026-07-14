@@ -47,6 +47,9 @@
       "category": "Segment",
       "floor": "1F",
       "name": "Toilet",
+      "requiresRoom": [
+        "0202"
+      ],
       "itemPriorities": [
         {
           "at": "-2480,-448",
@@ -123,7 +126,10 @@
     "0104": {
       "category": "Segment",
       "floor": "1F",
-      "name": "Strategy Room"
+      "name": "Strategy Room",
+      "requiresRoom": [
+        "0202"
+      ]
     },
     "0105": {
       "category": "Bridge",
@@ -145,7 +151,8 @@
       "doors": {
         "0307": {
           "requiresRoom": [
-            "030B"
+            "030B",
+            "0109"
           ]
         }
       }
@@ -248,6 +255,9 @@
       "category": "Segment",
       "floor": "1F",
       "name": "Lecture Room",
+      "requiresRoom": [
+        "0101"
+      ],
       "staticTargets": [
         "0108"
       ],
@@ -299,6 +309,13 @@
       "category": "Segment",
       "floor": "1F",
       "name": "Office",
+      "doors": {
+        "010A": {
+          "requiresRoom": [
+            "0101"
+          ]
+        }
+      },
       "itemPriorities": [
         {
           "at": "-7856,3888",
@@ -354,7 +371,14 @@
           "at": "-6144,768",
           "_why": "static ammo/health scatter target \u2014 An. Aid"
         }
-      ]
+      ],
+      "items": {
+        "20": {
+          "requires": [
+            47
+          ]
+        }
+      }
     },
     "010E": {
       "category": "Segment",
@@ -401,7 +425,8 @@
         },
         "0404": {
           "requiresRoom": [
-            "0106"
+            "0106",
+            "0109"
           ]
         }
       }
@@ -1000,7 +1025,8 @@
       "doors": {
         "0401": {
           "requiresRoom": [
-            "0205"
+            "0205",
+            "0109"
           ]
         }
       },

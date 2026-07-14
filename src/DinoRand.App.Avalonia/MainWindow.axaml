@@ -218,7 +218,7 @@
                               IsEnabled="{Binding CanRandomizeDoors}"
                               ToolTip.Tip="Shuffle where doors lead (reciprocal, kept provably beatable; scripted/cutscene doors left vanilla)."
                               IsChecked="{Binding RandomizeDoors, Mode=TwoWay}" />
-                    <CheckBox Content="Shuffle Key Items" Margin="0,2"
+                    <CheckBox Content="Shuffle Key Items (Normal/Original Mode Only)" Margin="0,2"
                               IsEnabled="{Binding CanShuffleKeyItems}"
                               ToolTip.Tip="Relocate the door-gating key items (Entrance / BG Area / C.O. Area keys, Key Card Lv. A) plus the DDK disc pairs to new spots, and also into static ammo/health pickups — kept provably beatable under the door-graph logic (a layout that can't be proven beatable reverts to vanilla); progression keys are never seated in one-way ending rooms; items conserved."
                               IsChecked="{Binding ShuffleKeyItems, Mode=TwoWay}" />
