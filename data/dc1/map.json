@@ -416,6 +416,26 @@
       "category": "Bridge",
       "floor": "Unknown",
       "name": "Elevator Hall",
+      "doors": {
+        "0309": {
+          "requires": [
+            65
+          ],
+          "requiresRoom": [
+            "010B"
+          ]
+        },
+        "050B": {
+          "requiresRoom": [
+            "0506"
+          ]
+        },
+        "0604": {
+          "requiresRoom": [
+            "0506"
+          ]
+        }
+      },
       "itemPriorities": [
         {
           "at": "1600,2128",
@@ -803,6 +823,26 @@
       "category": "Bridge",
       "floor": "B1",
       "name": "Hall B1",
+      "nodeSplit": true,
+      "regions": {
+        "west": {
+          "doors": [
+            "0307",
+            "030A",
+            "030D"
+          ],
+          "_why": "B1 / generator-stairs side (0307 = B1-Key-route entry; 030A/030D door quads at (-4544,-6096)). The shuttle car partitions this from the boarding/elevator side; from here only the west exits are reachable on foot. STATIC-SCD-RE cont.64 \u00a7E / GRAPH-LOGIC-PARITY \u00a78k."
+        },
+        "shuttle": {
+          "doors": [
+            "0306",
+            "0113",
+            "050B",
+            "0604"
+          ],
+          "_why": "Boarding / 0113-elevator side (0113/050B/0604 doors all at the single boarding point (912,-4088), placed in event sub32, floor-selected by 2:5; 0306 = Main Hallway B1, DDK-L gated). Reachable only by entering 0309 from a shuttle-side door \u2014 the deep B2/B3 hub must be reached through the large elevator (heliport route) or the 0113 elevator, NOT the generator stairs. No accessFrom = the west\u2194shuttle on-foot crossing is [uncertain \u2014 needs CE], modeled as blocked (tightest safe model; vanilla still beatable via the elevator/large-elevator). cont.64 \u00a7E."
+        }
+      },
       "itemPriorities": [
         {
           "at": "-7968,-7232",
@@ -1087,6 +1127,13 @@
       "category": "Bridge",
       "floor": "Unknown",
       "name": "Large Size Elevator",
+      "doors": {
+        "060F": {
+          "requiresRoom": [
+            "030B"
+          ]
+        }
+      },
       "itemPriorities": [
         {
           "at": "-7684,-8104",
@@ -1841,6 +1888,18 @@
       "category": "Bridge",
       "floor": "Unknown",
       "name": "Large Size Elevator",
+      "doors": {
+        "030C": {
+          "requiresRoom": [
+            "030B"
+          ]
+        },
+        "0600": {
+          "requiresRoom": [
+            "030B"
+          ]
+        }
+      },
       "itemPriorities": [
         {
           "at": "288,-1920",

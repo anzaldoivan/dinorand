@@ -1062,6 +1062,151 @@ public class KeyItemPlacerTests
         }
     }
 
+    // --- Endgame escape + elevator forge-chain gates (re-audit 2026-07-14; DC1-ELEVATOR-ID-CARD-GATE) ---
+    //
+    // The prior §8o/§8p item gates (0x36/0x3B on the elevator, 0x3B/0x4C/0x4D on the escape doors) were
+    // REFUTED by static native tracing: the elevator floor-select is a native panel whose card reader's
+    // output flags (0:55/0:56) are read by nothing, and the Third Energy overload sets no SCD flag the
+    // escape doors read (both native/CE-only). So the goal-lock is the pre-existing Key Card A endgame
+    // lock, and the elevator is gated the communication-room way — on the ROOM that forges the card /
+    // restores power (a code-anchored requiresRoom producer, not a refuted item gate).
+
+    /// <summary>
+    /// Option 1 (re-audit): the only offline-verifiable goal-critical door key is Key Card Lv. A (0x3a) —
+    /// removing it blocks the goal. The Kirk card 0x3B / Stabilizer 0x4C / Initializer 0x4D are NOT modeled
+    /// gates (the overload is native, not an SCD/door flag), so removing any of them still reaches the goal.
+    /// Guards against re-adding the guide-only §8o/§8p gates that native tracing refuted.
+    /// </summary>
+    [Fact]
+    public void RealInstall_EndgameEscape_OnlyKeyCardAIsGoalCritical()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+        var all = new HashSet<int>(Game.KeyItemIds);
+
+        var minusA = new HashSet<int>(all); minusA.Remove(0x3a);
+        Assert.DoesNotContain(Game.GoalRoomCode,
+            KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, minusA));
+
+        foreach (var notAGate in new[] { 0x3B, 0x4C, 0x4D }) // native/CE-only — not a modeled door gate
+        {
+            var minus = new HashSet<int>(all); minus.Remove(notAGate);
+            Assert.Contains(Game.GoalRoomCode,
+                KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, minus));
+        }
+    }
+
+    /// <summary>
+    /// The facility elevator (0113) descent is gated the communication-room way — on the forge ROOM, not
+    /// the refuted per-floor card item: B1 (0309) needs the F.C. Device 0x41 AND the Researcher rewrite room
+    /// 010B; B2 (050B) and B3 (0604) need the endgame Kirk rewrite room 0506. The big/cargo elevator
+    /// (0405→060F→030C/0600) needs the generator-power room 030B. All are reachability-inert (the lab keeps
+    /// non-elevator entrances) but the free-bridge EDGE is removed — so this guards the edge requirement
+    /// directly. The inter-floor edges are deliberately left to their door-record logic (gating them breaks
+    /// the vanilla key ordering — measured).
+    /// </summary>
+    [Fact]
+    public void RealInstall_ElevatorDescent_GatedByForgeAndPowerRooms()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        AssertEdgeRequires(graph, 0x0113, 0x0309, items: new[] { 0x41 }, rooms: new[] { 0x010B });
+        AssertEdgeRequires(graph, 0x0113, 0x050B, items: System.Array.Empty<int>(), rooms: new[] { 0x0506 });
+        AssertEdgeRequires(graph, 0x0113, 0x0604, items: System.Array.Empty<int>(), rooms: new[] { 0x0506 });
+        AssertEdgeRequires(graph, 0x0405, 0x060F, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
+        AssertEdgeRequires(graph, 0x060F, 0x030C, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
+        AssertEdgeRequires(graph, 0x060F, 0x0600, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
+    }
+
+    /// <summary>
+    /// The 0309 "Hall B1" shuttle-car partition (STATIC-SCD-RE cont.64 §E / REGION-SCHEMA-PLAN §2): the
+    /// generator-stairs / B1 side (west {0307,030A,030D}) is fenced off on foot from the boarding/elevator
+    /// side (shuttle {0306,0113,050B,0604}). Without this split the room is atomic and the graph FLATTENS —
+    /// descending to B1 by the stairs (010D→030B, BG Room B1 Key) freely reaches the elevator hall and the
+    /// deep B2/B3 hub, bypassing the whole ~6-stage heliport/large-elevator progression (the free-bridge
+    /// phantom, GRAPH-LOGIC-PARITY §8k). Asserts, on the real map.json: (a) 0309 IS node-split, and (b)
+    /// holding ONLY the two descent keys (BG Room B1 Key 0x2F + BG Area Key 0x30) reaches B1 but NOT the
+    /// B2/B3 shuttle side — you can only reach beyond B2/B3 through the heliport route. RED if the map.json
+    /// 0309 nodeSplit is missing (the data was lost once; this guards it from vanishing again).
+    /// </summary>
+    [Fact]
+    public void RealInstall_HallB1ShuttleSplit_GeneratorStairsCannotReachB2B3Hub()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        // (a) 0309 is a real sub-region node-split, not an atomic room.
+        var hub = graph.Nodes.Where(n => n.Code == 0x0309).ToList();
+        Assert.Equal(2, hub.Count);
+
+        // (b) With only the descent keys, the generator-stairs B1 side is reachable but the fenced-off
+        // shuttle/elevator side and the deep B2/B3 hub are NOT (they need the heliport/large-elevator
+        // progression). Atomic 0309 would wrongly reach them all via the free shuttle crossing.
+        var descentKeys = new HashSet<int> { 0x2F, 0x30 };
+        var reach = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, descentKeys);
+
+        Assert.Contains(0x030B, reach);   // Backup Generator Room B1 — reached by the stairs
+        Assert.Contains(0x0309, reach);   // Hall B1 (west side)
+        Assert.Contains(0x0307, reach);   // Medical Room Hallway (west side)
+        foreach (var beyond in new[] { 0x0113, 0x050B, 0x0604, 0x0506, 0x0509, 0x0508 })
+            Assert.DoesNotContain(beyond, reach); // elevator hall + B2/B3 hub — fenced off, heliport-only
+    }
+
+    // Every edge src->dest must carry the required held items and visited rooms — no un-stamped bypass.
+    private static void AssertEdgeRequires(RoomGraph graph, int src, int dest, int[] items, int[] rooms)
+    {
+        var edges = graph.Nodes.Where(n => n.Code == src)
+            .SelectMany(n => n.Edges).Where(e => e.Door.OriginalTargetCode == dest).ToList();
+        Assert.NotEmpty(edges);
+        foreach (var e in edges)
+        {
+            foreach (var it in items) Assert.Contains(it, e.Requires.Items ?? System.Array.Empty<int>());
+            foreach (var rm in rooms) Assert.Contains(rm, e.Requires.RoomsVisited ?? System.Array.Empty<int>());
+        }
+    }
+
+    /// <summary>
+    /// The self-seal invariant (Phase 4 (ii)): across a seed sweep with the key shuffle (and DDK-disc
+    /// relocation) on, no key item is ever placed in a playable-world room that requires that same key to
+    /// reach — i.e. never past its own dominating gate. Out-of-world Operation Wipe-Out duplicates (stage
+    /// <c>0x0A</c>, unreachable even with every key) are excluded exactly as
+    /// <see cref="KeyItemPlacer.Verify"/>'s StrandedKeyItems does. Standing guard on the whole overlay,
+    /// including the re-audited elevator forge-chain + power gates.
+    /// </summary>
+    [Fact]
+    public void RealInstall_KeyShuffle_NoKeyPlacedPastItsOwnDominatingGate()
+    {
+        if (LoadInstall() is null) return;
+        for (int seed = 0; seed < 16; seed++)
+        {
+            var rooms = LoadInstall()!;
+            new ProgressionPass().Apply(new RandomizationContext(Game, rooms,
+                RoomGraph.Build(rooms, Game.Requirements), new Seed(seed),
+                new RandomizerConfig { ShuffleKeyItems = true, RelocateDdkDiscs = true }, _ => { }));
+
+            var graph = RoomGraph.Build(rooms, Game.Requirements);
+            var pos = KeysByRoom(rooms);
+            var all = new HashSet<int>(pos.Values.SelectMany(v => v));
+            var world = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, all); // playable world
+
+            foreach (var (room, keys) in pos)
+            {
+                if (!world.Contains(room)) continue;                 // out-of-world duplicate — never required
+                foreach (var k in keys)
+                {
+                    var minusK = new HashSet<int>(all); minusK.Remove(k);
+                    Assert.True(
+                        KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, minusK).Contains(room),
+                        $"seed {seed}: key 0x{k:X2} sits in room 0x{room:X4}, which is unreachable without 0x{k:X2}");
+                }
+            }
+        }
+    }
+
     // --- Synthetic pair-gate (runs on CI, no game files) -----------------------------------------------
 
     /// <summary>Stamp one edge (src→dest) with an item AND-requirement, so a synthetic graph can express a

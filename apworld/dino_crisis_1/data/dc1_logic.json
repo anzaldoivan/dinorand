@@ -196,6 +196,32 @@
       ]
     },
     {
+      "from": "0113",
+      "to": "0309",
+      "requiresItems": [
+        65
+      ],
+      "requiresRooms": [
+        "010b"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "050b",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0506"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "0604",
+      "requiresItems": [],
+      "requiresRooms": [
+        "0506"
+      ]
+    },
+    {
       "from": "0203",
       "to": "0202",
       "requiresItems": [
@@ -236,6 +262,14 @@
       "requiresItems": [],
       "requiresRooms": [
         "0205"
+      ]
+    },
+    {
+      "from": "0405",
+      "to": "060f",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
       ]
     },
     {
@@ -352,6 +386,22 @@
         58
       ],
       "requiresRooms": []
+    },
+    {
+      "from": "060f",
+      "to": "030c",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "0600",
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
     },
     {
       "from": "0611",
@@ -3060,6 +3110,7 @@
       48,
       49,
       58,
+      65,
       98,
       99,
       100,

@@ -38,6 +38,51 @@ record (the 010D→010A shape above) it mislabels the gate "open-by-default" and
 silence is no longer proof of absence for branch-into-record placements (cont.61). The
 lock-axis external gate `0108→0113` (type-1, flag `9:6`) lives in `map-requirements.md`, not here.
 
+## Elevator forge-chain + power gates (re-audit 2026-07-14 — NATIVE mechanism, requiresRoom producer model)
+
+A native-mechanism analog to the `0400→0401` communication-room gate above (§8d): where the real unlock is
+a **native** check with **no readable SCD flag**, model it on the ROOM whose event produces the unlock —
+not on a refuted item/register. Two static native traces this session settled both mechanisms (agents,
+`DINO.exe`):
+
+- **Facility elevator (`0113` → floors) — ID-card forge, native.** The `2:4/2:5/2:6` door flags are the
+  floor-select REGISTER (native panel `0x4466BC` + `st30b` writes; §8c/§8d "author nothing" **stands for
+  the register**). The real gate is the card forge: `st113` sub15's card reader tests items `0x36/0x3B/0x34`
+  but its output flags `0:55/0:56` are **read by nothing** — the check is native/CE-only. So it is modelled
+  on the forge ROOM per the decoded chain (`DC1-ELEVATOR-ID-CARD-GATE.md`).
+- **Big/cargo elevator (`0405↔060F↔030C/0600`) — power, native.** Gated on the generator-power producer
+  room `030B` (power restored via BG Room B1 Key `0x2F`, `010D→030B`).
+
+| Door room | Dest | Real gate | Authored | Provenance |
+|---|---|---|---|---|
+| 0113 | 0309 (B1) | Researcher-card forge | ✅ `requires:[0x41]` + `requiresRoom:[010B]` | F.C. Device `0x41` @`0104` → Paul Baker print @`0113` → rewrite @`010B` (sub10) |
+| 0113 | 050B (B2) | Kirk-card forge | ✅ `requiresRoom:[0506]` | Kirk print @`050C` → rewrite @`0506` (sub13) |
+| 0113 | 0604 (B3) | Kirk-card forge | ✅ `requiresRoom:[0506]` | same endgame forge |
+| 0405 | 060F | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
+| 060F | 030C | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
+| 060F | 0600 | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
+
+Only the `0113→floor` **descent** edges are gated; the inter-floor elevator edges (`0309↔050B↔0604`) are
+left to their door-record logic — gating them **breaks the vanilla key ordering** (measured: `Verify`
+fails). All six gates are reachability-**inert** (the lab keeps non-elevator entrances) but remove the
+free-bridge EDGE (matters for door-rando / model soundness). This **deliberately supersedes** the
+§8c/§8d "author nothing yet" deferral **for these specific edges** (user-directed, 2026-07-14): the
+deferral was about the `2:x/3:x` toggled FLAGS; these gate the producer ROOM instead (monotonic
+room-visit, the same shape as `0400→0401`). Guard:
+`KeyItemPlacerTests.RealInstall_ElevatorDescent_GatedByForgeAndPowerRooms`.
+
+## Endgame goal-lock — Key Card A only (re-audit 2026-07-14)
+
+Static native tracing **REFUTED** the prior §8o/§8p door gates: the Third Energy overload sets **no SCD
+flag** the `060D` escape doors read (they read only the transient cutscene toggle `3:33`, denylisted), so
+Kirk `0x3B` / Stabilizer `0x4C` / Initializer `0x4D` are native/CE-only — **not** modeled door gates. The
+only offline-verifiable goal lock is the pre-existing **Key Card A (`0x3a`)** on the escape doors +
+`0611→060D` (type `0x08`). The overload chain is `[uncertain — native / CE-only]`, left to a future
+`ce-live-capture`. Guard: `KeyItemPlacerTests.RealInstall_EndgameEscape_OnlyKeyCardAIsGoalCritical`. Also
+note: the **Entrance Key `0x2e`** is NOT a placement-axis gate — it is a door **TYPE-byte** gate
+(`0107→0400 type=0x2E`, handled by `KeyItemsForDoor`), so it is already modeled in the engine and belongs
+to neither ledger; the earlier "Entrance Key is free / reachable another way" note was **wrong** (removed).
+
 ## Resolved — Large-Size Elevator edges are FREE (CE-witnessed 2026-07-10, NOT authored)
 
 | Door room | Dest | Flag | Verdict |
@@ -144,3 +189,18 @@ its reciprocal. The `west↔shuttle` on-foot crossing is `[uncertain — needs C
 persistence-vs-runtime-panel question, cont.46) → **no `accessFrom` authored** (tightest safe model;
 vanilla stays beatable via the `0113` elevator). The pre-existing `0309→0306` DDK gate (`requires
 [0x64,0x6b]`) is preserved and binds to the shuttle sub-region.
+
+> **ERRATA (2026-07-14) — the `0309` `nodeSplit` was described "Applied" (cont.64) but was NEVER in
+> `map.json`** (`git log -S nodeSplit -- data/dc1/map.json` empty; the C# split, `RegionNodeSplitTests`,
+> and this ledger all referenced a partition the *data file* lacked). Effect: `0309` parsed **atomic**, so
+> the graph **flattened** — descending to B1 by the stairs (`010D→030B`, BG Room B1 Key `0x2F`) freely
+> reached the elevator hall `0113` and the whole deep B2/B3 hub, bypassing the ~6-stage heliport /
+> large-elevator progression (a `CrossRegionFreeBridges` phantom, GRAPH-LOGIC-PARITY §8k). This was the
+> root cause of the "DDK Input N in `0508` is reachable" report: `0508` was reached through the phantom
+> shuttle crossing (`030A/030D→0309→050B→0509→0508`), not the intended route. **RESTORED**: authored the
+> `0309.nodeSplit + regions` (`west {0307,030A,030D}` / `shuttle {0306,0113,050B,0604}`, cont.64 §E) into
+> `map.json`. Post-fix the generator stairs + descent keys (`0x2F,0x30`) reach B1 (36 rooms) but NOT the
+> shuttle side (`0113/050B/0604/0506/0509/0508`) — the deep B2/B3 hub is reachable only through the
+> heliport / large-elevator route (or the `0113` elevator once `0506` is reached). Vanilla still beatable;
+> shuffle-OFF byte-identical (overlay-only). Guard: `KeyItemPlacerTests.RealInstall_HallB1ShuttleSplit_
+> GeneratorStairsCannotReachB2B3Hub` (RED on atomic `0309`, GREEN with the split).
