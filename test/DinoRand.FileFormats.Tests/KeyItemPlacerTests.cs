@@ -144,6 +144,35 @@ public class KeyItemPlacerTests
         Assert.Contains(0x0200, KeyItemPlacer.Reachable(g, Game, 0x010d, new HashSet<int>()));
     }
 
+    /// <summary>
+    /// The real 010B->010A case (2026-07-15, user-directed): a type-2 setter can itself carry an
+    /// authored <see cref="Requirement"/> (map.json requiresRoom/requires), not just be structurally
+    /// "free to cross" as <c>Reachable</c>'s latch pre-pass assumed. 0200 (mirrors 010B) is
+    /// independently reachable, same as 0100 (mirrors 010A) — but its type-2 edge to 0100 is gated on
+    /// visiting 0900. Without 0900, the setter's own AND-gate is unsatisfied, so the latch it would set
+    /// must NOT be considered set, so the reciprocal type-1 reader (0100->0300, a room reachable ONLY
+    /// through that shortcut) must stay locked. The bug: the pre-pass added every reachable node's
+    /// type-2 <c>LockId</c>s to <c>latches</c> unconditionally ("source room reachable" alone), ignoring
+    /// the setter edge's own <see cref="RoomEdge.Requires"/> / destination <see cref="RoomNode.Requires"/>
+    /// — wrongly opening 0300 even though the setter itself was never actually traversable.
+    /// </summary>
+    [Fact]
+    public void Reachable_Type2Setter_GatedByRequirement_LatchStaysClosedUntilSatisfied()
+    {
+        var g = new RoomGraph();
+        Link(g, 0x010d, 0x0100, 0x00);            // start -> 0100, free (independent route, like 010A/0107)
+        Link(g, 0x010d, 0x0200, 0x00);            // start -> 0200, free (independent route, like 010B/0108)
+        Link(g, 0x0100, 0x0300, 0x01, 0x0f);      // type-1 reader, lock 0x0f — 0300 has NO other route in
+        var setter = new RoomEdge(g.GetOrAdd(0x01, 0x00), Door(0x0100, 2, 0x0f))
+        { Requires = Requirement.OfRooms(0x0900) };
+        g.GetOrAdd(0x02, 0x00).Edges.Add(setter); // 0200 -> 0100, type-2 setter, gated on visiting 0900
+
+        var reach = KeyItemPlacer.Reachable(g, Game, 0x010d, new HashSet<int>());
+        Assert.Contains(0x0100, reach);
+        Assert.Contains(0x0200, reach);           // both endpoints independently reachable regardless
+        Assert.DoesNotContain(0x0300, reach);     // but the shortcut must stay locked without 0900
+    }
+
     // --- Verify: an existing placement is/ isn't solvable ---------------------------------------
 
     [Fact]
@@ -584,6 +613,44 @@ public class KeyItemPlacerTests
         var res = KeyItemPlacer.Verify(graph, Game, Game.StartRoomCode, Game.GoalRoomCode,
                                        KeysByRoom(rooms));
         Assert.True(res.Success, string.Join("\n", res.Log));
+    }
+
+    /// <summary>
+    /// DDK Code Disc H (0x69) vanilla-spawns in 0100 (Locker Room); DDK Input Disc H (0x62) vanilla-spawns
+    /// in 0103 (Management Office). DDK Code Disc E (0x6c) vanilla-spawns in 0104 (Strategy Room), which
+    /// sits behind the 0102 fenceA laser fence — reachable only after visiting 0202 (Chief's Room,
+    /// <c>data/dc1/placement-gates.md</c> "0102 A"), which itself requires holding BOTH DDK Input Disc H
+    /// (0x62) AND DDK Code Disc H (0x69) to cross 0203→0202 — either one alone missing already blocks it
+    /// (AND-gate). All three discs gate a modeled door edge, so <c>RelocateDdkDiscs</c> legally pools all
+    /// of them as relocatable — swapping EITHER 0x62 or 0x69 into 0104 (displacing 0x6c out to the moved
+    /// disc's vanilla room) puts that disc behind its own prerequisite: a genuine circular dependency
+    /// (user-raised 2026-07-15; the specific rooms first suggested — 0511/0205/050B — turned out unrelated
+    /// to this fence on inspection, but 0104 genuinely is; the user separately flagged that both discs of
+    /// the pair, not just one, need covering). This locks in that the existing
+    /// <see cref="KeyItemPlacer.Verify"/> reachability check already rejects EITHER swap — the sphere-based
+    /// safety net that keeps <c>ProgressionPass</c> from ever shipping this seed. No map.json change: the
+    /// fenceA gate was already correctly authored (unlike the 010D case above); this is a regression test
+    /// for existing engine correctness, not a new gate.
+    /// </summary>
+    [Theory]
+    [InlineData(0x69, 0x0100)] // DDK Code Disc H, vanilla 0100 Locker Room
+    [InlineData(0x62, 0x0103)] // DDK Input Disc H, vanilla 0103 Management Office
+    public void RealInstall_DdkDiscRelocation_RejectsEitherHDiscBehindItsOwnFenceGate(int disc, int vanillaRoom)
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return; // no game files (CI) — skip
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        var keys = KeysByRoom(rooms).ToDictionary(kv => kv.Key, kv => new List<int>(kv.Value));
+        keys[vanillaRoom].Remove(disc);
+        keys[vanillaRoom].Add(0x6c);
+        keys[0x0104].Remove(0x6c);
+        keys[0x0104].Add(disc);
+        var dict = keys.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<int>)kv.Value);
+
+        var res = KeyItemPlacer.Verify(graph, Game, Game.StartRoomCode, Game.GoalRoomCode, dict);
+        Assert.False(res.Success,
+            $"DDK disc 0x{disc:x2} placed behind the 0202 fence it itself unlocks must be rejected as unsolvable");
     }
 
     /// <summary>
