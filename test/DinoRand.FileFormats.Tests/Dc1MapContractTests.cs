@@ -117,4 +117,86 @@ public class Dc1MapContractTests
     [InlineData(0x0604, 0x0609, 0x66, 0x6D)] // W
     public void Map_DdkPairDoors_RequireBothDiscs(int from, int to, int input, int code)
         => AssertDoorRequires(Rooms(), from, to, items: new[] { input, code }, visitRooms: Array.Empty<int>());
+
+    // --- (D2) 0101 Toilet — room-level backstop for the fenceA laser-fence gate (cont.62, already
+    // authored door-edge-side on 0102->0101/0104 as requiresRoom [0106,0202,0107]). A room-level gate
+    // survives door-rando repointing a different door straight into 0101, which the edge-level gate
+    // would not. -------------------------------------------------------------------------------------
+
+    [Fact]
+    public void Map_0101_Toilet_RequiresVisitingChiefsRoom()
+        => AssertRoomRequiresRoom(Rooms(), 0x0101, "Toilet", 0x0202);
+
+    // --- (D3) 0104 Strategy Room — same fenceA room-level backstop as 0101 (sibling door on the same
+    // partition, 0102->0101/0104 requiresRoom [0106,0202,0107]). 0104 also hosts DDK Code Disc E and is
+    // a legal RelocateDdkDiscs pool spot (KeyItemPlacerTests.RealInstall_DdkDiscRelocation_Rejects
+    // EitherHDiscBehindItsOwnFenceGate already proves the edge-level gate rejects an H-disc landing
+    // there); this room-level gate is the same door-rando-safe backstop as 0101's. ---------------------
+
+    [Fact]
+    public void Map_0104_StrategyRoom_RequiresVisitingChiefsRoom()
+        => AssertRoomRequiresRoom(Rooms(), 0x0104, "Strategy Room", 0x0202);
+
+    private static void AssertRoomRequiresRoom(JsonElement rooms, int room, string name, int requiredRoom)
+    {
+        var r = Room(rooms, room);
+        Assert.True(r.TryGetProperty("requiresRoom", out var rr) && rr.ValueKind == JsonValueKind.Array,
+            $"{room:x4} lost its requiresRoom — {name} access should require having visited {requiredRoom:x4}");
+        Assert.Contains(requiredRoom, IntArrayOf(rr));
+    }
+
+    // --- (D4) The 0101-gated downstream chain (user-directed 2026-07-15, NO code trace — the "Gail
+    // cutscene at 0109" mechanism has no decoded `cutscenes` entry in room-data.json). The 0107->0113
+    // shortcut (DDK-N pair only) reaches the free {0108,0111,010B,0109} cluster and, via the 010B->010A
+    // door, the main 0102 hub — bypassing 0101/0202/the H-pair entirely (empirically confirmed: 0109/
+    // 0108/0111/010B/060B were all reachable in the all-minus-ddk-62/-69 oracle probes despite 0101/0202
+    // being correctly excluded). Four gates close it: 010B->010A needs 0101; 0109 (Lecture Room, host of
+    // the Gail cutscene) needs 0101; and the two downstream doors the cutscene+030B combination opens
+    // (0105->0307, 0112->0404) additionally need 0109 (on top of their existing 030B/0106 gates).
+
+    [Fact]
+    public void Map_010B_to_010A_RequiresVisitingToilet()
+        => AssertDoorRequires(Rooms(), 0x010B, 0x010A, items: Array.Empty<int>(), visitRooms: new[] { 0x0101 });
+
+    [Fact]
+    public void Map_0109_LectureRoom_RequiresVisitingToilet()
+        => AssertRoomRequiresRoom(Rooms(), 0x0109, "Lecture Room", 0x0101);
+
+    [Fact]
+    public void Map_0105_to_0307_RequiresGailCutsceneAtLectureRoom()
+        => AssertDoorRequires(Rooms(), 0x0105, 0x0307, items: Array.Empty<int>(), visitRooms: new[] { 0x030B, 0x0109 });
+
+    [Fact]
+    public void Map_0112_to_0404_RequiresGailCutsceneAtLectureRoom()
+        => AssertDoorRequires(Rooms(), 0x0112, 0x0404, items: Array.Empty<int>(), visitRooms: new[] { 0x0106, 0x0109 });
+
+    // --- (D5) 0400->0401 (the heliport gateway) additionally requires 0109 (user-directed 2026-07-15,
+    // NO code trace), on top of its existing 0205 Communication Room requirement. 050B/0604/0609/060B
+    // already transitively require 0401 (0309.doors["050B"].requiresRoom=[0401], .doors["0604"].
+    // requiresRoom=[050B]), so this single edit closes the whole 050B/0604/0609/060B chain back to the
+    // 0101/0202/H-pair root without touching those edges directly. -------------------------------------
+
+    [Fact]
+    public void Map_0400_to_0401_RequiresGailCutsceneAtLectureRoom()
+        => AssertDoorRequires(Rooms(), 0x0400, 0x0401, items: Array.Empty<int>(), visitRooms: new[] { 0x0205, 0x0109 });
+
+    // --- (D) 010D An. Aid scatter-spot safety gate (user-directed, placement-gates.md). ---------------
+    // Conservative: makes the KeyItemPlacer spot at 010D's An. Aid position (a legal key-item scatter
+    // target) require holding the B1 Room Key before it counts reachable, so a shuffled/scattered key
+    // landing there can never be seated ahead of its own prerequisite.
+
+    [Fact]
+    public void Map_010D_AnAid_RequiresB1RoomKey()
+        => AssertItemRequires(Rooms(), 0x010D, itemId: 0x20, requires: new[] { 0x2F });
+
+    private static void AssertItemRequires(JsonElement rooms, int room, int itemId, int[] requires)
+    {
+        var items = Room(rooms, room).GetProperty("items");
+        JsonElement? entry = null;
+        foreach (var p in items.EnumerateObject())
+            if (int.TryParse(p.Name, System.Globalization.NumberStyles.HexNumber, null, out var c) && c == itemId)
+                entry = p.Value;
+        Assert.True(entry.HasValue, $"item {itemId:x2} requires-gate absent from map.json room {room:x4}");
+        Assert.Equal(requires.OrderBy(x => x), IntArray(entry!.Value, "requires").OrderBy(x => x));
+    }
 }

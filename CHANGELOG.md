@@ -9,6 +9,13 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.5.1] — 2026-07-15
+
+### Fixed
+
+- **DC1 key-item placement fix for the Backyard of the Facility Area.**
+- **DC1 Chief Room Softlock has been fixed**
+
 ## [0.5.0] — 2026-07-15
 
 ### Added

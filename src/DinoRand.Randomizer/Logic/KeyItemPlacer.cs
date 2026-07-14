@@ -64,9 +64,14 @@ public sealed class KeyItemPlacer
         var seen = new HashSet<int> { start };               // NodeCodes (start room's primary node)
         var rooms = new HashSet<int> { start & 0xffff };     // masked room codes (requiresRoom + return)
         // Group-9 story latches (STATIC-SCD-RE.md cont.40): a type-2 door is free to cross, so its lock
-        // is set once its source room is reachable; a type-1 reader door is passable only once its lock
-        // is in this set. Recomputed from `seen` each fixpoint pass (monotonic, set-once), which is what
-        // stops the door-rando "stranded shortcut" softlock the free-edge model could not see.
+        // is set once its source room is reachable AND the setter edge's own gate (door-type key-set,
+        // authored Requires, destination room-state) is satisfied — "source room reachable" alone is
+        // NOT enough once a type-2 edge itself carries an authored requiresRoom/requires (the real
+        // 010B->010A case, user-directed 2026-07-15: gating the setter edge is silently bypassed for
+        // every same-lock reader if the setter's own gate isn't also checked here). A type-1 reader door
+        // is passable only once its lock is in this set. Recomputed from `seen` each fixpoint pass
+        // (monotonic, set-once), which is what stops the door-rando "stranded shortcut" softlock the
+        // free-edge model could not see.
         var latches = new HashSet<int>();
         bool grew = true;
         while (grew)
@@ -75,7 +80,9 @@ public sealed class KeyItemPlacer
             foreach (var nc in seen)
                 if (byNode.TryGetValue(nc, out var n))
                     foreach (var e in n.Edges)
-                        if (e.Door.SetsStoryLatch) latches.Add(e.Door.LockId);
+                        if (e.Door.SetsStoryLatch && CanCross(game, e.Door, held)
+                            && e.Requires.SatisfiedBy(held, rooms) && e.Target.Requires.SatisfiedBy(held, rooms))
+                            latches.Add(e.Door.LockId);
 
             var queue = new Queue<int>(seen);
             while (queue.Count > 0)
