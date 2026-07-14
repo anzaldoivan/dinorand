@@ -9,48 +9,23 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-07-15
+
 ### Added
 
-- **Scatter key items into ammo/health pickups (DC1)** (`--scatter-key-items`, off by default;
-  GUI sub-toggle under "Shuffle Key Items"). When the key shuffle is on, a door key can now also
-  land in an ordinary ammo/health pickup, not only in another key slot — so the Entrance Key might
-  be sitting where a health spray used to be. Only genuinely static pickups are used (nothing that
-  appears under a story condition), every seed stays provably beatable, and no item is lost (the
-  displaced ammo/health moves to the freed key slot). Leave it off and your seeds are byte-identical.
+- **Scatter key items into ammo/health pickups (DC1)**
 
-- **Shuffle Key Items now also relocates the DDK Input/Code disc pairs (DC1).** When the key shuffle is
-  on, the seven DDK Input/Code disc pairs join the relocation pool too — previously they were always left
-  in their vanilla spots because they open their doors as a pair rather than as an ordinary keyed door.
-  This is on automatically whenever key items are shuffled (no separate toggle); it also switches on the
-  "into ammo/health pickups" option by default. Every pair stays collectable in order, all discs are
-  conserved, and each seed stays provably beatable. Panel keys and the B1 Room Key are intentionally left
-  in place. Leave the key shuffle off and your seeds are byte-identical.
+- **Shuffle Key Items now also relocates the DDK Input/Code disc pairs (DC1).**
 
 ### Changed
 
-- **DC1 key-item placement is now provably beatable when shuffled.** The placer and the beatability
-  checker were brought into exact agreement (the placer used to "assume" you already held some items,
-  which could let it hide a key behind a door you can't yet open); it now earns those items in order,
-  the same way the checker does. Every produced key layout is verified before it ships — an
-  unverifiable one falls back to the vanilla placement instead of shipping a possible soft-lock. As a
-  result the BG Area Key can now safely join the shuffle. No change with default options.
+- **DC1 key-item placement is now beatable when shuffled.**
 
-- **DC1 key-item logic is tighter and more faithful.** Decoded three native/event door locks the
-  static decode missed (the B1-Generator-Room key door, the Backyard→stage-4 story door, and the
-  generator-powered 1F↔B1 shuttle) and modeled the `Hall B1` shuttle room as a true sub-region so
-  reachability depends on which door you enter by. "Logic soundness" is now validated the way
-  Archipelago validates a seed (beatable with no key stranded), and the door-key shuffle correctly
-  assumes non-shuffled key items (e.g. the DDK discs) remain available. No change with default options.
+- **DC1 key-item logic is tighter and more faithful.**
 
 ### Fixed
 
-- **DC1 item generator now protects the right pickups in "letter" rooms.** A case-sensitivity bug made
-  `scripts/gen_item_map.py` silently skip every room whose id contains a hex letter (010C, 030C, …), so
-  the pickups it is supposed to pin in place were left un-pinned. The one place this changed a default
-  (no-flags) seed: room 030C's **An. Darts M** — which shares a spot with an ID Card that a script
-  places at runtime — now correctly stays put instead of being rerolled by the item shuffle (every other
-  affected pickup is a key item or an empty runtime slot, so nothing else changes). The generator also no
-  longer silently overwrites hand-authored pins in these rooms, and the CI check now validates them too.
+- **DC1 item generator now protects the right pickups in "letter" rooms.**
 
 ## [0.4.2] — 2026-07-12
 
@@ -158,7 +133,6 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
   game data (so it's randomizable as a data edit), not generated randomly at runtime. No player-facing
   change yet.
 
-
 ## [0.2.0] — 2026-06-27
 
 ### Added — Voice randomization (early slice)
@@ -206,6 +180,7 @@ Initial feature set — everything prior to the voice randomizer.
   was.
 - Self-contained single-file release builds.
 
+[0.5.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.0
 [0.4.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.2
 [0.4.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.1
 [0.4.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.0
