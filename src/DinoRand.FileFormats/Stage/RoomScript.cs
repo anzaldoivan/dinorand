@@ -38,9 +38,21 @@ public sealed class RoomScript
 
     private static bool IsLoadedPtr(uint p) => p >= LoadedPtrLo && p < LoadedPtrHi;
 
+    /// <summary>SCD opcode for a static-scenery display node (op23): it fills the same
+    /// <c>scratch+0x7CE8</c> display-node pool item visuals use, so its slot indexes are occupied
+    /// (STATIC-SCD-RE cont.72 / handler <c>0x4266A6</c>). Its slot byte is <c>rec+1</c>.</summary>
+    private const byte Scenery = 0x23;
+    private const int SceneryLength = 32;
+    private const int ScenerySlotOffset = 0x01;
+
+    /// <summary>Fail-closed ceiling for Lever-A display-slot allocation. 32 pool entries are proven to
+    /// exist (index <c>0x1F</c> is filled by op23 in st202); the pool's true capacity is CE-unmeasured, so
+    /// visual normalization never allocates a slot at or above this. PICKUP-GROUND-MODEL-FEASIBILITY.md.</summary>
+    public const int DisplaySlotPoolCap = 0x20;
+
     private RoomScript(bool parsedCleanly, int tableOffset, int subroutineCount,
                        IReadOnlyList<ItemRecord> items, IReadOnlyList<EnemyRecord> enemies,
-                       IReadOnlyList<DoorRecord> doors)
+                       IReadOnlyList<DoorRecord> doors, IReadOnlyCollection<byte> scenerySlots)
     {
         ParsedCleanly = parsedCleanly;
         TableOffset = tableOffset;
@@ -48,6 +60,7 @@ public sealed class RoomScript
         Items = items;
         Enemies = enemies;
         Doors = doors;
+        SceneryDisplaySlots = scenerySlots;
     }
 
     /// <summary>True when the function-offset table was valid and every non-trailing subroutine
@@ -72,6 +85,11 @@ public sealed class RoomScript
     /// <summary>Door / area-transition records (<c>0x28</c> subtype 0) found in the script.</summary>
     public IReadOnlyList<DoorRecord> Doors { get; }
 
+    /// <summary>Display-node pool slots occupied by op23 static-scenery records in this room (their
+    /// <c>rec+1</c> slot bytes). Item pickups share the same pool via <see cref="ItemRecord.DisplaySlot"/>,
+    /// so a Lever-A visual normalization must avoid both sets when allocating a fresh slot. cont.72.</summary>
+    public IReadOnlyCollection<byte> SceneryDisplaySlots { get; }
+
     /// <summary>
     /// Parse the SCD script out of a decompressed RDT <paramref name="buffer"/>.
     /// </summary>
@@ -79,17 +97,19 @@ public sealed class RoomScript
     {
         if (!TryReadFunctionTable(buffer, out int tableOffset, out var starts))
             return new RoomScript(false, -1, 0, Array.Empty<ItemRecord>(),
-                                  Array.Empty<EnemyRecord>(), Array.Empty<DoorRecord>());
+                                  Array.Empty<EnemyRecord>(), Array.Empty<DoorRecord>(),
+                                  Array.Empty<byte>());
 
         var items = new List<ItemRecord>();
         var enemies = new List<EnemyRecord>();
         var doors = new List<DoorRecord>();
+        var scenerySlots = new HashSet<byte>();
         bool clean = true;
         for (int i = 0; i < starts.Count; i++)
         {
             int start = starts[i];
             int end = i + 1 < starts.Count ? starts[i + 1] : buffer.Length;
-            bool ok = WalkSubroutine(buffer, start, end, items, enemies, doors);
+            bool ok = WalkSubroutine(buffer, start, end, items, enemies, doors, scenerySlots);
             // A derail anywhere but the last subroutine means an unknown/misaligned opcode.
             if (!ok && i != starts.Count - 1) clean = false;
         }
@@ -97,7 +117,7 @@ public sealed class RoomScript
         // Flag NPC-scene actors (Rick/Gail/Kirk) once all 0x20 records are visible: the shared-motion /
         // distinct-model tell is relational, so it can't be decided per-record at parse (cont.41).
         EnemyRecord.MarkNpcSceneActors(enemies);
-        return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors);
+        return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors, scenerySlots);
     }
 
     /// <summary>
@@ -137,7 +157,7 @@ public sealed class RoomScript
     /// </summary>
     private static bool WalkSubroutine(ReadOnlySpan<byte> buffer, int start, int end,
                                        List<ItemRecord> items, List<EnemyRecord> enemies,
-                                       List<DoorRecord> doors)
+                                       List<DoorRecord> doors, HashSet<byte> scenerySlots)
     {
         if (start < 0 || end > buffer.Length) return false;
         int pos = start;
@@ -146,7 +166,9 @@ public sealed class RoomScript
             int len = DcOpcodes.Length(buffer, pos);
             if (len <= 0 || pos + len > end) return false;
 
-            if (buffer[pos] == DcOpcodes.Door
+            if (buffer[pos] == Scenery && len == SceneryLength)
+                scenerySlots.Add(buffer[pos + ScenerySlotOffset]);
+            else if (buffer[pos] == DcOpcodes.Door
                 && len == DcOpcodes.DoorLength
                 && buffer[pos + 2] == DcOpcodes.DoorSubtype)
             {
@@ -257,6 +279,13 @@ public sealed class RoomScript
     /// Patch edited item ids back into a decompressed RDT <paramref name="buffer"/>. Only the id
     /// byte of each record is written (the high id byte stays 0); empty slots (id 0xFF) and
     /// records without a positional offset are skipped.
+    ///
+    /// <para>When <see cref="ItemRecord.NormalizeVisual"/> is set (Lever A, off by default), the record's
+    /// ground visual is also rewritten to the shared generic pickup panel: display slot
+    /// (<see cref="ItemRecord.DisplaySlotOffset"/>) = <see cref="ItemRecord.NormalizeDisplaySlot"/> and the
+    /// model pointer (<see cref="ItemRecord.ModelPtrOffset"/>) = <see cref="ItemRecord.GenericPanelModelPtr"/>.
+    /// With the flag unset these two fields are left byte-identical, so an id-only edit round-trips
+    /// exactly. PICKUP-GROUND-MODEL-FEASIBILITY.md.</para>
     /// </summary>
     public void ApplyEdits(byte[] buffer, IReadOnlyList<ItemRecord> edited)
     {
@@ -266,6 +295,18 @@ public sealed class RoomScript
             int idPos = item.FileOffset + ItemRecord.IdOffset;
             if (idPos >= 0 && idPos < buffer.Length)
                 buffer[idPos] = (byte)item.ItemId;
+
+            if (item.NormalizeVisual)
+            {
+                int slotPos = item.FileOffset + ItemRecord.DisplaySlotOffset;
+                int ptrPos = item.FileOffset + ItemRecord.ModelPtrOffset;
+                if (ptrPos + 4 <= buffer.Length)
+                {
+                    buffer[slotPos] = item.NormalizeDisplaySlot;
+                    // Lever A leaves the default (generic panel); Lever B points at an appended donor mesh.
+                    WriteU32(buffer, ptrPos, item.VisualModelPtr);
+                }
+            }
         }
     }
 

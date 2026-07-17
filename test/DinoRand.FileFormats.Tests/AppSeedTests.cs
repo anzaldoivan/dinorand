@@ -140,6 +140,28 @@ public class AppSeedTests
     }
 
     [Fact]
+    public void PuzzleMaster_RoundTrips_AsByte16Bits3And4()
+    {
+        // The GUI's single "Randomize Puzzles" flag rides the two subflag bits — no new wire field.
+        var seed = Make(new RandomizerConfig { Dc2RandomizePuzzles = true });
+        Assert.Equal(17, Payload(seed).Length); // forces the byte-16 block, nothing more
+        var back = RoundTrip(seed).Config;
+        Assert.True(back.Dc2ScramblePuzzleCodes);
+        Assert.True(back.Dc2ShuffleCircuits);
+        Assert.True(back.Dc2RandomizePuzzles);
+
+        // Boundary: a single-subflag seed (CLI/legacy) round-trips the exact mixed state and still
+        // presents as puzzles-on; pre-feature payloads decode fully off.
+        var circuitsOnly = RoundTrip(Make(new RandomizerConfig { Dc2ShuffleCircuits = true })).Config;
+        Assert.True(circuitsOnly.Dc2ShuffleCircuits);
+        Assert.False(circuitsOnly.Dc2ScramblePuzzleCodes);
+        Assert.True(circuitsOnly.Dc2RandomizePuzzles);
+
+        var legacy = Make(new RandomizerConfig { IncludeDc2BossEnemies = true });
+        Assert.False(RoundTrip(legacy).Config.Dc2RandomizePuzzles);
+    }
+
+    [Fact]
     public void CanonicalSpeciesOrder_LocksToTheSeedEncodedLandSpecies()
     {
         // The wire order is FROZEN and only holds the LAND species — the aquatic donors (0x05/0x0a/0x0b/

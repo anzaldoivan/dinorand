@@ -80,7 +80,11 @@ public static class Dc2ShopShuffleInstaller
         int moved = entries.Count(e => e.OldPrice != e.NewPrice || e.OldMask != e.NewMask);
         log?.Invoke($"[shop-shuffle] seed {seed}: {moved}/{entries.Length} shop items changed (backup: {Path.GetFileName(backupPath)})");
         foreach (var e in entries.Where(e => e.OldPrice != e.NewPrice || e.OldMask != e.NewMask))
-            log?.Invoke($"[shop-shuffle]   item 0x{e.ItemId:X2}: price {e.OldPrice} -> {e.NewPrice}, stock-mask 0x{e.OldMask:X2} -> 0x{e.NewMask:X2}");
+        {
+            // recovery (tools) items carry no stock mask (0/0) — show price only for those.
+            string mask = (e.OldMask == 0 && e.NewMask == 0) ? "" : $", stock-mask 0x{e.OldMask:X2} -> 0x{e.NewMask:X2}";
+            log?.Invoke($"[shop-shuffle]   item 0x{e.ItemId:X2}: price {e.OldPrice} -> {e.NewPrice}{mask}");
+        }
         return Dc2ShopShuffleOutcome.Applied;
     }
 }

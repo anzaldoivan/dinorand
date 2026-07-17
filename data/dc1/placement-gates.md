@@ -357,3 +357,169 @@ unsolvable. Guards: `Dc1MapContractTests.Map_010B_to_010A_RequiresVisitingToilet
 its own, per the "known incomplete" note — if a future session wants the `{0108,0111,010B,0109}` cluster
 and `010A` fully sealed against the DDK-N-only `0107→0113` shortcut, that needs a room-level gate on
 `010A` and/or `0113` itself, deliberately left open this session per user direction.
+
+## ENGINE BUG FIXED — the group-9 story-latch pre-pass ignored the setter edge's own gate (2026-07-15,
+## user-caught, CODE fix, not data)
+
+Follow-up to the `010B→010A` gate above: the user pointed out `010A→010B` (the reciprocal type-1
+"shortcut back" reader) was *also* supposed to be locked behind `0101`, since it's the same physical
+lock as the now-gated `010B→010A` type-2 setter. Investigating found this wasn't a data gap — it was a
+genuine bug in `KeyItemPlacer.Reachable`'s latch pre-pass (`src/DinoRand.Randomizer/Logic/
+KeyItemPlacer.cs`): the loop that populates `latches` from every reachable node's type-2
+(`SetsStoryLatch`) edges checked only `e.Door.SetsStoryLatch`, never the setter edge's own
+`Requires`/destination `Requires` — i.e. "a type-2 door is free to cross" (true for every *other* type-2
+door in the game, until this session's `010B→010A`) was hard-coded as "its source room is reachable",
+completely bypassing any authored gate on the setter itself. Since `010B` is independently reachable
+(via `0108`, unrelated to `0101`), the pre-pass unconditionally added `010B→010A`'s lock to `latches`,
+silently re-opening `010A→010B` for anyone, gate or no gate.
+
+**No measurable effect on the current oracle** (confirmed: zero diff on regeneration) — `010A` and
+`010B` are *both* already independently reachable via other free edges (`0107→010A`, `0108→010B`), so
+this bug happened to be a no-op for their own reachability today. It is NOT a no-op in general: any
+future type-2 setter with an authored gate, or a door-rando shuffle that removes one side's independent
+free route, would have silently bypassed the gate via this exact mechanism — precisely the "you think
+it's reachable due to the code saying so" class of bug flagged earlier in this session (same family as
+the `010F`/`0114` and `0309` phantom bridges, but in the *algorithm* this time, not the data).
+
+**FIXED**: the latch pre-pass now additionally requires `CanCross` (door-type key-set) and
+`e.Requires.SatisfiedBy(...)`/`e.Target.Requires.SatisfiedBy(...)` before adding a setter's lock to
+`latches` — i.e. a type-2 door only opens its reciprocal reader once it is *actually* traversable, not
+merely "its source room is in the reachable set." Verified: new synthetic regression test RED before the
+fix, GREEN after; the 3 pre-existing latch tests (stranded producer / reachable-producer shortcut /
+self-latching type-2 / type-3 free) all stay green — the "free to cross" fast path is unchanged for
+every ungated type-2 door. Oracle regeneration shows zero diff (expected, see above). Full 109-test
+suite green, `gen_ap_logic`/`gen_reachability`/`gen_data_reference` `--check` + apworld selfchecks clean,
+30-seed beatability sweep 0/30 unsolvable. Guard:
+`KeyItemPlacerTests.Reachable_Type2Setter_GatedByRequirement_LatchStaysClosedUntilSatisfied`.
+
+## Gate A — `0309→0306` DDK-L: VERIFIED already sealed, NO change (2026-07-16, user-directed audit)
+
+The user directed a check that the Main Hallway door `0309→0306` requires DDK Input Disc L (`0x64`).
+Finding: **already correctly enforced, no bypass, nothing authored.** The exact gate (`requires
+[0x64,0x6b]`, the native op58-3 pair AND) has been in `map.json` since the DDK-pair tier
+(`Dc1MapContractTests.Map_DdkPairDoors_RequireBothDiscs` row L pins the exact array), and a full
+edge dump on the real graph (`RoomGraph.Build(rooms, Game.Requirements)`, every edge into/out of the
+`{0300,0301,0302,0303,0304,0305,0306}` cluster reverse-searched) proved the cluster's **only external
+entry is this one door** — every other incoming edge to any cluster room originates inside the cluster
+(`0300←0304` only; `0304←{0300,0301,0306}`; `0306←{0304,0305,0309.shuttle}`; `0301/0302/0303/0305`
+all interior). Oracle confirmation: `all-minus-ddk-64`/`-6b` drop the whole 7-room cluster (96→89
+pre-session), no other probe reaches it. A `0101`/`0104`-style **room-level backstop was considered and
+is NOT expressible**: room-level `requiresRoom` carries visited-rooms only, not held items, so "holding
+the DDK-L pair" cannot be encoded on the room node — the lock-in is instead the exact-array contract
+test plus a new reach guard. Also noted for the record: the interior path `0306→0305→0301→0304`
+bypasses the `0306→0304 requiresRoom [030C]` door gate entirely, so `030C` is NOT actually required to
+traverse the cluster (that gate only shortcuts the direct door). Guard:
+`KeyItemPlacerTests.RealInstall_ExperimentWing_SoleEntryIsTheDdkLDoor` (theory, both L discs: dropping
+either must remove all 7 cluster rooms from reach).
+
+## Gate B — `0304→0300` also requires Key Card L + Key Card R (2026-07-16, user-directed, NO code trace)
+
+The Experiment Simulation Room door `0304→0300` (the DDK-E pair door, native op58-3 `[0x65,0x6c]`)
+additionally requires **Key Card L (`0x47`) and Key Card R (`0x48`)**, per user direction — no code
+trace; the census records for both cards (`0202` KC-L, event sub25, flag-gated 2:11; `0305` KC-R,
+event sub14) do not by themselves witness a door gate. Both ids appended to the door's `requires`
+(edge-level item AND), preserving the DDK-E pair:
+
+```
+0304.doors["0300"].requires: [101,108] → [101,108,71,72]   (0x65,0x6c,0x47,0x48)
+```
+
+Circularity pre-checked before authoring: KC-L vanilla-spawns in `0202` (behind the DDK-H door,
+shallow) and KC-R in `0305` (inside the experiment-wing cluster but BEFORE this door), so vanilla
+stays beatable. The contract theory row E was moved out of `Map_DdkPairDoors_RequireBothDiscs`
+(exact-array assert) into its own fact. Oracle: `47`/`48` join `gatingKeys` (+`key-47`/`key-48`
+probes, 3 rooms each); the minus-E effect is subsumed by Gate C below. Guards:
+`Dc1MapContractTests.Map_0304_to_0300_RequiresDdkEPairAndKeyCardsLR`,
+`KeyItemPlacerTests.RealInstall_CommunicationRoomChain_ItemIsGoalCritical` (rows 0x47/0x48/0x65/0x6c).
+
+## Gate C — `0205` Communication Room requires reaching `0300` (2026-07-16, user-directed, NO code
+## trace, LARGE cascade)
+
+`0205` gets a **room-level** `requiresRoom ["0300"]` — room-level, not edge-level, because the edge
+dump found TWO free incoming routes (`0106→0205` free type-0, and `0201→0205` which is three physical
+records: type-1 story reader + type-0xff + a plain **type-0 free record**, so the group-9 latch is not
+the only way in); a room gate closes all of them uniformly (same pattern as `0101`/`0104`/`0109`).
+
+```
+0205.requiresRoom: (none) → ["0300"]
+```
+
+**Measured cascade (oracle regenerated, per-probe diff inspected):** `0400→0401` requires
+`[0205,0109]` and `0401` transitively gates the entire B2/B3 deep facility + goal `060D` — so `0300`'s
+whole access chain becomes goal-critical: the facility elevator (DDK-N pair `0x63/0x6a` — the heliport
+alternative is now circular through `0205` — plus F.C. Device `0x41` + `010B`), the cluster entry
+(DDK-L pair `0x64/0x6b`), and the `0304→0300` door itself (DDK-E pair + KC-L/R). Probe movements,
+each verified room-by-room:
+
+| Probe | Before → after | What moved |
+|---|---|---|
+| `all` | 96 → 96 | unchanged — vanilla reaches everything |
+| `key-2f`, `key-30` | 31→30, 20→19 | lost exactly `0205` (its free reach is gone) |
+| `all-minus-ddk-63`/`-6a` (N) | 96 → 41 | −55: `0113` + the whole cluster + `0205,0401`, all of B2/B3 incl. goal `060d` — DDK-N now goal-critical (was tolerated via the heliport) |
+| `all-minus-ddk-64`/`-6b` (L) | 89 → 42 | −47: `0205,0401` + B2/B3 incl. `060d` (cluster was already lost pre-change) |
+| `all-minus-ddk-65`/`-6c` (E) | 95 → 48 | −47: same deep set (only `0300` was lost pre-change) |
+
+Goal checks: `060D`, `0205`, `0401`, `0300` are absent from every one of those six probes, and from
+all-keys-minus-`0x47`/-`0x48` (test-verified; the DDK-band-only oracle has no minus-47/48 probes).
+The Entrance-Key invariant is unchanged (minus-`0x2e`: `0205`/`0300` reachable, goal not). The
+pre-existing guard `RealInstall_DeepFacility_RequiresTheEntranceKey` carried a now-stale assertion
+("goal stays reachable without the DDK-N pair" — the heliport route) — updated to assert the
+opposite, with the reason inline. `gen_ap_logic` promoted `0x47/0x48` into the AP progression-items
+list. Guards: `Dc1MapContractTests.Map_0205_CommunicationRoom_RequiresExperimentSimulationRoom`,
+`KeyItemPlacerTests.RealInstall_CommunicationRoomChain_ItemIsGoalCritical` (9-row theory: E/L/N
+pairs, KC-L/R, F.C. Device each individually kill `0300`→`0205`→`0401`→goal).
+
+## ENGINE BUG FIXED — FrontierKeys was blind to a split room's non-primary regions (2026-07-16,
+## found by Gate C, CODE fix, not data)
+
+Gate C initially made `ProgressionPass`'s key shuffle fail EVERY seed (`RelocateDdkDiscs` never moved
+a disc across 30 seeds; every `Place` attempt "stalled at 42 rooms with 13 keys unplaced"). Bisecting
+against HEAD proved the gates triggered it; a step-by-step replication of the fill isolated the bug in
+`KeyItemPlacer.FrontierKeys` (`src/DinoRand.Randomizer/Logic/KeyItemPlacer.cs`): it resolved the
+masked ROOM codes in `reach` through a **NodeCode-keyed** dictionary, so for a node-split room only
+the PRIMARY region's edges were enumerated — a key-gated door owned by a non-primary sub-region (the
+real case: the DDK-L door on `0309`'s `shuttle` region, exactly Gate A's door) was invisible to the
+frontier, its key was never surfaced as "helpful", and the fill stalled at the point where crossing it
+is the only way forward. Pre-Gate-C this blindspot was benign: the cluster wasn't goal-critical, so
+the L discs were seated as post-goal filler. Same family as the latch pre-pass bug above — the
+algorithm, not the data, silently disagreeing with the split-room model.
+
+**FIXED**: `Reachable` now has an internal `ReachableCore` variant that also returns the reached
+**NodeCodes**; `PlaceOnce` passes that set to `FrontierKeys`, which enumerates edges per reached
+sub-region node (room-code semantics unchanged for the already-reachable skip and `SatisfiedBy`).
+Verified: synthetic regression RED before / GREEN after
+(`KeyItemPlacerTests.Place_KeyGatedDoorOnNonPrimaryRegion_IsSurfacedToTheFrontier` — start→`0113`→
+`0309.shuttle`→key-gated `050B`); all 8 `RealInstall_RelocateDdkDiscs_*` tests green again including
+`ActuallyRelocatesADisc`. No gate was loosened.
+
+## `0305` B1 Key Chip → Key Card R + numbered memo (2026-07-17, user-directed, NO code trace)
+
+Same conservative, user-directed pattern as the `010D` An. Aid entry above (an **item-guard**, not a
+door gate). The user's authored note: *"B1 Key Chip — Required to find the Key Card R and a memo at
+0305."* `0305` (Library Room) hosts two pickups gated behind the **B1 Key Chip (`0x46`, vanilla `0303`)**:
+**Key Card R (`0x48`)** at `2304,2560` (event sub14) and the **numbered memo "B1 Key Chip (3695)"
+(`0x5e`)** at `-6400,-4864` (event sub12, census `GetFlag(0,96)`). Neither pickup's census record
+by itself witnesses the `0x46` dependency (both are engine/native-armed), so this is authored from the
+user's game knowledge, flagged as trace-free for the record.
+
+**AUTHORED**: `0305.items["48"].requires = [70]` and `0305.items["5e"].requires = [70]` (`70` = `0x46`)
+— the pickups' `NodeItem.Requires` now demand holding the B1 Key Chip before `KeyItemPlacer` treats
+those spots as reachable (consumed identically for a door-key or an opt-in scatter placement).
+
+**Circularity pre-checked** (`KeyItemPlacer.Verify` on the real graph, both with and without the guard):
+`Success=True` in both cases — `0x46` @`0303` is collectable before either `0x48` or `0x5e` (both rooms
+sit in the experiment wing entered at `0306`; neither `0303` nor `0305` is behind the KC-R-gated
+`0304→0300` door), so no cycle and vanilla stays beatable. **Oracle/AP effect: none** — item-guards gate
+pickup *collection*, not room reachability, so `0x46` does not enter `gatingKeys` / the AP progression
+list (`gen_ap_logic`/`gen_reachability`/`gen_data_reference` `--check` all clean, zero diff), exactly
+like the `010D` precedent. Guards (data-contract, like `010D`):
+`Dc1MapContractTests.Map_0305_KeyCardR_RequiresB1KeyChip`,
+`.Map_0305_NumberedMemo_RequiresB1KeyChip`. The existing `RealInstall_VanillaPlacement_IsBeatable`
+now exercises the guard on the live graph.
+
+**Validation (2026-07-17):** full `Dc1MapContract` + `KeyItemPlacer` suite green (106/106, incl. the two
+new `Map_0305_*` facts and the install-gated `RealInstall_VanillaPlacement_IsBeatable`, which now
+exercises the guard on the live graph); `Dc1ReachabilityOracle` byte-identical (zero diff, confirming
+item-guards don't touch the oracle); `gen_ap_logic`/`gen_reachability`/`gen_data_reference` `--check`
+clean. (A brief window of concurrent unrelated WIP had the C# build non-compiling mid-session; it cleared
+and the suite was run to completion.)

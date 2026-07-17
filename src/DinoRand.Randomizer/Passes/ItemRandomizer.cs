@@ -23,7 +23,8 @@ public sealed class ItemRandomizer : IRandomizationPass
 
     public bool IsEnabled(RandomizerConfig config) => config.RandomizeItems;
 
-    private readonly record struct Slot(int Room, ItemRecord Record, string? Link = null);
+    private readonly record struct Slot(int Room, ItemRecord Record, string? Link = null,
+                                        PickupVisual Visual = PickupVisual.GenericPanel);
 
     public void Apply(RandomizationContext context)
     {
@@ -54,7 +55,7 @@ public sealed class ItemRandomizer : IRandomizationPass
                 // Fixed-priority pickups (map.json item overlay) stay exactly vanilla — the per-item
                 // form of room protection: never collected, so never rerolled or pool-placed.
                 if (ni.Priority == ItemPriority.Fixed) continue;
-                slots.Add(new Slot(node.Code, r, ni.Link));
+                slots.Add(new Slot(node.Code, r, ni.Link, ni.Visual));
             }
         }
 
@@ -179,7 +180,16 @@ public sealed class ItemRandomizer : IRandomizationPass
             // only kept when its base weapon is obtainable (§7.3 — no dead upgrades).
             var availableBases = toPlace.Where(game.WeaponIds.Contains)
                                         .Concat(game.StartingWeaponIds).ToHashSet();
-            var free = slots.OrderBy(_ => rng.Next()).ToList();
+            // Weapons/parts prefer spots WITH a ground visual (AvoidHiddenPickupSpots, on by default):
+            // an interaction-only slot renders nothing, so a weapon there is findable only by examining
+            // the spot. Visible slots vastly outnumber the weapon set, so hidden slots are overflow-only;
+            // the shuffle consumes the same RNG either way (flag off ⇒ byte-identical order).
+            var shuffledSlots = slots.OrderBy(_ => rng.Next()).ToList();
+            var free = cfg.AvoidHiddenPickupSpots
+                ? shuffledSlots.Where(s => s.Visual != PickupVisual.InteractionOnly)
+                               .Concat(shuffledSlots.Where(s => s.Visual == PickupVisual.InteractionOnly))
+                               .ToList()
+                : shuffledSlots;
             var suppressedParts = new HashSet<int>();   // parts consumed by a pre-upgraded weapon
             int fi = 0;
             foreach (var w in toPlace)
@@ -297,7 +307,13 @@ public sealed class ItemRandomizer : IRandomizationPass
     private static void ForcePlaceRemovedStartWeapons(List<Slot> slots, IReadOnlyList<int> weapons,
                                                       IReadOnlySet<int> startRegion, Random rng, RandomizationContext context)
     {
-        var early = slots.Where(s => startRegion.Contains(s.Room)).OrderBy(_ => rng.Next()).ToList();
+        var shuffled = slots.Where(s => startRegion.Contains(s.Room)).OrderBy(_ => rng.Next()).ToList();
+        // A forced start weapon is important — prefer a spot with a ground visual (same overflow rule
+        // as the weapon pool-place; flag off keeps the plain shuffled order, byte-identical).
+        var early = context.Config.AvoidHiddenPickupSpots
+            ? shuffled.Where(s => s.Visual != PickupVisual.InteractionOnly)
+                      .Concat(shuffled.Where(s => s.Visual == PickupVisual.InteractionOnly)).ToList()
+            : shuffled;
         int taken = 0;
         foreach (var weapon in weapons)
         {

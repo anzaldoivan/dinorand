@@ -208,6 +208,10 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
                 "pos": [x, y],
                 "collectedFlag": rec.get("collected_flag"),
                 "source": _source(rec),
+                # Ground-visual class (item_control `visual`, STATIC-SCD-RE cont.72): generic-panel /
+                # bespoke-mesh / interaction-only. Informational (DATA-REFERENCE / hint text) — the AP
+                # contract places against ids and rooms, never the visual.
+                "visual": rec.get("visual"),
             }
             fl = (rec.get("gate") or {}).get("flag")
             if fl:

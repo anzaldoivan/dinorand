@@ -909,6 +909,9 @@
               1808,
               -1104
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -947,6 +950,9 @@
               -1712,
               -2528
             ],
+            "display_slot": "0x11",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -985,6 +991,9 @@
               -1088,
               2976
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x8010731c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1069,6 +1078,9 @@
               -2480,
               -448
             ],
+            "display_slot": "0x8",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1107,6 +1119,9 @@
               1648,
               1664
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1252,6 +1267,9 @@
               2288,
               -2224
             ],
+            "display_slot": "0x11",
+            "model_ptr": "0x8010f460",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1290,6 +1308,9 @@
               -2800,
               992
             ],
+            "display_slot": "0x12",
+            "model_ptr": "0x8010f31c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1328,6 +1349,9 @@
               -512,
               1072
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x8010ee24",
+            "visual": "bespoke-mesh",
             "sub": 9,
             "placement_path": "event(sub9)",
             "reachable": true,
@@ -1376,6 +1400,9 @@
               -544,
               640
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 9,
             "placement_path": "event(sub9)",
             "reachable": true,
@@ -1414,6 +1441,9 @@
               -2576,
               3008
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,
@@ -1456,6 +1486,9 @@
               -2576,
               3008
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x8010ea3c",
+            "visual": "bespoke-mesh",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,
@@ -1531,6 +1564,9 @@
               -2352,
               -272
             ],
+            "display_slot": "0x5",
+            "model_ptr": "0x8010a7a0",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1569,6 +1605,9 @@
               -528,
               1280
             ],
+            "display_slot": "0x6",
+            "model_ptr": "0x8010a65c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1607,6 +1646,9 @@
               -2880,
               -2032
             ],
+            "display_slot": "0x7",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1683,6 +1725,9 @@
               -6432,
               -6240
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1721,6 +1766,9 @@
               -4096,
               3072
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1917,6 +1965,9 @@
               -5856,
               7584
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1955,6 +2006,9 @@
               4240,
               7376
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -1993,6 +2047,9 @@
               2384,
               -2208
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2065,6 +2122,9 @@
               7840,
               10464
             ],
+            "display_slot": "0xa",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2103,6 +2163,9 @@
               -7408,
               -8592
             ],
+            "display_slot": "0xb",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2141,6 +2204,9 @@
               -8256,
               -7904
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2179,6 +2245,9 @@
               -8240,
               -7904
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 11,
             "placement_path": "event(sub11)",
             "reachable": true,
@@ -2265,6 +2334,9 @@
               2560,
               -1632
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x80112ad4",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2303,6 +2375,9 @@
               -1920,
               -48
             ],
+            "display_slot": "0x13",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2545,6 +2620,9 @@
               -8896,
               5536
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2764,6 +2842,9 @@
               -7856,
               3888
             ],
+            "display_slot": "0x17",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2802,6 +2883,9 @@
               5008,
               -840
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 10,
             "placement_path": "event(sub10)",
             "reachable": true,
@@ -2881,6 +2965,9 @@
               704,
               2928
             ],
+            "display_slot": "0x8",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -2919,6 +3006,9 @@
               -2992,
               2720
             ],
+            "display_slot": "0xa",
+            "model_ptr": "0x8010d264",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -3129,6 +3219,9 @@
               -6144,
               768
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -3167,6 +3260,9 @@
               -5696,
               5904
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -3370,6 +3466,9 @@
               -9024,
               -7760
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -3452,6 +3551,9 @@
               -5120,
               3584
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 17,
             "placement_path": "event(sub17)",
             "reachable": true,
@@ -3542,6 +3644,9 @@
               10480,
               2352
             ],
+            "display_slot": "0xa",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -3834,6 +3939,9 @@
               1600,
               2128
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -3872,6 +3980,9 @@
               -7008,
               2928
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4105,6 +4216,9 @@
               5632,
               3184
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4268,6 +4382,9 @@
               -3300,
               1400
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4306,6 +4423,9 @@
               10200,
               5400
             ],
+            "display_slot": "0x17",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4510,6 +4630,9 @@
               -3568,
               720
             ],
+            "display_slot": "0x1e",
+            "model_ptr": "0x8010d41c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4548,6 +4671,9 @@
               2020,
               -1392
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4586,6 +4712,9 @@
               -1792,
               1792
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 11,
             "placement_path": "event(sub11)",
             "reachable": true,
@@ -4624,6 +4753,9 @@
               -3468,
               2768
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 25,
             "placement_path": "event(sub25)",
             "reachable": true,
@@ -4859,6 +4991,9 @@
               4800,
               4100
             ],
+            "display_slot": "0x3",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4897,6 +5032,9 @@
               -8500,
               -2300
             ],
+            "display_slot": "0x4",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -4976,6 +5114,9 @@
               -3900,
               4300
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5014,6 +5155,9 @@
               3800,
               2800
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5052,6 +5196,9 @@
               3600,
               -1000
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5090,6 +5237,9 @@
               2000,
               -3000
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8010d5b4",
+            "visual": "bespoke-mesh",
             "sub": 6,
             "placement_path": "event(sub6)",
             "reachable": true,
@@ -5322,6 +5472,9 @@
               -208,
               -1248
             ],
+            "display_slot": "0x1d",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5360,6 +5513,9 @@
               -2032,
               1632
             ],
+            "display_slot": "0x1e",
+            "model_ptr": "0x80107734",
+            "visual": "bespoke-mesh",
             "sub": 5,
             "placement_path": "event(sub5)",
             "reachable": true,
@@ -5451,6 +5607,9 @@
               -656,
               -3168
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5489,6 +5648,9 @@
               200,
               -300
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5527,6 +5689,9 @@
               -1900,
               -300
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5599,6 +5764,9 @@
               4512,
               -944
             ],
+            "display_slot": "0x19",
+            "model_ptr": "0x8010afd4",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5637,6 +5805,9 @@
               -8048,
               4560
             ],
+            "display_slot": "0x1a",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5702,6 +5873,9 @@
               10416,
               7072
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5740,6 +5914,9 @@
               -13232,
               7216
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5815,6 +5992,9 @@
               2880,
               -3056
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -5853,6 +6033,9 @@
               -1280,
               1152
             ],
+            "display_slot": "0x6",
+            "model_ptr": "0x8010e0c0",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -6080,6 +6263,9 @@
               -6144,
               -2048
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -6118,6 +6304,9 @@
               512,
               -2048
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -6156,6 +6345,9 @@
               3088,
               -1008
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -6210,6 +6402,9 @@
               3088,
               -1008
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -6264,6 +6459,9 @@
               3088,
               -1008
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 9,
             "placement_path": "event(sub9)",
             "reachable": true,
@@ -6333,6 +6531,9 @@
               3328,
               -2560
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 10,
             "placement_path": "event(sub10)",
             "reachable": true,
@@ -6402,6 +6603,9 @@
               3088,
               -1008
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 10,
             "placement_path": "event(sub10)",
             "reachable": true,
@@ -6674,6 +6878,9 @@
               -4700,
               6100
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -6712,6 +6919,9 @@
               3300,
               -4200
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -6750,6 +6960,9 @@
               -1500,
               0
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 8,
             "placement_path": "event(sub8)",
             "reachable": true,
@@ -6975,6 +7188,9 @@
               5136,
               -4352
             ],
+            "display_slot": "0xb",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7013,6 +7229,9 @@
               5376,
               5184
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7051,6 +7270,9 @@
               -6864,
               5888
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7089,6 +7311,9 @@
               -2176,
               2032
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80107504",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7127,6 +7352,9 @@
               -6400,
               -4864
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 12,
             "placement_path": "event(sub12)",
             "reachable": true,
@@ -7181,6 +7409,9 @@
               2304,
               2560
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 14,
             "placement_path": "event(sub14)",
             "reachable": true,
@@ -7469,6 +7700,9 @@
               3152,
               1024
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7727,6 +7961,9 @@
               -3536,
               2960
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7765,6 +8002,9 @@
               1536,
               -2464
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x80180000",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7803,6 +8043,9 @@
               1536,
               -2464
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x80180000",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7841,6 +8084,9 @@
               -368,
               2512
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7879,6 +8125,9 @@
               -128,
               -1792
             ],
+            "display_slot": "0x5",
+            "model_ptr": "0x8010a58c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -7917,6 +8166,9 @@
               -1185,
               1451
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x80180000",
+            "visual": "interaction-only",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -7959,6 +8211,9 @@
               -1185,
               1451
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x80180000",
+            "visual": "interaction-only",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -8001,6 +8256,9 @@
               -1185,
               1451
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x80180000",
+            "visual": "interaction-only",
             "sub": 14,
             "placement_path": "event(sub14)",
             "reachable": true,
@@ -8043,6 +8301,9 @@
               -1185,
               1451
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x80180000",
+            "visual": "interaction-only",
             "sub": 14,
             "placement_path": "event(sub14)",
             "reachable": true,
@@ -8269,6 +8530,9 @@
               -7968,
               -7232
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -8307,6 +8571,9 @@
               10112,
               7040
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -8345,6 +8612,9 @@
               1824,
               2704
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -8383,6 +8653,9 @@
               3760,
               2720
             ],
+            "display_slot": "0x17",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -8465,6 +8738,9 @@
               2848,
               -9776
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -8545,6 +8821,9 @@
               -4272,
               -1296
             ],
+            "display_slot": "0x1f",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -8583,6 +8862,9 @@
               -5120,
               3584
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 20,
             "placement_path": "event(sub20)",
             "reachable": true,
@@ -9012,6 +9294,9 @@
               -7700,
               6900
             ],
+            "display_slot": "0x12",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9050,6 +9335,9 @@
               -4800,
               7000
             ],
+            "display_slot": "0x13",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9088,6 +9376,9 @@
               5000,
               7200
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9126,6 +9417,9 @@
               -7700,
               6900
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 20,
             "placement_path": "event(sub20)",
             "reachable": true,
@@ -9368,6 +9662,9 @@
               2848,
               -9776
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9443,6 +9740,9 @@
               -7968,
               -7232
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9481,6 +9781,9 @@
               10112,
               7040
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9519,6 +9822,9 @@
               1824,
               2704
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9557,6 +9863,9 @@
               3760,
               2720
             ],
+            "display_slot": "0x17",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9767,6 +10076,9 @@
               13264,
               1792
             ],
+            "display_slot": "0x4",
+            "model_ptr": "0x80109a94",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9805,6 +10117,9 @@
               -12240,
               -944
             ],
+            "display_slot": "0x3",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9843,6 +10158,9 @@
               12576,
               1328
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -9881,6 +10199,9 @@
               7984,
               1104
             ],
+            "display_slot": "0x5",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10180,6 +10501,9 @@
               -12400,
               -8100
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10218,6 +10542,9 @@
               -1380,
               12320
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10301,6 +10628,9 @@
               -2864,
               -11488
             ],
+            "display_slot": "0x13",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10339,6 +10669,9 @@
               5888,
               -12960
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10377,6 +10710,9 @@
               -4352,
               -12992
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10415,6 +10751,9 @@
               -5888,
               -11520
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x8011addc",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10638,6 +10977,9 @@
               12300,
               -7800
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10676,6 +11018,9 @@
               -13300,
               -13200
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10714,6 +11059,9 @@
               -5800,
               14200
             ],
+            "display_slot": "0x17",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10919,6 +11267,9 @@
               -4200,
               3200
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -10957,6 +11308,9 @@
               5300,
               3000
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -11330,6 +11684,9 @@
               1008,
               11296
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -11368,6 +11725,9 @@
               -7684,
               -8104
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -11406,6 +11766,9 @@
               -160,
               11032
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -11876,6 +12239,9 @@
               2896,
               -3360
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -11914,6 +12280,9 @@
               -3456,
               1280
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x8011b8ac",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -11952,6 +12321,9 @@
               -3956,
               -1600
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -12000,6 +12372,9 @@
               -4352,
               224
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 12,
             "placement_path": "event(sub12)",
             "reachable": true,
@@ -12335,6 +12710,9 @@
               -7008,
               -9012
             ],
+            "display_slot": "0x8",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -12373,6 +12751,9 @@
               2656,
               11347
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -12448,6 +12829,9 @@
               -2576,
               -5568
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8010cf70",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -12486,6 +12870,9 @@
               -544,
               -5987
             ],
+            "display_slot": "0x1d",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13045,6 +13432,9 @@
               240,
               -2266
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13083,6 +13473,9 @@
               2816,
               -2496
             ],
+            "display_slot": "0xb",
+            "model_ptr": "0x8010bdd0",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13215,6 +13608,9 @@
               -7568,
               6672
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13294,6 +13690,9 @@
               -11232,
               -480
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13550,6 +13949,9 @@
               -9472,
               3840
             ],
+            "display_slot": "0x6",
+            "model_ptr": "0x801149bc",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13588,6 +13990,9 @@
               -16384,
               -4352
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13626,6 +14031,9 @@
               4480,
               -6656
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -13713,6 +14121,9 @@
               -3468,
               2768
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 14,
             "placement_path": "event(sub14)",
             "reachable": true,
@@ -13787,6 +14198,9 @@
               -3468,
               2768
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 14,
             "placement_path": "event(sub14)",
             "reachable": true,
@@ -13861,6 +14275,9 @@
               -3468,
               2768
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 17,
             "placement_path": "event(sub17)",
             "reachable": true,
@@ -13914,6 +14331,9 @@
               -10240,
               -5248
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 22,
             "placement_path": "event(sub22)",
             "reachable": true,
@@ -13955,6 +14375,9 @@
               -2800,
               -3088
             ],
+            "display_slot": "0x13",
+            "model_ptr": "0x80123158",
+            "visual": "bespoke-mesh",
             "sub": 22,
             "placement_path": "event(sub22)",
             "reachable": true,
@@ -13996,6 +14419,9 @@
               -10240,
               4480
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 23,
             "placement_path": "event(sub23)",
             "reachable": true,
@@ -14190,6 +14616,9 @@
               -1792,
               1792
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 25,
             "placement_path": "event(sub25)",
             "reachable": true,
@@ -14273,6 +14702,9 @@
               -1632,
               2304
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80121690",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -14311,6 +14743,9 @@
               -2912,
               3872
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x801200d0",
+            "visual": "bespoke-mesh",
             "sub": 12,
             "placement_path": "event(sub12)",
             "reachable": true,
@@ -14490,6 +14925,9 @@
               4896,
               -3840
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x8011e03c",
+            "visual": "bespoke-mesh",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -14669,6 +15107,9 @@
               2256,
               -3840
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8011bfa8",
+            "visual": "bespoke-mesh",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -14848,6 +15289,9 @@
               4896,
               -3840
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x8011e03c",
+            "visual": "bespoke-mesh",
             "sub": 14,
             "placement_path": "event(sub14)",
             "reachable": true,
@@ -14911,6 +15355,9 @@
               2256,
               -3840
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8011bfa8",
+            "visual": "bespoke-mesh",
             "sub": 15,
             "placement_path": "event(sub15)",
             "reachable": true,
@@ -14974,6 +15421,9 @@
               -2912,
               3872
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x801200d0",
+            "visual": "bespoke-mesh",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,
@@ -15232,6 +15682,9 @@
               -1100,
               1800
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15270,6 +15723,9 @@
               -5300,
               -1000
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15308,6 +15764,9 @@
               -4200,
               5700
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15396,6 +15855,9 @@
               -5696,
               -1232
             ],
+            "display_slot": "0x8",
+            "model_ptr": "0x8011437c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15434,6 +15896,9 @@
               3840,
               2592
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x8010e0f8",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15472,6 +15937,9 @@
               -6144,
               128
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15510,6 +15978,9 @@
               -6912,
               3328
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -15622,6 +16093,9 @@
               6144,
               3088
             ],
+            "display_slot": "0x17",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15660,6 +16134,9 @@
               -4352,
               10000
             ],
+            "display_slot": "0x18",
+            "model_ptr": "0x8013aa4c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15698,6 +16175,9 @@
               4352,
               7824
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x8010001c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15752,6 +16232,9 @@
               4352,
               9616
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80100778",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -15806,6 +16289,9 @@
               4352,
               7824
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x8010001c",
+            "visual": "bespoke-mesh",
             "sub": 31,
             "placement_path": "event(sub31)",
             "reachable": true,
@@ -15844,6 +16330,9 @@
               4352,
               9616
             ],
+            "display_slot": "0x16",
+            "model_ptr": "0x80100778",
+            "visual": "bespoke-mesh",
             "sub": 31,
             "placement_path": "event(sub31)",
             "reachable": true,
@@ -15967,6 +16456,9 @@
               -1728,
               -9456
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -16069,6 +16561,9 @@
               7344,
               4736
             ],
+            "display_slot": "0x1f",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 3,
             "placement_path": "event(sub3)",
             "reachable": true,
@@ -16134,6 +16629,9 @@
               6656,
               -3328
             ],
+            "display_slot": "0x11",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -16370,6 +16868,9 @@
               3008,
               -3856
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -16408,6 +16909,9 @@
               -3328,
               5616
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 15,
             "placement_path": "event(sub15)",
             "reachable": true,
@@ -16843,6 +17347,9 @@
               -2100,
               -2700
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -16881,6 +17388,9 @@
               -7700,
               6900
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 8,
             "placement_path": "event(sub8)",
             "reachable": true,
@@ -16934,6 +17444,9 @@
               -7700,
               6900
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 8,
             "placement_path": "event(sub8)",
             "reachable": true,
@@ -17347,6 +17860,9 @@
               -1100,
               -2100
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -17385,6 +17901,9 @@
               -7700,
               6900
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,
@@ -17461,6 +17980,9 @@
               4336,
               3344
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x8012c53c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -17499,6 +18021,9 @@
               0,
               -5280
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -17568,6 +18093,9 @@
               -10240,
               -5248
             ],
+            "display_slot": "0x14",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,
@@ -17609,6 +18137,9 @@
               -2800,
               -3088
             ],
+            "display_slot": "0x13",
+            "model_ptr": "0x80123158",
+            "visual": "bespoke-mesh",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,
@@ -17650,6 +18181,9 @@
               -10240,
               4480
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 17,
             "placement_path": "event(sub17)",
             "reachable": true,
@@ -18176,6 +18710,9 @@
               -1616,
               4480
             ],
+            "display_slot": "0x1b",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18214,6 +18751,9 @@
               3840,
               -11056
             ],
+            "display_slot": "0x1d",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18252,6 +18792,9 @@
               -5120,
               3584
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 19,
             "placement_path": "event(sub19)",
             "reachable": true,
@@ -18384,6 +18927,9 @@
               2752,
               4560
             ],
+            "display_slot": "0x1f",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18422,6 +18968,9 @@
               -5120,
               3584
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -18589,6 +19138,9 @@
               1536,
               -768
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18627,6 +19179,9 @@
               1856,
               4224
             ],
+            "display_slot": "0x8",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18665,6 +19220,9 @@
               -3072,
               4096
             ],
+            "display_slot": "0x4",
+            "model_ptr": "0x8010001c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18703,6 +19261,9 @@
               2608,
               -32
             ],
+            "display_slot": "0xa",
+            "model_ptr": "0x8010001c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18783,6 +19344,9 @@
               -10800,
               12192
             ],
+            "display_slot": "0x5",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -18858,6 +19422,9 @@
               3024,
               224
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19137,6 +19704,9 @@
               12032,
               384
             ],
+            "display_slot": "0x19",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 23,
             "placement_path": "event(sub23)",
             "reachable": true,
@@ -19178,6 +19748,9 @@
               -3072,
               3328
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x8011b57c",
+            "visual": "bespoke-mesh",
             "sub": 23,
             "placement_path": "event(sub23)",
             "reachable": true,
@@ -19264,6 +19837,9 @@
               6144,
               -2560
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19302,6 +19878,9 @@
               6912,
               -11392
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19340,6 +19919,9 @@
               3328,
               -2560
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19378,6 +19960,9 @@
               -7648,
               2880
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x8010d980",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19416,6 +20001,9 @@
               -7680,
               3392
             ],
+            "display_slot": "0x11",
+            "model_ptr": "0x8010dc64",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19496,6 +20084,9 @@
               -5248,
               8192
             ],
+            "display_slot": "0x19",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19534,6 +20125,9 @@
               4480,
               640
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -19597,6 +20191,9 @@
               4480,
               640
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -19660,6 +20257,9 @@
               -1792,
               1792
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 20,
             "placement_path": "event(sub20)",
             "reachable": true,
@@ -19738,6 +20338,9 @@
               -7936,
               6400
             ],
+            "display_slot": "0x7",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19817,6 +20420,9 @@
               -1360,
               1152
             ],
+            "display_slot": "0x12",
+            "model_ptr": "0x8011db7c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -19855,6 +20461,9 @@
               5760,
               512
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -20001,6 +20610,9 @@
               10064,
               15104
             ],
+            "display_slot": "0x10",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -20039,6 +20651,9 @@
               -5120,
               3584
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 13,
             "placement_path": "event(sub13)",
             "reachable": true,
@@ -20117,6 +20732,9 @@
               2736,
               -6656
             ],
+            "display_slot": "0x5",
+            "model_ptr": "0x80111b00",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -20155,6 +20773,9 @@
               -4480,
               5760
             ],
+            "display_slot": "0x6",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -20430,6 +21051,9 @@
               -8448,
               15104
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -20468,6 +21092,9 @@
               -2816,
               10368
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x8011275c",
+            "visual": "bespoke-mesh",
             "sub": 29,
             "placement_path": "event(sub29)",
             "reachable": true,
@@ -20521,6 +21148,9 @@
               -2816,
               10368
             ],
+            "display_slot": "0xa",
+            "model_ptr": "0x8011275c",
+            "visual": "bespoke-mesh",
             "sub": 29,
             "placement_path": "event(sub29)",
             "reachable": true,
@@ -20574,6 +21204,9 @@
               -2816,
               10368
             ],
+            "display_slot": "0xb",
+            "model_ptr": "0x8011275c",
+            "visual": "bespoke-mesh",
             "sub": 29,
             "placement_path": "event(sub29)",
             "reachable": true,
@@ -20627,6 +21260,9 @@
               -2816,
               10368
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8011275c",
+            "visual": "bespoke-mesh",
             "sub": 29,
             "placement_path": "event(sub29)",
             "reachable": true,
@@ -20680,6 +21316,9 @@
               -2816,
               10368
             ],
+            "display_slot": "0xa",
+            "model_ptr": "0x8011275c",
+            "visual": "bespoke-mesh",
             "sub": 29,
             "placement_path": "event(sub29)",
             "reachable": true,
@@ -20733,6 +21372,9 @@
               -2816,
               10368
             ],
+            "display_slot": "0xb",
+            "model_ptr": "0x8011275c",
+            "visual": "bespoke-mesh",
             "sub": 29,
             "placement_path": "event(sub29)",
             "reachable": true,
@@ -20786,6 +21428,9 @@
               -2816,
               10368
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8011275c",
+            "visual": "bespoke-mesh",
             "sub": 29,
             "placement_path": "event(sub29)",
             "reachable": true,
@@ -20895,6 +21540,9 @@
               4128,
               448
             ],
+            "display_slot": "0x9",
+            "model_ptr": "0x8012304c",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -20954,6 +21602,9 @@
               288,
               -1920
             ],
+            "display_slot": "0x8",
+            "model_ptr": "0x80122f08",
+            "visual": "bespoke-mesh",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -21013,6 +21664,9 @@
               864,
               8240
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -21072,6 +21726,9 @@
               3344,
               1264
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 33,
             "placement_path": "event(sub33)",
             "reachable": true,
@@ -21309,6 +21966,9 @@
               -1664,
               -2016
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 21,
             "placement_path": "event(sub21)",
             "reachable": true,
@@ -21383,6 +22043,9 @@
               -1024,
               -2048
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8010c0b0",
+            "visual": "bespoke-mesh",
             "sub": 43,
             "placement_path": "event(sub43)",
             "reachable": true,
@@ -21435,6 +22098,9 @@
               -1024,
               -2048
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x8010c0b0",
+            "visual": "bespoke-mesh",
             "sub": 43,
             "placement_path": "event(sub43)",
             "reachable": true,
@@ -21487,6 +22153,9 @@
               -1024,
               -2048
             ],
+            "display_slot": "0xd",
+            "model_ptr": "0x8010c0b0",
+            "visual": "bespoke-mesh",
             "sub": 43,
             "placement_path": "event(sub43)",
             "reachable": true,
@@ -21539,6 +22208,9 @@
               -1024,
               -2048
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x8010c0b0",
+            "visual": "bespoke-mesh",
             "sub": 43,
             "placement_path": "event(sub43)",
             "reachable": true,
@@ -21591,6 +22263,9 @@
               -1024,
               -2048
             ],
+            "display_slot": "0xf",
+            "model_ptr": "0x8010c0b0",
+            "visual": "bespoke-mesh",
             "sub": 43,
             "placement_path": "event(sub43)",
             "reachable": true,
@@ -21643,6 +22318,9 @@
               -1024,
               -2048
             ],
+            "display_slot": "0xc",
+            "model_ptr": "0x8010c0b0",
+            "visual": "bespoke-mesh",
             "sub": 43,
             "placement_path": "event(sub43)",
             "reachable": true,
@@ -21695,6 +22373,9 @@
               -1024,
               -2048
             ],
+            "display_slot": "0xe",
+            "model_ptr": "0x8010c0b0",
+            "visual": "bespoke-mesh",
             "sub": 43,
             "placement_path": "event(sub43)",
             "reachable": true,
@@ -21826,6 +22507,9 @@
               -896,
               0
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 15,
             "placement_path": "event(sub15)",
             "reachable": true,
@@ -21864,6 +22548,9 @@
               -896,
               0
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 15,
             "placement_path": "event(sub15)",
             "reachable": true,
@@ -21912,6 +22599,9 @@
               -896,
               0
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 15,
             "placement_path": "event(sub15)",
             "reachable": true,
@@ -21950,6 +22640,9 @@
               -896,
               0
             ],
+            "display_slot": "0xff",
+            "model_ptr": "0x0",
+            "visual": "interaction-only",
             "sub": 15,
             "placement_path": "event(sub15)",
             "reachable": true,
@@ -22025,6 +22718,9 @@
               10064,
               15104
             ],
+            "display_slot": "0x1f",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -22101,6 +22797,9 @@
               -3232,
               -14192
             ],
+            "display_slot": "0xa",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -22139,6 +22838,9 @@
               1776,
               3904
             ],
+            "display_slot": "0xb",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 0,
             "placement_path": "init",
             "reachable": true,
@@ -22202,6 +22904,9 @@
               12032,
               384
             ],
+            "display_slot": "0x19",
+            "model_ptr": "0x80180000",
+            "visual": "generic-panel",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,
@@ -22243,6 +22948,9 @@
               -3072,
               3328
             ],
+            "display_slot": "0x15",
+            "model_ptr": "0x80119d80",
+            "visual": "bespoke-mesh",
             "sub": 16,
             "placement_path": "event(sub16)",
             "reachable": true,

@@ -132,6 +132,10 @@ say **CE-verify** in `--help` — they are lab tools, expect rough edges.
 
 ## Seeds, spoilers and the playthrough log
 
+Every randomized install shows its identity on the **title screen** — "DINORAND V…" plus the
+same shareable `DINO-…` seed string the GUI displays (it encodes the seed *and* your settings,
+so anyone can re-type it from a screenshot to reproduce the run). Removed by `--restore`.
+
 Every run writes into the output folder:
 
 - **`SPOILER.md`** — a bug-report debug block on top (safe to share), then room-by-room

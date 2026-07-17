@@ -56,7 +56,13 @@ public static class GameInstaller
     /// keyed in the manifest by their forward-slash relative path. Scoped to known audio paths (voice banks,
     /// speech, BGM slots) so an overlay can never clobber an arbitrary game file.
     /// </summary>
-    private static readonly string[] LooseSubtrees = { "Sound/VOICE/", "Sound/BGM/", "Speech/" };
+    private static readonly string[] LooseSubtrees =
+    {
+        "Sound/VOICE/", "Sound/BGM/", "Speech/",
+        // DC1 title-screen seed watermark — a single named file, not a subtree, so the
+        // allow-list stays narrow (docs/decisions/cross/SEED-WATERMARK-PLAN.md).
+        "Data/t_image.imd",
+    };
 
     /// <summary>The game root (parent of <c>Data\</c>) — where the exe and <c>Sound\VOICE\</c> live.</summary>
     private static string GameRoot(string dataDir) => Path.GetDirectoryName(Path.GetFullPath(
@@ -110,7 +116,10 @@ public static class GameInstaller
         int backedUp = 0, overlaid = 0;
         var files = new List<string>();
 
-        foreach (var modPath in Directory.EnumerateFiles(modDir, "*.dat"))
+        // No "*.dat" glob: it is case-sensitive on Linux/WSL and would skip DC2's uppercase ST*.DAT
+        // (the St502 case-glob bug class — dc1-st502-case-glob-bug).
+        foreach (var modPath in Directory.EnumerateFiles(modDir)
+                     .Where(p => p.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)))
         {
             var modName = Path.GetFileName(modPath);
             // Scope to the current run's recorded output when an allow-list is supplied: a stale/foreign

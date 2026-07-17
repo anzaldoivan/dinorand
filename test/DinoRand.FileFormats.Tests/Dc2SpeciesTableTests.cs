@@ -158,6 +158,35 @@ public class Dc2SpeciesTableTests
     }
 
     [Fact]
+    public void E32_IsNeverADonor_EvenWithWaterFlagOn_ButE31AndMosasaurusStayEligible()
+    {
+        // Crash RCA 2026-07-17 (DC2 dump 13-22-55, Dino2.exe): a live E32 (0x0c) grunt swapped onto land
+        // crashed with an AV reading NULL+0x40 at 0x00432061 — its per-tick spawner AI (sub 0x431fe0, from
+        // state handler 0x430404) dereferences a NULL spawn-anchor at actor+0x210 that only its native
+        // aquatic init populates. The fault is in the grunt BEHAVIOR, not the load/residency path, so the
+        // wave-preload path does NOT prevent it (the earlier "healthy on spawn" CE snapshot is the delay
+        // before the AI ticks into the spawn state). So E32 is hard-excluded from the donor pool in EVERY
+        // flag combination — see docs/reference/dc2/_registries/EXE-SYMBOLS.md.
+        foreach (var (setpiece, boss, water) in new[]
+                 {
+                     (false, false, false), (true, true, false),
+                     (false, false, true),  (true, false, true), (true, true, true),
+                 })
+        {
+            var pool = Dc2SpeciesTable.DonorPool(setpiece, boss, water).Select(d => d.Type).ToList();
+            Assert.DoesNotContain(0x0c, pool);
+            Assert.False(Dc2SpeciesTable.IsDonorPoolMember(0x0c, setpiece, boss, water));
+        }
+
+        // Boundary: the exclusion is scoped to E32 (0x0c) ONLY. E31 (0x0b), the sibling grunt, is separately
+        // live-confirmed NOT to crash (user evidence 2026-07-17) and stays wave-eligible; Mosasaurus (0x0a,
+        // the wave-safe aquatic donor) likewise. Both must STILL be admitted when the water flag is on.
+        var waterPool = Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: false, allowWater: true).Select(d => d.Type).ToList();
+        Assert.Contains(0x0b, waterPool);
+        Assert.Contains(0x0a, waterPool);
+    }
+
+    [Fact]
     public void IsEnemyCtorType_ExcludesGenericPlayerAndNonEnemy()
     {
         Assert.True(Dc2SpeciesTable.IsEnemyCtorType(0x02));  // Velociraptor

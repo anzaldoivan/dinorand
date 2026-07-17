@@ -55,6 +55,20 @@ public sealed class GameInstallerTests : IDisposable
     }
 
     [Fact]
+    public void Install_overlays_uppercase_DAT_names_on_any_platform()
+    {
+        // DC2 emits uppercase ST*.DAT; the mod-dir glob must match it case-insensitively even on
+        // Linux/WSL (the St502 case-glob bug class — dc1-st502-case-glob-bug).
+        WriteData("ST105.DAT", new byte[] { 1, 1, 1 });
+        WriteMod("ST105.DAT", new byte[] { 9, 9, 9 });
+
+        var result = GameInstaller.Install(_dataDir, _modDir, "seed-dc2");
+
+        Assert.Equal(1, result.Overlaid);
+        Assert.Equal(new byte[] { 9, 9, 9 }, ReadData("ST105.DAT"));
+    }
+
+    [Fact]
     public void Install_only_touches_files_with_a_matching_original()
     {
         WriteData("st100.dat", new byte[] { 1 });

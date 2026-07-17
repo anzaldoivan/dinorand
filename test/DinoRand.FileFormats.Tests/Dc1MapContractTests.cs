@@ -110,13 +110,22 @@ public class Dc1MapContractTests
     [Theory]
     [InlineData(0x0107, 0x0113, 0x63, 0x6A)] // N
     [InlineData(0x0203, 0x0202, 0x62, 0x69)] // H
-    [InlineData(0x0304, 0x0300, 0x65, 0x6C)] // E
     [InlineData(0x0309, 0x0306, 0x64, 0x6B)] // L
     [InlineData(0x0506, 0x0507, 0x67, 0x6E)] // S
     [InlineData(0x0507, 0x0508, 0x68, 0x6F)] // D
     [InlineData(0x0604, 0x0609, 0x66, 0x6D)] // W
     public void Map_DdkPairDoors_RequireBothDiscs(int from, int to, int input, int code)
         => AssertDoorRequires(Rooms(), from, to, items: new[] { input, code }, visitRooms: Array.Empty<int>());
+
+    // --- (C2) 0304->0300 — the DDK-E pair door (formerly row E of the theory above) ALSO requires
+    // Key Card L (0x47) + Key Card R (0x48) (user-directed 2026-07-16, NO code trace): the Experiment
+    // Simulation Room door demands the card pair on top of the native op58-3 disc AND-gate. Kept as its
+    // own fact because the theory asserts the exact requires array. ------------------------------------
+
+    [Fact]
+    public void Map_0304_to_0300_RequiresDdkEPairAndKeyCardsLR()
+        => AssertDoorRequires(Rooms(), 0x0304, 0x0300, items: new[] { 0x65, 0x6C, 0x47, 0x48 },
+                              visitRooms: Array.Empty<int>());
 
     // --- (D2) 0101 Toilet — room-level backstop for the fenceA laser-fence gate (cont.62, already
     // authored door-edge-side on 0102->0101/0104 as requiresRoom [0106,0202,0107]). A room-level gate
@@ -180,6 +189,19 @@ public class Dc1MapContractTests
     public void Map_0400_to_0401_RequiresGailCutsceneAtLectureRoom()
         => AssertDoorRequires(Rooms(), 0x0400, 0x0401, items: Array.Empty<int>(), visitRooms: new[] { 0x0205, 0x0109 });
 
+    // --- (D6) 0205 Communication Room requires having reached 0300 Experiment Simulation Room
+    // (user-directed 2026-07-16, NO code trace). Room-level, not edge-level: 0205 has TWO free incoming
+    // routes (0106->0205 and 0201->0205 — the latter including a plain type-0 record alongside its
+    // type-1 story reader, so the group-9 latch is not the only path in); a room-level gate closes all
+    // of them uniformly, same pattern as 0101/0104/0109. High-cascade: 0400->0401 requires [0205,0109],
+    // and 0401 transitively gates the whole B2/B3 deep facility + goal 060D — so this pulls the DDK-E
+    // pair, Key Card L/R, the DDK-L pair, and the facility-elevator chain (DDK-N + F.C. Device) into the
+    // goal-critical set. ---------------------------------------------------------------------------------
+
+    [Fact]
+    public void Map_0205_CommunicationRoom_RequiresExperimentSimulationRoom()
+        => AssertRoomRequiresRoom(Rooms(), 0x0205, "Communication Room", 0x0300);
+
     // --- (D) 010D An. Aid scatter-spot safety gate (user-directed, placement-gates.md). ---------------
     // Conservative: makes the KeyItemPlacer spot at 010D's An. Aid position (a legal key-item scatter
     // target) require holding the B1 Room Key before it counts reachable, so a shuffled/scattered key
@@ -188,6 +210,19 @@ public class Dc1MapContractTests
     [Fact]
     public void Map_010D_AnAid_RequiresB1RoomKey()
         => AssertItemRequires(Rooms(), 0x010D, itemId: 0x20, requires: new[] { 0x2F });
+
+    // --- (E) 0305 Library Room — B1 Key Chip gates the Key Card R + numbered-memo pickups (user-directed,
+    // placement-gates.md). Both spots are reachable only once the B1 Key Chip (0x46) is held; an item-guard,
+    // NOT a door gate, so it cannot enter the reachability oracle / AP progression graph (item-guards gate
+    // pickup collection, not room reach). Circularity checked: KeyItemPlacer.Verify stays Success (0x46 @0303
+    // is collectable before both 0x48 and 0x5e). ---------------------------------------------------------
+    [Fact]
+    public void Map_0305_KeyCardR_RequiresB1KeyChip()
+        => AssertItemRequires(Rooms(), 0x0305, itemId: 0x48, requires: new[] { 0x46 });
+
+    [Fact]
+    public void Map_0305_NumberedMemo_RequiresB1KeyChip()
+        => AssertItemRequires(Rooms(), 0x0305, itemId: 0x5E, requires: new[] { 0x46 });
 
     private static void AssertItemRequires(JsonElement rooms, int room, int itemId, int[] requires)
     {

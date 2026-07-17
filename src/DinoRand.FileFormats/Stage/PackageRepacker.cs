@@ -95,12 +95,26 @@ public static class PackageRepacker
     {
         var pkg = GianPackage.TryParse(package)
                   ?? throw new InvalidDataException("not a recognized Gian package");
-        if (!pkg.IsDc2)
-            throw new InvalidDataException("not a DC2 (32-byte-entry) Gian package");
         var matches = Enumerable.Range(0, pkg.Entries.Count).Where(i => pkg.Entries[i].Type == type).ToList();
         if (matches.Count != 1)
             throw new InvalidDataException($"package has {matches.Count} {type} entries (expected exactly 1)");
-        int idx = matches[0];
+        return ReplaceEntryDc2(package, matches[0], newPayload);
+    }
+
+    /// <summary>
+    /// Index-keyed variant of <see cref="ReplaceEntryDc2(ReadOnlySpan{byte}, GianEntryType, ReadOnlySpan{byte})"/>
+    /// for packages holding several entries of the same type (e.g. the two LZSS0 entries of
+    /// <c>TITLE2.DAT</c> — the title-watermark background edit, SEED-WATERMARK-PLAN.md).
+    /// </summary>
+    public static byte[] ReplaceEntryDc2(ReadOnlySpan<byte> package, int entryIndex, ReadOnlySpan<byte> newPayload)
+    {
+        var pkg = GianPackage.TryParse(package)
+                  ?? throw new InvalidDataException("not a recognized Gian package");
+        if (!pkg.IsDc2)
+            throw new InvalidDataException("not a DC2 (32-byte-entry) Gian package");
+        if (entryIndex < 0 || entryIndex >= pkg.Entries.Count)
+            throw new ArgumentOutOfRangeException(nameof(entryIndex));
+        int idx = entryIndex;
 
         int total = HeaderSize;
         for (int i = 0; i < pkg.Entries.Count; i++)

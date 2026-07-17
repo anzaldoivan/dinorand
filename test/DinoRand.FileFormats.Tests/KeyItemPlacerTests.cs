@@ -3,6 +3,7 @@ using DinoRand.Randomizer;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Graph;
 using DinoRand.Randomizer.Logic;
+using DinoRand.Randomizer.Maps;
 using DinoRand.Randomizer.Passes;
 using Xunit;
 
@@ -579,6 +580,47 @@ public class KeyItemPlacerTests
         Assert.False(res.Success);
     }
 
+    /// <summary>
+    /// ENGINE regression (2026-07-16, found via the Gate-C stall): <c>FrontierKeys</c> resolved the
+    /// masked room codes in <c>reach</c> through a NodeCode-keyed dictionary, so for a node-split room
+    /// only the PRIMARY region's edges were enumerated — a key-gated door owned by a non-primary
+    /// sub-region (the real case: the DDK-L door 0309.shuttle→0306) was invisible to the frontier, the
+    /// key was never surfaced as helpful, and Place stalled on every attempt once that door became
+    /// goal-critical. Synthetic repro: start→0113→0309(lands in the non-primary shuttle region)→050B
+    /// key-gated; the only key must be surfaced and seated for Place to succeed.
+    /// </summary>
+    [Fact]
+    public void Place_KeyGatedDoorOnNonPrimaryRegion_IsSurfacedToTheFrontier()
+    {
+        const string overlay = """
+        {
+          "rooms": {
+            "0309": {
+              "nodeSplit": true,
+              "regions": {
+                "west":    { "doors": ["0307"] },
+                "shuttle": { "doors": ["0113", "050B"] }
+              }
+            }
+          }
+        }
+        """;
+        var rooms = new List<RoomFile>
+        {
+            Room(0x010d, new[] { (0x0113, 0) }, Array.Empty<int>()),
+            Room(0x0113, new[] { (0x010d, 0), (0x0309, 0) }, Array.Empty<int>()),
+            Room(0x0309, new[] { (0x0307, 0), (0x0113, 0), (0x050b, 0x30) }, Array.Empty<int>()),
+            Room(0x0307, new[] { (0x0309, 0) }, Array.Empty<int>()),
+            Room(0x050b, Array.Empty<(int, int)>(), Array.Empty<int>()),
+        };
+        var graph = RoomGraph.Build(rooms, MapRequirements.Parse(overlay));
+
+        var spots = new[] { Spot(0x010d), Spot(0x0113) };
+        var res = new KeyItemPlacer().Place(graph, Game, 0x010d, 0x050b, spots,
+                                            new[] { 0x30 }, new Seed(1));
+        Assert.True(res.Success, string.Join("\n", res.Log));
+    }
+
     // --- Real install: the door-graph model is solvable on the shipped game ----------------------
 
     private static List<RoomFile>? LoadInstall()
@@ -686,11 +728,16 @@ public class KeyItemPlacerTests
 
         const int entranceKey = 0x2e, ddkInputN = 0x63, ddkCodeN = 0x6a;
 
-        // Vanilla stays beatable, and dropping only the DDK-N discs still descends via the heliport +
-        // Large Elevator (guards against over-gating the deep facility):
         Assert.True(GoalReachable(Without()), "all keys held: goal must be reachable");
-        Assert.True(GoalReachable(Without(ddkInputN, ddkCodeN)),
-            "goal must stay reachable via the heliport + Large Elevator when only the DDK-N discs are missing");
+
+        // STALE-ASSERTION UPDATE (2026-07-16, Gate C in placement-gates.md): this used to assert the goal
+        // stays reachable WITHOUT the DDK-N discs (heliport + Large Elevator descent). Since 0205 now
+        // requires 0300 (whose only chain runs 0107→0113 (DDK-N) → 0113→0309 → shuttle → DDK-L → 0306 →
+        // 0304 → 0300), and 0400→0401 requires 0205, the heliport route is circular without the facility
+        // elevator — so the DDK-N pair is now itself goal-critical and the old tolerance is impossible.
+        Assert.False(GoalReachable(Without(ddkInputN, ddkCodeN)),
+            "the DDK-N pair is goal-critical since 0205 requires 0300 (Gate C): without it the shuttle side " +
+            "is unreachable, so 0300→0205→0401 never opens");
 
         // THE INVARIANT — the Entrance Key is a hard B3 requirement. Even holding every other key (incl.
         // the DDK-N pair), the goal must be UNREACHABLE without it: the facility elevator + 0309 shuttle
@@ -1250,6 +1297,64 @@ public class KeyItemPlacerTests
             Assert.Contains(Game.GoalRoomCode,
                 KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, minus));
         }
+    }
+
+    /// <summary>
+    /// Gate-A verification (user-directed 2026-07-16): the B1 experiment wing {0300,0301,0302,0303,0304,
+    /// 0305,0306} has EXACTLY ONE external entry — the DDK-L pair door 0309(shuttle)→0306 (edge-dumped on
+    /// the real graph: every other edge into any cluster room originates inside the cluster). So dropping
+    /// EITHER L disc must remove the whole cluster from reach. No room-level backstop is authored — the
+    /// map.json room-level schema (`requiresRoom`) expresses visited-rooms only, not held items, so the
+    /// 0101/0104-style backstop cannot encode "holding DDK-L"; this reach guard + the exact-array door
+    /// contract (Dc1MapContractTests.Map_DdkPairDoors_RequireBothDiscs row L) are the lock-in instead.
+    /// </summary>
+    [Theory]
+    [InlineData(0x64)] // DDK Input Disc L
+    [InlineData(0x6B)] // DDK Code Disc L
+    public void RealInstall_ExperimentWing_SoleEntryIsTheDdkLDoor(int disc)
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        var held = new HashSet<int>(Game.KeyItemIds);
+        held.Remove(disc);
+        var reach = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, held);
+        foreach (var room in new[] { 0x0300, 0x0301, 0x0302, 0x0303, 0x0304, 0x0305, 0x0306 })
+            Assert.DoesNotContain(room, reach);
+    }
+
+    /// <summary>
+    /// Gates B+C (user-directed 2026-07-16, placement-gates.md): 0304→0300 requires the DDK-E pair AND
+    /// Key Card L/R, and 0205 (Communication Room) requires having reached 0300. Since 0400→0401 requires
+    /// 0205 and 0401 transitively gates the whole B2/B3 deep facility + goal, each of those four items is
+    /// goal-critical — and so is everything on 0300's only access chain (the DDK-L door, the facility
+    /// elevator's DDK-N pair + F.C. Device forge). Also pins the chain shape itself: without any one of
+    /// them, 0300 and 0205 and 0401 must all drop out of reach together.
+    /// </summary>
+    [Theory]
+    [InlineData(0x65)] // DDK Input Disc E
+    [InlineData(0x6C)] // DDK Code Disc E
+    [InlineData(0x47)] // Key Card L
+    [InlineData(0x48)] // Key Card R
+    [InlineData(0x64)] // DDK Input Disc L  (cluster entry)
+    [InlineData(0x6B)] // DDK Code Disc L
+    [InlineData(0x63)] // DDK Input Disc N  (facility-elevator chain)
+    [InlineData(0x6A)] // DDK Code Disc N
+    [InlineData(0x41)] // F.C. Device       (0113→0309 descent forge)
+    public void RealInstall_CommunicationRoomChain_ItemIsGoalCritical(int item)
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        var held = new HashSet<int>(Game.KeyItemIds);
+        held.Remove(item);
+        var reach = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, held);
+        Assert.DoesNotContain(0x0300, reach);
+        Assert.DoesNotContain(0x0205, reach);
+        Assert.DoesNotContain(0x0401, reach);
+        Assert.DoesNotContain(Game.GoalRoomCode, reach);
     }
 
     /// <summary>

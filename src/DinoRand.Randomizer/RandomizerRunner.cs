@@ -24,6 +24,14 @@ public sealed class RandomizerRunner
         new DoorRandomizer(),
         new ProgressionPass(),
         new ItemRandomizer(),
+        // Gated off by default (NormalizePickupVisuals). Runs after progression + item relocation so it sees
+        // final ids: rewrites a relocated key/weapon's ground visual to the generic panel where the landing
+        // spot's visual doesn't match. Lever A, docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md.
+        new NormalizePickupVisualsPass(),
+        // Gated off by default (ShortenCutscenes): in-place rewrite of whitelisted cutscene brackets
+        // to their side effects (cont.74). No relocation — runs before the splicing passes, whose
+        // relocation handles the new gotos as ordinary branch sites.
+        new CutsceneShortenPass(),
         new EnemyRandomizer(),
         // Gated off by default: per-placement enemy maxHP override (writes +6). Runs after the permute so it
         // sets HP on the final species assignment. docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
@@ -32,6 +40,11 @@ public sealed class RandomizerRunner
         // into eligible rooms, declaring the EXE patches they need on the context (the installer applies them).
         // docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.
         new CrossSpeciesEnemyPass(),
+        // Gated off by default (ImportPickupModels, Lever B): donor ground meshes for relocated
+        // pickups. MUST run after every ScriptInjector-splicing pass (the enemy passes above) — a
+        // later mid-script insertion would shift the appended mesh out from under the record's
+        // stored pointer. docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md ("Lever B plan").
+        new PickupModelImportPass(),
         // Gated off by default (Dc1CutsceneSafeEnemies): palette-tint fallback for choreography-census
         // rooms the two enemy passes above refuse to touch. Must run AFTER every room-record-mutating
         // pass — its room-output override freezes the serialized bytes.
@@ -44,6 +57,9 @@ public sealed class RandomizerRunner
         // with transcoded same-tag donor tracks — a pure loose-file overlay, reversed by Restore.
         // docs/decisions/cross/BGM-RANDO-PLAN.md.
         new Bgm.BgmRandomizer(),
+        // Always-on cosmetic: seed watermark drawn into the title screen (BioRand parity;
+        // docs/decisions/cross/SEED-WATERMARK-PLAN.md). Last — it touches nothing other passes read.
+        new TitleWatermarkPass(),
     };
 
     public RandomizerRunner(GameDefinition game) => _game = game;

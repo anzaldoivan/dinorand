@@ -304,13 +304,48 @@ public sealed class RoomFile
             map[texture.TpageCodes[i]] = placed.TpageCodes[i];
         TextureImporter.RewriteModelCodes(RdtBuffer, importedModelPtr, map, placed.ClutCode);
 
-        _textureInserts = new List<PackageRepacker.NewEntry>
-        {
-            new(GianEntryType.Lzss2, placed.Texture.Dst, Lzss.Compress(placed.Texture.Pixels)),
-            new(GianEntryType.Palette, placed.Palette.Dst, placed.Palette.Pixels),
-        };
+        // Append (don't replace): multiple textured imports into one room each keep their entries.
+        _textureInserts ??= new List<PackageRepacker.NewEntry>();
+        _textureInserts.Add(new(GianEntryType.Lzss2, placed.Texture.Dst, Lzss.Compress(placed.Texture.Pixels)));
+        _textureInserts.Add(new(GianEntryType.Palette, placed.Palette.Dst, placed.Palette.Pixels));
         _structurallyEdited = true; // ensure Write() emits even if record-edit detection would skip
         return new TexturedImportResult(TextureImportOutcome.Relocated, placed.Texture.Dst, placed.Palette.Dst);
+    }
+
+    /// <summary>VRAM rects already claimed by staged texture entries (enemy imports, earlier pickup
+    /// imports) — a later placement into this room must avoid them as well as the on-disk uploads.</summary>
+    public IReadOnlyList<VramRect> StagedTextureRects
+        => _textureInserts?.Select(e => e.Dst).ToList() ?? (IReadOnlyList<VramRect>)Array.Empty<VramRect>();
+
+    /// <summary>Stage one extra texture/palette package entry for <see cref="Write"/> to inject before
+    /// the RDT (Lever B pickup texture travel; same channel as <see cref="StageTexture"/>).</summary>
+    public void StageTextureEntry(PackageRepacker.NewEntry entry)
+    {
+        _textureInserts ??= new List<PackageRepacker.NewEntry>();
+        _textureInserts.Add(entry);
+        _structurallyEdited = true;
+    }
+
+    /// <summary>
+    /// Append a pickup ground-mesh blob at the END of the decompressed RDT and return its file-form
+    /// pointer (<c>0x80100000 + offset</c>). End-append is <see cref="ScriptInjector.Insert"/>'s
+    /// degenerate case — nothing shifts, so no pointer/table/branch relocation is needed (and the
+    /// blob must NOT go through <c>Insert</c>: its pointer scan would double-shift the blob's own
+    /// header self-pointers). The caller rebases the blob for the returned pointer
+    /// (<see cref="PickupMeshFormat.RebaseAndRetarget"/>) BEFORE calling. Fails (returns false)
+    /// when growth would cross the engine work-struct ceiling
+    /// (<see cref="SpeciesImporter.EngineRoomRdtCeiling"/>).
+    /// </summary>
+    public bool TryAppendPickupMesh(byte[] blob, out uint filePtr)
+    {
+        filePtr = RoomScript.PsxRdtBase + (uint)RdtBuffer.Length;
+        if (RdtBuffer.Length + blob.Length > SpeciesImporter.EngineRoomRdtCeiling) return false;
+        var grown = new byte[RdtBuffer.Length + blob.Length];
+        RdtBuffer.CopyTo(grown, 0);
+        blob.CopyTo(grown, RdtBuffer.Length);
+        RdtBuffer = grown;
+        _structurallyEdited = true;
+        return true;
     }
 
     /// <summary>
@@ -765,7 +800,7 @@ public sealed class RoomFile
 
         bool changed = _structurallyEdited;
         foreach (var item in Items)
-            if (!item.IsEmptySlot && item.ItemId != item.OriginalItemId) { changed = true; break; }
+            if (!item.IsEmptySlot && (item.ItemId != item.OriginalItemId || item.NormalizeVisual)) { changed = true; break; }
         if (!changed)
             foreach (var enemy in Enemies)
                 if (enemy.IsEdited) { changed = true; break; }

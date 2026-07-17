@@ -63,6 +63,19 @@ public enum ItemPriority
     Fixed,
 }
 
+/// <summary>The pickup's decoded GROUND VISUAL class (STATIC-SCD-RE cont.72: record field pair
+/// <c>rec+0x22</c> display-node slot / <c>rec+0x24</c> model pointer — never derived from the item
+/// id). <see cref="GenericPanel"/> = the shared globally-resident blinking-panel model every ground
+/// consumable shows (the implicit default; not emitted to map.json). <see cref="BespokeMesh"/> = a
+/// room-local mesh of the VANILLA item (a relocated id still renders the old item's model).
+/// <see cref="InteractionOnly"/> = no visual at all — collectable only by examining the spot.</summary>
+public enum PickupVisual
+{
+    GenericPanel,
+    BespokeMesh,
+    InteractionOnly,
+}
+
 /// <summary>An item pickup attached to a <see cref="RoomNode"/>: the live record plus its optional
 /// guard (the map.json item <c>requires</c> case — a pickup reachable only once the guard is held).</summary>
 public sealed record NodeItem(ItemRecord Record)
@@ -87,6 +100,13 @@ public sealed record NodeItem(ItemRecord Record)
     /// the group's canonical record onto the rest, never desyncing or duplicating it. Today the key is
     /// the original item-id hex (BioRand's <c>MapRoomItem.Link</c>, clean-room).</summary>
     public string? Link { get; set; }
+
+    /// <summary>Ground-visual class of this spot, stamped from the map.json <c>itemVisuals</c> overlay
+    /// (default <see cref="PickupVisual.GenericPanel"/> — the overlay emits only non-default classes).
+    /// Consulted by the passes when <see cref="RandomizerConfig.AvoidHiddenPickupSpots"/> is on: weapons
+    /// and parts avoid <see cref="PickupVisual.InteractionOnly"/> slots, and an interaction-only spot may
+    /// only receive a key whose vanilla home was also interaction-only ("no worse than vanilla").</summary>
+    public PickupVisual Visual { get; set; } = PickupVisual.GenericPanel;
 }
 
 /// <summary>A directed door from one room to another. <see cref="Requires"/> is the composite

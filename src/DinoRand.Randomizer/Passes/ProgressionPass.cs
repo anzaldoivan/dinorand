@@ -145,6 +145,15 @@ public sealed class ProgressionPass : IRandomizationPass
         var keys = new List<int>();
         var canonical = new Dictionary<(int, string), ItemRecord>();
         var siblings = new Dictionary<ItemRecord, List<ItemRecord>>();
+        // Hidden-spot rule (AvoidHiddenPickupSpots, on by default): an interaction-only spot (no ground
+        // visual — decoded map.json itemVisuals) may only receive a key whose own vanilla home was also
+        // interaction-only ("no worse than vanilla"): a visible key never becomes invisible, a hidden key
+        // may become visible. Collected in the same sweep, stamped onto the spots afterwards (the set is
+        // complete only after the loop). docs/decisions/dc1/items/PICKUP-VISUAL-PLACEMENT-PLAN.md.
+        bool avoidHidden = context.Config.AvoidHiddenPickupSpots;
+        var hiddenVanillaKeys = new HashSet<int>();
+        var hiddenSpotIdx = new List<int>();
+        var spotVisuals = new Dictionary<ItemRecord, PickupVisual>(); // spoiler annotation only
         foreach (var node in graph.Nodes)
         {
             // Reachable, and not a one-way ending sink: a key seated in an escape-ride dead end
@@ -169,6 +178,12 @@ public sealed class ProgressionPass : IRandomizationPass
                     canonical[groupKey] = ni.Record;
                     siblings[ni.Record] = new List<ItemRecord>();
                 }
+                spotVisuals[ni.Record] = ni.Visual;
+                if (avoidHidden && ni.Visual == PickupVisual.InteractionOnly)
+                {
+                    hiddenVanillaKeys.Add(ni.Record.ItemId);
+                    hiddenSpotIdx.Add(spots.Count);
+                }
                 spots.Add(new KeyItemPlacer.Spot(node.Code, ni.Record, ni.Requires));
                 keys.Add(ni.Record.ItemId);
             }
@@ -191,10 +206,19 @@ public sealed class ProgressionPass : IRandomizationPass
                     // also drops co-located positions, this is the belt to that suspenders.
                     if (!ni.IsScatterTarget || ni.Record.IsEmptySlot
                         || game.KeyItemIds.Contains(ni.Record.ItemId)) continue;
+                    spotVisuals[ni.Record] = ni.Visual;
+                    if (avoidHidden && ni.Visual == PickupVisual.InteractionOnly)
+                        hiddenSpotIdx.Add(spots.Count); // admits only hidden-vanilla keys (below)
                     spots.Add(new KeyItemPlacer.Spot(node.Code, ni.Record, ni.Requires));
                     scatterRecords.Add(ni.Record);
                 }
             }
+
+        // Stamp the completed hidden-vanilla key set onto every interaction-only spot. One shared set
+        // instance — the placer's tightness guard groups constrained spots by it. Flag off ⇒ no spot is
+        // constrained and the placer runs exactly as before.
+        foreach (var i in hiddenSpotIdx)
+            spots[i] = spots[i] with { EligibleKeys = hiddenVanillaKeys };
 
         if (spots.Count == 0)
         {
@@ -279,14 +303,56 @@ public sealed class ProgressionPass : IRandomizationPass
         }
 
         var spoiler = context.Spoiler.Section(KeySpoilerTitle, KeySpoilerColumns);
+        var donorIds = DonorIdsForHint(context);
         foreach (var (spot, key) in placement.Placements)
+        {
+            // Ground-visual hint (cont.72): the spot's visual never follows the relocated id, so tell
+            // the player what they will (or won't) actually see at the spot. When Lever-A normalization
+            // is on (NormalizePickupVisuals), a mismatched spot is rewritten to the generic panel, so the
+            // vanilla hidden/wrong-mesh hint no longer applies. The current key-shuffle exposure rooms all
+            // have a free slot (census, PICKUP-GROUND-MODEL-FEASIBILITY.md), so the note holds.
+            var spotVisual = spotVisuals.GetValueOrDefault(spot.Record);
+            var visualNote = VisualNote(spotVisual, context.Config.NormalizePickupVisuals,
+                                        context.Config.ImportPickupModels, donorIds.Contains(key),
+                                        Spoiler.Dc1ItemNames.NameOf(spot.Record.OriginalItemId));
             spoiler.AddRow(Spoiler.Dc1RoomNames.Describe(spot.RoomCode),
                            Spoiler.Dc1ItemNames.NameOf(spot.Record.OriginalItemId),
-                           Spoiler.Dc1ItemNames.NameOf(key));
+                           Spoiler.Dc1ItemNames.NameOf(key) + visualNote);
+        }
         context.Log($"[keyshuffle] relocated {placement.Placements.Count} door keys across " +
                     $"{placement.Placements.Select(p => p.Spot.RoomCode).Distinct().Count()} rooms");
         spoiler.AddNote($"relocated {placement.Placements.Count} door key(s) across " +
                         $"{placement.Placements.Select(p => p.Spot.RoomCode).Distinct().Count()} room(s)");
+    }
+
+    /// <summary>The key-table's per-row ground-visual hint (a PREDICTION — the authoritative outcome
+    /// is the "Pickup models imported" spoiler section, since a Lever-B import can fail closed).
+    /// Design correction 2026-07-17: donor-aware — a key with its own donor mesh shows that model on
+    /// ANY spot class when Lever B is on; the generic-panel note applies only where marking actually
+    /// rewrites the visual (mismatched spot, no donor upgrade).</summary>
+    public static string VisualNote(PickupVisual spotVisual, bool normalizeOn, bool importOn,
+                                    bool hasDonor, string originalItemName)
+    {
+        if (importOn && hasDonor) return " (shows its own model)";
+        bool markingOn = normalizeOn || importOn;   // mirrors NormalizePickupVisualsPass.IsEnabled
+        return (spotVisual, markingOn) switch
+        {
+            (PickupVisual.InteractionOnly or PickupVisual.BespokeMesh, true) => " (shown as generic pickup)",
+            (PickupVisual.InteractionOnly, false) => " (hidden — examine the spot)",
+            (PickupVisual.BespokeMesh, false) => $" (appears as {originalItemName})",
+            _ => "",
+        };
+    }
+
+    /// <summary>Ids Lever B can give their own ground model — empty when Lever B is off, so the
+    /// donor-catalog scan (a full-corpus mesh parse) only runs when the hint can differ.</summary>
+    private static IReadOnlySet<int> DonorIdsForHint(RandomizationContext context)
+    {
+        if (!context.Config.ImportPickupModels) return new HashSet<int>();
+        var relocatable = new HashSet<int>(context.Game.KeyItemIds);
+        relocatable.UnionWith(context.Game.WeaponIds);
+        relocatable.UnionWith(context.Game.WeaponPartIds);
+        return PickupDonorCatalog.Build(context.Rooms, relocatable).Keys.ToHashSet();
     }
 
     private static Dictionary<int, IReadOnlyList<int>> KeysByRoom(RoomGraph graph, GameDefinition game)

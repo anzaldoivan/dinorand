@@ -26,6 +26,10 @@ public sealed class Dc2RandomizerRunner
         new Dc2RaptorTierRandomizer(), // after the enemy pass: reads its working bytes, skips converted raptors
         new Dc2PlayerModelSwap(),
         new Dc2VoiceRandomizer(), // LIVE 2026-07-05: emits swapped Speech/NNNN.dat loose files
+        new Dc2CircuitShuffle(),  // after the room-byte passes: builds on their working bytes (K110)
+        // Always-on cosmetic: seed watermark into TITLE.DAT/TITLE2.DAT (BioRand parity;
+        // docs/decisions/cross/SEED-WATERMARK-PLAN.md). Last — it touches nothing other passes read.
+        new Passes.Dc2TitleWatermarkPass(),
 
         // TODO(dc2): new Dc2DoorRandomizer(), new Dc2ItemRandomizer(), once OPEN #2/#5 decode.
     };
@@ -66,6 +70,27 @@ public sealed class Dc2RandomizerRunner
         {
             if (!pass.IsEnabled(config)) continue;
             pass.Apply(context);
+        }
+
+        // 2b. Optional CR .d2p sidecar (docs/parity/NONDESTRUCTIVE-INSTALL-PARITY.md): word-diff each
+        //     touched room's SCD blob into <out>\patch\ for the wrapper's patch\ST*.d2p override
+        //     (LOADER-DC2.md §5). Purely additive — no other output byte changes; a stale patch dir
+        //     from a previous roll never survives (same integrity rule as room files/spoiler).
+        var patchDir = Path.Combine(outputDir, Dc2D2pWriter.PatchDirName);
+        if (Directory.Exists(patchDir)) Directory.Delete(patchDir, recursive: true);
+        if (config.Dc2EmitD2pPatches)
+        {
+            int patchCount = 0;
+            foreach (var room in rooms)
+            {
+                var current = context.CurrentBytes(room);
+                if (ReferenceEquals(current, room.OriginalBytes)) continue;   // untouched this run
+                if (Dc2D2pWriter.BuildFromPackages(room.OriginalBytes, current) is not { } d2p) continue;
+                Directory.CreateDirectory(patchDir);
+                File.WriteAllBytes(Path.Combine(patchDir, Dc2D2pWriter.FileNameFor(room.Stage, room.Room)), d2p);
+                patchCount++;
+            }
+            Log($"[d2p] {patchCount} CR room patch file(s) → {patchDir}");
         }
 
         // 3. Outputs: enemies are ROOM-FILE editable (K59 — the op-0x1a TYPE literal; NOT EXE-side),

@@ -19,8 +19,8 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
         Usage:
           dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]
                    [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items] [--exotic-enemies]
-                   [--dc1-cutscene-safe]                                    (dc1)
-                   [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps]
+                   [--dc1-cutscene-safe] [--allow-hidden-spots] [--normalize-pickup-visuals] [--no-pickup-ground-models]   (dc1)
+                   [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]
                    [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]
                    [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)
                    [--dc2-character-skin stock|gail|rick|random]           (dc2)
@@ -59,6 +59,9 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
           dinorand --dc2-shuffle-bgm --install <dc2GameDir> [--seed <n>] [--restore]
           dinorand --dc2-export-bgm --install <dc2GameDir> --out <dir>
           dinorand --dc2-import-bgm --install <dc2GameDir> --bgm-packs <dir> --out <dir> [--seed <n>]
+          dinorand --dc2-scramble-puzzle-codes --install <dc2GameDir> [--seed <n>] [--restore]
+          dinorand --dc2-shuffle-circuits --install <dc2GameDir> [--seed <n>] [--restore]
+          dinorand --dc2-door-skip --install <dc2GameDir>
 
         Notes:
           - --dc2-edit-door retargets Dino Crisis 2's ST101 ST201-door to ST102. With --install it
@@ -75,6 +78,11 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             enemy slot and drives it through authored waypoints, STATIC-SCD-RE cont.49/59) are
             excluded from the in-room permute and from --exotic-enemies imports, and get a seeded
             palette tint instead (the cont.51/57 "Blue Raptor" lever). Off = byte-identical.
+          - --dc2-emit-d2p (dc2, off; EXPERIMENTAL) additionally write each randomized room's edits
+            as a Classic REbirth patch\ST*.d2p word-patch into <out>\patch\ — copy that folder to
+            rebirth\patch\ and the wrapper applies the seed's ROOM edits in memory with Data\
+            untouched (levels only: exe levers, watermark, voice and models still need the overlay).
+            Purely additive to the normal output. docs/parity/NONDESTRUCTIVE-INSTALL-PARITY.md.
           - --dc2-allow-water-swaps (dc2 enemy rando, off; EXPERIMENTAL) "Allow Enemy swaps in the
             Water Levels": lifts the aquatic-room block (ST700/702/703/704 take land donors on their
             wave descriptors) AND admits aquatic donors, all wave-only (Mosasaurus at low weight; the
@@ -297,6 +305,26 @@ if (argv.Contains("--dc2-import-bgm"))
 // table-only --restore (Dc2ShopTablePatch.RestoreCanonical) that leaves other patches alone.
 if (argv.Contains("--dc2-shuffle-shop"))
     return ShuffleDc2Shop(GetOpt("--install"), GetOpt("--seed"), argv.Contains("--restore"));
+
+// DC2 elevator puzzle-code scramble (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §3, K108): write 8
+// distinct seed-derived 4-digit codes (digits 0–5) into the setup fn's imm32 candidate table.
+// Displayed==checked is automatic (single runtime copy at scene_mgr+0x1204) — no document work.
+// Reversible: pristine .bak plus a slot-only --restore (Dc2ElevatorCodePatch.RestoreCanonical).
+if (argv.Contains("--dc2-scramble-puzzle-codes"))
+    return ScrambleDc2PuzzleCodes(GetOpt("--install"), GetOpt("--seed"), argv.Contains("--restore"));
+
+// DC2 stungun-circuit shuffle (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §4 item 2, K110): rewrite the
+// scripted blink box-id sequences of ST607 routines 7/8 and ST402 routines 23/24 with seed-derived
+// orders (same length, every box at least once, no adjacent repeats; terminators untouched).
+// Room-file edit under the backup-and-swap contract (ST*.DAT.bak); --restore reverts both rooms.
+if (argv.Contains("--dc2-shuffle-circuits"))
+    return ShuffleDc2Circuits(GetOpt("--install"), GetOpt("--seed"), argv.Contains("--restore"));
+
+// DC2 REbirth DoorSkip passthrough (CUTSCENE-SKIP-FEASIBILITY.md §5, K115): set DoorSkip = 1 in the
+// game root's config.ini [DLL] section — the wrapper DLL's own door-transition skip. A user-config
+// write, not a game edit; undo by setting the key back to 0 in config.ini (or the REbirth launcher).
+if (argv.Contains("--dc2-door-skip"))
+    return EnableDc2DoorSkip(GetOpt("--install"));
 
 // DC2 starting main-weapon lever (docs/decisions/dc2/loadout/DC2-STARTING-LOADOUT-PLAN.md I2; I3 human gate PENDING):
 // patch the new-game bootstrap equip immediates' weapon-id bytes (Dylan file 0x50D69, Regina 0x50E9D).
@@ -537,6 +565,20 @@ var config = new RandomizerConfig
     // (pair-aware Place), discs conserved. The RandomizerConfig.RelocateDdkDiscs flag stays independent so
     // tests can exercise it in isolation. docs/decisions/dc1/items/PROGRESSION-KEY-RELOCATION-RESEARCH.md.
     RelocateDdkDiscs = argv.Contains("--shuffle-keys"),
+    // DC1 (ON by default): keep important items visible — weapons/parts avoid interaction-only (no ground
+    // visual) spots, and the key shuffle applies "no worse than vanilla" (an interaction-only spot only
+    // receives a key whose vanilla home was interaction-only). Decoded map.json itemVisuals layer
+    // (STATIC-SCD-RE cont.72). --allow-hidden-spots restores the old anything-anywhere behaviour.
+    AvoidHiddenPickupSpots = !argv.Contains("--allow-hidden-spots"),
+    // DC1 Lever A (OFF by default — in-game render not yet human-witnessed): when a relocated key/weapon lands
+    // in a spot whose ground visual doesn't match (interaction-only = invisible, or bespoke = shows the old
+    // item), rewrite that spot to the generic pickup panel. docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md.
+    NormalizePickupVisuals = argv.Contains("--normalize-pickup-visuals"),
+    // DC1 (OFF by default — pilot rooms not yet human-witnessed): shorten whitelisted cutscene brackets
+    // to their side effects (in-place script rewrite, cont.74). docs/decisions/cross/CUTSCENE-SKIP-FEASIBILITY.md §9.3.
+    ShortenCutscenes = argv.Contains("--dc1-shorten-cutscenes"),
+    // Default ON for the in-game witness session; --no-pickup-ground-models is the off-switch.
+    ImportPickupModels = !argv.Contains("--no-pickup-ground-models"),
     // Experimental: import foreign species (cat8 Theri + grounded RaptorHeavy) into eligible rooms and queue
     // the EXE patches they need. Off unless asked; with --install-to-data it patches DINO.exe (game must be
     // CLOSED). docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.
@@ -890,6 +932,8 @@ int RunDc2(string installDir)
         // Character-skin swap: Dylan renders as Gail/Rick (docs/reference/dc2/models/DC2-EXTRA-CRISIS-ROSTER-DECODE.md §7-9).
         Dc2CharacterSkin = ParseSkin(GetOpt("--dc2-character-skin")),
         Dc2ReginaSkin = ParseSkin(GetOpt("--dc2-regina-skin")),
+        // Additive CR patch\ST*.d2p sidecar output (off; docs/parity/NONDESTRUCTIVE-INSTALL-PARITY.md).
+        Dc2EmitD2pPatches = argv.Contains("--dc2-emit-d2p"),
     };
     if (GetOpt("--difficulty") is { } d && double.TryParse(d, out var diff))
         dc2Config.EnemyDifficulty = Math.Clamp(diff, 0, 1);
@@ -1417,6 +1461,73 @@ static int ShuffleDc2Shop(string? installDir, string? seedArg, bool restore)
             Console.WriteLine("note    : prices show in the shop after a relaunch; difficulty still halves/doubles them.");
             return 0;
         case Dc2ShopShuffleOutcome.Restored:
+            return 0;
+        default:
+            return 1;
+    }
+}
+
+// DC2 REbirth DoorSkip passthrough: one ini key in config.ini [DLL] (K115).
+static int EnableDc2DoorSkip(string? installDir)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-door-skip requires --install <dc2GameDir>.");
+        return 1;
+    }
+    if (!Dc2DoorSkipInstaller.Apply(installDir, Console.WriteLine)) return 1;
+    Console.WriteLine("undo    : set DoorSkip = 0 in config.ini [DLL] (or via the REbirth launcher).");
+    return 0;
+}
+
+// DC2 elevator puzzle-code scramble (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §3, K108): rewrite the
+// 8 candidate imm32s in the keypad setup fn with distinct seed-derived 4-digit codes (digits 0–5).
+// The in-game "Elevator Security Code" file renders from the same runtime field the check reads, so
+// displayed==checked survives any rewrite. Reversible: pristine .bak plus a slot-only --restore.
+static int ScrambleDc2PuzzleCodes(string? installDir, string? seedArg, bool restore)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-scramble-puzzle-codes requires --install <dc2GameDir>.");
+        return 1;
+    }
+    var seed = seedArg is { } s ? Seed.Parse(s) : Seed.Random();
+    var outcome = Dc2PuzzleCodeScrambleInstaller.Apply(installDir, seed.Value, restore, Console.WriteLine);
+    switch (outcome)
+    {
+        case Dc2PuzzleCodeOutcome.Applied:
+            Console.WriteLine($"seed    : {seed}");
+            Console.WriteLine($"undo    : dinorand --dc2-scramble-puzzle-codes --install \"{installDir}\" --restore");
+            Console.WriteLine("note    : relaunch the game; the rolled code shows in the in-game Elevator Security Code file.");
+            return 0;
+        case Dc2PuzzleCodeOutcome.Restored:
+            return 0;
+        default:
+            return 1;
+    }
+}
+
+// DC2 stungun-circuit shuffle (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §4 item 2, K110): rewrite the
+// blink box-id literals of ST607 routines 7/8 + ST402 routines 23/24 in place (lengths, cadence and
+// terminators untouched). Room-file edit under the ST*.DAT.bak backup-and-swap contract; --restore
+// reverts both rooms and removes the backups. Both rooms are pin-validated before either is written.
+static int ShuffleDc2Circuits(string? installDir, string? seedArg, bool restore)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-shuffle-circuits requires --install <dc2GameDir>.");
+        return 1;
+    }
+    var seed = seedArg is { } s ? Seed.Parse(s) : Seed.Random();
+    var outcome = Dc2CircuitShuffleInstaller.Apply(installDir, seed.Value, restore, Console.WriteLine);
+    switch (outcome)
+    {
+        case Dc2CircuitShuffleOutcome.Applied:
+            Console.WriteLine($"seed    : {seed}");
+            Console.WriteLine($"undo    : dinorand --dc2-shuffle-circuits --install \"{installDir}\" --restore");
+            Console.WriteLine("note    : re-enter the generator (ST607) / silo bridge (ST402) circuit puzzles to see the new blink order.");
+            return 0;
+        case Dc2CircuitShuffleOutcome.Restored:
             return 0;
         default:
             return 1;

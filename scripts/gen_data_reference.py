@@ -93,13 +93,17 @@ def build_dc1_doc():
               "Coordinates are the placement quad's first corner. Source: `static` = placed at "
               "room load; `runtime-armed (trigger)` = slot whose item id a trigger/native code "
               "sets at runtime (id unknowable statically; gating flag shown when decoded); "
-              "`event-granted` = placed by a non-load event subroutine. Emergency-box contents "
+              "`event-granted` = placed by a non-load event subroutine. Visual: the decoded ground "
+              "visual (STATIC-SCD-RE cont.72) — `generic-panel` = the shared blinking pickup model, "
+              "`bespoke-mesh` = a room-local model of the vanilla item, `interaction-only` = no "
+              "visual at all (found by examining the spot). Emergency-box contents "
               "(`emergency-boxes.json`) and keys granted with no placement record are separate "
               "systems, not rows here.", ""]
-    lines += _table(["Room", "Room name", "Item id", "Item", "X,Z", "Source"],
+    lines += _table(["Room", "Room name", "Item id", "Item", "X,Z", "Source", "Visual"],
                     [(l["room"], l["name"].split(" (")[0], f"0x{l['itemId']:02x}",
                       l["itemName"], f"{l['pos'][0]},{l['pos'][1]}",
-                      l["source"] + (f" gate {l['gateFlag']}" if l.get("gateFlag") else ""))
+                      l["source"] + (f" gate {l['gateFlag']}" if l.get("gateFlag") else ""),
+                      l.get("visual") or "—")
                      for l in locs])
 
     rooms = sorted(room_data.items())

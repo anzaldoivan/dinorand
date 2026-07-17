@@ -186,5 +186,17 @@ public static class Dc2SpeciesTable
         s.Confidence == Confidence.Known
         && (s.Habitat == Dc2Habitat.Land || (allowWater && IsWaterHabitat(s.Habitat)))
         && (!s.IsSetpiece || includeSetpiece)
-        && (!s.IsBoss || includeBoss);
+        && (!s.IsBoss || includeBoss)
+        && !IsCrashProneDonorType(s.Type);
+
+    /// <summary>Species hard-excluded as DONORS in EVERY flag combination (independent of habitat/water flag),
+    /// because their behavior crashes when run outside their native scene. Currently just E32 (TYPE 0x0c):
+    /// crash RCA 2026-07-17 (DC2 dump 13-22-55, Dino2.exe) — a live E32 grunt swapped onto land AV'd reading
+    /// NULL+0x40 at 0x00432061, its per-tick spawner AI (sub 0x431fe0, from state handler 0x430404)
+    /// dereferencing a NULL spawn-anchor at actor+0x210 that only its native aquatic init populates. This is a
+    /// BEHAVIOR fault, not a load/residency one, so the wave-preload path does NOT prevent it.
+    /// Scoped to 0x0c ONLY: its sibling E31 (0x0b) is separately live-confirmed NOT to crash (user evidence
+    /// 2026-07-17), so it stays wave-eligible. If another grunt/aquatic donor is later found to crash, add its
+    /// TYPE here. See docs/reference/dc2/_registries/EXE-SYMBOLS.md.</summary>
+    public static bool IsCrashProneDonorType(int type) => type == 0x0c;
 }

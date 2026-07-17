@@ -45,4 +45,49 @@ public class RandomizerConfigTests
         // the item pass stays byte-identical until a family is explicitly cleared.
         Assert.Equal(WeaponFamily.All, new RandomizerConfig().EnabledWeaponFamilies);
     }
+
+    // --- Dc2RandomizePuzzles: the GUI's single "Randomize Puzzles" flag over the two puzzle
+    // subflags (DC2-PUZZLE-RANDO-PLAN.md). Setter drives BOTH; getter ORs them so a seed/CLI
+    // state with only one subflag on still reads as puzzles-randomized. ---
+
+    [Fact]
+    public void Dc2RandomizePuzzles_DefaultsOff_WithBothSubflagsOff()
+    {
+        var cfg = new RandomizerConfig();
+        Assert.False(cfg.Dc2RandomizePuzzles);
+        Assert.False(cfg.Dc2ScramblePuzzleCodes);
+        Assert.False(cfg.Dc2ShuffleCircuits);
+    }
+
+    [Fact]
+    public void Dc2RandomizePuzzles_On_EnablesBothSubflags()
+    {
+        var cfg = new RandomizerConfig { Dc2RandomizePuzzles = true };
+        Assert.True(cfg.Dc2ScramblePuzzleCodes);
+        Assert.True(cfg.Dc2ShuffleCircuits);
+        Assert.True(cfg.Dc2RandomizePuzzles);
+    }
+
+    [Fact]
+    public void Dc2RandomizePuzzles_Off_ClearsBothSubflags()
+    {
+        var cfg = new RandomizerConfig { Dc2ScramblePuzzleCodes = true, Dc2ShuffleCircuits = true };
+        cfg.Dc2RandomizePuzzles = false;
+        Assert.False(cfg.Dc2ScramblePuzzleCodes);
+        Assert.False(cfg.Dc2ShuffleCircuits);
+    }
+
+    [Fact]
+    public void Dc2RandomizePuzzles_ReadsTrue_WhenEitherSubflagIsOn()
+    {
+        // Boundary: mixed states stay representable (a CLI-applied single lever / a legacy seed
+        // with one bit) and must present as "puzzles randomized" without mutating the other subflag.
+        var codesOnly = new RandomizerConfig { Dc2ScramblePuzzleCodes = true };
+        Assert.True(codesOnly.Dc2RandomizePuzzles);
+        Assert.False(codesOnly.Dc2ShuffleCircuits);
+
+        var circuitsOnly = new RandomizerConfig { Dc2ShuffleCircuits = true };
+        Assert.True(circuitsOnly.Dc2RandomizePuzzles);
+        Assert.False(circuitsOnly.Dc2ScramblePuzzleCodes);
+    }
 }

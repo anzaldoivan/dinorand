@@ -147,6 +147,20 @@ namespace DinoRand.App
         // admits aquatic (wave-only) donors (K72). Maps to RandomizerConfig.Dc2AllowWaterLevelEnemySwaps.
         [ObservableProperty] private bool _dc2AllowWaterLevelEnemySwaps;
 
+        // DC1 EXPERIMENTAL (off — in-game witness pending): shorten whitelisted cutscene brackets to their
+        // side effects (CUTSCENE-SKIP-FEASIBILITY.md §9.3). Not seed-encoded — session-only, lost on seed paste.
+        // ponytail: the GUI CheckBox that drives this is HIDDEN (MainWindow.axaml IsVisible=False) because the
+        // lever does not shorten cutscenes in-game yet. Property + wiring + CLI path deliberately kept so the
+        // control can be un-hidden once CutsceneShortener is CE-verified in-game. Do not delete.
+        [ObservableProperty] private bool _shortenCutscenes;
+
+        // DC2 (off): REbirth DoorSkip passthrough — Install writes DoorSkip = 1 into config.ini [DLL]
+        // (K115). A user-config write, never seed-encoded; Restore does NOT touch it.
+        // ponytail: the GUI CheckBox is HIDDEN (MainWindow.axaml IsVisible=False), matching the hidden
+        // DC1 cutscene-shorten control — door/cutscene skip is off the user surface this release.
+        // Defaults false (off). Property + wiring + CLI path kept; un-hide when skip ships. Do not delete.
+        [ObservableProperty] private bool _dc2DoorSkip;
+
         // DC2 donor distribution (docs/decisions/dc2/enemies/ENEMY-DISTRIBUTION-PLAN.md D7): mode selector
         // (0 = Weighted, 1 = Fixed), the fixed-donor pick, and one weight slider row per registry
         // species. All changes funnel into UpdateSeedFromUi (the block seed-encodes, AppSeed D6).
@@ -158,9 +172,20 @@ namespace DinoRand.App
         [ObservableProperty] private Dc2FixedSpeciesOption _selectedDc2FixedSpecies;
 
         /// <summary>Pinnable donors for fixed mode: every Known+LAND species (a pin IS the
-        /// boss/setpiece opt-in, plan D3).</summary>
-        public IReadOnlyList<Dc2FixedSpeciesOption> Dc2FixedSpeciesOptions { get; } =
-            Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true)
+        /// boss/setpiece opt-in, plan D3), plus the aquatic (wave-only) donors while the
+        /// experimental water toggle is on — the same pool the pass validates the pin against.</summary>
+        public IReadOnlyList<Dc2FixedSpeciesOption> Dc2FixedSpeciesOptions =>
+            Dc2AllowWaterLevelEnemySwaps ? WaterFixedSpeciesOptions : LandFixedSpeciesOptions;
+
+        // Cached per toggle value: the ComboBox matches SelectedItem by reference, so the
+        // instances must be stable across gets.
+        private static readonly IReadOnlyList<Dc2FixedSpeciesOption> LandFixedSpeciesOptions =
+            BuildFixedSpeciesOptions(allowWater: false);
+        private static readonly IReadOnlyList<Dc2FixedSpeciesOption> WaterFixedSpeciesOptions =
+            BuildFixedSpeciesOptions(allowWater: true);
+
+        private static IReadOnlyList<Dc2FixedSpeciesOption> BuildFixedSpeciesOptions(bool allowWater) =>
+            Dc2SpeciesTable.DonorPool(includeSetpiece: true, includeBoss: true, allowWater)
                 .OrderBy(s => s.Type)
                 .Select(s => new Dc2FixedSpeciesOption(s.Creature, s.Type))
                 .ToList();
@@ -189,6 +214,13 @@ namespace DinoRand.App
         // stock-unlock permutation. Seed-string byte 16 bit 2.
         [ObservableProperty]
         private bool _dc2ShuffleShop;
+
+        // DC2 puzzle randomization (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md): ONE master toggle
+        // driving both subflags via RandomizerConfig.Dc2RandomizePuzzles — the elevator-code scramble
+        // (K108, Dino2.exe) and the stungun-circuit shuffle (K110, ST607/ST402 room files).
+        // Seed-string byte 16 bits 3+4. Default ON for DC2 (ApplyGameCapabilities).
+        [ObservableProperty]
+        private bool _dc2RandomizePuzzles;
 
         // DC2 starting main weapon (docs/decisions/dc2/loadout/DC2-STARTING-LOADOUT-PLAN.md): new-game bootstrap
         // equip-immediate patch; subweapon bytes never touched (Machete/Stun Gun kept). Seed-string
@@ -259,6 +291,9 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _randomizeDoors;
         [ObservableProperty] private bool _shuffleKeyItems;
+        // On by default; NOT seed-encoded (like RelocateDdkDiscs) — a cosmetic/QoL placement constraint,
+        // not part of the seed identity. PICKUP-VISUAL-PLACEMENT-PLAN.md.
+        [ObservableProperty] private bool _avoidHiddenPickupSpots = true;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CustomSupplyEnabled))]
@@ -321,6 +356,8 @@ namespace DinoRand.App
         public bool CanSwapDc2PlayerCharacters => SelectedGame.Supports(GameFeature.PlayerModel);
         public bool CanRandomizeDoors => SelectedGame.Supports(GameFeature.Doors);
         public bool CanShuffleKeyItems => SelectedGame.Supports(GameFeature.KeyItems);
+        // Cutscene shortening is DC1-only today (the flag(2,2) bracket protocol is a DC1 decode, cont.74).
+        public bool CanShortenCutscenes => SelectedGame.Id == "dc1";
 
         // The key-item scatter (into ammo/health pickups) and the DDK Input/Code disc relocation have no
         // toggles: both ride on the key shuffle, config-built as ShuffleKeyItemsIntoPickups = ShuffleKeyItems
@@ -361,8 +398,10 @@ namespace DinoRand.App
                 // Raptor tier block back to defaults too, so a non-DC2 game never emits it.
                 Dc2RandomizeRaptorTiers = false;
                 Dc2ShuffleShop = false;
+                Dc2RandomizePuzzles = false;
                 Dc2RandomizeStartWeapon = false;
                 Dc2AddAndEquipStartWeapon = false;
+                Dc2DoorSkip = false;
                 Dc2DylanStartWeaponIndex = 0;
                 Dc2ReginaStartWeaponIndex = 0;
                 Dc2BlueRaptorCombo = 20;
@@ -370,9 +409,18 @@ namespace DinoRand.App
                 foreach (var row in Dc2RaptorTierOptions)
                     row.Weight = Dc2RaptorTiers.DefaultWeights.GetValueOrDefault(row.Type);
             }
+            else
+            {
+                // GUI default for DC2: Randomize Puzzles starts ON (DC2-PUZZLE-RANDO-PLAN.md).
+                // Runs after UpdateUiFromSeed on startup/game-switch, so it wins over a persisted
+                // seed's cleared bits; the RandomizerConfig/CLI default stays off, and a seed pasted
+                // AFTER entering DC2 still round-trips exactly (this hook doesn't run on seed paste).
+                Dc2RandomizePuzzles = true;
+            }
             if (!CanSwapDc2PlayerCharacters) { Dc2CharacterSkinIndex = 0; Dc2ReginaSkinIndex = 0; }
             if (!CanRandomizeDoors) RandomizeDoors = false;
             if (!CanShuffleKeyItems) ShuffleKeyItems = false;
+            if (!CanShortenCutscenes) ShortenCutscenes = false;
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
             if (!CanRandomizeVoices) IsVoicesChecked = false;
             if (!CanShuffleBgm) ShuffleBgm = false;
@@ -388,6 +436,7 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanSwapDc2PlayerCharacters));
             OnPropertyChanged(nameof(CanRandomizeDoors));
             OnPropertyChanged(nameof(CanShuffleKeyItems));
+            OnPropertyChanged(nameof(CanShortenCutscenes));
             OnPropertyChanged(nameof(CanRandomizeStartingInventory));
             OnPropertyChanged(nameof(CanRandomizeVoices));
             OnPropertyChanged(nameof(ShowDc1VoiceCast));
@@ -459,18 +508,24 @@ namespace DinoRand.App
         [ObservableProperty] private string _ratioVanillaText;
         [ObservableProperty] private IBrush _ratioVanillaBrush;
 
-        [ObservableProperty] private string _progressText;
-        [ObservableProperty] private IBrush _progressBrush;
         [ObservableProperty] private string _installStatusText;
         [ObservableProperty] private IBrush _installStatusBrush;
 
         // --- Busy + button enablement (bound) ----------------------------------
 
-        [ObservableProperty] private bool _isBusy;
-        [ObservableProperty] private bool _canGenerate;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanPlayNow))]
+        private bool _isBusy;
         [ObservableProperty] private bool _canInstall;
         [ObservableProperty] private bool _canRestore;
-        [ObservableProperty] private bool _canPlay;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanPlayNow))]
+        private bool _canPlay;
+
+        /// <summary>Play is offered only when a game exe resolves AND no generate/install/restore is
+        /// running — so the game can't be launched mid-install. Recomputed via NotifyPropertyChangedFor
+        /// on both source flags (the codebase's derived-property pattern, no XAML multi-binding).</summary>
+        public bool CanPlayNow => CanPlay && !IsBusy;
 
         // --- Install options (bound) -------------------------------------------
 
@@ -480,13 +535,13 @@ namespace DinoRand.App
         [ObservableProperty] private bool _importBgm;
         [ObservableProperty] private string _bgmPacksRoot = "";
 
-        [ObservableProperty] private bool _scramblePuzzleCodes;
+        [ObservableProperty] private bool _scramblePuzzleCodes = true;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(BoxModeEnabled))]
-        private bool _randomizeBoxes;
+        private bool _randomizeBoxes = true;
 
-        [ObservableProperty] private int _boxModeIndex;
+        [ObservableProperty] private int _boxModeIndex = 1; // default = Reroll from box pool
         public bool BoxModeEnabled => RandomizeBoxes;
 
         // --- Starting-inventory editor (bound) ---------------------------------
@@ -557,6 +612,14 @@ namespace DinoRand.App
             // Admits aquatic species to the pool ⇒ their weight rows become relevant. Not seed-encoded
             // (experimental), so no UpdateSeedFromUi — just refresh the visible weight set.
             RefreshDc2WeightVisibility();
+
+            // The fixed-species dropdown swaps between the land/water lists; remap the selection
+            // by TYPE onto the new instance list. Toggle off with an aquatic pin ⇒ fall back to
+            // the first land donor (a stale aquatic pin would make the pass skip every room).
+            OnPropertyChanged(nameof(Dc2FixedSpeciesOptions));
+            SelectedDc2FixedSpecies = Dc2FixedSpeciesOptions
+                .FirstOrDefault(o => o.Type == SelectedDc2FixedSpecies?.Type)
+                ?? Dc2FixedSpeciesOptions[0];
         }
 
         /// <summary>Show each weight row iff its species is in the donor pool under the current
@@ -571,6 +634,9 @@ namespace DinoRand.App
         partial void OnDc2EnemyModeIndexChanged(int value) => UpdateSeedFromUi();
         partial void OnDc2RandomizeRaptorTiersChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2ShuffleShopChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDc2RandomizePuzzlesChanged(bool value) => UpdateSeedFromUi();
+        partial void OnShortenCutscenesChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDc2DoorSkipChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2RandomizeStartWeaponChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2AddAndEquipStartWeaponChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2DylanStartWeaponIndexChanged(int value) => UpdateSeedFromUi();
@@ -585,6 +651,10 @@ namespace DinoRand.App
         // config-built as ShuffleKeyItemsIntoPickups = RelocateDdkDiscs = ShuffleKeyItems.
         partial void OnShuffleKeyItemsChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeStartingInventoryChanged(bool value) => UpdateSeedFromUi();
+        // Import external music: its only effect path is config.RandomizeBgm (UpdateSeedFromUi) → the
+        // BgmRandomizer pass. Without this trigger the derivation was dead — a toggle never reached the
+        // config. (ShuffleBgm/boxes/puzzle-codes need no hook: Install() reads those properties directly.)
+        partial void OnImportBgmChanged(bool value) => UpdateSeedFromUi();
         partial void OnReplaceItemPoolChanged(bool value) => UpdateSeedFromUi();
         partial void OnPreUpgradedWeaponsChanged(bool value) => UpdateSeedFromUi();
         partial void OnWeaponHandgunChanged(bool value) => UpdateSeedFromUi();
@@ -664,6 +734,7 @@ namespace DinoRand.App
                 Dc2ReginaSkinIndex = (int)_appSeed.Config.Dc2ReginaSkin;
                 Dc2RandomizeRaptorTiers = _appSeed.Config.Dc2RandomizeRaptorTiers;
                 Dc2ShuffleShop = _appSeed.Config.Dc2ShuffleShop;
+                Dc2RandomizePuzzles = _appSeed.Config.Dc2RandomizePuzzles;
                 Dc2RandomizeStartWeapon = _appSeed.Config.Dc2RandomizeStartWeapon;
                 Dc2AddAndEquipStartWeapon = _appSeed.Config.Dc2AddAndEquipStartWeapon;
                 Dc2DylanStartWeaponIndex = _appSeed.Config.Dc2DylanStartWeaponId is { } dId
@@ -677,6 +748,8 @@ namespace DinoRand.App
                     row.Weight = effTierWeights.GetValueOrDefault(row.Type);
                 RandomizeDoors = _appSeed.Config.RandomizeDoors;
                 ShuffleKeyItems = _appSeed.Config.ShuffleKeyItems;
+                ShortenCutscenes = _appSeed.Config.ShortenCutscenes;
+                Dc2DoorSkip = _appSeed.Config.Dc2DoorSkip;
                 RandomizeStartingInventory = _appSeed.Config.RandomizeStartingInventory;
                 Difficulty = Math.Round(_appSeed.Config.EnemyDifficulty * 31);
 
@@ -748,6 +821,7 @@ namespace DinoRand.App
                 Dc2ReginaSkin = (Dc2CharacterSkin)Dc2ReginaSkinIndex,
                 Dc2RandomizeRaptorTiers = Dc2RandomizeRaptorTiers,
                 Dc2ShuffleShop = Dc2ShuffleShop,
+                Dc2RandomizePuzzles = Dc2RandomizePuzzles,
                 Dc2RandomizeStartWeapon = Dc2RandomizeStartWeapon,
                 Dc2AddAndEquipStartWeapon = Dc2AddAndEquipStartWeapon,
                 Dc2DylanStartWeaponId = Dc2DylanStartWeaponIndex > 0
@@ -764,6 +838,11 @@ namespace DinoRand.App
                 // PROGRESSION-KEY-RELOCATION-RESEARCH.md / KEY-ITEM-SCATTER-DATA-AUDIT.md.
                 ShuffleKeyItemsIntoPickups = ShuffleKeyItems,
                 RelocateDdkDiscs = ShuffleKeyItems,
+                AvoidHiddenPickupSpots = AvoidHiddenPickupSpots,
+                // Session-only (not seed-encoded): the cutscene shorten lever (DC1, experimental) and the
+                // REbirth DoorSkip ini passthrough (DC2). Both are lost on seed paste by design.
+                ShortenCutscenes = ShortenCutscenes && CanShortenCutscenes,
+                Dc2DoorSkip = Dc2DoorSkip,
                 RandomizeStartingInventory = RandomizeStartingInventory,
                 RandomizeVoices = voicesOn,
                 IncludeCrossGameVoices = CrossGameVoices,
@@ -784,6 +863,8 @@ namespace DinoRand.App
                     (WeaponShotgun ? WeaponFamily.Shotgun : WeaponFamily.None) |
                     (WeaponGrenade ? WeaponFamily.GrenadeGun : WeaponFamily.None),
             };
+            // Derive the no-toggle flags (NormalizePickupVisuals) from the options just built.
+            ApplyDerivedFlags(config);
             // Voice donor settings are shared across games (cross-game datapacks).
             _settings.VoicePacksRoot = config.VoicePacksRoot;
             _settings.BgmPacksRoot = config.BgmPacksRoot;
@@ -797,7 +878,26 @@ namespace DinoRand.App
         private static AppSeed NormalizeSeed(AppSeed seed)
         {
             var config = seed.Config;
-            return config.NormalizeRatios() ? seed.WithConfig(config) : seed;
+            bool changed = config.NormalizeRatios();
+            changed |= ApplyDerivedFlags(config);
+            return changed ? seed.WithConfig(config) : seed;
+        }
+
+        /// <summary>Apply the config flags the GUI DERIVES rather than exposes as their own control, so
+        /// <see cref="CurrentConfig"/> is consistent no matter how the config was set (option toggle or a
+        /// pasted share-seed). Returns whether anything changed.
+        ///
+        /// <para><b>NormalizePickupVisuals</b> (Lever A, PICKUP-GROUND-MODEL-FEASIBILITY.md): on whenever ANY
+        /// item randomization runs — normal item pickups (<see cref="RandomizerConfig.RandomizeItems"/>) OR
+        /// key items (<see cref="RandomizerConfig.ShuffleKeyItems"/>) — so a relocated pickup never renders
+        /// as the wrong or an invisible item. It is not seed-encoded, so it must be re-derived here (a pasted
+        /// seed carries the two source flags, not this one).</para></summary>
+        private static bool ApplyDerivedFlags(RandomizerConfig config)
+        {
+            bool normalize = config.RandomizeItems || config.ShuffleKeyItems;
+            if (config.NormalizePickupVisuals == normalize) return false;
+            config.NormalizePickupVisuals = normalize;
+            return true;
         }
 
         private void UpdateRatioVanillaHint()
@@ -1163,67 +1263,9 @@ namespace DinoRand.App
             RefreshInstallStatus();
         }
 
-        // --- Generate ----------------------------------------------------------
-
-        [RelayCommand]
-        private async Task Generate()
-        {
-            if (_gameDrmProtected)
-            {
-                ProgressBrush = Brushes.Red;
-                ProgressText = "DRM-protected game (Steam/Enigma) — DinoRand cannot operate on it.";
-                return;
-            }
-            var game = SelectedGame;
-            if (!game.IsImplemented)
-            {
-                ProgressBrush = Brushes.Red;
-                ProgressText = $"⛔ {game.DisplayName} is experimental — not yet supported.";
-                return;
-            }
-            CanGenerate = false;
-            IsBusy = true;
-            ProgressBrush = null;
-            ProgressText = "Generating…";
-            try
-            {
-                var gamePath = ResolveGameDir(GamePath);
-                var outPath = WorkingModDir;
-                var seed = _appSeed.Seed;
-                var config = _appSeed.Config;
-                // DC2 uses its own runner (cross-species enemy swap) and writes non-destructively to the
-                // working mod dir via Dc2OutputDirSink; DC1 uses the shared RandomizerRunner. Both are a
-                // pure "generate to a folder" — Install overlays it (docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md).
-                var (roomsWritten, writtenDir) = await Task.Run(() =>
-                {
-                    if (game is DinoCrisis2 dc2)
-                    {
-                        var r = new Dc2RandomizerRunner(dc2).Run(gamePath, outPath, seed, config);
-                        return (r.RoomsWritten, r.OutputDir);
-                    }
-                    var rr = new RandomizerRunner(game).Run(gamePath, outPath, seed, config);
-                    return (rr.RoomsWritten, rr.OutputDir);
-                });
-                ProgressBrush = Brushes.Green;
-                ProgressText = $"✓ Seed generated → {writtenDir} (SPOILER.md: debug info + spoilers)";
-
-                CurrentSlice.GamePath = GamePath;
-                CurrentSlice.LastSeed = _appSeed.ToString();
-                _settings.Save();
-            }
-            catch (Exception ex)
-            {
-                ProgressBrush = Brushes.Red;
-                ProgressText = $"Error: {ex.Message}";
-            }
-            finally
-            {
-                IsBusy = false;
-                CanGenerate = true;
-            }
-        }
-
         // --- Install / restore -------------------------------------------------
+        // (The standalone "Generate" command was removed — "Install to Game" regenerates via the same
+        //  runners and the runner still writes SPOILER.md, so no generate-only path is needed.)
 
         private string CurrentDataDir() => ResolveDataDir(SelectedGame, GamePath);
 
@@ -1303,7 +1345,6 @@ namespace DinoRand.App
             var dataDir = CurrentDataDir();
             CanInstall = !_gameDrmProtected && dataDir.Length > 0;
             CanRestore = !_gameDrmProtected && dataDir.Length > 0 && GameInstaller.IsInstalled(dataDir);
-            CanGenerate = !_gameDrmProtected;
             CanPlay = !_gameDrmProtected && ResolvePlayExe() is not null;
         }
 
@@ -1399,6 +1440,17 @@ namespace DinoRand.App
                         if (config.FixDc2MotionTrail)
                             try { tn = $" {Dc2MotionTrailInstaller.Apply(gamePath)}"; }
                             catch (Exception tex) { tn = $" (motion-trail fix skipped: {tex.Message})"; }
+                        // REbirth DoorSkip passthrough (K115): one config.ini [DLL] key, best-effort.
+                        // Restore does NOT undo it — flip the key back in config.ini / the REbirth launcher.
+                        if (config.Dc2DoorSkip)
+                        {
+                            try
+                            {
+                                tn += Dc2DoorSkipInstaller.Apply(gamePath)
+                                    ? " door-skip:on" : " (door-skip: config.ini not found)";
+                            }
+                            catch (Exception dex) { tn += $" (door-skip skipped: {dex.Message})"; }
+                        }
                         // Character skin: the WP graft files are in the overlay; the exe gate patch
                         // makes them load (docs/reference/dc2/models/DC2-EXTRA-CRISIS-ROSTER-DECODE.md §9).
                         if (config.Dc2CharacterSkin != Dc2CharacterSkin.Stock
@@ -1464,6 +1516,13 @@ namespace DinoRand.App
                         {
                             try { tn += $" shop:{Dc2ShopShuffleInstaller.Apply(gamePath, seed.Value)}"; }
                             catch (Exception shex) { tn += $" (shop shuffle skipped: {shex.Message})"; }
+                        }
+                        // Elevator puzzle-code scramble: candidate imm32 table inside Dino2.exe (shared
+                        // .bak contract, so the Restore button's full-exe restore reverts it too).
+                        if (config.Dc2ScramblePuzzleCodes)
+                        {
+                            try { tn += $" puzzle-codes:{Dc2PuzzleCodeScrambleInstaller.Apply(gamePath, seed.Value)}"; }
+                            catch (Exception pcex) { tn += $" (puzzle-code scramble skipped: {pcex.Message})"; }
                         }
                         // Starting main weapon: bootstrap equip-immediate exe patch (shared .bak
                         // contract, so the Restore button's full-exe restore reverts it too).
@@ -1552,7 +1611,7 @@ namespace DinoRand.App
             catch (Exception ex)
             {
                 InstallStatusBrush = Brushes.Red;
-                InstallStatusText = $"Error: {ex.Message}";
+                InstallStatusText = FriendlyError(ex);
             }
             finally
             {
@@ -1570,6 +1629,7 @@ namespace DinoRand.App
 
             CanInstall = false;
             CanRestore = false;
+            IsBusy = true;                 // greys Play (CanPlayNow) and shows the busy bar during restore
             InstallStatusBrush = null;
             InstallStatusText = "Restoring…";
             try
@@ -1599,12 +1659,31 @@ namespace DinoRand.App
             catch (Exception ex)
             {
                 InstallStatusBrush = Brushes.Red;
-                InstallStatusText = $"Error: {ex.Message}";
+                InstallStatusText = FriendlyError(ex);
             }
             finally
             {
+                IsBusy = false;
                 UpdateInstallButtons();
             }
+        }
+
+        /// <summary>Map an install/restore exception to a short, actionable line for the status label,
+        /// keeping the raw exception out of the UI (it goes to the debug log only). Public + static so
+        /// it is unit-tested directly, like the other pure helpers here (<see cref="ResolveDataDir"/>).</summary>
+        public static string FriendlyError(Exception ex)
+        {
+            Debug.WriteLine(ex);   // raw detail stays in the log, never on the user-facing status line
+            return ex switch
+            {
+                IOException io when io.Message.Contains("being used by another process")
+                    => "Close the game (and any window open in its game folder), then install again.",
+                FileNotFoundException or DirectoryNotFoundException
+                    => "Couldn't find a game file — check the Game Location points at your DINO.exe / Dino2.exe folder.",
+                UnauthorizedAccessException
+                    => "Windows blocked the change — move the game out of Program Files, or run DinoRand as administrator.",
+                _ => "Install failed — see the log for details.",
+            };
         }
 
         [RelayCommand]
