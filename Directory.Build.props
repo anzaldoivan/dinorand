@@ -10,6 +10,6 @@
   <!-- Project version. Bump alongside an entry in CHANGELOG.md. VersionPrefix feeds
        AssemblyVersion/FileVersion/InformationalVersion for every project in the build. -->
   <PropertyGroup>
-    <VersionPrefix>0.5.1</VersionPrefix>
+    <VersionPrefix>0.5.2</VersionPrefix>
   </PropertyGroup>
 </Project>
