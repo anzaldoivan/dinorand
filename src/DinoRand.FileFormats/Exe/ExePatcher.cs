@@ -915,11 +915,13 @@ public static class ExePatcher
     }
 
     // ---- Emergency-box contents (the box-content randomizer lever) ----
-    // The live box-contents table in DINO.exe (docs/reference/dc1/items/EMERGENCY-BOX-DATA.md, EXE-SYMBOLS 0x65AC05).
-    // Each box = a 21-byte record [u8 slotCount=0x0A][≤10 (itemId,count) byte pairs][zero pad]. Boxes are
-    // grouped into per-(region,difficulty) blocks of 17 records. The three INTERNATIONAL difficulty blocks
+    // The live box-contents table in DINO.exe (docs/reference/dc1/items/EMERGENCY-BOX-DATA.md, EXE-SYMBOLS 0x65AB48).
+    // Each box = a 21-byte record [u8 slotCount=0x0A][≤10 (itemId,count) byte pairs][zero pad]. The table is
+    // 7 blocks of 17 records (360-byte stride): a {JP, International} pair per difficulty tier plus one
+    // special-mode block, with NO separate Normal block — the runtime selector (fn 0x483313, pointer table
+    // 0x65B578) maps difficulties 0 (Easy) and 1 (Normal) to the same block. The three INTERNATIONAL blocks
     // below were located + validated against data/dc1/emergency-boxes.json (every box's content multiset
-    // matched the binary verbatim). Easy and Normal share one block (identical contents in this build).
+    // matched the binary verbatim), so patching them covers all four selectable difficulties.
 
     /// <summary>VA of the International Easy/Normal emergency-box block (17 × 21-byte records).</summary>
     public const uint EmergencyBoxBlockEasyVa = 0x0065ACB0;

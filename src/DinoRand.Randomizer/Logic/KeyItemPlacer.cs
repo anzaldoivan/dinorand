@@ -26,7 +26,12 @@ public sealed class KeyItemPlacer
     /// <summary>A candidate location for a key: the room it sits in, the item record to write, and the
     /// optional guard that must be satisfied before the pickup is reachable (the map.json item
     /// <c>requires</c> case). <c>default</c> guard ⇒ no guard (see <see cref="Requirement"/>).</summary>
-    public sealed record Spot(int RoomCode, ItemRecord Record, Requirement Requires = default);
+    /// <summary>A candidate home for a relocated key. <paramref name="EligibleKeys"/> (optional)
+    /// restricts WHICH keys may seat here — <c>null</c> = any. Used by the hidden-spot rule
+    /// (<see cref="RandomizerConfig.AvoidHiddenPickupSpots"/>): an interaction-only spot only admits
+    /// keys whose vanilla home was also interaction-only ("no worse than vanilla").</summary>
+    public sealed record Spot(int RoomCode, ItemRecord Record, Requirement Requires = default,
+                              IReadOnlySet<int>? EligibleKeys = null);
 
     public sealed record PlacementResult(
         bool Success,
@@ -55,6 +60,14 @@ public sealed class KeyItemPlacer
     /// </summary>
     public static HashSet<int> Reachable(RoomGraph graph, GameDefinition game, int start,
                                          IReadOnlySet<int> held)
+        => ReachableCore(graph, game, start, held).Rooms;
+
+    /// <summary>Same flood as <see cref="Reachable"/>, but also returns the reached <b>NodeCodes</b> —
+    /// needed wherever edges must be enumerated per sub-region (a split room's non-primary regions own
+    /// edges the masked room-code set cannot resolve; the <see cref="FrontierKeys"/> blindspot that
+    /// stalled Place once the 0309.shuttle→0306 DDK-L door became goal-critical).</summary>
+    internal static (HashSet<int> Rooms, HashSet<int> Nodes) ReachableCore(
+        RoomGraph graph, GameDefinition game, int start, IReadOnlySet<int> held)
     {
         // Flood over NodeCode identity (so a split room's sub-regions are distinct — entry-direction
         // partitions, REGION-SCHEMA-PLAN.md §2), but track and RETURN masked room codes so every caller —
@@ -99,7 +112,7 @@ public sealed class KeyItemPlacer
                 }
             }
         }
-        return rooms;
+        return (rooms, seen);
     }
 
     /// <summary>True when the door-type key-set (OR) is open, the group-9 story latch (if this is a
@@ -252,6 +265,11 @@ public sealed class KeyItemPlacer
         var byNode = graph.Nodes.ToDictionary(n => n.NodeCode);
         var held = new HashSet<int>();
         var remaining = new List<int>(keyItems);
+        // Without scatter the pool is a bijection (every spot receives a key), so a constrained spot
+        // (EligibleKeys) must end up with one of its admissible keys — the tightness guard below
+        // reserves them once the counts get tight. With scatter there is slack (an unused key spot
+        // receives a displaced consumable), so constrained spots may simply go unused.
+        bool mustFillAll = spots.Count == keyItems.Count;
         var placements = new List<(Spot, int)>();
         var usedSpots = new HashSet<Spot>();
         var log = new List<string>();
@@ -263,9 +281,10 @@ public sealed class KeyItemPlacer
             // non-relocated item held-from-t=0 lets the fill cross a gate it has not honestly earned and
             // seat a key Verify then can't reach (the §8l Place↔Verify divergence).
             HashSet<int> reach;
+            HashSet<int> reachNodes;
             while (true)
             {
-                reach = Reachable(graph, game, start, held);
+                (reach, reachNodes) = ReachableCore(graph, game, start, held);
                 bool collected = false;
                 foreach (var room in reach)
                     if (byNode.TryGetValue(room, out var node))
@@ -290,7 +309,7 @@ public sealed class KeyItemPlacer
             // reach)? Once the goal is reached, any remaining key is non-blocking filler.
             var helpful = goalReached
                 ? new HashSet<int>(remaining)
-                : FrontierKeys(graph, game, reach, held, remaining);
+                : FrontierKeys(graph, game, reach, reachNodes, held, remaining);
 
             // Item-guard frontier (plan §4.3): if a reachable spot is blocked only by its own guard,
             // surface the guard's items so a key needed to *reach a key* is placed first.
@@ -316,9 +335,20 @@ public sealed class KeyItemPlacer
 
             int key = Pick(helpful, rng);
             // Only seat a key in a spot the player can actually pick up: reachable room, not used,
-            // and its own guard (if any) already satisfied.
+            // its own guard (if any) already satisfied, and the spot admits this key (EligibleKeys —
+            // the hidden-spot "no worse than vanilla" rule; null = any key).
             var free = spots.Where(s => reach.Contains(s.RoomCode) && !usedSpots.Contains(s)
-                                        && s.Requires.SatisfiedBy(held, reach)).ToList();
+                                        && s.Requires.SatisfiedBy(held, reach)
+                                        && (s.EligibleKeys is null || s.EligibleKeys.Contains(key))).ToList();
+            // Tightness guard (bijection pools only): when the keys still admissible to the reachable
+            // constrained spots no longer outnumber those spots, this admissible key must seat in one
+            // now — otherwise a constrained spot is left with no admissible key and the fill dead-ends.
+            if (mustFillAll)
+            {
+                var tight = free.Where(s => s.EligibleKeys is not null).ToList();
+                if (tight.Count > 0 && remaining.Count(k => tight[0].EligibleKeys!.Contains(k)) <= tight.Count)
+                    free = tight;
+            }
             if (free.Count == 0)
             {
                 log.Add($"[progression] FAILED: no reachable spot to place key {key:X2} " +
@@ -337,13 +367,17 @@ public sealed class KeyItemPlacer
     /// <summary>Keys (from <paramref name="remaining"/>) that gate an edge leading from a reached
     /// room to a not-yet-reached one — i.e. placing one would extend the frontier. Covers both the
     /// door-type key-set and the edge's / destination's authored item requirement (the room-state
-    /// part is unlocked by reaching rooms, not by placing a key, so it is not surfaced here).</summary>
+    /// part is unlocked by reaching rooms, not by placing a key, so it is not surfaced here).
+    /// Enumerates edges by reached <b>NodeCode</b> (<paramref name="reachNodes"/>) so a split room's
+    /// non-primary regions contribute their edges too — resolving the masked room code found only the
+    /// primary region, leaving e.g. the 0309.shuttle→0306 DDK-L door invisible to the frontier and
+    /// stalling Place once that door became goal-critical. <paramref name="reach"/> (room codes) keeps
+    /// the room-visited semantics for the skip and SatisfiedBy checks.</summary>
     private static HashSet<int> FrontierKeys(RoomGraph graph, GameDefinition game,
-                                             IReadOnlySet<int> reach, IReadOnlySet<int> held,
+                                             IReadOnlySet<int> reach, IReadOnlySet<int> reachNodes,
+                                             IReadOnlySet<int> held,
                                              IReadOnlyCollection<int> remaining)
     {
-        // Keyed by NodeCode (unique across split-room sub-regions). Room-code lookups (`byCode[room]`)
-        // resolve to the primary region (index 0, NodeCode == Code) — the room's item records live there.
         var byCode = graph.Nodes.ToDictionary(n => n.NodeCode);
         var remainingSet = new HashSet<int>(remaining);
         var result = new HashSet<int>();
@@ -354,7 +388,7 @@ public sealed class KeyItemPlacer
                 if (remainingSet.Contains(k)) result.Add(k);
         }
 
-        foreach (var code in reach)
+        foreach (var code in reachNodes)
         {
             if (!byCode.TryGetValue(code, out var node)) continue;
             foreach (var edge in node.Edges)

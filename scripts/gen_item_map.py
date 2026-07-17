@@ -240,6 +240,54 @@ def compute_scatter(doc):
     return out
 
 
+# --- Ground-visual overlay (STATIC-SCD-RE cont.72; PICKUP-GROUND-MODEL-FEASIBILITY.md) --------------
+# Projects item_control's per-record `visual` (decoded from rec+0x22 display slot + rec+0x24 model
+# pointer) onto map.json as `itemVisuals: [{at, visual, _why}]`. Only NON-DEFAULT classes are
+# emitted (`generic-panel` — the shared blinking panel — is the implicit default), so the overlay
+# stays small. A position shared by records of different classes takes the MOST RESTRICTIVE
+# (interaction-only > bespoke-mesh > generic-panel): the consumer treats restrictive classes as
+# placement constraints, so worst-wins fails closed. Runtime-armed 0xff slots are skipped (never a
+# placement target; always Fixed-pinned).
+_VISUAL_RANK = {"generic-panel": 0, "bespoke-mesh": 1, "interaction-only": 2}
+_VISUAL_DEFAULT = "generic-panel"
+
+
+def room_visuals(records):
+    by_pos = {}
+    for r in records:
+        if r.get("item_id") == "0xff":
+            continue
+        vis = r.get("visual")
+        if vis not in _VISUAL_RANK:
+            continue
+        pos = r.get("pos")
+        if not pos or len(pos) != 2:
+            continue
+        key = (int(pos[0]), int(pos[1]))
+        cur = by_pos.get(key)
+        name = r.get("item_name") or r.get("item_id")
+        if cur is None or _VISUAL_RANK[vis] > _VISUAL_RANK[cur[0]]:
+            by_pos[key] = (vis, {name})
+        elif _VISUAL_RANK[vis] == _VISUAL_RANK[cur[0]]:
+            cur[1].add(name)
+    return [{"at": f"{x},{z}", "visual": vis,
+             "_why": f"ground visual (rec+0x22/0x24) — {', '.join(sorted(names))}"}
+            for (x, z), (vis, names) in sorted(by_pos.items()) if vis != _VISUAL_DEFAULT]
+
+
+def compute_visuals(doc):
+    """room_id -> itemVisuals list, for every item_control room with >=1 non-default visual."""
+    out = {}
+    for rid, room in doc["rooms"].items():
+        ic = room.get("item_control")
+        if not ic:
+            continue
+        vv = room_visuals(ic.get("records", []))
+        if vv:
+            out[rid] = vv
+    return out
+
+
 # A gen-computed itemPriorities entry leads its `_why` with a hazard-reason token (see hazard_reasons);
 # a hand-authored pin uses free-form prose the generator never produces. This lets regenerate_map keep
 # hand-authored pins instead of clobbering them, and integrity_violations skip them in the SPURIOUS check.
@@ -257,6 +305,7 @@ def regenerate_map(roomdoc, mapdoc):
     pins = compute(roomdoc)
     links = compute_links(roomdoc)
     scatter = compute_scatter(roomdoc)
+    visuals = compute_visuals(roomdoc)
     out = json.loads(json.dumps(mapdoc))  # deep copy
     rooms = out["rooms"]
     # map.json keys rooms in UPPERCASE hex (010C, 030C, …). Resolve the room-data id case-INSENSITIVELY
@@ -269,7 +318,7 @@ def regenerate_map(roomdoc, mapdoc):
             continue
         mkey = ci.get(rid.lower())
         if mkey is None:
-            if rid in pins or rid in links or rid in scatter:
+            if rid in pins or rid in links or rid in scatter or rid in visuals:
                 missing.append(rid)
             continue
         # Merge computed pins with any HAND-AUTHORED pin already in the room (a human `_why` the
@@ -293,6 +342,10 @@ def regenerate_map(roomdoc, mapdoc):
             rooms[mkey]["scatterTargets"] = scatter[rid]
         else:
             rooms[mkey].pop("scatterTargets", None)
+        if rid in visuals:
+            rooms[mkey]["itemVisuals"] = visuals[rid]
+        else:
+            rooms[mkey].pop("itemVisuals", None)
     return out, missing
 
 
@@ -309,12 +362,15 @@ def cmd_apply():
     json.loads(text)
     open(MAP_FP, "w", encoding="utf-8", newline="\n").write(text)
     pins, links, scatter = compute(roomdoc), compute_links(roomdoc), compute_scatter(roomdoc)
+    visuals = compute_visuals(roomdoc)
     npins = sum(len(v) for v in pins.values())
     nlinks = sum(len(v) for v in links.values())
     nscatter = sum(len(v) for v in scatter.values())
+    nvis = sum(len(v) for v in visuals.values())
     print(f"applied: {npins} Fixed item pins across {len(pins)} rooms; "
           f"{nlinks} itemLinks across {len(links)} rooms; "
-          f"{nscatter} scatterTargets across {len(scatter)} rooms; map.json valid")
+          f"{nscatter} scatterTargets across {len(scatter)} rooms; "
+          f"{nvis} itemVisuals across {len(visuals)} rooms; map.json valid")
     if missing:
         print(f"  NOTE: {len(missing)} item_control room(s) not in map.json (out of door-rando scope): {missing}")
 
@@ -324,6 +380,7 @@ def integrity_violations(roomdoc, mapdoc):
     pins = compute(roomdoc)
     links = compute_links(roomdoc)
     scatter = compute_scatter(roomdoc)
+    visuals = compute_visuals(roomdoc)
     rooms = mapdoc["rooms"]
     # Resolve every room-data id onto map.json's UPPERCASE hex key (010C, 030C, …); the same
     # case-insensitive resolver regenerate_map uses, so hex-letter rooms are validated too (cont.68).
@@ -355,6 +412,15 @@ def integrity_violations(roomdoc, mapdoc):
         for s in slist:
             if s["at"] not in have:
                 v.append(f"COVERAGE: {rid} missing scatterTarget at {s['at']} ({s['_why']})")
+    # every computed non-default ground visual present in map.json with the same class
+    for rid, vlist in visuals.items():
+        mkey = ci.get(rid.lower())
+        if mkey is None:
+            continue
+        have = {(e.get("at"), e.get("visual")) for e in rooms[mkey].get("itemVisuals", [])}
+        for e in vlist:
+            if (e["at"], e["visual"]) not in have:
+                v.append(f"COVERAGE: {rid} missing itemVisual {e['visual']} at {e['at']} ({e['_why']})")
     # no spurious itemPriorities / itemLinks / scatterTargets in an item_control room (every entry computed)
     for rid, r in roomdoc["rooms"].items():
         if not r.get("item_control"):
@@ -375,6 +441,11 @@ def integrity_violations(roomdoc, mapdoc):
         for e in rooms[mkey].get("scatterTargets", []):
             if e.get("at") not in want_st:
                 v.append(f"SPURIOUS: {rid} has scatterTarget at {e.get('at')} that is not a legal static target")
+        want_vis = {(x["at"], x["visual"]) for x in visuals.get(rid, [])}
+        for e in rooms[mkey].get("itemVisuals", []):
+            if (e.get("at"), e.get("visual")) not in want_vis:
+                v.append(f"SPURIOUS: {rid} has itemVisual {e.get('visual')} at {e.get('at')} "
+                         "not backed by item_control")
     return v
 
 

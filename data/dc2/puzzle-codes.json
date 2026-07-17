@@ -1,0 +1,16 @@
+{
+  "_doc": "DC2 code-input puzzles. DC2 has ONE: the sub-level elevator keypad. Candidates are imm32s in the setup function, not a flat data table; the active code is picked at runtime (prng()&7) into scene_mgr+0x1204, which both display and check read — displayed==checked is automatic. K108.",
+  "elevator_code_table": {
+    "setup_function_va": "0x450d60",
+    "imm32_file_offsets": ["0x50d72", "0x50d89", "0x50da1", "0x50da9", "0x50db7", "0x50dbf", "0x50dc7", "0x50dda"],
+    "digit_encoding": "byte per digit, first displayed digit = lowest byte, RAW (no +1)",
+    "digit_alphabet": "0-5 only (vanilla constraint; 6-9 unproven on the keypad UI)",
+    "runtime_active_code": "scene_mgr(+[0x876db8]) + 0x1204 .. + 0x1207",
+    "selection": "0x450ee6 call 0x48f8b0 (prng, state 0x876dd0); and al,7; store 0x450f06"
+  },
+  "family": [
+    {"row": 0, "vanilla_candidates": ["2350", "0153", "1452", "5210", "5420", "4015", "3051", "4521"],
+     "lock": "Sub-level elevator (3rd Energy Facility)", "character": "Regina",
+     "document": {"name": "Elevator Security Code", "display": "renderer token 6 substitutes digits from scene+0x1204 at draw time; no static text to rewrite"}}
+  ]
+}

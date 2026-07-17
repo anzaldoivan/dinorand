@@ -141,6 +141,67 @@ public sealed class RandomizerConfig
     public bool Dc2ShuffleShop { get; set; } = false;
 
     /// <summary>
+    /// DC2 only (off by default). Scramble the sub-level elevator security-code candidates
+    /// (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §3, K108): writes 8 distinct seed-derived
+    /// 4-digit codes (digits 0–5) into the setup function's imm32 table inside <c>Dino2.exe</c>.
+    /// Displayed==checked is automatic (single runtime copy). Reversible <c>.bak</c>-backed exe
+    /// patch, rebirth build only. CLI <c>--dc2-scramble-puzzle-codes</c>.
+    /// </summary>
+    public bool Dc2ScramblePuzzleCodes { get; set; } = false;
+
+    /// <summary>
+    /// DC2 only (off by default). Shuffle the stungun-circuit blink choreography
+    /// (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §4 item 2, K110): rewrites the scripted blink
+    /// box-id sequences of ST607 (generator stabilizer) and ST402 (Missile Silo bridge) with
+    /// seed-derived orders — same length, every box at least once, no adjacent repeats. Room-file
+    /// edit (backup-and-swap). CLI <c>--dc2-shuffle-circuits</c>.
+    /// </summary>
+    public bool Dc2ShuffleCircuits { get; set; } = false;
+
+    /// <summary>
+    /// DC2 only. The GUI's single "Randomize Puzzles" flag over the two puzzle subflags
+    /// (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md): setting it drives BOTH
+    /// <see cref="Dc2ScramblePuzzleCodes"/> and <see cref="Dc2ShuffleCircuits"/>; reading it ORs
+    /// them, so a config carrying only one subflag (a standalone CLI lever / a legacy seed bit)
+    /// still presents as puzzles-randomized. Not itself seed-encoded — it rides the subflag bits
+    /// (byte 16 bits 3/4). Same master/subflag pattern as ShuffleKeyItems → RelocateDdkDiscs.
+    /// </summary>
+    public bool Dc2RandomizePuzzles
+    {
+        get => Dc2ScramblePuzzleCodes || Dc2ShuffleCircuits;
+        set { Dc2ScramblePuzzleCodes = value; Dc2ShuffleCircuits = value; }
+    }
+
+    /// <summary>
+    /// DC2 only (<b>off by default</b>). Enable Classic REbirth's own door-transition skip by
+    /// writing <c>DoorSkip = 1</c> into the game root's <c>config.ini</c> <c>[DLL]</c> section
+    /// (<see cref="Dc2.Dc2DoorSkipInstaller"/> — K115). A user-config passthrough, not a game edit:
+    /// never seed-encoded, restore = flip the ini key back. CLI <c>--dc2-door-skip</c>.
+    /// </summary>
+    public bool Dc2DoorSkip { get; set; } = false;
+
+    /// <summary>
+    /// DC1 only (<b>off by default — pilot rooms not yet human-witnessed in game</b>). Shorten
+    /// cutscenes to their side effects: rewrite each whitelisted script-authored cutscene bracket
+    /// (<c>SetFlag(2,2,1)…SetFlag(2,2,0)</c>, STATIC-SCD-RE cont.74) in place so every flag write
+    /// and item record still executes while the choreography is jumped over
+    /// (<see cref="FileFormats.Stage.CutsceneShortener"/>). Conservative whitelist — brackets with
+    /// gosub/task-spawn/goto-sub or branch hazards are left untouched (65 of 171 corpus brackets
+    /// qualify). CLI <c>--dc1-shorten-cutscenes</c>. docs/decisions/cross/CUTSCENE-SKIP-FEASIBILITY.md §9.3.
+    /// </summary>
+    public bool ShortenCutscenes { get; set; } = false;
+
+    /// <summary>
+    /// DC2 only. Additionally emit each touched room's edits as a Classic REbirth
+    /// <c>patch\ST*.d2p</c> word-patch into <c>&lt;out&gt;\patch\</c>
+    /// (<see cref="FileFormats.Stage.Dc2.Dc2D2pWriter"/> — the wrapper's decoded non-destructive
+    /// override, docs/parity/NONDESTRUCTIVE-INSTALL-PARITY.md). Purely additive: the room files and
+    /// every other output byte are unchanged by this flag. An install/output-shape option like
+    /// <see cref="FixDc2MotionTrail"/>, NOT seed-encoded. CLI <c>--dc2-emit-d2p</c>.
+    /// </summary>
+    public bool Dc2EmitD2pPatches { get; set; } = false;
+
+    /// <summary>
     /// DC2 only. Per-variant weight overrides (variant 0–7 → 0–15) for the raptor tier draw;
     /// <c>null</c> = the registry defaults (<c>data/dc2/raptor-tiers.json</c>: common tiers 4, the
     /// variant-5 blue/super raptor 1). Weight 0 excludes a variant. Overlaid by
@@ -302,6 +363,46 @@ public sealed class RandomizerConfig
     /// </summary>
     public bool RelocateDdkDiscs { get; set; } = false;
 
+    /// <summary>
+    /// DC1 (<b>on by default</b>). Keep important items out of HIDDEN pickup spots, using the decoded
+    /// ground-visual class (map.json <c>itemVisuals</c> → <see cref="Graph.NodeItem.Visual"/>;
+    /// STATIC-SCD-RE cont.72 — 59 of the 154 vanilla pickups are interaction-only: no ground visual,
+    /// collectable only by examining the spot). Two effects: (1) the item pass pool-places weapons and
+    /// weapon parts only into spots with a visual; (2) the key shuffle applies "no worse than vanilla" —
+    /// an interaction-only spot may only receive a key whose own vanilla home was interaction-only, so a
+    /// visible key never becomes invisible (and a hidden key may become visible). Consumable fill is
+    /// unaffected (vanilla hides consumables too). Turning this OFF restores the previous behaviour.
+    /// CLI <c>--allow-hidden-spots</c> (disables). docs/decisions/dc1/items/PICKUP-VISUAL-PLACEMENT-PLAN.md.
+    /// </summary>
+    public bool AvoidHiddenPickupSpots { get; set; } = true;
+
+    /// <summary>
+    /// DC1 Lever A (<b>off by default — in-game render not yet human-witnessed</b>). When a relocated key
+    /// or weapon lands in a spot whose ground visual does not match it — an interaction-only spot (no
+    /// visual) or a bespoke-mesh spot (shows the OLD item's model) — rewrite that spot's ground visual to
+    /// the shared generic pickup panel (display slot + model <c>0x80180000</c>), so what the player sees
+    /// matches the randomizer. Fail-closed: an interaction-only spot needs a free display-node pool slot
+    /// (<see cref="Stage.RoomScript.DisplaySlotPoolCap"/>); a room with none free is left untouched (still
+    /// vanilla-invisible, no worse than today). Records with a deferred-visual flag (<c>rec+0x28≠0</c>) are
+    /// skipped. Independent of <see cref="AvoidHiddenPickupSpots"/>. CLI <c>--normalize-pickup-visuals</c>.
+    /// docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md (Lever A).
+    /// </summary>
+    public bool NormalizePickupVisuals { get; set; } = false;
+
+    /// <summary>
+    /// DC1 Lever B (<b>ON by default for the in-game witness session — the render is not yet
+    /// human-confirmed; disable with the flag off if a seed misbehaves</b>). On top of Lever A: a
+    /// relocated key/weapon whose id has a vanilla bespoke ground mesh anywhere in the game gets that
+    /// donor mesh imported into its destination room (mesh appended to the RDT, texture UV sub-rect +
+    /// CLUT re-uploaded at a free VRAM column, texrefs rewritten), so the pickup shows its OWN model
+    /// instead of the generic panel. Ids without a donor and every failure path (no free VRAM, RDT
+    /// ceiling) fall back to the Lever-A generic panel — implies the Lever-A marking even when
+    /// <see cref="NormalizePickupVisuals"/> is off. CLI <c>--pickup-ground-models</c> (redundant while
+    /// the default is on). docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md ("Lever B
+    /// plan"), STATIC-SCD-RE cont.73.
+    /// </summary>
+    public bool ImportPickupModels { get; set; } = true;
+
     /// <summary>Phase 3. Off until the door-graph pass lands.</summary>
     public bool RandomizeDoors { get; set; } = false;
 
@@ -332,6 +433,15 @@ public sealed class RandomizerConfig
     /// lets any character speak in another game's actor's voice. Independent of the toggles above.
     /// </summary>
     public bool IncludeCrossGameVoices { get; set; } = false;
+
+    /// <summary>
+    /// Draw "DINORAND V&lt;version&gt; / SEED &lt;n&gt;" into the title screen(s) — DC1
+    /// <c>Data\t_image.imd</c>, DC2 <c>TITLE.DAT</c>/<c>TITLE2.DAT</c> (BioRand parity;
+    /// docs/decisions/cross/SEED-WATERMARK-PLAN.md). Always on with any seeded randomization —
+    /// no GUI/CLI toggle; this bool exists so tests can isolate other passes' output
+    /// (the <see cref="RelocateDdkDiscs"/> pattern). Reversed by <c>--restore</c>.
+    /// </summary>
+    public bool TitleWatermark { get; set; } = true;
 
     /// <summary>
     /// Phase 4. Filesystem root holding the BioRand-layout donor datapacks (each subdir a pack;

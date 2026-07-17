@@ -13,8 +13,11 @@ public class RoomScriptTests
 {
     private const uint PsxBase = RoomScript.PsxRdtBase;
 
-    /// <summary>Build a 44-byte 0x28 subtype-4 item record with the given id/count.</summary>
-    private static byte[] ItemRec(byte id, ushort count = 1)
+    /// <summary>Build a 44-byte 0x28 subtype-4 item record with the given id/count, and optionally its
+    /// ground-visual fields (display slot @ +0x22, model pointer @ +0x24). Default slot 0xFF + model 0 =
+    /// an interaction-only spot.</summary>
+    private static byte[] ItemRec(byte id, ushort count = 1,
+                                  byte slot = ItemRecord.NoDisplaySlot, uint model = 0)
     {
         var r = new byte[DcOpcodes.ItemLength];
         r[0] = DcOpcodes.Item;        // 0x28
@@ -22,6 +25,18 @@ public class RoomScriptTests
         r[ItemRecord.IdOffset] = id;
         r[ItemRecord.CountOffset] = (byte)count;
         r[ItemRecord.CountOffset + 1] = (byte)(count >> 8);
+        r[ItemRecord.DisplaySlotOffset] = slot;
+        WriteU32(r, ItemRecord.ModelPtrOffset, model);
+        return r;
+    }
+
+    /// <summary>Build a 32-byte op23 static-scenery record occupying display-pool slot <paramref name="slot"/>
+    /// (its <c>rec+1</c> byte).</summary>
+    private static byte[] SceneryRec(byte slot)
+    {
+        var r = new byte[32];
+        r[0] = 0x23;
+        r[1] = slot;
         return r;
     }
 
@@ -116,6 +131,58 @@ public class RoomScriptTests
         Assert.Equal(17, s.Items[0].Amount);
         Assert.Equal(0x2b, s.Items[1].ItemId);
         Assert.Equal(DcOpcodes.Item, rdt[s.Items[0].FileOffset]);
+    }
+
+    [Fact]
+    public void Parse_CollectsSceneryAndItemDisplaySlots()
+    {
+        // op23 scenery on slots 0/1/3 + a visible item on slot 2 + an interaction-only item (0xFF).
+        var rdt = BuildRdt(SceneryRec(0), SceneryRec(1), SceneryRec(3),
+                           ItemRec(0x16, 1, slot: 2, model: 0x80123456),
+                           ItemRec(0x2b));
+        var s = RoomScript.Parse(rdt);
+
+        Assert.True(s.ParsedCleanly);
+        Assert.Equal(new byte[] { 0, 1, 3 }, s.SceneryDisplaySlots.OrderBy(x => x));
+        Assert.Equal(2, s.Items.Single(i => i.ItemId == 0x16).DisplaySlot);
+        Assert.Equal(ItemRecord.NoDisplaySlot, s.Items.Single(i => i.ItemId == 0x2b).DisplaySlot);
+    }
+
+    [Fact]
+    public void ApplyEdits_FlagOff_LeavesVisualFieldsByteIdentical()
+    {
+        var rdt = BuildRdt(ItemRec(0x16, 1, slot: 5, model: 0x80123456));
+        var s = RoomScript.Parse(rdt);
+        s.Items[0].ItemId = 0x2b; // relocate the id only
+
+        var buf = (byte[])rdt.Clone();
+        s.ApplyEdits(buf, s.Items);
+        var reread = RoomScript.Parse(buf);
+
+        Assert.Equal(0x2b, reread.Items[0].ItemId);
+        Assert.Equal(5, reread.Items[0].DisplaySlot);              // slot untouched
+        Assert.Equal(0x80123456u, ReadU32(reread.Items[0].Raw, ItemRecord.ModelPtrOffset)); // model untouched
+    }
+
+    [Fact]
+    public void ApplyEdits_NormalizeVisual_WritesChosenSlotAndGenericPanel()
+    {
+        // A relocated key in a bespoke-mesh spot (slot 5, old model): reuse the slot, repoint the model.
+        var rdt = BuildRdt(ItemRec(0x3a, 1, slot: 5, model: 0x80123456));
+        var s = RoomScript.Parse(rdt);
+        var it = s.Items[0];
+        it.ItemId = 0x2b;
+        it.NormalizeVisual = true;
+        it.NormalizeDisplaySlot = 9;   // e.g. a freshly-allocated slot
+
+        var buf = (byte[])rdt.Clone();
+        s.ApplyEdits(buf, s.Items);
+        var reread = RoomScript.Parse(buf);
+
+        Assert.Equal(0x2b, reread.Items[0].ItemId);
+        Assert.Equal(9, reread.Items[0].DisplaySlot);
+        Assert.Equal(ItemRecord.GenericPanelModelPtr,
+                     ReadU32(reread.Items[0].Raw, ItemRecord.ModelPtrOffset));
     }
 
     [Fact]

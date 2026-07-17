@@ -200,12 +200,46 @@ public sealed class ItemRecord
     public const int IdOffset = 0x1c;
     /// <summary>Byte offset of the count word within the record.</summary>
     public const int CountOffset = 0x1e;
+    /// <summary>Byte offset of the ground-visual display-node slot (<c>0xFF</c> = no visual /
+    /// interaction-only). STATIC-SCD-RE cont.72 — the <c>scratch+0x7CE8</c> pool index this pickup's
+    /// visual node occupies, shared with op23 scenery nodes.</summary>
+    public const int DisplaySlotOffset = 0x22;
+    /// <summary>Byte offset of the ground-model PSX pointer (copied to <c>node+0x3c</c>). cont.72.</summary>
+    public const int ModelPtrOffset = 0x24;
+    /// <summary>Display-slot value meaning "no visual node" (interaction-only pickup). cont.72.</summary>
+    public const byte NoDisplaySlot = 0xFF;
+    /// <summary>The globally-resident shared blinking-panel model every ground consumable renders
+    /// (cont.72; outside the <c>0x80100000</c> RDT relocation set, so resident in every room). Lever A
+    /// normalization points a relocated key/weapon's ground model here so it shows a standard pickup.</summary>
+    public const uint GenericPanelModelPtr = 0x80180000;
     /// <summary>Item id used for an empty / runtime-armed placement slot (never a real pickup).</summary>
     public const byte EmptySlotId = 0xFF;
 
     public int ItemId { get; set; }
     public int Amount { get; set; }
     public byte[] Raw { get; set; } = Array.Empty<byte>();
+
+    /// <summary>The pickup's vanilla display-node slot as decoded from the file (<see cref="DisplaySlotOffset"/>),
+    /// or <see cref="NoDisplaySlot"/> for an interaction-only spot (or an undersized/unlocated record).</summary>
+    public byte DisplaySlot => Raw.Length > DisplaySlotOffset ? Raw[DisplaySlotOffset] : NoDisplaySlot;
+
+    /// <summary>Lever A (PICKUP-GROUND-MODEL-FEASIBILITY.md): when true, <see cref="RoomScript.ApplyEdits"/>
+    /// rewrites this record's ground visual to the shared generic pickup panel — display slot
+    /// <see cref="NormalizeDisplaySlot"/> + model <see cref="GenericPanelModelPtr"/> — so a relocated key/weapon
+    /// that would otherwise be invisible or show the old item's mesh renders a standard pickup. Default false
+    /// (byte-identical, id-only edit). Set only by <c>NormalizePickupVisualsPass</c> behind the
+    /// <c>NormalizePickupVisuals</c> flag.</summary>
+    public bool NormalizeVisual { get; set; }
+
+    /// <summary>The display-node pool slot to write when <see cref="NormalizeVisual"/> is set — the existing
+    /// slot (bespoke-mesh spot) or a freshly-allocated free slot (interaction-only spot).</summary>
+    public byte NormalizeDisplaySlot { get; set; }
+
+    /// <summary>The ground-model pointer <see cref="RoomScript.ApplyEdits"/> writes when
+    /// <see cref="NormalizeVisual"/> is set. Defaults to the Lever-A generic panel; Lever B
+    /// (<c>PickupModelImportPass</c>) points it at a donor mesh appended to this room's RDT
+    /// (PICKUP-GROUND-MODEL-FEASIBILITY.md "Lever B plan").</summary>
+    public uint VisualModelPtr { get; set; } = GenericPanelModelPtr;
 
     /// <summary>The id as decoded from the file, before any randomizer edit. Drives change
     /// detection (so an unedited room round-trips byte-exact) and the empty-slot check.</summary>

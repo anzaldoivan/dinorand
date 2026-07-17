@@ -76,8 +76,11 @@ public class Dc2AquaticEnemyTests
     public void D2_Distribution_HasLowWeightAquaticRows()
     {
         var dist = Dc2EnemyDistribution.LoadEmbedded();
-        foreach (var t in new[] { 0x05, 0x0a, 0x0b, 0x0c })
+        // 0x0c (E32) intentionally has NO row — hard-excluded as a donor (crash RCA 2026-07-17,
+        // Dc2SpeciesTable.IsCrashProneDonorType). The other aquatics keep their low-weight rows.
+        foreach (var t in new[] { 0x05, 0x0a, 0x0b })
             Assert.True(dist.DefaultWeights.ContainsKey(t), $"0x{t:X2} needs a distribution row");
+        Assert.False(dist.DefaultWeights.ContainsKey(0x0c), "E32 (0x0c) must NOT have a distribution row");
         Assert.True(dist.DefaultWeights[0x0a] <= 2, "Mosasaurus must be a LOW default weight");
         Assert.True(dist.DefaultWeights[0x05] <= 2, "Plesiosaurus boss must be a very low default weight");
     }
@@ -102,7 +105,7 @@ public class Dc2AquaticEnemyTests
             .Select(s => s.Type).ToList();
         Assert.Contains(0x05, onSet);
         Assert.Contains(0x0b, onSet);
-        Assert.Contains(0x0c, onSet);
+        Assert.DoesNotContain(0x0c, onSet); // E32 hard-excluded even with setpiece+water (crash RCA 2026-07-17)
     }
 
     [Fact]

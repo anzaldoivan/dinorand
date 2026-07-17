@@ -12,14 +12,39 @@
          Visibility → IsVisible. Dynamically-coloured labels bind their brush through NullToUnsetConverter
          so a null brush reproduces the old ClearValue (themed-default) behaviour. The two LostFocus
          handlers and the PieChart are the only view glue left in code-behind (the rest is bindings). -->
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8">
+    <DockPanel>
+        <!-- Install to game: PINNED to the window bottom (DockPanel.Dock=Bottom) so the primary
+             actions (Play / Restore / Install) stay fully visible no matter how far the options
+             above scroll. The scrollable options fill the remaining space. -->
+        <HeaderedContentControl DockPanel.Dock="Bottom" Classes="group" Header="Install to Game" Margin="12,4,12,8">
+            <StackPanel Margin="4">
+                <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,6"
+                           Text="Overlays the generated rooms onto the game's Data folder. Your originals are backed up first and can be restored at any time." />
+                <!-- Busy indicator; collapsed while idle. Signals Generate+Install progress. -->
+                <ProgressBar Height="6" Margin="0,0,0,6" IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
+                               Text="{Binding InstallStatusText}"
+                               Foreground="{Binding InstallStatusBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
+                    <Button Grid.Column="1" Content="▶ Play" Padding="12,6" Margin="0,0,6,0"
+                            Command="{Binding PlayCommand}" IsEnabled="{Binding CanPlayNow}"
+                            ToolTip.Tip="Launch the selected DINO.exe. Whatever is currently in the game's Data folder is what loads — install first to play the randomized rooms." />
+                    <Button Grid.Column="2" Content="Restore Originals" Padding="12,6" Margin="0,0,6,0"
+                            Command="{Binding RestoreCommand}" IsEnabled="{Binding CanRestore}" />
+                    <Button Grid.Column="3" Content="Install to Game" Padding="14,6" FontWeight="Bold"
+                            Command="{Binding InstallCommand}" IsEnabled="{Binding CanInstall}" />
+                </Grid>
+            </StackPanel>
+        </HeaderedContentControl>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8">
         <StackPanel>
 
             <!-- Header -->
             <Grid Margin="4,4,4,8" ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="DinoRand" FontSize="20" FontWeight="Bold" />
-                    <TextBlock Text="v0.5.0" Margin="8,0,0,0"
+                    <TextBlock Text="v0.5.1" Margin="8,0,0,0"
                                VerticalAlignment="Bottom" Foreground="Gray" />
                 </StackPanel>
                 <HyperlinkButton Grid.Column="1" VerticalAlignment="Center"
@@ -108,7 +133,7 @@
                                       SelectedItem="{Binding SelectedDc2FixedSpecies, Mode=TwoWay}"
                                       IsVisible="{Binding Dc2FixedOptionsVisible}"
                                       MinWidth="140" Margin="6,0,0,0"
-                                      ToolTip.Tip="The pinned donor. Pinning a boss/setpiece species doesn't need the include-toggles; rooms where the pin is unsafe stay vanilla." />
+                                      ToolTip.Tip="The pinned donor. Pinning a boss/setpiece species doesn't need the include-toggles; aquatic donors appear only with the water-levels toggle on. Rooms where the pin is unsafe stay vanilla." />
                         </StackPanel>
                         <ItemsControl ItemsSource="{Binding Dc2WeightOptions}"
                                       IsVisible="{Binding Dc2WeightedOptionsVisible}" Margin="0,2,0,2">
@@ -137,6 +162,21 @@
                         <CheckBox Content="Shuffle Shop (prices + stock unlocks)" Margin="0,2"
                                   ToolTip.Tip="Permute the 11 shop items' prices and the shop level each appears at (backup-protected Dino2.exe patch, undone by Restore). Difficulty half/double pricing still applies."
                                   IsChecked="{Binding Dc2ShuffleShop, Mode=TwoWay}" />
+                        <!-- DC2 puzzle randomization (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md K108/K110):
+                             one master toggle driving both levers (elevator codes + circuit blink order). -->
+                        <CheckBox Content="Randomize Puzzles" Margin="0,2"
+                                  ToolTip.Tip="Scramble the sub-level elevator security codes (backup-protected Dino2.exe patch) and reshuffle the stungun circuit blink order in the 3rd Energy generator and Missile Silo bridge puzzles (room-file edits). Undone by Restore."
+                                  IsChecked="{Binding Dc2RandomizePuzzles, Mode=TwoWay}" />
+                        <!-- REbirth DoorSkip passthrough (K115): one config.ini [DLL] key, written on Install.
+                             Not seed-encoded; Restore does not undo it (it's the wrapper's own user setting).
+                             ponytail: HIDDEN (IsVisible=False) — door/cutscene skip is pulled from the user
+                             surface for both games this release (DC1 cutscene-shorten unverified in-game;
+                             DC2 door-skip hidden alongside it for a consistent surface). Wiring/CLI kept.
+                             Re-enable (delete IsVisible) when the skip feature set is shipped for real. -->
+                        <CheckBox Content="Door skip (Classic REbirth)" Margin="0,2"
+                                  IsVisible="False"
+                                  ToolTip.Tip="Turn on Classic REbirth's own door-transition skip: Install writes DoorSkip = 1 into the game folder's config.ini. Not part of the seed. Undo by setting DoorSkip = 0 in config.ini or the REbirth launcher — Restore does not change it."
+                                  IsChecked="{Binding Dc2DoorSkip, Mode=TwoWay}" />
                         <CheckBox Content="Randomize Raptor Tiers (colour + HP)" Margin="0,2"
                                   ToolTip.Tip="Shuffle raptor colour/HP tier variants per spawn using the weights below (room-file edits + a small backup-protected Dino2.exe patch for wave rooms, undone by Restore)."
                                   IsChecked="{Binding Dc2RandomizeRaptorTiers, Mode=TwoWay}" />
@@ -222,10 +262,78 @@
                               IsEnabled="{Binding CanShuffleKeyItems}"
                               ToolTip.Tip="Relocate the door-gating key items (Entrance / BG Area / C.O. Area keys, Key Card Lv. A) plus the DDK disc pairs to new spots, and also into static ammo/health pickups — kept provably beatable under the door-graph logic (a layout that can't be proven beatable reverts to vanilla); progression keys are never seated in one-way ending rooms; items conserved."
                               IsChecked="{Binding ShuffleKeyItems, Mode=TwoWay}" />
+                    <CheckBox Content="Keep important items visible" Margin="0,2"
+                              ToolTip.Tip="Weapons, upgrades and relocated key items avoid the game's hidden pickup spots (59 vanilla spots have no ground visual and are found only by examining, e.g. corpses and desks). A relocated key can land in a hidden spot only if it was hidden in the vanilla game. Uncheck to allow anything anywhere."
+                              IsChecked="{Binding AvoidHiddenPickupSpots, Mode=TwoWay}" />
+                    <!-- DC1 cutscene shortening (cont.74 / CUTSCENE-SKIP-FEASIBILITY.md §9.3): in-place script
+                         rewrite keeping every story flag + item grant. Experimental until in-game witnessed.
+                         ponytail: HIDDEN (IsVisible=False) — the lever does not actually shorten cutscenes
+                         in-game (no live witness; reported non-working). Wiring/binding/CLI path kept intact.
+                         Re-enable (delete IsVisible) once CutsceneShortener is CE-verified in-game. -->
+                    <CheckBox Content="Shorten cutscenes (experimental)" Margin="0,2"
+                              IsVisible="False"
+                              IsEnabled="{Binding CanShortenCutscenes}"
+                              ToolTip.Tip="Skip cutscene choreography while keeping every story flag and item grant intact (65 of 171 cutscenes qualify; the rest play normally). Experimental: not yet verified in-game, and not part of the shareable seed string."
+                              IsChecked="{Binding ShortenCutscenes, Mode=TwoWay}" />
                     <CheckBox Content="Randomize starting inventory" Margin="0,2"
                               IsEnabled="{Binding CanRandomizeStartingInventory}"
                               ToolTip.Tip="New game starts with a randomized supply kit (the Handgun and its ammo are always granted). Seen on the next new game after relaunch."
                               IsChecked="{Binding RandomizeStartingInventory, Mode=TwoWay}" />
+                    <!-- Starting-inventory detail editor: pin the starting weapon / set explicit supply slots.
+                         Sits under its master toggle (moved here from the install panel to de-clutter it). -->
+                    <Expander Header="Starting inventory (EXPERIMENTAL)" Margin="20,0,0,6"
+                              IsEnabled="{Binding CanRandomizeStartingInventory}">
+                        <StackPanel Margin="0,4,0,0">
+                            <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,6"
+                                       Text="Patches DINO.exe for the new game. 'Randomize starting inventory' (above) rolls a random supply kit; here you can pin the starting weapon and/or set explicit supply slots. CLOSE the game first — seen on the next NEW GAME, reversed by Restore." />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="Starting weapon:" VerticalAlignment="Center" Width="110" />
+                                <ComboBox Width="200"
+                                          ItemsSource="{Binding StartWeapons}"
+                                          SelectedItem="{Binding SelectedStartWeapon, Mode=TwoWay}"
+                                          ToolTip.Tip="Vanilla keeps the game's start (Handgun). None = start weaponless; the removed Handgun is then placed in the early world (needs Randomize Items on). Or pick a weapon to start with instead." />
+                            </StackPanel>
+                            <StackPanel IsEnabled="{Binding CustomSupplyEnabled}">
+                                <TextBlock Text="{Binding CustomSupplyLabel}"
+                                           Foreground="Gray" Margin="0,0,0,4" />
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
+                                              SelectedItem="{Binding SelectedItem0, Mode=TwoWay}" />
+                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
+                                    <TextBox Width="50" Text="{Binding Count0, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
+                                              SelectedItem="{Binding SelectedItem1, Mode=TwoWay}" />
+                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
+                                    <TextBox Width="50" Text="{Binding Count1, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
+                                              SelectedItem="{Binding SelectedItem2, Mode=TwoWay}" />
+                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
+                                    <TextBox Width="50" Text="{Binding Count2, Mode=TwoWay}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+                    <CheckBox Content="Randomize Puzzles" Margin="0,2"
+                              IsEnabled="{Binding CanScramblePuzzleCodes}"
+                              IsChecked="{Binding ScramblePuzzleCodes, Mode=TwoWay}"
+                              ToolTip.Tip="Patch DINO.exe + room files at install so each keypad safe (Management Office, Lounge, Computer Room gas, Stabilizer) accepts a new seed-derived 4-digit code, and the in-game document that states the code is rewritten to match. Reversed by Restore. CLOSE the game first — codes are read at load, seen after the next launch." />
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <CheckBox Content="Randomize emergency boxes" VerticalAlignment="Center"
+                                  IsEnabled="{Binding CanRandomizeBoxes}"
+                                  IsChecked="{Binding RandomizeBoxes, Mode=TwoWay}"
+                                  ToolTip.Tip="EXPERIMENTAL: patch DINO.exe at install to randomize emergency-box contents (seeded from the same seed). Plug costs and box locations are unchanged. Reversed by Restore. CLOSE the game first — the change is seen after the next launch." />
+                        <ComboBox Width="150" Margin="8,0,0,0" VerticalAlignment="Center"
+                                  SelectedIndex="{Binding BoxModeIndex, Mode=TwoWay}"
+                                  IsEnabled="{Binding BoxModeEnabled}"
+                                  ToolTip.Tip="Shuffle = move each box's whole loadout to another box. Reroll from box pool = redraw each box's items from that difficulty's own box loot (distinct from map drops).">
+                            <ComboBoxItem Content="Shuffle" />
+                            <ComboBoxItem Content="Reroll from box pool" />
+                        </ComboBox>
+                    </StackPanel>
 
                     <!-- Randomize Cutscene Voices. The header checkbox is the master enable; children disable
                          as a unit (handled by the control's own template). -->
@@ -307,6 +415,29 @@
                         </StackPanel>
                     </local:CheckGroupBox>
 
+                    <!-- Audio options (moved here from the install panel to de-clutter it). -->
+                    <CheckBox Content="Shuffle music (BGM)" Margin="0,8,0,2"
+                              IsEnabled="{Binding CanShuffleBgm}"
+                              IsChecked="{Binding ShuffleBgm, Mode=TwoWay}"
+                              ToolTip.Tip="Also patch DINO.exe so every track plays a different cue (within its stream/loop class), seeded from the same seed. Reversed by Restore. CLOSE the game first — it edits the executable, and the change is heard after the next launch." />
+                    <!-- External BGM import (DC1 only; DC2 music is in undecoded MS_ container payloads).
+                         ponytail: HIDDEN (IsVisible=False) — the import lever is wired (ImportBgm →
+                         RandomizerConfig.RandomizeBgm → BgmRandomizer pass) but pulled from the user surface
+                         until it ships with curated datapacks. Bindings + CLI (bgm-import) kept intact.
+                         Re-enable by restoring IsVisible="{Binding CanImportBgm}" (DC1-only gate). -->
+                    <StackPanel Margin="0,0,0,2" IsVisible="False">
+                        <CheckBox Content="Import external music (DC1)" Margin="0,0,0,2"
+                                  IsChecked="{Binding ImportBgm, Mode=TwoWay}"
+                                  ToolTip.Tip="Overwrite each Sound/BGM slot with a transcoded same-mood track drawn from your BGM datapacks. Installed with the seed and reversed by Restore. Composes with 'Shuffle music'." />
+                        <Grid ColumnDefinitions="*,Auto" Margin="20,0,0,0" IsEnabled="{Binding ImportBgm}">
+                            <TextBox Grid.Column="0" Margin="0,0,4,0" VerticalContentAlignment="Center"
+                                     Text="{Binding BgmPacksRoot, Mode=TwoWay}"
+                                     ToolTip.Tip="Folder of BGM datapacks laid out &lt;pack&gt;/data/bgm/&lt;tag&gt;/*.ogg|wav (tag = mood folder; 'all' = catch-all)." />
+                            <Button Grid.Column="1" Content="Browse..." Padding="10,2"
+                                    Command="{Binding BrowseBgmPacksCommand}" />
+                        </Grid>
+                    </StackPanel>
+
                     <local:RandoSlider Margin="0,8,0,0"
                                        Heading="Enemy Difficulty" LowText="Easy" HighText="Hard" Maximum="31"
                                        Value="{Binding Difficulty, Mode=TwoWay}"
@@ -366,109 +497,7 @@
                 </StackPanel>
             </HeaderedContentControl>
 
-            <!-- Generate -->
-            <Grid Margin="4,8,4,4" ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
-                           Text="{Binding ProgressText}"
-                           Foreground="{Binding ProgressBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
-                <Button Grid.Column="1" Content="Generate" Padding="20,6" FontWeight="Bold"
-                        Background="#FF4CAF50" Foreground="White"
-                        Command="{Binding GenerateCommand}" IsEnabled="{Binding CanGenerate}" />
-            </Grid>
-
-            <!-- Busy indicator; collapsed while idle. -->
-            <ProgressBar Height="6" Margin="4,0,4,0" IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
-
-            <!-- Install to game -->
-            <HeaderedContentControl Classes="group" Header="Install to Game" Margin="4,8,4,4">
-                <StackPanel Margin="4">
-                    <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,6"
-                               Text="Overlays the generated rooms onto the game's Data folder. Your originals are backed up first and can be restored at any time." />
-                    <CheckBox Content="Shuffle music (BGM)" Margin="0,0,0,6"
-                              IsEnabled="{Binding CanShuffleBgm}"
-                              IsChecked="{Binding ShuffleBgm, Mode=TwoWay}"
-                              ToolTip.Tip="Also patch DINO.exe so every track plays a different cue (within its stream/loop class), seeded from the same seed. Reversed by Restore. CLOSE the game first — it edits the executable, and the change is heard after the next launch." />
-                    <!-- External BGM import (DC1 only; DC2 music is in undecoded MS_ container payloads). -->
-                    <StackPanel Margin="0,0,0,6" IsVisible="{Binding CanImportBgm}">
-                        <CheckBox Content="Import external music (DC1)" Margin="0,0,0,2"
-                                  IsChecked="{Binding ImportBgm, Mode=TwoWay}"
-                                  ToolTip.Tip="Overwrite each Sound/BGM slot with a transcoded same-mood track drawn from your BGM datapacks. Installed with the seed and reversed by Restore. Composes with 'Shuffle music'." />
-                        <Grid ColumnDefinitions="*,Auto" Margin="20,0,0,0" IsEnabled="{Binding ImportBgm}">
-                            <TextBox Grid.Column="0" Margin="0,0,4,0" VerticalContentAlignment="Center"
-                                     Text="{Binding BgmPacksRoot, Mode=TwoWay}"
-                                     ToolTip.Tip="Folder of BGM datapacks laid out &lt;pack&gt;/data/bgm/&lt;tag&gt;/*.ogg|wav (tag = mood folder; 'all' = catch-all)." />
-                            <Button Grid.Column="1" Content="Browse..." Padding="10,2"
-                                    Command="{Binding BrowseBgmPacksCommand}" />
-                        </Grid>
-                    </StackPanel>
-                    <CheckBox Content="Scramble puzzle codes (safes)" Margin="0,0,0,6"
-                              IsEnabled="{Binding CanScramblePuzzleCodes}"
-                              IsChecked="{Binding ScramblePuzzleCodes, Mode=TwoWay}"
-                              ToolTip.Tip="Also patch DINO.exe + room files so each keypad safe (Management Office, Lounge, Computer Room gas, Stabilizer) accepts a new seed-derived 4-digit code, and the in-game document that states the code is rewritten to match. Reversed by Restore. CLOSE the game first — codes are read at load, seen after the next launch." />
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                        <CheckBox Content="Randomize emergency boxes" VerticalAlignment="Center"
-                                  IsEnabled="{Binding CanRandomizeBoxes}"
-                                  IsChecked="{Binding RandomizeBoxes, Mode=TwoWay}"
-                                  ToolTip.Tip="EXPERIMENTAL: also patch DINO.exe to randomize emergency-box contents (seeded from the same seed). Plug costs and box locations are unchanged. Reversed by Restore. CLOSE the game first — the change is seen after the next launch." />
-                        <ComboBox Width="150" Margin="8,0,0,0" VerticalAlignment="Center"
-                                  SelectedIndex="{Binding BoxModeIndex, Mode=TwoWay}"
-                                  IsEnabled="{Binding BoxModeEnabled}"
-                                  ToolTip.Tip="Shuffle = move each box's whole loadout to another box. Reroll from box pool = redraw each box's items from that difficulty's own box loot (distinct from map drops).">
-                            <ComboBoxItem Content="Shuffle" />
-                            <ComboBoxItem Content="Reroll from box pool" />
-                        </ComboBox>
-                    </StackPanel>
-                    <Expander Header="Starting inventory (EXPERIMENTAL)" Margin="0,0,0,6"
-                              IsEnabled="{Binding CanRandomizeStartingInventory}">
-                        <StackPanel Margin="0,4,0,0">
-                            <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,6"
-                                       Text="Patches DINO.exe for the new game. 'Randomize starting inventory' (Options) rolls a random supply kit; here you can pin the starting weapon and/or set explicit supply slots. CLOSE the game first — seen on the next NEW GAME, reversed by Restore." />
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <TextBlock Text="Starting weapon:" VerticalAlignment="Center" Width="110" />
-                                <ComboBox Width="200"
-                                          ItemsSource="{Binding StartWeapons}"
-                                          SelectedItem="{Binding SelectedStartWeapon, Mode=TwoWay}"
-                                          ToolTip.Tip="Vanilla keeps the game's start (Handgun). None = start weaponless; the removed Handgun is then placed in the early world (needs Randomize Items on). Or pick a weapon to start with instead." />
-                            </StackPanel>
-                            <StackPanel IsEnabled="{Binding CustomSupplyEnabled}">
-                                <TextBlock Text="{Binding CustomSupplyLabel}"
-                                           Foreground="Gray" Margin="0,0,0,4" />
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
-                                              SelectedItem="{Binding SelectedItem0, Mode=TwoWay}" />
-                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
-                                    <TextBox Width="50" Text="{Binding Count0, Mode=TwoWay}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
-                                              SelectedItem="{Binding SelectedItem1, Mode=TwoWay}" />
-                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
-                                    <TextBox Width="50" Text="{Binding Count1, Mode=TwoWay}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                                    <ComboBox Width="200" ItemsSource="{Binding SupplyItemsList}"
-                                              SelectedItem="{Binding SelectedItem2, Mode=TwoWay}" />
-                                    <TextBlock Text="×" VerticalAlignment="Center" Margin="6,0" />
-                                    <TextBox Width="50" Text="{Binding Count2, Mode=TwoWay}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-                        <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
-                                   Text="{Binding InstallStatusText}"
-                                   Foreground="{Binding InstallStatusBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
-                        <Button Grid.Column="1" Content="▶ Play" Padding="12,6" Margin="0,0,6,0"
-                                Command="{Binding PlayCommand}" IsEnabled="{Binding CanPlay}"
-                                ToolTip.Tip="Launch the selected DINO.exe. Whatever is currently in the game's Data folder is what loads — install first to play the randomized rooms." />
-                        <Button Grid.Column="2" Content="Restore Originals" Padding="12,6" Margin="0,0,6,0"
-                                Command="{Binding RestoreCommand}" IsEnabled="{Binding CanRestore}" />
-                        <Button Grid.Column="3" Content="Install to Game" Padding="14,6" FontWeight="Bold"
-                                Command="{Binding InstallCommand}" IsEnabled="{Binding CanInstall}" />
-                    </Grid>
-                </StackPanel>
-            </HeaderedContentControl>
-
         </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+    </DockPanel>
 </Window>

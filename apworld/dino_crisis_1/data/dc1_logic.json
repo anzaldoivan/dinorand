@@ -245,7 +245,9 @@
       "to": "0300",
       "requiresItems": [
         101,
-        108
+        108,
+        71,
+        72
       ],
       "requiresRooms": []
     },
@@ -455,7 +457,8 @@
         "group": 8,
         "bit": 18
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0100:69:-1088,2976",
@@ -471,7 +474,8 @@
         "group": 8,
         "bit": 105
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0103:01:2288,-2224",
@@ -487,7 +491,8 @@
         "group": 8,
         "bit": 1
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0103:3e:-2800,992",
@@ -503,7 +508,8 @@
         "group": 8,
         "bit": 62
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0103:62:-512,1072",
@@ -520,6 +526,7 @@
         "bit": 98
       },
       "source": "event-granted",
+      "visual": "bespoke-mesh",
       "gateFlag": "7:84"
     },
     {
@@ -536,7 +543,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0103:20:-2576,3008",
@@ -552,7 +560,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0103:2e:-2576,3008",
@@ -568,7 +577,8 @@
         "group": 8,
         "bit": 46
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0104:41:-2352,-272",
@@ -584,7 +594,8 @@
         "group": 8,
         "bit": 65
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0104:6c:-528,1280",
@@ -600,7 +611,8 @@
         "group": 8,
         "bit": 108
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0104:2b:-2880,-2032",
@@ -616,7 +628,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0105:16:-4096,3072",
@@ -632,7 +645,8 @@
         "group": 8,
         "bit": 22
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0107:20:2384,-2208",
@@ -648,7 +662,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0108:2b:-8256,-7904",
@@ -664,7 +679,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0108:2b:-8240,-7904",
@@ -681,6 +697,7 @@
         "bit": 43
       },
       "source": "event-granted",
+      "visual": "interaction-only",
       "gateFlag": "7:99"
     },
     {
@@ -697,7 +714,8 @@
         "group": 8,
         "bit": 47
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "010b:36:5008,-840",
@@ -713,7 +731,8 @@
         "group": 8,
         "bit": 54
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "010c:1d:704,2928",
@@ -729,7 +748,8 @@
         "group": 8,
         "bit": 29
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "010c:30:-2992,2720",
@@ -745,7 +765,8 @@
         "group": 8,
         "bit": 48
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "010d:20:-6144,768",
@@ -761,7 +782,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "010e:20:-9024,-7760",
@@ -777,7 +799,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "010f:40:-5120,3584",
@@ -793,7 +816,8 @@
         "group": 8,
         "bit": 64
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0113:2b:-7008,2928",
@@ -809,7 +833,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0114:20:5632,3184",
@@ -825,7 +850,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0202:63:-3568,720",
@@ -841,7 +867,8 @@
         "group": 8,
         "bit": 99
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0202:10:2020,-1392",
@@ -857,7 +884,8 @@
         "group": 8,
         "bit": 16
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0202:3d:-1792,1792",
@@ -873,7 +901,8 @@
         "group": 8,
         "bit": 61
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0202:47:-3468,2768",
@@ -890,6 +919,7 @@
         "bit": 71
       },
       "source": "event-granted",
+      "visual": "interaction-only",
       "gateFlag": "2:11"
     },
     {
@@ -906,7 +936,8 @@
         "group": 8,
         "bit": 16
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0204:13:3800,2800",
@@ -922,7 +953,8 @@
         "group": 8,
         "bit": 19
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0204:0e:2000,-3000",
@@ -939,6 +971,7 @@
         "bit": 14
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "2:11"
     },
     {
@@ -955,7 +988,8 @@
         "group": 8,
         "bit": 17
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0205:45:-2032,1632",
@@ -972,6 +1006,7 @@
         "bit": 69
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "7:38"
     },
     {
@@ -988,7 +1023,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0300:0c:4512,-944",
@@ -1004,7 +1040,8 @@
         "group": 8,
         "bit": 12
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0300:14:-8048,4560",
@@ -1020,7 +1057,8 @@
         "group": 8,
         "bit": 20
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0302:2b:2880,-3056",
@@ -1036,7 +1074,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0302:65:-1280,1152",
@@ -1052,7 +1091,8 @@
         "group": 8,
         "bit": 101
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0303:21:512,-2048",
@@ -1068,7 +1108,8 @@
         "group": 8,
         "bit": 33
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0303:2d:3088,-1008",
@@ -1085,6 +1126,7 @@
         "bit": 45
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:90"
     },
     {
@@ -1102,6 +1144,7 @@
         "bit": 70
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:86"
     },
     {
@@ -1119,6 +1162,7 @@
         "bit": 70
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:86"
     },
     {
@@ -1135,7 +1179,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0304:44:-1500,0",
@@ -1152,6 +1197,7 @@
         "bit": 68
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "7:37"
     },
     {
@@ -1168,7 +1214,8 @@
         "group": 8,
         "bit": 29
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0305:0d:-2176,2032",
@@ -1184,7 +1231,8 @@
         "group": 8,
         "bit": 13
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0305:5e:-6400,-4864",
@@ -1201,6 +1249,7 @@
         "bit": 94
       },
       "source": "event-granted",
+      "visual": "interaction-only",
       "gateFlag": "0:96"
     },
     {
@@ -1217,7 +1266,8 @@
         "group": 8,
         "bit": 72
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0308:1d:1536,-2464",
@@ -1233,7 +1283,8 @@
         "group": 8,
         "bit": 29
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0308:2b:-368,2512",
@@ -1249,7 +1300,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0308:34:-128,-1792",
@@ -1265,7 +1317,8 @@
         "group": 8,
         "bit": 52
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0308:23:-1185,1451",
@@ -1281,7 +1334,8 @@
         "group": 8,
         "bit": 35
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0308:1d:-1185,1451",
@@ -1297,7 +1351,8 @@
         "group": 8,
         "bit": 29
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0308:1f:-1185,1451",
@@ -1313,7 +1368,8 @@
         "group": 8,
         "bit": 31
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "030b:2b:-4272,-1296",
@@ -1329,7 +1385,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "030b:40:-5120,3584",
@@ -1345,7 +1402,8 @@
         "group": 8,
         "bit": 64
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "030c:13:-7700,6900",
@@ -1361,7 +1419,8 @@
         "group": 8,
         "bit": 19
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "030c:35:-7700,6900",
@@ -1377,7 +1436,8 @@
         "group": 8,
         "bit": 53
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0400:6a:13264,1792",
@@ -1393,7 +1453,8 @@
         "group": 8,
         "bit": 106
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0400:20:12576,1328",
@@ -1409,7 +1470,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0400:10:7984,1104",
@@ -1425,7 +1487,8 @@
         "group": 8,
         "bit": 16
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0402:18:5888,-12960",
@@ -1441,7 +1504,8 @@
         "group": 8,
         "bit": 24
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0402:18:-4352,-12992",
@@ -1457,7 +1521,8 @@
         "group": 8,
         "bit": 24
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0402:09:-5888,-11520",
@@ -1473,7 +1538,8 @@
         "group": 8,
         "bit": 9
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0404:11:-4200,3200",
@@ -1489,7 +1555,8 @@
         "group": 8,
         "bit": 17
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0404:11:5300,3000",
@@ -1505,7 +1572,8 @@
         "group": 8,
         "bit": 17
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0405:2b:1008,11296",
@@ -1521,7 +1589,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0406:64:-3456,1280",
@@ -1537,7 +1606,8 @@
         "group": 8,
         "bit": 100
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0406:6b:-3956,-1600",
@@ -1554,6 +1624,7 @@
         "bit": 107
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:1"
     },
     {
@@ -1570,7 +1641,8 @@
         "group": 8,
         "bit": 107
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0408:43:-2576,-5568",
@@ -1586,7 +1658,8 @@
         "group": 8,
         "bit": 67
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "040b:20:240,-2266",
@@ -1602,7 +1675,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "040b:3c:2816,-2496",
@@ -1618,7 +1692,8 @@
         "group": 8,
         "bit": 60
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0500:20:-7568,6672",
@@ -1634,7 +1709,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0502:38:-9472,3840",
@@ -1650,7 +1726,8 @@
         "group": 8,
         "bit": 56
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0502:21:-16384,-4352",
@@ -1666,7 +1743,8 @@
         "group": 8,
         "bit": 33
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0502:14:4480,-6656",
@@ -1682,7 +1760,8 @@
         "group": 8,
         "bit": 20
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0503:4c:-3468,2768",
@@ -1699,6 +1778,7 @@
         "bit": 76
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "11:83"
     },
     {
@@ -1716,6 +1796,7 @@
         "bit": 77
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "11:83"
     },
     {
@@ -1732,7 +1813,8 @@
         "group": 8,
         "bit": 81
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0503:2b:-10240,-5248",
@@ -1748,7 +1830,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0503:6f:-2800,-3088",
@@ -1764,7 +1847,8 @@
         "group": 8,
         "bit": 111
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0503:0b:-10240,4480",
@@ -1781,6 +1865,7 @@
         "bit": 11
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "2:11"
     },
     {
@@ -1797,7 +1882,8 @@
         "group": 8,
         "bit": 91
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0504:6d:-1632,2304",
@@ -1813,7 +1899,8 @@
         "group": 8,
         "bit": 109
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0504:4f:-2912,3872",
@@ -1830,6 +1917,7 @@
         "bit": 79
       },
       "source": "event-granted",
+      "visual": "bespoke-mesh",
       "gateFlag": "2:11"
     },
     {
@@ -1847,6 +1935,7 @@
         "bit": 80
       },
       "source": "event-granted",
+      "visual": "bespoke-mesh",
       "gateFlag": "2:11"
     },
     {
@@ -1864,6 +1953,7 @@
         "bit": 78
       },
       "source": "event-granted",
+      "visual": "bespoke-mesh",
       "gateFlag": "2:11"
     },
     {
@@ -1881,6 +1971,7 @@
         "bit": 79
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "7:49"
     },
     {
@@ -1897,7 +1988,8 @@
         "group": 8,
         "bit": 80
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0505:2b:-1100,1800",
@@ -1913,7 +2005,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0506:56:-5696,-1232",
@@ -1929,7 +2022,8 @@
         "group": 8,
         "bit": 86
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0506:67:3840,2592",
@@ -1945,7 +2039,8 @@
         "group": 8,
         "bit": 103
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0506:2b:-6144,128",
@@ -1961,7 +2056,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0506:3b:-6912,3328",
@@ -1978,6 +2074,7 @@
         "bit": 59
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "2:4"
     },
     {
@@ -1994,7 +2091,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0507:0f:-4352,10000",
@@ -2010,7 +2108,8 @@
         "group": 8,
         "bit": 15
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0507:52:4352,7824",
@@ -2027,6 +2126,7 @@
         "bit": 82
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "0:213"
     },
     {
@@ -2044,6 +2144,7 @@
         "bit": 83
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "0:213"
     },
     {
@@ -2060,7 +2161,8 @@
         "group": 8,
         "bit": 32
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "050a:2b:7344,4736",
@@ -2076,7 +2178,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "generic-panel"
     },
     {
       "key": "050b:2b:6656,-3328",
@@ -2092,7 +2195,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "050c:5d:-3328,5616",
@@ -2109,6 +2213,7 @@
         "bit": 93
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "7:162"
     },
     {
@@ -2125,7 +2230,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "050e:3a:-7700,6900",
@@ -2141,7 +2247,8 @@
         "group": 8,
         "bit": 58
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "050e:61:-7700,6900",
@@ -2158,6 +2265,7 @@
         "bit": 97
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:5"
     },
     {
@@ -2174,7 +2282,8 @@
         "group": 8,
         "bit": 29
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "050f:58:-7700,6900",
@@ -2190,7 +2299,8 @@
         "group": 8,
         "bit": 88
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0510:39:4336,3344",
@@ -2206,7 +2316,8 @@
         "group": 8,
         "bit": 57
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0510:22:0,-5280",
@@ -2222,7 +2333,8 @@
         "group": 8,
         "bit": 34
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0511:2b:-10240,-5248",
@@ -2238,7 +2350,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0511:6f:-2800,-3088",
@@ -2254,7 +2367,8 @@
         "group": 8,
         "bit": 111
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0511:0b:-10240,4480",
@@ -2271,6 +2385,7 @@
         "bit": 11
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "2:11"
     },
     {
@@ -2287,7 +2402,8 @@
         "group": 8,
         "bit": 24
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0600:5a:-5120,3584",
@@ -2304,6 +2420,7 @@
         "bit": 90
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "2:4"
     },
     {
@@ -2321,6 +2438,7 @@
         "bit": 90
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "2:4"
     },
     {
@@ -2337,7 +2455,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0602:49:-3072,4096",
@@ -2353,7 +2472,8 @@
         "group": 8,
         "bit": 73
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0602:4a:2608,-32",
@@ -2369,7 +2489,8 @@
         "group": 8,
         "bit": 74
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0604:2b:3024,224",
@@ -2385,7 +2506,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0605:1b:12032,384",
@@ -2401,7 +2523,8 @@
         "group": 8,
         "bit": 27
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0605:66:-3072,3328",
@@ -2417,7 +2540,8 @@
         "group": 8,
         "bit": 102
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0606:2b:6144,-2560",
@@ -2433,7 +2557,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0606:2b:6912,-11392",
@@ -2449,7 +2574,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0606:18:3328,-2560",
@@ -2465,7 +2591,8 @@
         "group": 8,
         "bit": 24
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0606:31:-7648,2880",
@@ -2481,7 +2608,8 @@
         "group": 8,
         "bit": 49
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0606:4b:-7680,3392",
@@ -2497,7 +2625,8 @@
         "group": 8,
         "bit": 75
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0607:4d:4480,640",
@@ -2514,6 +2643,7 @@
         "bit": 77
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:4"
     },
     {
@@ -2531,6 +2661,7 @@
         "bit": 76
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:4"
     },
     {
@@ -2547,7 +2678,8 @@
         "group": 8,
         "bit": 91
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0608:2b:-7936,6400",
@@ -2563,7 +2695,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0609:57:-1360,1152",
@@ -2579,7 +2712,8 @@
         "group": 8,
         "bit": 87
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "0609:2b:5760,512",
@@ -2595,7 +2729,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "060a:21:10064,15104",
@@ -2611,7 +2746,8 @@
         "group": 8,
         "bit": 33
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "060a:55:-5120,3584",
@@ -2627,7 +2763,8 @@
         "group": 8,
         "bit": 85
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "060b:6e:2736,-6656",
@@ -2643,7 +2780,8 @@
         "group": 8,
         "bit": 110
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     },
     {
       "key": "060b:23:-4480,5760",
@@ -2659,7 +2797,8 @@
         "group": 8,
         "bit": 35
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "060d:09:-2816,10368",
@@ -2676,6 +2815,7 @@
         "bit": 9
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "11:10"
     },
     {
@@ -2693,6 +2833,7 @@
         "bit": 43
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "11:10"
     },
     {
@@ -2710,6 +2851,7 @@
         "bit": 24
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "11:10"
     },
     {
@@ -2727,6 +2869,7 @@
         "bit": 104
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "0:184"
     },
     {
@@ -2744,6 +2887,7 @@
         "bit": 50
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "0:184"
     },
     {
@@ -2761,6 +2905,7 @@
         "bit": 43
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "0:184"
     },
     {
@@ -2777,7 +2922,8 @@
         "group": 8,
         "bit": 21
       },
-      "source": "static"
+      "source": "static",
+      "visual": "interaction-only"
     },
     {
       "key": "0610:54:-1664,-2016",
@@ -2794,6 +2940,7 @@
         "bit": 84
       },
       "source": "static",
+      "visual": "interaction-only",
       "gateFlag": "2:18"
     },
     {
@@ -2811,6 +2958,7 @@
         "bit": 9
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "11:10"
     },
     {
@@ -2828,6 +2976,7 @@
         "bit": 43
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "11:10"
     },
     {
@@ -2845,6 +2994,7 @@
         "bit": 24
       },
       "source": "static",
+      "visual": "bespoke-mesh",
       "gateFlag": "11:10"
     },
     {
@@ -2861,7 +3011,8 @@
         "group": 8,
         "bit": 43
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0612:09:-896,0",
@@ -2878,6 +3029,7 @@
         "bit": 9
       },
       "source": "event-granted",
+      "visual": "interaction-only",
       "gateFlag": "11:10"
     },
     {
@@ -2894,7 +3046,8 @@
         "group": 8,
         "bit": 24
       },
-      "source": "event-granted"
+      "source": "event-granted",
+      "visual": "interaction-only"
     },
     {
       "key": "0613:21:10064,15104",
@@ -2910,7 +3063,8 @@
         "group": 8,
         "bit": 33
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0615:1b:12032,384",
@@ -2926,7 +3080,8 @@
         "group": 8,
         "bit": 27
       },
-      "source": "static"
+      "source": "static",
+      "visual": "generic-panel"
     },
     {
       "key": "0615:66:-3072,3328",
@@ -2942,7 +3097,8 @@
         "group": 8,
         "bit": 102
       },
-      "source": "static"
+      "source": "static",
+      "visual": "bespoke-mesh"
     }
   ],
   "items": {
@@ -3139,6 +3295,8 @@
       49,
       58,
       65,
+      71,
+      72,
       98,
       99,
       100,

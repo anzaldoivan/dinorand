@@ -16,8 +16,8 @@ namespace DinoRand.Randomizer.Spoiler;
 /// bytes 17–21 = the DC2 raptor-tier block, present only when non-default: byte 17 = enable bit7 +
 /// colour-mode bit5 (0=RoomTier, 1=MixedTiers) + (blue-combo-threshold−1) bits 0–4;
 /// bytes 18–21 = variant-weight nibbles V0..V7, low first;
-/// byte 16 bits 0-1 = the Regina character skin, bit 2 = DC2 shop shuffle; present only when
-/// non-default):
+/// byte 16 bits 0-1 = the Regina character skin, bit 2 = DC2 shop shuffle, bit 3 = DC2 elevator
+/// puzzle-code scramble, bit 4 = DC2 stungun-circuit shuffle; present only when non-default):
 ///   bytes 0–3  Seed.Value (int, little-endian)
 ///   byte 4     config flags — bit0=Items, bit1=Enemies, bit2=Doors, bit3=StartingInventory,
 ///              bit4=ShuffleKeyItems, bit5=ReplaceItemPool, bit6=EnemyHp (DC1),
@@ -67,7 +67,9 @@ public static class SeedString
                         || config.IncludeDc2BossEnemies || !weightsDefault
                         || config.Dc2CharacterSkin != Dc2.Passes.Dc2CharacterSkin.Stock;
         bool reginaByte = config.Dc2ReginaSkin != Dc2.Passes.Dc2CharacterSkin.Stock
-                          || config.Dc2ShuffleShop; // byte 16: Regina skin bits 0-1, shop bit 2
+                          || config.Dc2ShuffleShop          // byte 16: Regina skin bits 0-1, shop bit 2,
+                          || config.Dc2ScramblePuzzleCodes  // puzzle codes bit 3,
+                          || config.Dc2ShuffleCircuits;     // circuits bit 4
         if (reginaByte) dc2Block = true; // byte 16 needs the block's fixed positions
 
         // Raptor tier block (bytes 17–21, RAPTOR-TIER-RE.md §4): byte 17 = enable bit7 +
@@ -126,8 +128,10 @@ public static class SeedString
                 bytes[12 + i / 2] |= (byte)(i % 2 == 0 ? nibble : nibble << 4);
             }
             if (reginaByte)
-                bytes[16] = (byte)(((int)config.Dc2ReginaSkin & 0x03)      // Regina skin, bits 0-1
-                                   | (config.Dc2ShuffleShop ? 0x04 : 0));  // shop shuffle, bit 2
+                bytes[16] = (byte)(((int)config.Dc2ReginaSkin & 0x03)             // Regina skin, bits 0-1
+                                   | (config.Dc2ShuffleShop ? 0x04 : 0)           // shop shuffle, bit 2
+                                   | (config.Dc2ScramblePuzzleCodes ? 0x08 : 0)   // puzzle codes, bit 3
+                                   | (config.Dc2ShuffleCircuits ? 0x10 : 0));     // circuits, bit 4
             if (raptorBlock)
             {
                 bytes[17] = (byte)((config.Dc2RandomizeRaptorTiers ? 0x80 : 0)
@@ -194,7 +198,7 @@ public static class SeedString
             bool dc2Setpiece = false, dc2Boss = false;
             var dc2Skin = Dc2.Passes.Dc2CharacterSkin.Stock;
             var dc2ReginaSkin = Dc2.Passes.Dc2CharacterSkin.Stock;
-            bool dc2ShuffleShop = false;
+            bool dc2ShuffleShop = false, dc2PuzzleCodes = false, dc2Circuits = false;
             IReadOnlyDictionary<int, byte>? dc2Weights = null;
             if (bytes.Length >= 16)
             {
@@ -215,6 +219,8 @@ public static class SeedString
                 {
                     dc2ReginaSkin = (Dc2.Passes.Dc2CharacterSkin)(bytes[16] & 0x03);
                     dc2ShuffleShop = (bytes[16] & 0x04) != 0;
+                    dc2PuzzleCodes = (bytes[16] & 0x08) != 0;
+                    dc2Circuits = (bytes[16] & 0x10) != 0;
                 }
 
                 var weights = new Dictionary<int, byte>(Dc2CanonicalSpecies.Count);
@@ -294,6 +300,8 @@ public static class SeedString
                 Dc2CharacterSkin           = dc2Skin,
                 Dc2ReginaSkin              = dc2ReginaSkin,
                 Dc2ShuffleShop             = dc2ShuffleShop,
+                Dc2ScramblePuzzleCodes     = dc2PuzzleCodes,
+                Dc2ShuffleCircuits         = dc2Circuits,
                 Dc2RandomizeRaptorTiers    = raptorTiers,
                 Dc2RaptorColourMode        = raptorColourMode,
                 Dc2RaptorTierWeights       = tierWeights,

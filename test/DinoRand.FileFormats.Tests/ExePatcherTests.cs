@@ -1010,6 +1010,147 @@ public class ExePatcherTests
                 Assert.Equal((0x22, 1), BoxRecordPair(exe, va, i));
     }
 
+    // --- Emergency boxes: per-difficulty runtime coverage (independent oracle) ------------------------
+    //
+    // These tests deliberately do NOT use ExePatcher.EmergencyBoxBlockVas to build or select blocks —
+    // fixtures derived from the patcher's own constants cannot catch a wrong-VA / missed-difficulty bug.
+    // Instead they model the REAL decoded EXE as literals (EMERGENCY-BOX-DATA.md, audit 2026-07-16):
+    //   • the table = 7 blocks of 17 × 21-byte records at 0x65AB48 + block*360 (357 data + 3 pad):
+    //     [0] JP Easy/Normal, [1] Intl Easy/Normal, [2] special-mode, [3] JP Hard, [4] Intl Hard,
+    //     [5] JP VH, [6] Intl VH;
+    //   • the runtime selector (fn 0x483313): difficulty d → pointer index (d<=1 ? 0 : d==2 ? 1 : 2)
+    //     into the International pointer half {0x65ACB0, 0x65B0E8, 0x65B3B8} (bit7 of the difficulty
+    //     byte = International; the build DinoRand ships).
+    // Guarantee: for EVERY selectable difficulty the block the game reads is randomized and valid, and
+    // the blocks the International runtime never reads (JP + special-mode) stay byte-identical.
+
+    private const uint BoxTableBaseVa = 0x0065AB48;   // real table base (block 0), NOT the patcher const
+    private const int BoxBlockStride = 360;           // 17*21 data + 3 pad
+    private static uint RealBlockVa(int block) => BoxTableBaseVa + (uint)(block * BoxBlockStride);
+
+    /// <summary>The block VA the game's decoded runtime selector reads for a difficulty (International).</summary>
+    private static uint RuntimeBoxBlockVa(int difficulty)
+        => RealBlockVa(difficulty <= 1 ? 1 : difficulty == 2 ? 4 : 6);
+
+    private static readonly int[] NonRuntimeBoxBlocks = { 0, 2, 3, 5 }; // JP Easy/N, special-mode, JP Hard, JP VH
+
+    /// <summary>A synthetic image with the REAL 7-block topology: every block filled with 17
+    /// distinguishable valid records ([0x0A][unique id in 0x10–0x23][unique count]).</summary>
+    private static byte[] NewImageWithRealBoxTopology()
+    {
+        var exe = NewImage();
+        for (int b = 0; b < 7; b++)
+            for (int i = 0; i < 17; i++)
+            {
+                int rec = ExePatcher.VaToFileOffset(RealBlockVa(b)) + i * 21;
+                exe[rec] = 0x0A;
+                exe[rec + 1] = (byte)(0x10 + i);         // unique item id per slot (0x10..0x20)
+                exe[rec + 2] = (byte)(1 + b * 17 + i);   // unique count per (block, slot)
+            }
+        return exe;
+    }
+
+    private static byte[] BlockBytes(byte[] exe, uint blockVa)
+        => exe.Skip(ExePatcher.VaToFileOffset(blockVa)).Take(17 * 21).ToArray();
+
+    private static void AssertValidBoxBlock(byte[] exe, uint blockVa)
+    {
+        int off = ExePatcher.VaToFileOffset(blockVa);
+        for (int i = 0; i < 17; i++)
+        {
+            int rec = off + i * 21;
+            Assert.Equal(0x0A, exe[rec]); // slot marker at every 21-byte boundary
+            for (int k = 0; k < 10; k++)
+            {
+                byte id = exe[rec + 1 + 2 * k];
+                if (id == 0) break;
+                Assert.InRange(id, (byte)0x10, (byte)0x23);
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(0)] // Easy
+    [InlineData(1)] // Normal (shares the Easy block via the 0x483313 selector — must still be covered)
+    [InlineData(2)] // Hard
+    [InlineData(3)] // Very Hard
+    public void ShuffleEmergencyBoxContents_RandomizesTheBlockEachDifficultyReads(int difficulty)
+    {
+        var exe = NewImageWithRealBoxTopology();
+        uint runtimeVa = RuntimeBoxBlockVa(difficulty);
+        var pristine = BlockBytes(exe, runtimeVa);
+
+        ExePatcher.ShuffleEmergencyBoxContents(exe, seed: 4242);
+
+        Assert.False(BlockBytes(exe, runtimeVa).SequenceEqual(pristine),
+            $"difficulty {difficulty}: the block the game reads (0x{runtimeVa:X}) was left vanilla");
+        AssertValidBoxBlock(exe, runtimeVa);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void RerollEmergencyBoxContents_RandomizesTheBlockEachDifficultyReads(int difficulty)
+    {
+        var exe = NewImageWithRealBoxTopology();
+        uint runtimeVa = RuntimeBoxBlockVa(difficulty);
+        var pristine = BlockBytes(exe, runtimeVa);
+
+        ExePatcher.RerollEmergencyBoxContents(exe, seed: 777);
+
+        Assert.False(BlockBytes(exe, runtimeVa).SequenceEqual(pristine),
+            $"difficulty {difficulty}: the block the game reads (0x{runtimeVa:X}) was left vanilla");
+        AssertValidBoxBlock(exe, runtimeVa);
+    }
+
+    [Fact]
+    public void EmergencyBoxPatches_LeaveBlocksTheRuntimeNeverReadsUntouched()
+    {
+        // The International runtime never reads the JP blocks or the special-mode block (mode-2 override,
+        // identity unconfirmed) — both modes must leave all four byte-identical, pads included.
+        foreach (var patch in new[]
+                 {
+                     (Action<byte[]>)(e => ExePatcher.ShuffleEmergencyBoxContents(e, seed: 4242)),
+                     e => ExePatcher.RerollEmergencyBoxContents(e, seed: 777),
+                 })
+        {
+            var exe = NewImageWithRealBoxTopology();
+            var pristine = NonRuntimeBoxBlocks.Select(b =>
+                exe.Skip(ExePatcher.VaToFileOffset(RealBlockVa(b))).Take(BoxBlockStride).ToArray()).ToArray();
+
+            patch(exe);
+
+            for (int n = 0; n < NonRuntimeBoxBlocks.Length; n++)
+                Assert.True(exe.Skip(ExePatcher.VaToFileOffset(RealBlockVa(NonRuntimeBoxBlocks[n])))
+                        .Take(BoxBlockStride).SequenceEqual(pristine[n]),
+                    $"non-runtime block {NonRuntimeBoxBlocks[n]} (0x{RealBlockVa(NonRuntimeBoxBlocks[n]):X}) was modified");
+        }
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void EmergencyBoxPatches_AreDeterministicPerDifficultyBlock(int difficulty)
+    {
+        uint runtimeVa = RuntimeBoxBlockVa(difficulty);
+
+        var a = NewImageWithRealBoxTopology();
+        var b = NewImageWithRealBoxTopology();
+        ExePatcher.ShuffleEmergencyBoxContents(a, seed: 99);
+        ExePatcher.ShuffleEmergencyBoxContents(b, seed: 99);
+        Assert.Equal(Convert.ToHexString(BlockBytes(a, runtimeVa)), Convert.ToHexString(BlockBytes(b, runtimeVa)));
+
+        var c = NewImageWithRealBoxTopology();
+        var d = NewImageWithRealBoxTopology();
+        ExePatcher.RerollEmergencyBoxContents(c, seed: 99);
+        ExePatcher.RerollEmergencyBoxContents(d, seed: 99);
+        Assert.Equal(Convert.ToHexString(BlockBytes(c, runtimeVa)), Convert.ToHexString(BlockBytes(d, runtimeVa)));
+    }
+
     // --- Starting inventory (the new-game starting-inventory randomizer lever) ------------------------
 
     // A synthetic image with every starting-inventory slot store written as a valid

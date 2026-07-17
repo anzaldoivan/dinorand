@@ -7,7 +7,26 @@ versions may include breaking changes).
 
 The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Directory.Build.props).
 
-## [Unreleased]
+## [0.5.2] - 2026-07-18
+
+### Added
+
+- **Title-screen seed watermark (both games, always on).**
+- **Added Puzzle Randomizer (DC2).**
+
+### Fixed
+
+- **Adjusted Key Randomizer Logic in order to avoid Softlocks (DC1).**
+- **Keep important items visible during swaps (DC1, on by default).**
+- **Pickup ground-visual data layer (DC1).**
+- **Normalize relocated pickup visuals (DC1).**
+
+## [0.5.1] — 2026-07-15
+
+### Fixed
+
+- **DC1 key-item placement fix for the Backyard of the Facility Area.**
+- **DC1 Chief Room Softlock has been fixed**
 
 ## [0.5.1] — 2026-07-15
 

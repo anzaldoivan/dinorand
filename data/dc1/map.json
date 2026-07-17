@@ -41,6 +41,13 @@
           "at": "-1712,-2528",
           "_why": "static ammo/health scatter target \u2014 An. Darts S"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-1088,2976",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc H"
+        }
       ]
     },
     "0101": {
@@ -121,6 +128,33 @@
           "priority": "Fixed",
           "_why": "flag-gated 7:84; unresolved-trigger \u2014 DDK Input Disc H"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-2800,992",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Panel Key 2"
+        },
+        {
+          "at": "-2576,3008",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Entrance Key"
+        },
+        {
+          "at": "-544,640",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        },
+        {
+          "at": "-512,1072",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc H"
+        },
+        {
+          "at": "2288,-2224",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Shotgun \"\"Model PA3\"\" (pump-action)"
+        }
       ]
     },
     "0104": {
@@ -129,6 +163,18 @@
       "name": "Strategy Room",
       "requiresRoom": [
         "0202"
+      ],
+      "itemVisuals": [
+        {
+          "at": "-2352,-272",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 F. C. Device \" without FingerPrint \""
+        },
+        {
+          "at": "-528,1280",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc E"
+        }
       ]
     },
     "0105": {
@@ -249,6 +295,18 @@
           "id": "2b",
           "_why": "relocation-twin \u00d72 \u2014 Plug"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-8256,-7904",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        },
+        {
+          "at": "-8240,-7904",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        }
       ]
     },
     "0109": {
@@ -266,6 +324,13 @@
           "at": "-1920,-48",
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "2560,-1632",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 BG Room B1 Key"
         }
       ]
     },
@@ -327,6 +392,13 @@
           "priority": "Fixed",
           "_why": "unresolved-trigger \u2014 ID Card Type \" Researcher \""
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "5008,-840",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 ID Card Type \" Researcher \""
+        }
       ]
     },
     "010C": {
@@ -337,6 +409,13 @@
         {
           "at": "704,2928",
           "_why": "static ammo/health scatter target \u2014 Med. Pak M"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-2992,2720",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 BG Area Key"
         }
       ]
     },
@@ -383,12 +462,26 @@
     "010E": {
       "category": "Segment",
       "floor": "Unknown",
-      "name": "Passageway to the Backup Generator"
+      "name": "Passageway to the Backup Generator",
+      "itemVisuals": [
+        {
+          "at": "-9024,-7760",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 An. Aid"
+        }
+      ]
     },
     "010F": {
       "category": "Segment",
       "floor": "1F",
-      "name": "Backup Generator Room 1F"
+      "name": "Backup Generator Room 1F",
+      "itemVisuals": [
+        {
+          "at": "-5120,3584",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Startup Battery. R \" Charged \""
+        }
+      ]
     },
     "0110": {
       "category": "Bridge",
@@ -466,7 +559,14 @@
     "0114": {
       "category": "Segment",
       "floor": "Unknown",
-      "name": "Passageway to the Backup Generator"
+      "name": "Passageway to the Backup Generator",
+      "itemVisuals": [
+        {
+          "at": "5632,3184",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 An. Aid"
+        }
+      ]
     },
     "0200": {
       "category": "Segment",
@@ -510,6 +610,23 @@
         {
           "at": "2020,-1392",
           "_why": "static ammo/health scatter target \u2014 SG Bullets"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-3568,720",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc N"
+        },
+        {
+          "at": "-3468,2768",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Key Card L"
+        },
+        {
+          "at": "-1792,1792",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Panel Key 1"
         }
       ]
     },
@@ -560,12 +677,22 @@
           "at": "3800,2800",
           "_why": "static ammo/health scatter target \u2014 An. Darts M"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "2000,-3000",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Handgun Slides (upgrade To Glock 35)"
+        }
       ]
     },
     "0205": {
       "category": "Segment",
       "floor": "2F",
       "name": "Communication Room",
+      "requiresRoom": [
+        "0300"
+      ],
       "itemPriorities": [
         {
           "at": "-2032,1632",
@@ -577,6 +704,13 @@
         {
           "at": "-208,-1248",
           "_why": "static ammo/health scatter target \u2014 Slag Bullets"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-2032,1632",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Antenna Key"
         }
       ]
     },
@@ -614,6 +748,13 @@
         {
           "at": "-8048,4560",
           "_why": "static ammo/health scatter target \u2014 An. Darts L"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "4512,-944",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Shotgun Stock"
         }
       ]
     },
@@ -662,7 +803,19 @@
     "0302": {
       "category": "Segment",
       "floor": "B1",
-      "name": "Research Meeting Room"
+      "name": "Research Meeting Room",
+      "itemVisuals": [
+        {
+          "at": "-1280,1152",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc E"
+        },
+        {
+          "at": "2880,-3056",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        }
+      ]
     },
     "0303": {
       "category": "Segment",
@@ -700,6 +853,18 @@
           "at": "512,-2048",
           "_why": "static ammo/health scatter target \u2014 Recovery Aid"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "3088,-1008",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B1 Key Chip, Small Size Key"
+        },
+        {
+          "at": "3328,-2560",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B1 Key Chip"
+        }
       ]
     },
     "0304": {
@@ -722,10 +887,19 @@
         "0300": {
           "requires": [
             101,
-            108
+            108,
+            71,
+            72
           ]
         }
-      }
+      },
+      "itemVisuals": [
+        {
+          "at": "-1500,0",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Screwdriver"
+        }
+      ]
     },
     "0305": {
       "category": "Segment",
@@ -753,7 +927,36 @@
           "at": "-6864,5888",
           "_why": "static ammo/health scatter target \u2014 Med. Pak M"
         }
-      ]
+      ],
+      "itemVisuals": [
+        {
+          "at": "-6400,-4864",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B1 Key Chip \" with number \"(3695)"
+        },
+        {
+          "at": "-2176,2032",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Handgun Sights (critical hit)"
+        },
+        {
+          "at": "2304,2560",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Key Card R"
+        }
+      ],
+      "items": {
+        "48": {
+          "requires": [
+            70
+          ]
+        },
+        "5e": {
+          "requires": [
+            70
+          ]
+        }
+      }
     },
     "0306": {
       "category": "Bridge",
@@ -829,6 +1032,28 @@
         {
           "id": "1d",
           "_why": "relocation-twin \u00d74 \u2014 Med. Pak M"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-1185,1451",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Med. Pak M, Multiplier, Resuscitation"
+        },
+        {
+          "at": "-368,2512",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        },
+        {
+          "at": "-128,-1792",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 ID Card Type \" Colonel \""
+        },
+        {
+          "at": "1536,-2464",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Med. Pak M"
         }
       ]
     },
@@ -934,7 +1159,14 @@
     "030B": {
       "category": "Bridge",
       "floor": "Unknown",
-      "name": "Backup Generator Room B1"
+      "name": "Backup Generator Room B1",
+      "itemVisuals": [
+        {
+          "at": "-5120,3584",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Startup Battery. R \" Charged \""
+        }
+      ]
     },
     "030C": {
       "category": "Bridge",
@@ -955,6 +1187,13 @@
           "at": "5000,7200",
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-7700,6900",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 ID Card Type \" Communicator \""
         }
       ]
     },
@@ -1046,6 +1285,18 @@
           "at": "12576,1328",
           "_why": "static ammo/health scatter target \u2014 An. Aid"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "12576,1328",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 An. Aid"
+        },
+        {
+          "at": "13264,1792",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc N"
+        }
       ]
     },
     "0401": {
@@ -1096,6 +1347,13 @@
         {
           "id": "18",
           "_why": "relocation-twin \u00d72 \u2014 Grenade Bullets"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-5888,-11520",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Grenade Gun (40mmHK)"
         }
       ]
     },
@@ -1169,6 +1427,13 @@
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "1008,11296",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        }
       ]
     },
     "0406": {
@@ -1196,6 +1461,23 @@
         {
           "id": "6b",
           "_why": "relocation-twin \u00d72 \u2014 DDK Code Disc L"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-4352,224",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc L"
+        },
+        {
+          "at": "-3956,-1600",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc L"
+        },
+        {
+          "at": "-3456,1280",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc L"
         }
       ]
     },
@@ -1226,6 +1508,13 @@
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-2576,-5568",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B1 Crane Card"
+        }
       ]
     },
     "0409": {
@@ -1249,6 +1538,18 @@
         {
           "at": "240,-2266",
           "_why": "static ammo/health scatter target \u2014 An. Aid"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "240,-2266",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 An. Aid"
+        },
+        {
+          "at": "2816,-2496",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 C. O. Pass Card"
         }
       ]
     },
@@ -1338,6 +1639,13 @@
           "at": "4480,-6656",
           "_why": "static ammo/health scatter target \u2014 An. Darts L"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-9472,3840",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Key Card Lv. C"
+        }
       ]
     },
     "0503": {
@@ -1366,7 +1674,29 @@
             58
           ]
         }
-      }
+      },
+      "itemVisuals": [
+        {
+          "at": "-10240,4480",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Shotgun Parts (upgrade To SPAS12)"
+        },
+        {
+          "at": "-3468,2768",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Initializer, Protect P. 2-B, Stabilizer"
+        },
+        {
+          "at": "-2800,-3088",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc D"
+        },
+        {
+          "at": "-1792,1792",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Secret Disc \" With Data \""
+        }
+      ]
     },
     "0504": {
       "category": "Segment",
@@ -1402,6 +1732,28 @@
           "id": "50",
           "_why": "relocation-twin \u00d72 \u2014 Protect P. 1-B"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-2912,3872",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Protect P. 1-B, Protect P. 2-A"
+        },
+        {
+          "at": "-1632,2304",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc W"
+        },
+        {
+          "at": "2256,-3840",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Protect P. 1-A"
+        },
+        {
+          "at": "4896,-3840",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Protect P. 1-B, Protect P. 2-A"
+        }
       ]
     },
     "0505": {
@@ -1418,6 +1770,13 @@
           "at": "-4200,5700",
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-1100,1800",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
         }
       ]
     },
@@ -1439,7 +1798,29 @@
             110
           ]
         }
-      }
+      },
+      "itemVisuals": [
+        {
+          "at": "-6912,3328",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 ID Card Type \" Project Superintendent \" (Dr. Kirk)"
+        },
+        {
+          "at": "-6144,128",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        },
+        {
+          "at": "-5696,-1232",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B2 Key Chip 1"
+        },
+        {
+          "at": "3840,2592",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc S"
+        }
+      ]
     },
     "0507": {
       "category": "Box",
@@ -1474,7 +1855,24 @@
             111
           ]
         }
-      }
+      },
+      "itemVisuals": [
+        {
+          "at": "-4352,10000",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Grenade Gun"
+        },
+        {
+          "at": "4352,7824",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Core Parts 1"
+        },
+        {
+          "at": "4352,9616",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Core Parts 2"
+        }
+      ]
     },
     "0508": {
       "category": "Segment",
@@ -1534,6 +1932,13 @@
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-3328,5616",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Researcher Memo \" with number \"(1281)"
+        }
       ]
     },
     "050D": {
@@ -1550,6 +1955,18 @@
           "at": "-7700,6900",
           "priority": "Fixed",
           "_why": "flag-gated 0:5 \u2014 Planning Disc"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-7700,6900",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Key Card Lv. A, Planning Disc"
+        },
+        {
+          "at": "-2100,-2700",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
         }
       ]
     },
@@ -1573,6 +1990,13 @@
           "at": "-1100,-2100",
           "_why": "static ammo/health scatter target \u2014 Med. Pak M"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-7700,6900",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Pulse Receiver"
+        }
       ]
     },
     "0510": {
@@ -1587,12 +2011,31 @@
           "at": "0,-5280",
           "_why": "static ammo/health scatter target \u2014 Intensifier"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "4336,3344",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Key Card Lv. B"
+        }
       ]
     },
     "0511": {
       "category": "Segment",
       "floor": "B2",
-      "name": "Stabilizer Experiment Room"
+      "name": "Stabilizer Experiment Room",
+      "itemVisuals": [
+        {
+          "at": "-10240,4480",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Shotgun Parts (upgrade To SPAS12)"
+        },
+        {
+          "at": "-2800,-3088",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc D"
+        }
+      ]
     },
     "0600": {
       "category": "Bridge",
@@ -1627,6 +2070,13 @@
           "at": "-1616,4480",
           "_why": "static ammo/health scatter target \u2014 Grenade Bullets"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-5120,3584",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Startup Battery. W \" Large \""
+        }
       ]
     },
     "0601": {
@@ -1643,6 +2093,13 @@
           "at": "2752,4560",
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-5120,3584",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Startup Battery. W \" Large \""
         }
       ]
     },
@@ -1667,6 +2124,18 @@
           "at": "1536,-768",
           "priority": "Fixed",
           "_why": "runtime-armed \u2014 (empty / runtime-armed slot)"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-3072,4096",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B3 Crane Card 1"
+        },
+        {
+          "at": "2608,-32",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B3 Crane Card 2"
         }
       ]
     },
@@ -1693,7 +2162,14 @@
             109
           ]
         }
-      }
+      },
+      "itemVisuals": [
+        {
+          "at": "3024,224",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        }
+      ]
     },
     "0605": {
       "category": "Box",
@@ -1703,6 +2179,13 @@
         {
           "at": "12032,384",
           "_why": "static ammo/health scatter target \u2014 Hemostat"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-3072,3328",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc W"
         }
       ]
     },
@@ -1778,6 +2261,33 @@
           "at": "3328,-2560",
           "_why": "static ammo/health scatter target \u2014 Grenade Bullets"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-7680,3392",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B3 Crane Card 3"
+        },
+        {
+          "at": "-7648,2880",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 C. O. Area Key"
+        },
+        {
+          "at": "3328,-2560",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Grenade Bullets"
+        },
+        {
+          "at": "6144,-2560",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        },
+        {
+          "at": "6912,-11392",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        }
       ]
     },
     "0607": {
@@ -1811,7 +2321,19 @@
             58
           ]
         }
-      }
+      },
+      "itemVisuals": [
+        {
+          "at": "-1792,1792",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Secret Disc \" With Data \""
+        },
+        {
+          "at": "4480,640",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Initializer, Stabilizer"
+        }
+      ]
     },
     "0608": {
       "category": "Bridge",
@@ -1845,7 +2367,19 @@
     "0609": {
       "category": "Segment",
       "floor": "B3",
-      "name": "Disembarkation Immigration Office"
+      "name": "Disembarkation Immigration Office",
+      "itemVisuals": [
+        {
+          "at": "-1360,1152",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 B2 Key Chip 2"
+        },
+        {
+          "at": "5760,512",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        }
+      ]
     },
     "060A": {
       "category": "Segment",
@@ -1863,6 +2397,13 @@
           "at": "10064,15104",
           "_why": "static ammo/health scatter target \u2014 Recovery Aid"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-5120,3584",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Nucleum"
+        }
       ]
     },
     "060B": {
@@ -1873,6 +2414,13 @@
         {
           "at": "-4480,5760",
           "_why": "static ammo/health scatter target \u2014 Multiplier"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "2736,-6656",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Code Disc S"
         }
       ]
     },
@@ -1905,6 +2453,13 @@
         {
           "id": "2b",
           "_why": "relocation-twin \u00d72 \u2014 Plug"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-2816,10368",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Grenade Bullets, Grenade Gun (40mmHK), Plug"
         }
       ]
     },
@@ -1941,6 +2496,28 @@
           "priority": "Fixed",
           "_why": "flag-gated 0:184 \u2014 DDK Input Disc D"
         }
+      ],
+      "itemVisuals": [
+        {
+          "at": "288,-1920",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Port Card Key"
+        },
+        {
+          "at": "864,8240",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Plug"
+        },
+        {
+          "at": "3344,1264",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Poison Dart"
+        },
+        {
+          "at": "4128,448",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc D"
+        }
       ]
     },
     "0610": {
@@ -1971,6 +2548,18 @@
         {
           "id": "2b",
           "_why": "relocation-twin \u00d72 \u2014 Plug"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-1664,-2016",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Energy Tank"
+        },
+        {
+          "at": "-1024,-2048",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Grenade Bullets, Grenade Gun (40mmHK), Plug"
         }
       ]
     },
@@ -2004,6 +2593,13 @@
         {
           "id": "18",
           "_why": "relocation-twin \u00d72 \u2014 Grenade Bullets"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-896,0",
+          "visual": "interaction-only",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 Grenade Bullets, Grenade Gun (40mmHK), Plug"
         }
       ]
     },
@@ -2043,6 +2639,13 @@
         {
           "at": "12032,384",
           "_why": "static ammo/health scatter target \u2014 Hemostat"
+        }
+      ],
+      "itemVisuals": [
+        {
+          "at": "-3072,3328",
+          "visual": "bespoke-mesh",
+          "_why": "ground visual (rec+0x22/0x24) \u2014 DDK Input Disc W"
         }
       ]
     }
