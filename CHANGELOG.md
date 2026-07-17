@@ -7,62 +7,19 @@ versions may include breaking changes).
 
 The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Directory.Build.props).
 
-## [Unreleased]
+## [0.5.2] - 2026-07-18
 
 ### Added
 
-- **DC1: cutscene shortening (experimental, default off — `--dc1-shorten-cutscenes`).** DC1
-  cutscenes were decoded as script-authored `flag(2,2)` brackets watched by a native wrapper task
-  that letterboxes and saves/restores the player (STATIC-SCD-RE cont.74). The new pass rewrites
-  each conservatively-whitelisted bracket in place so its side effects (story flags, item grants)
-  still execute while the choreography is jumped over — the engine's own wrapper keeps the skip
-  pose-safe. 65 of 171 corpus brackets qualify for v1; in-game verification pending (pilots
-  st202/st10f). GUI: "Shorten cutscenes (experimental)" checkbox (DC1; session-only, not part of
-  the seed string). docs/decisions/cross/CUTSCENE-SKIP-FEASIBILITY.md §9.
-- **DC2: REbirth door-skip passthrough (`--dc2-door-skip`).** Enables Classic REbirth's own
-  door-transition skip by writing `DoorSkip = 1` into the game root's `config.ini` `[DLL]` section
-  (K115) — a user-config write, undone by flipping the key back. GUI: "Door skip (Classic
-  REbirth)" checkbox in the DC2 options panel (applied on Install; not part of the seed; Restore
-  does not undo it).
+- **Title-screen seed watermark (both games, always on).**
+- **Added Puzzle Randomizer (DC2).**
 
-- **DC1: per-item ground models for relocated pickups (Lever B, experimental, default ON —
-  disable with `--no-pickup-ground-models`).** A shuffled key/weapon whose id has a vanilla ground
-  mesh anywhere in the game now shows that model at its new spot: the donor mesh is appended to the
-  destination room's script data and its texture/palette footprint re-uploaded at a free VRAM
-  column (43 item ids covered). Ids without a mesh and any placement failure fall back to the
-  generic pickup panel (the `--normalize-pickup-visuals` behavior, which this feature implies).
-  In-game render verification is in progress; the flag is the kill-switch.
-  - 2026-07-17 (live-witness follow-ups): imported textures were rendered squashed/black — the
-    engine's texture blit consumes 64-byte row units, so upload widths are now padded to 32
-    halfwords; and the visual now always represents the item that is actually there: a key with its
-    own model shows it even on a formerly-generic spot, and an ammo/heal pickup landing on a key's
-    spot shows the generic panel instead of the old key's model (hidden interaction-only spots keep
-    vanilla behaviour for consumables). The key-shuffle spoiler hint is donor-aware
-    ("shows its own model" / "shown as generic pickup").
+### Fixed
 
-- **Title-screen seed watermark (both games, always on).** The title screen now shows
-  "DINORAND V…" and the shareable `DINO-…` seed string (the same one the GUI shows — it encodes
-  seed + settings, so a screenshot identifies the exact run). DC1: `Data\t_image.imd`;
-  DC2: the static backgrounds inside `TITLE.DAT`/`TITLE2.DAT`. Backed up and removed by
-  `--restore`, like every other edit. (BioRand parity; SEED-WATERMARK-PLAN.md.)
-
-- **Keep important items visible (DC1, on by default).** DC1 hides 59 of its 154 pickups (no ground
-  visual — found only by examining corpses/desks/devices). Weapons and upgrade parts now avoid those
-  spots, and a relocated key item can land in one only if it was hidden in the vanilla game ("no
-  worse than vanilla"). Disable with `--allow-hidden-spots` / the GUI checkbox to restore the old
-  anything-anywhere behaviour. NOTE: because this is on by default, default seeds differ from
-  v0.5.1 for the same seed number.
-- **Pickup ground-visual data layer (DC1).** Decoded per-pickup visual class (generic panel /
-  bespoke mesh / interaction-only) through `room-data.json` → `map.json itemVisuals` →
-  DATA-REFERENCE "Visual" column; the key-shuffle spoiler now marks keys placed in hidden spots
-  ("hidden — examine the spot") and spots that still show the old item's model ("appears as …").
-- **Normalize relocated pickup visuals (DC1).** When the shuffle moves a key or weapon into a spot whose
-  ground visual doesn't match — an invisible interaction-only spot, or one that still shows the old item's
-  model — the spot is rewritten to render the standard blinking pickup panel, so what you see matches what
-  you get. A fresh visual slot is allocated only from the room's proven-free pool indexes (fail-closed).
-  The GUI turns this on automatically whenever item and/or key-item randomization is enabled (no separate
-  checkbox); the CLI keeps it opt-in via `--normalize-pickup-visuals`. (Lever A,
-  PICKUP-GROUND-MODEL-FEASIBILITY.md.)
+- **Adjusted Key Randomizer Logic in order to avoid Softlocks (DC1).**
+- **Keep important items visible during swaps (DC1, on by default).**
+- **Pickup ground-visual data layer (DC1).**
+- **Normalize relocated pickup visuals (DC1).**
 
 ## [0.5.1] — 2026-07-15
 
