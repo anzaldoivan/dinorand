@@ -20,13 +20,7 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 - **Keep important items visible during swaps (DC1, on by default).**
 - **Pickup ground-visual data layer (DC1).**
 - **Normalize relocated pickup visuals (DC1).**
-
-## [0.5.1] — 2026-07-15
-
-### Fixed
-
-- **DC1 key-item placement fix for the Backyard of the Facility Area.**
-- **DC1 Chief Room Softlock has been fixed**
+- **Crashes related to the Enemy Randomizer have been fixed (DC2).**
 
 ## [0.5.1] — 2026-07-15
 
