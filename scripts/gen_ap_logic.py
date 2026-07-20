@@ -220,6 +220,21 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
     return locs
 
 
+CLIENT_CHECKS = DC1 / "ap-client-checks.json"
+
+
+def _load_client_checks() -> dict[str, dict]:
+    """AP location name -> its runtime-client check entry (data/dc1/ap-client-checks.json,
+    generated install-side by scripts/gen_ap_client_checks.py). Fail-closed: the runtime client
+    (AP-CLIENT-PLAN.md) needs a predicate for every location, so a missing/renamed entry must
+    break the build, not surface as a silently-uncheckable location."""
+    if not CLIENT_CHECKS.exists():
+        raise SystemExit(f"gen_ap_logic: {CLIENT_CHECKS.relative_to(REPO)} missing — "
+                         "run 'python3 scripts/gen_ap_client_checks.py --apply' (needs the DC1 install)")
+    doc = json.loads(CLIENT_CHECKS.read_text(encoding="utf-8"))
+    return {e["name"]: e for e in doc["locations"]}
+
+
 def build_dc1() -> dict:
     _assert_dc1_parity(require_oracle=False)  # fail closed: never silently drop an unrepresentable construct
     items = load_items()
@@ -235,11 +250,25 @@ def build_dc1() -> dict:
     if off_graph:
         print(f"  NOTE: dc1 pickups in {len(off_graph)} room(s) outside the door graph "
               f"excluded from the AP contract: {off_graph}")
+    # Runtime-client check parity (AP-CLIENT-PLAN.md §2): every AP location must have a check
+    # predicate, and shared-flag locations the client cannot attribute individually are marked
+    # `excluded` so the apworld keeps progression out of them (LocationProgressType.EXCLUDED).
+    checks = _load_client_checks()
+    have, want = set(checks), {l["name"] for l in locs}
+    if have != want:
+        missing, stale = sorted(want - have), sorted(have - want)
+        raise SystemExit("gen_ap_logic: ap-client-checks.json out of sync with the location set "
+                         f"(missing {missing[:5]}{'…' if len(missing) > 5 else ''}, "
+                         f"stale {stale[:5]}{'…' if len(stale) > 5 else ''}) — "
+                         "regenerate with gen_ap_client_checks.py --apply")
+    for l in locs:
+        if checks[l["name"]].get("excluded"):
+            l["excluded"] = True
     progression = sorted({i for e in m["edges"] for i in e["requiresItems"]})
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
-        "_source": "data/dc1/{map,items,room-data}.json (authored)",
-        "version": 1,
+        "_source": "data/dc1/{map,items,room-data}.json (authored) + ap-client-checks.json",
+        "version": 2,
         "startRoom": m["startRoom"],
         "goalRoom": m["goalRoom"],
         "regions": m["regions"],
@@ -487,8 +516,31 @@ def check_dc2(data: dict) -> None:
 def check_dc1(data: dict) -> None:
     _assert_dc1_parity(require_oracle=True)  # + oracle golden snapshot still agrees with the source
     names = _check_common(data)
+    assert data["version"] == 2, data["version"]  # v2 = runtime-client fields (excluded)
     assert data["startRoom"] == "010d", data["startRoom"]
     assert data["goalRoom"] == "060d", data["goalRoom"]
+    # Runtime-client check contract: name parity is enforced in build_dc1 (fail-closed); here,
+    # non-excluded locations must have pairwise-unique check flags (the client's attribution
+    # guarantee) and the excluded set must stay a small tail, never a silent majority.
+    checks = _load_client_checks()
+    # apId parity: the checks file carries the apworld's sorted-name location ids so the C#
+    # client never re-derives the scheme — assert the two derivations agree (id-scheme guard).
+    expected_ap = {name: 0x0DC1_0000 + 0x1_0000 + i
+                   for i, name in enumerate(sorted(l["name"] for l in data["locations"]))}
+    flag_users: dict[int, str] = {}
+    excluded = 0
+    for loc in data["locations"]:
+        e = checks[loc["name"]]
+        assert e["apId"] == expected_ap[loc["name"]], (loc["name"], e["apId"])
+        assert e["predicate"]["kind"] == "flag" and e["predicate"]["anyOf"], e
+        if loc.get("excluded"):
+            excluded += 1
+            continue
+        for f in e["predicate"]["anyOf"]:
+            assert f not in flag_users, f"flag 7:{f} shared by '{flag_users[f]}' and '{loc['name']}'"
+            assert 0 < f < 256, f
+            flag_users[f] = loc["name"]
+    assert excluded <= len(data["locations"]) // 4, f"{excluded} excluded locations — checks data suspect"
     # A known key gate: some door from room 0112 to 0114 requires the BG Area key (0x30).
     gate = [e for e in data["edges"] if e["from"] == "0112" and e["to"] == "0114"]
     assert gate and 0x30 in gate[0]["requiresItems"], gate

@@ -7,9 +7,10 @@ data/dc1 files. This module is pure data + no Archipelago imports, so it can be 
 from __future__ import annotations
 
 import json
-from pathlib import Path
+import pkgutil
 
-_DATA = json.loads((Path(__file__).parent / "data" / "dc1_logic.json").read_text(encoding="utf-8"))
+# pkgutil (not pathlib) so the contract loads from a zipped .apworld too, not just a folder.
+_DATA = json.loads(pkgutil.get_data(__name__, "data/dc1_logic.json").decode("utf-8"))
 
 VERSION: int = _DATA["version"]
 START_ROOM: str = _DATA["startRoom"]
@@ -34,6 +35,19 @@ LOCATION_NAME_TO_ID: dict[str, int] = {
     loc["name"]: _BASE_ID + 0x1_0000 + i
     for i, loc in enumerate(sorted(LOCATIONS, key=lambda l: l["name"]))
 }
+
+
+# Runtime client (AP-CLIENT-PLAN.md D5): slot_data `placements` value meaning "this location
+# holds another world's item" — the install renders it as the marker item (client-side constant;
+# the apworld never carries exe knowledge).
+OTHER_WORLD_MARKER = -1
+
+# AP item name -> the DC1 game item id the installer writes / the client grants. Names are not
+# unique in the raw table (14 costume variants share one name) — take the lowest id per name,
+# deterministically, matching ITEM_NAME_TO_ID's unique-name key set.
+GAME_ITEM_ID: dict[str, int] = {}
+for _gid, _name in sorted(ITEM_NAMES.items()):
+    GAME_ITEM_ID.setdefault(_name, _gid)
 
 
 def region_name(code: str) -> str:

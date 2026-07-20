@@ -254,6 +254,11 @@ public sealed class RoomFile
         /// texture is already resident in VRAM (the renderable path for same-species event injection;
         /// ADD-ENEMY-EVENT-INJECTION-CRASH-RCA.md).</summary>
         Reused,
+        /// <summary>No free VRAM region existed, so the donor texture was placed over the replaced
+        /// victim's own texture column / palette row (safe because no surviving model samples them;
+        /// the staged entry uploads after the original and wins). The generalization of the Theri
+        /// fixed-column strategy — see TEXTURE-IMPORT-VRAM.md "Outcome census".</summary>
+        ReclaimedVictim,
     }
 
     /// <summary>Result of a textured import: the <see cref="Outcome"/> and (when relocated) the
@@ -277,25 +282,62 @@ public sealed class RoomFile
     /// </summary>
     public TexturedImportResult ImportSpeciesTextured(SpeciesDonor donor, int enemyIndex)
     {
+        var reclaim = VictimReclaimableRects(enemyIndex);
         ImportSpecies(donor, enemyIndex);
-        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr);
+        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr, reclaim);
     }
 
     /// <summary>Multi-range (entangled species) sibling of
     /// <see cref="ImportSpeciesTextured(SpeciesDonor,int)"/>.</summary>
     public TexturedImportResult ImportSpeciesTextured(SpeciesDonorMulti donor, int enemyIndex)
     {
+        var reclaim = VictimReclaimableRects(enemyIndex);
         ImportSpecies(donor, enemyIndex);
-        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr);
+        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr, reclaim);
     }
 
-    private TexturedImportResult StageTexture(TextureBlock? texture, uint importedModelPtr)
+    /// <summary>
+    /// The victim's own texture + palette VRAM rects, IF replacing this record frees them: null when
+    /// the victim texture can't be resolved or when any OTHER enemy record's model still samples one
+    /// of the victim's tpage/CLUT codes (shared skin — overwriting it would garble the survivor).
+    /// Unreadable sibling models count as sharing (fail closed). Computed BEFORE the geometry import
+    /// (needs the victim's original model pointer).
+    /// </summary>
+    private IReadOnlyList<VramRect>? VictimReclaimableRects(int enemyIndex)
+    {
+        var victim = Enemies[enemyIndex];
+        var victimTex = SpeciesImporter.TryExtractTexture(OriginalBytes, RdtBuffer, victim.OriginalModelPtr);
+        if (victimTex is null) return null;
+
+        var victimTpages = victimTex.TpageCodes.ToHashSet();
+        for (int j = 0; j < Enemies.Count; j++)
+        {
+            if (j == enemyIndex) continue;
+            try
+            {
+                var (tpages, clut) = TextureImporter.ReadModelTextureCodes(RdtBuffer, Enemies[j].OriginalModelPtr);
+                if (clut == victimTex.ClutCode || tpages.Any(victimTpages.Contains)) return null;
+            }
+            catch { return null; } // ponytail: unreadable sibling model ⇒ assume it shares, keep the texture
+        }
+        return new[] { victimTex.Texture.Dst, victimTex.Palette.Dst };
+    }
+
+    private TexturedImportResult StageTexture(TextureBlock? texture, uint importedModelPtr,
+                                              IReadOnlyList<VramRect>? reclaim = null)
     {
         if (texture is null) return new TexturedImportResult(TextureImportOutcome.GeometryOnly, null, null);
 
         TextureBlock placed;
+        var outcome = TextureImportOutcome.Relocated;
         try { placed = TextureImporter.PickFreeRegion(OriginalBytes, texture); }
-        catch (InvalidOperationException) { return new TexturedImportResult(TextureImportOutcome.GeometryOnly, null, null); }
+        catch (InvalidOperationException)
+        {
+            if (reclaim is null) return new TexturedImportResult(TextureImportOutcome.GeometryOnly, null, null);
+            try { placed = TextureImporter.PickFreeRegion(OriginalBytes, texture, reclaim); }
+            catch (InvalidOperationException) { return new TexturedImportResult(TextureImportOutcome.GeometryOnly, null, null); }
+            outcome = TextureImportOutcome.ReclaimedVictim;
+        }
 
         // Rewrite the imported model's baked codes (donor coords) to the relocated coords; Write() then
         // emits the rewritten RDT and injects the relocated texture + palette entries.
@@ -309,7 +351,7 @@ public sealed class RoomFile
         _textureInserts.Add(new(GianEntryType.Lzss2, placed.Texture.Dst, Lzss.Compress(placed.Texture.Pixels)));
         _textureInserts.Add(new(GianEntryType.Palette, placed.Palette.Dst, placed.Palette.Pixels));
         _structurallyEdited = true; // ensure Write() emits even if record-edit detection would skip
-        return new TexturedImportResult(TextureImportOutcome.Relocated, placed.Texture.Dst, placed.Palette.Dst);
+        return new TexturedImportResult(outcome, placed.Texture.Dst, placed.Palette.Dst);
     }
 
     /// <summary>VRAM rects already claimed by staged texture entries (enemy imports, earlier pickup
@@ -800,7 +842,8 @@ public sealed class RoomFile
 
         bool changed = _structurallyEdited;
         foreach (var item in Items)
-            if (!item.IsEmptySlot && (item.ItemId != item.OriginalItemId || item.NormalizeVisual)) { changed = true; break; }
+            if (!item.IsEmptySlot && (item.ItemId != item.OriginalItemId || item.NormalizeVisual
+                || item.TakeIndex != item.OriginalTakeIndex)) { changed = true; break; }
         if (!changed)
             foreach (var enemy in Enemies)
                 if (enemy.IsEdited) { changed = true; break; }

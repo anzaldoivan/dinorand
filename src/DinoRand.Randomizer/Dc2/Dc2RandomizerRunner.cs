@@ -27,6 +27,7 @@ public sealed class Dc2RandomizerRunner
         new Dc2PlayerModelSwap(),
         new Dc2VoiceRandomizer(), // LIVE 2026-07-05: emits swapped Speech/NNNN.dat loose files
         new Dc2CircuitShuffle(),  // after the room-byte passes: builds on their working bytes (K110)
+        new Dc2PlateKeyRekey(),   // ST205 SAT-9 routing + blue-panel recolour (K118)
         // Always-on cosmetic: seed watermark into TITLE.DAT/TITLE2.DAT (BioRand parity;
         // docs/decisions/cross/SEED-WATERMARK-PLAN.md). Last — it touches nothing other passes read.
         new Passes.Dc2TitleWatermarkPass(),
@@ -39,8 +40,10 @@ public sealed class Dc2RandomizerRunner
     /// <param name="emitSpoiler">Write <c>SPOILER.md</c> beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
     /// Built strictly AFTER the passes have emitted every game file — turning it off changes no
     /// other output byte (regression-locked).</param>
+    /// <param name="ct">Cancels the GENERATE phase only — see <see cref="RandomizerRunner.Run"/>;
+    /// the overlay onto <c>Data\</c> is deliberately not cancellable.</param>
     public Dc2RunResult Run(string installDir, string outputDir, Seed seed, RandomizerConfig config,
-                            bool emitSpoiler = true)
+                            bool emitSpoiler = true, CancellationToken ct = default)
     {
         var logLines = new List<string>();
         void Log(string line) => logLines.Add(line);
@@ -69,6 +72,7 @@ public sealed class Dc2RandomizerRunner
         foreach (var pass in _passes)
         {
             if (!pass.IsEnabled(config)) continue;
+            ct.ThrowIfCancellationRequested();   // output-dir writes only — safe to abort between passes
             pass.Apply(context);
         }
 

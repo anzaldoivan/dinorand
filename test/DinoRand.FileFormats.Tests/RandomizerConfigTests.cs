@@ -12,6 +12,12 @@ namespace DinoRand.FileFormats.Tests;
 public class RandomizerConfigTests
 {
     [Fact]
+    public void Dc2RandomizeWeapons_DefaultsOff()
+    {
+        Assert.False(new RandomizerConfig().Dc2RandomizeWeapons);
+    }
+
+    [Fact]
     public void NormalizeRatios_BothZero_BecomesDefaultAndReportsChange()
     {
         var cfg = new RandomizerConfig { RatioAmmo = 0, RatioHealth = 0 };
@@ -89,5 +95,21 @@ public class RandomizerConfigTests
         var circuitsOnly = new RandomizerConfig { Dc2ShuffleCircuits = true };
         Assert.True(circuitsOnly.Dc2RandomizePuzzles);
         Assert.False(circuitsOnly.Dc2ScramblePuzzleCodes);
+
+        var plateOnly = new RandomizerConfig { Dc2RekeyPlateDoor = true };
+        Assert.True(plateOnly.Dc2RandomizePuzzles);
+        Assert.False(plateOnly.Dc2ScramblePuzzleCodes);
+        Assert.False(plateOnly.Dc2ShuffleCircuits);
+    }
+
+    [Fact]
+    public void Dc2RandomizePuzzles_DrivesTheKeyPlateSubflag()
+    {
+        var on = new RandomizerConfig { Dc2RandomizePuzzles = true };
+        Assert.True(on.Dc2RekeyPlateDoor);   // K118: setter drives the plate-key re-key too
+
+        var off = new RandomizerConfig { Dc2RekeyPlateDoor = true };
+        off.Dc2RandomizePuzzles = false;
+        Assert.False(off.Dc2RekeyPlateDoor);
     }
 }

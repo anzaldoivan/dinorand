@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{01809BA3-C9D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DinoRand.App.Avalonia", "src\DinoRand.App.Avalonia\DinoRand.App.Avalonia.csproj", "{80449DB1-D499-4600-B577-28ED308C8E33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DinoRand.ApClient", "src\DinoRand.ApClient\DinoRand.ApClient.csproj", "{92446146-52B4-4F95-9E84-500600623918}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,8 +43,13 @@ Global
 		{80449DB1-D499-4600-B577-28ED308C8E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80449DB1-D499-4600-B577-28ED308C8E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80449DB1-D499-4600-B577-28ED308C8E33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92446146-52B4-4F95-9E84-500600623918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92446146-52B4-4F95-9E84-500600623918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92446146-52B4-4F95-9E84-500600623918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92446146-52B4-4F95-9E84-500600623918}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{80449DB1-D499-4600-B577-28ED308C8E33} = {01809BA3-C9DC-4AED-9804-B7DF03B5D675}
+		{92446146-52B4-4F95-9E84-500600623918} = {01809BA3-C9DC-4AED-9804-B7DF03B5D675}
 	EndGlobalSection
 EndGlobal

@@ -80,7 +80,12 @@ public sealed class CrossSpeciesImporter : ICrossSpeciesImporter
         var donor = FindGroundedDonor(def.Species);
         if (donor is null) { note = $"no {def.Species} donor"; return false; }
         var tex = room.ImportSpeciesTextured(donor, victimIdx);
-        note = tex.Outcome == RoomFile.TextureImportOutcome.Relocated ? "geometry + texture" : "geometry only";
+        note = tex.Outcome switch
+        {
+            RoomFile.TextureImportOutcome.Relocated => "geometry + texture",
+            RoomFile.TextureImportOutcome.ReclaimedVictim => "geometry + texture (victim column reclaimed)",
+            _ => "geometry only",
+        };
         return true;
     }
 

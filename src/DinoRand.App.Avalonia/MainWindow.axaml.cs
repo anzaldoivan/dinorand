@@ -18,19 +18,57 @@ namespace DinoRand.App
     public partial class MainWindow : Window
     {
         private readonly MainWindowViewModel _vm;
+        private readonly IDialogs _dialogs;
+
+        /// <summary>Guards the re-entrant close: without it, cancelling the close and calling
+        /// <see cref="Window.Close"/> again livelocks (AvaloniaUI#15533).</summary>
+        private bool _forceClose;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            _dialogs = new AvaloniaDialogs(this);
             _vm = new MainWindowViewModel(
                 new AvaloniaFilePicker(this),
-                new AvaloniaDialogs(this),
+                _dialogs,
                 () => Clipboard);
             _vm.PieDataChanged += UpdateItemPie;
             DataContext = _vm;
 
             UpdateItemPie();   // initial render (the VM raised PieDataChanged before we subscribed)
+        }
+
+        // --- Shutdown (GUI-SHUTDOWN-AND-CANCEL-PLAN.md S1) ---------------------
+
+        /// <summary>
+        /// Warn before closing while an install or an Archipelago session is live — the window
+        /// closing does NOT close the game, so a silent exit can leave someone playing with no
+        /// checks reaching the multiworld, or leave the game's Data\ folder half-overlaid.
+        ///
+        /// <para>Avalonia's <c>Closing</c> is <b>synchronous</b>: the window closes at the first
+        /// <c>await</c> even with <c>e.Cancel = true</c> (AvaloniaUI#4070/#14748). So this uses the
+        /// sanctioned re-entrant pattern — cancel the close, await the dialog, then set
+        /// <see cref="_forceClose"/> and close again (#15307). The cancellation of the running work
+        /// is fire-and-forget: blocking the UI thread on it deadlocks (#8782).</para>
+        /// </summary>
+        protected override async void OnClosing(WindowClosingEventArgs e)
+        {
+            base.OnClosing(e);
+
+            if (_forceClose || !_vm.ShouldConfirmClose)
+            {
+                _vm.CancelRunningWork();   // clean disconnect / state save on the way out
+                return;
+            }
+
+            e.Cancel = true;
+            if (!await _dialogs.ConfirmAsync("Close DinoRand?", _vm.CloseConfirmMessage))
+                return;                    // user chose to stay — session and install keep running
+
+            _forceClose = true;
+            _vm.CancelRunningWork();
+            Close();
         }
 
         // --- View glue ---------------------------------------------------------

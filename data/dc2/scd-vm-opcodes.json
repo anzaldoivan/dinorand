@@ -1,765 +1,769 @@
 {
-  "_source": "Dino2.exe (rebirth) SCD-style room-script VM. Live CE + offline capstone, 2026-06-23.",
-  "_vm": {
-    "dispatch_table": "0x00731AD0",
-    "exec_loop": "0x0048BDC0 (per VM tick: 10 entities x stride 0xA4 at [0x878BE0]; opcode = byte at entity IP [entity+0]; call [0x731AD0+op*4]; handler returns 0=continue, nonzero=yield)",
-    "state_struct": "entity: [+0]=IP into slot-5 cmd stream; [+0x84]=operand-stack ptr; [+0x80]=inline data block; [+0x9b]/[+0x9d]=run/wait state; stride 0xA4",
-    "opcode_encoding": "single byte at IP indexes the table; each handler advances IP by its own length and pushes/pops the operand stack",
-    "nop_handler": "0x00489B00 (unused opcode slots)",
-    "entity_constructor": "0x0048BF20 (entity[+0]=slot5base[scene_mgr+0xA54]+offset; entity[+0x84]=entity+0x80)"
+ "_source": "Dino2.exe (rebirth) SCD-style room-script VM. Live CE + offline capstone, 2026-06-23.",
+ "_vm": {
+  "dispatch_table": "0x00731AD0",
+  "exec_loop": "0x0048BDC0 (per VM tick: 10 entities x stride 0xA4 at [0x878BE0]; opcode = byte at entity IP [entity+0]; call [0x731AD0+op*4]; handler returns 0=continue, nonzero=yield)",
+  "state_struct": "entity: [+0]=IP into slot-5 cmd stream; [+0x84]=operand-stack ptr; [+0x80]=inline data block; [+0x9b]/[+0x9d]=run/wait state; stride 0xA4",
+  "opcode_encoding": "single byte at IP indexes the table; each handler advances IP by its own length and pushes/pops the operand stack",
+  "nop_handler": "0x00489B00 (unused opcode slots)",
+  "entity_constructor": "0x0048BF20 (entity[+0]=slot5base[scene_mgr+0xA54]+offset; entity[+0x84]=entity+0x80)"
+ },
+ "_door": {
+  "create_opcode": 21,
+  "create_opcode_hex": "0x15",
+  "create_handler": "0x00487A10 (creates a SCRIPT-ENTITY via ctor 0x48BF20 = the 0xA4-stride [0x878BE0] pool, NOT an enemy actor; IP+=2) = AOT/door-create",
+  "push_word_imm_opcode": 5,
+  "push_word_imm_handler": "0x00487670 (resolves cmd byte[+1]=mode, word[+2]=operand via reader 0x48BA50 {0=literal,1=var,2=block,6=global}; then DECREMENTS operand-stack ptr [entity+0x84] by 4 and stores the value; IP+=4). The stack grows DOWN from entity+0x80; successive pushes land at decreasing addresses.",
+  "commit_opcode": 48,
+  "commit_opcode_hex": "0x30",
+  "commit_handler": "0x00489750 = AOT_COMMIT: copies the entity block [entity+0x84][+0x00..+0x48] into the STATIC door exit-record array [scene_mgr+0xA5C]=0x752388 (record stride 0x28, index=block[+0x48]); flags rec+0=block[+0x44]|9, dest rec+0x1C=block[+0x0C], type rec+0x1E=block[+0x08]; IP+=2. (DOOR path only.)",
+  "dest_location_runtime": "door exit-record 0x752388[rec+0x1C] = (u8 stage, u8 room); see K38/K41",
+  "dest_opcode": "RESOLVED (K41): dest is a mode-0 literal word pushed by op 0x05, committed by op 0x30 -> room-file editable"
+ },
+ "_enemy_spawn": {
+  "_summary": "RESOLVED 2026-06-25 (static, K47): the ENEMY/ACTOR spawn opcode is op 0x1a. Found by call-graph reachability (tools/dc2_re/opcode_reach.py): op 0x1a is the ONLY opcode whose handler directly calls the actor allocator 0x48D980. Cross-validated vs the live Giganotosaurus capture (block[+0x0C] -> [actor+0x60] = the model-base field that read 0x5E5044).",
+  "spawn_opcode": 26,
+  "spawn_opcode_hex": "0x1a",
+  "spawn_handler": "0x00487B70 (IP+=2)",
+  "allocator": "0x0048D980 (arg=slot index; actor = [[0x876DB8]+0x940] + slot*0x260; zeroes 0x260 bytes, sets defaults [+0x50]=1, [+0xFF]=slot, [+0xFC]=5, [+0x6C/70/74]=0x1000)",
+  "ctor_dispatch": "after fill: if [actor+0x58]<=0xF call 0x46F9F0(2,0x14,1); then call [0x876C60 + [actor+0x58]*4](actor) = the per-type species constructor (indirect; this is why the loader 0x48DA10 is reached via the type ctor, not by a direct call from op 0x1a).",
+  "spawn_gate": "block[+0x00] != 0  =>  call 0x46FA70(4, id); if it returns nonzero the actor is NOT created (IP just advances). = the per-spawn flag-gate condition.",
+  "block_to_actor_field_map": {
+   "+0x00 (byte)": "spawn flag-gate id (via 0x46FA70 type 4) AND -> [actor+0x11C]",
+   "+0x04 (word)": "-> [actor+0x1C0]",
+   "+0x08": "if dword>=0x500000 -> [actor+0x88] (ptr) else word -> [actor+0x10C] (HP-ish)",
+   "+0x0C (dword)": "-> [actor+0x60] = SPECIES MODEL RAM BASE (the live discriminator)",
+   "+0x10 (word)": "-> [actor+0x4A]; also seeds [actor+0x5A] = [actor+0x42]*const>>6",
+   "+0x14 (word)": "-> [actor+0x44] and [actor+0xE4] = position Z",
+   "+0x18 (word)": "-> [actor+0x42] and [actor+0xE2] = position Y / param",
+   "+0x1C (word)": "-> [actor+0x40] and [actor+0xE0] = position X",
+   "+0x20 (byte)": "-> [actor+0x58] = SPECIES/TYPE index (drives the 0x876C60 ctor dispatch; likely the E-file family id, cf. exe_id_table high-nibble)",
+   "+0x24 (dword)": "actor SLOT index -> allocator 0x48D980"
   },
-  "_door": {
-    "create_opcode": 21,
-    "create_opcode_hex": "0x15",
-    "create_handler": "0x00487A10 (creates a SCRIPT-ENTITY via ctor 0x48BF20 = the 0xA4-stride [0x878BE0] pool, NOT an enemy actor; IP+=2) = AOT/door-create",
-    "push_word_imm_opcode": 5,
-    "push_word_imm_handler": "0x00487670 (resolves cmd byte[+1]=mode, word[+2]=operand via reader 0x48BA50 {0=literal,1=var,2=block,6=global}; then DECREMENTS operand-stack ptr [entity+0x84] by 4 and stores the value; IP+=4). The stack grows DOWN from entity+0x80; successive pushes land at decreasing addresses.",
-    "commit_opcode": 48,
-    "commit_opcode_hex": "0x30",
-    "commit_handler": "0x00489750 = AOT_COMMIT: copies the entity block [entity+0x84][+0x00..+0x48] into the STATIC door exit-record array [scene_mgr+0xA5C]=0x752388 (record stride 0x28, index=block[+0x48]); flags rec+0=block[+0x44]|9, dest rec+0x1C=block[+0x0C], type rec+0x1E=block[+0x08]; IP+=2. (DOOR path only.)",
-    "dest_location_runtime": "door exit-record 0x752388[rec+0x1C] = (u8 stage, u8 room); see K38/K41",
-    "dest_opcode": "RESOLVED (K41): dest is a mode-0 literal word pushed by op 0x05, committed by op 0x30 -> room-file editable"
+  "block_population": "Same mechanism as doors: a run of (typically 10) op 0x05 push-word-immediates fills the entity block (stack grows down from entity+0x80; op 0x1a then reads fixed offsets off the moved [entity+0x84]). Push order -> block offset: the LAST push = block+0 (GATE); going back, block+0x04,+0x08,+0x0c(MODEL_BASE),+0x10,+0x14(posZ),+0x18(posY),+0x1c(posX),+0x20(TYPE),+0x24(SLOT) = the FIRST push. In mode-0 (literal) those fields are literal words in slot-5 => statically editable in ST*.DAT (same editability class as the door dest, K41).",
+  "opcode_length_table": "Derived statically from each handler's IP advance (tools/dc2_re/opcode_lengths.py): op 0x01/0x02/0x03=6; 0x05/0x06/0x07/0x08=4; ALL of 0x10..0x59=2; EXCEPT op 0x04=RETURN and op 0x19=JUMP which set IP absolutely (control flow, no fixed length). nop slots: 0x00,0x09-0x0f,0x34,0x3c,0x3d,0x3f,0x5a-0x5f.",
+  "validation_ST102": "tools/dc2_re/decode_script.py walked ST102 slot-5 (dir entry [5] @blob+0x14 -> 0x0ad40; subprog offset array @sec+0x20 rel to sec+0x1c): 5 routines, 1108 ops, 0 INVALID, every routine RETURN-terminated. 6 op-0x1a spawns in TWO alternative routines of 3 (slots 3/4/5 each) -> per active routine 3 spawns = the 3 live raptors at slots 3/4/5 (K43). SLOT/TYPE/posX/posY are mode-0 LITERALS (editable); raptor MODEL_BASE + posZ are mode-6 GLOBAL refs (computed; consistent with E00 resident + spawn-time colour/tier, K43/K45). End-to-end confirms op 0x1a + block field map + length table.",
+  "editability_open": "For literal-mode fields (slot/type/position) the room-file edit path is proven. STILL OPEN: (a) mode 1/2/6 (var/block/global) operands are computed not literal (the raptor model base is a global ref, so swapping it isn't a slot-5 literal edit); (b) the TYPE byte -> species mapping (TYPE=0x10 vs 0x02 seen in ST102's two routines) vs the exe_id_table E-file ids; (c) which routine is the live/active one per difficulty."
+ },
+ "_scene_cutscene": {
+  "_summary": "DECODED 2026-06-30 (offline disx, docs/dc2/CUTSCENE-DETECTION-PLAN.md). The room-file signal a cross-species enemy swap must AVOID is the SCRIPTED-EVENT BARRIER, not the scene-change op. tools/dc2_re/scan_cutscene_rooms.py scans all 89 ST*.DAT and emits data/dc2/cutscene-rooms.json.",
+  "flag_query_fn": "0x0046fa70(type, id) -> bit: bank = [type*8 + 0x723c40] (bank table); word = bank[id>>5]; return (word >> (id&0x1f)) & 1. Generic global flag-bank read. type=4 is the enemy-spawn gate (K47); type=2 is the scripted-event bank (0x8778fc, 0x40 bits).",
+  "flag_bank_table": "0x00723c40 (8-byte entries {ptr, size_bits}); bank[2].ptr=0x008778fc.",
+  "barrier_ops": {
+   "0x41": "0x0048aed0 = WAIT/BARRIER on bank-2 flags 0/2 (blocks VM IP until satisfied)",
+   "0x42": "0x0048af30 = predicate on bank-2 flag 2",
+   "0x2c": "0x004895d0 = predicate on bank-2 flag 6"
   },
-  "_enemy_spawn": {
-    "_summary": "RESOLVED 2026-06-25 (static, K47): the ENEMY/ACTOR spawn opcode is op 0x1a. Found by call-graph reachability (tools/dc2_re/opcode_reach.py): op 0x1a is the ONLY opcode whose handler directly calls the actor allocator 0x48D980. Cross-validated vs the live Giganotosaurus capture (block[+0x0C] -> [actor+0x60] = the model-base field that read 0x5E5044).",
-    "spawn_opcode": 26,
-    "spawn_opcode_hex": "0x1a",
-    "spawn_handler": "0x00487B70 (IP+=2)",
-    "allocator": "0x0048D980 (arg=slot index; actor = [[0x876DB8]+0x940] + slot*0x260; zeroes 0x260 bytes, sets defaults [+0x50]=1, [+0xFF]=slot, [+0xFC]=5, [+0x6C/70/74]=0x1000)",
-    "ctor_dispatch": "after fill: if [actor+0x58]<=0xF call 0x46F9F0(2,0x14,1); then call [0x876C60 + [actor+0x58]*4](actor) = the per-type species constructor (indirect; this is why the loader 0x48DA10 is reached via the type ctor, not by a direct call from op 0x1a).",
-    "spawn_gate": "block[+0x00] != 0  =>  call 0x46FA70(4, id); if it returns nonzero the actor is NOT created (IP just advances). = the per-spawn flag-gate condition.",
-    "block_to_actor_field_map": {
-      "+0x00 (byte)": "spawn flag-gate id (via 0x46FA70 type 4) AND -> [actor+0x11C]",
-      "+0x04 (word)": "-> [actor+0x1C0]",
-      "+0x08": "if dword>=0x500000 -> [actor+0x88] (ptr) else word -> [actor+0x10C] (HP-ish)",
-      "+0x0C (dword)": "-> [actor+0x60] = SPECIES MODEL RAM BASE (the live discriminator)",
-      "+0x10 (word)": "-> [actor+0x4A]; also seeds [actor+0x5A] = [actor+0x42]*const>>6",
-      "+0x14 (word)": "-> [actor+0x44] and [actor+0xE4] = position Z",
-      "+0x18 (word)": "-> [actor+0x42] and [actor+0xE2] = position Y / param",
-      "+0x1C (word)": "-> [actor+0x40] and [actor+0xE0] = position X",
-      "+0x20 (byte)": "-> [actor+0x58] = SPECIES/TYPE index (drives the 0x876C60 ctor dispatch; likely the E-file family id, cf. exe_id_table high-nibble)",
-      "+0x24 (dword)": "actor SLOT index -> allocator 0x48D980"
-    },
-    "block_population": "Same mechanism as doors: a run of (typically 10) op 0x05 push-word-immediates fills the entity block (stack grows down from entity+0x80; op 0x1a then reads fixed offsets off the moved [entity+0x84]). Push order -> block offset: the LAST push = block+0 (GATE); going back, block+0x04,+0x08,+0x0c(MODEL_BASE),+0x10,+0x14(posZ),+0x18(posY),+0x1c(posX),+0x20(TYPE),+0x24(SLOT) = the FIRST push. In mode-0 (literal) those fields are literal words in slot-5 => statically editable in ST*.DAT (same editability class as the door dest, K41).",
-    "opcode_length_table": "Derived statically from each handler's IP advance (tools/dc2_re/opcode_lengths.py): op 0x01/0x02/0x03=6; 0x05/0x06/0x07/0x08=4; ALL of 0x10..0x59=2; EXCEPT op 0x04=RETURN and op 0x19=JUMP which set IP absolutely (control flow, no fixed length). nop slots: 0x00,0x09-0x0f,0x34,0x3c,0x3d,0x3f,0x5a-0x5f.",
-    "validation_ST102": "tools/dc2_re/decode_script.py walked ST102 slot-5 (dir entry [5] @blob+0x14 -> 0x0ad40; subprog offset array @sec+0x20 rel to sec+0x1c): 5 routines, 1108 ops, 0 INVALID, every routine RETURN-terminated. 6 op-0x1a spawns in TWO alternative routines of 3 (slots 3/4/5 each) -> per active routine 3 spawns = the 3 live raptors at slots 3/4/5 (K43). SLOT/TYPE/posX/posY are mode-0 LITERALS (editable); raptor MODEL_BASE + posZ are mode-6 GLOBAL refs (computed; consistent with E00 resident + spawn-time colour/tier, K43/K45). End-to-end confirms op 0x1a + block field map + length table.",
-    "editability_open": "For literal-mode fields (slot/type/position) the room-file edit path is proven. STILL OPEN: (a) mode 1/2/6 (var/block/global) operands are computed not literal (the raptor model base is a global ref, so swapping it isn't a slot-5 literal edit); (b) the TYPE byte -> species mapping (TYPE=0x10 vs 0x02 seen in ST102's two routines) vs the exe_id_table E-file ids; (c) which routine is the live/active one per difficulty."
+  "anim_op": "0x46 (0x0048a6a0 -> 0x48e050) = SCRIPTED ACTOR-MOTION/ANIMATION. Second scripted-sequencing signal, ORTHOGONAL to the event barrier: catches the ST102-class scripted set-pieces (ST102 op-0x46 x6, barrier 0) that op-0x41/0x42 misses. A species swap breaks the actor's clip table -> zero-span keyframe -> the K60 divide-by-zero crash at 0x48e57f. Absent in the plain adjacent raptor rooms ST105/104/107 -> keeps them randomizable.",
+  "turret_op": "0x58 (0x0048ac80) = ST407-unique actor-flag script (auto-confirm set-piece).",
+  "scene_change_op": "0x29 (0x004892f0) = scene-stack/camera-cut writing scene index scene_mgr+0x10b4, setup via 0x482420. Documented but NOT the detector signal (10 rooms, none ground-truth).",
+  "rejected_signal": "op-0x2b (0x489580) actor-command over-flags (also in combat ST102).",
+  "boss_setpiece_spawn_types": {
+   "0x03": "Tyrannosaurus(boss)",
+   "0x05": "Mosasaurus(aquatic-boss)",
+   "0x06": "Giganotosaurus(boss)",
+   "0x09": "Triceratops(setpiece)"
   },
-  "_scene_cutscene": {
-    "_summary": "DECODED 2026-06-30 (offline disx, docs/dc2/CUTSCENE-DETECTION-PLAN.md). The room-file signal a cross-species enemy swap must AVOID is the SCRIPTED-EVENT BARRIER, not the scene-change op. tools/dc2_re/scan_cutscene_rooms.py scans all 89 ST*.DAT and emits data/dc2/cutscene-rooms.json.",
-    "flag_query_fn": "0x0046fa70(type, id) -> bit: bank = [type*8 + 0x723c40] (bank table); word = bank[id>>5]; return (word >> (id&0x1f)) & 1. Generic global flag-bank read. type=4 is the enemy-spawn gate (K47); type=2 is the scripted-event bank (0x8778fc, 0x40 bits).",
-    "flag_bank_table": "0x00723c40 (8-byte entries {ptr, size_bits}); bank[2].ptr=0x008778fc.",
-    "barrier_ops": {
-      "0x41": "0x0048aed0 = WAIT/BARRIER on bank-2 flags 0/2 (blocks VM IP until satisfied)",
-      "0x42": "0x0048af30 = predicate on bank-2 flag 2",
-      "0x2c": "0x004895d0 = predicate on bank-2 flag 6"
-    },
-    "anim_op": "0x46 (0x0048a6a0 -> 0x48e050) = SCRIPTED ACTOR-MOTION/ANIMATION. Second scripted-sequencing signal, ORTHOGONAL to the event barrier: catches the ST102-class scripted set-pieces (ST102 op-0x46 x6, barrier 0) that op-0x41/0x42 misses. A species swap breaks the actor's clip table -> zero-span keyframe -> the K60 divide-by-zero crash at 0x48e57f. Absent in the plain adjacent raptor rooms ST105/104/107 -> keeps them randomizable.",
-    "turret_op": "0x58 (0x0048ac80) = ST407-unique actor-flag script (auto-confirm set-piece).",
-    "scene_change_op": "0x29 (0x004892f0) = scene-stack/camera-cut writing scene index scene_mgr+0x10b4, setup via 0x482420. Documented but NOT the detector signal (10 rooms, none ground-truth).",
-    "rejected_signal": "op-0x2b (0x489580) actor-command over-flags (also in combat ST102).",
-    "boss_setpiece_spawn_types": {"0x03": "Tyrannosaurus(boss)", "0x05": "Mosasaurus(aquatic-boss)", "0x06": "Giganotosaurus(boss)", "0x09": "Triceratops(setpiece)"},
-    "detector": "FLAGGED (22, 'middle path') = op-0x46 scripted actor-animation (swap-crash risk; e.g. ST102 first-raptor ambush) OR op-0x58 (ST407) OR a hardcoded mode-0 boss/set-piece spawn (0x03/0x05/0x06/0x09 -> ST200/402/503/706/903/80A) OR a human ground-truth cutscene label (ST101 intro/ST106 water-tower). UNCERTAIN = barrier op-0x41/0x42 present but no animation/boss/label confirmation (21 rooms) -> playtest to promote/demote; NOT auto-excluded. CLEAR = no scripted signal (46, incl. plain raptor rooms ST105/104/107/103 + arena ST202). Within the barrier-only set static opcodes CANNOT distinguish swap-breaking from safe-scripted -> honest limitation, surfaced not guessed. op-0x46 corrects the original plan's ground truth (ST102 wrongly listed safe)."
+  "detector": "FLAGGED (22, 'middle path') = op-0x46 scripted actor-animation (swap-crash risk; e.g. ST102 first-raptor ambush) OR op-0x58 (ST407) OR a hardcoded mode-0 boss/set-piece spawn (0x03/0x05/0x06/0x09 -> ST200/402/503/706/903/80A) OR a human ground-truth cutscene label (ST101 intro/ST106 water-tower). UNCERTAIN = barrier op-0x41/0x42 present but no animation/boss/label confirmation (21 rooms) -> playtest to promote/demote; NOT auto-excluded. CLEAR = no scripted signal (46, incl. plain raptor rooms ST105/104/107/103 + arena ST202). Within the barrier-only set static opcodes CANNOT distinguish swap-breaking from safe-scripted -> honest limitation, surfaced not guessed. op-0x46 corrects the original plan's ground truth (ST102 wrongly listed safe)."
+ },
+ "_wave_spawner": {
+  "_summary": "DECODED 2026-07-01 (K65, static + live-reconciled): DC2 rooms have a SECOND, NATIVE enemy-creation path besides op-0x1a - the per-frame WAVE SPAWNER. Room init runs op-0x4f with a descriptor pointer baked in the room blob; the engine then respawns creatures continuously. ST105's visible raptors (live slots 5/6) are wave spawns - its op-0x1a routine[3] is a separate once-per-latch camera-zone-3 ambush (flag(7,18)); this resolves the K64 'dormant spawn record' mystery.",
+  "arm_opcode": "0x4f (handler 0x48a960) -> [scene_mgr+0xa68]=descriptor; self-loads the species file via LoadEnemyCategory(desc[+1], desc[+4]) @0x48aa1b",
+  "spawner": "0x4720d0, called per frame by room-systems tick 0x472e70 (<- main loops 0x4518b0/0x451b20), gated flag(1,0x0b)==0; budget/timers at scene+0xa80; spawn-point selection = farthest-from-actors heuristic over desc point recs (stride 0x10, list at desc+word[subrec+0x10])",
+  "actor_fields": "actor=0x48d910 (TOP-DOWN slot scan from [0x878900]-1 - why live ST105 raptors sit at slots 6,5); [actor+0x58]=desc[+1] @0x4728cb/0x4728ce; pos [+0x40/42/44] from point rec; [+0x10c]=0x20 spawn-in anim; tier nibbles via 0x703e9c/0x703ec4 -> [+0x18c]; TYPE 2/7 + pointrec[8]!=0 -> or [actor+0x50],0x810; ctor call [0x876c60+TYPE*4] sets [actor+0x60]",
+  "descriptor_format": "byte+0: subrec count/kind (0x0b in ST105); byte+1: species TYPE/category (THE LEVER); byte+4: .TEX variant; then zone sub-records stride 0x20 (zone match 0x48f8f0 point-in-region via 0x472b00), spawn-point lists stride 0x10 (XYZ + drop-id byte[9] -> 0x472050 writes a rec[1]=4 item-drop record via 0x48d570)",
+  "st105": "init routine +0x230/+0x240: flag-branched op-0x4f arming glb[5]=blob+0x6194 or glb[6]=blob+0x5ed4 (glb[6]==glb[4], the same record op-0x23 preloads); both desc[+1]=0x02 Velociraptor; desc@0x6194 has [+4]=1 (variant). Species lever = blob bytes 0x5ed5 and 0x6195.",
+  "census": "49/89 rooms arm op-0x4f (all descriptors = mode-6 room-blob ptrs; push(mode0,0) = disarm). TYPE 0x02 raptor: ST102/104/105/107/108/10A/10B/10D/10E/110/201/300/400/407/40A/801/802; 0x07: ST107/108/10D/10E/201/300-305/408/409/803/804/901/902/905/906; 0x04: ST10C/200/602/603/900; 0x0a: ST700/702-704; 0x0b: ST600/601/604; 0x0c: ST001; 0x0e: ST404/405/806/807/80B; 0x08: ST808. Multiple op-0x4f per room = flag-gated difficulty/story variants or zone re-arms.",
+  "exe_descriptor_mode": "special mode only: FSM 0x419400 writes [scene+0xa68] from EXE table 0x71ecb4 (5 ptrs into .psxseg, indexed by [scene+0x84c]) - not the story-room path.",
+  "drop_record_pool": "[scene_mgr+0x948] stride 0x34, count [0x876dd4] (=roomcfg[6]+1, carved by 0x482060) = DROP/WORLD-OBJECT records (alloc 0x48d570, free 0x48d5d0=rec[0]:=0), NOT an actor save/restore store."
+ },
+ "opcodes": [
+  {
+   "op": 0,
+   "op_hex": "0x00",
+   "handler": "0x00489b00",
+   "nop": true
   },
-
-  "_wave_spawner": {
-    "_summary": "DECODED 2026-07-01 (K65, static + live-reconciled): DC2 rooms have a SECOND, NATIVE enemy-creation path besides op-0x1a - the per-frame WAVE SPAWNER. Room init runs op-0x4f with a descriptor pointer baked in the room blob; the engine then respawns creatures continuously. ST105's visible raptors (live slots 5/6) are wave spawns - its op-0x1a routine[3] is a separate once-per-latch camera-zone-3 ambush (flag(7,18)); this resolves the K64 'dormant spawn record' mystery.",
-    "arm_opcode": "0x4f (handler 0x48a960) -> [scene_mgr+0xa68]=descriptor; self-loads the species file via LoadEnemyCategory(desc[+1], desc[+4]) @0x48aa1b",
-    "spawner": "0x4720d0, called per frame by room-systems tick 0x472e70 (<- main loops 0x4518b0/0x451b20), gated flag(1,0x0b)==0; budget/timers at scene+0xa80; spawn-point selection = farthest-from-actors heuristic over desc point recs (stride 0x10, list at desc+word[subrec+0x10])",
-    "actor_fields": "actor=0x48d910 (TOP-DOWN slot scan from [0x878900]-1 - why live ST105 raptors sit at slots 6,5); [actor+0x58]=desc[+1] @0x4728cb/0x4728ce; pos [+0x40/42/44] from point rec; [+0x10c]=0x20 spawn-in anim; tier nibbles via 0x703e9c/0x703ec4 -> [+0x18c]; TYPE 2/7 + pointrec[8]!=0 -> or [actor+0x50],0x810; ctor call [0x876c60+TYPE*4] sets [actor+0x60]",
-    "descriptor_format": "byte+0: subrec count/kind (0x0b in ST105); byte+1: species TYPE/category (THE LEVER); byte+4: .TEX variant; then zone sub-records stride 0x20 (zone match 0x48f8f0 point-in-region via 0x472b00), spawn-point lists stride 0x10 (XYZ + drop-id byte[9] -> 0x472050 writes a rec[1]=4 item-drop record via 0x48d570)",
-    "st105": "init routine +0x230/+0x240: flag-branched op-0x4f arming glb[5]=blob+0x6194 or glb[6]=blob+0x5ed4 (glb[6]==glb[4], the same record op-0x23 preloads); both desc[+1]=0x02 Velociraptor; desc@0x6194 has [+4]=1 (variant). Species lever = blob bytes 0x5ed5 and 0x6195.",
-    "census": "49/89 rooms arm op-0x4f (all descriptors = mode-6 room-blob ptrs; push(mode0,0) = disarm). TYPE 0x02 raptor: ST102/104/105/107/108/10A/10B/10D/10E/110/201/300/400/407/40A/801/802; 0x07: ST107/108/10D/10E/201/300-305/408/409/803/804/901/902/905/906; 0x04: ST10C/200/602/603/900; 0x0a: ST700/702-704; 0x0b: ST600/601/604; 0x0c: ST001; 0x0e: ST404/405/806/807/80B; 0x08: ST808. Multiple op-0x4f per room = flag-gated difficulty/story variants or zone re-arms.",
-    "exe_descriptor_mode": "special mode only: FSM 0x419400 writes [scene+0xa68] from EXE table 0x71ecb4 (5 ptrs into .psxseg, indexed by [scene+0x84c]) - not the story-room path.",
-    "drop_record_pool": "[scene_mgr+0x948] stride 0x34, count [0x876dd4] (=roomcfg[6]+1, carved by 0x482060) = DROP/WORLD-OBJECT records (alloc 0x48d570, free 0x48d5d0=rec[0]:=0), NOT an actor save/restore store."
+  {
+   "op": 1,
+   "op_hex": "0x01",
+   "handler": "0x00487520",
+   "nop": false,
+   "note": "var[slot]=resolve(mode,val) \u2014 local-var assign (see _operand_model)"
   },
-
-  "opcodes": [
-    {
-      "op": 0,
-      "op_hex": "0x00",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 1,
-      "op_hex": "0x01",
-      "handler": "0x00487520",
-      "nop": false,
-      "note": "var[slot]=resolve(mode,val) \u2014 local-var assign (see _operand_model)"
-    },
-    {
-      "op": 2,
-      "op_hex": "0x02",
-      "handler": "0x00487560",
-      "nop": false,
-      "note": "store var[slot] -> dest(mode,idx) \u2014 assign to stack/var/global"
-    },
-    {
-      "op": 3,
-      "op_hex": "0x03",
-      "handler": "0x004875a0",
-      "nop": false,
-      "note": "ALU/EXPRESSION (FULLY DECODED 2026-06-28). operator=byte[IP+1] indexes 26-entry table 0x48bc20 (dispatch 0x48baf0); slot=byte[IP+2], rmode=byte[IP+3], rval=word[IP+4]; IP+=6. If slot!=0xff: var[slot]=ALU(var[slot], resolve(rmode,rval), operator) (stack delta 0). If slot==0xff: stackptr=ALU(stackptr, rval*4, operator) = the explicit operand-stack move (ADD=pop rval, SUB=push rval); 28530/31473 corpus uses, dominated by ADD=POP. Sets cond flag [entity+0x9c]=0x2a when result==0 (via 0x48bc90, read by op 0x07). See _operand_model.alu_table / stack_delta_model."
-    },
-    {
-      "op": 4,
-      "op_hex": "0x04",
-      "handler": "0x00487630",
-      "nop": false,
-      "note": "RETURN (DECODED 2026-06-28). If [entity+0x9d](call depth)>0: pop saved IP off operand stack (stackptr+=4), [entity]=popped IP, depth--. If depth==0: routine end (VM yields; walker terminator). Stack delta +1 (pop) when depth>0."
-    },
-    {
-      "op": 5,
-      "op_hex": "0x05",
-      "handler": "0x00487670",
-      "nop": false,
-      "note": "push resolve(mode,val) onto operand stack"
-    },
-    {
-      "op": 6,
-      "op_hex": "0x06",
-      "handler": "0x004876b0",
-      "nop": false,
-      "note": "POP-and-STORE (DECODED 2026-06-28). v=pop top operand (stackptr+=4); store(entity, mode=byte[IP+1], idx=word[IP+2], v) via 0x48baa0; IP+=4. mode 6 => writes the mode-6 global array [[0x878c00]]+idx*4 (a writer of the door/item mode-6 globals, cf task 2). Stack delta +1 (pop)."
-    },
-    {
-      "op": 7,
-      "op_hex": "0x07",
-      "handler": "0x004876f0",
-      "nop": false,
-      "note": "conditional skip on [entity+0x9c] flag bit"
-    },
-    {
-      "op": 8,
-      "op_hex": "0x08",
-      "handler": "0x00487730",
-      "nop": false,
-      "note": "CALL subprogram (DECODED 2026-06-28). Push return IP (stackptr-=4, [stackptr]=IP+4); target=slot5base[scene_mgr+0xa54] + [base + word[IP+2]*4]; [entity]=target (ABSOLUTE jump); depth++ ([entity+0x9d]). Stack delta -1 (push). Control-flow: sets IP absolutely; the LEN=4 table entry is only a linear-listing fallback."
-    },
-    {
-      "op": 9,
-      "op_hex": "0x09",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 10,
-      "op_hex": "0x0a",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 11,
-      "op_hex": "0x0b",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 12,
-      "op_hex": "0x0c",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 13,
-      "op_hex": "0x0d",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 14,
-      "op_hex": "0x0e",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 15,
-      "op_hex": "0x0f",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 16,
-      "op_hex": "0x10",
-      "handler": "0x00487780",
-      "nop": false,
-      "note": "SLEEP(N) (DECODED 2026-07-01, K65). [entity+0x98]=word stack[0], [entity+0x9b]=2; exec loop 0x48bdc0 decrements per tick and resumes when 0. Yields."
-    },
-    {
-      "op": 17,
-      "op_hex": "0x11",
-      "handler": "0x004877b0",
-      "nop": false
-    },
-    {
-      "op": 18,
-      "op_hex": "0x12",
-      "handler": "0x004877f0",
-      "nop": false,
-      "note": "BIND-SYSCALL (DECODED 2026-06-28). [entity+0x9e]=low byte of stack[1]; [entity+0x9f]=low byte of stack[0] — stores two operand selector bytes into the syscall-id field read by op 0x1f. Peeks operand stack (no ptr move). IP+=2."
-    },
-    {
-      "op": 19,
-      "op_hex": "0x13",
-      "handler": "0x00487820",
-      "nop": false
-    },
-    {
-      "op": 20,
-      "op_hex": "0x14",
-      "handler": "0x00487900",
-      "nop": false
-    },
-    {
-      "op": 21,
-      "op_hex": "0x15",
-      "handler": "0x00487a10",
-      "nop": false,
-      "note": "START SCRIPT THREAD (DECODED 2026-07-01, K65; supersedes the old 'AOT/door create' label). Gate: if 0x46fa70(0,9)!=0 skip. Calls StartScriptEntity 0x48bf20(entity_idx=byte stack[1], routine_idx=word stack[0]): zero the 0xA4 entity, IP=opbase+opbase[routine_idx] (routine offset table at slot5base=scene_mgr[+0xa54], already advanced +0x1c by the VM prologue), stack reset, [entity+0xa0]=0xff. THE routine activator - ST105: r0 starts r1(ent2)+r2(ent1); r1 starts r3 (raptor ambush, ent3); r3 starts r4."
-    },
-    {
-      "op": 22,
-      "op_hex": "0x16",
-      "handler": "0x00487a60",
-      "nop": false,
-      "note": "KILL script thread stack[0] via 0x48bf90; if the entity killed itself ([entity+0x9b]==0) the IP does not advance (thread ends)."
-    },
-    {
-      "op": 23,
-      "op_hex": "0x17",
-      "handler": "0x00487aa0",
-      "nop": false,
-      "note": "SUSPEND thread stack[0]: set bit 0x80 in its [entity+0x9b]."
-    },
-    {
-      "op": 24,
-      "op_hex": "0x18",
-      "handler": "0x00487ad0",
-      "nop": false,
-      "note": "RESUME thread stack[0]: clear bit 0x80 in its [entity+0x9b]."
-    },
-    {
-      "op": 25,
-      "op_hex": "0x19",
-      "handler": "0x00487b10",
-      "nop": false,
-      "note": "JUMP/RESTART thread (DECODED 2026-06-28). Zeroes entire entity (0x29 dwords = 0xa4), resets operand stack to EMPTY ([entity+0x84]=entity+0x80), depth=0, run-flag [+0x9b]=1; new IP = slot5base[scene_mgr+0xa54] + [base + stack[0]*4]. Stack delta = RESET to empty. Control-flow (absolute IP)."
-    },
-    {
-      "op": 26,
-      "op_hex": "0x1a",
-      "handler": "0x00487b70",
-      "nop": false,
-      "role": "ENEMY/ACTOR SPAWN (K47) -> allocator 0x48D980; fills actor from entity block; species ctor via [0x876C60+type*4]; flag-gated by 0x46FA70(4,id). See _enemy_spawn."
-    },
-    {
-      "op": 27,
-      "op_hex": "0x1b",
-      "handler": "0x0048add0",
-      "nop": false,
-      "note": "PARTIAL (2026-07-01): actor lookup 0x48bfc0 + comparator 0x48c220(actorcopy, stack[0]); reads a drop/record handle [actor+0x64] via 0x48d550. Used between ST105 ambush spawns (operands 88/90) - a wait/proximity check."
-    },
-    {
-      "op": 28,
-      "op_hex": "0x1c",
-      "handler": "0x00487cd0",
-      "nop": false,
-      "note": "ENGINE FLAG/STATE SET (DECODED 2026-06-28). Peeks top-3 operands (stack[0]=[ptr], stack[1]=[ptr+4], stack[2]=[ptr+8]). If (stack[2]==1 && stack[1]==0xff): scene_mgr[+0xb14] = (stack[0]==1 ? 0xffffffbf : 0). Else: call 0x46f9f0(stack[2], stack[1], stack[0]) = flag/state engine fn (group,id,value; sibling of gate 0x46fa70, also the SAT-3 backend). No ptr move. IP+=2."
-    },
-    {
-      "op": 29,
-      "op_hex": "0x1d",
-      "handler": "0x00487d50",
-      "nop": false,
-      "note": "ENGINE FLAG QUERY (DECODED 2026-07-01, K65). 0x46fa70(type=stack[1], id=stack[0]); flag set -> [entity+0x9c]=0x40, var[0]=1; clear -> [entity+0x9c]=0x02, var[0]=0. With op-0x1c forms the TEST-AND-SET spawn-once latch: ST105 routine[1] queries flag(7,18), LNOT, branch-if-set skips, else op-0x1c(7,18,1) + op-0x15 starts the op-0x1a ambush routine[3]. Bank 7 = 0x877904 = scene_mgr+0xb24 (phase driver zeroes its LOW word every tick -> ids 0-15 transient signals, 16-31 persistent latches; 34/89 rooms; stage-3 rooms ST303/304/305 clear ids 16-21)."
-    },
-    {
-      "op": 30,
-      "op_hex": "0x1e",
-      "handler": "0x00487db0",
-      "nop": false,
-      "note": "ACTOR-COMMAND family (DECODED 2026-07-01, K65): call [0x7319b0 + [entity+0x9e]*4](entity) - sub-handler table indexed by the op-0x12-bound id; args from the operand stack."
-    },
-    {
-      "op": 31,
-      "op_hex": "0x1f",
-      "handler": "0x004888d0",
-      "nop": false,
-      "note": "INVOKE-SYSCALL (DECODED 2026-06-28). id=byte[entity+0x9e] (set by op 0x12); call [0x7319d4 + id*4](entity) = native library fn (table 0x7319d4, 9 entries immediately before the SAT table 0x7319f8); result -> var[0] ([entity+0x88]); set cond flag [entity+0x9c]=0x2a if result==0 (via 0x48bc90). The native fn reads its args off the operand stack via [entity+0x84]. No VM ptr move here. IP+=2."
-    },
-    {
-      "op": 32,
-      "op_hex": "0x20",
-      "handler": "0x004890e0",
-      "nop": false,
-      "note": "READ VM ENTRY-STATE (DECODED 2026-07-01, K65). If [0x878c05]!=0xff: var[0]=[0x878c05]. The native door-transition writer 0x471290 stages [0x878f4f] -> [0x878c05] on room entry; scripts branch on it to resume the right routine. 60/89 rooms; ABSENT in ST105."
-    },
-    {
-      "op": 33,
-      "op_hex": "0x21",
-      "handler": "0x00489110",
-      "nop": false,
-      "note": "SET ACTOR ANIM/MOTION (DECODED 2026-07-01, K65). actor=[scene_mgr+0x940]+stack[0x10]*0x260; if stack[0]==0 zero [actor+0x7c]; then 0x48e050(actor, stack[0xc], stack[4], stack[8], stack[0]) - same callee as cutscene op-0x46. Follows each ST105 op-0x1a spawn (poses the spawned raptor)."
-    },
-    {
-      "op": 34,
-      "op_hex": "0x22",
-      "handler": "0x00489170",
-      "nop": false,
-      "note": "REQUEST ROUTINE SWITCH (DECODED 2026-07-01, K65). [0x878c07]=byte stack[0]. Phase driver 0x48bd60: if [0x878c07]!=0xff and flag(2,6)==0 -> phase [0x878c04]=1 -> 0x48be20 (reset all 10 VM entities via 0x48bf90, free type-1 drop records via 0x48d5d0, misc flag resets) -> phase2 0x48bed0 -> StartScriptEntity(0, [0x878c07]), then [0x878c07]=0xff, phase=0. Whole-VM routine switch (wave/scenario progression). 49/89 rooms; ABSENT in ST105."
-    },
-    {
-      "op": 35,
-      "op_hex": "0x23",
-      "handler": "0x00489190",
-      "nop": false,
-      "note": "ENEMY PRELOAD (DECODED 2026-07-01, K64). rec=stack[1] ([entity+0x84]+4); if rec>=0x500000 (a blob descriptor ptr): LoadEnemyCategory(cat=byte[rec+1], var=byte[rec+4]) 0x4821c0; else jb 0x4891c4 cat=stack[1]/var=*stack[0]. IP+=2. This is how generic TYPE-0x10 rooms (which early-out of the op-0x1a self-load) become resident: e.g. ST105 preloads cat 2 (E00) via a descriptor at blob 0x5ed4 (desc[+1]=0x02 cat, desc[+4]=0x00 var). The cat byte is a static file-editable residency lever."
-    },
-    {
-      "op": 36,
-      "op_hex": "0x24",
-      "handler": "0x004891e0",
-      "nop": false
-    },
-    {
-      "op": 37,
-      "op_hex": "0x25",
-      "handler": "0x00489220",
-      "nop": false
-    },
-    {
-      "op": 38,
-      "op_hex": "0x26",
-      "handler": "0x00489250",
-      "nop": false
-    },
-    {
-      "op": 39,
-      "op_hex": "0x27",
-      "handler": "0x00489280",
-      "nop": false
-    },
-    {
-      "op": 40,
-      "op_hex": "0x28",
-      "handler": "0x004892b0",
-      "nop": false
-    },
-    {
-      "op": 41,
-      "op_hex": "0x29",
-      "handler": "0x004892f0",
-      "nop": false,
-      "note": "SCENE-STACK / CAMERA-CUT (DECODED 2026-06-30). Reads operand-stack top code: -1 push current scene index [scene_mgr+0x10b4] onto the 2-slot scene stack [+0x10b6/+0x10b8] (toggle sp [+0x108f]); -2 pop/restore; -3 FADE-TO-SCENE 0xC ([+0x10b4]=0xC, [esi+0x58]=0xf); else write the code as the new scene index. Then (if sp!=3) split lo/hi of [+0x10b4] and call scene-entry setup 0x482420(scene#, type). IP+=2. = the semantically-obvious 'scene change', but appears in only 10 rooms and NEITHER cutscene ground-truth room (ST106/ST407) -> documented, NOT the cutscene-detector signal (see _scene_cutscene)."
-    },
-    {
-      "op": 42,
-      "op_hex": "0x2a",
-      "handler": "0x00489550",
-      "nop": false
-    },
-    {
-      "op": 43,
-      "op_hex": "0x2b",
-      "handler": "0x00489580",
-      "nop": false,
-      "note": "ACTOR-COMMAND (DECODED 2026-06-30). Reads block[0/4/8/0xc] off the operand stack; actor = [scene_mgr+0x940] + block[0xc]*0x260 (the 0x260-stride ACTOR/ENEMY pool); call 0x48f9e0(block0, block4, block8, actor) = pose/move a SPECIFIC actor by index. IP+=2. Appealing 'scripted-actor' signal but ALSO occurs in plain-combat ST102 (a must-NOT-flag room) -> over-flags; NOT used by the cutscene detector (see _scene_cutscene)."
-    },
-    {
-      "op": 44,
-      "op_hex": "0x2c",
-      "handler": "0x004895d0",
-      "nop": false,
-      "note": "EVENT-FLAG PREDICATE (DECODED 2026-06-30). return 0x46fa70(type=2, id=6) -> 1 iff bank-2 scripted-event flag 6 set. Sibling of op-0x41/0x42 barrier ops (same bank-2 group). See _scene_cutscene."
-    },
-    {
-      "op": 45,
-      "op_hex": "0x2d",
-      "handler": "0x00489630",
-      "nop": false
-    },
-    {
-      "op": 46,
-      "op_hex": "0x2e",
-      "handler": "0x0048aea0",
-      "nop": false,
-      "note": "3-ARG ENGINE CALL (DECODED 2026-06-30). Reads block[0/4/8]; call 0x48c7a0(block0, block4, block8). IP+=2. Not actor/scene-specific enough for the cutscene detector."
-    },
-    {
-      "op": 47,
-      "op_hex": "0x2f",
-      "handler": "0x004896b0",
-      "nop": false
-    },
-    {
-      "op": 48,
-      "op_hex": "0x30",
-      "handler": "0x00489750",
-      "nop": false
-    },
-    {
-      "op": 49,
-      "op_hex": "0x31",
-      "handler": "0x00489880",
-      "nop": false
-    },
-    {
-      "op": 50,
-      "op_hex": "0x32",
-      "handler": "0x00489950",
-      "nop": false
-    },
-    {
-      "op": 51,
-      "op_hex": "0x33",
-      "handler": "0x00489a20",
-      "nop": false
-    },
-    {
-      "op": 52,
-      "op_hex": "0x34",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 53,
-      "op_hex": "0x35",
-      "handler": "0x00489b10",
-      "nop": false
-    },
-    {
-      "op": 54,
-      "op_hex": "0x36",
-      "handler": "0x00489cf0",
-      "nop": false
-    },
-    {
-      "op": 55,
-      "op_hex": "0x37",
-      "handler": "0x00489dc0",
-      "nop": false
-    },
-    {
-      "op": 56,
-      "op_hex": "0x38",
-      "handler": "0x00489e80",
-      "nop": false
-    },
-    {
-      "op": 57,
-      "op_hex": "0x39",
-      "handler": "0x00489f40",
-      "nop": false
-    },
-    {
-      "op": 58,
-      "op_hex": "0x3a",
-      "handler": "0x0048a020",
-      "nop": false
-    },
-    {
-      "op": 59,
-      "op_hex": "0x3b",
-      "handler": "0x0048a170",
-      "nop": false
-    },
-    {
-      "op": 60,
-      "op_hex": "0x3c",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 61,
-      "op_hex": "0x3d",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 62,
-      "op_hex": "0x3e",
-      "handler": "0x0048a240",
-      "nop": false,
-      "note": "AOT-DISPATCH (DECODED 2026-06-28). slot=stack[0]; rec=[scene_mgr+0xa5c](=0x752388)+slot*0x28; call [0x7319f8 + rec[+1]*4](rec) = the SAT category handler (rec+1=SAT byte). Returns 1 iff rec[+1]==5 (gated SAT-5). Peeks stack (no ptr move). IP+=2. = the runtime trigger/activate for an AOT record (door/item/flag). See AOT-SYSTEM-RE.md."
-    },
-    {
-      "op": 63,
-      "op_hex": "0x3f",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 64,
-      "op_hex": "0x40",
-      "handler": "0x0048a290",
-      "nop": false
-    },
-    {
-      "op": 65,
-      "op_hex": "0x41",
-      "handler": "0x0048aed0",
-      "nop": false,
-      "role": "SCRIPTED-EVENT BARRIER (cutscene-detector PRIMARY signal, K##)",
-      "note": "SCRIPTED-EVENT WAIT/BARRIER (DECODED 2026-06-30). Polls bank-2 global event flags via 0x46fa70(type=2,id): block[0]!=0 -> wait until bank2.flag0 set; block[0]==0 -> wait until bank2.flag0 AND flag2 clear. If the condition is not met the handler branches to 0x48af22 WITHOUT advancing the VM IP -> the script thread BLOCKS on the scripted event (re-runs next tick). = the scripted-sequencing barrier used by set-pieces / in-engine scenes. Present in ST106 (4) + ST407 (19), ZERO in combat ST102/ST202 -> the cutscene-room signature. See _scene_cutscene."
-    },
-    {
-      "op": 66,
-      "op_hex": "0x42",
-      "handler": "0x0048af30",
-      "nop": false,
-      "role": "SCRIPTED-EVENT PREDICATE (cutscene-detector PRIMARY signal, K##)",
-      "note": "EVENT-FLAG PREDICATE (DECODED 2026-06-30). return 0x46fa70(type=2, id=2) -> 1 iff bank-2 scripted-event flag 2 set. The non-blocking predicate form of op-0x41; co-occurs with it in the exact same 33-room set. Part of the cutscene signature. See _scene_cutscene."
-    },
-    {
-      "op": 67,
-      "op_hex": "0x43",
-      "handler": "0x0048afc0",
-      "nop": false
-    },
-    {
-      "op": 68,
-      "op_hex": "0x44",
-      "handler": "0x0048a390",
-      "nop": false
-    },
-    {
-      "op": 69,
-      "op_hex": "0x45",
-      "handler": "0x0048a430",
-      "nop": false
-    },
-    {
-      "op": 70,
-      "op_hex": "0x46",
-      "handler": "0x0048a6a0",
-      "nop": false,
-      "role": "SCRIPTED ACTOR-MOTION/ANIMATION (cutscene-detector AUTO-CONFIRM, K##)",
-      "note": "SCRIPTED ACTOR-ANIMATION (DECODED 2026-06-30). actor = [scene_mgr+0x940] + [entity+0x9f]*0x260 (specific pool actor by the op-0x12 syscall-selector byte); reads block[0/4/8/0xc] off the operand stack; call 0x48e050(actor, block0xc, block4, block8, block0) = an actor motion/animation-state setter in the 0x48exxx anim cluster (sibling of SetAnimClip 0x48de40 + the anim transform 0x48e530 that idiv-by-zero CRASHED the K60 ST102 raptor swap; 0x48e050 writes actor[+0x9c]/[+0xa0] from a descriptor). IP+=2. Because a species swap breaks the actor's clip table (zero-span keyframe), a room that scripts actor animation is a swap-crash set-piece. This catches the ST102-class rooms the event-barrier MISSES (ST102 has op-0x46 x6 but ZERO barrier); absent in the plain adjacent raptor rooms ST105/104/107. See _scene_cutscene."
-    },
-    {
-      "op": 71,
-      "op_hex": "0x47",
-      "handler": "0x0048a6f0",
-      "nop": false
-    },
-    {
-      "op": 72,
-      "op_hex": "0x48",
-      "handler": "0x0048a7b0",
-      "nop": false,
-      "note": "var[0] = RNG 0x4de152() & 0xffff; cond via 0x48bc90 (DECODED 2026-07-01)."
-    },
-    {
-      "op": 73,
-      "op_hex": "0x49",
-      "handler": "0x0048b0f0",
-      "nop": false
-    },
-    {
-      "op": 74,
-      "op_hex": "0x4a",
-      "handler": "0x0048a7e0",
-      "nop": false
-    },
-    {
-      "op": 75,
-      "op_hex": "0x4b",
-      "handler": "0x0048a890",
-      "nop": false,
-      "note": "WAIT FOR CAMERA-ZONE CHANGE (DECODED 2026-07-01, K65). Blocks (no IP advance) until byte [scene_mgr+0x7c4] (current camera zone, written from camera rec+0xd, e.g. 0x4160e9) != [entity+0xa0]; then var[0]=zone, [entity+0xa0]=zone, advance. ST105 routine[1]'s scene-watcher switch key (case zone==3 -> raptor ambush)."
-    },
-    {
-      "op": 76,
-      "op_hex": "0x4c",
-      "handler": "0x0048a8e0",
-      "nop": false
-    },
-    {
-      "op": 77,
-      "op_hex": "0x4d",
-      "handler": "0x0048a910",
-      "nop": false
-    },
-    {
-      "op": 78,
-      "op_hex": "0x4e",
-      "handler": "0x0048a940",
-      "nop": false
-    },
-    {
-      "op": 79,
-      "op_hex": "0x4f",
-      "handler": "0x0048a960",
-      "nop": false,
-      "note": "SET WAVE-SPAWN DESCRIPTOR (DECODED 2026-07-01, K65 - arms THE real ST105 spawner). desc=stack[0] (a mode-6 room-blob ptr, or 0=disarm). Calls 0x4720b0(byte scene+0x1091, byte scene+0x1090) first; if desc != [scene_mgr+0xa68]: store it, zero wave state scene+0xa80 (0x12 dwords, +0xa89/+0xad1=0xff), and if desc!=0 call LoadEnemyCategory(cat=desc[+1], var=desc[+4]) @0x48aa1b (the formerly-unresolved '4th 0x4821c0 caller', K59 -> RESOLVED). The armed descriptor drives the NATIVE per-frame wave spawner 0x4720d0 (tick 0x472e70, gated flag(1,0xb)==0): actor=0x48d910 (top-down slots), [actor+0x58]=desc[+1] @0x4728cb/ce, position from desc spawn-point recs, ctor [0x876c60+TYPE*4] sets [actor+0x60]. desc[+1] = the ONE-BYTE species lever (ST105: blob 0x5ed5 + 0x6195). 49/89 rooms arm this system (see _wave_spawner)."
-    },
-    {
-      "op": 80,
-      "op_hex": "0x50",
-      "handler": "0x0048aa30",
-      "nop": false
-    },
-    {
-      "op": 81,
-      "op_hex": "0x51",
-      "handler": "0x0048aaa0",
-      "nop": false
-    },
-    {
-      "op": 82,
-      "op_hex": "0x52",
-      "handler": "0x0048ab00",
-      "nop": false
-    },
-    {
-      "op": 83,
-      "op_hex": "0x53",
-      "handler": "0x0048ae70",
-      "nop": false
-    },
-    {
-      "op": 84,
-      "op_hex": "0x54",
-      "handler": "0x0048ab90",
-      "nop": false
-    },
-    {
-      "op": 85,
-      "op_hex": "0x55",
-      "handler": "0x0048af80",
-      "nop": false
-    },
-    {
-      "op": 86,
-      "op_hex": "0x56",
-      "handler": "0x0048ac30",
-      "nop": false
-    },
-    {
-      "op": 87,
-      "op_hex": "0x57",
-      "handler": "0x0048ac50",
-      "nop": false
-    },
-    {
-      "op": 88,
-      "op_hex": "0x58",
-      "handler": "0x0048ac80",
-      "nop": false,
-      "role": "TURRET-CLASS ACTOR-FLAG SCRIPT (cutscene-detector AUTO-CONFIRM, K##)",
-      "note": "ACTOR-FLAG SCRIPT (DECODED 2026-06-30). actor = [scene_mgr+0x940] + [entity+0x9f]*0x260 (specific pool actor by the op-0x12 syscall-selector byte); call 0x48d550(actor[+0x64], block[4]); if block[0]==1 clear flag-bit 0x10000000 in actor[+0x50]. IP+=2. Occurs in EXACTLY ONE room corpus-wide (ST407, the turret set-piece) -> auto-confirm signal for a scripted set-piece that directly commands its enemy actors. See _scene_cutscene."
-    },
-    {
-      "op": 89,
-      "op_hex": "0x59",
-      "handler": "0x0048ad00",
-      "nop": false
-    },
-    {
-      "op": 90,
-      "op_hex": "0x5a",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 91,
-      "op_hex": "0x5b",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 92,
-      "op_hex": "0x5c",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 93,
-      "op_hex": "0x5d",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 94,
-      "op_hex": "0x5e",
-      "handler": "0x00489b00",
-      "nop": true
-    },
-    {
-      "op": 95,
-      "op_hex": "0x5f",
-      "handler": "0x00489b00",
-      "nop": true
-    }
-  ],
-  "_operand_model": {
-    "_decoded": "2026-06-28 (offline, disx) \u2014 slot-5 SCD VM operand resolve/store + assignment opcodes.",
-    "resolve_fn": "0x0048BA50 resolve(entity,mode,value)->value",
-    "store_fn": "0x0048BAA0 store(entity,mode,value,src)",
-    "modes": {
-      "0": "literal: value itself",
-      "1": "var: local var array at [entity+0x88] + value*4",
-      "2": "stack: operand stack at [entity+0x84] + value*4 (NOT a persistent block; relative to the live stack ptr, which op-0x05 grows downward by 4 per push)",
-      "6": "global: global array at [[0x878C00]] + value*4 (story/runtime state)"
-    },
-    "global_array": "[0x00878C00] (dword array; mode-6 operands index it as *(P+idx*4), P=[0x878c00]). DECODED 2026-07-01 (K64): P is NOT runtime story state -- it is set ONCE per room at VM-init 0x48bd32 to P = slot5base+0x1c+*(slot5base+0xc) (slot5base=[scene_mgr+0xa54]), i.e. P points INTO the loaded room blob. ⇒ the mode-6 'globals' are a per-room DATA TABLE baked in ST*.DAT slot-5 at file offset sec+0x1c+*(sec+0xc). The generic TYPE-0x10 spawn's MODEL_BASE (block+0x0c) is a mode-6 read of this table, so the raptor model base is a STATIC FILE LITERAL (ST105: glb[13/17/19/21]=0x00633000 @blob 0x94fc), NOT a computed value (refines K60's 'computed global'). Can ALSO be written at runtime by op-0x02(mode6)/op-0x06(mode6), but ST105's slot-5 has ZERO such stores -- the value is purely file-sourced.",
-    "cond_flag": "[entity+0x9c] = the boolean/condition byte. Set to 0x2a by helper 0x48bc90(entity,result) when result==0; consumed by op 0x07 (conditional skip). op 0x03 and op 0x1f both call 0x48bc90.",
-    "syscall_table": "0x007319d4 (native library fn table; op 0x12 sets the id byte [entity+0x9e], op 0x1f calls [0x7319d4 + id*4](entity)). Sits 0x24 bytes (9 entries) immediately before the AOT SAT table 0x7319f8.",
-    "alu_dispatch": "0x0048BAF0 ALU(a,b,operator) -> jumps via 26-entry table 0x0048BC20 (operator 0..0x19); default(>0x19)=0x48bc1b returns a. Used by op 0x03 (slot==0xff form passes a=stackptr,b=rval*4).",
-    "alu_table": {
-      "_base": "0x0048BC20 (26 dwords). a=[esp+4], b=[esp+8]. Decoded 2026-06-28 (disx).",
-      "0x00": "ADD  a+b",
-      "0x01": "SUB  a-b",
-      "0x02": "MUL  a*b",
-      "0x03": "DIV  a/b (signed idiv)",
-      "0x04": "MOD  a%b (signed)",
-      "0x05": "OR   a|b",
-      "0x06": "AND  a&b",
-      "0x07": "XOR  a^b",
-      "0x08": "NOT  ~a",
-      "0x09": "SHL  a<<b",
-      "0x0a": "SAR  a>>b (arithmetic)",
-      "0x0b": "SHL  (alias of 0x09)",
-      "0x0c": "SAR  (alias of 0x0a)",
-      "0x0d": "GT   a>b -> 0/1",
-      "0x0e": "LT   a<b -> 0/1",
-      "0x0f": "GE   a>=b -> 0/1",
-      "0x10": "LE   a<=b -> 0/1",
-      "0x11": "EQ   a==b -> 0/1",
-      "0x12": "NE   a!=b -> 0/1",
-      "0x13": "LNOT !a -> 0/1",
-      "0x14": "INC  a+1",
-      "0x15": "DEC  a-1",
-      "0x16": "MOV  a (identity)",
-      "0x17": "MOV  a (identity)",
-      "0x18": "LOR  (a||b) truthy",
-      "0x19": "LAND (a&&b) -> 0/1"
-    },
-    "_alu_corpus": "31473 op-0x03 across 89 rooms; ALL operators <= 0x19 (0 out-of-table). slot==0xff (stack-ptr form) = 28530 (90.6%), dominated by operator 0x00 ADD (28013) = the VM's POP-N idiom. operands: 31289 literal / 183 stack / 1 global.",
-    "stack_delta_model": {
-      "_summary": "Only SIX opcodes write the operand-stack pointer [entity+0x84] (verified by scanning every non-nop handler for a write to +0x84). All other ops (incl. 0x12/0x1c/0x1f/0x3e and the whole 0x10..0x59 statement range) only PEEK the stack; the script cleans up with an explicit op-0x03 ADD. This set is sufficient to symbolically track a routine's stack depth.",
-      "0x05": "PUSH: ptr -= 4 (+1 slot).",
-      "0x06": "POP-STORE: ptr += 4 (-1 slot); stores popped value to dest(mode,idx).",
-      "0x03": "if slot==0xff: ptr := ALU(ptr, rval*4, operator) -> ADD pops rval, SUB pushes rval, etc. (literal rval => static delta). if slot!=0xff: delta 0.",
-      "0x04": "RETURN: if depth>0 ptr += 4 (pop saved IP); if depth==0 routine-end (no change).",
-      "0x08": "CALL: ptr -= 4 (push return IP); depth++; absolute jump.",
-      "0x19": "JUMP/RESTART: ptr := entity+0x80 (reset to EMPTY); zeroes entity; absolute jump."
-    },
-    "ops": {
-      "0x01 (0x00487520)": "var[byte IP+1] = resolve(mode=byte IP+2, value=word IP+4); IP+=6. Local-var assign.",
-      "0x02 (0x00487560)": "store(mode=byte IP+2, idx=word IP+4, src=var[byte IP+1]); IP+=6. Assign var -> stack/var/global dest.",
-      "0x03 (0x004875A0)": "ALU/EXPRESSION (full). operator=byte IP+1 (table 0x48bc20), slot=byte IP+2, rmode=byte IP+3, rval=word IP+4; IP+=6. slot!=0xff: var[slot]=ALU(var[slot], resolve(rmode,rval), operator). slot==0xff: stackptr=ALU(stackptr, rval*4, operator) (explicit pop/push). cond flag set if result==0. See alu_table + stack_delta_model.",
-      "0x04 (0x00487630)": "RETURN: depth>0 pops saved IP (ptr+=4) and restores it, depth--; depth==0 ends routine. See stack_delta_model.",
-      "0x05 (0x00487670)": "push resolve(mode=byte IP+1, value=word IP+2) onto operand stack [entity+0x84]-=4; IP+=4.",
-      "0x06 (0x004876B0)": "POP-STORE: pop top operand (ptr+=4); store(mode=byte IP+1, idx=word IP+2, popped) via 0x48baa0; IP+=4. mode 6 writes the global array.",
-      "0x07 (0x004876F0)": "conditional skip: if bit (1<<byte[IP+1]) set in [entity+0x9c] (or byte[IP+1]==0) skip; gates the following block.",
-      "0x08 (0x00487730)": "CALL subprogram by index (word IP+2): push return IP (ptr-=4), depth++, absolute jump to slot5base+[base+idx*4].",
-      "0x12 (0x004877F0)": "BIND-SYSCALL: [entity+0x9e]=low(stack[1]); [entity+0x9f]=low(stack[0]); peek only; IP+=2. Pairs with op 0x1f.",
-      "0x19 (0x00487B10)": "JUMP/RESTART: zero entity (0xa4), reset stack to empty (ptr=entity+0x80), depth=0; new IP from slot5base+[base+stack[0]*4].",
-      "0x1c (0x00487CD0)": "ENGINE FLAG SET: peek top-3 (group=stack[2], id=stack[1], value=stack[0]); special-case scene_mgr+0xb14 when (group==1 && id==0xff); else 0x46f9f0(group,id,value); IP+=2.",
-      "0x1f (0x004888D0)": "INVOKE-SYSCALL: call [0x7319d4 + [entity+0x9e]*4](entity); result -> var[0] ([entity+0x88]); cond flag if result==0; IP+=2.",
-      "0x3e (0x0048A240)": "AOT-DISPATCH: rec=0x752388+stack[0]*0x28; call [0x7319f8 + rec[+1]*4](rec); returns 1 iff rec[+1]==5; IP+=2."
-    }
+  {
+   "op": 2,
+   "op_hex": "0x02",
+   "handler": "0x00487560",
+   "nop": false,
+   "note": "store var[slot] -> dest(mode,idx) \u2014 assign to stack/var/global"
+  },
+  {
+   "op": 3,
+   "op_hex": "0x03",
+   "handler": "0x004875a0",
+   "nop": false,
+   "note": "ALU/EXPRESSION (FULLY DECODED 2026-06-28). operator=byte[IP+1] indexes 26-entry table 0x48bc20 (dispatch 0x48baf0); slot=byte[IP+2], rmode=byte[IP+3], rval=word[IP+4]; IP+=6. If slot!=0xff: var[slot]=ALU(var[slot], resolve(rmode,rval), operator) (stack delta 0). If slot==0xff: stackptr=ALU(stackptr, rval*4, operator) = the explicit operand-stack move (ADD=pop rval, SUB=push rval); 28530/31473 corpus uses, dominated by ADD=POP. Sets cond flag [entity+0x9c]=0x2a when result==0 (via 0x48bc90, read by op 0x07). See _operand_model.alu_table / stack_delta_model."
+  },
+  {
+   "op": 4,
+   "op_hex": "0x04",
+   "handler": "0x00487630",
+   "nop": false,
+   "note": "RETURN (DECODED 2026-06-28). If [entity+0x9d](call depth)>0: pop saved IP off operand stack (stackptr+=4), [entity]=popped IP, depth--. If depth==0: routine end (VM yields; walker terminator). Stack delta +1 (pop) when depth>0."
+  },
+  {
+   "op": 5,
+   "op_hex": "0x05",
+   "handler": "0x00487670",
+   "nop": false,
+   "note": "push resolve(mode,val) onto operand stack"
+  },
+  {
+   "op": 6,
+   "op_hex": "0x06",
+   "handler": "0x004876b0",
+   "nop": false,
+   "note": "POP-and-STORE (DECODED 2026-06-28). v=pop top operand (stackptr+=4); store(entity, mode=byte[IP+1], idx=word[IP+2], v) via 0x48baa0; IP+=4. mode 6 => writes the mode-6 global array [[0x878c00]]+idx*4 (a writer of the door/item mode-6 globals, cf task 2). Stack delta +1 (pop)."
+  },
+  {
+   "op": 7,
+   "op_hex": "0x07",
+   "handler": "0x004876f0",
+   "nop": false,
+   "note": "conditional skip on [entity+0x9c] flag bit"
+  },
+  {
+   "op": 8,
+   "op_hex": "0x08",
+   "handler": "0x00487730",
+   "nop": false,
+   "note": "CALL subprogram (DECODED 2026-06-28). Push return IP (stackptr-=4, [stackptr]=IP+4); target=slot5base[scene_mgr+0xa54] + [base + word[IP+2]*4]; [entity]=target (ABSOLUTE jump); depth++ ([entity+0x9d]). Stack delta -1 (push). Control-flow: sets IP absolutely; the LEN=4 table entry is only a linear-listing fallback."
+  },
+  {
+   "op": 9,
+   "op_hex": "0x09",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 10,
+   "op_hex": "0x0a",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 11,
+   "op_hex": "0x0b",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 12,
+   "op_hex": "0x0c",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 13,
+   "op_hex": "0x0d",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 14,
+   "op_hex": "0x0e",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 15,
+   "op_hex": "0x0f",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 16,
+   "op_hex": "0x10",
+   "handler": "0x00487780",
+   "nop": false,
+   "note": "SLEEP(N) (DECODED 2026-07-01, K65). [entity+0x98]=word stack[0], [entity+0x9b]=2; exec loop 0x48bdc0 decrements per tick and resumes when 0. Yields."
+  },
+  {
+   "op": 17,
+   "op_hex": "0x11",
+   "handler": "0x004877b0",
+   "nop": false
+  },
+  {
+   "op": 18,
+   "op_hex": "0x12",
+   "handler": "0x004877f0",
+   "nop": false,
+   "note": "BIND-SYSCALL (DECODED 2026-06-28). [entity+0x9e]=low byte of stack[1]; [entity+0x9f]=low byte of stack[0] \u2014 stores two operand selector bytes into the syscall-id field read by op 0x1f. Peeks operand stack (no ptr move). IP+=2."
+  },
+  {
+   "op": 19,
+   "op_hex": "0x13",
+   "handler": "0x00487820",
+   "nop": false
+  },
+  {
+   "op": 20,
+   "op_hex": "0x14",
+   "handler": "0x00487900",
+   "nop": false
+  },
+  {
+   "op": 21,
+   "op_hex": "0x15",
+   "handler": "0x00487a10",
+   "nop": false,
+   "note": "START SCRIPT THREAD (DECODED 2026-07-01, K65; supersedes the old 'AOT/door create' label). Gate: if 0x46fa70(0,9)!=0 skip. Calls StartScriptEntity 0x48bf20(entity_idx=byte stack[1], routine_idx=word stack[0]): zero the 0xA4 entity, IP=opbase+opbase[routine_idx] (routine offset table at slot5base=scene_mgr[+0xa54], already advanced +0x1c by the VM prologue), stack reset, [entity+0xa0]=0xff. THE routine activator - ST105: r0 starts r1(ent2)+r2(ent1); r1 starts r3 (raptor ambush, ent3); r3 starts r4."
+  },
+  {
+   "op": 22,
+   "op_hex": "0x16",
+   "handler": "0x00487a60",
+   "nop": false,
+   "note": "KILL script thread stack[0] via 0x48bf90; if the entity killed itself ([entity+0x9b]==0) the IP does not advance (thread ends)."
+  },
+  {
+   "op": 23,
+   "op_hex": "0x17",
+   "handler": "0x00487aa0",
+   "nop": false,
+   "note": "SUSPEND thread stack[0]: set bit 0x80 in its [entity+0x9b]."
+  },
+  {
+   "op": 24,
+   "op_hex": "0x18",
+   "handler": "0x00487ad0",
+   "nop": false,
+   "note": "RESUME thread stack[0]: clear bit 0x80 in its [entity+0x9b]."
+  },
+  {
+   "op": 25,
+   "op_hex": "0x19",
+   "handler": "0x00487b10",
+   "nop": false,
+   "note": "JUMP/RESTART thread (DECODED 2026-06-28). Zeroes entire entity (0x29 dwords = 0xa4), resets operand stack to EMPTY ([entity+0x84]=entity+0x80), depth=0, run-flag [+0x9b]=1; new IP = slot5base[scene_mgr+0xa54] + [base + stack[0]*4]. Stack delta = RESET to empty. Control-flow (absolute IP)."
+  },
+  {
+   "op": 26,
+   "op_hex": "0x1a",
+   "handler": "0x00487b70",
+   "nop": false,
+   "role": "ENEMY/ACTOR SPAWN (K47) -> allocator 0x48D980; fills actor from entity block; species ctor via [0x876C60+type*4]; flag-gated by 0x46FA70(4,id). See _enemy_spawn."
+  },
+  {
+   "op": 27,
+   "op_hex": "0x1b",
+   "handler": "0x0048add0",
+   "nop": false,
+   "note": "PARTIAL (2026-07-01): actor lookup 0x48bfc0 + comparator 0x48c220(actorcopy, stack[0]); reads a drop/record handle [actor+0x64] via 0x48d550. Used between ST105 ambush spawns (operands 88/90) - a wait/proximity check."
+  },
+  {
+   "op": 28,
+   "op_hex": "0x1c",
+   "handler": "0x00487cd0",
+   "nop": false,
+   "note": "ENGINE FLAG/STATE SET (DECODED 2026-06-28). Peeks top-3 operands (stack[0]=[ptr], stack[1]=[ptr+4], stack[2]=[ptr+8]). If (stack[2]==1 && stack[1]==0xff): scene_mgr[+0xb14] = (stack[0]==1 ? 0xffffffbf : 0). Else: call 0x46f9f0(stack[2], stack[1], stack[0]) = flag/state engine fn (group,id,value; sibling of gate 0x46fa70, also the SAT-3 backend). No ptr move. IP+=2."
+  },
+  {
+   "op": 29,
+   "op_hex": "0x1d",
+   "handler": "0x00487d50",
+   "nop": false,
+   "note": "ENGINE FLAG QUERY (DECODED 2026-07-01, K65). 0x46fa70(type=stack[1], id=stack[0]); flag set -> [entity+0x9c]=0x40, var[0]=1; clear -> [entity+0x9c]=0x02, var[0]=0. With op-0x1c forms the TEST-AND-SET spawn-once latch: ST105 routine[1] queries flag(7,18), LNOT, branch-if-set skips, else op-0x1c(7,18,1) + op-0x15 starts the op-0x1a ambush routine[3]. Bank 7 = 0x877904 = scene_mgr+0xb24 (phase driver zeroes its LOW word every tick -> ids 0-15 transient signals, 16-31 persistent latches; 34/89 rooms; stage-3 rooms ST303/304/305 clear ids 16-21)."
+  },
+  {
+   "op": 30,
+   "op_hex": "0x1e",
+   "handler": "0x00487db0",
+   "nop": false,
+   "note": "ACTOR-COMMAND family (DECODED 2026-07-01, K65): call [0x7319b0 + [entity+0x9e]*4](entity) - sub-handler table indexed by the op-0x12-bound id; args from the operand stack."
+  },
+  {
+   "op": 31,
+   "op_hex": "0x1f",
+   "handler": "0x004888d0",
+   "nop": false,
+   "note": "INVOKE-SYSCALL (DECODED 2026-06-28). id=byte[entity+0x9e] (set by op 0x12); call [0x7319d4 + id*4](entity) = native library fn (table 0x7319d4, 9 entries immediately before the SAT table 0x7319f8); result -> var[0] ([entity+0x88]); set cond flag [entity+0x9c]=0x2a if result==0 (via 0x48bc90). The native fn reads its args off the operand stack via [entity+0x84]. No VM ptr move here. IP+=2."
+  },
+  {
+   "op": 32,
+   "op_hex": "0x20",
+   "handler": "0x004890e0",
+   "nop": false,
+   "note": "READ VM ENTRY-STATE (DECODED 2026-07-01, K65). If [0x878c05]!=0xff: var[0]=[0x878c05]. The native door-transition writer 0x471290 stages [0x878f4f] -> [0x878c05] on room entry; scripts branch on it to resume the right routine. 60/89 rooms; ABSENT in ST105."
+  },
+  {
+   "op": 33,
+   "op_hex": "0x21",
+   "handler": "0x00489110",
+   "nop": false,
+   "note": "SET ACTOR ANIM/MOTION (DECODED 2026-07-01, K65). actor=[scene_mgr+0x940]+stack[0x10]*0x260; if stack[0]==0 zero [actor+0x7c]; then 0x48e050(actor, stack[0xc], stack[4], stack[8], stack[0]) - same callee as cutscene op-0x46. Follows each ST105 op-0x1a spawn (poses the spawned raptor)."
+  },
+  {
+   "op": 34,
+   "op_hex": "0x22",
+   "handler": "0x00489170",
+   "nop": false,
+   "note": "REQUEST ROUTINE SWITCH (DECODED 2026-07-01, K65). [0x878c07]=byte stack[0]. Phase driver 0x48bd60: if [0x878c07]!=0xff and flag(2,6)==0 -> phase [0x878c04]=1 -> 0x48be20 (reset all 10 VM entities via 0x48bf90, free type-1 drop records via 0x48d5d0, misc flag resets) -> phase2 0x48bed0 -> StartScriptEntity(0, [0x878c07]), then [0x878c07]=0xff, phase=0. Whole-VM routine switch (wave/scenario progression). 49/89 rooms; ABSENT in ST105."
+  },
+  {
+   "op": 35,
+   "op_hex": "0x23",
+   "handler": "0x00489190",
+   "nop": false,
+   "note": "ENEMY PRELOAD (DECODED 2026-07-01, K64). rec=stack[1] ([entity+0x84]+4); if rec>=0x500000 (a blob descriptor ptr): LoadEnemyCategory(cat=byte[rec+1], var=byte[rec+4]) 0x4821c0; else jb 0x4891c4 cat=stack[1]/var=*stack[0]. IP+=2. This is how generic TYPE-0x10 rooms (which early-out of the op-0x1a self-load) become resident: e.g. ST105 preloads cat 2 (E00) via a descriptor at blob 0x5ed4 (desc[+1]=0x02 cat, desc[+4]=0x00 var). The cat byte is a static file-editable residency lever."
+  },
+  {
+   "op": 36,
+   "op_hex": "0x24",
+   "handler": "0x004891e0",
+   "nop": false
+  },
+  {
+   "op": 37,
+   "op_hex": "0x25",
+   "handler": "0x00489220",
+   "nop": false
+  },
+  {
+   "op": 38,
+   "op_hex": "0x26",
+   "handler": "0x00489250",
+   "nop": false
+  },
+  {
+   "op": 39,
+   "op_hex": "0x27",
+   "handler": "0x00489280",
+   "nop": false
+  },
+  {
+   "op": 40,
+   "op_hex": "0x28",
+   "handler": "0x004892b0",
+   "nop": false
+  },
+  {
+   "op": 41,
+   "op_hex": "0x29",
+   "handler": "0x004892f0",
+   "nop": false,
+   "note": "SCENE-STACK / CAMERA-CUT (DECODED 2026-06-30). Reads operand-stack top code: -1 push current scene index [scene_mgr+0x10b4] onto the 2-slot scene stack [+0x10b6/+0x10b8] (toggle sp [+0x108f]); -2 pop/restore; -3 FADE-TO-SCENE 0xC ([+0x10b4]=0xC, [esi+0x58]=0xf); else write the code as the new scene index. Then (if sp!=3) split lo/hi of [+0x10b4] and call scene-entry setup 0x482420(scene#, type). IP+=2. = the semantically-obvious 'scene change', but appears in only 10 rooms and NEITHER cutscene ground-truth room (ST106/ST407) -> documented, NOT the cutscene-detector signal (see _scene_cutscene)."
+  },
+  {
+   "op": 42,
+   "op_hex": "0x2a",
+   "handler": "0x00489550",
+   "nop": false
+  },
+  {
+   "op": 43,
+   "op_hex": "0x2b",
+   "handler": "0x00489580",
+   "nop": false,
+   "note": "ACTOR-COMMAND (DECODED 2026-06-30). Reads block[0/4/8/0xc] off the operand stack; actor = [scene_mgr+0x940] + block[0xc]*0x260 (the 0x260-stride ACTOR/ENEMY pool); call 0x48f9e0(block0, block4, block8, actor) = pose/move a SPECIFIC actor by index. IP+=2. Appealing 'scripted-actor' signal but ALSO occurs in plain-combat ST102 (a must-NOT-flag room) -> over-flags; NOT used by the cutscene detector (see _scene_cutscene)."
+  },
+  {
+   "op": 44,
+   "op_hex": "0x2c",
+   "handler": "0x004895d0",
+   "nop": false,
+   "note": "EVENT-FLAG PREDICATE (DECODED 2026-06-30). return 0x46fa70(type=2, id=6) -> 1 iff bank-2 scripted-event flag 6 set. Sibling of op-0x41/0x42 barrier ops (same bank-2 group). See _scene_cutscene."
+  },
+  {
+   "op": 45,
+   "op_hex": "0x2d",
+   "handler": "0x00489630",
+   "nop": false
+  },
+  {
+   "op": 46,
+   "op_hex": "0x2e",
+   "handler": "0x0048aea0",
+   "nop": false,
+   "note": "3-ARG ENGINE CALL (DECODED 2026-06-30). Reads block[0/4/8]; call 0x48c7a0(block0, block4, block8). IP+=2. Not actor/scene-specific enough for the cutscene detector."
+  },
+  {
+   "op": 47,
+   "op_hex": "0x2f",
+   "handler": "0x004896b0",
+   "nop": false
+  },
+  {
+   "op": 48,
+   "op_hex": "0x30",
+   "handler": "0x00489750",
+   "nop": false
+  },
+  {
+   "op": 49,
+   "op_hex": "0x31",
+   "handler": "0x00489880",
+   "nop": false
+  },
+  {
+   "op": 50,
+   "op_hex": "0x32",
+   "handler": "0x00489950",
+   "nop": false
+  },
+  {
+   "op": 51,
+   "op_hex": "0x33",
+   "handler": "0x00489a20",
+   "nop": false
+  },
+  {
+   "op": 52,
+   "op_hex": "0x34",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 53,
+   "op_hex": "0x35",
+   "handler": "0x00489b10",
+   "nop": false
+  },
+  {
+   "op": 54,
+   "op_hex": "0x36",
+   "handler": "0x00489cf0",
+   "nop": false
+  },
+  {
+   "op": 55,
+   "op_hex": "0x37",
+   "handler": "0x00489dc0",
+   "nop": false
+  },
+  {
+   "op": 56,
+   "op_hex": "0x38",
+   "handler": "0x00489e80",
+   "nop": false
+  },
+  {
+   "op": 57,
+   "op_hex": "0x39",
+   "handler": "0x00489f40",
+   "nop": false
+  },
+  {
+   "op": 58,
+   "op_hex": "0x3a",
+   "handler": "0x0048a020",
+   "nop": false
+  },
+  {
+   "op": 59,
+   "op_hex": "0x3b",
+   "handler": "0x0048a170",
+   "nop": false
+  },
+  {
+   "op": 60,
+   "op_hex": "0x3c",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 61,
+   "op_hex": "0x3d",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 62,
+   "op_hex": "0x3e",
+   "handler": "0x0048a240",
+   "nop": false,
+   "note": "AOT-DISPATCH (DECODED 2026-06-28). slot=stack[0]; rec=[scene_mgr+0xa5c](=0x752388)+slot*0x28; call [0x7319f8 + rec[+1]*4](rec) = the SAT category handler (rec+1=SAT byte). Returns 1 iff rec[+1]==5 (gated SAT-5). Peeks stack (no ptr move). IP+=2. = the runtime trigger/activate for an AOT record (door/item/flag). See AOT-SYSTEM-RE.md."
+  },
+  {
+   "op": 63,
+   "op_hex": "0x3f",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 64,
+   "op_hex": "0x40",
+   "handler": "0x0048a290",
+   "nop": false
+  },
+  {
+   "op": 65,
+   "op_hex": "0x41",
+   "handler": "0x0048aed0",
+   "nop": false,
+   "role": "SCRIPTED-EVENT BARRIER (cutscene-detector PRIMARY signal, K##)",
+   "note": "SCRIPTED-EVENT WAIT/BARRIER (DECODED 2026-06-30). Polls bank-2 global event flags via 0x46fa70(type=2,id): block[0]!=0 -> wait until bank2.flag0 set; block[0]==0 -> wait until bank2.flag0 AND flag2 clear. If the condition is not met the handler branches to 0x48af22 WITHOUT advancing the VM IP -> the script thread BLOCKS on the scripted event (re-runs next tick). = the scripted-sequencing barrier used by set-pieces / in-engine scenes. Present in ST106 (4) + ST407 (19), ZERO in combat ST102/ST202 -> the cutscene-room signature. See _scene_cutscene."
+  },
+  {
+   "op": 66,
+   "op_hex": "0x42",
+   "handler": "0x0048af30",
+   "nop": false,
+   "role": "SCRIPTED-EVENT PREDICATE (cutscene-detector PRIMARY signal, K##)",
+   "note": "EVENT-FLAG PREDICATE (DECODED 2026-06-30). return 0x46fa70(type=2, id=2) -> 1 iff bank-2 scripted-event flag 2 set. The non-blocking predicate form of op-0x41; co-occurs with it in the exact same 33-room set. Part of the cutscene signature. See _scene_cutscene."
+  },
+  {
+   "op": 67,
+   "op_hex": "0x43",
+   "handler": "0x0048afc0",
+   "nop": false
+  },
+  {
+   "op": 68,
+   "op_hex": "0x44",
+   "handler": "0x0048a390",
+   "nop": false
+  },
+  {
+   "op": 69,
+   "op_hex": "0x45",
+   "handler": "0x0048a430",
+   "nop": false
+  },
+  {
+   "op": 70,
+   "op_hex": "0x46",
+   "handler": "0x0048a6a0",
+   "nop": false,
+   "role": "SCRIPTED ACTOR-MOTION/ANIMATION (cutscene-detector AUTO-CONFIRM, K##)",
+   "note": "SCRIPTED ACTOR-ANIMATION (DECODED 2026-06-30). actor = [scene_mgr+0x940] + [entity+0x9f]*0x260 (specific pool actor by the op-0x12 syscall-selector byte); reads block[0/4/8/0xc] off the operand stack; call 0x48e050(actor, block0xc, block4, block8, block0) = an actor motion/animation-state setter in the 0x48exxx anim cluster (sibling of SetAnimClip 0x48de40 + the anim transform 0x48e530 that idiv-by-zero CRASHED the K60 ST102 raptor swap; 0x48e050 writes actor[+0x9c]/[+0xa0] from a descriptor). IP+=2. Because a species swap breaks the actor's clip table (zero-span keyframe), a room that scripts actor animation is a swap-crash set-piece. This catches the ST102-class rooms the event-barrier MISSES (ST102 has op-0x46 x6 but ZERO barrier); absent in the plain adjacent raptor rooms ST105/104/107. See _scene_cutscene."
+  },
+  {
+   "op": 71,
+   "op_hex": "0x47",
+   "handler": "0x0048a6f0",
+   "nop": false
+  },
+  {
+   "op": 72,
+   "op_hex": "0x48",
+   "handler": "0x0048a7b0",
+   "nop": false,
+   "note": "var[0] = RNG 0x4de152() & 0xffff; cond via 0x48bc90 (DECODED 2026-07-01)."
+  },
+  {
+   "op": 73,
+   "op_hex": "0x49",
+   "handler": "0x0048b0f0",
+   "nop": false
+  },
+  {
+   "op": 74,
+   "op_hex": "0x4a",
+   "handler": "0x0048a7e0",
+   "nop": false
+  },
+  {
+   "op": 75,
+   "op_hex": "0x4b",
+   "handler": "0x0048a890",
+   "nop": false,
+   "note": "WAIT FOR CAMERA-ZONE CHANGE (DECODED 2026-07-01, K65). Blocks (no IP advance) until byte [scene_mgr+0x7c4] (current camera zone, written from camera rec+0xd, e.g. 0x4160e9) != [entity+0xa0]; then var[0]=zone, [entity+0xa0]=zone, advance. ST105 routine[1]'s scene-watcher switch key (case zone==3 -> raptor ambush)."
+  },
+  {
+   "op": 76,
+   "op_hex": "0x4c",
+   "handler": "0x0048a8e0",
+   "nop": false
+  },
+  {
+   "op": 77,
+   "op_hex": "0x4d",
+   "handler": "0x0048a910",
+   "nop": false
+  },
+  {
+   "op": 78,
+   "op_hex": "0x4e",
+   "handler": "0x0048a940",
+   "nop": false
+  },
+  {
+   "op": 79,
+   "op_hex": "0x4f",
+   "handler": "0x0048a960",
+   "nop": false,
+   "note": "SET WAVE-SPAWN DESCRIPTOR (DECODED 2026-07-01, K65 - arms THE real ST105 spawner). desc=stack[0] (a mode-6 room-blob ptr, or 0=disarm). Calls 0x4720b0(byte scene+0x1091, byte scene+0x1090) first; if desc != [scene_mgr+0xa68]: store it, zero wave state scene+0xa80 (0x12 dwords, +0xa89/+0xad1=0xff), and if desc!=0 call LoadEnemyCategory(cat=desc[+1], var=desc[+4]) @0x48aa1b (the formerly-unresolved '4th 0x4821c0 caller', K59 -> RESOLVED). The armed descriptor drives the NATIVE per-frame wave spawner 0x4720d0 (tick 0x472e70, gated flag(1,0xb)==0): actor=0x48d910 (top-down slots), [actor+0x58]=desc[+1] @0x4728cb/ce, position from desc spawn-point recs, ctor [0x876c60+TYPE*4] sets [actor+0x60]. desc[+1] = the ONE-BYTE species lever (ST105: blob 0x5ed5 + 0x6195). 49/89 rooms arm this system (see _wave_spawner)."
+  },
+  {
+   "op": 80,
+   "op_hex": "0x50",
+   "handler": "0x0048aa30",
+   "nop": false
+  },
+  {
+   "op": 81,
+   "op_hex": "0x51",
+   "handler": "0x0048aaa0",
+   "nop": false
+  },
+  {
+   "op": 82,
+   "op_hex": "0x52",
+   "handler": "0x0048ab00",
+   "nop": false
+  },
+  {
+   "op": 83,
+   "op_hex": "0x53",
+   "handler": "0x0048ae70",
+   "nop": false
+  },
+  {
+   "op": 84,
+   "op_hex": "0x54",
+   "handler": "0x0048ab90",
+   "nop": false
+  },
+  {
+   "op": 85,
+   "op_hex": "0x55",
+   "handler": "0x0048af80",
+   "nop": false
+  },
+  {
+   "op": 86,
+   "op_hex": "0x56",
+   "handler": "0x0048ac30",
+   "nop": false
+  },
+  {
+   "op": 87,
+   "op_hex": "0x57",
+   "handler": "0x0048ac50",
+   "nop": false
+  },
+  {
+   "op": 88,
+   "op_hex": "0x58",
+   "handler": "0x0048ac80",
+   "nop": false,
+   "role": "TURRET-CLASS ACTOR-FLAG SCRIPT (cutscene-detector AUTO-CONFIRM, K##)",
+   "note": "ACTOR-FLAG SCRIPT (DECODED 2026-06-30). actor = [scene_mgr+0x940] + [entity+0x9f]*0x260 (specific pool actor by the op-0x12 syscall-selector byte); call 0x48d550(actor[+0x64], block[4]); if block[0]==1 clear flag-bit 0x10000000 in actor[+0x50]. IP+=2. Occurs in EXACTLY ONE room corpus-wide (ST407, the turret set-piece) -> auto-confirm signal for a scripted set-piece that directly commands its enemy actors. See _scene_cutscene."
+  },
+  {
+   "op": 89,
+   "op_hex": "0x59",
+   "handler": "0x0048ad00",
+   "nop": false
+  },
+  {
+   "op": 90,
+   "op_hex": "0x5a",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 91,
+   "op_hex": "0x5b",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 92,
+   "op_hex": "0x5c",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 93,
+   "op_hex": "0x5d",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 94,
+   "op_hex": "0x5e",
+   "handler": "0x00489b00",
+   "nop": true
+  },
+  {
+   "op": 95,
+   "op_hex": "0x5f",
+   "handler": "0x00489b00",
+   "nop": true
   }
+ ],
+ "_operand_model": {
+  "_decoded": "2026-06-28 (offline, disx) \u2014 slot-5 SCD VM operand resolve/store + assignment opcodes.",
+  "resolve_fn": "0x0048BA50 resolve(entity,mode,value)->value",
+  "store_fn": "0x0048BAA0 store(entity,mode,value,src)",
+  "modes": {
+   "0": "literal: value itself",
+   "1": "var: local var array at [entity+0x88] + value*4",
+   "2": "stack: operand stack at [entity+0x84] + value*4 (NOT a persistent block; relative to the live stack ptr, which op-0x05 grows downward by 4 per push)",
+   "6": "global: global array at [[0x878C00]] + value*4 (story/runtime state)",
+   "_default": "K122 2026-07-20: resolver 0x48BA50 dispatches ONLY modes 1/2/6; every other mode byte (0, 4, ...) falls through to 0x48BA93 = return value itself (literal). Corpus: op-0x15/0x19 routine-idx pushes are uniformly mode 4 = literal."
+  },
+  "global_array": "[0x00878C00] (dword array; mode-6 operands index it as *(P+idx*4), P=[0x878c00]). DECODED 2026-07-01 (K64): P is NOT runtime story state -- it is set ONCE per room at VM-init 0x48bd32 to P = slot5base+0x1c+*(slot5base+0xc) (slot5base=[scene_mgr+0xa54]), i.e. P points INTO the loaded room blob. \u21d2 the mode-6 'globals' are a per-room DATA TABLE baked in ST*.DAT slot-5 at file offset sec+0x1c+*(sec+0xc). The generic TYPE-0x10 spawn's MODEL_BASE (block+0x0c) is a mode-6 read of this table, so the raptor model base is a STATIC FILE LITERAL (ST105: glb[13/17/19/21]=0x00633000 @blob 0x94fc), NOT a computed value (refines K60's 'computed global'). Can ALSO be written at runtime by op-0x02(mode6)/op-0x06(mode6), but ST105's slot-5 has ZERO such stores -- the value is purely file-sourced.",
+  "cond_flag": "[entity+0x9c] = the boolean/condition byte. Set to 0x2a by helper 0x48bc90(entity,result) when result==0; consumed by op 0x07 (conditional skip). op 0x03 and op 0x1f both call 0x48bc90.",
+  "syscall_table": "0x007319d4 (native library fn table; op 0x12 sets the id byte [entity+0x9e], op 0x1f calls [0x7319d4 + id*4](entity)). Sits 0x24 bytes (9 entries) immediately before the AOT SAT table 0x7319f8.",
+  "alu_dispatch": "0x0048BAF0 ALU(a,b,operator) -> jumps via 26-entry table 0x0048BC20 (operator 0..0x19); default(>0x19)=0x48bc1b returns a. Used by op 0x03 (slot==0xff form passes a=stackptr,b=rval*4).",
+  "alu_table": {
+   "_base": "0x0048BC20 (26 dwords). a=[esp+4], b=[esp+8]. Decoded 2026-06-28 (disx).",
+   "0x00": "ADD  a+b",
+   "0x01": "SUB  a-b",
+   "0x02": "MUL  a*b",
+   "0x03": "DIV  a/b (signed idiv)",
+   "0x04": "MOD  a%b (signed)",
+   "0x05": "OR   a|b",
+   "0x06": "AND  a&b",
+   "0x07": "XOR  a^b",
+   "0x08": "NOT  ~a",
+   "0x09": "SHL  a<<b",
+   "0x0a": "SAR  a>>b (arithmetic)",
+   "0x0b": "SHL  (alias of 0x09)",
+   "0x0c": "SAR  (alias of 0x0a)",
+   "0x0d": "GT   a>b -> 0/1",
+   "0x0e": "LT   a<b -> 0/1",
+   "0x0f": "GE   a>=b -> 0/1",
+   "0x10": "LE   a<=b -> 0/1",
+   "0x11": "EQ   a==b -> 0/1",
+   "0x12": "NE   a!=b -> 0/1",
+   "0x13": "LNOT !a -> 0/1",
+   "0x14": "INC  a+1",
+   "0x15": "DEC  a-1",
+   "0x16": "MOV  a (identity)",
+   "0x17": "MOV  a (identity)",
+   "0x18": "LOR  (a||b) truthy",
+   "0x19": "LAND (a&&b) -> 0/1"
+  },
+  "_alu_corpus": "31473 op-0x03 across 89 rooms; ALL operators <= 0x19 (0 out-of-table). slot==0xff (stack-ptr form) = 28530 (90.6%), dominated by operator 0x00 ADD (28013) = the VM's POP-N idiom. operands: 31289 literal / 183 stack / 1 global.",
+  "stack_delta_model": {
+   "_summary": "Only SIX opcodes write the operand-stack pointer [entity+0x84] (verified by scanning every non-nop handler for a write to +0x84). All other ops (incl. 0x12/0x1c/0x1f/0x3e and the whole 0x10..0x59 statement range) only PEEK the stack; the script cleans up with an explicit op-0x03 ADD. This set is sufficient to symbolically track a routine's stack depth.",
+   "0x05": "PUSH: ptr -= 4 (+1 slot).",
+   "0x06": "POP-STORE: ptr += 4 (-1 slot); stores popped value to dest(mode,idx).",
+   "0x03": "if slot==0xff: ptr := ALU(ptr, rval*4, operator) -> ADD pops rval, SUB pushes rval, etc. (literal rval => static delta). if slot!=0xff: delta 0.",
+   "0x04": "RETURN: if depth>0 ptr += 4 (pop saved IP); if depth==0 routine-end (no change).",
+   "0x08": "CALL: ptr -= 4 (push return IP); depth++; absolute jump.",
+   "0x19": "JUMP/RESTART: ptr := entity+0x80 (reset to EMPTY); zeroes entity; absolute jump."
+  },
+  "ops": {
+   "0x01 (0x00487520)": "var[byte IP+1] = resolve(mode=byte IP+2, value=word IP+4); IP+=6. Local-var assign.",
+   "0x02 (0x00487560)": "store(mode=byte IP+2, idx=word IP+4, src=var[byte IP+1]); IP+=6. Assign var -> stack/var/global dest.",
+   "0x03 (0x004875A0)": "ALU/EXPRESSION (full). operator=byte IP+1 (table 0x48bc20), slot=byte IP+2, rmode=byte IP+3, rval=word IP+4; IP+=6. slot!=0xff: var[slot]=ALU(var[slot], resolve(rmode,rval), operator). slot==0xff: stackptr=ALU(stackptr, rval*4, operator) (explicit pop/push). cond flag set if result==0. See alu_table + stack_delta_model.",
+   "0x04 (0x00487630)": "RETURN: depth>0 pops saved IP (ptr+=4) and restores it, depth--; depth==0 ends routine. See stack_delta_model.",
+   "0x05 (0x00487670)": "push resolve(mode=byte IP+1, value=word IP+2) onto operand stack [entity+0x84]-=4; IP+=4.",
+   "0x06 (0x004876B0)": "POP-STORE: pop top operand (ptr+=4); store(mode=byte IP+1, idx=word IP+2, popped) via 0x48baa0; IP+=4. mode 6 writes the global array.",
+   "0x07 (0x004876F0)": "conditional skip: if bit (1<<byte[IP+1]) set in [entity+0x9c] (or byte[IP+1]==0) skip; gates the following block.",
+   "0x08 (0x00487730)": "CALL subprogram by index (word IP+2): push return IP (ptr-=4), depth++, absolute jump to slot5base+[base+idx*4].",
+   "0x12 (0x004877F0)": "BIND-SYSCALL: [entity+0x9e]=low(stack[1]); [entity+0x9f]=low(stack[0]); peek only; IP+=2. Pairs with op 0x1f.",
+   "0x19 (0x00487B10)": "JUMP/RESTART: zero entity (0xa4), reset stack to empty (ptr=entity+0x80), depth=0; new IP from slot5base+[base+stack[0]*4].",
+   "0x1c (0x00487CD0)": "ENGINE FLAG SET: peek top-3 (group=stack[2], id=stack[1], value=stack[0]); special-case scene_mgr+0xb14 when (group==1 && id==0xff); else 0x46f9f0(group,id,value); IP+=2.",
+   "0x1f (0x004888D0)": "INVOKE-SYSCALL: call [0x7319d4 + [entity+0x9e]*4](entity); result -> var[0] ([entity+0x88]); cond flag if result==0; IP+=2.",
+   "0x3e (0x0048A240)": "AOT-DISPATCH: rec=0x752388+stack[0]*0x28; call [0x7319f8 + rec[+1]*4](rec); returns 1 iff rec[+1]==5; IP+=2."
+  }
+ }
 }

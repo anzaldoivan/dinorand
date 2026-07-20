@@ -1,7 +1,7 @@
 {
   "_generated_by": "scripts/gen_ap_logic.py",
-  "_source": "data/dc1/{map,items,room-data}.json (authored)",
-  "version": 1,
+  "_source": "data/dc1/{map,items,room-data}.json (authored) + ap-client-checks.json",
+  "version": 2,
   "startRoom": "010d",
   "goalRoom": "060d",
   "regions": {
@@ -680,7 +680,8 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "excluded": true
     },
     {
       "key": "0108:2b:-8240,-7904",
@@ -698,7 +699,8 @@
       },
       "source": "event-granted",
       "visual": "interaction-only",
-      "gateFlag": "7:99"
+      "gateFlag": "7:99",
+      "excluded": true
     },
     {
       "key": "0109:2f:2560,-1632",
@@ -817,7 +819,8 @@
         "bit": 64
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "excluded": true
     },
     {
       "key": "0113:2b:-7008,2928",
@@ -1403,7 +1406,8 @@
         "bit": 64
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "excluded": true
     },
     {
       "key": "030c:13:-7700,6900",
@@ -1866,7 +1870,8 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "2:11"
+      "gateFlag": "2:11",
+      "excluded": true
     },
     {
       "key": "0503:5b:-1792,1792",
@@ -1918,7 +1923,8 @@
       },
       "source": "event-granted",
       "visual": "bespoke-mesh",
-      "gateFlag": "2:11"
+      "gateFlag": "2:11",
+      "excluded": true
     },
     {
       "key": "0504:50:4896,-3840",
@@ -1936,7 +1942,8 @@
       },
       "source": "event-granted",
       "visual": "bespoke-mesh",
-      "gateFlag": "2:11"
+      "gateFlag": "2:11",
+      "excluded": true
     },
     {
       "key": "0504:4e:2256,-3840",
@@ -1972,7 +1979,8 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "7:49"
+      "gateFlag": "7:49",
+      "excluded": true
     },
     {
       "key": "0504:50:-2912,3872",
@@ -1989,7 +1997,8 @@
         "bit": 80
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "excluded": true
     },
     {
       "key": "0505:2b:-1100,1800",
@@ -2386,7 +2395,8 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "2:11"
+      "gateFlag": "2:11",
+      "excluded": true
     },
     {
       "key": "0600:18:-1616,4480",
@@ -2541,7 +2551,8 @@
         "bit": 102
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "excluded": true
     },
     {
       "key": "0606:2b:6144,-2560",
@@ -3098,7 +3109,8 @@
         "bit": 102
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "excluded": true
     }
   ],
   "items": {

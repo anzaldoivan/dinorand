@@ -272,6 +272,48 @@ public class PickupModelImportTests
         Assert.Equal(640 + 32, placed2!.TexRect.X);
     }
 
+    [Fact]
+    public void TryPlace_FailsClosed_WhenRoomArenaFull()
+    {
+        // Corpus rule (148-room survey, 2026-07-18): room packages only ever upload texture columns
+        // inside [512,768). x>=768 holds engine-global VRAM — the item-icon atlas at (768,0) and the
+        // font glyphs — which seed DINO-WxCfArn_H_8vBw garbled by parking a pickup texture there
+        // (st10d: atlas 320..576 + species columns 576/640/704 fill the whole arena). A full arena
+        // must fail closed (Lever-A generic panel), never spill past 768.
+        var target = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(320, 0, 256, 512), Lzss.Compress(PatternPixels(256, 512))),
+            (GianEntryType.Lzss2, new VramRect(576, 0, 64, 512), Lzss.Compress(PatternPixels(64, 512))),
+            (GianEntryType.Lzss2, new VramRect(640, 0, 64, 512), Lzss.Compress(PatternPixels(64, 512))),
+            (GianEntryType.Lzss2, new VramRect(704, 0, 64, 512), Lzss.Compress(PatternPixels(64, 512))),
+            (GianEntryType.Palette, new VramRect(768, 505, 256, 4), PatternPixels(256, 4)),
+            (GianEntryType.Data, default, new byte[4]));
+
+        var cut = new PickupTextureCut(TextureImporter.MakeTpage(512, 0, 0), TextureImporter.MakeClut(768, 511),
+                                       new VramRect(512, 0, 32, 128), PatternPixels(32, 128),
+                                       new VramRect(768, 511, 16, 1), PatternPixels(16, 1));
+
+        Assert.False(PickupModelImporter.TryPlace(target, Array.Empty<VramRect>(), cut, out _));
+    }
+
+    [Fact]
+    public void TryPlace_ClutRow_StaysOnVanillaWitnessedRows()
+    {
+        // Vanilla palette uploads only ever land on rows {497,498,505..511}; 499..504 hold engine
+        // CLUTs (the bad seed parked one at (768,504) and trashed the UI). With 505..511 taken the
+        // next candidate is 498 — not 504.
+        var target = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(320, 0, 192, 512), Lzss.Compress(PatternPixels(192, 512))),
+            (GianEntryType.Palette, new VramRect(768, 505, 256, 7), PatternPixels(256, 7)),
+            (GianEntryType.Data, default, new byte[4]));
+
+        var cut = new PickupTextureCut(TextureImporter.MakeTpage(512, 0, 0), TextureImporter.MakeClut(864, 507),
+                                       new VramRect(512, 0, 8, 16), PatternPixels(8, 16),
+                                       new VramRect(864, 507, 16, 1), PatternPixels(16, 1));
+
+        Assert.True(PickupModelImporter.TryPlace(target, Array.Empty<VramRect>(), cut, out var placed));
+        Assert.Equal(498, placed!.ClutRect.Y);
+    }
+
     // --- RoomScript.ApplyEdits: the VisualModelPtr write (Lever B repoint) -------------------------
 
     [Fact]
@@ -425,12 +467,39 @@ public class PickupModelImportTests
                         $"seed {seed}: texref tpage {tr.Tpage:x} bbox exceeds its upload rect");
                     Assert.True(texBlock.Dst.W % PickupModelImporter.BlitRowHalfwords == 0,
                         $"seed {seed}: upload W={texBlock.Dst.W} not a multiple of the blit row unit");
+                    // Imports never leave the room-class VRAM arena (x>=768 is the engine's
+                    // icon/font atlas; rows 499..504 its CLUTs — the DINO-WxCfArn_H_8vBw garble).
+                    Assert.True(texBlock.Dst.X >= TextureImporter.RoomArenaX
+                             && texBlock.Dst.X + texBlock.Dst.W <= TextureImporter.RoomArenaEnd,
+                        $"seed {seed}: import upload {texBlock.Dst} outside the room VRAM arena");
+                    Assert.Contains(cy, TextureImporter.RoomClutRows);
                     Assert.True(blocks.Any(b => b.Type == GianEntryType.Palette && b.Dst.Contains(cx, cy)),
                         $"seed {seed}: texref clut {tr.Clut:x} not covered by a palette upload");
                 }
             }
         }
         Assert.True(imported > 0, $"seed {seed}: no donor import happened at all ({fellBack} fallbacks)");
+    }
+
+    [Fact]
+    public void RealInstall_TryPlace_FailsClosed_St10d_FullArena()
+    {
+        // Direct repro of the DINO-WxCfArn_H_8vBw garble: pristine st10d's atlas (320,0,256,512) plus
+        // species columns 576/640/704 occupy the entire room VRAM arena — a pickup import there must
+        // fail closed, not land at (768,0) on top of the engine's item-icon atlas.
+        var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (string.IsNullOrEmpty(root)) return; // no game files (CI) — skip
+        var refs = Game.EnumerateRooms(root);
+        if (refs.Count == 0) return;
+        var st10d = refs.Single(r => r.Stage == 1 && r.Room == 0x0d);
+        var target = File.ReadAllBytes(st10d.Path);
+
+        var cut = new PickupTextureCut(TextureImporter.MakeTpage(512, 0, 0), TextureImporter.MakeClut(768, 511),
+                                       new VramRect(512, 0, 32, 128), PatternPixels(32, 128),
+                                       new VramRect(768, 511, 16, 1), PatternPixels(16, 1));
+
+        Assert.False(PickupModelImporter.TryPlace(target, Array.Empty<VramRect>(), cut, out var placed),
+            $"pickup import must fail closed in st10d, but landed at {placed?.TexRect}");
     }
 
     // --- design correction (2026-07-17): visual always matches the landed item ----------------------

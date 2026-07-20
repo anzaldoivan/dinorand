@@ -29,7 +29,8 @@ public static class Dc2ShopShuffleInstaller
     /// Resolve the DC2 install at <paramref name="installDir"/> and shuffle (or, with
     /// <paramref name="restore"/>, un-shuffle) the exe's shop tables.
     /// </summary>
-    public static Dc2ShopShuffleOutcome Apply(string installDir, int seed, bool restore = false, Action<string>? log = null)
+    public static Dc2ShopShuffleOutcome Apply(string installDir, int seed, bool restore = false,
+        Action<string>? log = null, bool shuffleCatalogMasks = true)
     {
         var dataDir = new DinoCrisis2().GetDataDir(installDir);
         if (dataDir is null)
@@ -39,11 +40,13 @@ public static class Dc2ShopShuffleInstaller
         }
         var gameRoot = Path.GetDirectoryName(Path.GetFullPath(
             dataDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)))!;
-        return ApplyToFile(Path.Combine(gameRoot, Dc2CharacterSkinInstaller.ExeName), seed, restore, log);
+        return ApplyToFile(Path.Combine(gameRoot, Dc2CharacterSkinInstaller.ExeName), seed, restore, log,
+            shuffleCatalogMasks);
     }
 
     /// <summary>File-level worker (testable without a full install layout).</summary>
-    public static Dc2ShopShuffleOutcome ApplyToFile(string exePath, int seed, bool restore = false, Action<string>? log = null)
+    public static Dc2ShopShuffleOutcome ApplyToFile(string exePath, int seed, bool restore = false,
+        Action<string>? log = null, bool shuffleCatalogMasks = true)
     {
         if (!File.Exists(exePath))
         {
@@ -54,7 +57,7 @@ public static class Dc2ShopShuffleInstaller
         var bytes = File.ReadAllBytes(exePath);
         try
         {
-            Dc2ShopTablePatch.Validate(bytes);
+            Dc2ShopTablePatch.Validate(bytes, validateCatalogMasks: shuffleCatalogMasks);
         }
         catch (InvalidOperationException ex)
         {
@@ -75,7 +78,7 @@ public static class Dc2ShopShuffleInstaller
         if (!File.Exists(backupPath))
             File.Copy(exePath, backupPath);
 
-        var entries = Dc2ShopTablePatch.Shuffle(bytes, seed);
+        var entries = Dc2ShopTablePatch.Shuffle(bytes, seed, shuffleCatalogMasks);
         File.WriteAllBytes(exePath, bytes);
         int moved = entries.Count(e => e.OldPrice != e.NewPrice || e.OldMask != e.NewMask);
         log?.Invoke($"[shop-shuffle] seed {seed}: {moved}/{entries.Length} shop items changed (backup: {Path.GetFileName(backupPath)})");

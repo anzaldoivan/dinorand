@@ -4,6 +4,10 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DinoRand.FileFormats\DinoRand.FileFormats.csproj" />
+    <!-- Archipelago runtime session (Ap/Dc1ApRunner) — the loop-closing install it drives lives
+         here (ApPlacementInstaller/GameInstaller), so the shared runner lives here too and both
+         front-ends bind it without either one re-implementing the flow (AP-CLIENT-PLAN.md D3). -->
+    <ProjectReference Include="..\DinoRand.ApClient\DinoRand.ApClient.csproj" />
   </ItemGroup>
   <!-- Ship the door-rando metadata (plan §6) inside the assembly so DoorMap.LoadDefault finds it. -->
   <ItemGroup>

@@ -57,6 +57,12 @@ public sealed class AppSettings
     /// (<c>RandomizerConfig.IncludeCrossGameVoices</c>).</summary>
     public bool IncludeCrossGameVoices { get; set; }
 
+    /// <summary>Archipelago connect tab: last-used <c>host:port</c> and slot name (AP-CLIENT-PLAN.md
+    /// increment 2). Shared, not per-game — AP support is DC1-only today. The password is
+    /// deliberately NOT persisted.</summary>
+    public string? ApHostPort { get; set; }
+    public string? ApSlot { get; set; }
+
     /// <summary>Voice rando: per-character donor pins (target actor ⇒ donor actor), shared across games —
     /// targets are distinct character names per game so a single dict holds all of them
     /// (<c>RandomizerConfig.VoiceDonors</c>).</summary>

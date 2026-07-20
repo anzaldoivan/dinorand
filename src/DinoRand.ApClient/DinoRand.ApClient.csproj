@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>DinoRand.ApClient</RootNamespace>
+    <!-- Pin the one external dependency's full transitive graph (packages.lock.json, committed);
+         CI restores in locked mode so a hijacked/retagged upstream package can't slip in. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- The only approved external dependency (AP-CLIENT-PLAN.md D1): the official AP .NET
+         protocol library (MIT). Everything game-specific stays in this repo. -->
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.7.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DinoRand.FileFormats.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Per-location check predicates + install-time take-index plan (gen_ap_client_checks.py)
+         so Dc1ClientChecks.LoadEmbedded finds it. -->
+    <EmbeddedResource Include="..\..\data\dc1\ap-client-checks.json" LogicalName="DinoRand.ApClient.Data.dc1.ap-client-checks.json" />
+  </ItemGroup>
+</Project>

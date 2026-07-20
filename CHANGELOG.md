@@ -7,6 +7,88 @@ versions may include breaking changes).
 
 The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Directory.Build.props).
 
+## [Unreleased]
+
+### Added
+
+- **DC2 “Enable Randomized Weapons” (EXPERIMENTAL, default OFF).** Seed-scrambles the six
+  non-starter MAIN weapons into exact three-weapon Regina/Dylan sets while pinning each character's
+  starter and required door tool. Uses the existing cross-character grafts, validates every owned
+  MAIN against a non-NULL character slot, installs after starting-loadout edits, and restores to the
+  verified native layout. Seed byte 16 bit 7; GUI Advanced option and CLI
+  `--dc2-randomize-weapons`; incompatible with Shared Weapons. Shop prices/recovery still shuffle,
+  but catalog-mask shuffling is suppressed for this option. Known cosmetic limitation: randomized
+  weapons retain the original owner's inventory icon. Not verified in-game.
+
+- **DC2 "Enable Character Shared Weapons" (EXPERIMENTAL, default OFF).** Makes weapons **shared**
+  between Regina and Dylan rather than one set each — usable *and* shop-purchasable by both — the way
+  the seven natively dual-owned catalog ids already work in the retail game. Sub-weapons (Machete,
+  Large Stungun) are a two-bit `Dino2.exe` item-catalog edit (`0x704260[id]+0xA`). Main weapons
+  additionally need their geometry graft — an owner bit on a MAIN whose `0x71B230` slot is NULL runs
+  the loader on a stale blob and crashes — so the main half **delegates to the in-game-proven graft
+  installer** rather than writing the same bits twice; enabling this implies "Enable Cross Character
+  Weapons". GUI: Advanced options; CLI: `--dc2-shared-weapons`, or
+  `--dc2-shared-weapons-subs-only` for the graft-free subset (`--restore` to revert). Not
+  seed-encoded. Known limitations: a shared weapon keeps its original owner's inventory icon on both
+  characters (the icon UV is global per weapon id, with no per-character indirection), and the four
+  large weapons (Missile Pod, Rocket Launcher, Solid Cannon, Antitank Rifle) are built but not yet
+  fully witnessed in-game.
+
+- **Archipelago runtime client, DC1 (multiworld play).** New long-running CLI command
+  `--ap-connect <host[:port]> --ap-slot <name> [--ap-password] --install <dir>`: connects to an
+  Archipelago server, patches AP's item placement into the local GOG install (same
+  backup-and-swap as a normal seed; other worlds' items appear as a marker pickup), then polls
+  the running `DINO.exe` from outside the process — pickups become multiworld checks, items other
+  players find are granted in-game, and reaching the Underground Heliport reports the goal.
+  Windows host only for the play half; reconnect-safe (the server stays authoritative). The DC1
+  apworld contract moves to v2 (slot_data `placements`/`item_ids`; 12 shared-flag locations are
+  excluded from progression). Decision record `AP-CLIENT-PLAN.md`; taken-flag decode
+  `EXE-SYMBOLS` cont.81.
+
+- **Door Skip (Experimental) — DC1.** New default-off option (GUI checkbox + `--dc1-door-skip`) that
+  patches `DINO.exe` so room-to-room door transitions are near-instant: the door-opening animation is
+  removed while the destination room's background still loads correctly. Two small reversible `.text`
+  windows, applied at install from a pristine backup and undone by `--restore`; not part of the seed
+  string, and leaves the shared animation engine untouched (no effect on enemy/cutscene timing).
+  Decode + live confirmation: `STATIC-SCD-RE` / `EXE-SYMBOLS` cont.78.
+
+- **Fast Forward Cutscenes (Experimental/Crash Risk) — DC1.** New default-off option (GUI checkbox +
+  `--dc1-fast-forward-cutscenes`) that patches `DINO.exe` so cutscenes play faster: dead-air pauses
+  are compressed by a guarded script-VM tick multiplier while every story flag, item grant and
+  dialogue line is preserved and message/voice pacing is kept intact. One reversible `.text` hook +
+  code cave, applied at install from a pristine backup and undone by `--restore`; not part of the seed
+  string. Labelled "Crash Risk" pending broad in-game witness. Decode: `STATIC-SCD-RE` / `EXE-SYMBOLS`
+  cont.79; the aggressive auto-skip variant is a documented crash dead-end (cont.80 RCA,
+  `CUTSCENE-DRAIN-NULL-SKELETON-RCA`).
+
+- **Ready-made `.apworld` downloads on every release.** Releases now attach
+  `dino_crisis_1.apworld` and `dino_crisis_2.apworld` alongside the per-RID binaries — drop the
+  file straight into your Archipelago install's `custom_worlds/` instead of hand-zipping the
+  source folder. Dino Crisis 1 is the full world (generation **and** multiworld play via the
+  runtime client); Dino Crisis 2 is **generation-only** — it produces a completable seed but has
+  no key-item logic or in-game client yet.
+
+### Fixed
+
+- **DC2 owner-bit revert is now vanilla-relative (latent-corruption fix).**
+  `Dc2CrossCharWeaponPatch.Restore` cleared a weapon's owner bit with a blanket `flags & ~bit`. That
+  was correct only because no *natively dual-owned* id was in its pair list; RE work (K125) then
+  established that **seven** catalog ids ship dual-owned (`0x00 0x05 0x10 0x13 0x14 0x16 0x19`), not
+  the three previously assumed — and `0x16` Chain Mine is a shop subweapon, a plausible future
+  addition. Adding any of them would have made Apply→Restore silently non-byte-identical *and*
+  stripped a bit the retail build set. Revert now restores each bit to its PSX-verified vanilla
+  state via the new `Dc2OwnerBits` helper, and fails closed on ids with no recorded baseline. No
+  behaviour change for the currently shipped weapon set.
+
+- **Archipelago DC1 apworld: distributable-package fixes** found by the first live end-to-end
+  run (local AP 0.6.7 server, 2-slot multiworld — full connectivity matrix recorded in
+  `AP-CLIENT-PLAN.md` Deviations, all rows passing): the logic contract now loads from inside a
+  zipped `.apworld` (pkgutil, not filesystem paths), `archipelago.json` carries the
+  `compatible_version` the AP 0.7 loader will require, and `requiresRooms` edge rules register
+  their indirect region conditions so AP's region cache can't serve stale reachability during
+  fill. CI's AP integration job re-pinned from a nonexistent `0.6.8` tag to the real `0.6.7`
+  release; the AP protocol dependency is now lockfile-pinned and restored in locked mode.
+
 ## [0.5.2] - 2026-07-18
 
 ### Added
@@ -20,6 +102,10 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 - **Keep important items visible during swaps (DC1, on by default).**
 - **Pickup ground-visual data layer (DC1).**
 - **Normalize relocated pickup visuals (DC1).**
+- **Imported textures can no longer overwrite the game's icon/font graphics (DC1).** Pickup and
+  enemy texture imports now only use the video-memory space the game's own rooms use, and skip the
+  import (showing the generic pickup instead) when a room has no free space — previously a full room
+  could garble the inventory icons and on-screen text for the rest of the session.
 - **Crashes related to the Enemy Randomizer have been fixed (DC2).**
 
 ## [0.5.1] — 2026-07-15

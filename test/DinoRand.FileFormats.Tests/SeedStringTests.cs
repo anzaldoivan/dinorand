@@ -155,11 +155,37 @@ public class SeedStringTests
         Assert.Equal((byte?)0x07, cfg.Dc2ReginaStartWeaponId);
     }
 
-    private static int PayloadLength(string s)
+    /// <summary>Byte 16 bit 5 (DC2 Key-Plate re-key, DC2-PUZZLE-RANDO-PLAN.md §4 item 4, K118): the
+    /// flag round-trips, rides the "Randomize Puzzles" master toggle, occupies the FREE bit 5 (not the
+    /// circuits/codes bits 3/4), and is absent — feature-off byte-identical — when off.</summary>
+    [Fact]
+    public void RekeyPlateDoorByte_RoundTrips_UsesByte16Bit5_AndIsAbsentWhenOff()
+    {
+        var seed = new Seed(555);
+
+        var s = SeedString.Encode(seed, new RandomizerConfig { Dc2RekeyPlateDoor = true });
+        Assert.True(SeedString.TryParse(s, out var s2, out var c));
+        Assert.Equal(seed.Value, s2.Value);
+        Assert.True(c.Dc2RekeyPlateDoor);
+        Assert.True(c.Dc2RandomizePuzzles);                       // rides the master toggle
+        Assert.Equal(0x20, PayloadBytes(s)[16] & 0x20);           // byte 16, bit 5
+
+        // it uses a DIFFERENT bit than circuits (bit 4) — no collision with a shipped lever
+        var circuits = PayloadBytes(SeedString.Encode(seed, new RandomizerConfig { Dc2ShuffleCircuits = true }));
+        Assert.Equal(0, circuits[16] & 0x20);
+        Assert.Equal(0x10, circuits[16] & 0x10);
+
+        // Off ⇒ no DC2 block at all: a default config keeps its historical 10-byte payload.
+        Assert.Equal(10, PayloadLength(SeedString.Encode(seed, new RandomizerConfig())));
+    }
+
+    private static byte[] PayloadBytes(string s)
     {
         var b64 = s["DINO-".Length..].Replace('-', '+').Replace('_', '/');
-        return Convert.FromBase64String(b64.PadRight((b64.Length + 3) / 4 * 4, '=')).Length;
+        return Convert.FromBase64String(b64.PadRight((b64.Length + 3) / 4 * 4, '='));
     }
+
+    private static int PayloadLength(string s) => PayloadBytes(s).Length;
 
     [Fact]
     public void TryParse_RejectsGarbage()

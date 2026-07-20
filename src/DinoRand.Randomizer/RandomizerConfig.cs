@@ -159,17 +159,58 @@ public sealed class RandomizerConfig
     public bool Dc2ShuffleCircuits { get; set; } = false;
 
     /// <summary>
-    /// DC2 only. The GUI's single "Randomize Puzzles" flag over the two puzzle subflags
-    /// (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md): setting it drives BOTH
-    /// <see cref="Dc2ScramblePuzzleCodes"/> and <see cref="Dc2ShuffleCircuits"/>; reading it ORs
-    /// them, so a config carrying only one subflag (a standalone CLI lever / a legacy seed bit)
-    /// still presents as puzzles-randomized. Not itself seed-encoded — it rides the subflag bits
-    /// (byte 16 bits 3/4). Same master/subflag pattern as ShuffleKeyItems → RelocateDdkDiscs.
+    /// DC2 only (off by default). Re-key the Regina Key-Plate terminal (ST205, the blue-panel
+    /// terminal; docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §4 item 4, K118): permute the SAT-9
+    /// routing so a seed-chosen plate colour is the correct one, and recolour the blue slot panel to
+    /// match. Room-file edit (backup-and-swap, <c>ST205.DAT.bak</c>). CLI <c>--dc2-rekey-plate-door</c>.
+    /// </summary>
+    public bool Dc2RekeyPlateDoor { get; set; } = false;
+
+    /// <summary>
+    /// DC2 only (off by default). Let Regina and Dylan wield each other's weapons while still
+    /// rendering with their OWN body model (docs/decisions/dc2/models/DC2-CROSS-CHAR-WEAPON-MODEL-SWAP.md).
+    /// Builds eight grafted <c>WEP_P</c> packages at install time from the user's own Data files — the
+    /// weapon owner's file (keeps the id's fire tail/sound/damage) carrying the target character's
+    /// geometry head + skin — then repoints the NULL <c>0x71B230</c> catalog slots at them and adds the
+    /// target's owner bit in <c>0x704260</c>. Exe + Data edit (backup-and-swap). CLI
+    /// <c>--dc2-cross-char-weapons</c>. Four of the eight pairs are built but not yet witnessed in-game
+    /// (the large weapons whose geometry spills past the splice boundary).
+    /// </summary>
+    public bool Dc2CrossCharWeapons { get; set; } = false;
+
+    /// <summary>DC2 only (EXPERIMENTAL, off by default). Seed-scramble the six non-starter MAIN
+    /// weapons into exact three-weapon Regina/Dylan sets. Implies the cross-character model grafts;
+    /// incompatible with <see cref="Dc2SharedWeapons"/>. Seed byte 16 bit 7. Inventory icons retain
+    /// the weapon's original owner art.</summary>
+    public bool Dc2RandomizeWeapons { get; set; } = false;
+
+    /// <summary>
+    /// DC2 only. EXPERIMENTAL. Makes weapons SHARED between Regina and Dylan rather than one set
+    /// each, the way the seven natively dual-owned catalog ids already work (K125).
+    /// <para>SUB weapons (Machete, Large Stungun) are a two-bit <c>0x704260</c> owner-bit edit — they
+    /// resolve as <c>0x213 + subIndex</c> with no character term, so the bit alone suffices. MAIN
+    /// weapons additionally require their geometry graft: an owner bit on a MAIN whose
+    /// <c>0x71B230</c> slot is NULL runs the loader on a stale blob and crashes. So the MAIN half is
+    /// DELEGATED to <c>Dc2CrossCharWeaponInstaller</c> (the in-game-proven path) rather than writing
+    /// the same bits twice — enabling this implies that lever.</para>
+    /// CLI <c>--dc2-shared-weapons</c> (<c>--dc2-shared-weapons-subs-only</c> for the graft-free
+    /// subset). Not seed-encoded. Undone by Restore.
+    /// </summary>
+    public bool Dc2SharedWeapons { get; set; } = false;
+
+    /// <summary>
+    /// DC2 only. The GUI's single "Randomize Puzzles" flag over the puzzle subflags
+    /// (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md): setting it drives
+    /// <see cref="Dc2ScramblePuzzleCodes"/>, <see cref="Dc2ShuffleCircuits"/> and
+    /// <see cref="Dc2RekeyPlateDoor"/>; reading it ORs them, so a config carrying only one subflag
+    /// (a standalone CLI lever / a legacy seed bit) still presents as puzzles-randomized. Not itself
+    /// seed-encoded — it rides the subflag bits (byte 16 bits 3/4/5). Same master/subflag pattern as
+    /// ShuffleKeyItems → RelocateDdkDiscs.
     /// </summary>
     public bool Dc2RandomizePuzzles
     {
-        get => Dc2ScramblePuzzleCodes || Dc2ShuffleCircuits;
-        set { Dc2ScramblePuzzleCodes = value; Dc2ShuffleCircuits = value; }
+        get => Dc2ScramblePuzzleCodes || Dc2ShuffleCircuits || Dc2RekeyPlateDoor;
+        set { Dc2ScramblePuzzleCodes = value; Dc2ShuffleCircuits = value; Dc2RekeyPlateDoor = value; }
     }
 
     /// <summary>
@@ -488,6 +529,28 @@ public sealed class RandomizerConfig
     /// flag is NOT seed-encoded.
     /// </summary>
     public bool Dc1CutsceneSafeEnemies { get; set; } = false;
+
+    /// <summary>
+    /// Opt-in (default off; DC1 only). "Door skip (experimental)": patch <c>DINO.exe</c> so room-to-room
+    /// door transitions are near-instant — the leaf-swing animation is removed while the destination
+    /// background/room-view commit is preserved (STATIC-SCD-RE cont.78, LIVE-CONFIRMED). Two small reversible
+    /// <c>.text</c> windows via <see cref="FileFormats.Exe.ExePatcher.ApplyDoorSkip"/>; leaves the shared
+    /// keyframe stepper untouched (no enemy/cutscene timing impact). Applied at install time from a pristine
+    /// backup and reversed by <c>--restore</c>. Like <see cref="Dc1CutsceneSafeEnemies"/>, NOT seed-encoded.
+    /// </summary>
+    public bool Dc1DoorSkip { get; set; } = false;
+
+    /// <summary>
+    /// Opt-in (default off; DC1 only). "Fast forward cutscenes (experimental / crash risk)": patch
+    /// <c>DINO.exe</c> so cutscene dead air is compressed by a guarded SCD-VM tick multiplier (STATIC-SCD-RE
+    /// cont.79 v2) — every story flag / item grant still commits, message and voice pacing are preserved, and
+    /// runnable poll waits (incl. async model loads) are never outrun (the guard that makes it safe; the
+    /// aggressive auto-skip variant that force-satisfies waits is a documented crash dead-end, cont.80 RCA).
+    /// One reversible <c>.text</c> hook + code cave via <see cref="FileFormats.Exe.ExePatcher.ApplyCutsceneFastForward"/>.
+    /// Applied at install time from a pristine backup and reversed by <c>--restore</c>. Like
+    /// <see cref="Dc1DoorSkip"/>, NOT seed-encoded. Still "experimental" pending broad in-game witness.
+    /// </summary>
+    public bool Dc1FastForwardCutscenes { get; set; } = false;
 
     /// <summary>
     /// Opt-in (default off). Allow the installer to patch <c>DINO.exe</c> (back it up first; reversed

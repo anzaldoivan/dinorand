@@ -24,8 +24,10 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      # --locked-mode: projects with a committed packages.lock.json (DinoRand.ApClient — the AP
+      # protocol dependency) fail the build if the resolved package graph drifts from the lockfile.
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore --locked-mode
 
       - name: Build
         run: dotnet build -c Release --no-restore

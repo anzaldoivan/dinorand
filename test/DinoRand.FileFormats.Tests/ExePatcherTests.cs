@@ -106,6 +106,122 @@ public class ExePatcherTests
         Assert.Throws<ArgumentOutOfRangeException>(() => ExePatcher.ReadUInt32(small, 2));
     }
 
+    // ---- Door skip (cont.78): reversible two-window patch ----
+
+    /// <summary>Seed the two door-skip sites with their pristine bytes (skip-swing prologue + `cmp edx,0x3c`).</summary>
+    private static byte[] NewImageWithDoorSitesPristine()
+    {
+        var exe = NewImage();
+        byte[] swing = { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F };
+        int a = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipSwingVa);
+        swing.CopyTo(exe, a);
+        int g = ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa);
+        exe[g] = 0x83; exe[g + 1] = 0xFA; exe[g + 2] = ExePatcher.DoorHoldPristine; // cmp edx, 0x3c
+        return exe;
+    }
+
+    [Fact]
+    public void ApplyDoorSkip_PatchesBothWindows_AndIsDetected()
+    {
+        var exe = NewImageWithDoorSitesPristine();
+        Assert.False(ExePatcher.IsDoorSkipApplied(exe));
+
+        ExePatcher.ApplyDoorSkip(exe);
+
+        // A: skip-swing prologue rewritten to `mov eax,[ebp+8]; mov word[eax+2],1; jmp 0x47149a`.
+        int a = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipSwingVa);
+        byte[] expected = { 0x8B, 0x45, 0x08, 0x66, 0xC7, 0x40, 0x02, 0x01, 0x00, 0xE9, 0x6A, 0x03, 0x00, 0x00 };
+        Assert.Equal(expected, exe.Skip(a).Take(expected.Length).ToArray());
+        // B: the 60-frame hold immediate is lowered; the `cmp edx` opcode is untouched.
+        int g = ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa);
+        Assert.Equal(0x83, exe[g]);
+        Assert.Equal(0xFA, exe[g + 1]);
+        Assert.Equal(ExePatcher.DoorHoldPatched, exe[g + 2]);
+        Assert.True(ExePatcher.IsDoorSkipApplied(exe));
+    }
+
+    [Fact]
+    public void ApplyDoorSkip_IsIdempotent()
+    {
+        var exe = NewImageWithDoorSitesPristine();
+        ExePatcher.ApplyDoorSkip(exe);
+        var once = (byte[])exe.Clone();
+        ExePatcher.ApplyDoorSkip(exe); // second apply must be a no-op, not a throw
+        Assert.Equal(once, exe);
+    }
+
+    [Fact]
+    public void ApplyDoorSkip_RefusesUnexpectedSwingBytes()
+    {
+        var exe = NewImageWithDoorSitesPristine();
+        exe[ExePatcher.VaToFileOffset(ExePatcher.DoorSkipSwingVa)] ^= 0xFF; // corrupt the window
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDoorSkip(exe));
+    }
+
+    [Fact]
+    public void ApplyDoorSkip_RefusesWrongHoldGuard()
+    {
+        var exe = NewImageWithDoorSitesPristine();
+        exe[ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa)] = 0x90; // not `cmp edx,imm8`
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDoorSkip(exe));
+    }
+
+    // ---- Fast-forward cutscenes (cont.79 v2): reversible hook + code cave ----
+
+    /// <summary>Seed the hook site with the pristine `call 0x46AA41` (E8 AB B5 FF FF); the cave stays zero-slack.</summary>
+    private static byte[] NewImageWithFfHookPristine()
+    {
+        var exe = NewImage();
+        byte[] hook = { 0xE8, 0xAB, 0xB5, 0xFF, 0xFF };
+        hook.CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.CutsceneFfHookVa));
+        return exe;
+    }
+
+    [Fact]
+    public void ApplyCutsceneFastForward_PatchesHookAndCave_AndIsDetected()
+    {
+        var exe = NewImageWithFfHookPristine();
+        Assert.False(ExePatcher.IsCutsceneFastForwardApplied(exe));
+
+        ExePatcher.ApplyCutsceneFastForward(exe);
+
+        // Hook rewritten to `call CutsceneFfCaveVa` (rel32 = cave - (hook+5)).
+        int h = ExePatcher.VaToFileOffset(ExePatcher.CutsceneFfHookVa);
+        int rel = unchecked((int)(ExePatcher.CutsceneFfCaveVa - (ExePatcher.CutsceneFfHookVa + 5)));
+        byte[] expectedHook = { 0xE8, (byte)rel, (byte)(rel >> 8), (byte)(rel >> 16), (byte)(rel >> 24) };
+        Assert.Equal(expectedHook, exe.Skip(h).Take(5).ToArray());
+        // Cave first byte is a `call` (E8) and the cave is no longer zero-slack.
+        int c = ExePatcher.VaToFileOffset(ExePatcher.CutsceneFfCaveVa);
+        Assert.Equal(0xE8, exe[c]);
+        Assert.True(ExePatcher.IsCutsceneFastForwardApplied(exe));
+    }
+
+    [Fact]
+    public void ApplyCutsceneFastForward_IsIdempotent()
+    {
+        var exe = NewImageWithFfHookPristine();
+        ExePatcher.ApplyCutsceneFastForward(exe);
+        var once = (byte[])exe.Clone();
+        ExePatcher.ApplyCutsceneFastForward(exe); // second apply must be a no-op, not a throw
+        Assert.Equal(once, exe);
+    }
+
+    [Fact]
+    public void ApplyCutsceneFastForward_RefusesUnexpectedHookBytes()
+    {
+        var exe = NewImageWithFfHookPristine();
+        exe[ExePatcher.VaToFileOffset(ExePatcher.CutsceneFfHookVa)] ^= 0xFF; // not the pristine call
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyCutsceneFastForward(exe));
+    }
+
+    [Fact]
+    public void ApplyCutsceneFastForward_RefusesDirtyCave()
+    {
+        var exe = NewImageWithFfHookPristine();
+        exe[ExePatcher.VaToFileOffset(ExePatcher.CutsceneFfCaveVa) + 3] = 0x42; // cave not zero-slack, not our cave
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyCutsceneFastForward(exe));
+    }
+
     [Fact]
     public void RepointSetupFn_IsReversible()
     {

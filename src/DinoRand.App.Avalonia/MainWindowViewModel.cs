@@ -4,15 +4,18 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Input;            // DataFormat
 using Avalonia.Input.Platform;   // IClipboard (+ SetValueAsync / TryGetTextAsync)
 using Avalonia.Media;            // IBrush / Brushes (foreground + border colours, lifted verbatim)
+using Avalonia.Threading;        // Dispatcher (AP log lines arrive on a background thread)
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DinoRand.App.Services;
 using DinoRand.FileFormats.Exe;
 using DinoRand.Randomizer;
+using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;   // Dc2CharacterSkin
 using DinoRand.Randomizer.Definitions;
@@ -77,13 +80,17 @@ namespace DinoRand.App
 
         // <paramref name="settings"/> defaults to the on-disk store (%APPDATA%\DinoRand\settings.json);
         // tests pass an in-memory AppSettings so they neither read nor depend on a real settings file.
+        // <paramref name="apRunner"/> / <paramref name="uiPost"/> are the AP connect tab's two seams
+        // (a fake runner + a synchronous post make the connect/disconnect state machine unit-testable).
         public MainWindowViewModel(IFilePicker filePicker, IDialogs dialogs, Func<IClipboard> clipboard,
-            AppSettings settings = null)
+            AppSettings settings = null, ApRunner apRunner = null, Action<Action> uiPost = null)
         {
             _filePicker = filePicker;
             _dialogs = dialogs;
             _clipboard = clipboard;
             _settings = settings ?? AppSettings.Load();
+            _apRunner = apRunner ?? Dc1ApRunner.Run;
+            _uiPost = uiPost ?? (a => Dispatcher.UIThread.Post(a));
 
             BuildStartingInventoryEditor();
 
@@ -109,6 +116,9 @@ namespace DinoRand.App
             IsVoicesChecked = _settings.RandomizeCutsceneVoices;
             CrossGameVoices = _settings.IncludeCrossGameVoices;
             BgmPacksRoot = _settings.BgmPacksRoot ?? "";
+            // AP connect tab: last-used server/slot (never the password).
+            ApHostPort = _settings.ApHostPort ?? DefaultApHostPort;
+            ApSlot = _settings.ApSlot ?? "";
             _suspend = false;
 
             if (slice.LastSeed is { } last && AppSeed.TryParse(last, out var parsed))
@@ -221,6 +231,26 @@ namespace DinoRand.App
         // Seed-string byte 16 bits 3+4. Default ON for DC2 (ApplyGameCapabilities).
         [ObservableProperty]
         private bool _dc2RandomizePuzzles;
+
+        // DC2 cross-character weapons (DC2-CROSS-CHAR-WEAPON-MODEL-SWAP.md): each character can wield
+        // the other's weapons on their OWN body model. Eight WEP_P grafts built at install time from
+        // the user's own Data files + a Dino2.exe catalog/owner-flag patch.
+        // Seed-string byte 16 bit 6. Default OFF (four of the eight pairs await an in-game witness).
+        [ObservableProperty]
+        private bool _dc2CrossCharWeapons;
+
+        // DC2 randomized MAIN ownership: exact seeded three/three split. Implies the cross-character
+        // graft prerequisite and is mutually exclusive with shared weapons. Seed byte 16 bit 7.
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanUseDc2SharedWeapons))]
+        private bool _dc2RandomizeWeapons;
+
+        public bool CanUseDc2SharedWeapons => !Dc2RandomizeWeapons;
+
+        // DC2 EXPERIMENTAL: share the SUB weapons (Machete, Large Stungun) between Regina and Dylan
+        // via the item-catalog owner bits (K125). Not seed-encoded. Default OFF.
+        [ObservableProperty]
+        private bool _dc2SharedWeapons;
 
         // DC2 starting main weapon (docs/decisions/dc2/loadout/DC2-STARTING-LOADOUT-PLAN.md): new-game bootstrap
         // equip-immediate patch; subweapon bytes never touched (Machete/Stun Gun kept). Seed-string
@@ -359,6 +389,12 @@ namespace DinoRand.App
         // Cutscene shortening is DC1-only today (the flag(2,2) bracket protocol is a DC1 decode, cont.74).
         public bool CanShortenCutscenes => SelectedGame.Id == "dc1";
 
+        // Door skip is a DC1-only DINO.exe patch (mode-6 door machine, cont.78).
+        public bool CanDc1DoorSkip => SelectedGame.Id == "dc1";
+
+        // Fast-forward cutscenes is a DC1-only DINO.exe patch (SCD-VM tick multiplier, cont.79 v2).
+        public bool CanDc1FastForwardCutscenes => SelectedGame.Id == "dc1";
+
         // The key-item scatter (into ammo/health pickups) and the DDK Input/Code disc relocation have no
         // toggles: both ride on the key shuffle, config-built as ShuffleKeyItemsIntoPickups = ShuffleKeyItems
         // and RelocateDdkDiscs = ShuffleKeyItems, so "Shuffle Key Items" does all three key-shuffle behaviors
@@ -399,6 +435,9 @@ namespace DinoRand.App
                 Dc2RandomizeRaptorTiers = false;
                 Dc2ShuffleShop = false;
                 Dc2RandomizePuzzles = false;
+                Dc2CrossCharWeapons = false;
+                Dc2RandomizeWeapons = false;
+                Dc2SharedWeapons = false;
                 Dc2RandomizeStartWeapon = false;
                 Dc2AddAndEquipStartWeapon = false;
                 Dc2DoorSkip = false;
@@ -411,16 +450,27 @@ namespace DinoRand.App
             }
             else
             {
-                // GUI default for DC2: Randomize Puzzles starts ON (DC2-PUZZLE-RANDO-PLAN.md).
+                // GUI defaults for DC2: these start ON (DC2-PUZZLE-RANDO-PLAN.md + maintainer request).
                 // Runs after UpdateUiFromSeed on startup/game-switch, so it wins over a persisted
-                // seed's cleared bits; the RandomizerConfig/CLI default stays off, and a seed pasted
+                // seed's cleared bits; the RandomizerConfig/CLI defaults stay off, and a seed pasted
                 // AFTER entering DC2 still round-trips exactly (this hook doesn't run on seed paste).
                 Dc2RandomizePuzzles = true;
+                IncludeDc2BossEnemies = true;      // T-Rex in the cross-species donor pool by default
+                Dc2ShuffleShop = true;
+                Dc2RandomizeRaptorTiers = true;
+                Dc2AddAndEquipStartWeapon = true;  // effective only when Randomize Starting Weapon is on
             }
             if (!CanSwapDc2PlayerCharacters) { Dc2CharacterSkinIndex = 0; Dc2ReginaSkinIndex = 0; }
             if (!CanRandomizeDoors) RandomizeDoors = false;
-            if (!CanShuffleKeyItems) ShuffleKeyItems = false;
+            // GUI default: Shuffle Key Items starts ON where the game supports it (DC1), forced OFF
+            // otherwise. Like the DC2 defaults above, this wins over a persisted seed on startup/game-switch
+            // but not on paste (this hook doesn't run on seed paste); the RandomizerConfig/CLI default stays off.
+            ShuffleKeyItems = CanShuffleKeyItems;
+            // GUI default: Insert upgraded weapons starts ON (item-pool block; DC1-only visible, harmless for DC2).
+            PreUpgradedWeapons = true;
             if (!CanShortenCutscenes) ShortenCutscenes = false;
+            if (!CanDc1DoorSkip) Dc1DoorSkip = false;
+            if (!CanDc1FastForwardCutscenes) Dc1FastForwardCutscenes = false;
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
             if (!CanRandomizeVoices) IsVoicesChecked = false;
             if (!CanShuffleBgm) ShuffleBgm = false;
@@ -437,6 +487,8 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanRandomizeDoors));
             OnPropertyChanged(nameof(CanShuffleKeyItems));
             OnPropertyChanged(nameof(CanShortenCutscenes));
+            OnPropertyChanged(nameof(CanDc1DoorSkip));
+            OnPropertyChanged(nameof(CanDc1FastForwardCutscenes));
             OnPropertyChanged(nameof(CanRandomizeStartingInventory));
             OnPropertyChanged(nameof(CanRandomizeVoices));
             OnPropertyChanged(nameof(ShowDc1VoiceCast));
@@ -445,6 +497,7 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanImportBgm));
             OnPropertyChanged(nameof(CanRandomizeBoxes));
             OnPropertyChanged(nameof(CanScramblePuzzleCodes));
+            OnPropertyChanged(nameof(CanUseArchipelago));
             OnPropertyChanged(nameof(GameContentPlaceholder));
 
             // Re-sync the seed to the (possibly forced-off) toggles so the seed string and the checkboxes
@@ -515,8 +568,12 @@ namespace DinoRand.App
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CanPlayNow))]
+        [NotifyPropertyChangedFor(nameof(ShouldConfirmClose))]
+        [NotifyPropertyChangedFor(nameof(CloseConfirmMessage))]
         private bool _isBusy;
-        [ObservableProperty] private bool _canInstall;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ApTabEnabled))]
+        private bool _canInstall;
         [ObservableProperty] private bool _canRestore;
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CanPlayNow))]
@@ -530,6 +587,13 @@ namespace DinoRand.App
         // --- Install options (bound) -------------------------------------------
 
         [ObservableProperty] private bool _shuffleBgm;
+
+        // Door skip (experimental, DC1): reversible DINO.exe patch applied at install (cont.78). Default OFF.
+        [ObservableProperty] private bool _dc1DoorSkip;
+
+        // Fast-forward cutscenes (experimental/crash risk, DC1): reversible DINO.exe patch applied at
+        // install (cont.79 v2 guarded tick multiplier). Default OFF, not seed-encoded.
+        [ObservableProperty] private bool _dc1FastForwardCutscenes;
 
         // External BGM import (DC1): overwrite Sound/BGM/ slots with tagged donor tracks from BgmPacksRoot.
         [ObservableProperty] private bool _importBgm;
@@ -635,6 +699,12 @@ namespace DinoRand.App
         partial void OnDc2RandomizeRaptorTiersChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2ShuffleShopChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2RandomizePuzzlesChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDc2CrossCharWeaponsChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDc2RandomizeWeaponsChanged(bool value)
+        {
+            if (value) Dc2SharedWeapons = false;
+            UpdateSeedFromUi();
+        }
         partial void OnShortenCutscenesChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2DoorSkipChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2RandomizeStartWeaponChanged(bool value) => UpdateSeedFromUi();
@@ -735,6 +805,9 @@ namespace DinoRand.App
                 Dc2RandomizeRaptorTiers = _appSeed.Config.Dc2RandomizeRaptorTiers;
                 Dc2ShuffleShop = _appSeed.Config.Dc2ShuffleShop;
                 Dc2RandomizePuzzles = _appSeed.Config.Dc2RandomizePuzzles;
+                Dc2CrossCharWeapons = _appSeed.Config.Dc2CrossCharWeapons;
+                Dc2RandomizeWeapons = _appSeed.Config.Dc2RandomizeWeapons;
+                Dc2SharedWeapons = !Dc2RandomizeWeapons && _appSeed.Config.Dc2SharedWeapons;
                 Dc2RandomizeStartWeapon = _appSeed.Config.Dc2RandomizeStartWeapon;
                 Dc2AddAndEquipStartWeapon = _appSeed.Config.Dc2AddAndEquipStartWeapon;
                 Dc2DylanStartWeaponIndex = _appSeed.Config.Dc2DylanStartWeaponId is { } dId
@@ -822,6 +895,9 @@ namespace DinoRand.App
                 Dc2RandomizeRaptorTiers = Dc2RandomizeRaptorTiers,
                 Dc2ShuffleShop = Dc2ShuffleShop,
                 Dc2RandomizePuzzles = Dc2RandomizePuzzles,
+                Dc2CrossCharWeapons = Dc2CrossCharWeapons,
+                Dc2RandomizeWeapons = Dc2RandomizeWeapons,
+                Dc2SharedWeapons = !Dc2RandomizeWeapons && Dc2SharedWeapons,
                 Dc2RandomizeStartWeapon = Dc2RandomizeStartWeapon,
                 Dc2AddAndEquipStartWeapon = Dc2AddAndEquipStartWeapon,
                 Dc2DylanStartWeaponId = Dc2DylanStartWeaponIndex > 0
@@ -1346,6 +1422,9 @@ namespace DinoRand.App
             CanInstall = !_gameDrmProtected && dataDir.Length > 0;
             CanRestore = !_gameDrmProtected && dataDir.Length > 0 && GameInstaller.IsInstalled(dataDir);
             CanPlay = !_gameDrmProtected && ResolvePlayExe() is not null;
+            // Never leave a disabled tab on screen (the game folder can be cleared while it shows).
+            if (!ApTabEnabled)
+                SelectedTabIndex = 0;
         }
 
         private void RefreshInstallStatus()
@@ -1417,6 +1496,11 @@ namespace DinoRand.App
             IsBusy = true;
             InstallStatusBrush = null;
             InstallStatusText = "Generating and installing…";
+            // Cancels the GENERATE phase only (S4): it writes to the working mod dir, so aborting
+            // touches no game file. The overlay onto Data\ runs to completion by design.
+            using var installStop = new CancellationTokenSource();
+            _installStop = installStop;
+            var ct = installStop.Token;
             try
             {
                 var gamePath = ResolveGameDir(GamePath);
@@ -1432,7 +1516,7 @@ namespace DinoRand.App
                 {
                     var (ir2, trailNote) = await Task.Run(() =>
                     {
-                        var runRes = new Dc2RandomizerRunner(dc2).Run(gamePath, outPath, seed, config);
+                        var runRes = new Dc2RandomizerRunner(dc2).Run(gamePath, outPath, seed, config, ct: ct);
                         // Scope the overlay to THIS run's output so a stale/foreign *.dat left in the
                         // reused mod dir is never installed (docs/decisions/dc2/install/DC2-INSTALL-INTEGRITY-PLAN.md).
                         var res = GameInstaller.Install(dataDir, outPath, seed.ToString(), runRes.WrittenFiles);
@@ -1514,8 +1598,24 @@ namespace DinoRand.App
                         // contract, so the Restore button's full-exe restore reverts it too).
                         if (config.Dc2ShuffleShop)
                         {
-                            try { tn += $" shop:{Dc2ShopShuffleInstaller.Apply(gamePath, seed.Value)}"; }
+                            try { tn += $" shop:{Dc2ShopShuffleInstaller.Apply(gamePath, seed.Value,
+                                shuffleCatalogMasks: !config.Dc2RandomizeWeapons)}"; }
                             catch (Exception shex) { tn += $" (shop shuffle skipped: {shex.Message})"; }
+                        }
+                        // Cross-character weapons: eight WEP_P grafts built from the user's own Data
+                        // files + a Dino2.exe catalog/owner-flag patch (shared .bak contract, so the
+                        // Restore button's full-exe restore reverts the exe half too).
+                        if (config.Dc2CrossCharWeapons && !config.Dc2RandomizeWeapons)
+                        {
+                            try { tn += $" cross-char-weapons:{Dc2CrossCharWeaponInstaller.Apply(gamePath)}"; }
+                            catch (Exception ccex) { tn += $" (cross-character weapons skipped: {ccex.Message})"; }
+                        }
+                        // Character-shared SUB weapons: two owner bits in the Dino2.exe item catalog
+                        // (shared .bak contract, so the Restore button reverts it too).
+                        if (config.Dc2SharedWeapons)
+                        {
+                            try { tn += $" shared-weapons:{Dc2SharedWeaponInstaller.Apply(gamePath)}"; }
+                            catch (Exception swex) { tn += $" (shared weapons skipped: {swex.Message})"; }
                         }
                         // Elevator puzzle-code scramble: candidate imm32 table inside Dino2.exe (shared
                         // .bak contract, so the Restore button's full-exe restore reverts it too).
@@ -1536,6 +1636,13 @@ namespace DinoRand.App
                             }
                             catch (Exception swex) { tn += $" (start weapon skipped: {swex.Message})"; }
                         }
+                        // Randomized ownership is last: starting-loadout application restores catalog
+                        // owner bits to its verified baseline, so the final exact layout must follow it.
+                        if (config.Dc2RandomizeWeapons)
+                        {
+                            try { tn += $" randomized-weapons:{Dc2RandomizedWeaponInstaller.Apply(gamePath, seed)}"; }
+                            catch (Exception rwex) { tn += $" (randomized weapons skipped: {rwex.Message})"; }
+                        }
                         return (res, tn);
                     });
                     InstallStatusBrush = Brushes.Green;
@@ -1550,10 +1657,12 @@ namespace DinoRand.App
                 var randomizeBoxes = RandomizeBoxes;
                 var boxReroll = BoxModeIndex == 1;
                 var scramblePuzzleCodes = ScramblePuzzleCodes;
+                var dc1DoorSkip = Dc1DoorSkip;
+                var dc1FastForwardCutscenes = Dc1FastForwardCutscenes;
                 var startInvPlan = BuildStartingInventoryPlan(config);
                 var (ir, bgmNote, bgmFailed, boxNote, boxFailed) = await Task.Run(() =>
                 {
-                    new RandomizerRunner(game).Run(gamePath, outPath, seed, config);
+                    new RandomizerRunner(game).Run(gamePath, outPath, seed, config, ct: ct);
                     var res = GameInstaller.Install(dataDir, outPath, seed.ToString());
 
                     var (bn, bf) = ("", false);
@@ -1595,6 +1704,24 @@ namespace DinoRand.App
                         catch (IOException) { xn = (xn.Length == 0 ? "" : xn + ". ") + "puzzle codes NOT scrambled — DINO.exe is locked; close the game and re-install"; xf = true; }
                         catch (Exception pex) { xn = (xn.Length == 0 ? "" : xn + ". ") + $"puzzle codes NOT scrambled — {pex.Message}"; xf = true; }
 
+                    if (dc1DoorSkip)
+                        try
+                        {
+                            GameInstaller.PatchExeDoorSkip(dataDir, seed.ToString());
+                            xn = (xn.Length == 0 ? "" : xn + ". ") + "door skip applied (near-instant transitions on the next launch)";
+                        }
+                        catch (IOException) { xn = (xn.Length == 0 ? "" : xn + ". ") + "door skip NOT applied — DINO.exe is locked; close the game and re-install"; xf = true; }
+                        catch (Exception dex) { xn = (xn.Length == 0 ? "" : xn + ". ") + $"door skip NOT applied — {dex.Message}"; xf = true; }
+
+                    if (dc1FastForwardCutscenes)
+                        try
+                        {
+                            GameInstaller.PatchExeFastForwardCutscenes(dataDir, seed.ToString());
+                            xn = (xn.Length == 0 ? "" : xn + ". ") + "fast-forward cutscenes applied (EXPERIMENTAL/crash risk; seen on the next launch)";
+                        }
+                        catch (IOException) { xn = (xn.Length == 0 ? "" : xn + ". ") + "fast-forward cutscenes NOT applied — DINO.exe is locked; close the game and re-install"; xf = true; }
+                        catch (Exception fex) { xn = (xn.Length == 0 ? "" : xn + ". ") + $"fast-forward cutscenes NOT applied — {fex.Message}"; xf = true; }
+
                     return (res, bn, bf, xn, xf);
                 });
                 InstallStatusBrush = (bgmFailed || boxFailed) ? Brushes.OrangeRed : Brushes.Green;
@@ -1608,6 +1735,12 @@ namespace DinoRand.App
                 CurrentSlice.LastSeed = _appSeed.ToString();
                 _settings.Save();
             }
+            catch (OperationCanceledException)
+            {
+                // Generate phase aborted — only the working mod dir was written, the game is untouched.
+                InstallStatusBrush = null;
+                InstallStatusText = "Install cancelled — your game files were not changed.";
+            }
             catch (Exception ex)
             {
                 InstallStatusBrush = Brushes.Red;
@@ -1615,6 +1748,7 @@ namespace DinoRand.App
             }
             finally
             {
+                _installStop = null;
                 IsBusy = false;
                 UpdateInstallButtons();
             }
@@ -1686,6 +1820,181 @@ namespace DinoRand.App
             };
         }
 
+        // --- Archipelago connect tab (AP-CLIENT-PLAN.md D3, increment 2) -------
+        // The whole session (connect → logic_version gate → placement install → 4 Hz poll loop)
+        // is Dc1ApRunner — the SAME implementation `dinorand --ap-connect` runs. This tab only owns
+        // the connect/disconnect state machine and pipes the runner's log lines into the log view.
+
+        private const string DefaultApHostPort = "archipelago.gg:38281";
+        private const int ApLogMaxLines = 500;
+
+        private readonly ApRunner _apRunner;
+        private readonly Action<Action> _uiPost;
+        private CancellationTokenSource _apStop;
+        private CancellationTokenSource _installStop;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(RandomizerTabActive))]
+        private int _selectedTabIndex;
+
+        /// <summary>The bottom-pinned "Install to Game" panel belongs to the randomizer tab only —
+        /// the AP tab does its own (placement) install through the runner.</summary>
+        public bool RandomizerTabActive => SelectedTabIndex == 0;
+
+        /// <summary>The AP tab is selectable only once a usable game resolves: connecting installs
+        /// the multiworld's placement into that install, so without one the tab's Connect could only
+        /// ever fail. Deliberately the SAME predicate as the Install button (<see cref="CanInstall"/>
+        /// = a resolved Data dir and no DRM wrapper) so the two can't drift apart.</summary>
+        public bool ApTabEnabled => CanInstall;
+
+        [ObservableProperty] private string _apHostPort = DefaultApHostPort;
+        [ObservableProperty] private string _apSlot = "";
+        [ObservableProperty] private string _apPassword = "";   // session-only, never persisted
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ApConnectButtonText))]
+        [NotifyPropertyChangedFor(nameof(ApFieldsEnabled))]
+        [NotifyPropertyChangedFor(nameof(WindowTitle))]
+        [NotifyPropertyChangedFor(nameof(ShouldConfirmClose))]
+        [NotifyPropertyChangedFor(nameof(CloseConfirmMessage))]
+        private bool _apRunning;
+
+        [ObservableProperty] private string _apStatusText = "";
+        [ObservableProperty] private IBrush _apStatusBrush;
+
+        /// <summary>The runner's own progress lines (identical to what the CLI prints), newest last.</summary>
+        public ObservableCollection<string> ApLog { get; } = new();
+
+        public string ApConnectButtonText => ApRunning ? "Disconnect" : "Connect";
+        public bool ApFieldsEnabled => !ApRunning;
+
+        /// <summary>AP support is DC1-only today (plan D4), so the tab's Connect is gated on the game.</summary>
+        public bool CanUseArchipelago => SelectedGame.Id == "dc1";
+
+        /// <summary>The running session, or null when idle. Completes only after the UI state has been
+        /// reset, so a test can await it and then assert; the UI itself only reads <see cref="ApRunning"/>.</summary>
+        public Task ApSessionTask { get; private set; }
+
+        // --- Shutdown safety (GUI-SHUTDOWN-AND-CANCEL-PLAN.md) ----------------
+        // Closing the window kills whatever is running, and the GAME KEEPS RUNNING — so a silent
+        // close can leave someone playing with no checks reaching the multiworld, or leave the
+        // game's Data\ folder half-overlaid. Deliberately ahead of every AP reference client
+        // (none warn); justified because none of them are an embedded panel whose host window
+        // closing leaves the game alive. The view owns the Avalonia close dance; the DECISION and
+        // the copy live here so they are unit-testable without a window.
+
+        public const string DefaultWindowTitle = "DinoRand: Dino Crisis Randomizer";
+
+        /// <summary>Connected state in the title bar, so the taskbar itself carries it (the
+        /// PopTracker / kvui convention).</summary>
+        public string WindowTitle => ApRunning
+            ? $"DinoRand — ● Connected: {ApSlot}@{ApHostPort}"
+            : DefaultWindowTitle;
+
+        /// <summary>True when closing would interrupt something the user cares about. An idle
+        /// close stays instant and silent — a confirmation nobody would ever answer "no" to is
+        /// exactly the anti-pattern the platform guidance warns about.</summary>
+        public bool ShouldConfirmClose => IsBusy || ApRunning;
+
+        /// <summary>Install wins when both are true: a half-written game folder is the worse
+        /// consequence. The AP copy deliberately does NOT claim lost checks — the poll engine
+        /// re-derives them from the game's flag bank on reconnect; what is really lost is time,
+        /// and the other players waiting on those checks.</summary>
+        public string CloseConfirmMessage => IsBusy
+            ? "DinoRand is still installing to your game.\n\nClosing now interrupts it and can leave "
+              + "the game's files partially modified — use “Restore Originals” to put them back.\n\nClose anyway?"
+            : "Your Archipelago session is still connected.\n\nThe game will keep running, but closing "
+              + "DinoRand stops your checks from reaching the multiworld until you reconnect — other "
+              + "players waiting on your items will stay blocked.\n\nClose anyway?";
+
+        /// <summary>Cancel everything in flight, without waiting: the AP session's own finally-path
+        /// saves its state and disconnects. Called on the confirmed close path — never awaited on
+        /// the UI thread (that deadlocks).</summary>
+        public void CancelRunningWork()
+        {
+            _apStop?.Cancel();
+            _installStop?.Cancel();
+        }
+
+        /// <summary>One button, two meanings (the AP client convention): start a session, or cancel the
+        /// running one — cancellation is exactly the CLI's Ctrl-C path (clean disconnect + state save).</summary>
+        [RelayCommand]
+        private void ApToggleConnect()
+        {
+            if (_apStop is { } running)
+            {
+                ApSetStatus("Disconnecting…", null);
+                running.Cancel();
+                return;
+            }
+
+            if (!CanUseArchipelago)
+            {
+                ApSetStatus($"Archipelago support is Dino Crisis 1 only — {SelectedGame.DisplayName} is not supported yet.", Brushes.Red);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(ApSlot))
+            {
+                ApSetStatus("Enter the slot name you used in your YAML.", Brushes.Red);
+                return;
+            }
+            var gamePath = ResolveGameDir(GamePath);
+            if (CurrentDataDir().Length == 0)
+            {
+                ApSetStatus("Set a valid game folder on the Randomizer tab first.", Brushes.Red);
+                return;
+            }
+
+            _settings.ApHostPort = ApHostPort;
+            _settings.ApSlot = ApSlot;
+            _settings.Save();
+
+            ApLog.Clear();
+            ApRunning = true;
+            ApSetStatus("Connecting… the placement install can take several minutes.", null);
+
+            var host = string.IsNullOrWhiteSpace(ApHostPort) ? DefaultApHostPort : ApHostPort.Trim();
+            var slot = ApSlot.Trim();
+            var password = string.IsNullOrEmpty(ApPassword) ? null : ApPassword;
+            var outDir = WorkingModDir + "_ap";
+            var cts = new CancellationTokenSource();
+            _apStop = cts;
+
+            ApSessionTask = Task.Run(
+                    () => _apRunner(host, slot, password, gamePath, outDir, ApAppendLog, ApAppendLog, cts.Token))
+                .ContinueWith(t => _uiPost(() =>
+                {
+                    if (t.IsFaulted)
+                        ApSetStatus(t.Exception?.GetBaseException().Message ?? "Session failed.", Brushes.Red);
+                    else if (t.Result == 0)
+                        ApSetStatus("Disconnected.", null);
+                    else
+                        ApSetStatus("Session ended — see the log above.", Brushes.OrangeRed);
+
+                    cts.Dispose();
+                    _apStop = null;
+                    ApRunning = false;
+                }));
+        }
+
+        // Called from the runner's background thread — marshal to the UI thread before touching
+        // the bound collection (Avalonia rejects cross-thread collection changes).
+        private void ApAppendLog(string line) => _uiPost(() =>
+        {
+            ApLog.Add(line);
+            while (ApLog.Count > ApLogMaxLines)
+                ApLog.RemoveAt(0);
+            // The first line the runner emits after login confirms the session is live.
+            if (ApRunning && line.StartsWith("connected:", StringComparison.Ordinal))
+                ApSetStatus(line, Brushes.Green);
+        });
+
+        private void ApSetStatus(string text, IBrush brush)
+        {
+            ApStatusText = text;
+            ApStatusBrush = brush;
+        }
+
         [RelayCommand]
         private void Play()
         {
@@ -1717,6 +2026,11 @@ namespace DinoRand.App
             }
         }
     }
+
+    /// <summary>The AP session entry point as a seam — <see cref="DinoRand.Randomizer.Ap.Dc1ApRunner.Run"/>
+    /// in production, a fake in the connect-tab state-machine tests.</summary>
+    public delegate int ApRunner(string hostPort, string slot, string password, string install,
+        string outDir, Action<string> log, Action<string> error, CancellationToken ct);
 
     /// <summary>A starting-weapon dropdown choice. <see cref="WeaponId"/> is null for "Vanilla".</summary>
     public sealed class StartWeaponOption

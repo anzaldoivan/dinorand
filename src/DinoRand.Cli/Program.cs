@@ -1,7 +1,9 @@
+using DinoRand.ApClient;
 using DinoRand.FileFormats.Exe;
 using DinoRand.FileFormats.Stage;
 using DinoRand.FileFormats.Stage.Dc2;
 using DinoRand.Randomizer;
+using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Definitions;
@@ -19,7 +21,7 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
         Usage:
           dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]
                    [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items] [--exotic-enemies]
-                   [--dc1-cutscene-safe] [--allow-hidden-spots] [--normalize-pickup-visuals] [--no-pickup-ground-models]   (dc1)
+                   [--dc1-cutscene-safe] [--dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--no-pickup-ground-models]   (dc1)
                    [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]
                    [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]
                    [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)
@@ -61,7 +63,11 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
           dinorand --dc2-import-bgm --install <dc2GameDir> --bgm-packs <dir> --out <dir> [--seed <n>]
           dinorand --dc2-scramble-puzzle-codes --install <dc2GameDir> [--seed <n>] [--restore]
           dinorand --dc2-shuffle-circuits --install <dc2GameDir> [--seed <n>] [--restore]
+          dinorand --dc2-rekey-plate-door --install <dc2GameDir> [--seed <n>] [--restore]
+          dinorand --dc2-cross-char-weapons --install <dc2GameDir> [--restore]
+          dinorand --dc2-randomize-weapons --install <dc2GameDir> [--seed <n>] [--restore]
           dinorand --dc2-door-skip --install <dc2GameDir>
+          dinorand --ap-connect <host[:port]> --ap-slot <name> [--ap-password <pw>] --install <dc1GameDir> [--out <dir>]
 
         Notes:
           - --dc2-edit-door retargets Dino Crisis 2's ST101 ST201-door to ST102. With --install it
@@ -78,6 +84,14 @@ if (argv.Length == 0 || argv.Contains("--help") || argv.Contains("-h"))
             enemy slot and drives it through authored waypoints, STATIC-SCD-RE cont.49/59) are
             excluded from the in-room permute and from --exotic-enemies imports, and get a seeded
             palette tint instead (the cont.51/57 "Blue Raptor" lever). Off = byte-identical.
+          - --dc1-door-skip (dc1, off; EXPERIMENTAL) PATCHES DINO.exe: removes the door-transition
+            swing so room-to-room transitions are near-instant, keeping the destination background
+            (STATIC-SCD-RE cont.78). Two reversible .text windows, not seed-encoded, reversed by
+            --restore; leaves the shared animation stepper untouched. CLOSE the game first.
+          - --dc1-fast-forward-cutscenes (dc1, off; EXPERIMENTAL / CRASH RISK) PATCHES DINO.exe:
+            compresses cutscene dead air via a guarded SCD-VM tick multiplier (STATIC-SCD-RE cont.79
+            v2) — story flags/item grants still commit and dialogue pacing is preserved. One reversible
+            .text hook + code cave, not seed-encoded, reversed by --restore. CLOSE the game first.
           - --dc2-emit-d2p (dc2, off; EXPERIMENTAL) additionally write each randomized room's edits
             as a Classic REbirth patch\ST*.d2p word-patch into <out>\patch\ — copy that folder to
             rebirth\patch\ and the wrapper applies the seed's ROOM edits in memory with Data\
@@ -299,6 +313,20 @@ if (argv.Contains("--dc2-export-bgm"))
 if (argv.Contains("--dc2-import-bgm"))
     return ImportDc2Bgm(GetOpt("--install"), GetOpt("--bgm-packs"), GetOpt("--out"), GetOpt("--seed"));
 
+if (argv.Contains("--dc2-randomize-weapons")
+    && (argv.Contains("--dc2-shared-weapons") || argv.Contains("--dc2-shared-weapons-subs-only")))
+{
+    Console.Error.WriteLine("error: --dc2-randomize-weapons is incompatible with --dc2-shared-weapons.");
+    return 1;
+}
+
+// Randomized ownership must own the graft prerequisite and run after any shop/start-weapon edits.
+// Dispatch it before the standalone shop/cross/shared handlers so combined redundant flags cannot
+// apply the prerequisite twice.
+if (argv.Contains("--dc2-randomize-weapons"))
+    return RandomizeDc2Weapons(GetOpt("--install"), GetOpt("--seed"), argv.Contains("--restore"),
+        shuffleShop: argv.Contains("--dc2-shuffle-shop"));
+
 // DC2 shop shuffle (docs/decisions/dc2/shop/DC2-SHOP-RANDO-PLAN.md I1+I2; I3 live witness PENDING): permute the
 // Dino2.exe shop economy — retail prices (master table 0x71DCB8) and stock-unlock bitmasks
 // (catalog 0x704260+id*12+0xA) among the 11 for-sale ids. Reversible: pristine .bak plus a
@@ -320,11 +348,56 @@ if (argv.Contains("--dc2-scramble-puzzle-codes"))
 if (argv.Contains("--dc2-shuffle-circuits"))
     return ShuffleDc2Circuits(GetOpt("--install"), GetOpt("--seed"), argv.Contains("--restore"));
 
+// DC2 Key-Plate terminal re-key (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §4 item 4, K118): permute
+// ST205's SAT-9 routing so a seed-chosen plate colour is accepted, and recolour the blue slot panel to
+// match. Room-file edit under the ST205.DAT.bak backup-and-swap contract; --restore reverts.
+if (argv.Contains("--dc2-rekey-plate-door"))
+    return RekeyDc2PlateDoor(GetOpt("--install"), GetOpt("--seed"), argv.Contains("--restore"));
+
+// DC2 cross-character weapons (DC2-CROSS-CHAR-WEAPON-MODEL-SWAP.md): let Regina and Dylan wield each
+// other's weapons while still rendering with their own body. Builds eight WEP_P grafts from the user's
+// own Data files + repoints the NULL 0x71B230 catalog slots; --restore reverts exe and deletes them.
+if (argv.Contains("--dc2-cross-char-weapons"))
+    return Dc2CrossCharWeapons(GetOpt("--install"), argv.Contains("--restore"));
+
+// DC2 character-shared weapons (DC2-NATIVE-WEAPON-SHARING-DECODE.md, K125): grant both owner bits in
+// the 0x704260 item catalog so Regina and Dylan SHARE weapons instead of owning one set each. SUB
+// weapons are bits only; MAIN weapons delegate to the graft installer (a MAIN with a NULL 0x71B230
+// slot crashes). --dc2-shared-weapons-subs-only restricts it to the graft-free subset.
+if (argv.Contains("--dc2-shared-weapons") || argv.Contains("--dc2-shared-weapons-subs-only"))
+    return Dc2SharedWeapons(GetOpt("--install"), argv.Contains("--restore"),
+                            includeMain: !argv.Contains("--dc2-shared-weapons-subs-only"));
+
 // DC2 REbirth DoorSkip passthrough (CUTSCENE-SKIP-FEASIBILITY.md §5, K115): set DoorSkip = 1 in the
 // game root's config.ini [DLL] section — the wrapper DLL's own door-transition skip. A user-config
 // write, not a game edit; undo by setting the key back to 0 in config.ini (or the REbirth launcher).
 if (argv.Contains("--dc2-door-skip"))
     return EnableDc2DoorSkip(GetOpt("--install"));
+
+static int Dc2SharedWeapons(string? installDir, bool restore, bool includeMain)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-shared-weapons requires --install <dc2GameDir>.");
+        return 1;
+    }
+    var outcome = Dc2SharedWeaponInstaller.Apply(installDir, restore, Console.WriteLine, includeMain);
+    switch (outcome)
+    {
+        case Dc2SharedWeaponOutcome.Applied:
+            Console.WriteLine($"undo    : dinorand --dc2-shared-weapons --install \"{installDir}\" --restore");
+            Console.WriteLine(includeMain
+                ? "note    : every main and sub weapon is now usable — and shop-purchasable — by BOTH characters."
+                : "note    : Machete and Large Stungun are now usable — and shop-purchasable — by BOTH characters.");
+            Console.WriteLine("note    : cosmetic — a shared weapon keeps its original owner's inventory icon on both characters.");
+            return 0;
+        case Dc2SharedWeaponOutcome.AlreadyApplied:
+        case Dc2SharedWeaponOutcome.Restored:
+            return 0;
+        default:
+            return 1;
+    }
+}
 
 // DC2 starting main-weapon lever (docs/decisions/dc2/loadout/DC2-STARTING-LOADOUT-PLAN.md I2; I3 human gate PENDING):
 // patch the new-game bootstrap equip immediates' weapon-id bytes (Dylan file 0x50D69, Regina 0x50E9D).
@@ -342,6 +415,15 @@ if (argv.Contains("--dc2-randomize-start-weapon") || GetOpt("--dc2-start-weapon"
     return SetDc2StartWeapon(GetOpt("--install"), GetOpt("--seed"), GetOpt("--dc2-start-weapon"),
                              argv.Contains("--restore"), argv.Contains("--allow-unsafe"),
                              argv.Contains("--dc2-add-and-equip"));
+
+// Archipelago runtime client, DC1 v1 (docs/decisions/cross/AP-CLIENT-PLAN.md): connect to an AP
+// server, patch AP's fill into the local install (loop-closing, D5), then poll the running
+// DINO.exe — pickups → LocationChecks, ReceivedItems → grants, goal room → CLIENT_GOAL.
+// Long-running; Ctrl-C disconnects cleanly. The poll half needs the WINDOWS host (WSL cannot
+// attach to a Windows process).
+if (GetOpt("--ap-connect") is { } apHostPort)
+    return ApConnectDc1(apHostPort, GetOpt("--ap-slot"), GetOpt("--ap-password"),
+                        GetOpt("--install"), GetOpt("--out"));
 
 string? install = GetOpt("--install");
 if (install is null)
@@ -554,6 +636,8 @@ var config = new RandomizerConfig
     // flagged tier, STATIC-SCD-RE cont.49/59) refuse permutes/species imports and get the palette-tint
     // fallback instead. Off = byte-identical. Not seed-encoded.
     Dc1CutsceneSafeEnemies = argv.Contains("--dc1-cutscene-safe"),
+    Dc1DoorSkip = argv.Contains("--dc1-door-skip"),
+    Dc1FastForwardCutscenes = argv.Contains("--dc1-fast-forward-cutscenes"),
     ShuffleKeyItems = argv.Contains("--shuffle-keys"),
     // DC1: key-item scatter (a door key may also land in a static ammo/health pickup, not only another
     // door-key spot) rides on --shuffle-keys by default, like the DDK relocation below — the product does
@@ -715,6 +799,22 @@ if (argv.Contains("--install-to-data"))
         foreach (var r in iv.Repoints) Console.WriteLine($"inventory: {r}");
         Console.WriteLine("inventory: EXPERIMENTAL — seen on the NEXT NEW GAME after relaunch "
             + "(a removed start weapon is placed in the early world by the item pass).");
+    }
+    // Door skip (experimental, DC1): reversible DINO.exe patch that removes the door-transition swing while
+    // keeping the destination background commit (cont.78). Install-time, not seed-encoded; reversed by --restore.
+    if (config.Dc1DoorSkip)
+    {
+        var ds = GameInstaller.PatchExeDoorSkip(dataDir, seed.ToString());
+        foreach (var r in ds.Repoints) Console.WriteLine($"door skip: {r}");
+        Console.WriteLine("door skip: EXPERIMENTAL — door transitions are near-instant on the next launch. CLOSE the game first.");
+    }
+    // Fast-forward cutscenes (experimental/crash risk, DC1): reversible DINO.exe patch that compresses cutscene
+    // dead air via a guarded SCD-VM tick multiplier (cont.79 v2). Install-time, not seed-encoded; reversed by --restore.
+    if (config.Dc1FastForwardCutscenes)
+    {
+        var ff = GameInstaller.PatchExeFastForwardCutscenes(dataDir, seed.ToString());
+        foreach (var r in ff.Repoints) Console.WriteLine($"fast-forward cutscenes: {r}");
+        Console.WriteLine("fast-forward cutscenes: EXPERIMENTAL / CRASH RISK — cutscenes are sped up on the next launch. CLOSE the game first.");
     }
     Console.WriteLine($"backup: {ir.BackupDir}  (run with --restore to undo)");
 }
@@ -1467,6 +1567,36 @@ static int ShuffleDc2Shop(string? installDir, string? seedArg, bool restore)
     }
 }
 
+static int RandomizeDc2Weapons(string? installDir, string? seedArg, bool restore, bool shuffleShop)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-randomize-weapons requires --install <dc2GameDir>.");
+        return 1;
+    }
+    var seed = seedArg is { } s ? Seed.Parse(s) : Seed.Random();
+    if (shuffleShop)
+    {
+        var shop = Dc2ShopShuffleInstaller.Apply(installDir, seed.Value, restore, Console.WriteLine,
+            shuffleCatalogMasks: false);
+        if (shop is Dc2ShopShuffleOutcome.NotFound or Dc2ShopShuffleOutcome.UnrecognizedVersion)
+            return 1;
+    }
+    var outcome = Dc2RandomizedWeaponInstaller.Apply(installDir, seed, restore, Console.WriteLine);
+    switch (outcome)
+    {
+        case Dc2RandomizedWeaponOutcome.Applied:
+            Console.WriteLine($"seed    : {seed}");
+            Console.WriteLine($"undo    : dinorand --dc2-randomize-weapons --install \"{installDir}\" --restore");
+            Console.WriteLine("note    : randomized weapons retain the original owner's inventory icon.");
+            return 0;
+        case Dc2RandomizedWeaponOutcome.Restored:
+            return 0;
+        default:
+            return 1;
+    }
+}
+
 // DC2 REbirth DoorSkip passthrough: one ini key in config.ini [DLL] (K115).
 static int EnableDc2DoorSkip(string? installDir)
 {
@@ -1528,6 +1658,57 @@ static int ShuffleDc2Circuits(string? installDir, string? seedArg, bool restore)
             Console.WriteLine("note    : re-enter the generator (ST607) / silo bridge (ST402) circuit puzzles to see the new blink order.");
             return 0;
         case Dc2CircuitShuffleOutcome.Restored:
+            return 0;
+        default:
+            return 1;
+    }
+}
+
+// DC2 Key-Plate terminal re-key (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md §4 item 4, K118): permute
+// ST205 routine[2]'s SAT-9 routing so a seed-chosen plate is the correct one, and recolour the blue
+// slot panel (entry 13) to match. Room-file edit under the ST205.DAT.bak backup-and-swap contract;
+// --restore reverts. Byte-identical when the seed picks the vanilla blue plate.
+static int RekeyDc2PlateDoor(string? installDir, string? seedArg, bool restore)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-rekey-plate-door requires --install <dc2GameDir>.");
+        return 1;
+    }
+    var seed = seedArg is { } s ? Seed.Parse(s) : Seed.Random();
+    var outcome = Dc2PlateKeyInstaller.Apply(installDir, seed.Value, restore, Console.WriteLine);
+    switch (outcome)
+    {
+        case Dc2PlateKeyOutcome.Applied:
+            Console.WriteLine($"seed    : {seed}");
+            Console.WriteLine($"undo    : dinorand --dc2-rekey-plate-door --install \"{installDir}\" --restore");
+            Console.WriteLine("note    : at the ST205 Regina terminal, use the newly-correct plate colour (shown above); a different plate prints \"not the correct one for this terminal\".");
+            return 0;
+        case Dc2PlateKeyOutcome.Restored:
+            return 0;
+        default:
+            return 1;
+    }
+}
+
+static int Dc2CrossCharWeapons(string? installDir, bool restore)
+{
+    if (installDir is null)
+    {
+        Console.Error.WriteLine("error: --dc2-cross-char-weapons requires --install <dc2GameDir>.");
+        return 1;
+    }
+    var outcome = Dc2CrossCharWeaponInstaller.Apply(installDir, restore, Console.WriteLine);
+    switch (outcome)
+    {
+        case Dc2CrossCharWeaponOutcome.Applied:
+            Console.WriteLine($"undo    : dinorand --dc2-cross-char-weapons --install \"{installDir}\" --restore");
+            Console.WriteLine("note    : each character now carries the other's weapons once owned, rendered on their own body.");
+            foreach (var p in Dc2CrossCharWeaponPatch.Pairs.Where(p => !p.HeadGraftSafe))
+                Console.WriteLine($"warn    : {p.Target} + weapon 0x{p.WeaponId:X2} ({p.OwnerFile}) is built but NOT yet witnessed in-game.");
+            return 0;
+        case Dc2CrossCharWeaponOutcome.AlreadyApplied:
+        case Dc2CrossCharWeaponOutcome.Restored:
             return 0;
         default:
             return 1;
@@ -2297,11 +2478,16 @@ static int SwapSpecies(string installDir, string roomArg, string speciesName, in
     var result = target.ImportSpeciesTextured(donor, idx);
     File.WriteAllBytes(targetRef.Path, target.Write());
 
-    string texNote = result.Outcome == RoomFile.TextureImportOutcome.Relocated
-        ? $"texture relocated to {result.TextureRect}, palette {result.PaletteRect}"
-        : donor.Texture is null
+    string texNote = result.Outcome switch
+    {
+        RoomFile.TextureImportOutcome.Relocated =>
+            $"texture relocated to {result.TextureRect}, palette {result.PaletteRect}",
+        RoomFile.TextureImportOutcome.ReclaimedVictim =>
+            $"texture placed over the victim's own column {result.TextureRect}, palette {result.PaletteRect} (VRAM was full; victim slot reclaimed)",
+        _ => donor.Texture is null
             ? "geometry only — donor texture unresolved (may be mis-coloured)"
-            : "geometry only — no free VRAM region in target (may be mis-coloured)";
+            : "geometry only — no free VRAM region in target (may be mis-coloured)",
+    };
     Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {was} -> {species}  (RDT grew, model+motion imported; {texNote})");
     Console.WriteLine($"wrote   : {targetRef.Path}");
     Console.WriteLine($"backup  : {backupPath}");
@@ -3504,4 +3690,19 @@ static int AnalyzeScripts(string installDir)
     if (itemIds.Count > 0)
         Console.WriteLine($"item id histogram   : {string.Join(", ", itemIds.Select(kv => $"0x{kv.Key:X2}×{kv.Value}"))}");
     return 0;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Archipelago runtime client, DC1 v1 (docs/decisions/cross/AP-CLIENT-PLAN.md).
+// Flow: connect/login → slot_data placements → patch rooms (ApPlacementInstaller) → overlay
+// install (GameInstaller) → attach DINO.exe → 4 Hz poll loop until Ctrl-C.
+// ---------------------------------------------------------------------------------------------
+// The flow itself lives in Dc1ApRunner (DinoRand.Randomizer/Ap) so this command and the Avalonia
+// connect tab run ONE implementation; this binder only supplies the console sinks and Ctrl-C.
+static int ApConnectDc1(string hostPort, string? slot, string? password, string? install, string? outDirArg)
+{
+    using var stop = new CancellationTokenSource();
+    Console.CancelKeyPress += (_, e) => { e.Cancel = true; stop.Cancel(); };
+    return Dc1ApRunner.Run(hostPort, slot, password, install, outDirArg,
+        Console.WriteLine, Console.Error.WriteLine, stop.Token);
 }

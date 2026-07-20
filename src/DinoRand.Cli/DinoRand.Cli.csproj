@@ -6,5 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DinoRand.Randomizer\DinoRand.Randomizer.csproj" />
+    <ProjectReference Include="..\DinoRand.ApClient\DinoRand.ApClient.csproj" />
   </ItemGroup>
 </Project>

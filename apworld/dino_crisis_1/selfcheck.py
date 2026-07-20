@@ -28,6 +28,7 @@ def _install_ap_stubs() -> None:
         def connect(self, other, name=None, rule=None):
             assert other is not self, f"self-loop on region {self.name}"
             self.exits.append((other, rule))
+            return (self, other)  # stands in for the Entrance world.py registers indirect conditions on
 
     class Location:
         def __init__(self, player, name, code, parent):
@@ -44,8 +45,12 @@ def _install_ap_stubs() -> None:
     class CollectionState:  # only referenced in type hints / rule bodies, never built here
         pass
 
+    class LocationProgressType:
+        DEFAULT, PRIORITY, EXCLUDED = 1, 2, 3  # mirrors AP's enum values
+
     base.Region, base.Location, base.Item = Region, Location, Item
     base.ItemClassification, base.CollectionState = ItemClassification, CollectionState
+    base.LocationProgressType = LocationProgressType
     sys.modules["BaseClasses"] = base
 
     worlds = types.ModuleType("worlds")
@@ -73,6 +78,10 @@ def _install_ap_stubs() -> None:
 class _MultiWorld:
     def __init__(self):
         self.regions, self.itempool, self.completion_condition = [], [], {}
+        self.indirect_connections = []
+
+    def register_indirect_condition(self, region, entrance):
+        self.indirect_connections.append((region, entrance))
 
 
 def main() -> int:

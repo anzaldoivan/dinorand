@@ -1,0 +1,7257 @@
+{
+ "_source": "Authored 2026-07-19 (K119) from an offline CFG census of every slot-5 SCD routine (scratchpad census over decode_script.py disasm; pristine .dinorand-bak-preferred rooms). For each op-0x30 DOOR / op-0x31 ITEM AOT commit, records the op-0x07 conditional-skip spans enclosing it and the predicate feeding each span. This is the control-flow axis door-gating.json deliberately flattens (K107 noted the omission): a commit inside a skippable span means the door/pickup AOT is NEVER BUILT unless the predicate holds \u2014 distinct from lock_index locking (locked doors exist and show a message; guarded commits don't exist).",
+ "_semantics": "Byte-proven on Dino2.exe.bak (offline capstone disx): op-0x07 handler 0x4876F0 \u2014 mask=1<<byte[op+1]; if [entity+0x9c]&mask (or byte[op+1]==0) then IP=op_addr+sext16(word[op+2]) (span SKIPPED), else IP+=4 (span EXECUTES). arg==0 is therefore an unconditional forward jump (else-branch marker). Cond-flag writer 0x48BC90: result==0 -> [0x9c]=0x2A (bit1 SET); result>0 -> 0x4C; result<0 -> 0x70 (bit1 CLEAR). op-0x03 (0x4875A0) and op-0x01 (0x487520) both finish with 0x48BC90(result), so the last value-producing op before the 0x07 decides. op-0x1d GetFlag leaves var[0]=1/0; the canonical tail [op03 ff-stackmove; push var0; op03 ff-stackmove; op01 var0:=stack] re-materializes var[0] through 0x48BC90 => arg=1 span EXECUTES IFF FLAG SET (polarity 'iff_set'). One op-0x03 operator=19 (LNOT, the ST105 spawn-once latch pattern) inverts => 'iff_clear'. Tails with any other value op are 'unknown' \u2014 no polarity is asserted for them. UPDATE (K121, same day): guard predicates are now SYMBOLICALLY RESOLVED (scratchpad stack/var evaluator over the decoded op semantics; 91/91 commits, 0 unresolved). Full ALU operator table 0x48BC20 (all 26 handlers disassembled): 0 ADD 1 SUB 2 MUL 3 DIV 4 MOD 5 OR 6 AND 7 XOR 8 NOT 9/11 SHL 10/12 SAR 13 GT 14 LT 15 GE 16 LE 17 EQ 18 NE 19 LNOT 20 INC 21 DEC 22/23 MOV 24 LOR 25 LAND. Each guard row's `expr` uses: flag(g,i) = GetFlag; CHARACTER(+0x108F) 0=Regina 1=Dylan; DIFFICULTY(+0x108E); vmEntryState = op-0x20; word(scene+0x10A8) = family-5 prop 0x1e (VERIFIED prev-room id word; writer 0x41EA98/0x41EABB). arg=1 rows execute iff expr != 0; arg=0 rows are the else-branch of the innermost preceding test.",
+ "_held_item_door_gates": [
+  {
+   "edge": "10D->10F",
+   "requiresCatalogId": "0x2e",
+   "requiresItem": "Gas Mask",
+   "mechanism": "flag(9,0x2e) ownership test guards the door AOT commit",
+   "citation": "ST10D blob: GetFlag(9,0x2e) test @0xe458 (pushes 05 00 09 00 / 05 00 2e 00 @0xe450/0xe454); op-0x07 arg=1 @0xe470 skip 0x5c spans 0xe474..0xe4cc; the ST10D->ST10F door commit @0xe4c0 (door-graph slot 2, dest push @0xe4b2 = 0x010f) lies inside; polarity iff_set per _semantics",
+   "itemSource": "flag(9,0x2e) granted in ST10F routines 2/3 (items.json keyItemGrantSites, K101)",
+   "note": "The ONLY cross-room held-key-item door gate in the corpus. Partially amends K107: the requiresItems axis is not empty \u2014 it has exactly this one offline-provable member."
+  }
+ ],
+ "_flag8_commit_guarded_doors": "106->10E & 10E->106 (flag(8,3), set by ST10E routine 2 script), 603->604 (flag(8,9), ST603 routine 4), 902->903 (flag(8,27), ST902 routine 1): door-EXISTENCE guards on group-8 flags, invisible to the lock_index model (none is in door-gating locked_doors). All three flags are script_set in the door's own room/pair => same-room event/puzzle gates (K107 producer model: vacuous as cross-room requiresRooms), but a door randomizer or tracker must know these doors are absent until the flag fires.",
+ "door_guards": [
+  {
+   "room": "003",
+   "kind": "door",
+   "commit_off": "0x200fc",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,14)) != 0",
+     "expr": "flag(6,14)",
+     "arg": 1,
+     "op07_off": "0x200ac",
+     "span_end": "0x20108"
+    }
+   ],
+   "dest_id": "002"
+  },
+  {
+   "room": "100",
+   "kind": "door",
+   "commit_off": "0x3424",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,15)) != 0",
+     "expr": "flag(6,15)",
+     "arg": 1,
+     "op07_off": "0x33d4",
+     "span_end": "0x368c"
+    }
+   ],
+   "dest_id": "110"
+  },
+  {
+   "room": "102",
+   "kind": "door",
+   "commit_off": "0xafe6",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,15)) != 0",
+     "expr": "flag(6,15)",
+     "arg": 1,
+     "op07_off": "0xaf72",
+     "span_end": "0xaff2"
+    }
+   ],
+   "dest_id": "110"
+  },
+  {
+   "room": "106",
+   "kind": "door",
+   "commit_off": "0x9fbc",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(8,3)) != 0",
+     "expr": "flag(8,3)",
+     "arg": 1,
+     "op07_off": "0x9f6c",
+     "span_end": "0x9fc8"
+    }
+   ],
+   "dest_id": "10E"
+  },
+  {
+   "room": "10D",
+   "kind": "door",
+   "commit_off": "0xe4c0",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(9,46)) != 0",
+     "expr": "flag(9,46)",
+     "arg": 1,
+     "op07_off": "0xe470",
+     "span_end": "0xe4cc"
+    }
+   ],
+   "dest_id": "10F"
+  },
+  {
+   "room": "10E",
+   "kind": "door",
+   "commit_off": "0xcc2c",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(8,3)) != 0",
+     "expr": "flag(8,3)",
+     "arg": 1,
+     "op07_off": "0xcbdc",
+     "span_end": "0xcc38"
+    }
+   ],
+   "dest_id": "106"
+  },
+  {
+   "room": "408",
+   "kind": "door",
+   "commit_off": "0x126c8",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x12654",
+     "span_end": "0x12828"
+    },
+    {
+     "cond": "executes iff (flag(6,119)) != 0",
+     "expr": "flag(6,119)",
+     "arg": 1,
+     "op07_off": "0x12678",
+     "span_end": "0x126d4"
+    }
+   ],
+   "dest_id": "409"
+  },
+  {
+   "room": "408",
+   "kind": "door",
+   "commit_off": "0x12874",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x12654",
+     "span_end": "0x12828"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x12824",
+     "span_end": "0x1287c"
+    }
+   ],
+   "dest_id": "409"
+  },
+  {
+   "room": "408",
+   "kind": "door",
+   "commit_off": "0x13a4c",
+   "routine_dir_idx": 4,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(7,29))) != 0",
+     "expr": "!(flag(7,29))",
+     "arg": 1,
+     "op07_off": "0x137da",
+     "span_end": "0x137e6"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x137de",
+     "span_end": "0x13a88"
+    },
+    {
+     "cond": "executes iff (1) != 0",
+     "expr": "1",
+     "arg": 1,
+     "op07_off": "0x139b0",
+     "span_end": "0x13a88"
+    },
+    {
+     "cond": "executes iff (syscall(fam=0,arg=30)) != 0",
+     "expr": "syscall(fam=0,arg=30)",
+     "arg": 1,
+     "op07_off": "0x139d0",
+     "span_end": "0x13a78"
+    }
+   ],
+   "dest_id": "409"
+  },
+  {
+   "room": "408",
+   "kind": "door",
+   "commit_off": "0x13b0e",
+   "routine_dir_idx": 5,
+   "guards": [
+    {
+     "cond": "executes iff (flag(7,29)) != 0",
+     "expr": "flag(7,29)",
+     "arg": 1,
+     "op07_off": "0x13aaa",
+     "span_end": "0x13b26"
+    }
+   ],
+   "dest_id": "409"
+  },
+  {
+   "room": "409",
+   "kind": "door",
+   "commit_off": "0x12430",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x123bc",
+     "span_end": "0x125b4"
+    },
+    {
+     "cond": "executes iff (flag(6,119)) != 0",
+     "expr": "flag(6,119)",
+     "arg": 1,
+     "op07_off": "0x123e0",
+     "span_end": "0x12490"
+    }
+   ],
+   "dest_id": "40A"
+  },
+  {
+   "room": "409",
+   "kind": "door",
+   "commit_off": "0x12484",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x123bc",
+     "span_end": "0x125b4"
+    },
+    {
+     "cond": "executes iff (flag(6,119)) != 0",
+     "expr": "flag(6,119)",
+     "arg": 1,
+     "op07_off": "0x123e0",
+     "span_end": "0x12490"
+    }
+   ],
+   "dest_id": "408"
+  },
+  {
+   "room": "409",
+   "kind": "door",
+   "commit_off": "0x12600",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x123bc",
+     "span_end": "0x125b4"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x125b0",
+     "span_end": "0x1265c"
+    }
+   ],
+   "dest_id": "40A"
+  },
+  {
+   "room": "409",
+   "kind": "door",
+   "commit_off": "0x12654",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x123bc",
+     "span_end": "0x125b4"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x125b0",
+     "span_end": "0x1265c"
+    }
+   ],
+   "dest_id": "408"
+  },
+  {
+   "room": "409",
+   "kind": "door",
+   "commit_off": "0x12ac4",
+   "routine_dir_idx": 1,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(7,29))) != 0",
+     "expr": "!(flag(7,29))",
+     "arg": 1,
+     "op07_off": "0x12852",
+     "span_end": "0x1285e"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x12856",
+     "span_end": "0x12b14"
+    },
+    {
+     "cond": "executes iff (1) != 0",
+     "expr": "1",
+     "arg": 1,
+     "op07_off": "0x12a28",
+     "span_end": "0x12b14"
+    },
+    {
+     "cond": "executes iff (syscall(fam=0,arg=30)) != 0",
+     "expr": "syscall(fam=0,arg=30)",
+     "arg": 1,
+     "op07_off": "0x12a48",
+     "span_end": "0x12b04"
+    }
+   ],
+   "dest_id": "40A"
+  },
+  {
+   "room": "409",
+   "kind": "door",
+   "commit_off": "0x12b9a",
+   "routine_dir_idx": 2,
+   "guards": [
+    {
+     "cond": "executes iff (flag(7,29)) != 0",
+     "expr": "flag(7,29)",
+     "arg": 1,
+     "op07_off": "0x12b36",
+     "span_end": "0x12bc6"
+    }
+   ],
+   "dest_id": "40A"
+  },
+  {
+   "room": "503",
+   "kind": "door",
+   "commit_off": "0x15f56",
+   "routine_dir_idx": 2,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,44))) != 0",
+     "expr": "!(flag(6,44))",
+     "arg": 1,
+     "op07_off": "0x15ed2",
+     "span_end": "0x15ede"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x15ed6",
+     "span_end": "0x15f6a"
+    }
+   ],
+   "dest_id": "504"
+  },
+  {
+   "room": "603",
+   "kind": "door",
+   "commit_off": "0x3cf0",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(8,9)) != 0",
+     "expr": "flag(8,9)",
+     "arg": 1,
+     "op07_off": "0x3ca0",
+     "span_end": "0x3d38"
+    }
+   ],
+   "dest_id": "604"
+  },
+  {
+   "room": "605",
+   "kind": "door",
+   "commit_off": "0x14362",
+   "routine_dir_idx": 8,
+   "guards": [
+    {
+     "cond": "executes iff (!(vmEntryState)) != 0",
+     "expr": "!(vmEntryState)",
+     "arg": 1,
+     "op07_off": "0x14306",
+     "span_end": "0x1437a"
+    }
+   ],
+   "dest_id": "606"
+  },
+  {
+   "room": "606",
+   "kind": "door",
+   "commit_off": "0xe400",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,20))) != 0",
+     "expr": "!(flag(6,20))",
+     "arg": 1,
+     "op07_off": "0xe3b0",
+     "span_end": "0xe40c"
+    }
+   ],
+   "dest_id": "607"
+  },
+  {
+   "room": "606",
+   "kind": "door",
+   "commit_off": "0xf126",
+   "routine_dir_idx": 3,
+   "guards": [
+    {
+     "cond": "executes iff (!(vmEntryState)) != 0",
+     "expr": "!(vmEntryState)",
+     "arg": 1,
+     "op07_off": "0xf0ca",
+     "span_end": "0xf13e"
+    }
+   ],
+   "dest_id": "605"
+  },
+  {
+   "room": "607",
+   "kind": "door",
+   "commit_off": "0xe586",
+   "routine_dir_idx": 18,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,52)) != 0",
+     "expr": "flag(6,52)",
+     "arg": 1,
+     "op07_off": "0xe488",
+     "span_end": "0xe5be"
+    },
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 0)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 0)",
+     "arg": 1,
+     "op07_off": "0xe4c8",
+     "span_end": "0xe5ae"
+    },
+    {
+     "cond": "executes iff (flag(5,2)) != 0",
+     "expr": "flag(5,2)",
+     "arg": 1,
+     "op07_off": "0xe4ec",
+     "span_end": "0xe59e"
+    }
+   ],
+   "dest_id": "700"
+  },
+  {
+   "room": "706",
+   "kind": "door",
+   "commit_off": "0x10894",
+   "routine_dir_idx": 10,
+   "guards": [
+    {
+     "cond": "executes iff (!(vmEntryState)) != 0",
+     "expr": "!(vmEntryState)",
+     "arg": 1,
+     "op07_off": "0x10662",
+     "span_end": "0x108ac"
+    }
+   ],
+   "dest_id": "800"
+  },
+  {
+   "room": "800",
+   "kind": "door",
+   "commit_off": "0x18516",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (((word(scene+0x10A8) == 1798) && !(flag(5,17)))) != 0",
+     "expr": "((word(scene+0x10A8) == 1798) && !(flag(5,17)))",
+     "arg": 1,
+     "op07_off": "0x183ca",
+     "span_end": "0x18476"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x18472",
+     "span_end": "0x18590"
+    }
+   ],
+   "dest_id": "005"
+  },
+  {
+   "room": "800",
+   "kind": "door",
+   "commit_off": "0x18610",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,22)) != 0",
+     "expr": "flag(6,22)",
+     "arg": 1,
+     "op07_off": "0x185c0",
+     "span_end": "0x1861c"
+    }
+   ],
+   "dest_id": "801"
+  },
+  {
+   "room": "800",
+   "kind": "door",
+   "commit_off": "0x1a952",
+   "routine_dir_idx": 7,
+   "guards": [
+    {
+     "cond": "executes iff (!(vmEntryState)) != 0",
+     "expr": "!(vmEntryState)",
+     "arg": 1,
+     "op07_off": "0x1a8ac",
+     "span_end": "0x1a96a"
+    }
+   ],
+   "dest_id": "706"
+  },
+  {
+   "room": "902",
+   "kind": "door",
+   "commit_off": "0x1b40",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(8,27)) != 0",
+     "expr": "flag(8,27)",
+     "arg": 1,
+     "op07_off": "0x1af0",
+     "span_end": "0x1b4c"
+    }
+   ],
+   "dest_id": "903"
+  }
+ ],
+ "item_guards": [
+  {
+   "room": "000",
+   "kind": "item",
+   "commit_off": "0x80a4",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((flag(6,117) && !(flag(6,125)))) != 0",
+     "expr": "(flag(6,117) && !(flag(6,125)))",
+     "arg": 1,
+     "op07_off": "0x7fae",
+     "span_end": "0x80b0"
+    }
+   ]
+  },
+  {
+   "room": "002",
+   "kind": "item",
+   "commit_off": "0x11504",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,16)) != 0",
+     "expr": "flag(6,16)",
+     "arg": 1,
+     "op07_off": "0x11400",
+     "span_end": "0x11518"
+    },
+    {
+     "cond": "executes iff (!(flag(6,121))) != 0",
+     "expr": "!(flag(6,121))",
+     "arg": 1,
+     "op07_off": "0x11434",
+     "span_end": "0x11514"
+    },
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x11454",
+     "span_end": "0x11510"
+    }
+   ]
+  },
+  {
+   "room": "002",
+   "kind": "item",
+   "commit_off": "0x116a0",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,17)) != 0",
+     "expr": "flag(6,17)",
+     "arg": 1,
+     "op07_off": "0x11538",
+     "span_end": "0x11714"
+    },
+    {
+     "cond": "executes iff (!(flag(6,18))) != 0",
+     "expr": "!(flag(6,18))",
+     "arg": 1,
+     "op07_off": "0x1156c",
+     "span_end": "0x116b0"
+    },
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x1158c",
+     "span_end": "0x116ac"
+    },
+    {
+     "cond": "executes iff (flag(6,127)) != 0",
+     "expr": "flag(6,127)",
+     "arg": 1,
+     "op07_off": "0x11628",
+     "span_end": "0x1166c"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x11668",
+     "span_end": "0x116a8"
+    }
+   ]
+  },
+  {
+   "room": "002",
+   "kind": "item",
+   "commit_off": "0x11748",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,17)) != 0",
+     "expr": "flag(6,17)",
+     "arg": 1,
+     "op07_off": "0x11538",
+     "span_end": "0x11714"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x11710",
+     "span_end": "0x11750"
+    }
+   ]
+  },
+  {
+   "room": "003",
+   "kind": "item",
+   "commit_off": "0x20410",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,117)) != 0",
+     "expr": "flag(6,117)",
+     "arg": 1,
+     "op07_off": "0x203d8",
+     "span_end": "0x20428"
+    }
+   ]
+  },
+  {
+   "room": "003",
+   "kind": "item",
+   "commit_off": "0x204bc",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,117)) != 0",
+     "expr": "flag(6,117)",
+     "arg": 1,
+     "op07_off": "0x203d8",
+     "span_end": "0x20428"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x20424",
+     "span_end": "0x20504"
+    },
+    {
+     "cond": "executes iff (flag(6,18)) != 0",
+     "expr": "flag(6,18)",
+     "arg": 1,
+     "op07_off": "0x20448",
+     "span_end": "0x20450"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x2044c",
+     "span_end": "0x20504"
+    },
+    {
+     "cond": "executes iff (flag(6,17)) != 0",
+     "expr": "flag(6,17)",
+     "arg": 1,
+     "op07_off": "0x20470",
+     "span_end": "0x204c8"
+    }
+   ]
+  },
+  {
+   "room": "005",
+   "kind": "item",
+   "commit_off": "0x76f6",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((flag(6,117) && !(flag(6,125)))) != 0",
+     "expr": "(flag(6,117) && !(flag(6,125)))",
+     "arg": 1,
+     "op07_off": "0x75cc",
+     "span_end": "0x7706"
+    },
+    {
+     "cond": "executes iff (!(flag(7,16))) != 0",
+     "expr": "!(flag(7,16))",
+     "arg": 1,
+     "op07_off": "0x76be",
+     "span_end": "0x7702"
+    }
+   ]
+  },
+  {
+   "room": "102",
+   "kind": "item",
+   "commit_off": "0xb190",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((!(flag(6,2)) && (CHARACTER(+0x108F) == 1))) != 0",
+     "expr": "(!(flag(6,2)) && (CHARACTER(+0x108F) == 1))",
+     "arg": 1,
+     "op07_off": "0xb144",
+     "span_end": "0xb1ac"
+    }
+   ]
+  },
+  {
+   "room": "106",
+   "kind": "item",
+   "commit_off": "0xa1ec",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,50))) != 0",
+     "expr": "!(flag(5,50))",
+     "arg": 1,
+     "op07_off": "0xa150",
+     "span_end": "0xa1f8"
+    }
+   ]
+  },
+  {
+   "room": "107",
+   "kind": "item",
+   "commit_off": "0x5030",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,8)) != 0",
+     "expr": "flag(6,8)",
+     "arg": 1,
+     "op07_off": "0x4f4c",
+     "span_end": "0x4f60"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x4f5c",
+     "span_end": "0x50ac"
+    },
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 0)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 0)",
+     "arg": 1,
+     "op07_off": "0x4f7c",
+     "span_end": "0x5058"
+    },
+    {
+     "cond": "executes iff (flag(6,9)) != 0",
+     "expr": "flag(6,9)",
+     "arg": 1,
+     "op07_off": "0x4fa0",
+     "span_end": "0x4ffc"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x4ff8",
+     "span_end": "0x5054"
+    }
+   ]
+  },
+  {
+   "room": "10C",
+   "kind": "item",
+   "commit_off": "0x11204",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,7))) != 0",
+     "expr": "!(flag(6,7))",
+     "arg": 1,
+     "op07_off": "0x11188",
+     "span_end": "0x1126c"
+    },
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 0)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 0)",
+     "arg": 1,
+     "op07_off": "0x111a8",
+     "span_end": "0x11244"
+    }
+   ]
+  },
+  {
+   "room": "10E",
+   "kind": "item",
+   "commit_off": "0xcc6c",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(8,3)) != 0",
+     "expr": "flag(8,3)",
+     "arg": 1,
+     "op07_off": "0xcbdc",
+     "span_end": "0xcc38"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0xcc34",
+     "span_end": "0xcc74"
+    }
+   ]
+  },
+  {
+   "room": "110",
+   "kind": "item",
+   "commit_off": "0x2f88",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,16))) != 0",
+     "expr": "!(flag(5,16))",
+     "arg": 1,
+     "op07_off": "0x2f50",
+     "span_end": "0x2f94"
+    }
+   ]
+  },
+  {
+   "room": "201",
+   "kind": "item",
+   "commit_off": "0x2288",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,48))) != 0",
+     "expr": "!(flag(5,48))",
+     "arg": 1,
+     "op07_off": "0x2250",
+     "span_end": "0x2294"
+    }
+   ]
+  },
+  {
+   "room": "205",
+   "kind": "item",
+   "commit_off": "0xd8d0",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((flag(6,6) && !(flag(6,12)))) != 0",
+     "expr": "(flag(6,6) && !(flag(6,12)))",
+     "arg": 1,
+     "op07_off": "0xd69c",
+     "span_end": "0xd9b8"
+    }
+   ]
+  },
+  {
+   "room": "205",
+   "kind": "item",
+   "commit_off": "0xd954",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((flag(6,6) && !(flag(6,12)))) != 0",
+     "expr": "(flag(6,6) && !(flag(6,12)))",
+     "arg": 1,
+     "op07_off": "0xd69c",
+     "span_end": "0xd9b8"
+    },
+    {
+     "cond": "executes iff (!(flag(6,112))) != 0",
+     "expr": "!(flag(6,112))",
+     "arg": 1,
+     "op07_off": "0xd91c",
+     "span_end": "0xd9b4"
+    }
+   ]
+  },
+  {
+   "room": "302",
+   "kind": "item",
+   "commit_off": "0x6444",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,8)) != 0",
+     "expr": "flag(6,8)",
+     "arg": 1,
+     "op07_off": "0x63fc",
+     "span_end": "0x6410"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x640c",
+     "span_end": "0x646a"
+    }
+   ]
+  },
+  {
+   "room": "304",
+   "kind": "item",
+   "commit_off": "0x76e8",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,45))) != 0",
+     "expr": "!(flag(5,45))",
+     "arg": 1,
+     "op07_off": "0x766c",
+     "span_end": "0x76f4"
+    }
+   ]
+  },
+  {
+   "room": "304",
+   "kind": "item",
+   "commit_off": "0x7ed6",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,109)) != 0",
+     "expr": "flag(6,109)",
+     "arg": 1,
+     "op07_off": "0x7cf8",
+     "span_end": "0x7e72"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x7e6a",
+     "span_end": "0x8164"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x7e6e",
+     "span_end": "0x7f2a"
+    },
+    {
+     "cond": "executes iff (flag(6,108)) != 0",
+     "expr": "flag(6,108)",
+     "arg": 1,
+     "op07_off": "0x7e92",
+     "span_end": "0x7ee2"
+    }
+   ]
+  },
+  {
+   "room": "304",
+   "kind": "item",
+   "commit_off": "0x7f22",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,109)) != 0",
+     "expr": "flag(6,109)",
+     "arg": 1,
+     "op07_off": "0x7cf8",
+     "span_end": "0x7e72"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x7e6a",
+     "span_end": "0x8164"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x7e6e",
+     "span_end": "0x7f2a"
+    },
+    {
+     "cond": "executes iff (flag(6,108)) != 0",
+     "expr": "flag(6,108)",
+     "arg": 1,
+     "op07_off": "0x7e92",
+     "span_end": "0x7ee2"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x7ede",
+     "span_end": "0x7f2a"
+    }
+   ]
+  },
+  {
+   "room": "304",
+   "kind": "item",
+   "commit_off": "0x94a2",
+   "routine_dir_idx": 18,
+   "guards": [
+    {
+     "cond": "executes iff ((vmEntryState == 0)) != 0",
+     "expr": "(vmEntryState == 0)",
+     "arg": 1,
+     "op07_off": "0x93aa",
+     "span_end": "0x94ae"
+    }
+   ]
+  },
+  {
+   "room": "306",
+   "kind": "item",
+   "commit_off": "0x2cac",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,12))) != 0",
+     "expr": "!(flag(5,12))",
+     "arg": 1,
+     "op07_off": "0x2c74",
+     "span_end": "0x2cfc"
+    }
+   ]
+  },
+  {
+   "room": "401",
+   "kind": "item",
+   "commit_off": "0x59d6",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(5,1)) != 0",
+     "expr": "flag(5,1)",
+     "arg": 1,
+     "op07_off": "0x595e",
+     "span_end": "0x59a2"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x599e",
+     "span_end": "0x59de"
+    }
+   ]
+  },
+  {
+   "room": "401",
+   "kind": "item",
+   "commit_off": "0x5b8a",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,49))) != 0",
+     "expr": "!(flag(5,49))",
+     "arg": 1,
+     "op07_off": "0x5b52",
+     "span_end": "0x5b96"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "kind": "item",
+   "commit_off": "0x16c4a",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((!(flag(6,33)) || flag(6,62))) != 0",
+     "expr": "(!(flag(6,33)) || flag(6,62))",
+     "arg": 1,
+     "op07_off": "0x16bb6",
+     "span_end": "0x16c16"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x16c12",
+     "span_end": "0x16c96"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "kind": "item",
+   "commit_off": "0x16d56",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,63))) != 0",
+     "expr": "!(flag(6,63))",
+     "arg": 1,
+     "op07_off": "0x16d1e",
+     "span_end": "0x16d9e"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "kind": "item",
+   "commit_off": "0x16d92",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,63))) != 0",
+     "expr": "!(flag(6,63))",
+     "arg": 1,
+     "op07_off": "0x16d1e",
+     "span_end": "0x16d9e"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "kind": "item",
+   "commit_off": "0x1d7c2",
+   "routine_dir_idx": 26,
+   "guards": [
+    {
+     "cond": "executes iff (!(vmEntryState)) != 0",
+     "expr": "!(vmEntryState)",
+     "arg": 1,
+     "op07_off": "0x1d5cc",
+     "span_end": "0x1d7da"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "kind": "item",
+   "commit_off": "0x1dbde",
+   "routine_dir_idx": 27,
+   "guards": [
+    {
+     "cond": "executes iff (!(vmEntryState)) != 0",
+     "expr": "!(vmEntryState)",
+     "arg": 1,
+     "op07_off": "0x1da52",
+     "span_end": "0x1dc08"
+    }
+   ]
+  },
+  {
+   "room": "408",
+   "kind": "item",
+   "commit_off": "0x127d4",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x12654",
+     "span_end": "0x12828"
+    },
+    {
+     "cond": "executes iff (flag(6,119)) != 0",
+     "expr": "flag(6,119)",
+     "arg": 1,
+     "op07_off": "0x12678",
+     "span_end": "0x126d4"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x126d0",
+     "span_end": "0x12818"
+    }
+   ]
+  },
+  {
+   "room": "409",
+   "kind": "item",
+   "commit_off": "0x124c4",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0x123bc",
+     "span_end": "0x125b4"
+    },
+    {
+     "cond": "executes iff (flag(6,119)) != 0",
+     "expr": "flag(6,119)",
+     "arg": 1,
+     "op07_off": "0x123e0",
+     "span_end": "0x12490"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x1248c",
+     "span_end": "0x125a4"
+    }
+   ]
+  },
+  {
+   "room": "502",
+   "kind": "item",
+   "commit_off": "0x27430",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,42))) != 0",
+     "expr": "!(flag(6,42))",
+     "arg": 1,
+     "op07_off": "0x272f0",
+     "span_end": "0x27314"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x27310",
+     "span_end": "0x2743c"
+    },
+    {
+     "cond": "executes iff (!(flag(6,146))) != 0",
+     "expr": "!(flag(6,146))",
+     "arg": 1,
+     "op07_off": "0x27344",
+     "span_end": "0x2743c"
+    }
+   ]
+  },
+  {
+   "room": "603",
+   "kind": "item",
+   "commit_off": "0x3ef0",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,53))) != 0",
+     "expr": "!(flag(5,53))",
+     "arg": 1,
+     "op07_off": "0x3eb8",
+     "span_end": "0x3efc"
+    }
+   ]
+  },
+  {
+   "room": "605",
+   "kind": "item",
+   "commit_off": "0x1166c",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,54))) != 0",
+     "expr": "!(flag(5,54))",
+     "arg": 1,
+     "op07_off": "0x11634",
+     "span_end": "0x11678"
+    }
+   ]
+  },
+  {
+   "room": "605",
+   "kind": "item",
+   "commit_off": "0x11864",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,20)) != 0",
+     "expr": "flag(6,20)",
+     "arg": 1,
+     "op07_off": "0x11698",
+     "span_end": "0x11718"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x11714",
+     "span_end": "0x118d0"
+    },
+    {
+     "cond": "executes iff (!(flag(6,113))) != 0",
+     "expr": "!(flag(6,113))",
+     "arg": 1,
+     "op07_off": "0x11748",
+     "span_end": "0x11830"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x1182c",
+     "span_end": "0x118d0"
+    }
+   ]
+  },
+  {
+   "room": "605",
+   "kind": "item",
+   "commit_off": "0x13326",
+   "routine_dir_idx": 5,
+   "guards": [
+    {
+     "cond": "executes iff (((((vmEntryState == code0(+0x1204)) && (vmEntryState == code1(+0x1205))) && (vmEntryState == code2(+0x1206))) && (vmEntryState == code3(+0x1207)))) != 0",
+     "expr": "((((vmEntryState == code0(+0x1204)) && (vmEntryState == code1(+0x1205))) && (vmEntryState == code2(+0x1206))) && (vmEntryState == code3(+0x1207)))",
+     "arg": 1,
+     "op07_off": "0x131f8",
+     "span_end": "0x13346"
+    }
+   ]
+  },
+  {
+   "room": "607",
+   "kind": "item",
+   "commit_off": "0xb7da",
+   "routine_dir_idx": 2,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,2))) != 0",
+     "expr": "!(flag(5,2))",
+     "arg": 1,
+     "op07_off": "0xb6e6",
+     "span_end": "0xb7e6"
+    }
+   ]
+  },
+  {
+   "room": "701",
+   "kind": "item",
+   "commit_off": "0x3828",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,59)) != 0",
+     "expr": "flag(6,59)",
+     "arg": 1,
+     "op07_off": "0x37b0",
+     "span_end": "0x37f4"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x37f0",
+     "span_end": "0x3830"
+    }
+   ]
+  },
+  {
+   "room": "703",
+   "kind": "item",
+   "commit_off": "0x6d50",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,130)) != 0",
+     "expr": "flag(6,130)",
+     "arg": 1,
+     "op07_off": "0x6cdc",
+     "span_end": "0x6d90"
+    }
+   ]
+  },
+  {
+   "room": "703",
+   "kind": "item",
+   "commit_off": "0x6dc4",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,130)) != 0",
+     "expr": "flag(6,130)",
+     "arg": 1,
+     "op07_off": "0x6cdc",
+     "span_end": "0x6d90"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0x6d8c",
+     "span_end": "0x6e78"
+    }
+   ]
+  },
+  {
+   "room": "703",
+   "kind": "item",
+   "commit_off": "0x79ba",
+   "routine_dir_idx": 2,
+   "guards": [
+    {
+     "cond": "executes iff ((vmEntryState == 0)) != 0",
+     "expr": "(vmEntryState == 0)",
+     "arg": 1,
+     "op07_off": "0x7668",
+     "span_end": "0x7a02"
+    }
+   ]
+  },
+  {
+   "room": "704",
+   "kind": "item",
+   "commit_off": "0xb008",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,114)) != 0",
+     "expr": "flag(6,114)",
+     "arg": 1,
+     "op07_off": "0xaf7c",
+     "span_end": "0xaf8e"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0xaf8a",
+     "span_end": "0xb04c"
+    }
+   ]
+  },
+  {
+   "room": "704",
+   "kind": "item",
+   "commit_off": "0xb044",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,114)) != 0",
+     "expr": "flag(6,114)",
+     "arg": 1,
+     "op07_off": "0xaf7c",
+     "span_end": "0xaf8e"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0xaf8a",
+     "span_end": "0xb04c"
+    }
+   ]
+  },
+  {
+   "room": "705",
+   "kind": "item",
+   "commit_off": "0x5902",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,59)) != 0",
+     "expr": "flag(6,59)",
+     "arg": 1,
+     "op07_off": "0x57e2",
+     "span_end": "0x5966"
+    },
+    {
+     "cond": "executes iff (!(flag(5,55))) != 0",
+     "expr": "!(flag(5,55))",
+     "arg": 1,
+     "op07_off": "0x58ca",
+     "span_end": "0x5962"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xd424",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,144))) != 0",
+     "expr": "!(flag(6,144))",
+     "arg": 1,
+     "op07_off": "0xd3ec",
+     "span_end": "0xd46c"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xd4a0",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,144))) != 0",
+     "expr": "!(flag(6,144))",
+     "arg": 1,
+     "op07_off": "0xd3ec",
+     "span_end": "0xd46c"
+    },
+    {
+     "cond": "else-branch",
+     "expr": "ELSE",
+     "arg": 0,
+     "op07_off": "0xd468",
+     "span_end": "0xd4e4"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xd946",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(4,16))) != 0",
+     "expr": "!(flag(4,16))",
+     "arg": 1,
+     "op07_off": "0xd838",
+     "span_end": "0xdc74"
+    },
+    {
+     "cond": "executes iff (!(flag(6,99))) != 0",
+     "expr": "!(flag(6,99))",
+     "arg": 1,
+     "op07_off": "0xd86c",
+     "span_end": "0xda42"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xd982",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(4,16))) != 0",
+     "expr": "!(flag(4,16))",
+     "arg": 1,
+     "op07_off": "0xd838",
+     "span_end": "0xdc74"
+    },
+    {
+     "cond": "executes iff (!(flag(6,99))) != 0",
+     "expr": "!(flag(6,99))",
+     "arg": 1,
+     "op07_off": "0xd86c",
+     "span_end": "0xda42"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xd9be",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(4,16))) != 0",
+     "expr": "!(flag(4,16))",
+     "arg": 1,
+     "op07_off": "0xd838",
+     "span_end": "0xdc74"
+    },
+    {
+     "cond": "executes iff (!(flag(6,99))) != 0",
+     "expr": "!(flag(6,99))",
+     "arg": 1,
+     "op07_off": "0xd86c",
+     "span_end": "0xda42"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xdb60",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(4,16))) != 0",
+     "expr": "!(flag(4,16))",
+     "arg": 1,
+     "op07_off": "0xd838",
+     "span_end": "0xdc74"
+    },
+    {
+     "cond": "executes iff (!(flag(6,100))) != 0",
+     "expr": "!(flag(6,100))",
+     "arg": 1,
+     "op07_off": "0xda86",
+     "span_end": "0xdc5c"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xdb9c",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(4,16))) != 0",
+     "expr": "!(flag(4,16))",
+     "arg": 1,
+     "op07_off": "0xd838",
+     "span_end": "0xdc74"
+    },
+    {
+     "cond": "executes iff (!(flag(6,100))) != 0",
+     "expr": "!(flag(6,100))",
+     "arg": 1,
+     "op07_off": "0xda86",
+     "span_end": "0xdc5c"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0xdbd8",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(4,16))) != 0",
+     "expr": "!(flag(4,16))",
+     "arg": 1,
+     "op07_off": "0xd838",
+     "span_end": "0xdc74"
+    },
+    {
+     "cond": "executes iff (!(flag(6,100))) != 0",
+     "expr": "!(flag(6,100))",
+     "arg": 1,
+     "op07_off": "0xda86",
+     "span_end": "0xdc5c"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "kind": "item",
+   "commit_off": "0x1205a",
+   "routine_dir_idx": 15,
+   "guards": [
+    {
+     "cond": "executes iff (!(vmEntryState)) != 0",
+     "expr": "!(vmEntryState)",
+     "arg": 1,
+     "op07_off": "0x11e2a",
+     "span_end": "0x120ae"
+    }
+   ]
+  },
+  {
+   "room": "800",
+   "kind": "item",
+   "commit_off": "0x18748",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 0)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 0)",
+     "arg": 1,
+     "op07_off": "0x186ec",
+     "span_end": "0x1886c"
+    },
+    {
+     "cond": "executes iff (flag(6,144)) != 0",
+     "expr": "flag(6,144)",
+     "arg": 1,
+     "op07_off": "0x18710",
+     "span_end": "0x18754"
+    }
+   ]
+  },
+  {
+   "room": "800",
+   "kind": "item",
+   "commit_off": "0x18858",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 0)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 0)",
+     "arg": 1,
+     "op07_off": "0x186ec",
+     "span_end": "0x1886c"
+    },
+    {
+     "cond": "executes iff (flag(5,17)) != 0",
+     "expr": "flag(5,17)",
+     "arg": 1,
+     "op07_off": "0x187b0",
+     "span_end": "0x18868"
+    },
+    {
+     "cond": "executes iff ((!(flag(6,22)) && (word(scene+0x10A8) == 1798))) != 0",
+     "expr": "(!(flag(6,22)) && (word(scene+0x10A8) == 1798))",
+     "arg": 1,
+     "op07_off": "0x18804",
+     "span_end": "0x18864"
+    }
+   ]
+  },
+  {
+   "room": "801",
+   "kind": "item",
+   "commit_off": "0x421e",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (flag(6,101)) != 0",
+     "expr": "flag(6,101)",
+     "arg": 1,
+     "op07_off": "0x41b2",
+     "span_end": "0x4272"
+    },
+    {
+     "cond": "executes iff (!(flag(5,36))) != 0",
+     "expr": "!(flag(5,36))",
+     "arg": 1,
+     "op07_off": "0x41e6",
+     "span_end": "0x426e"
+    }
+   ]
+  },
+  {
+   "room": "801",
+   "kind": "item",
+   "commit_off": "0x4c3c",
+   "routine_dir_idx": 2,
+   "guards": [
+    {
+     "cond": "executes iff (1) != 0",
+     "expr": "1",
+     "arg": 1,
+     "op07_off": "0x47c6",
+     "span_end": "0x4ca6"
+    },
+    {
+     "cond": "executes iff ((1 == 6)) != 0",
+     "expr": "(1 == 6)",
+     "arg": 1,
+     "op07_off": "0x4804",
+     "span_end": "0x4c96"
+    }
+   ]
+  },
+  {
+   "room": "803",
+   "kind": "item",
+   "commit_off": "0x8b62",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(6,23))) != 0",
+     "expr": "!(flag(6,23))",
+     "arg": 1,
+     "op07_off": "0x8ae4",
+     "span_end": "0x8b6e"
+    }
+   ]
+  },
+  {
+   "room": "808",
+   "kind": "item",
+   "commit_off": "0xc440",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0xc386",
+     "span_end": "0xc4d8"
+    },
+    {
+     "cond": "executes iff (!(flag(6,25))) != 0",
+     "expr": "!(flag(6,25))",
+     "arg": 1,
+     "op07_off": "0xc3ba",
+     "span_end": "0xc4c4"
+    }
+   ]
+  },
+  {
+   "room": "808",
+   "kind": "item",
+   "commit_off": "0xc47c",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0xc386",
+     "span_end": "0xc4d8"
+    },
+    {
+     "cond": "executes iff (!(flag(6,25))) != 0",
+     "expr": "!(flag(6,25))",
+     "arg": 1,
+     "op07_off": "0xc3ba",
+     "span_end": "0xc4c4"
+    }
+   ]
+  },
+  {
+   "room": "808",
+   "kind": "item",
+   "commit_off": "0xc4b8",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((CHARACTER(+0x108F) == 1)) != 0",
+     "expr": "(CHARACTER(+0x108F) == 1)",
+     "arg": 1,
+     "op07_off": "0xc386",
+     "span_end": "0xc4d8"
+    },
+    {
+     "cond": "executes iff (!(flag(6,25))) != 0",
+     "expr": "!(flag(6,25))",
+     "arg": 1,
+     "op07_off": "0xc3ba",
+     "span_end": "0xc4c4"
+    }
+   ]
+  },
+  {
+   "room": "809",
+   "kind": "item",
+   "commit_off": "0x179ee",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,56))) != 0",
+     "expr": "!(flag(5,56))",
+     "arg": 1,
+     "op07_off": "0x179b6",
+     "span_end": "0x17a4e"
+    }
+   ]
+  },
+  {
+   "room": "809",
+   "kind": "item",
+   "commit_off": "0x17d7a",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff ((!(flag(6,26)) && (CHARACTER(+0x108F) == 1))) != 0",
+     "expr": "(!(flag(6,26)) && (CHARACTER(+0x108F) == 1))",
+     "arg": 1,
+     "op07_off": "0x17d0c",
+     "span_end": "0x17d86"
+    }
+   ]
+  },
+  {
+   "room": "900",
+   "kind": "item",
+   "commit_off": "0x3bec",
+   "routine_dir_idx": 0,
+   "guards": [
+    {
+     "cond": "executes iff (!(flag(5,52))) != 0",
+     "expr": "!(flag(5,52))",
+     "arg": 1,
+     "op07_off": "0x3bb4",
+     "span_end": "0x3bf8"
+    }
+   ]
+  }
+ ],
+ "conditional_routine_starts": [
+  {
+   "room": "001",
+   "caller_start": "0x150c",
+   "op15_off": "0x1704",
+   "starts_routine": 4,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x1554",
+     "span_end": "0x2246"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x16c8",
+     "span_end": "0x1714"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x16f8",
+     "span_end": "0x1710"
+    }
+   ]
+  },
+  {
+   "room": "002",
+   "caller_start": "0x112e4",
+   "op15_off": "0x113d4",
+   "starts_routine": 2,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 15,
+      "test_off": "0x1138c"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x113b4",
+     "span_end": "0x113e0"
+    }
+   ]
+  },
+  {
+   "room": "002",
+   "caller_start": "0x112e4",
+   "op15_off": "0x117b0",
+   "starts_routine": 5,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 18,
+      "test_off": "0x11758"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x11770",
+     "span_end": "0x117c0"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 117,
+      "test_off": "0x1177c"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x117a4",
+     "span_end": "0x117bc"
+    }
+   ]
+  },
+  {
+   "room": "003",
+   "caller_start": "0x20050",
+   "op15_off": "0x206f8",
+   "starts_routine": 9,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 10,
+      "test_off": "0x2053c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20554",
+     "span_end": "0x2062a"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20626",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 117,
+      "test_off": "0x20632"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x2064a",
+     "span_end": "0x20652"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2064e",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 18,
+      "test_off": "0x2065a"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20672",
+     "span_end": "0x20684"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20680",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 12,
+      "test_off": "0x2068c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x206a4",
+     "span_end": "0x20708"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 17,
+      "test_off": "0x206b0"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x206d8",
+     "span_end": "0x20704"
+    }
+   ]
+  },
+  {
+   "room": "003",
+   "caller_start": "0x20050",
+   "op15_off": "0x2077c",
+   "starts_routine": 7,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 10,
+      "test_off": "0x2053c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20554",
+     "span_end": "0x2062a"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20626",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 117,
+      "test_off": "0x20632"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x2064a",
+     "span_end": "0x20652"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2064e",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 18,
+      "test_off": "0x2065a"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20672",
+     "span_end": "0x20684"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20680",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 12,
+      "test_off": "0x2068c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x206a4",
+     "span_end": "0x20708"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20704",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 15,
+      "test_off": "0x20710"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20728",
+     "span_end": "0x20796"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 16,
+      "test_off": "0x20734"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x2075c",
+     "span_end": "0x20788"
+    }
+   ]
+  },
+  {
+   "room": "003",
+   "caller_start": "0x20050",
+   "op15_off": "0x2080a",
+   "starts_routine": 5,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 10,
+      "test_off": "0x2053c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20554",
+     "span_end": "0x2062a"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20626",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 117,
+      "test_off": "0x20632"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x2064a",
+     "span_end": "0x20652"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2064e",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 18,
+      "test_off": "0x2065a"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20672",
+     "span_end": "0x20684"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20680",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 12,
+      "test_off": "0x2068c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x206a4",
+     "span_end": "0x20708"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20704",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 15,
+      "test_off": "0x20710"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x20728",
+     "span_end": "0x20796"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x20792",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 12,
+      "test_off": "0x2079e"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x207b6",
+     "span_end": "0x2081a"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 14,
+      "test_off": "0x207c2"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x207ea",
+     "span_end": "0x20816"
+    }
+   ]
+  },
+  {
+   "room": "003",
+   "caller_start": "0x24260",
+   "op15_off": "0x245ba",
+   "starts_routine": 16,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 19,
+      "test_off": "0x24596"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x245ae",
+     "span_end": "0x245c6"
+    }
+   ]
+  },
+  {
+   "room": "100",
+   "caller_start": "0x3278",
+   "op15_off": "0x3328",
+   "starts_routine": 2,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 30,
+      "test_off": "0x32f0"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x3318",
+     "span_end": "0x3320"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x331c",
+     "span_end": "0x3330"
+    }
+   ]
+  },
+  {
+   "room": "100",
+   "caller_start": "0x3278",
+   "op15_off": "0x33a4",
+   "starts_routine": 1,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 6,
+      "test_off": "0x3338"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x3350",
+     "span_end": "0x33b4"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 143,
+      "test_off": "0x335c"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x3384",
+     "span_end": "0x33b0"
+    }
+   ]
+  },
+  {
+   "room": "100",
+   "caller_start": "0x3278",
+   "op15_off": "0x3660",
+   "starts_routine": 3,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 15,
+      "test_off": "0x33bc"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x33d4",
+     "span_end": "0x368c"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 65,
+      "test_off": "0x34c8"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x34e0",
+     "span_end": "0x3648"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x3644",
+     "span_end": "0x3688"
+    }
+   ]
+  },
+  {
+   "room": "101",
+   "caller_start": "0xa634",
+   "op15_off": "0xaaa2",
+   "starts_routine": 1,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 1,
+      "test_off": "0xaa5a"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xaa82",
+     "span_end": "0xaaae"
+    }
+   ]
+  },
+  {
+   "room": "102",
+   "caller_start": "0xae0c",
+   "op15_off": "0xb1a0",
+   "starts_routine": 5,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 2,
+      "test_off": "0xb0fc"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0xb144",
+     "span_end": "0xb1ac"
+    }
+   ]
+  },
+  {
+   "room": "105",
+   "caller_start": "0x880c",
+   "op15_off": "0x897c",
+   "starts_routine": 1,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 120,
+      "test_off": "0x88f8"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x8930",
+     "span_end": "0x89a8"
+    }
+   ]
+  },
+  {
+   "room": "105",
+   "caller_start": "0x880c",
+   "op15_off": "0x898c",
+   "starts_routine": 2,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 120,
+      "test_off": "0x88f8"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x8930",
+     "span_end": "0x89a8"
+    }
+   ]
+  },
+  {
+   "room": "105",
+   "caller_start": "0x8a2a",
+   "op15_off": "0x8ad8",
+   "starts_routine": 3,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x8a36",
+     "span_end": "0x8c5e"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x8a5c",
+     "span_end": "0x8a88"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x8a6c",
+     "span_end": "0x8ae8"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x8a7c",
+     "span_end": "0x8b54"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x8a80",
+     "span_end": "0x8bd4"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x8a84",
+     "span_end": "0x8c54"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 18,
+      "test_off": "0x8a90"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x8ab8",
+     "span_end": "0x8ae4"
+    }
+   ]
+  },
+  {
+   "room": "106",
+   "caller_start": "0x9ef8",
+   "op15_off": "0xa446",
+   "starts_routine": 5,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 3,
+      "test_off": "0xa320"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0xa358",
+     "span_end": "0xa386"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xa382",
+     "span_end": "0xa452"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0xa43a",
+     "span_end": "0xa452"
+    }
+   ]
+  },
+  {
+   "room": "107",
+   "caller_start": "0x4cb4",
+   "op15_off": "0x4fec",
+   "starts_routine": 1,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x4f34"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x4f4c",
+     "span_end": "0x4f60"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x4f5c",
+     "span_end": "0x50ac"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x4f34"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x4f7c",
+     "span_end": "0x5058"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 9,
+      "test_off": "0x4f88"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x4fa0",
+     "span_end": "0x4ffc"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 102,
+      "test_off": "0x4fb8"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x4fe0",
+     "span_end": "0x4ff8"
+    }
+   ]
+  },
+  {
+   "room": "107",
+   "caller_start": "0x4cb4",
+   "op15_off": "0x50a0",
+   "starts_routine": 1,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x4f34"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x4f4c",
+     "span_end": "0x4f60"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x4f5c",
+     "span_end": "0x50ac"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x4f34"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x4f7c",
+     "span_end": "0x5058"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x5054",
+     "span_end": "0x50ac"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 102,
+      "test_off": "0x506c"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x5094",
+     "span_end": "0x50ac"
+    }
+   ]
+  },
+  {
+   "room": "108",
+   "caller_start": "0x73b4",
+   "op15_off": "0x7614",
+   "starts_routine": 1,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x755a"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x7572",
+     "span_end": "0x7586"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x7582",
+     "span_end": "0x764c"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x759a"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x75d4",
+     "span_end": "0x7640"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 111,
+      "test_off": "0x75e0"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x7608",
+     "span_end": "0x7630"
+    }
+   ]
+  },
+  {
+   "room": "108",
+   "caller_start": "0x73b4",
+   "op15_off": "0x7624",
+   "starts_routine": 3,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x755a"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x7572",
+     "span_end": "0x7586"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x7582",
+     "span_end": "0x764c"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x759a"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x75d4",
+     "span_end": "0x7640"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 111,
+      "test_off": "0x75e0"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x7608",
+     "span_end": "0x7630"
+    }
+   ]
+  },
+  {
+   "room": "108",
+   "caller_start": "0x76b0",
+   "op15_off": "0x78ce",
+   "starts_routine": 2,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x76bc",
+     "span_end": "0x7c0c"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x76ee",
+     "span_end": "0x771a"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x76fe",
+     "span_end": "0x79e2"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x770e",
+     "span_end": "0x79e2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x7712",
+     "span_end": "0x7b06"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x7716",
+     "span_end": "0x7c02"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 111,
+      "test_off": "0x7722"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x774a",
+     "span_end": "0x78e6"
+    }
+   ]
+  },
+  {
+   "room": "109",
+   "caller_start": "0x83a8",
+   "op15_off": "0x871e",
+   "starts_routine": 4,
+   "entity": 7,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 103,
+      "test_off": "0x86ea"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x8712",
+     "span_end": "0x872a"
+    }
+   ]
+  },
+  {
+   "room": "109",
+   "caller_start": "0x83a8",
+   "op15_off": "0x8766",
+   "starts_routine": 2,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 104,
+      "test_off": "0x8732"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x875a",
+     "span_end": "0x8772"
+    }
+   ]
+  },
+  {
+   "room": "10C",
+   "caller_start": "0x10fe4",
+   "op15_off": "0x1124c",
+   "starts_routine": 1,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 7,
+      "test_off": "0x11160"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x11188",
+     "span_end": "0x1126c"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 7,
+      "test_off": "0x11160"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x111a8",
+     "span_end": "0x11244"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x11240",
+     "span_end": "0x11268"
+    }
+   ]
+  },
+  {
+   "room": "10C",
+   "caller_start": "0x10fe4",
+   "op15_off": "0x11274",
+   "starts_routine": 1,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 7,
+      "test_off": "0x11160"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x11188",
+     "span_end": "0x1126c"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x11268",
+     "span_end": "0x115ac"
+    }
+   ]
+  },
+  {
+   "room": "10D",
+   "caller_start": "0xe374",
+   "op15_off": "0xe626",
+   "starts_routine": 3,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 83,
+      "test_off": "0xe5e8"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xe610",
+     "span_end": "0xe632"
+    }
+   ]
+  },
+  {
+   "room": "10E",
+   "caller_start": "0xcb88",
+   "op15_off": "0xcd5e",
+   "starts_routine": 5,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 96,
+      "test_off": "0xcd20"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xcd48",
+     "span_end": "0xcd6a"
+    }
+   ]
+  },
+  {
+   "room": "110",
+   "caller_start": "0x3056",
+   "op15_off": "0x3118",
+   "starts_routine": 2,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 16,
+      "test_off": "0x30e4"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x310c",
+     "span_end": "0x3124"
+    }
+   ]
+  },
+  {
+   "room": "200",
+   "caller_start": "0xf1d0",
+   "op15_off": "0xf49e",
+   "starts_routine": 2,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 6,
+      "test_off": "0xf38c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0xf3a4",
+     "span_end": "0xf3fe"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xf3fa",
+     "span_end": "0xf5b6"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xf412"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xf43a",
+     "span_end": "0xf568"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 4,
+      "test_off": "0xf446"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xf46e",
+     "span_end": "0xf4aa"
+    }
+   ]
+  },
+  {
+   "room": "201",
+   "caller_start": "0x204c",
+   "op15_off": "0x234c",
+   "starts_routine": 1,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x229c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x22b4",
+     "span_end": "0x22c8"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x22c4",
+     "span_end": "0x2368"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 115,
+      "test_off": "0x22d0"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x22e8",
+     "span_end": "0x22fc"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x22f8",
+     "span_end": "0x2368"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 57,
+      "test_off": "0x2304"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x232c",
+     "span_end": "0x2368"
+    }
+   ]
+  },
+  {
+   "room": "201",
+   "caller_start": "0x204c",
+   "op15_off": "0x235c",
+   "starts_routine": 2,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 8,
+      "test_off": "0x229c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x22b4",
+     "span_end": "0x22c8"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x22c4",
+     "span_end": "0x2368"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 115,
+      "test_off": "0x22d0"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x22e8",
+     "span_end": "0x22fc"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x22f8",
+     "span_end": "0x2368"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 57,
+      "test_off": "0x2304"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x232c",
+     "span_end": "0x2368"
+    }
+   ]
+  },
+  {
+   "room": "203",
+   "caller_start": "0x2514",
+   "op15_off": "0x2afe",
+   "starts_routine": 2,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 55,
+      "test_off": "0x2a92"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x2aaa",
+     "span_end": "0x2af6"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae6",
+     "span_end": "0x2af2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2aea",
+     "span_end": "0x2af6"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2af2",
+     "span_end": "0x2b06"
+    }
+   ]
+  },
+  {
+   "room": "205",
+   "caller_start": "0xd0f8",
+   "op15_off": "0xd9a8",
+   "starts_routine": 24,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 12,
+      "test_off": "0xd664"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0xd69c",
+     "span_end": "0xd9b8"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 112,
+      "test_off": "0xd8f4"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xd91c",
+     "span_end": "0xd9b4"
+    }
+   ]
+  },
+  {
+   "room": "205",
+   "caller_start": "0x10e9c",
+   "op15_off": "0x10eec",
+   "starts_routine": 26,
+   "entity": 6,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 16,
+      "test_off": "0x10ea4"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x10ecc",
+     "span_end": "0x10ef8"
+    }
+   ]
+  },
+  {
+   "room": "300",
+   "caller_start": "0x4fec",
+   "op15_off": "0x53c4",
+   "starts_routine": 2,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x536c"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x53a4",
+     "span_end": "0x53d0"
+    }
+   ]
+  },
+  {
+   "room": "301",
+   "caller_start": "0x9002",
+   "op15_off": "0x9580",
+   "starts_routine": 3,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 12,
+      "test_off": "0x94e2"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x94fa",
+     "span_end": "0x950e"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x950a",
+     "span_end": "0x9598"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 11,
+      "test_off": "0x9516"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x952e",
+     "span_end": "0x9540"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x953c",
+     "span_end": "0x9598"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 10,
+      "test_off": "0x9548"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x9560",
+     "span_end": "0x958c"
+    }
+   ]
+  },
+  {
+   "room": "303",
+   "caller_start": "0x4e60",
+   "op15_off": "0x5602",
+   "starts_routine": 2,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 46,
+      "test_off": "0x556e"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x5586",
+     "span_end": "0x56ea"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 109,
+      "test_off": "0x559e"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x55c6",
+     "span_end": "0x56e6"
+    }
+   ]
+  },
+  {
+   "room": "303",
+   "caller_start": "0x5c32",
+   "op15_off": "0x5caa",
+   "starts_routine": 9,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 46,
+      "test_off": "0x5c76"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x5c9e",
+     "span_end": "0x5cce"
+    }
+   ]
+  },
+  {
+   "room": "304",
+   "caller_start": "0x7396",
+   "op15_off": "0x80aa",
+   "starts_routine": 20,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 109,
+      "test_off": "0x7ce0"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x7cf8",
+     "span_end": "0x7e72"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x7e6a",
+     "span_end": "0x8164"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 46,
+      "test_off": "0x8016"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x802e",
+     "span_end": "0x815e"
+    }
+   ]
+  },
+  {
+   "room": "304",
+   "caller_start": "0x7396",
+   "op15_off": "0x80ba",
+   "starts_routine": 19,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 109,
+      "test_off": "0x7ce0"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x7cf8",
+     "span_end": "0x7e72"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x7e6a",
+     "span_end": "0x8164"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 46,
+      "test_off": "0x8016"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x802e",
+     "span_end": "0x815e"
+    }
+   ]
+  },
+  {
+   "room": "305",
+   "caller_start": "0x3f00",
+   "op15_off": "0x45ae",
+   "starts_routine": 2,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 46,
+      "test_off": "0x44e6"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x44fe",
+     "span_end": "0x4662"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 109,
+      "test_off": "0x450a"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x4532",
+     "span_end": "0x4652"
+    }
+   ]
+  },
+  {
+   "room": "400",
+   "caller_start": "0xc70e",
+   "op15_off": "0xcc5a",
+   "starts_routine": 3,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 9,
+      "id": 44,
+      "test_off": "0xcc36"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0xcc4e",
+     "span_end": "0xcc66"
+    }
+   ]
+  },
+  {
+   "room": "401",
+   "caller_start": "0x58fa",
+   "op15_off": "0x5ca4",
+   "starts_routine": 3,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x5bf6"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x5c2e",
+     "span_end": "0x5cb0"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "caller_start": "0x16634",
+   "op15_off": "0x16e12",
+   "starts_routine": 2,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 32,
+      "test_off": "0x16da6"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x16dbe",
+     "span_end": "0x16e22"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 33,
+      "test_off": "0x16dca"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x16df2",
+     "span_end": "0x16e1e"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "caller_start": "0x18be6",
+   "op15_off": "0x18c80",
+   "starts_routine": 6,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x18bf2",
+     "span_end": "0x18caa"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 2,
+      "id": 11,
+      "test_off": "0x18bfe"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x18c16",
+     "span_end": "0x18c9a"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x18c2e"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x18c68",
+     "span_end": "0x18c96"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "caller_start": "0x1bea6",
+   "op15_off": "0x1c1f6",
+   "starts_routine": 24,
+   "entity": 0,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x1c1b0"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x1c1ea",
+     "span_end": "0x1c202"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "caller_start": "0x1bea6",
+   "op15_off": "0x1c22a",
+   "starts_routine": 23,
+   "entity": 0,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x1c1b0"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x1c1ea",
+     "span_end": "0x1c202"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x1c1fe",
+     "span_end": "0x1c246"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x1c21e",
+     "span_end": "0x1c236"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "caller_start": "0x1bea6",
+   "op15_off": "0x1c23e",
+   "starts_routine": 24,
+   "entity": 0,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x1c1b0"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x1c1ea",
+     "span_end": "0x1c202"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x1c1fe",
+     "span_end": "0x1c246"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x1c21e",
+     "span_end": "0x1c236"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x1c232",
+     "span_end": "0x1c246"
+    }
+   ]
+  },
+  {
+   "room": "402",
+   "caller_start": "0x1dec4",
+   "op15_off": "0x1df72",
+   "starts_routine": 8,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x1ded0",
+     "span_end": "0x1df9c"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 4,
+      "id": 12,
+      "test_off": "0x1dedc"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x1def4",
+     "span_end": "0x1df8c"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x1df0c"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x1df46",
+     "span_end": "0x1df88"
+    }
+   ]
+  },
+  {
+   "room": "403",
+   "caller_start": "0x12e58",
+   "op15_off": "0x13158",
+   "starts_routine": 7,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 36,
+      "test_off": "0x130f0"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x13138",
+     "span_end": "0x13164"
+    }
+   ]
+  },
+  {
+   "room": "403",
+   "caller_start": "0x12e58",
+   "op15_off": "0x1316c",
+   "starts_routine": 4,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 36,
+      "test_off": "0x130f0"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x13138",
+     "span_end": "0x13164"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x13160",
+     "span_end": "0x13184"
+    }
+   ]
+  },
+  {
+   "room": "403",
+   "caller_start": "0x12e58",
+   "op15_off": "0x1317c",
+   "starts_routine": 10,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 36,
+      "test_off": "0x130f0"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x13138",
+     "span_end": "0x13164"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x13160",
+     "span_end": "0x13184"
+    }
+   ]
+  },
+  {
+   "room": "407",
+   "caller_start": "0x169c0",
+   "op15_off": "0x16aac",
+   "starts_routine": 1,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x16a30"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x16a58",
+     "span_end": "0x16be8"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 38,
+      "test_off": "0x16a64"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x16a8c",
+     "span_end": "0x16ab8"
+    }
+   ]
+  },
+  {
+   "room": "407",
+   "caller_start": "0x19ba6",
+   "op15_off": "0x19c34",
+   "starts_routine": 3,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x19bbe",
+     "span_end": "0x19cd6"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 23,
+      "test_off": "0x19bca"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x19be2",
+     "span_end": "0x19bf4"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x19bec",
+     "span_end": "0x19cdc"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 19,
+      "test_off": "0x19bfc"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x19c14",
+     "span_end": "0x19c4a"
+    }
+   ]
+  },
+  {
+   "room": "408",
+   "caller_start": "0x12618",
+   "op15_off": "0x12724",
+   "starts_routine": 2,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x1262c"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x12654",
+     "span_end": "0x12828"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 119,
+      "test_off": "0x12660"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x12678",
+     "span_end": "0x126d4"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x126d0",
+     "span_end": "0x12818"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 40,
+      "test_off": "0x126dc"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x12704",
+     "span_end": "0x12730"
+    }
+   ]
+  },
+  {
+   "room": "408",
+   "caller_start": "0x12618",
+   "op15_off": "0x12798",
+   "starts_routine": 6,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0x1262c"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0x12654",
+     "span_end": "0x12828"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 119,
+      "test_off": "0x12660"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x12678",
+     "span_end": "0x126d4"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x126d0",
+     "span_end": "0x12818"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 40,
+      "test_off": "0x126dc"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x12704",
+     "span_end": "0x12730"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x1272c",
+     "span_end": "0x127a0"
+    }
+   ]
+  },
+  {
+   "room": "40A",
+   "caller_start": "0xcad4",
+   "op15_off": "0xccce",
+   "starts_routine": 12,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 41,
+      "test_off": "0xcc2c"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0xcc44",
+     "span_end": "0xcc56"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xcc52",
+     "span_end": "0xccda"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 132,
+      "test_off": "0xcc5e"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0xcc76",
+     "span_end": "0xcc88"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xcc84",
+     "span_end": "0xccda"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 131,
+      "test_off": "0xcc9a"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xccc2",
+     "span_end": "0xccda"
+    }
+   ]
+  },
+  {
+   "room": "603",
+   "caller_start": "0x3a70",
+   "op15_off": "0x415c",
+   "starts_routine": 5,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 140,
+      "test_off": "0x4128"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x4150",
+     "span_end": "0x4168"
+    }
+   ]
+  },
+  {
+   "room": "603",
+   "caller_start": "0x3a70",
+   "op15_off": "0x41b4",
+   "starts_routine": 8,
+   "entity": 6,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 44,
+      "test_off": "0x4180"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x41a8",
+     "span_end": "0x41c0"
+    }
+   ]
+  },
+  {
+   "room": "603",
+   "caller_start": "0x52aa",
+   "op15_off": "0x5314",
+   "starts_routine": 9,
+   "entity": 7,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x52b0",
+     "span_end": "0x5338"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 44,
+      "test_off": "0x52bc"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x52d4",
+     "span_end": "0x5328"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 16,
+      "test_off": "0x52e0"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x5308",
+     "span_end": "0x5320"
+    }
+   ]
+  },
+  {
+   "room": "607",
+   "caller_start": "0xc366",
+   "op15_off": "0xc618",
+   "starts_routine": 8,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc5e4"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc60c",
+     "span_end": "0xc624"
+    }
+   ]
+  },
+  {
+   "room": "607",
+   "caller_start": "0xc366",
+   "op15_off": "0xc67c",
+   "starts_routine": 8,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc5e4"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc60c",
+     "span_end": "0xc624"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xc620",
+     "span_end": "0xc6ac"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc628"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc650",
+     "span_end": "0xc69c"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc628"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc670",
+     "span_end": "0xc688"
+    }
+   ]
+  },
+  {
+   "room": "607",
+   "caller_start": "0xc366",
+   "op15_off": "0xc690",
+   "starts_routine": 7,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc5e4"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc60c",
+     "span_end": "0xc624"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xc620",
+     "span_end": "0xc6ac"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc628"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc650",
+     "span_end": "0xc69c"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc628"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc670",
+     "span_end": "0xc688"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xc684",
+     "span_end": "0xc698"
+    }
+   ]
+  },
+  {
+   "room": "607",
+   "caller_start": "0xc366",
+   "op15_off": "0xc6a4",
+   "starts_routine": 7,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc5e4"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc60c",
+     "span_end": "0xc624"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xc620",
+     "span_end": "0xc6ac"
+    },
+    {
+     "pred": {
+      "kind": "syscall_0x1f",
+      "test_off": "0xc628"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xc650",
+     "span_end": "0xc69c"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0xc698",
+     "span_end": "0xc6ac"
+    }
+   ]
+  },
+  {
+   "room": "607",
+   "caller_start": "0xd27e",
+   "op15_off": "0xd626",
+   "starts_routine": 6,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "vm_entry_state",
+      "test_off": "0xd5d2"
+     },
+     "polarity": "n/a",
+     "arg": 1,
+     "op07_off": "0xd5fa",
+     "span_end": "0xd632"
+    }
+   ]
+  },
+  {
+   "room": "700",
+   "caller_start": "0x44f4",
+   "op15_off": "0x48a4",
+   "starts_routine": 4,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 20,
+      "test_off": "0x4874"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x488c",
+     "span_end": "0x48e0"
+    }
+   ]
+  },
+  {
+   "room": "700",
+   "caller_start": "0x44f4",
+   "op15_off": "0x48b4",
+   "starts_routine": 5,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 20,
+      "test_off": "0x4874"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x488c",
+     "span_end": "0x48e0"
+    }
+   ]
+  },
+  {
+   "room": "700",
+   "caller_start": "0x44f4",
+   "op15_off": "0x48c4",
+   "starts_routine": 7,
+   "entity": 6,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 20,
+      "test_off": "0x4874"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x488c",
+     "span_end": "0x48e0"
+    }
+   ]
+  },
+  {
+   "room": "700",
+   "caller_start": "0x44f4",
+   "op15_off": "0x48d4",
+   "starts_routine": 6,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 20,
+      "test_off": "0x4874"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x488c",
+     "span_end": "0x48e0"
+    }
+   ]
+  },
+  {
+   "room": "700",
+   "caller_start": "0x44f4",
+   "op15_off": "0x490c",
+   "starts_routine": 1,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 20,
+      "test_off": "0x4874"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x488c",
+     "span_end": "0x48e0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x48dc",
+     "span_end": "0x4914"
+    }
+   ]
+  },
+  {
+   "room": "702",
+   "caller_start": "0x2a84",
+   "op15_off": "0x2b2a",
+   "starts_routine": 3,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2a8a",
+     "span_end": "0x2bca"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ab0",
+     "span_end": "0x2b18"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ac0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ad0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2af0",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b00",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b10",
+     "span_end": "0x2ba2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b14",
+     "span_end": "0x2bc0"
+    }
+   ]
+  },
+  {
+   "room": "702",
+   "caller_start": "0x2a84",
+   "op15_off": "0x2b3a",
+   "starts_routine": 4,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2a8a",
+     "span_end": "0x2bca"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ab0",
+     "span_end": "0x2b18"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ac0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ad0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2af0",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b00",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b10",
+     "span_end": "0x2ba2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b14",
+     "span_end": "0x2bc0"
+    }
+   ]
+  },
+  {
+   "room": "702",
+   "caller_start": "0x2a84",
+   "op15_off": "0x2b58",
+   "starts_routine": 5,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2a8a",
+     "span_end": "0x2bca"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ab0",
+     "span_end": "0x2b18"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ac0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ad0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2af0",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b00",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b10",
+     "span_end": "0x2ba2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b14",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b42",
+     "span_end": "0x2bc0"
+    }
+   ]
+  },
+  {
+   "room": "702",
+   "caller_start": "0x2a84",
+   "op15_off": "0x2b68",
+   "starts_routine": 6,
+   "entity": 6,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2a8a",
+     "span_end": "0x2bca"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ab0",
+     "span_end": "0x2b18"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ac0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ad0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2af0",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b00",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b10",
+     "span_end": "0x2ba2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b14",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b42",
+     "span_end": "0x2bc0"
+    }
+   ]
+  },
+  {
+   "room": "702",
+   "caller_start": "0x2a84",
+   "op15_off": "0x2b86",
+   "starts_routine": 7,
+   "entity": 7,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2a8a",
+     "span_end": "0x2bca"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ab0",
+     "span_end": "0x2b18"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ac0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ad0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2af0",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b00",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b10",
+     "span_end": "0x2ba2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b14",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b42",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b70",
+     "span_end": "0x2bc0"
+    }
+   ]
+  },
+  {
+   "room": "702",
+   "caller_start": "0x2a84",
+   "op15_off": "0x2b96",
+   "starts_routine": 8,
+   "entity": 8,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2a8a",
+     "span_end": "0x2bca"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ab0",
+     "span_end": "0x2b18"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ac0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ad0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2af0",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b00",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b10",
+     "span_end": "0x2ba2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b14",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b42",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b70",
+     "span_end": "0x2bc0"
+    }
+   ]
+  },
+  {
+   "room": "702",
+   "caller_start": "0x2a84",
+   "op15_off": "0x2bb4",
+   "starts_routine": 9,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2a8a",
+     "span_end": "0x2bca"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ab0",
+     "span_end": "0x2b18"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ac0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ad0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2ae0",
+     "span_end": "0x2b46"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2af0",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b00",
+     "span_end": "0x2b74"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x2b10",
+     "span_end": "0x2ba2"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b14",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b42",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b70",
+     "span_end": "0x2bc0"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x2b9e",
+     "span_end": "0x2bc0"
+    }
+   ]
+  },
+  {
+   "room": "704",
+   "caller_start": "0xad5c",
+   "op15_off": "0xb1cc",
+   "starts_routine": 5,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 114,
+      "test_off": "0xb198"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xb1c0",
+     "span_end": "0xb1d8"
+    }
+   ]
+  },
+  {
+   "room": "705",
+   "caller_start": "0x528c",
+   "op15_off": "0x5956",
+   "starts_routine": 6,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 59,
+      "test_off": "0x57ca"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x57e2",
+     "span_end": "0x5966"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 55,
+      "test_off": "0x58a2"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x58ca",
+     "span_end": "0x5962"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "caller_start": "0xd252",
+   "op15_off": "0xdcfc",
+   "starts_routine": 6,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 21,
+      "test_off": "0xdca4"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xdccc",
+     "span_end": "0xdd08"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "caller_start": "0xd252",
+   "op15_off": "0xdd74",
+   "starts_routine": 8,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 4,
+      "id": 16,
+      "test_off": "0xdd40"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xdd68",
+     "span_end": "0xdd80"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "caller_start": "0xfd2e",
+   "op15_off": "0xfdec",
+   "starts_routine": 16,
+   "entity": 9,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0xfd34",
+     "span_end": "0xfe0c"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 4,
+      "id": 16,
+      "test_off": "0xfd40"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0xfd58",
+     "span_end": "0xfdfc"
+    }
+   ]
+  },
+  {
+   "room": "706",
+   "caller_start": "0x12212",
+   "op15_off": "0x122b0",
+   "starts_routine": 9,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x12218",
+     "span_end": "0x1234c"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 21,
+      "test_off": "0x12224"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x1223c",
+     "span_end": "0x1233c"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 100,
+      "test_off": "0x1226c"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x122a4",
+     "span_end": "0x12334"
+    }
+   ]
+  },
+  {
+   "room": "800",
+   "caller_start": "0x18320",
+   "op15_off": "0x18a4c",
+   "starts_routine": 6,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 30,
+      "test_off": "0x18a18"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x18a40",
+     "span_end": "0x18a58"
+    }
+   ]
+  },
+  {
+   "room": "801",
+   "caller_start": "0x3f9a",
+   "op15_off": "0x45ea",
+   "starts_routine": 2,
+   "entity": 3,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 101,
+      "test_off": "0x419a"
+     },
+     "polarity": "iff_set",
+     "arg": 1,
+     "op07_off": "0x41b2",
+     "span_end": "0x4272"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x426e",
+     "span_end": "0x45f2"
+    }
+   ]
+  },
+  {
+   "room": "802",
+   "caller_start": "0x2dac",
+   "op15_off": "0x3020",
+   "starts_routine": 1,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 4,
+      "id": 28,
+      "test_off": "0x2fa8"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x2fd0",
+     "span_end": "0x3130"
+    },
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 60,
+      "test_off": "0x2fdc"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x3004",
+     "span_end": "0x302c"
+    }
+   ]
+  },
+  {
+   "room": "802",
+   "caller_start": "0x313e",
+   "op15_off": "0x317a",
+   "starts_routine": 2,
+   "entity": 2,
+   "guards": [
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x3144",
+     "span_end": "0x3196"
+    },
+    {
+     "pred": {
+      "kind": "unknown"
+     },
+     "polarity": "unknown",
+     "arg": 1,
+     "op07_off": "0x316a",
+     "span_end": "0x3172"
+    },
+    {
+     "pred": {
+      "kind": "else_branch"
+     },
+     "polarity": "n/a",
+     "arg": 0,
+     "op07_off": "0x316e",
+     "span_end": "0x318c"
+    }
+   ]
+  },
+  {
+   "room": "808",
+   "caller_start": "0xf26c",
+   "op15_off": "0xf5f6",
+   "starts_routine": 15,
+   "entity": 5,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 7,
+      "id": 18,
+      "test_off": "0xf5b6"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0xf5de",
+     "span_end": "0xf602"
+    }
+   ]
+  },
+  {
+   "room": "809",
+   "caller_start": "0x17980",
+   "op15_off": "0x17a42",
+   "starts_routine": 5,
+   "entity": 4,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 5,
+      "id": 56,
+      "test_off": "0x1798e"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x179b6",
+     "span_end": "0x17a4e"
+    }
+   ]
+  },
+  {
+   "room": "809",
+   "caller_start": "0x17980",
+   "op15_off": "0x17dc2",
+   "starts_routine": 4,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 147,
+      "test_off": "0x17d8e"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x17db6",
+     "span_end": "0x17dce"
+    }
+   ]
+  },
+  {
+   "room": "900",
+   "caller_start": "0x38b0",
+   "op15_off": "0x3cda",
+   "starts_routine": 3,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 6,
+      "id": 28,
+      "test_off": "0x3c70"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x3c98",
+     "span_end": "0x3ce6"
+    }
+   ]
+  },
+  {
+   "room": "905",
+   "caller_start": "0x12594",
+   "op15_off": "0x1272a",
+   "starts_routine": 1,
+   "entity": 1,
+   "guards": [
+    {
+     "pred": {
+      "kind": "flag",
+      "group": 2,
+      "id": 33,
+      "test_off": "0x125c6"
+     },
+     "polarity": "iff_clear",
+     "arg": 1,
+     "op07_off": "0x125ee",
+     "span_end": "0x12736"
+    }
+   ]
+  }
+ ],
+ "_stats": {
+  "door_guards": 27,
+  "item_guards": 64,
+  "conditional_routine_starts": 92,
+  "flag_guarded_doors": 20,
+  "unresolved_predicates": 0,
+  "routines": {
+   "UNCOND": 186,
+   "COND": 481,
+   "UNREFERENCED": 11
+  },
+  "door_provenance": {
+   "on-entry": 134,
+   "on-entry-guarded": 17,
+   "interaction-committed": 16,
+   "event-committed": 12,
+   "no-start-site-found": 2
+  }
+ },
+ "_subweapon_key_use_gates": {
+  "_mechanism": "The 14 op-0x3a SAT-10 key_use records (door-gating.json) are DC2's vine/electric subweapon doors. Consumer 0x48B790 (byte-cited disasm 2026-07-19): reads the EQUIPPED SUB-WEAPON id byte scene+0x10B5 (equip word scene+0x10B4: lo=main, hi=sub; PSX mirror +0xc50/51 K80); sub id in {2,8} -> requires record subtype==1 (cmp byte[rec+0x14],1 @0x48B7C4); sub id in {1,7} -> requires subtype==2 (cmp @0x48B824); match -> actor poke + 0x48C220 + SetFlag(8, rec+0x15, 1) + record deactivate. Equipped-sub id encoding = catalog id - 0x10, witnessed twice: Dylan bootstrap equip word 0x0101 (main 0x01 Shotgun, sub 1 = 0x11 Machete) and Regina stored word 0x0202 @0x450E96 (main 0x02 Handgun, sub 2 = 0x12 Large Stungun); congruent with the K76 improve transforms 0x11->0x17 / 0x12->0x18 (= sub 1->7 / 2->8, both accepted). Catalog owner flags (weapon-catalog.json, PSX-verified): 0x11/0x17 owner Dylan, 0x12/0x18 owner Regina \u2014 so these are equip gates that are character gates in practice.",
+  "subtype_to_subweapon": {
+   "1": {
+    "acceptedSubIds": [
+     2,
+     8
+    ],
+    "catalogIds": [
+     "0x12",
+     "0x18"
+    ],
+    "item": "Large Stungun / improved",
+    "character": "Regina",
+    "doorKind": "electrical lock"
+   },
+   "2": {
+    "acceptedSubIds": [
+     1,
+     7
+    ],
+    "catalogIds": [
+     "0x11",
+     "0x17"
+    ],
+    "item": "Machete / improved",
+    "character": "Dylan",
+    "doorKind": "vine/cut door"
+   }
+  },
+  "locked_door_requirements": [
+   {
+    "edges": [
+     "100->109",
+     "109->100"
+    ],
+    "unlock_flag8": 37,
+    "subtype": 1,
+    "requires": "Large Stungun (Regina)"
+   },
+   {
+    "edges": [
+     "100->101",
+     "101->100"
+    ],
+    "unlock_flag8": 32,
+    "subtype": 1,
+    "requires": "Large Stungun (Regina)"
+   },
+   {
+    "edges": [
+     "202->204"
+    ],
+    "unlock_flag8": 33,
+    "subtype": 1,
+    "requires": "Large Stungun (Regina)"
+   },
+   {
+    "edges": [
+     "101->102",
+     "102->101"
+    ],
+    "unlock_flag8": 48,
+    "subtype": 2,
+    "requires": "Machete (Dylan)"
+   },
+   {
+    "edges": [
+     "300->302",
+     "302->300"
+    ],
+    "unlock_flag8": 49,
+    "subtype": 2,
+    "requires": "Machete (Dylan)"
+   },
+   {
+    "edges": [
+     "303->304",
+     "304->303"
+    ],
+    "unlock_flag8": 50,
+    "subtype": 2,
+    "requires": "Machete (Dylan)"
+   },
+   {
+    "edges": [
+     "304->305",
+     "305->304"
+    ],
+    "unlock_flag8": 51,
+    "subtype": 2,
+    "requires": "Machete (Dylan)"
+   },
+   {
+    "edges": [
+     "801->803"
+    ],
+    "unlock_flag8": 53,
+    "subtype": 2,
+    "requires": "Machete (Dylan)"
+   },
+   {
+    "edges": [
+     "302->303",
+     "303->302"
+    ],
+    "unlock_flag8": 1,
+    "subtype": null,
+    "requires": "none \u2014 script_set (ST302 r5 / ST303 r6 story routines)"
+   },
+   {
+    "edges": [
+     "303->306"
+    ],
+    "unlock_flag8": 2,
+    "subtype": null,
+    "requires": "none \u2014 script_set (ST303 r7)"
+   }
+  ]
+ },
+ "_character_door_gates": {
+  "_mechanism": "Byte-proven 2026-07-19: op-0x12 binds syscall family (stack[1]) + arg selector; op-0x1f calls [0x7319D4 + family*4]. Family 5 = 0x488D30, a scene-property switch (arg-0x1e jump table 0x488F90); arg 0x22 (34) -> case 4 handler 0x488D8A returns byte[scene+0x108F] = CURRENT CHARACTER (0=Regina, 1=Dylan, 2=David... DC2-EXTRA-CRISIS-ROSTER-DECODE.md). Result compared via op-0x03 operator 17 = EQ (handler 0x48BBB8, sete) against a literal; canonical tail -> arg-1 condskip executes iff EQUAL. (ALU operator 19 = LNOT, 0x48BC01 \u2014 confirms the K119 polarity table.)",
+  "gates": [
+   {
+    "room": "408",
+    "predicate": "character == 1 (Dylan)",
+    "if_branch_doors": [
+     "0x126c8 ->409"
+    ],
+    "else_branch_doors": [
+     "0x12874 ->409"
+    ],
+    "cite": "op12 args (5,0) @~0x12618; push 34 @0x12628; op1f @0x1262c; op03 EQ rval=1 @0x1263e; condskip @0x12654"
+   },
+   {
+    "room": "409",
+    "predicate": "character == 1 (Dylan)",
+    "if_branch_doors": [
+     "0x12430 ->40A",
+     "0x12484 ->408"
+    ],
+    "else_branch_doors": [
+     "0x12600 ->40A",
+     "0x12654 ->408"
+    ],
+    "cite": "push 34 @0x12390; op1f @0x12394; op03 EQ rval=1 @0x123a6; condskip @0x123bc"
+   },
+   {
+    "room": "607",
+    "predicate": "character == 0 (Regina)",
+    "if_branch_doors": [
+     "0xe586 ->700"
+    ],
+    "else_branch_doors": [],
+    "cite": "push 34 @0xe49c; op1f @0xe4a0; op03 EQ rval=0 @0xe4b2; condskip @0xe4c8 (plus flag(6,52) and flag(5,2) guards on the same commit)"
+   }
+  ],
+  "_note": "Both 408/409 branches commit doors to the same dests \u2014 the character split selects door VARIANTS (flags/pose), not reachability. 607->700 is the one door committed for Regina only. Other syscall-guarded commits in door_guards/item_guards keep kind=syscall_0x1f unresolved unless annotated here."
+ },
+ "_scene_properties_family5": {
+  "_source": "op-0x1f family 5 = 0x488D30 (syscall table 0x7319D4[5]) \u2014 scene-property getter, arg-0x1e jump table 0x488F90, all 43 case handlers disassembled 2026-07-19. Getters only (no writes).",
+  "properties": {
+   "0x1e": "word: byte[scene+0x10A9]<<8 | byte[scene+0x10A8] (0xSRR room-id form; VERIFIED = PREVIOUS-ROOM id: transition writer 0x41EA98/0x41EABB copies old scene+0x1090/91 (current room lo/stage hi) into +0x10A8/A9 before overwriting)",
+   "0x1f": "byte scene+0x7C6",
+   "0x20": "equip word scene+0x10B4 (lo=main, hi=sub)",
+   "0x21": "dword [0x878900]",
+   "0x22": "byte scene+0x108F = CURRENT CHARACTER (0=Regina,1=Dylan,2=David; EC roster)",
+   "0x23": "byte scene+0xB4B",
+   "0x24": "byte scene+0x7C4",
+   "0x25-0x27": "bytes scene+0xB58/B59/B5A",
+   "0x28-0x33": "s16 words scene+0x798..0x7B4 (player/camera coords band)",
+   "0x34": "word [dword(scene+0x7B8)]+6",
+   "0x35": "byte scene+0xB5B",
+   "0x36-0x39": "elevator security code digits scene+0x1204..0x1207 (K108)",
+   "0x3a": "dword scene+0xB54",
+   "0x3b/0x40": "arg echo (identity)",
+   "0x3c": "s8 scene+0x108E = DIFFICULTY (0 Easy/1 Normal/2 Hard)",
+   "0x3d": "s16 scene+0x1388",
+   "0x3e/0x3f/0x41": "s8 scene+0x10AA",
+   "0x42": "byte scene+0xB5C",
+   "0x43": "s8 scene+0xB5D",
+   "0x44": "s16 [0x878C0A]",
+   "0x45": "dword scene+0x12C8",
+   "0x46": "byte scene+0x850 (EC start char code)",
+   "0x47": "byte scene+0x851",
+   "0x48": "s16 scene+0x138A"
+  }
+ },
+ "_resolved_notables": {
+  "st102_pickup_K102_predicate": "ST102 op-0x31 @0xB190 (K102's open 'predicate==difficulty?') RESOLVED: executes iff !flag(6,2) && CHARACTER==1 (Dylan). The op-0x1f K102 saw is the family-5 CHARACTER getter, NOT a difficulty query \u2014 the difficulty property (0x3c) is unused here. K102's live Hard-absent witness therefore needs reinterpretation (difficulty must act via flag(6,2)/character state, or the difficulty-capacity path only); named live witness to close: read flag(6,2) + char byte on a Hard ST102 entry.",
+  "st800_to_005_door": "800->005 (prior 'unknown polarity') RESOLVED: executes iff word(scene+0x10A8)==0x706 && flag(5,17) CLEAR; else-branch commits the @0x18516-sibling variant. 0x706 = ST706 id form. ST800 pickups @0x18748/@0x18858 are CHARACTER==0 (Regina)-gated.",
+  "vm_entry_state_doors": "All four 'vm_entry_state' door guards (605->606, 606->605, 706->800, 800->706) resolve to !(vmEntryState) \u2014 committed only on entry-state 0 (normal entry), resume/cutscene entries skip them.",
+  "st10f_pickup_committed_doors": "BOTH ST10F exit doors are interaction-committed: the Gas Mask SAT-1 pickup routines r2@0x60cc / r3@0x6156 each do SetFlag(9,0x2e,1) (the K101 grant) and then commit one exit door AOT (r2: @0x6140 ->10D with dest push 269=0x10D; r3: @0x61ca ->40B). The grant and the door creation are the same program \u2014 a door-rando or tracker must treat ST10F's exits as pickup-dependent, and the 10D->10F Gas Mask gate (K119) pairs with this on the far side."
+ },
+ "_door_commit_provenance": {
+  "_source": "K122 (2026-07-20): routine-reachability fixpoint over the complete slot-5 invocation graph \u2014 op-0x08 gosub (imm routine idx; handler 0x487730 target=[dir+idx*4]), op-0x15 start / op-0x19 restart (routine idx = stack[0]; ALL 303 sites resolve to literals once resolver 0x48BA50 is modeled correctly: modes other than 1/2/6 fall through to 0x48BA93 = literal, so the ubiquitous mode-4 pushes are literals), and AOT handler registrations (op-0x31 param / op-0x39 routine). Directory entry 0 = room-entry init. 667 routines: 186 proven start-on-entry (UNCOND), 481 conditional (guarded start, conditional caller, or player-interaction handler), 11 with NO discoverable start site at all (K123 closure below). op-0x22 REQUEST ROUTINE SWITCH (K65) is modeled as an invocation edge (vm_switch), attributing the endgame/event door chains (903->904, 904->003, 407->408, 800->005/801, 808->809, ...).",
+  "_classes": {
+   "on-entry": "committed by an unconditionally-running routine, no guards \u2014 exists on plain room entry",
+   "on-entry-guarded": "in an entry-run routine but inside op-0x07 guard(s) \u2014 see guards[]",
+   "event-committed": "in a routine only started by conditional script flow (cutscene/story) \u2014 see routine_how",
+   "interaction-committed": "in an op-0x31 pickup / op-0x39 examine HANDLER \u2014 exists only after the player interaction fires it",
+   "no-start-site-found": "containing routine has NO discoverable start site (see _invocation_model_closure); cutscene-native or dead code \u2014 availability unproven offline"
+  },
+  "counts": {
+   "on-entry": 134,
+   "on-entry-guarded": 17,
+   "interaction-committed": 16,
+   "event-committed": 12,
+   "no-start-site-found": 2
+  },
+  "doors": [
+   {
+    "room": "000",
+    "commit_off": "0x7e80",
+    "dest": "003",
+    "class": "on-entry"
+   },
+   {
+    "room": "000",
+    "commit_off": "0x7ed4",
+    "dest": "100",
+    "class": "on-entry"
+   },
+   {
+    "room": "001",
+    "commit_off": "0x130e",
+    "dest": "003",
+    "class": "on-entry"
+   },
+   {
+    "room": "002",
+    "commit_off": "0x11368",
+    "dest": "003",
+    "class": "on-entry"
+   },
+   {
+    "room": "003",
+    "commit_off": "0x200fc",
+    "dest": "002",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(6,14)"
+    ]
+   },
+   {
+    "room": "003",
+    "commit_off": "0x20c52",
+    "dest": "00F",
+    "class": "interaction-committed",
+    "routine_how": "aot_item@0x20084: player-item"
+   },
+   {
+    "room": "003",
+    "commit_off": "0x21356",
+    "dest": "002",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0x20c9a: caller-conditional"
+   },
+   {
+    "room": "003",
+    "commit_off": "0x239e2",
+    "dest": "001",
+    "class": "event-committed",
+    "routine_how": "gosub@0x20676: flag(5,10) && flag(6,117) && flag(6,18)"
+   },
+   {
+    "room": "004",
+    "commit_off": "0x14c0",
+    "dest": "003",
+    "class": "on-entry"
+   },
+   {
+    "room": "004",
+    "commit_off": "0x1514",
+    "dest": "600",
+    "class": "on-entry"
+   },
+   {
+    "room": "005",
+    "commit_off": "0x751c",
+    "dest": "003",
+    "class": "on-entry"
+   },
+   {
+    "room": "005",
+    "commit_off": "0x7570",
+    "dest": "800",
+    "class": "on-entry"
+   },
+   {
+    "room": "100",
+    "commit_off": "0x3424",
+    "dest": "110",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(6,15)"
+    ]
+   },
+   {
+    "room": "100",
+    "commit_off": "0x37e4",
+    "dest": "000",
+    "class": "on-entry"
+   },
+   {
+    "room": "100",
+    "commit_off": "0x39d8",
+    "dest": "109",
+    "class": "on-entry"
+   },
+   {
+    "room": "100",
+    "commit_off": "0x3a2c",
+    "dest": "101",
+    "class": "on-entry"
+   },
+   {
+    "room": "101",
+    "commit_off": "0xa800",
+    "dest": "102",
+    "class": "on-entry"
+   },
+   {
+    "room": "101",
+    "commit_off": "0xa8f4",
+    "dest": "100",
+    "class": "on-entry"
+   },
+   {
+    "room": "102",
+    "commit_off": "0xae5e",
+    "dest": "101",
+    "class": "on-entry"
+   },
+   {
+    "room": "102",
+    "commit_off": "0xaf3a",
+    "dest": "105",
+    "class": "on-entry"
+   },
+   {
+    "room": "102",
+    "commit_off": "0xafe6",
+    "dest": "110",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(6,15)"
+    ]
+   },
+   {
+    "room": "103",
+    "commit_off": "0x1d10",
+    "dest": "105",
+    "class": "on-entry"
+   },
+   {
+    "room": "103",
+    "commit_off": "0x1d64",
+    "dest": "104",
+    "class": "on-entry"
+   },
+   {
+    "room": "104",
+    "commit_off": "0x3358",
+    "dest": "103",
+    "class": "on-entry"
+   },
+   {
+    "room": "104",
+    "commit_off": "0x33ac",
+    "dest": "106",
+    "class": "on-entry"
+   },
+   {
+    "room": "105",
+    "commit_off": "0x8880",
+    "dest": "102",
+    "class": "on-entry"
+   },
+   {
+    "room": "105",
+    "commit_off": "0x88d4",
+    "dest": "103",
+    "class": "on-entry"
+   },
+   {
+    "room": "106",
+    "commit_off": "0x9f44",
+    "dest": "107",
+    "class": "on-entry"
+   },
+   {
+    "room": "106",
+    "commit_off": "0x9fbc",
+    "dest": "10E",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(8,3)"
+    ]
+   },
+   {
+    "room": "106",
+    "commit_off": "0xa050",
+    "dest": "104",
+    "class": "on-entry"
+   },
+   {
+    "room": "107",
+    "commit_off": "0x4dae",
+    "dest": "108",
+    "class": "on-entry"
+   },
+   {
+    "room": "107",
+    "commit_off": "0x4e02",
+    "dest": "106",
+    "class": "on-entry"
+   },
+   {
+    "room": "108",
+    "commit_off": "0x7406",
+    "dest": "107",
+    "class": "on-entry"
+   },
+   {
+    "room": "108",
+    "commit_off": "0x745a",
+    "dest": "200",
+    "class": "on-entry"
+   },
+   {
+    "room": "109",
+    "commit_off": "0x83f4",
+    "dest": "10A",
+    "class": "on-entry"
+   },
+   {
+    "room": "109",
+    "commit_off": "0x8448",
+    "dest": "100",
+    "class": "on-entry"
+   },
+   {
+    "room": "10A",
+    "commit_off": "0x26ec",
+    "dest": "10B",
+    "class": "on-entry"
+   },
+   {
+    "room": "10A",
+    "commit_off": "0x2740",
+    "dest": "109",
+    "class": "on-entry"
+   },
+   {
+    "room": "10B",
+    "commit_off": "0x3a8c",
+    "dest": "10D",
+    "class": "on-entry"
+   },
+   {
+    "room": "10B",
+    "commit_off": "0x3ae0",
+    "dest": "10A",
+    "class": "on-entry"
+   },
+   {
+    "room": "10B",
+    "commit_off": "0x3b34",
+    "dest": "10C",
+    "class": "on-entry"
+   },
+   {
+    "room": "10C",
+    "commit_off": "0x11056",
+    "dest": "10B",
+    "class": "on-entry"
+   },
+   {
+    "room": "10C",
+    "commit_off": "0x110aa",
+    "dest": "300",
+    "class": "on-entry"
+   },
+   {
+    "room": "10D",
+    "commit_off": "0xe3f4",
+    "dest": "10B",
+    "class": "on-entry"
+   },
+   {
+    "room": "10D",
+    "commit_off": "0xe448",
+    "dest": "10E",
+    "class": "on-entry"
+   },
+   {
+    "room": "10D",
+    "commit_off": "0xe4c0",
+    "dest": "10F",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(9,46)"
+    ]
+   },
+   {
+    "room": "10E",
+    "commit_off": "0xcc2c",
+    "dest": "106",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(8,3)"
+    ]
+   },
+   {
+    "room": "10E",
+    "commit_off": "0xccc0",
+    "dest": "10D",
+    "class": "on-entry"
+   },
+   {
+    "room": "10E",
+    "commit_off": "0xce6e",
+    "dest": "106",
+    "class": "interaction-committed",
+    "routine_how": "aot_item@0xcc6c: player-item; flag(8,3)"
+   },
+   {
+    "room": "10F",
+    "commit_off": "0x6140",
+    "dest": "10D",
+    "class": "interaction-committed",
+    "routine_how": "aot_item@0x5f14: player-item"
+   },
+   {
+    "room": "10F",
+    "commit_off": "0x61ca",
+    "dest": "40B",
+    "class": "interaction-committed",
+    "routine_how": "aot_item@0x5f50: player-item"
+   },
+   {
+    "room": "110",
+    "commit_off": "0x2de4",
+    "dest": "100",
+    "class": "on-entry"
+   },
+   {
+    "room": "110",
+    "commit_off": "0x2e38",
+    "dest": "102",
+    "class": "on-entry"
+   },
+   {
+    "room": "200",
+    "commit_off": "0xf24c",
+    "dest": "108",
+    "class": "on-entry"
+   },
+   {
+    "room": "200",
+    "commit_off": "0xf2a0",
+    "dest": "201",
+    "class": "on-entry"
+   },
+   {
+    "room": "200",
+    "commit_off": "0xf2f4",
+    "dest": "205",
+    "class": "on-entry"
+   },
+   {
+    "room": "201",
+    "commit_off": "0x2098",
+    "dest": "200",
+    "class": "on-entry"
+   },
+   {
+    "room": "201",
+    "commit_off": "0x20ec",
+    "dest": "202",
+    "class": "on-entry"
+   },
+   {
+    "room": "202",
+    "commit_off": "0x24c8",
+    "dest": "201",
+    "class": "on-entry"
+   },
+   {
+    "room": "202",
+    "commit_off": "0x251c",
+    "dest": "203",
+    "class": "on-entry"
+   },
+   {
+    "room": "202",
+    "commit_off": "0x25a4",
+    "dest": "204",
+    "class": "on-entry"
+   },
+   {
+    "room": "203",
+    "commit_off": "0x25e2",
+    "dest": "202",
+    "class": "on-entry"
+   },
+   {
+    "room": "204",
+    "commit_off": "0x4082",
+    "dest": "202",
+    "class": "on-entry"
+   },
+   {
+    "room": "205",
+    "commit_off": "0xd1d6",
+    "dest": "200",
+    "class": "on-entry"
+   },
+   {
+    "room": "205",
+    "commit_off": "0xedac",
+    "dest": "100",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0xdd16: caller-conditional"
+   },
+   {
+    "room": "205",
+    "commit_off": "0xf784",
+    "dest": "003",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0xf0e4: caller-conditional"
+   },
+   {
+    "room": "300",
+    "commit_off": "0x5094",
+    "dest": "10C",
+    "class": "on-entry"
+   },
+   {
+    "room": "300",
+    "commit_off": "0x50e8",
+    "dest": "301",
+    "class": "on-entry"
+   },
+   {
+    "room": "300",
+    "commit_off": "0x513c",
+    "dest": "302",
+    "class": "on-entry"
+   },
+   {
+    "room": "301",
+    "commit_off": "0x904e",
+    "dest": "300",
+    "class": "on-entry"
+   },
+   {
+    "room": "302",
+    "commit_off": "0x61c8",
+    "dest": "300",
+    "class": "on-entry"
+   },
+   {
+    "room": "302",
+    "commit_off": "0x6324",
+    "dest": "303",
+    "class": "on-entry"
+   },
+   {
+    "room": "303",
+    "commit_off": "0x4eba",
+    "dest": "304",
+    "class": "on-entry"
+   },
+   {
+    "room": "303",
+    "commit_off": "0x4f86",
+    "dest": "305",
+    "class": "on-entry"
+   },
+   {
+    "room": "303",
+    "commit_off": "0x4fda",
+    "dest": "302",
+    "class": "on-entry"
+   },
+   {
+    "room": "303",
+    "commit_off": "0x50aa",
+    "dest": "306",
+    "class": "on-entry"
+   },
+   {
+    "room": "304",
+    "commit_off": "0x73f0",
+    "dest": "303",
+    "class": "on-entry"
+   },
+   {
+    "room": "304",
+    "commit_off": "0x74bc",
+    "dest": "305",
+    "class": "on-entry"
+   },
+   {
+    "room": "305",
+    "commit_off": "0x3f82",
+    "dest": "303",
+    "class": "on-entry"
+   },
+   {
+    "room": "305",
+    "commit_off": "0x3fd6",
+    "dest": "304",
+    "class": "on-entry"
+   },
+   {
+    "room": "306",
+    "commit_off": "0x2b94",
+    "dest": "303",
+    "class": "on-entry"
+   },
+   {
+    "room": "400",
+    "commit_off": "0xc5f0",
+    "dest": "401",
+    "class": "on-entry"
+   },
+   {
+    "room": "400",
+    "commit_off": "0xc644",
+    "dest": "40B",
+    "class": "on-entry"
+   },
+   {
+    "room": "401",
+    "commit_off": "0x7b0e",
+    "dest": "402",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0x65f0: caller-conditional"
+   },
+   {
+    "room": "401",
+    "commit_off": "0x7f2e",
+    "dest": "400",
+    "class": "interaction-committed",
+    "routine_how": "aot_item@0x5936: player-item"
+   },
+   {
+    "room": "402",
+    "commit_off": "0x1a8c2",
+    "dest": "403",
+    "class": "interaction-committed",
+    "routine_how": "aot_item@0x1dbde: player-item; !(vmEntryState); caller-conditional"
+   },
+   {
+    "room": "403",
+    "commit_off": "0x12eaa",
+    "dest": "404",
+    "class": "on-entry"
+   },
+   {
+    "room": "404",
+    "commit_off": "0x3028",
+    "dest": "403",
+    "class": "on-entry"
+   },
+   {
+    "room": "404",
+    "commit_off": "0x307c",
+    "dest": "405",
+    "class": "on-entry"
+   },
+   {
+    "room": "405",
+    "commit_off": "0x2c68",
+    "dest": "404",
+    "class": "on-entry"
+   },
+   {
+    "room": "405",
+    "commit_off": "0x2cbc",
+    "dest": "406",
+    "class": "on-entry"
+   },
+   {
+    "room": "406",
+    "commit_off": "0xa59c",
+    "dest": "407",
+    "class": "on-entry"
+   },
+   {
+    "room": "407",
+    "commit_off": "0x18f8c",
+    "dest": "408",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0x180b6: caller-conditional"
+   },
+   {
+    "room": "408",
+    "commit_off": "0x126c8",
+    "dest": "409",
+    "class": "on-entry-guarded",
+    "guards": [
+     "(CHARACTER(+0x108F) == 1)",
+     "flag(6,119)"
+    ]
+   },
+   {
+    "room": "408",
+    "commit_off": "0x12874",
+    "dest": "409",
+    "class": "on-entry-guarded",
+    "guards": [
+     "(CHARACTER(+0x108F) == 1)"
+    ]
+   },
+   {
+    "room": "408",
+    "commit_off": "0x13a4c",
+    "dest": "409",
+    "class": "interaction-committed",
+    "guards": [
+     "!(flag(7,29))",
+     "1",
+     "syscall(fam=0,arg=30)"
+    ],
+    "routine_how": "aot_item@0x127d4: player-item; (CHARACTER(+0x108F) == 1) && flag(6,119)"
+   },
+   {
+    "room": "408",
+    "commit_off": "0x13b0e",
+    "dest": "409",
+    "class": "no-start-site-found",
+    "guards": [
+     "flag(7,29)"
+    ]
+   },
+   {
+    "room": "409",
+    "commit_off": "0x12430",
+    "dest": "40A",
+    "class": "on-entry-guarded",
+    "guards": [
+     "(CHARACTER(+0x108F) == 1)",
+     "flag(6,119)"
+    ]
+   },
+   {
+    "room": "409",
+    "commit_off": "0x12484",
+    "dest": "408",
+    "class": "on-entry-guarded",
+    "guards": [
+     "(CHARACTER(+0x108F) == 1)",
+     "flag(6,119)"
+    ]
+   },
+   {
+    "room": "409",
+    "commit_off": "0x12600",
+    "dest": "40A",
+    "class": "on-entry-guarded",
+    "guards": [
+     "(CHARACTER(+0x108F) == 1)"
+    ]
+   },
+   {
+    "room": "409",
+    "commit_off": "0x12654",
+    "dest": "408",
+    "class": "on-entry-guarded",
+    "guards": [
+     "(CHARACTER(+0x108F) == 1)"
+    ]
+   },
+   {
+    "room": "409",
+    "commit_off": "0x12ac4",
+    "dest": "40A",
+    "class": "interaction-committed",
+    "guards": [
+     "!(flag(7,29))",
+     "1",
+     "syscall(fam=0,arg=30)"
+    ],
+    "routine_how": "aot_item@0x124c4: player-item; (CHARACTER(+0x108F) == 1) && flag(6,119)"
+   },
+   {
+    "room": "409",
+    "commit_off": "0x12b9a",
+    "dest": "40A",
+    "class": "no-start-site-found",
+    "guards": [
+     "flag(7,29)"
+    ]
+   },
+   {
+    "room": "40A",
+    "commit_off": "0xcb6c",
+    "dest": "409",
+    "class": "on-entry"
+   },
+   {
+    "room": "40A",
+    "commit_off": "0xcbc0",
+    "dest": "500",
+    "class": "on-entry"
+   },
+   {
+    "room": "40B",
+    "commit_off": "0x1168",
+    "dest": "10F",
+    "class": "on-entry"
+   },
+   {
+    "room": "40B",
+    "commit_off": "0x11bc",
+    "dest": "400",
+    "class": "on-entry"
+   },
+   {
+    "room": "500",
+    "commit_off": "0x2190",
+    "dest": "40A",
+    "class": "on-entry"
+   },
+   {
+    "room": "500",
+    "commit_off": "0x21e4",
+    "dest": "501",
+    "class": "on-entry"
+   },
+   {
+    "room": "501",
+    "commit_off": "0x2a70",
+    "dest": "500",
+    "class": "on-entry"
+   },
+   {
+    "room": "501",
+    "commit_off": "0x2ac4",
+    "dest": "502",
+    "class": "on-entry"
+   },
+   {
+    "room": "502",
+    "commit_off": "0x267f4",
+    "dest": "503",
+    "class": "on-entry"
+   },
+   {
+    "room": "502",
+    "commit_off": "0x26848",
+    "dest": "501",
+    "class": "on-entry"
+   },
+   {
+    "room": "503",
+    "commit_off": "0x15f56",
+    "dest": "504",
+    "class": "interaction-committed",
+    "guards": [
+     "!(flag(6,44))"
+    ],
+    "routine_how": "aot_item@0x15890: player-item"
+   },
+   {
+    "room": "600",
+    "commit_off": "0x2120",
+    "dest": "601",
+    "class": "on-entry"
+   },
+   {
+    "room": "600",
+    "commit_off": "0x2174",
+    "dest": "004",
+    "class": "on-entry"
+   },
+   {
+    "room": "601",
+    "commit_off": "0x20f8",
+    "dest": "600",
+    "class": "on-entry"
+   },
+   {
+    "room": "601",
+    "commit_off": "0x214c",
+    "dest": "602",
+    "class": "on-entry"
+   },
+   {
+    "room": "602",
+    "commit_off": "0x1d6c",
+    "dest": "601",
+    "class": "on-entry"
+   },
+   {
+    "room": "602",
+    "commit_off": "0x1dc0",
+    "dest": "603",
+    "class": "on-entry"
+   },
+   {
+    "room": "603",
+    "commit_off": "0x3c24",
+    "dest": "602",
+    "class": "on-entry"
+   },
+   {
+    "room": "603",
+    "commit_off": "0x3c78",
+    "dest": "605",
+    "class": "on-entry"
+   },
+   {
+    "room": "603",
+    "commit_off": "0x3cf0",
+    "dest": "604",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(8,9)"
+    ]
+   },
+   {
+    "room": "603",
+    "commit_off": "0x4aaa",
+    "dest": "604",
+    "class": "interaction-committed",
+    "routine_how": "aot_examine@0x3d70: player-examine; flag(8,9)"
+   },
+   {
+    "room": "604",
+    "commit_off": "0x2ea4",
+    "dest": "603",
+    "class": "on-entry"
+   },
+   {
+    "room": "604",
+    "commit_off": "0x2ef8",
+    "dest": "605",
+    "class": "on-entry"
+   },
+   {
+    "room": "605",
+    "commit_off": "0x11262",
+    "dest": "603",
+    "class": "on-entry"
+   },
+   {
+    "room": "605",
+    "commit_off": "0x112b6",
+    "dest": "604",
+    "class": "on-entry"
+   },
+   {
+    "room": "605",
+    "commit_off": "0x14362",
+    "dest": "606",
+    "class": "interaction-committed",
+    "guards": [
+     "!(vmEntryState)"
+    ],
+    "routine_how": "aot_item@0x11864: player-item; flag(6,20) && !(flag(6,113))"
+   },
+   {
+    "room": "606",
+    "commit_off": "0xe400",
+    "dest": "607",
+    "class": "on-entry-guarded",
+    "guards": [
+     "!(flag(6,20))"
+    ]
+   },
+   {
+    "room": "606",
+    "commit_off": "0xf126",
+    "dest": "605",
+    "class": "interaction-committed",
+    "guards": [
+     "!(vmEntryState)"
+    ],
+    "routine_how": "aot_item@0xe378: player-item"
+   },
+   {
+    "room": "607",
+    "commit_off": "0xb1f8",
+    "dest": "606",
+    "class": "on-entry"
+   },
+   {
+    "room": "607",
+    "commit_off": "0xe586",
+    "dest": "700",
+    "class": "interaction-committed",
+    "guards": [
+     "flag(6,52)",
+     "(CHARACTER(+0x108F) == 0)",
+     "flag(5,2)"
+    ],
+    "routine_how": "aot_item@0xb270: player-item"
+   },
+   {
+    "room": "700",
+    "commit_off": "0x4670",
+    "dest": "701",
+    "class": "on-entry"
+   },
+   {
+    "room": "701",
+    "commit_off": "0x38f8",
+    "dest": "700",
+    "class": "on-entry"
+   },
+   {
+    "room": "701",
+    "commit_off": "0x394c",
+    "dest": "702",
+    "class": "on-entry"
+   },
+   {
+    "room": "702",
+    "commit_off": "0x262c",
+    "dest": "701",
+    "class": "on-entry"
+   },
+   {
+    "room": "702",
+    "commit_off": "0x2680",
+    "dest": "703",
+    "class": "on-entry"
+   },
+   {
+    "room": "703",
+    "commit_off": "0x6a6c",
+    "dest": "702",
+    "class": "on-entry"
+   },
+   {
+    "room": "703",
+    "commit_off": "0x6ac0",
+    "dest": "704",
+    "class": "on-entry"
+   },
+   {
+    "room": "703",
+    "commit_off": "0x6b14",
+    "dest": "704",
+    "class": "on-entry"
+   },
+   {
+    "room": "704",
+    "commit_off": "0xae60",
+    "dest": "703",
+    "class": "on-entry"
+   },
+   {
+    "room": "704",
+    "commit_off": "0xaeb4",
+    "dest": "705",
+    "class": "on-entry"
+   },
+   {
+    "room": "704",
+    "commit_off": "0xaf08",
+    "dest": "703",
+    "class": "on-entry"
+   },
+   {
+    "room": "705",
+    "commit_off": "0x53f6",
+    "dest": "704",
+    "class": "on-entry"
+   },
+   {
+    "room": "705",
+    "commit_off": "0x544a",
+    "dest": "706",
+    "class": "on-entry"
+   },
+   {
+    "room": "706",
+    "commit_off": "0xd3b4",
+    "dest": "705",
+    "class": "on-entry"
+   },
+   {
+    "room": "706",
+    "commit_off": "0x10894",
+    "dest": "800",
+    "class": "interaction-committed",
+    "guards": [
+     "!(vmEntryState)"
+    ],
+    "routine_how": "aot_item@0xd4a0: player-item; !(flag(6,144))"
+   },
+   {
+    "room": "800",
+    "commit_off": "0x18516",
+    "dest": "005",
+    "class": "on-entry-guarded",
+    "guards": [
+     "((word(scene+0x10A8) == 1798) && !(flag(5,17)))"
+    ]
+   },
+   {
+    "room": "800",
+    "commit_off": "0x18610",
+    "dest": "801",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(6,22)"
+    ]
+   },
+   {
+    "room": "800",
+    "commit_off": "0x1a0b0",
+    "dest": "005",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0x19438: caller-conditional"
+   },
+   {
+    "room": "800",
+    "commit_off": "0x1a138",
+    "dest": "801",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0x19438: caller-conditional"
+   },
+   {
+    "room": "800",
+    "commit_off": "0x1a952",
+    "dest": "706",
+    "class": "interaction-committed",
+    "guards": [
+     "!(vmEntryState)"
+    ],
+    "routine_how": "aot_item@0x18748: player-item; (CHARACTER(+0x108F) == 0) && flag(6,144)"
+   },
+   {
+    "room": "801",
+    "commit_off": "0x463e",
+    "dest": "803",
+    "class": "on-entry"
+   },
+   {
+    "room": "801",
+    "commit_off": "0x470a",
+    "dest": "802",
+    "class": "on-entry"
+   },
+   {
+    "room": "801",
+    "commit_off": "0x475e",
+    "dest": "800",
+    "class": "on-entry"
+   },
+   {
+    "room": "802",
+    "commit_off": "0x2df8",
+    "dest": "801",
+    "class": "on-entry"
+   },
+   {
+    "room": "803",
+    "commit_off": "0x89e0",
+    "dest": "804",
+    "class": "on-entry"
+   },
+   {
+    "room": "803",
+    "commit_off": "0x8a34",
+    "dest": "801",
+    "class": "on-entry"
+   },
+   {
+    "room": "804",
+    "commit_off": "0x1c98",
+    "dest": "805",
+    "class": "on-entry"
+   },
+   {
+    "room": "804",
+    "commit_off": "0x1cec",
+    "dest": "803",
+    "class": "on-entry"
+   },
+   {
+    "room": "805",
+    "commit_off": "0x784a",
+    "dest": "804",
+    "class": "on-entry"
+   },
+   {
+    "room": "805",
+    "commit_off": "0x789e",
+    "dest": "80B",
+    "class": "on-entry"
+   },
+   {
+    "room": "806",
+    "commit_off": "0xb874",
+    "dest": "80B",
+    "class": "on-entry"
+   },
+   {
+    "room": "806",
+    "commit_off": "0xb8c8",
+    "dest": "807",
+    "class": "on-entry"
+   },
+   {
+    "room": "807",
+    "commit_off": "0x581a",
+    "dest": "806",
+    "class": "on-entry"
+   },
+   {
+    "room": "807",
+    "commit_off": "0x586e",
+    "dest": "808",
+    "class": "on-entry"
+   },
+   {
+    "room": "808",
+    "commit_off": "0xc342",
+    "dest": "807",
+    "class": "on-entry"
+   },
+   {
+    "room": "808",
+    "commit_off": "0xfca6",
+    "dest": "809",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0xf774: caller-conditional"
+   },
+   {
+    "room": "809",
+    "commit_off": "0x19aae",
+    "dest": "80A",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0x17ef0: caller-conditional"
+   },
+   {
+    "room": "80A",
+    "commit_off": "0x4df60",
+    "dest": "900",
+    "class": "on-entry"
+   },
+   {
+    "room": "80B",
+    "commit_off": "0x319e",
+    "dest": "805",
+    "class": "on-entry"
+   },
+   {
+    "room": "80B",
+    "commit_off": "0x31f2",
+    "dest": "806",
+    "class": "on-entry"
+   },
+   {
+    "room": "900",
+    "commit_off": "0x38fc",
+    "dest": "901",
+    "class": "on-entry"
+   },
+   {
+    "room": "900",
+    "commit_off": "0x3950",
+    "dest": "902",
+    "class": "on-entry"
+   },
+   {
+    "room": "901",
+    "commit_off": "0x1d7c",
+    "dest": "900",
+    "class": "on-entry"
+   },
+   {
+    "room": "902",
+    "commit_off": "0x19d8",
+    "dest": "900",
+    "class": "on-entry"
+   },
+   {
+    "room": "902",
+    "commit_off": "0x1b40",
+    "dest": "903",
+    "class": "on-entry-guarded",
+    "guards": [
+     "flag(8,27)"
+    ]
+   },
+   {
+    "room": "902",
+    "commit_off": "0x1d80",
+    "dest": "903",
+    "class": "interaction-committed",
+    "routine_how": "aot_examine@0x1b84: player-examine; flag(8,27)"
+   },
+   {
+    "room": "903",
+    "commit_off": "0xc91e",
+    "dest": "904",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0xc176: caller-conditional"
+   },
+   {
+    "room": "904",
+    "commit_off": "0x90c8",
+    "dest": "003",
+    "class": "event-committed",
+    "routine_how": "vm_switch@0x6e2c: caller-conditional"
+   }
+  ]
+ },
+ "_invocation_model_closure": {
+  "_k": "K123 (2026-07-20)",
+  "native_start_surface": "COMPLETE .text xref census: exactly 5 callers of the routine starter 0x48BF20 \u2014 (1) 0x487A33 in the op-0x15 handler; (2) 0x48B5DD in the SAT-1 pickup handler (entity=byte[rec+0x14], routine=word[rec+0x18]); (3) 0x48B765 in the SAT-9 examine/use handler (routine=word[rec+0x14], entity=byte[rec+0x18], K118); (4) 0x48BD4E room-load bootstrap: zeroes the 10-entity VM array then 0x48BF20(0,0) = starts directory routine 0 (proves dir-0 = init); (5) 0x48BF06: 0x48BF20(0, byte[0x878C07]) \u2014 one-shot consumer of the op-0x22 REQUEST ROUTINE SWITCH byte (only writers: op-0x22 handler 0x48917C, the VM-reset 0xFF clears 0x48BD13/0x48BF0E) \u2014 SAME-room switch, not cross-room.",
+  "tail_audit": "The 85,000 'unwalked' span bytes (12.3% of the corpus, first-RETURN walker limit) were recursively descended via every op-0x07 skip target: only 1,764 bytes are reachable code, containing ZERO door/item/examine/key_use/start ops \u2014 the tails are data (op-0x11 glyph text etc.). AUDIT PASSED: door-graph.json / item-placements.json miss nothing; the first-RETURN caveat is immaterial for records.",
+  "fallthrough": "All 11 no-start-site routines' predecessors end in a clean RETURN exactly at the routine boundary \u2014 fallthrough execution refuted for every one.",
+  "unstarted_routines": [
+   "ST106 r7@0xb094",
+   "ST305 r1@0x466a",
+   "ST400 r7@0xee02",
+   "ST408 r5@0x13a8a (flag(7,29) alt door ->409)",
+   "ST409 r2@0x12b16 (flag(7,29) alt door ->40A)",
+   "ST607 r9@0xce60",
+   "ST607 r10@0xd27e",
+   "ST801 r3@0x4cae",
+   "ST805 r5@0x877a",
+   "ST80A r4@0x4fa4e",
+   "ST904 r3@0x7fbc"
+  ],
+  "ce_witness": "One exec-BP on 0x48BF20 logging (entity, routine) while traversing these rooms (esp. 408<->409 as both characters) decides cutscene-native vs dead for each."
+ }
+}

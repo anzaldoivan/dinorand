@@ -17,7 +17,8 @@ namespace DinoRand.Randomizer.Spoiler;
 /// colour-mode bit5 (0=RoomTier, 1=MixedTiers) + (blue-combo-threshold−1) bits 0–4;
 /// bytes 18–21 = variant-weight nibbles V0..V7, low first;
 /// byte 16 bits 0-1 = the Regina character skin, bit 2 = DC2 shop shuffle, bit 3 = DC2 elevator
-/// puzzle-code scramble, bit 4 = DC2 stungun-circuit shuffle; present only when non-default):
+/// puzzle-code scramble, bit 4 = DC2 stungun-circuit shuffle, bit 5 = DC2 Key-Plate terminal re-key;
+/// present only when non-default):
 ///   bytes 0–3  Seed.Value (int, little-endian)
 ///   byte 4     config flags — bit0=Items, bit1=Enemies, bit2=Doors, bit3=StartingInventory,
 ///              bit4=ShuffleKeyItems, bit5=ReplaceItemPool, bit6=EnemyHp (DC1),
@@ -69,7 +70,10 @@ public static class SeedString
         bool reginaByte = config.Dc2ReginaSkin != Dc2.Passes.Dc2CharacterSkin.Stock
                           || config.Dc2ShuffleShop          // byte 16: Regina skin bits 0-1, shop bit 2,
                           || config.Dc2ScramblePuzzleCodes  // puzzle codes bit 3,
-                          || config.Dc2ShuffleCircuits;     // circuits bit 4
+                          || config.Dc2ShuffleCircuits      // circuits bit 4,
+                          || config.Dc2RekeyPlateDoor      // plate-door re-key bit 5,
+                          || config.Dc2CrossCharWeapons    // cross-character weapons bit 6,
+                          || config.Dc2RandomizeWeapons;   // randomized weapon ownership bit 7
         if (reginaByte) dc2Block = true; // byte 16 needs the block's fixed positions
 
         // Raptor tier block (bytes 17–21, RAPTOR-TIER-RE.md §4): byte 17 = enable bit7 +
@@ -131,7 +135,10 @@ public static class SeedString
                 bytes[16] = (byte)(((int)config.Dc2ReginaSkin & 0x03)             // Regina skin, bits 0-1
                                    | (config.Dc2ShuffleShop ? 0x04 : 0)           // shop shuffle, bit 2
                                    | (config.Dc2ScramblePuzzleCodes ? 0x08 : 0)   // puzzle codes, bit 3
-                                   | (config.Dc2ShuffleCircuits ? 0x10 : 0));     // circuits, bit 4
+                                   | (config.Dc2ShuffleCircuits ? 0x10 : 0)       // circuits, bit 4
+                                   | (config.Dc2RekeyPlateDoor ? 0x20 : 0)        // plate-door re-key, bit 5
+                                   | (config.Dc2CrossCharWeapons ? 0x40 : 0)      // cross-char weapons, bit 6
+                                   | (config.Dc2RandomizeWeapons ? 0x80 : 0));    // randomized weapons, bit 7
             if (raptorBlock)
             {
                 bytes[17] = (byte)((config.Dc2RandomizeRaptorTiers ? 0x80 : 0)
@@ -198,7 +205,8 @@ public static class SeedString
             bool dc2Setpiece = false, dc2Boss = false;
             var dc2Skin = Dc2.Passes.Dc2CharacterSkin.Stock;
             var dc2ReginaSkin = Dc2.Passes.Dc2CharacterSkin.Stock;
-            bool dc2ShuffleShop = false, dc2PuzzleCodes = false, dc2Circuits = false;
+            bool dc2ShuffleShop = false, dc2PuzzleCodes = false, dc2Circuits = false, dc2RekeyPlate = false;
+            bool dc2CrossCharWeapons = false, dc2RandomizeWeapons = false;
             IReadOnlyDictionary<int, byte>? dc2Weights = null;
             if (bytes.Length >= 16)
             {
@@ -221,6 +229,9 @@ public static class SeedString
                     dc2ShuffleShop = (bytes[16] & 0x04) != 0;
                     dc2PuzzleCodes = (bytes[16] & 0x08) != 0;
                     dc2Circuits = (bytes[16] & 0x10) != 0;
+                    dc2RekeyPlate = (bytes[16] & 0x20) != 0;
+                    dc2CrossCharWeapons = (bytes[16] & 0x40) != 0;
+                    dc2RandomizeWeapons = (bytes[16] & 0x80) != 0;
                 }
 
                 var weights = new Dictionary<int, byte>(Dc2CanonicalSpecies.Count);
@@ -302,6 +313,9 @@ public static class SeedString
                 Dc2ShuffleShop             = dc2ShuffleShop,
                 Dc2ScramblePuzzleCodes     = dc2PuzzleCodes,
                 Dc2ShuffleCircuits         = dc2Circuits,
+                Dc2RekeyPlateDoor          = dc2RekeyPlate,
+                Dc2CrossCharWeapons        = dc2CrossCharWeapons,
+                Dc2RandomizeWeapons        = dc2RandomizeWeapons,
                 Dc2RandomizeRaptorTiers    = raptorTiers,
                 Dc2RaptorColourMode        = raptorColourMode,
                 Dc2RaptorTierWeights       = tierWeights,

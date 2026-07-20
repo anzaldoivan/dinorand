@@ -1,0 +1,3545 @@
+{
+ "_generated_by": "scripts/gen_ap_client_checks.py",
+ "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + data/dc1/room-data.json + the english/Data room corpus",
+ "version": 1,
+ "game": "dc1",
+ "flagGroup": 7,
+ "locations": [
+  {
+   "name": "Backup Generator Room 1F (010f) - Startup Battery. R \" Charged \" @-5120,3584",
+   "apId": 230817792,
+   "key": "010f:40:-5120,3584",
+   "room": "010f",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     32
+    ]
+   },
+   "records": [
+    {
+     "room": "010f",
+     "rec": "0x16710",
+     "vanillaTake": 32,
+     "take": 32
+    }
+   ],
+   "class": "poisoned",
+   "excluded": true,
+   "sharedWith": [
+    "Backup Generator Room B1 (030b) - Startup Battery. R \" Charged \" @-5120,3584"
+   ]
+  },
+  {
+   "name": "Backup Generator Room B1 (030b) - Plug @-4272,-1296",
+   "apId": 230817793,
+   "key": "030b:2b:-4272,-1296",
+   "room": "030b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     125
+    ]
+   },
+   "records": [
+    {
+     "room": "030b",
+     "rec": "0x19514",
+     "vanillaTake": 125,
+     "take": 125
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Backup Generator Room B1 (030b) - Startup Battery. R \" Charged \" @-5120,3584",
+   "apId": 230817794,
+   "key": "030b:40:-5120,3584",
+   "room": "030b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     32
+    ]
+   },
+   "records": [
+    {
+     "room": "030b",
+     "rec": "0x1a0fc",
+     "vanillaTake": 32,
+     "take": 32
+    }
+   ],
+   "class": "poisoned",
+   "excluded": true,
+   "sharedWith": [
+    "Backup Generator Room 1F (010f) - Startup Battery. R \" Charged \" @-5120,3584"
+   ]
+  },
+  {
+   "name": "Backup Generator Room B3 (0601) - Startup Battery. W \" Large \" @-5120,3584",
+   "apId": 230817795,
+   "key": "0601:5a:-5120,3584",
+   "room": "0601",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     4
+    ]
+   },
+   "records": [
+    {
+     "room": "0601",
+     "rec": "0x10f74",
+     "vanillaTake": 0,
+     "take": 4
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Backyard of the Facility (010d) - An. Aid @-6144,768",
+   "apId": 230817796,
+   "key": "010d:20:-6144,768",
+   "room": "010d",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     130
+    ]
+   },
+   "records": [
+    {
+     "room": "010d",
+     "rec": "0x3e910",
+     "vanillaTake": 130,
+     "take": 130
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Carrying Out Room B1 (030c) - An. Darts M @-7700,6900",
+   "apId": 230817797,
+   "key": "030c:13:-7700,6900",
+   "room": "030c",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     136
+    ]
+   },
+   "records": [
+    {
+     "room": "030c",
+     "rec": "0x49ba0",
+     "vanillaTake": 136,
+     "take": 136
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Carrying Out Room B1 (030c) - ID Card Type \" Communicator \" @-7700,6900",
+   "apId": 230817798,
+   "key": "030c:35:-7700,6900",
+   "room": "030c",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     7
+    ]
+   },
+   "records": [
+    {
+     "room": "030c",
+     "rec": "0x4c044",
+     "vanillaTake": 0,
+     "take": 7
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Carrying Out Room B3 (0600) - Grenade Bullets @-1616,4480",
+   "apId": 230817799,
+   "key": "0600:18:-1616,4480",
+   "room": "0600",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     199
+    ]
+   },
+   "records": [
+    {
+     "room": "0600",
+     "rec": "0x542b8",
+     "vanillaTake": 199,
+     "take": 199
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Carrying Out Room B3 (0600) - Startup Battery. W \" Large \" @-5120,3584",
+   "apId": 230817800,
+   "key": "0600:5a:-5120,3584",
+   "room": "0600",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     8
+    ]
+   },
+   "records": [
+    {
+     "room": "0600",
+     "rec": "0x55598",
+     "vanillaTake": 0,
+     "take": 8
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Central Stairway (0608) - Plug @-7936,6400",
+   "apId": 230817801,
+   "key": "0608:2b:-7936,6400",
+   "room": "0608",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     193
+    ]
+   },
+   "records": [
+    {
+     "room": "0608",
+     "rec": "0x3fbf8",
+     "vanillaTake": 193,
+     "take": 193
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Chief's Room (0202) - DDK Input Disc N @-3568,720",
+   "apId": 230817802,
+   "key": "0202:63:-3568,720",
+   "room": "0202",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     85
+    ]
+   },
+   "records": [
+    {
+     "room": "0202",
+     "rec": "0x4ff0c",
+     "vanillaTake": 85,
+     "take": 85
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Chief's Room (0202) - Key Card L @-3468,2768",
+   "apId": 230817803,
+   "key": "0202:47:-3468,2768",
+   "room": "0202",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     9
+    ]
+   },
+   "records": [
+    {
+     "room": "0202",
+     "rec": "0x51a74",
+     "vanillaTake": 0,
+     "take": 9
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Chief's Room (0202) - Panel Key 1 @-1792,1792",
+   "apId": 230817804,
+   "key": "0202:3d:-1792,1792",
+   "room": "0202",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     10
+    ]
+   },
+   "records": [
+    {
+     "room": "0202",
+     "rec": "0x5042c",
+     "vanillaTake": 0,
+     "take": 10
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Chief's Room (0202) - SG Bullets @2020,-1392",
+   "apId": 230817805,
+   "key": "0202:10:2020,-1392",
+   "room": "0202",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     131
+    ]
+   },
+   "records": [
+    {
+     "room": "0202",
+     "rec": "0x5001c",
+     "vanillaTake": 131,
+     "take": 131
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Communication Room (0205) - Antenna Key @-2032,1632",
+   "apId": 230817806,
+   "key": "0205:45:-2032,1632",
+   "room": "0205",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     38
+    ]
+   },
+   "records": [
+    {
+     "room": "0205",
+     "rec": "0xc4e0",
+     "vanillaTake": 38,
+     "take": 38
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Communication Room (0205) - Slag Bullets @-208,-1248",
+   "apId": 230817807,
+   "key": "0205:11:-208,-1248",
+   "room": "0205",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     132
+    ]
+   },
+   "records": [
+    {
+     "room": "0205",
+     "rec": "0xc2cc",
+     "vanillaTake": 132,
+     "take": 132
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Computer Room (0304) - Plug @-4700,6100",
+   "apId": 230817808,
+   "key": "0304:2b:-4700,6100",
+   "room": "0304",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     108
+    ]
+   },
+   "records": [
+    {
+     "room": "0304",
+     "rec": "0x25698",
+     "vanillaTake": 108,
+     "take": 108
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Computer Room (0304) - Screwdriver @-1500,0",
+   "apId": 230817809,
+   "key": "0304:44:-1500,0",
+   "room": "0304",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     37
+    ]
+   },
+   "records": [
+    {
+     "room": "0304",
+     "rec": "0x25eac",
+     "vanillaTake": 37,
+     "take": 37
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Control Room B3 (0602) - B3 Crane Card 1 @-3072,4096",
+   "apId": 230817810,
+   "key": "0602:49:-3072,4096",
+   "room": "0602",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     42
+    ]
+   },
+   "records": [
+    {
+     "room": "0602",
+     "rec": "0x16a2c",
+     "vanillaTake": 42,
+     "take": 42
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Control Room B3 (0602) - B3 Crane Card 2 @2608,-32",
+   "apId": 230817811,
+   "key": "0602:4a:2608,-32",
+   "room": "0602",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     153
+    ]
+   },
+   "records": [
+    {
+     "room": "0602",
+     "rec": "0x16a90",
+     "vanillaTake": 153,
+     "take": 153
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Control Room B3 (0602) - Plug @1856,4224",
+   "apId": 230817812,
+   "key": "0602:2b:1856,4224",
+   "room": "0602",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     189
+    ]
+   },
+   "records": [
+    {
+     "room": "0602",
+     "rec": "0x169c0",
+     "vanillaTake": 189,
+     "take": 189
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Control Room Hall (0105) - 9mm Parabellum @-4096,3072",
+   "apId": 230817813,
+   "key": "0105:16:-4096,3072",
+   "room": "0105",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     213
+    ]
+   },
+   "records": [
+    {
+     "room": "0105",
+     "rec": "0x42990",
+     "vanillaTake": 213,
+     "take": 213
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Disembarkation Immigration Office (0609) - B2 Key Chip 2 @-1360,1152",
+   "apId": 230817814,
+   "key": "0609:57:-1360,1152",
+   "room": "0609",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     54
+    ]
+   },
+   "records": [
+    {
+     "room": "0609",
+     "rec": "0x4a9b4",
+     "vanillaTake": 54,
+     "take": 54
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Disembarkation Immigration Office (0609) - Plug @5760,512",
+   "apId": 230817815,
+   "key": "0609:2b:5760,512",
+   "room": "0609",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     115
+    ]
+   },
+   "records": [
+    {
+     "room": "0609",
+     "rec": "0x4a9ec",
+     "vanillaTake": 115,
+     "take": 115
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Dr. Kirk's Library Room (050f) - Med. Pak M @-1100,-2100",
+   "apId": 230817816,
+   "key": "050f:1d:-1100,-2100",
+   "room": "050f",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     183
+    ]
+   },
+   "records": [
+    {
+     "room": "050f",
+     "rec": "0x2c558",
+     "vanillaTake": 183,
+     "take": 183
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Dr. Kirk's Library Room (050f) - Pulse Receiver @-7700,6900",
+   "apId": 230817817,
+   "key": "050f:58:-7700,6900",
+   "room": "050f",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     11
+    ]
+   },
+   "records": [
+    {
+     "room": "050f",
+     "rec": "0x2db84",
+     "vanillaTake": 0,
+     "take": 11
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Dr. Kirk's Personal Lab (050e) - Key Card Lv. A @-7700,6900",
+   "apId": 230817818,
+   "key": "050e:3a:-7700,6900",
+   "room": "050e",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     13
+    ]
+   },
+   "records": [
+    {
+     "room": "050e",
+     "rec": "0x3f870",
+     "vanillaTake": 0,
+     "take": 13
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Dr. Kirk's Personal Lab (050e) - Planning Disc @-7700,6900",
+   "apId": 230817819,
+   "key": "050e:61:-7700,6900",
+   "room": "050e",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     15
+    ]
+   },
+   "records": [
+    {
+     "room": "050e",
+     "rec": "0x40360",
+     "vanillaTake": 0,
+     "take": 15
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Dr. Kirk's Personal Lab (050e) - Plug @-2100,-2700",
+   "apId": 230817820,
+   "key": "050e:2b:-2100,-2700",
+   "room": "050e",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     182
+    ]
+   },
+   "records": [
+    {
+     "room": "050e",
+     "rec": "0x3e05c",
+     "vanillaTake": 182,
+     "take": 182
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Elevator Hall (0113) - Plug @-7008,2928",
+   "apId": 230817821,
+   "key": "0113:2b:-7008,2928",
+   "room": "0113",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     101
+    ]
+   },
+   "records": [
+    {
+     "room": "0113",
+     "rec": "0x10134",
+     "vanillaTake": 101,
+     "take": 101
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Elevator Power Room (0408) - B1 Crane Card @-2576,-5568",
+   "apId": 230817822,
+   "key": "0408:43:-2576,-5568",
+   "room": "0408",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     36
+    ]
+   },
+   "records": [
+    {
+     "room": "0408",
+     "rec": "0x1a350",
+     "vanillaTake": 36,
+     "take": 36
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Experiment Room Hall (0502) - An. Darts L @4480,-6656",
+   "apId": 230817823,
+   "key": "0502:14:4480,-6656",
+   "room": "0502",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     195
+    ]
+   },
+   "records": [
+    {
+     "room": "0502",
+     "rec": "0x48068",
+     "vanillaTake": 195,
+     "take": 195
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Experiment Room Hall (0502) - Key Card Lv. C @-9472,3840",
+   "apId": 230817824,
+   "key": "0502:38:-9472,3840",
+   "room": "0502",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     16
+    ]
+   },
+   "records": [
+    {
+     "room": "0502",
+     "rec": "0x47ff8",
+     "vanillaTake": 16,
+     "take": 16
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Experiment Room Hall (0502) - Recovery Aid @-16384,-4352",
+   "apId": 230817825,
+   "key": "0502:21:-16384,-4352",
+   "room": "0502",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     142
+    ]
+   },
+   "records": [
+    {
+     "room": "0502",
+     "rec": "0x48030",
+     "vanillaTake": 142,
+     "take": 142
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Experiment Simulation Room (0300) - An. Darts L @-8048,4560",
+   "apId": 230817826,
+   "key": "0300:14:-8048,4560",
+   "room": "0300",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     160
+    ]
+   },
+   "records": [
+    {
+     "room": "0300",
+     "rec": "0xf99c",
+     "vanillaTake": 160,
+     "take": 160
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Experiment Simulation Room (0300) - Shotgun Stock @4512,-944",
+   "apId": 230817827,
+   "key": "0300:0c:4512,-944",
+   "room": "0300",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     146
+    ]
+   },
+   "records": [
+    {
+     "room": "0300",
+     "rec": "0xf970",
+     "vanillaTake": 146,
+     "take": 146
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Front Area of Entrance (0400) - An. Aid @12576,1328",
+   "apId": 230817828,
+   "key": "0400:20:12576,1328",
+   "room": "0400",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     156
+    ]
+   },
+   "records": [
+    {
+     "room": "0400",
+     "rec": "0x2ca00",
+     "vanillaTake": 156,
+     "take": 156
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Front Area of Entrance (0400) - DDK Code Disc N @13264,1792",
+   "apId": 230817829,
+   "key": "0400:6a:13264,1792",
+   "room": "0400",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     65
+    ]
+   },
+   "records": [
+    {
+     "room": "0400",
+     "rec": "0x2c99c",
+     "vanillaTake": 65,
+     "take": 65
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Front Area of Entrance (0400) - SG Bullets @7984,1104",
+   "apId": 230817830,
+   "key": "0400:10:7984,1104",
+   "room": "0400",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     147
+    ]
+   },
+   "records": [
+    {
+     "room": "0400",
+     "rec": "0x2ca2c",
+     "vanillaTake": 147,
+     "take": 147
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Gas Experiment Room (0303) - B1 Key Chip @3088,-1008",
+   "apId": 230817831,
+   "key": "0303:46:3088,-1008",
+   "room": "0303",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     18
+    ]
+   },
+   "records": [
+    {
+     "room": "0303",
+     "rec": "0x4fd5c",
+     "vanillaTake": 39,
+     "take": 18
+    },
+    {
+     "room": "0303",
+     "rec": "0x50700",
+     "vanillaTake": 39,
+     "take": 18
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Gas Experiment Room (0303) - B1 Key Chip @3328,-2560",
+   "apId": 230817832,
+   "key": "0303:46:3328,-2560",
+   "room": "0303",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     19
+    ]
+   },
+   "records": [
+    {
+     "room": "0303",
+     "rec": "0x50b20",
+     "vanillaTake": 39,
+     "take": 19
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Gas Experiment Room (0303) - Recovery Aid @512,-2048",
+   "apId": 230817833,
+   "key": "0303:21:512,-2048",
+   "room": "0303",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     23
+    ]
+   },
+   "records": [
+    {
+     "room": "0303",
+     "rec": "0x4fa68",
+     "vanillaTake": 179,
+     "take": 23
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Gas Experiment Room (0303) - Small Size Key @3088,-1008",
+   "apId": 230817834,
+   "key": "0303:2d:3088,-1008",
+   "room": "0303",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     2
+    ]
+   },
+   "records": [
+    {
+     "room": "0303",
+     "rec": "0x4fc70",
+     "vanillaTake": 2,
+     "take": 2
+    },
+    {
+     "room": "0303",
+     "rec": "0x50b70",
+     "vanillaTake": 2,
+     "take": 2
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "General Weapons Storage (0605) - DDK Input Disc W @-3072,3328",
+   "apId": 230817835,
+   "key": "0605:66:-3072,3328",
+   "room": "0605",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     90
+    ]
+   },
+   "records": [
+    {
+     "room": "0605",
+     "rec": "0x5c0dc",
+     "vanillaTake": 90,
+     "take": 90
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328"
+   ]
+  },
+  {
+   "name": "General Weapons Storage (0605) - Hemostat @12032,384",
+   "apId": 230817836,
+   "key": "0605:1b:12032,384",
+   "room": "0605",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     24
+    ]
+   },
+   "records": [
+    {
+     "room": "0605",
+     "rec": "0x5c0b0",
+     "vanillaTake": 196,
+     "take": 24
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328",
+   "apId": 230817837,
+   "key": "0615:66:-3072,3328",
+   "room": "0615",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     90
+    ]
+   },
+   "records": [
+    {
+     "room": "0615",
+     "rec": "0x21cbc",
+     "vanillaTake": 90,
+     "take": 90
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "General Weapons Storage (0605) - DDK Input Disc W @-3072,3328"
+   ]
+  },
+  {
+   "name": "General Weapons Storage (0615) - Hemostat @12032,384",
+   "apId": 230817838,
+   "key": "0615:1b:12032,384",
+   "room": "0615",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     25
+    ]
+   },
+   "records": [
+    {
+     "room": "0615",
+     "rec": "0x21c90",
+     "vanillaTake": 196,
+     "take": 25
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Hall 2F (0203) - SG Bullets @4800,4100",
+   "apId": 230817839,
+   "key": "0203:10:4800,4100",
+   "room": "0203",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     175
+    ]
+   },
+   "records": [
+    {
+     "room": "0203",
+     "rec": "0x3cda4",
+     "vanillaTake": 175,
+     "take": 175
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hangar (0402) - Grenade Bullets @-4352,-12992",
+   "apId": 230817840,
+   "key": "0402:18:-4352,-12992",
+   "room": "0402",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     148
+    ]
+   },
+   "records": [
+    {
+     "room": "0402",
+     "rec": "0x21bf0",
+     "vanillaTake": 148,
+     "take": 148
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hangar (0402) - Grenade Bullets @5888,-12960",
+   "apId": 230817841,
+   "key": "0402:18:5888,-12960",
+   "room": "0402",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     143
+    ]
+   },
+   "records": [
+    {
+     "room": "0402",
+     "rec": "0x21bb8",
+     "vanillaTake": 143,
+     "take": 143
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hangar (0402) - Grenade Gun (40mmHK) @-5888,-11520",
+   "apId": 230817842,
+   "key": "0402:09:-5888,-11520",
+   "room": "0402",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     26
+    ]
+   },
+   "records": [
+    {
+     "room": "0402",
+     "rec": "0x21c28",
+     "vanillaTake": 138,
+     "take": 26
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Hovercraft (0612) - Grenade Bullets @-896,0",
+   "apId": 230817843,
+   "key": "0612:18:-896,0",
+   "room": "0612",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     164,
+     165
+    ]
+   },
+   "records": [
+    {
+     "room": "0612",
+     "rec": "0x23330",
+     "vanillaTake": 164,
+     "take": 164
+    },
+    {
+     "room": "0612",
+     "rec": "0x2335c",
+     "vanillaTake": 165,
+     "take": 165
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hovercraft (0612) - Grenade Gun (40mmHK) @-896,0",
+   "apId": 230817844,
+   "key": "0612:09:-896,0",
+   "room": "0612",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     163
+    ]
+   },
+   "records": [
+    {
+     "room": "0612",
+     "rec": "0x23304",
+     "vanillaTake": 163,
+     "take": 163
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hovercraft (0612) - Plug @-896,0",
+   "apId": 230817845,
+   "key": "0612:2b:-896,0",
+   "room": "0612",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     166
+    ]
+   },
+   "records": [
+    {
+     "room": "0612",
+     "rec": "0x232c8",
+     "vanillaTake": 166,
+     "take": 166
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hovercraft Storage (0610) - Energy Tank @-1664,-2016",
+   "apId": 230817846,
+   "key": "0610:54:-1664,-2016",
+   "room": "0610",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     152
+    ]
+   },
+   "records": [
+    {
+     "room": "0610",
+     "rec": "0x22aa0",
+     "vanillaTake": 152,
+     "take": 152
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hovercraft Storage (0610) - Grenade Bullets @-1024,-2048",
+   "apId": 230817847,
+   "key": "0610:18:-1024,-2048",
+   "room": "0610",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     150,
+     161
+    ]
+   },
+   "records": [
+    {
+     "room": "0610",
+     "rec": "0x2384c",
+     "vanillaTake": 150,
+     "take": 150
+    },
+    {
+     "room": "0610",
+     "rec": "0x23878",
+     "vanillaTake": 161,
+     "take": 161
+    },
+    {
+     "room": "0610",
+     "rec": "0x238d4",
+     "vanillaTake": 150,
+     "take": 150
+    },
+    {
+     "room": "0610",
+     "rec": "0x23900",
+     "vanillaTake": 161,
+     "take": 161
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hovercraft Storage (0610) - Grenade Gun (40mmHK) @-1024,-2048",
+   "apId": 230817848,
+   "key": "0610:09:-1024,-2048",
+   "room": "0610",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     151
+    ]
+   },
+   "records": [
+    {
+     "room": "0610",
+     "rec": "0x237e8",
+     "vanillaTake": 151,
+     "take": 151
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Hovercraft Storage (0610) - Plug @-1024,-2048",
+   "apId": 230817849,
+   "key": "0610:2b:-1024,-2048",
+   "room": "0610",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     171
+    ]
+   },
+   "records": [
+    {
+     "room": "0610",
+     "rec": "0x23820",
+     "vanillaTake": 171,
+     "take": 171
+    },
+    {
+     "room": "0610",
+     "rec": "0x238a8",
+     "vanillaTake": 171,
+     "take": 171
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Large Size Elevator (0405) - Plug @1008,11296",
+   "apId": 230817850,
+   "key": "0405:2b:1008,11296",
+   "room": "0405",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     121
+    ]
+   },
+   "records": [
+    {
+     "room": "0405",
+     "rec": "0x54ef8",
+     "vanillaTake": 121,
+     "take": 121
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Large Size Elevator (060f) - DDK Input Disc D @4128,448",
+   "apId": 230817851,
+   "key": "060f:68:4128,448",
+   "room": "060f",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     89
+    ]
+   },
+   "records": [
+    {
+     "room": "060f",
+     "rec": "0x3bb48",
+     "vanillaTake": 89,
+     "take": 89
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Large Size Elevator (060f) - Plug @864,8240",
+   "apId": 230817852,
+   "key": "060f:2b:864,8240",
+   "room": "060f",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     203
+    ]
+   },
+   "records": [
+    {
+     "room": "060f",
+     "rec": "0x3bbac",
+     "vanillaTake": 203,
+     "take": 203
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Large Size Elevator (060f) - Poison Dart @3344,1264",
+   "apId": 230817853,
+   "key": "060f:15:3344,1264",
+   "room": "060f",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     27
+    ]
+   },
+   "records": [
+    {
+     "room": "060f",
+     "rec": "0x3cc40",
+     "vanillaTake": 0,
+     "take": 27
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Large Size Elevator (060f) - Port Card Key @288,-1920",
+   "apId": 230817854,
+   "key": "060f:32:288,-1920",
+   "room": "060f",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     181
+    ]
+   },
+   "records": [
+    {
+     "room": "060f",
+     "rec": "0x3bb80",
+     "vanillaTake": 181,
+     "take": 181
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-3956,-1600",
+   "apId": 230817855,
+   "key": "0406:6b:-3956,-1600",
+   "room": "0406",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     28
+    ]
+   },
+   "records": [
+    {
+     "room": "0406",
+     "rec": "0x37674",
+     "vanillaTake": 76,
+     "take": 28
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-4352,224",
+   "apId": 230817856,
+   "key": "0406:6b:-4352,224",
+   "room": "0406",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     29
+    ]
+   },
+   "records": [
+    {
+     "room": "0406",
+     "rec": "0x37fa0",
+     "vanillaTake": 76,
+     "take": 29
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Large Size Elevator Control Room (0406) - DDK Input Disc L @-3456,1280",
+   "apId": 230817857,
+   "key": "0406:64:-3456,1280",
+   "room": "0406",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     91
+    ]
+   },
+   "records": [
+    {
+     "room": "0406",
+     "rec": "0x37544",
+     "vanillaTake": 91,
+     "take": 91
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Large Size Elevator Passageway (0404) - Slag Bullets @-4200,3200",
+   "apId": 230817858,
+   "key": "0404:11:-4200,3200",
+   "room": "0404",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     139
+    ]
+   },
+   "records": [
+    {
+     "room": "0404",
+     "rec": "0x3ab0c",
+     "vanillaTake": 139,
+     "take": 139
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Large Size Elevator Passageway (0404) - Slag Bullets @5300,3000",
+   "apId": 230817859,
+   "key": "0404:11:5300,3000",
+   "room": "0404",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     140
+    ]
+   },
+   "records": [
+    {
+     "room": "0404",
+     "rec": "0x3ab44",
+     "vanillaTake": 140,
+     "take": 140
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Lecture Room (0109) - BG Room B1 Key @2560,-1632",
+   "apId": 230817860,
+   "key": "0109:2f:2560,-1632",
+   "room": "0109",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     20
+    ]
+   },
+   "records": [
+    {
+     "room": "0109",
+     "rec": "0x545ac",
+     "vanillaTake": 20,
+     "take": 20
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Lecture Room Hallway (0108) - Plug @-8240,-7904",
+   "apId": 230817861,
+   "key": "0108:2b:-8240,-7904",
+   "room": "0108",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     99
+    ]
+   },
+   "records": [
+    {
+     "room": "0108",
+     "rec": "0x3db08",
+     "vanillaTake": 99,
+     "take": 99
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Lecture Room Hallway (0108) - Plug @-8256,-7904"
+   ]
+  },
+  {
+   "name": "Lecture Room Hallway (0108) - Plug @-8256,-7904",
+   "apId": 230817862,
+   "key": "0108:2b:-8256,-7904",
+   "room": "0108",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     99
+    ]
+   },
+   "records": [
+    {
+     "room": "0108",
+     "rec": "0x3d82c",
+     "vanillaTake": 99,
+     "take": 99
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Lecture Room Hallway (0108) - Plug @-8240,-7904"
+   ]
+  },
+  {
+   "name": "Library Room (0305) - B1 Key Chip \" with number \"(3695) @-6400,-4864",
+   "apId": 230817863,
+   "key": "0305:5e:-6400,-4864",
+   "room": "0305",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     174
+    ]
+   },
+   "records": [
+    {
+     "room": "0305",
+     "rec": "0x377c0",
+     "vanillaTake": 174,
+     "take": 174
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Library Room (0305) - Handgun Sights (critical hit) @-2176,2032",
+   "apId": 230817864,
+   "key": "0305:0d:-2176,2032",
+   "room": "0305",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     109
+    ]
+   },
+   "records": [
+    {
+     "room": "0305",
+     "rec": "0x370cc",
+     "vanillaTake": 109,
+     "take": 109
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Library Room (0305) - Key Card R @2304,2560",
+   "apId": 230817865,
+   "key": "0305:48:2304,2560",
+   "room": "0305",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     41
+    ]
+   },
+   "records": [
+    {
+     "room": "0305",
+     "rec": "0x37964",
+     "vanillaTake": 41,
+     "take": 41
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Library Room (0305) - Med. Pak M @-6864,5888",
+   "apId": 230817866,
+   "key": "0305:1d:-6864,5888",
+   "room": "0305",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     180
+    ]
+   },
+   "records": [
+    {
+     "room": "0305",
+     "rec": "0x370a0",
+     "vanillaTake": 180,
+     "take": 180
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Locker Room (0100) - An. Darts S @-1712,-2528",
+   "apId": 230817867,
+   "key": "0100:12:-1712,-2528",
+   "room": "0100",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     137
+    ]
+   },
+   "records": [
+    {
+     "room": "0100",
+     "rec": "0x393b8",
+     "vanillaTake": 137,
+     "take": 137
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Locker Room (0100) - DDK Code Disc H @-1088,2976",
+   "apId": 230817868,
+   "key": "0100:69:-1088,2976",
+   "room": "0100",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     64
+    ]
+   },
+   "records": [
+    {
+     "room": "0100",
+     "rec": "0x393e4",
+     "vanillaTake": 64,
+     "take": 64
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Lounge (0204) - An. Darts M @3800,2800",
+   "apId": 230817869,
+   "key": "0204:13:3800,2800",
+   "room": "0204",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     176
+    ]
+   },
+   "records": [
+    {
+     "room": "0204",
+     "rec": "0x3baa0",
+     "vanillaTake": 176,
+     "take": 176
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Lounge (0204) - Handgun Slides (upgrade To Glock 35) @2000,-3000",
+   "apId": 230817870,
+   "key": "0204:0e:2000,-3000",
+   "room": "0204",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     141
+    ]
+   },
+   "records": [
+    {
+     "room": "0204",
+     "rec": "0x3bdfc",
+     "vanillaTake": 141,
+     "take": 141
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Main Entrance (0107) - An. Aid @2384,-2208",
+   "apId": 230817871,
+   "key": "0107:20:2384,-2208",
+   "room": "0107",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     178
+    ]
+   },
+   "records": [
+    {
+     "room": "0107",
+     "rec": "0x13940",
+     "vanillaTake": 178,
+     "take": 178
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Main Entrance (0206) - An. Aid @-656,-3168",
+   "apId": 230817872,
+   "key": "0206:20:-656,-3168",
+   "room": "0206",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     177
+    ]
+   },
+   "records": [
+    {
+     "room": "0206",
+     "rec": "0x105a8",
+     "vanillaTake": 177,
+     "take": 177
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Management Office (0103) - An. Aid @-2576,3008",
+   "apId": 230817873,
+   "key": "0103:20:-2576,3008",
+   "room": "0103",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     133
+    ]
+   },
+   "records": [
+    {
+     "room": "0103",
+     "rec": "0x1320c",
+     "vanillaTake": 133,
+     "take": 133
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Management Office (0103) - DDK Input Disc H @-512,1072",
+   "apId": 230817874,
+   "key": "0103:62:-512,1072",
+   "room": "0103",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     84
+    ]
+   },
+   "records": [
+    {
+     "room": "0103",
+     "rec": "0x12d48",
+     "vanillaTake": 84,
+     "take": 84
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Management Office (0103) - Entrance Key @-2576,3008",
+   "apId": 230817875,
+   "key": "0103:2e:-2576,3008",
+   "room": "0103",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     3
+    ]
+   },
+   "records": [
+    {
+     "room": "0103",
+     "rec": "0x13244",
+     "vanillaTake": 3,
+     "take": 3
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Management Office (0103) - Panel Key 2 @-2800,992",
+   "apId": 230817876,
+   "key": "0103:3e:-2800,992",
+   "room": "0103",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     30
+    ]
+   },
+   "records": [
+    {
+     "room": "0103",
+     "rec": "0x1292c",
+     "vanillaTake": 179,
+     "take": 30
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Management Office (0103) - Plug @-544,640",
+   "apId": 230817877,
+   "key": "0103:2b:-544,640",
+   "room": "0103",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     97
+    ]
+   },
+   "records": [
+    {
+     "room": "0103",
+     "rec": "0x12dac",
+     "vanillaTake": 97,
+     "take": 97
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Management Office (0103) - Shotgun \"Model PA3\" (pump-action) @2288,-2224",
+   "apId": 230817878,
+   "key": "0103:01:2288,-2224",
+   "room": "0103",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     31
+    ]
+   },
+   "records": [
+    {
+     "room": "0103",
+     "rec": "0x128ec",
+     "vanillaTake": 212,
+     "take": 31
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Material Storage (010c) - BG Area Key @-2992,2720",
+   "apId": 230817879,
+   "key": "010c:30:-2992,2720",
+   "room": "010c",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     5
+    ]
+   },
+   "records": [
+    {
+     "room": "010c",
+     "rec": "0xd980",
+     "vanillaTake": 5,
+     "take": 5
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Material Storage (010c) - Med. Pak M @704,2928",
+   "apId": 230817880,
+   "key": "010c:1d:704,2928",
+   "room": "010c",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     129
+    ]
+   },
+   "records": [
+    {
+     "room": "010c",
+     "rec": "0xd948",
+     "vanillaTake": 129,
+     "take": 129
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Materials Room (040b) - An. Aid @240,-2266",
+   "apId": 230817881,
+   "key": "040b:20:240,-2266",
+   "room": "040b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     157
+    ]
+   },
+   "records": [
+    {
+     "room": "040b",
+     "rec": "0x13db0",
+     "vanillaTake": 157,
+     "take": 157
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Materials Room (040b) - C. O. Pass Card @2816,-2496",
+   "apId": 230817882,
+   "key": "040b:3c:2816,-2496",
+   "room": "040b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     21
+    ]
+   },
+   "records": [
+    {
+     "room": "040b",
+     "rec": "0x13e74",
+     "vanillaTake": 21,
+     "take": 21
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Medical Room (0308) - ID Card Type \" Colonel \" @-128,-1792",
+   "apId": 230817883,
+   "key": "0308:34:-128,-1792",
+   "room": "0308",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     12
+    ]
+   },
+   "records": [
+    {
+     "room": "0308",
+     "rec": "0x422d4",
+     "vanillaTake": 12,
+     "take": 12
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Medical Room (0308) - Med. Pak M @-1185,1451",
+   "apId": 230817884,
+   "key": "0308:1d:-1185,1451",
+   "room": "0308",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     145
+    ]
+   },
+   "records": [
+    {
+     "room": "0308",
+     "rec": "0x42b4c",
+     "vanillaTake": 145,
+     "take": 145
+    },
+    {
+     "room": "0308",
+     "rec": "0x42ba8",
+     "vanillaTake": 145,
+     "take": 145
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Medical Room (0308) - Med. Pak M @1536,-2464",
+   "apId": 230817885,
+   "key": "0308:1d:1536,-2464",
+   "room": "0308",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     134,
+     135
+    ]
+   },
+   "records": [
+    {
+     "room": "0308",
+     "rec": "0x42250",
+     "vanillaTake": 134,
+     "take": 134
+    },
+    {
+     "room": "0308",
+     "rec": "0x4227c",
+     "vanillaTake": 135,
+     "take": 135
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Medical Room (0308) - Multiplier @-1185,1451",
+   "apId": 230817886,
+   "key": "0308:23:-1185,1451",
+   "room": "0308",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     35
+    ]
+   },
+   "records": [
+    {
+     "room": "0308",
+     "rec": "0x42b20",
+     "vanillaTake": 144,
+     "take": 35
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Medical Room (0308) - Plug @-368,2512",
+   "apId": 230817887,
+   "key": "0308:2b:-368,2512",
+   "room": "0308",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     110
+    ]
+   },
+   "records": [
+    {
+     "room": "0308",
+     "rec": "0x422a8",
+     "vanillaTake": 110,
+     "take": 110
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Medical Room (0308) - Resuscitation @-1185,1451",
+   "apId": 230817888,
+   "key": "0308:1f:-1185,1451",
+   "room": "0308",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     40
+    ]
+   },
+   "records": [
+    {
+     "room": "0308",
+     "rec": "0x42b7c",
+     "vanillaTake": 144,
+     "take": 40
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Office (010b) - ID Card Type \" Researcher \" @5008,-840",
+   "apId": 230817889,
+   "key": "010b:36:5008,-840",
+   "room": "010b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     14
+    ]
+   },
+   "records": [
+    {
+     "room": "010b",
+     "rec": "0x38c50",
+     "vanillaTake": 14,
+     "take": 14
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Parts Storage (0507) - Core Parts 1 @4352,7824",
+   "apId": 230817890,
+   "key": "0507:52:4352,7824",
+   "room": "0507",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     172
+    ]
+   },
+   "records": [
+    {
+     "room": "0507",
+     "rec": "0x416fc",
+     "vanillaTake": 172,
+     "take": 172
+    },
+    {
+     "room": "0507",
+     "rec": "0x42ad8",
+     "vanillaTake": 172,
+     "take": 172
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Parts Storage (0507) - Core Parts 2 @4352,9616",
+   "apId": 230817891,
+   "key": "0507:53:4352,9616",
+   "room": "0507",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     173
+    ]
+   },
+   "records": [
+    {
+     "room": "0507",
+     "rec": "0x41734",
+     "vanillaTake": 173,
+     "take": 173
+    },
+    {
+     "room": "0507",
+     "rec": "0x42b10",
+     "vanillaTake": 173,
+     "take": 173
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Parts Storage (0507) - Grenade Gun @-4352,10000",
+   "apId": 230817892,
+   "key": "0507:0f:-4352,10000",
+   "room": "0507",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     202
+    ]
+   },
+   "records": [
+    {
+     "room": "0507",
+     "rec": "0x41410",
+     "vanillaTake": 202,
+     "take": 202
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Parts Storage (0507) - Plug @6144,3088",
+   "apId": 230817893,
+   "key": "0507:2b:6144,3088",
+   "room": "0507",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     187
+    ]
+   },
+   "records": [
+    {
+     "room": "0507",
+     "rec": "0x413e4",
+     "vanillaTake": 187,
+     "take": 187
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Passageway (0508) - An. Aid @-1728,-9456",
+   "apId": 230817894,
+   "key": "0508:20:-1728,-9456",
+   "room": "0508",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     185
+    ]
+   },
+   "records": [
+    {
+     "room": "0508",
+     "rec": "0x4defc",
+     "vanillaTake": 185,
+     "take": 185
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Passageway to the Backup Generator (010e) - An. Aid @-9024,-7760",
+   "apId": 230817895,
+   "key": "010e:20:-9024,-7760",
+   "room": "010e",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     43
+    ]
+   },
+   "records": [
+    {
+     "room": "010e",
+     "rec": "0x1ca50",
+     "vanillaTake": 149,
+     "take": 43
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Passageway to the Backup Generator (0114) - An. Aid @5632,3184",
+   "apId": 230817896,
+   "key": "0114:20:5632,3184",
+   "room": "0114",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     45
+    ]
+   },
+   "records": [
+    {
+     "room": "0114",
+     "rec": "0x3ffd4",
+     "vanillaTake": 149,
+     "take": 45
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Passageway to the Experiment Area (0500) - An. Aid @-7568,6672",
+   "apId": 230817897,
+   "key": "0500:20:-7568,6672",
+   "room": "0500",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     184
+    ]
+   },
+   "records": [
+    {
+     "room": "0500",
+     "rec": "0x3ddb8",
+     "vanillaTake": 184,
+     "take": 184
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Passageway to the Port (060b) - DDK Code Disc S @2736,-6656",
+   "apId": 230817898,
+   "key": "060b:6e:2736,-6656",
+   "room": "060b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     68
+    ]
+   },
+   "records": [
+    {
+     "room": "060b",
+     "rec": "0x1e9e8",
+     "vanillaTake": 68,
+     "take": 68
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Passageway to the Port (060b) - Multiplier @-4480,5760",
+   "apId": 230817899,
+   "key": "060b:23:-4480,5760",
+   "room": "060b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     204
+    ]
+   },
+   "records": [
+    {
+     "room": "060b",
+     "rec": "0x1ea20",
+     "vanillaTake": 204,
+     "take": 204
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Port (060a) - Nucleum @-5120,3584",
+   "apId": 230817900,
+   "key": "060a:55:-5120,3584",
+   "room": "060a",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     52
+    ]
+   },
+   "records": [
+    {
+     "room": "060a",
+     "rec": "0x2b128",
+     "vanillaTake": 52,
+     "take": 52
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Port (060a) - Recovery Aid @10064,15104",
+   "apId": 230817901,
+   "key": "060a:21:10064,15104",
+   "room": "060a",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     46
+    ]
+   },
+   "records": [
+    {
+     "room": "060a",
+     "rec": "0x2aa2c",
+     "vanillaTake": 201,
+     "take": 46
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Port (0613) - Recovery Aid @10064,15104",
+   "apId": 230817902,
+   "key": "0613:21:10064,15104",
+   "room": "0613",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     50
+    ]
+   },
+   "records": [
+    {
+     "room": "0613",
+     "rec": "0x3f100",
+     "vanillaTake": 201,
+     "take": 50
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Power Freq. Room (050c) - Researcher Memo \" with number \"(1281) @-3328,5616",
+   "apId": 230817903,
+   "key": "050c:5d:-3328,5616",
+   "room": "050c",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     162
+    ]
+   },
+   "records": [
+    {
+     "room": "050c",
+     "rec": "0x43bcc",
+     "vanillaTake": 162,
+     "take": 162
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Research Meeting Room (0302) - DDK Input Disc E @-1280,1152",
+   "apId": 230817904,
+   "key": "0302:65:-1280,1152",
+   "room": "0302",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     87
+    ]
+   },
+   "records": [
+    {
+     "room": "0302",
+     "rec": "0x3d4e8",
+     "vanillaTake": 87,
+     "take": 87
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Research Meeting Room (0302) - Plug @2880,-3056",
+   "apId": 230817905,
+   "key": "0302:2b:2880,-3056",
+   "room": "0302",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     107
+    ]
+   },
+   "records": [
+    {
+     "room": "0302",
+     "rec": "0x3d3a4",
+     "vanillaTake": 107,
+     "take": 107
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Researcher Rest Room (0505) - Plug @-1100,1800",
+   "apId": 230817906,
+   "key": "0505:2b:-1100,1800",
+   "room": "0505",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     211
+    ]
+   },
+   "records": [
+    {
+     "room": "0505",
+     "rec": "0x47cd4",
+     "vanillaTake": 211,
+     "take": 211
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Rest Station (0604) - Plug @3024,224",
+   "apId": 230817907,
+   "key": "0604:2b:3024,224",
+   "room": "0604",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     192
+    ]
+   },
+   "records": [
+    {
+     "room": "0604",
+     "rec": "0x3fb88",
+     "vanillaTake": 192,
+     "take": 192
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Security Pass Room (0506) - B2 Key Chip 1 @-5696,-1232",
+   "apId": 230817908,
+   "key": "0506:56:-5696,-1232",
+   "room": "0506",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     53
+    ]
+   },
+   "records": [
+    {
+     "room": "0506",
+     "rec": "0x227a0",
+     "vanillaTake": 53,
+     "take": 53
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Security Pass Room (0506) - DDK Input Disc S @3840,2592",
+   "apId": 230817909,
+   "key": "0506:67:3840,2592",
+   "room": "0506",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     88
+    ]
+   },
+   "records": [
+    {
+     "room": "0506",
+     "rec": "0x227d8",
+     "vanillaTake": 88,
+     "take": 88
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Security Pass Room (0506) - ID Card Type \" Project Superintendent \" (Dr. Kirk) @-6912,3328",
+   "apId": 230817910,
+   "key": "0506:3b:-6912,3328",
+   "room": "0506",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     22
+    ]
+   },
+   "records": [
+    {
+     "room": "0506",
+     "rec": "0x23234",
+     "vanillaTake": 22,
+     "take": 22
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Security Pass Room (0506) - Plug @-6144,128",
+   "apId": 230817911,
+   "key": "0506:2b:-6144,128",
+   "room": "0506",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     114
+    ]
+   },
+   "records": [
+    {
+     "room": "0506",
+     "rec": "0x22830",
+     "vanillaTake": 114,
+     "take": 114
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Special Weapons Storage (0607) - Initializer @4480,640",
+   "apId": 230817912,
+   "key": "0607:4d:4480,640",
+   "room": "0607",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     209
+    ]
+   },
+   "records": [
+    {
+     "room": "0607",
+     "rec": "0x51048",
+     "vanillaTake": 209,
+     "take": 209
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Special Weapons Storage (0607) - Secret Disc \" With Data \" @-1792,1792",
+   "apId": 230817913,
+   "key": "0607:5b:-1792,1792",
+   "room": "0607",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     51
+    ]
+   },
+   "records": [
+    {
+     "room": "0607",
+     "rec": "0x51d64",
+     "vanillaTake": 0,
+     "take": 51
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Special Weapons Storage (0607) - Stabilizer @4480,640",
+   "apId": 230817914,
+   "key": "0607:4c:4480,640",
+   "room": "0607",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     210
+    ]
+   },
+   "records": [
+    {
+     "room": "0607",
+     "rec": "0x51074",
+     "vanillaTake": 210,
+     "take": 210
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Stabilizer Design Room (0504) - DDK Code Disc W @-1632,2304",
+   "apId": 230817915,
+   "key": "0504:6d:-1632,2304",
+   "room": "0504",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     70
+    ]
+   },
+   "records": [
+    {
+     "room": "0504",
+     "rec": "0x4f8b8",
+     "vanillaTake": 70,
+     "take": 70
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Stabilizer Design Room (0504) - Protect P. 1-A @2256,-3840",
+   "apId": 230817916,
+   "key": "0504:4e:2256,-3840",
+   "room": "0504",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     47
+    ]
+   },
+   "records": [
+    {
+     "room": "0504",
+     "rec": "0x4fee0",
+     "vanillaTake": 47,
+     "take": 47
+    },
+    {
+     "room": "0504",
+     "rec": "0x501a8",
+     "vanillaTake": 47,
+     "take": 47
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872",
+   "apId": 230817917,
+   "key": "0504:50:-2912,3872",
+   "room": "0504",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     48
+    ]
+   },
+   "records": [
+    {
+     "room": "0504",
+     "rec": "0x5028c",
+     "vanillaTake": 48,
+     "take": 48
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872"
+   ]
+  },
+  {
+   "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
+   "apId": 230817918,
+   "key": "0504:50:4896,-3840",
+   "room": "0504",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     49
+    ]
+   },
+   "records": [
+    {
+     "room": "0504",
+     "rec": "0x4feb4",
+     "vanillaTake": 49,
+     "take": 49
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840"
+   ]
+  },
+  {
+   "name": "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872",
+   "apId": 230817919,
+   "key": "0504:4f:-2912,3872",
+   "room": "0504",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     48
+    ]
+   },
+   "records": [
+    {
+     "room": "0504",
+     "rec": "0x4fbf0",
+     "vanillaTake": 48,
+     "take": 48
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872"
+   ]
+  },
+  {
+   "name": "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840",
+   "apId": 230817920,
+   "key": "0504:4f:4896,-3840",
+   "room": "0504",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     49
+    ]
+   },
+   "records": [
+    {
+     "room": "0504",
+     "rec": "0x500f8",
+     "vanillaTake": 49,
+     "take": 49
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840"
+   ]
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - DDK Code Disc D @-2800,-3088",
+   "apId": 230817921,
+   "key": "0503:6f:-2800,-3088",
+   "room": "0503",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     55
+    ]
+   },
+   "records": [
+    {
+     "room": "0503",
+     "rec": "0x4d194",
+     "vanillaTake": 69,
+     "take": 55
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - Initializer @-3468,2768",
+   "apId": 230817922,
+   "key": "0503:4d:-3468,2768",
+   "room": "0503",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     206
+    ]
+   },
+   "records": [
+    {
+     "room": "0503",
+     "rec": "0x4c6c4",
+     "vanillaTake": 206,
+     "take": 206
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - Plug @-10240,-5248",
+   "apId": 230817923,
+   "key": "0503:2b:-10240,-5248",
+   "room": "0503",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     56
+    ]
+   },
+   "records": [
+    {
+     "room": "0503",
+     "rec": "0x4d168",
+     "vanillaTake": 118,
+     "take": 56
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - Protect P. 2-B @-3468,2768",
+   "apId": 230817924,
+   "key": "0503:51:-3468,2768",
+   "room": "0503",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     205
+    ]
+   },
+   "records": [
+    {
+     "room": "0503",
+     "rec": "0x4cc00",
+     "vanillaTake": 205,
+     "take": 205
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - Secret Disc \" With Data \" @-1792,1792",
+   "apId": 230817925,
+   "key": "0503:5b:-1792,1792",
+   "room": "0503",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     57
+    ]
+   },
+   "records": [
+    {
+     "room": "0503",
+     "rec": "0x4dd50",
+     "vanillaTake": 0,
+     "take": 57
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+   "apId": 230817926,
+   "key": "0503:0b:-10240,4480",
+   "room": "0503",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     208
+    ]
+   },
+   "records": [
+    {
+     "room": "0503",
+     "rec": "0x4d4fc",
+     "vanillaTake": 208,
+     "take": 208
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480"
+   ]
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - Stabilizer @-3468,2768",
+   "apId": 230817927,
+   "key": "0503:4c:-3468,2768",
+   "room": "0503",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     207
+    ]
+   },
+   "records": [
+    {
+     "room": "0503",
+     "rec": "0x4c5f0",
+     "vanillaTake": 207,
+     "take": 207
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0511) - DDK Code Disc D @-2800,-3088",
+   "apId": 230817928,
+   "key": "0511:6f:-2800,-3088",
+   "room": "0511",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     58
+    ]
+   },
+   "records": [
+    {
+     "room": "0511",
+     "rec": "0x57258",
+     "vanillaTake": 69,
+     "take": 58
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0511) - Plug @-10240,-5248",
+   "apId": 230817929,
+   "key": "0511:2b:-10240,-5248",
+   "room": "0511",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     59
+    ]
+   },
+   "records": [
+    {
+     "room": "0511",
+     "rec": "0x5722c",
+     "vanillaTake": 118,
+     "take": 59
+    }
+   ],
+   "class": "rekeyed"
+  },
+  {
+   "name": "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+   "apId": 230817930,
+   "key": "0511:0b:-10240,4480",
+   "room": "0511",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     208
+    ]
+   },
+   "records": [
+    {
+     "room": "0511",
+     "rec": "0x575c0",
+     "vanillaTake": 208,
+     "take": 208
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Experiment Room (0503) - Shotgun Parts (upgrade To SPAS12) @-10240,4480"
+   ]
+  },
+  {
+   "name": "Strategy Room (0104) - DDK Code Disc E @-528,1280",
+   "apId": 230817931,
+   "key": "0104:6c:-528,1280",
+   "room": "0104",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     67
+    ]
+   },
+   "records": [
+    {
+     "room": "0104",
+     "rec": "0x3484c",
+     "vanillaTake": 67,
+     "take": 67
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Strategy Room (0104) - F. C. Device \" without FingerPrint \" @-2352,-272",
+   "apId": 230817932,
+   "key": "0104:41:-2352,-272",
+   "room": "0104",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     34
+    ]
+   },
+   "records": [
+    {
+     "room": "0104",
+     "rec": "0x3480c",
+     "vanillaTake": 34,
+     "take": 34
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Strategy Room (0104) - Plug @-2880,-2032",
+   "apId": 230817933,
+   "key": "0104:2b:-2880,-2032",
+   "room": "0104",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     98
+    ]
+   },
+   "records": [
+    {
+     "room": "0104",
+     "rec": "0x34884",
+     "vanillaTake": 98,
+     "take": 98
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Third Energy Area B3 (050a) - Plug @7344,4736",
+   "apId": 230817934,
+   "key": "050a:2b:7344,4736",
+   "room": "050a",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     198
+    ]
+   },
+   "records": [
+    {
+     "room": "050a",
+     "rec": "0x355e4",
+     "vanillaTake": 198,
+     "take": 198
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Third Energy Control Room (050b) - Plug @6656,-3328",
+   "apId": 230817935,
+   "key": "050b:2b:6656,-3328",
+   "room": "050b",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     186
+    ]
+   },
+   "records": [
+    {
+     "room": "050b",
+     "rec": "0x30a48",
+     "vanillaTake": 186,
+     "take": 186
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Third Energy Control Room (0510) - Intensifier @0,-5280",
+   "apId": 230817936,
+   "key": "0510:22:0,-5280",
+   "room": "0510",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     188
+    ]
+   },
+   "records": [
+    {
+     "room": "0510",
+     "rec": "0x30664",
+     "vanillaTake": 188,
+     "take": 188
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Third Energy Control Room (0510) - Key Card Lv. B @4336,3344",
+   "apId": 230817937,
+   "key": "0510:39:4336,3344",
+   "room": "0510",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     17
+    ]
+   },
+   "records": [
+    {
+     "room": "0510",
+     "rec": "0x305b0",
+     "vanillaTake": 17,
+     "take": 17
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Transport Passageway (0606) - B3 Crane Card 3 @-7680,3392",
+   "apId": 230817938,
+   "key": "0606:4b:-7680,3392",
+   "room": "0606",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     44
+    ]
+   },
+   "records": [
+    {
+     "room": "0606",
+     "rec": "0x3e65c",
+     "vanillaTake": 44,
+     "take": 44
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Transport Passageway (0606) - C. O. Area Key @-7648,2880",
+   "apId": 230817939,
+   "key": "0606:31:-7648,2880",
+   "room": "0606",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     6
+    ]
+   },
+   "records": [
+    {
+     "room": "0606",
+     "rec": "0x3e624",
+     "vanillaTake": 6,
+     "take": 6
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Transport Passageway (0606) - Grenade Bullets @3328,-2560",
+   "apId": 230817940,
+   "key": "0606:18:3328,-2560",
+   "room": "0606",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     197
+    ]
+   },
+   "records": [
+    {
+     "room": "0606",
+     "rec": "0x3e5f8",
+     "vanillaTake": 197,
+     "take": 197
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Transport Passageway (0606) - Plug @6144,-2560",
+   "apId": 230817941,
+   "key": "0606:2b:6144,-2560",
+   "room": "0606",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     104
+    ]
+   },
+   "records": [
+    {
+     "room": "0606",
+     "rec": "0x3e5a0",
+     "vanillaTake": 104,
+     "take": 104
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Transport Passageway (0606) - Plug @6912,-11392",
+   "apId": 230817942,
+   "key": "0606:2b:6912,-11392",
+   "room": "0606",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     105
+    ]
+   },
+   "records": [
+    {
+     "room": "0606",
+     "rec": "0x3e5cc",
+     "vanillaTake": 105,
+     "take": 105
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Underground Heliport (060d) - Grenade Bullets @-2816,10368",
+   "apId": 230817943,
+   "key": "060d:18:-2816,10368",
+   "room": "060d",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     168,
+     169
+    ]
+   },
+   "records": [
+    {
+     "room": "060d",
+     "rec": "0x2d230",
+     "vanillaTake": 168,
+     "take": 168
+    },
+    {
+     "room": "060d",
+     "rec": "0x2d268",
+     "vanillaTake": 169,
+     "take": 169
+    },
+    {
+     "room": "060d",
+     "rec": "0x2d2dc",
+     "vanillaTake": 168,
+     "take": 168
+    },
+    {
+     "room": "060d",
+     "rec": "0x2d314",
+     "vanillaTake": 169,
+     "take": 169
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Underground Heliport (060d) - Grenade Gun (40mmHK) @-2816,10368",
+   "apId": 230817944,
+   "key": "060d:09:-2816,10368",
+   "room": "060d",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     167
+    ]
+   },
+   "records": [
+    {
+     "room": "060d",
+     "rec": "0x2d1b8",
+     "vanillaTake": 167,
+     "take": 167
+    }
+   ],
+   "class": "clean"
+  },
+  {
+   "name": "Underground Heliport (060d) - Plug @-2816,10368",
+   "apId": 230817945,
+   "key": "060d:2b:-2816,10368",
+   "room": "060d",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     170
+    ]
+   },
+   "records": [
+    {
+     "room": "060d",
+     "rec": "0x2d1f8",
+     "vanillaTake": 170,
+     "take": 170
+    },
+    {
+     "room": "060d",
+     "rec": "0x2d2a4",
+     "vanillaTake": 170,
+     "take": 170
+    }
+   ],
+   "class": "clean"
+  }
+ ]
+}

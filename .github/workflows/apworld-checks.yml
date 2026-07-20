@@ -47,6 +47,9 @@ jobs:
     env:
       # Pinned Archipelago release. Must be >= apworld/*/archipelago.json minimum_ap_version (0.6.0).
       # Bump deliberately (a new AP release can change WorldTestBase); tags: github.com/ArchipelagoMW/Archipelago.
+      # 0.6.7 = the latest AP release (no 0.6.8 tag exists as of 2026-07-19 — the prior pin was a
+      # forward-reference that failed checkout); the runtime client was live-verified against a
+      # local 0.6.7 server + this apworld on 2026-07-19 (AP-CLIENT-PLAN.md Deviations).
       AP_REF: "0.6.7"
     steps:
       - name: Checkout DinoRand
@@ -65,8 +68,13 @@ jobs:
       - name: Install Archipelago dependencies
         working-directory: Archipelago
         run: python ModuleUpdate.py --yes
-      - name: Drop the DC1 world into the Archipelago checkout
-        run: cp -r dinorand/apworld/dino_crisis_1 Archipelago/worlds/dino_crisis_1
-      - name: Run the DC1 world tests (fill / reachability / beatability / gate dependencies)
+      - name: Drop both worlds into the Archipelago checkout
+        run: |
+          cp -r dinorand/apworld/dino_crisis_1 Archipelago/worlds/dino_crisis_1
+          cp -r dinorand/apworld/dino_crisis_2 Archipelago/worlds/dino_crisis_2
+      - name: Run the DC1 world tests (fill / reachability / beatability / gate dependencies / slot_data)
         working-directory: Archipelago
         run: python -m pytest worlds/dino_crisis_1/test -q
+      - name: Run the DC2 world tests (closes the DC2-absent CI divergence, AP-CLIENT-INVESTIGATION §1)
+        working-directory: Archipelago
+        run: python -m pytest worlds/dino_crisis_2/test -q

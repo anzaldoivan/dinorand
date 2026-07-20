@@ -1171,6 +1171,147 @@ public static class ExePatcher
     /// <summary>Write a byte at virtual address <paramref name="va"/>.</summary>
     public static void WriteUInt8AtVa(Span<byte> exe, uint va, byte value) => Slice(exe, VaToFileOffset(va), 1)[0] = value;
 
+    // ---- Door skip (Experimental): remove the door-transition swing, keep the room load ----
+    // cont.78 (LIVE-CONFIRMED 2026-07-18): the mode-6 door transition's state-1 (0x4710b7) is three
+    // interleaved sub-machines on the door struct. Two reversible windows make transitions instant while
+    // keeping the destination background correct (which a full state-1 skip breaks):
+    //   A. state-1 sub-state 0 (0x471122) normally calls the per-door-type leaf-sweep handler (~80 frames).
+    //      Replace it with `mov eax,[ebp+8]; mov word[eax+2],1; jmp 0x47149a` — advance past the sweep to
+    //      sub-state 1 while still falling through the tail, so the background/room-view machine (0x4715c1,
+    //      reached via the tail) still runs and commits the new room.
+    //   B. that background machine holds `byte[struct+0xf] > 0x3c` (60 frames); drop the 0x3c imm8 (of
+    //      `cmp edx,0x3c` @ 0x471631) to 4 so it isn't the new floor once the swing is gone.
+    // Leaves the shared keyframe stepper 0x45E227 untouched → no effect on enemy/cutscene timing.
+
+    /// <summary>VA of state-1 sub-state 0 (the leaf-sweep dispatch) — the skip-swing window. <c>[verified]</c></summary>
+    public const uint DoorSkipSwingVa = 0x00471122;
+
+    /// <summary>VA of the background machine's 60-frame hold gate `cmp edx,0x3c`. <c>[verified]</c></summary>
+    public const uint DoorHoldGateVa = 0x00471631;
+
+    /// <summary>Pristine hold threshold (frames) at <see cref="DoorHoldGateVa"/><c>+2</c>.</summary>
+    public const byte DoorHoldPristine = 0x3C;
+
+    /// <summary>Live-tuned hold threshold (frames) written by the door-skip patch.</summary>
+    public const byte DoorHoldPatched = 0x04;
+
+    private static readonly byte[] DoorSkipSwingPristine =
+        { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F };
+
+    private static readonly byte[] DoorSkipSwingCode =
+        { 0x8B, 0x45, 0x08, 0x66, 0xC7, 0x40, 0x02, 0x01, 0x00, 0xE9, 0x6A, 0x03, 0x00, 0x00 };
+
+    private static readonly byte[] DoorHoldGateSig = { 0x83, 0xFA }; // `cmp edx, imm8`
+
+    /// <summary>True when the door-skip patch is already applied (idempotency check).</summary>
+    public static bool IsDoorSkipApplied(ReadOnlySpan<byte> exe)
+        => Slice(exe, VaToFileOffset(DoorSkipSwingVa), DoorSkipSwingCode.Length).SequenceEqual(DoorSkipSwingCode);
+
+    /// <summary>
+    /// Apply the reversible "door skip" lever to <paramref name="exe"/> in place. Idempotent: a no-op if
+    /// already applied. Refuses (throws <see cref="InvalidOperationException"/>) if the skip-swing window is
+    /// neither pristine nor already patched, or if the hold-gate guard bytes don't match — so it can never
+    /// corrupt an unexpected build. Both sites are file-backed <c>.text</c> (guarded by
+    /// <see cref="VaToFileOffset"/>).
+    /// </summary>
+    public static void ApplyDoorSkip(Span<byte> exe)
+    {
+        var swing = Slice(exe, VaToFileOffset(DoorSkipSwingVa), DoorSkipSwingCode.Length);
+        bool pristine = swing.SequenceEqual(DoorSkipSwingPristine);
+        bool patched = swing.SequenceEqual(DoorSkipSwingCode);
+        if (!pristine && !patched)
+            throw new InvalidOperationException(
+                $"door-skip window @0x{DoorSkipSwingVa:X} is neither pristine nor already patched; refusing to overwrite an unexpected build.");
+
+        int gate = VaToFileOffset(DoorHoldGateVa);
+        if (!Slice(exe, gate, DoorHoldGateSig.Length).SequenceEqual(DoorHoldGateSig))
+            throw new InvalidOperationException(
+                $"door-skip hold gate @0x{DoorHoldGateVa:X} guard mismatch (expected `cmp edx,imm8`); refusing.");
+
+        DoorSkipSwingCode.CopyTo(swing);   // A: skip the leaf-sweep
+        exe[gate + 2] = DoorHoldPatched;   // B: shorten the 60-frame hold
+    }
+
+    // ---- Fast-forward cutscenes (Experimental / crash risk): guarded SCD-VM tick multiplier ----
+    // cont.79 v2 (STATIC-SCD-RE): DC1 cutscene choreography is script-authored inside the flag(2,2)
+    // bracket; the native wrapper 0x409773 only letterboxes + saves/restores the player. The SCD VM's
+    // per-frame runner 0x46AA41 (one call = one tick for all 10 task slots) has exactly ONE caller —
+    // the 5-byte `call 0x46AA41` at 0x46F491. We repoint that call into a code cave that ticks once,
+    // then bursts extra ticks (SPEED-1) ONLY while flag(2,2) is set, no message is open (flags 2:0/2:1
+    // clear), and every active task is timer-sleeping (`+5==2`, word[+0] > 1). That last guard is
+    // load-bearing: runnable tasks (`+5==1`) are frame-paced constructs — op-0x12/0x18 polls, op-0x03
+    // yields, and the `02 0001` one-frame script->native barriers — that MUST wake on the natural tick,
+    // so they (and the async model loader they gate) are never outrun. Only dead air inside long timer
+    // sleeps compresses. NOTE (cont.80 RCA, CUTSCENE-DRAIN-NULL-SKELETON-RCA.md): the more aggressive
+    // "drain/auto-skip" variant that force-satisfies waits crashes by posing a model before its skeleton
+    // is resident — this v2 lever deliberately never forces a runnable wait, which is why it is safe.
+    // Crash risk remains "experimental" because it has not yet been broadly in-game witnessed.
+
+    /// <summary>VA of the SCD-VM runner's sole call site (`call 0x46AA41`) — the fast-forward hook. <c>[verified]</c></summary>
+    public const uint CutsceneFfHookVa = 0x0046F491;
+
+    /// <summary>VA of the fast-forward code cave in the <c>.text</c> zero-slack tail (clear of the shipped
+    /// hit-descriptor + walker caves at <c>0x61F900..0x61FC00</c>). <c>[verified]</c></summary>
+    public const uint CutsceneFfCaveVa = 0x0061FF80;
+
+    private static readonly byte[] CutsceneFfHookPristine = { 0xE8, 0xAB, 0xB5, 0xFF, 0xFF }; // call 0x46AA41
+
+    // Repoint the hook: `call CutsceneFfCaveVa`. rel32 = cave - (hook + 5).
+    private static readonly byte[] CutsceneFfHookPatched =
+        BuildRel32Call(CutsceneFfHookVa, CutsceneFfCaveVa);
+
+    // The 72-byte v2 cave, assembled offline for SPEED=8 at CutsceneFfCaveVa (absolute refs to the runner
+    // 0x46AA41, group-2 flag bank [0x643018], and task array 0x6B4660 are baked for this build).
+    private static readonly byte[] CutsceneFfCave =
+    {
+        0xE8, 0xBC, 0xAA, 0xE4, 0xFF, 0x56, 0xBE, 0x07, 0x00, 0x00, 0x00, 0xA1, 0x18, 0x30, 0x64, 0x00,
+        0x8B, 0x00, 0x83, 0xE0, 0x07, 0x83, 0xF8, 0x04, 0x75, 0x2C, 0xB9, 0x60, 0x46, 0x6B, 0x00, 0xBA,
+        0x0A, 0x00, 0x00, 0x00, 0x8A, 0x41, 0x05, 0x84, 0xC0, 0x74, 0x0A, 0x3C, 0x02, 0x75, 0x17, 0x66,
+        0x83, 0x39, 0x01, 0x76, 0x11, 0x81, 0xC1, 0xB0, 0x00, 0x00, 0x00, 0x4A, 0x75, 0xE6, 0xE8, 0x7E,
+        0xAA, 0xE4, 0xFF, 0x4E, 0x75, 0xC5, 0x5E, 0xC3,
+    };
+
+    private static byte[] BuildRel32Call(uint fromVa, uint toVa)
+    {
+        int rel = unchecked((int)(toVa - (fromVa + 5)));
+        return new byte[] { 0xE8, (byte)rel, (byte)(rel >> 8), (byte)(rel >> 16), (byte)(rel >> 24) };
+    }
+
+    /// <summary>True when the cutscene fast-forward patch is already applied (idempotency check).</summary>
+    public static bool IsCutsceneFastForwardApplied(ReadOnlySpan<byte> exe)
+        => Slice(exe, VaToFileOffset(CutsceneFfHookVa), CutsceneFfHookPatched.Length).SequenceEqual(CutsceneFfHookPatched);
+
+    /// <summary>
+    /// Apply the reversible "fast-forward cutscenes (experimental)" lever to <paramref name="exe"/> in place.
+    /// Idempotent: a no-op if already applied. Refuses (throws <see cref="InvalidOperationException"/>) if the
+    /// hook site is neither the pristine <c>call 0x46AA41</c> nor already patched, or if the cave region is not
+    /// zero-slack / already the cave (so it can never corrupt an unexpected build or a shipped cave). Both the
+    /// hook and the cave are file-backed <c>.text</c>.
+    /// </summary>
+    public static void ApplyCutsceneFastForward(Span<byte> exe)
+    {
+        var hook = Slice(exe, VaToFileOffset(CutsceneFfHookVa), CutsceneFfHookPristine.Length);
+        bool pristine = hook.SequenceEqual(CutsceneFfHookPristine);
+        bool patched = hook.SequenceEqual(CutsceneFfHookPatched);
+        if (!pristine && !patched)
+            throw new InvalidOperationException(
+                $"cutscene fast-forward hook @0x{CutsceneFfHookVa:X} is neither pristine `call 0x46AA41` nor already patched; refusing to overwrite an unexpected build.");
+
+        uint caveEnd = CutsceneFfCaveVa + (uint)CutsceneFfCave.Length;
+        if (!IsFileBacked(CutsceneFfCaveVa) || caveEnd > TextRawEndVa)
+            throw new ArgumentOutOfRangeException(nameof(CutsceneFfCaveVa),
+                $"fast-forward cave [0x{CutsceneFfCaveVa:X}, 0x{caveEnd:X}) must lie in the .text raw-slack window (.., 0x{TextRawEndVa:X}).");
+
+        int caveOff = VaToFileOffset(CutsceneFfCaveVa);
+        for (int i = 0; i < CutsceneFfCave.Length; i++)
+            if (exe[caveOff + i] != 0 && exe[caveOff + i] != CutsceneFfCave[i])
+                throw new InvalidOperationException(
+                    $"fast-forward cave at 0x{CutsceneFfCaveVa:X} byte 0x{i:X} = 0x{exe[caveOff + i]:X2} is neither zero-slack nor the intended cave byte; refusing (not a clean cave).");
+
+        CutsceneFfCave.CopyTo(exe.Slice(caveOff, CutsceneFfCave.Length));
+        CutsceneFfHookPatched.CopyTo(hook);
+    }
+
     /// <summary>One slot written by a starting-inventory patch (for logging).</summary>
     public readonly record struct StartingInvWrite(string Block, int Slot, byte Id, byte Count);
 

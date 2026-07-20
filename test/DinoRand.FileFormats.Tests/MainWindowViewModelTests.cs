@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Input.Platform;
 using DinoRand.App;
@@ -71,6 +72,30 @@ public class MainWindowViewModelTests
         Assert.True(pasted.CurrentConfig.ShuffleKeyItems);
         Assert.True(pasted.CurrentConfig.ShuffleKeyItemsIntoPickups);
         Assert.Equal(seed, pasted.SeedText);
+    }
+
+    [Fact]
+    public void Dc2_randomized_weapons_clears_and_disables_shared_weapons_then_roundtrips()
+    {
+        var vm = NewVm();
+        vm.SelectedGameIndex = 1;
+        vm.Dc2SharedWeapons = true;
+
+        vm.Dc2RandomizeWeapons = true;
+
+        Assert.False(vm.Dc2SharedWeapons);
+        Assert.False(vm.CanUseDc2SharedWeapons);
+        Assert.True(vm.CurrentConfig.Dc2RandomizeWeapons);
+        Assert.False(vm.CurrentConfig.Dc2SharedWeapons);
+
+        var pasted = NewVm();
+        pasted.SelectedGameIndex = 1;
+        pasted.SeedText = vm.SeedText;
+        Assert.True(pasted.Dc2RandomizeWeapons);
+        Assert.False(pasted.CanUseDc2SharedWeapons);
+
+        pasted.Dc2RandomizeWeapons = false;
+        Assert.True(pasted.CanUseDc2SharedWeapons);
     }
 
     // NormalizePickupVisuals (Lever A, PICKUP-GROUND-MODEL-FEASIBILITY.md) has no GUI toggle — the GUI
@@ -286,6 +311,240 @@ public class MainWindowViewModelTests
         vm.IsBusy = true;
 
         Assert.Contains(nameof(vm.CanPlayNow), raised);
+    }
+
+    // --- Archipelago connect tab (AP-CLIENT-PLAN.md increment 2) ---------------------------------
+    // The tab owns exactly one piece of logic: the connect/disconnect state machine around
+    // Dc1ApRunner. It is driven here with a fake runner (blocks until cancelled, like a real
+    // session) and a synchronous "UI post", so no server, no game and no dispatcher are involved.
+
+    /// <summary>A throwaway DC1-shaped install (Data\ holding a room file) so the tab's
+    /// "valid game folder" guard resolves without a real game.</summary>
+    private static string NewFakeDc1Install()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "dinorand_ap_vm_" + Guid.NewGuid().ToString("N"));
+        var data = Path.Combine(root, "Data");
+        Directory.CreateDirectory(data);
+        File.WriteAllBytes(Path.Combine(data, "st102.dat"), new byte[16]);   // DC1 room-file name shape
+        return root;
+    }
+
+    // The tab is pointless (and its Connect misleading) without a game to install into, so it is
+    // selectable only once a usable game resolves — same predicate the Install button uses.
+
+    [Fact]
+    public void Ap_tab_is_not_selectable_until_a_game_folder_resolves()
+    {
+        var vm = NewVm();
+
+        vm.GamePath = "";
+        vm.ValidateGamePath();
+        Assert.False(vm.ApTabEnabled);                       // nothing selected → tab greyed
+
+        var install = NewFakeDc1Install();
+        try
+        {
+            vm.GamePath = install;
+            vm.ValidateGamePath();
+            Assert.True(vm.ApTabEnabled);                    // real game folder → tab available
+        }
+        finally
+        {
+            try { Directory.Delete(install, recursive: true); } catch { }
+        }
+    }
+
+    [Fact]
+    public void Clearing_the_game_folder_pulls_the_user_off_the_ap_tab()
+    {
+        var vm = NewVm();
+        var install = NewFakeDc1Install();
+        try
+        {
+            vm.GamePath = install;
+            vm.ValidateGamePath();
+            vm.SelectedTabIndex = 1;                         // user is on the Archipelago tab
+
+            vm.GamePath = "";
+            vm.ValidateGamePath();
+
+            Assert.False(vm.ApTabEnabled);
+            Assert.Equal(0, vm.SelectedTabIndex);            // never leave a disabled tab showing
+        }
+        finally
+        {
+            try { Directory.Delete(install, recursive: true); } catch { }
+        }
+    }
+
+    [Fact]
+    public async Task Ap_connect_then_disconnect_runs_the_session_once_and_returns_to_idle()
+    {
+        using var started = new ManualResetEventSlim();
+        CancellationToken seen = default;
+        int runs = 0;
+
+        int FakeRunner(string hostPort, string slot, string password, string install, string outDir,
+            Action<string> log, Action<string> error, CancellationToken ct)
+        {
+            runs++;
+            seen = ct;
+            log($"connected: seed TEST, slot #1 '{slot}', goal room 060d");
+            started.Set();
+            ct.WaitHandle.WaitOne();          // a live session blocks until cancelled
+            log("disconnected");
+            return 0;
+        }
+
+        var vm = new MainWindowViewModel(new FakeFilePicker(), new FakeDialogs(), () => null!,
+            new AppSettings(), FakeRunner, a => a());
+        var install = NewFakeDc1Install();
+        try
+        {
+            vm.GamePath = install;
+            vm.ApSlot = "Regina";
+
+            vm.ApToggleConnectCommand.Execute(null);
+            Assert.True(started.Wait(TimeSpan.FromSeconds(5)), "the runner never started");
+            Assert.True(vm.ApRunning);
+            Assert.Equal("Disconnect", vm.ApConnectButtonText);
+            Assert.False(vm.ApFieldsEnabled);                       // fields lock while connected
+
+            vm.ApToggleConnectCommand.Execute(null);                // same button = disconnect
+            await vm.ApSessionTask;
+
+            Assert.True(seen.IsCancellationRequested);              // cancellation = the CLI's Ctrl-C path
+            Assert.Equal(1, runs);                                  // toggled, never started twice
+            Assert.False(vm.ApRunning);
+            Assert.Equal("Connect", vm.ApConnectButtonText);
+            Assert.True(vm.ApFieldsEnabled);
+            Assert.Contains(vm.ApLog, l => l.StartsWith("connected:", StringComparison.Ordinal));
+        }
+        finally
+        {
+            try { Directory.Delete(install, recursive: true); } catch { }
+        }
+    }
+
+    [Fact]
+    public void Ap_connect_refuses_without_a_slot_name_and_never_starts_a_session()
+    {
+        bool ran = false;
+        var vm = new MainWindowViewModel(new FakeFilePicker(), new FakeDialogs(), () => null!,
+            new AppSettings(),
+            (h, s, p, i, o, l, e, ct) => { ran = true; return 0; },
+            a => a());
+
+        vm.ApSlot = "";
+        vm.ApToggleConnectCommand.Execute(null);
+
+        Assert.False(ran);
+        Assert.False(vm.ApRunning);
+        Assert.Null(vm.ApSessionTask);
+        Assert.Contains("slot name", vm.ApStatusText);
+    }
+
+    // --- Shutdown safety (GUI-SHUTDOWN-AND-CANCEL-PLAN.md) ---------------------------------------
+    // Closing the window kills the AP session / install while the GAME KEEPS RUNNING, so the close
+    // is confirmed — but ONLY when something is actually in flight. A confirmation nobody would
+    // answer "no" to is the anti-pattern; an idle close must stay instant and silent.
+
+    [Fact]
+    public void Idle_close_is_never_confirmed()
+    {
+        var vm = NewVm();
+
+        Assert.False(vm.IsBusy);
+        Assert.False(vm.ApRunning);
+        Assert.False(vm.ShouldConfirmClose);
+    }
+
+    [Fact]
+    public void Close_is_confirmed_while_connected_or_installing_and_install_wins_the_message()
+    {
+        var vm = NewVm();
+
+        vm.ApRunning = true;
+        Assert.True(vm.ShouldConfirmClose);
+        Assert.Contains("Archipelago", vm.CloseConfirmMessage);
+
+        vm.ApRunning = false;
+        vm.IsBusy = true;
+        Assert.True(vm.ShouldConfirmClose);
+        Assert.Contains("installing", vm.CloseConfirmMessage);
+
+        // Both in flight: the half-written game folder is the worse consequence, so it wins.
+        vm.ApRunning = true;
+        Assert.Contains("installing", vm.CloseConfirmMessage);
+        Assert.Contains("Restore Originals", vm.CloseConfirmMessage);
+    }
+
+    [Fact]
+    public void Confirm_close_state_raises_change_notifications_for_the_dialog_decision()
+    {
+        // The view reads ShouldConfirmClose at close time, but the title bar binds live — without
+        // these notifications the window title would keep saying "Connected" after disconnect.
+        var vm = NewVm();
+        var raised = new List<string>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        vm.ApRunning = true;
+
+        Assert.Contains(nameof(vm.ShouldConfirmClose), raised);
+        Assert.Contains(nameof(vm.CloseConfirmMessage), raised);
+        Assert.Contains(nameof(vm.WindowTitle), raised);
+    }
+
+    [Fact]
+    public void Window_title_carries_the_connected_slot_and_reverts_on_disconnect()
+    {
+        var vm = NewVm();
+        Assert.Equal(MainWindowViewModel.DefaultWindowTitle, vm.WindowTitle);
+
+        vm.ApSlot = "Regina";
+        vm.ApHostPort = "archipelago.gg:38281";
+        vm.ApRunning = true;
+        Assert.Contains("Regina", vm.WindowTitle);
+        Assert.Contains("Connected", vm.WindowTitle);
+
+        vm.ApRunning = false;
+        Assert.Equal(MainWindowViewModel.DefaultWindowTitle, vm.WindowTitle);
+    }
+
+    [Fact]
+    public async Task Cancelling_running_work_stops_a_live_ap_session()
+    {
+        // The confirmed-close path calls CancelRunningWork() instead of letting the process die,
+        // so the session takes its normal finally-path (state save + clean disconnect).
+        using var started = new ManualResetEventSlim();
+        int FakeRunner(string hostPort, string slot, string password, string install, string outDir,
+            Action<string> log, Action<string> error, CancellationToken ct)
+        {
+            started.Set();
+            ct.WaitHandle.WaitOne();
+            return 0;
+        }
+
+        var vm = new MainWindowViewModel(new FakeFilePicker(), new FakeDialogs(), () => null!,
+            new AppSettings(), FakeRunner, a => a());
+        var install = NewFakeDc1Install();
+        try
+        {
+            vm.GamePath = install;
+            vm.ApSlot = "Regina";
+            vm.ApToggleConnectCommand.Execute(null);
+            Assert.True(started.Wait(TimeSpan.FromSeconds(5)));
+
+            vm.CancelRunningWork();
+            await vm.ApSessionTask;
+
+            Assert.False(vm.ApRunning);
+            Assert.False(vm.ShouldConfirmClose);             // nothing left in flight
+        }
+        finally
+        {
+            try { Directory.Delete(install, recursive: true); } catch { }
+        }
     }
 
     // --- Friendly install/restore errors (GUI de-clutter: no raw exception strings in the UI) -----

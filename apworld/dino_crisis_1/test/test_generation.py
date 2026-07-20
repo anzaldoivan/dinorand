@@ -11,7 +11,10 @@ every door-gating item is progression, and the DDK disc AND-gates). Run these in
 Archipelago checkout (.github/workflows/apworld-checks.yml) so the shipped world — not just a python
 re-simulation — is validated the AP way (GRAPH-LOGIC-PARITY parity contract).
 """
+from BaseClasses import Item, ItemClassification
+
 from .. import data as dc1
+from ..world import DinoCrisis1Item
 from .bases import DinoCrisis1TestBase
 
 # One of the goal-room (Underground Heliport, 060d) checks; all of them sit behind the Key Card gate.
@@ -62,9 +65,99 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
             self.assertTrue(all(i.advancement for i in items),
                             f"{name} gates an edge but is not a progression item")
 
+    def test_excluded_locations_hold_no_progression(self) -> None:
+        # Shared-taken-flag locations (ap-client-checks.json `excluded`, dc1_logic v2) cannot be
+        # attributed individually by the runtime client — fill must keep progression out.
+        from Fill import distribute_items_restrictive
+        excluded = [loc["name"] for loc in dc1.LOCATIONS if loc.get("excluded")]
+        self.assertEqual(12, len(excluded), "excluded tail drifted — regenerate the contract")
+        distribute_items_restrictive(self.multiworld)
+        for name in excluded:
+            item = self.multiworld.get_location(name, self.player).item
+            self.assertIsNotNone(item, f"{name} unfilled")
+            self.assertFalse(item.advancement, f"progression item '{item.name}' on excluded '{name}'")
+
+    def test_slot_data_placements_cover_every_location(self) -> None:
+        # The loop-closing channel (AP-CLIENT-PLAN.md D5): every location must appear in
+        # placements with either a valid DC1 game item id or the other-world marker.
+        from Fill import distribute_items_restrictive
+        distribute_items_restrictive(self.multiworld)
+        slot_data = self.world.fill_slot_data()
+        self.assertEqual(2, slot_data["logic_version"])
+        placements = slot_data["placements"]
+        self.assertEqual(len(dc1.LOCATIONS), len(placements))
+        valid_ids = set(dc1.GAME_ITEM_ID.values())
+        for loc in dc1.LOCATIONS:
+            ap_id = str(dc1.LOCATION_NAME_TO_ID[loc["name"]])
+            self.assertIn(ap_id, placements, f"no placement for {loc['name']}")
+            value = placements[ap_id]
+            self.assertTrue(value == dc1.OTHER_WORLD_MARKER or value in valid_ids,
+                            f"bad placement value {value} at {loc['name']}")
+
+    def test_not_beatable_without_fc_device(self) -> None:
+        # Every edge into the goal room (0503->060d, 0607->060d) requires the F.C. Device —
+        # the second hard goal gate besides Key Card Lv. A.
+        fc_device = dc1.ITEM_NAMES[58]
+        self.collect_all_but([fc_device])
+        self.assertBeatable(False)
+
+    def test_slot_data_marks_foreign_items_with_marker(self) -> None:
+        # The runtime client renders another slot's item as the marker pickup. Exercise the
+        # item.player/item.game discrimination in fill_slot_data directly (a solo fill never
+        # takes that branch): a foreign-game item AND a same-game-other-slot item must both
+        # become OTHER_WORLD_MARKER.
+        from Fill import distribute_items_restrictive
+        distribute_items_restrictive(self.multiworld)
+        loc_a = self.multiworld.get_location(_first_location_in("0100"), self.player)
+        loc_b = self.multiworld.get_location(_first_location_in("0103"), self.player)
+        loc_a.item = Item("Foreign Widget", ItemClassification.filler, None, self.player + 1)
+        loc_b.item = DinoCrisis1Item("An. Aid", ItemClassification.filler, None, self.player + 1)
+        slot_data = self.world.fill_slot_data()
+        self.assertEqual(dc1.OTHER_WORLD_MARKER, slot_data["placements"][str(loc_a.address)])
+        self.assertEqual(dc1.OTHER_WORLD_MARKER, slot_data["placements"][str(loc_b.address)])
+
+    def test_slot_data_item_ids_shape(self) -> None:
+        # item_ids is the client's AP-id -> game-id grant map: complete, valid, and never
+        # colliding with the other-world marker value.
+        slot_data = self.world.fill_slot_data()
+        item_ids = slot_data["item_ids"]
+        self.assertEqual(len(dc1.ITEM_NAME_TO_ID), len(item_ids))
+        valid_ids = set(dc1.GAME_ITEM_ID.values())
+        for ap_id, game_id in item_ids.items():
+            self.assertIn(int(ap_id), dc1.ITEM_NAME_TO_ID.values(), f"unknown AP id {ap_id}")
+            self.assertIn(game_id, valid_ids, f"AP id {ap_id} maps to invalid game id {game_id}")
+            self.assertNotEqual(dc1.OTHER_WORLD_MARKER, game_id)
+
     def test_ddk_disc_pairs_are_and_gated(self) -> None:
         # A DDK Input+Code disc door needs BOTH discs (native op58-3 AND-gate, [[ddk-disc-relocation]]).
         # 0304->0300 (discs E) and 0604->0609 (discs W) both bite in the star model with a location present.
         for room, discs in (("0300", ["DDK Input Disc E", "DDK Code Disc E"]),
                             ("0609", ["DDK Input Disc W", "DDK Code Disc W"])):
             self.assertAccessDependency([_first_location_in(room)], [discs], only_check_listed=True)
+
+
+class TestMinimalAccessibility(DinoCrisis1TestBase):
+    """Generic AP suite (fill / reachability / seeding) under accessibility: minimal —
+    the universal option most likely to expose a rule/region wiring hole."""
+    options = {"accessibility": "minimal"}
+
+
+class TestStartInventory(DinoCrisis1TestBase):
+    """Generic AP suite with a precollected goal gate — catches pool/count math breaking
+    when a progression item starts in inventory instead of the pool."""
+    options = {"start_inventory": {"Key Card Lv. A": 1}}
+
+
+class TestDeterminism(DinoCrisis1TestBase):
+    def test_same_seed_same_placements(self) -> None:
+        # slot_data is the install contract — the same multiworld seed must produce the same
+        # placements byte-for-byte (unseeded randomness in get_filler_item_name or set-iteration
+        # order would silently break reroll reproducibility).
+        from Fill import distribute_items_restrictive
+
+        def generate(seed: int) -> dict:
+            self.world_setup(seed)
+            distribute_items_restrictive(self.multiworld)
+            return dict(self.world.fill_slot_data()["placements"])
+
+        self.assertEqual(generate(20260719), generate(20260719))

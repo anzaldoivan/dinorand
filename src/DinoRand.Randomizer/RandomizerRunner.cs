@@ -67,8 +67,13 @@ public sealed class RandomizerRunner
     /// <param name="emitSpoiler">Write <c>SPOILER.md</c> beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
     /// The spoiler is a pure projection of the passes' recorded decisions, built strictly AFTER every
     /// game file is written — turning it off changes no other output byte (regression-locked).</param>
+    /// <param name="ct">Cancels the GENERATE phase only — every write here lands in
+    /// <paramref name="outputDir"/> (the working mod dir), so aborting touches no game file. The
+    /// overlay onto <c>Data\</c> is <see cref="Install.GameInstaller.Install"/>, which is
+    /// deliberately NOT cancellable: it is sub-second, and tearing it in half is exactly the
+    /// partial-install state the GUI's close warning exists to avoid.</param>
     public RunResult Run(string installDir, string outputDir, Seed seed, RandomizerConfig config,
-                         bool emitSpoiler = true)
+                         bool emitSpoiler = true, CancellationToken ct = default)
     {
         var logLines = new List<string>();
         void Log(string line) => logLines.Add(line);
@@ -97,6 +102,7 @@ public sealed class RandomizerRunner
         foreach (var pass in _passes)
         {
             if (!pass.IsEnabled(config)) continue;
+            ct.ThrowIfCancellationRequested();   // between passes: nothing is written yet
             pass.Apply(context);
         }
 
@@ -114,6 +120,7 @@ public sealed class RandomizerRunner
 
         foreach (var (rref, room) in refs.Zip(rooms))
         {
+            ct.ThrowIfCancellationRequested();   // mod-dir writes only — safe to abort mid-way
             // A pass may supply final bytes (a post-serialization transform like a texture import); otherwise
             // emit the RoomFile as edited in place.
             var bytes = context.TryGetRoomOutput(room, out var overridden) ? overridden : room.Write();

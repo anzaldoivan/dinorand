@@ -58,6 +58,9 @@ jobs:
             ( cd "dist/$rid" && zip -r "../../dinorand-v$VERSION-$rid.zip" . )
           done
 
+      - name: Package .apworld release assets
+        run: python3 scripts/package_apworlds.py
+
       - name: Extract release notes from CHANGELOG.md
         id: notes
         run: |
@@ -88,7 +91,7 @@ jobs:
           else
             NOTES="--generate-notes"
           fi
-          gh release create "v$VERSION" ./dinorand-v"$VERSION"-*.zip \
+          gh release create "v$VERSION" ./dinorand-v"$VERSION"-*.zip ./dist/*.apworld \
             --title "v$VERSION" \
             --target "$GITHUB_SHA" \
             $NOTES \

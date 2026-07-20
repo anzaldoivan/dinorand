@@ -137,14 +137,19 @@ each published executable is the whole tool.
 
 ## Archipelago (experimental)
 
-DinoRand ships a Python [Archipelago](https://archipelago.gg) world in **`apworld/dino_crisis_1/`**.
-It's separate from the .NET build — drop the folder into an Archipelago checkout's `worlds/` and AP
-can generate a Dino Crisis 1 multiworld seed. **Status: DC1 *generation half* only** (verified against
-AP 0.6.8); no in-game client/patching yet, and DC2 is not supported. It ships **no game assets** — the
-logic is distilled from authored data via `scripts/gen_ap_logic.py`.
+DinoRand ships a Python [Archipelago](https://archipelago.gg) world in **`apworld/dino_crisis_1/`**
+(zip it as `dino_crisis_1.apworld` for AP's `custom_worlds/`, or drop the folder into a source
+checkout's `worlds/` — verified against AP 0.6.7) **plus a DC1 runtime client** in the DinoRand CLI:
+`dinorand --ap-connect <host[:port]> --ap-slot <name> --install <dir>` patches AP's item placement
+into your GOG install and syncs the running game — pickups become checks, received items appear in
+your inventory, reaching the goal completes your slot. The full loop (connect, checks, grants,
+reconnect, goal) is live-verified end-to-end. The client polls `DINO.exe` from outside the
+process (nothing injected) and therefore runs on the **Windows host only**. DC2 is generation-only
+for now. It ships **no game assets** — the logic is distilled from authored data via
+`scripts/gen_ap_logic.py`.
 
-Setup + tests: **[apworld/dino_crisis_1/README.md](apworld/dino_crisis_1/README.md)**. Design notes:
-`docs/decisions/cross/ARCHIPELAGO-INTEGRATION-FEASIBILITY.md`.
+Setup + tests: **[apworld/dino_crisis_1/README.md](apworld/dino_crisis_1/README.md)** and the
+USER-GUIDE "Archipelago" section.
 
 ## Contributing & Releases
 

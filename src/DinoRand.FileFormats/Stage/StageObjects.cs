@@ -200,6 +200,12 @@ public sealed class ItemRecord
     public const int IdOffset = 0x1c;
     /// <summary>Byte offset of the count word within the record.</summary>
     public const int CountOffset = 0x1e;
+    /// <summary>Byte offset of the <b>take-index</b> word — the pickup's per-record taken-flag id:
+    /// registration <c>0x426C9C</c> suppresses via <c>GetFlag(7, word[rec+0x20])</c> (group 8 for
+    /// id 0xFF) and the take commit <c>0x44A6A1/0x44A6B9</c> sets the same flag. 0 = never
+    /// suppressed (the pickup respawns). EXE-SYMBOLS cont.81; consumed by the AP runtime client
+    /// (data/dc1/ap-client-checks.json rekey plan).</summary>
+    public const int TakeIndexOffset = 0x20;
     /// <summary>Byte offset of the ground-visual display-node slot (<c>0xFF</c> = no visual /
     /// interaction-only). STATIC-SCD-RE cont.72 — the <c>scratch+0x7CE8</c> pool index this pickup's
     /// visual node occupies, shared with op23 scenery nodes.</summary>
@@ -244,6 +250,14 @@ public sealed class ItemRecord
     /// <summary>The id as decoded from the file, before any randomizer edit. Drives change
     /// detection (so an unedited room round-trips byte-exact) and the empty-slot check.</summary>
     public int OriginalItemId { get; set; }
+
+    /// <summary>Take-index word (<see cref="TakeIndexOffset"/>) — written back only when it
+    /// differs from <see cref="OriginalTakeIndex"/> (the AP client's rekey; the standalone
+    /// randomizer never changes it, so its rooms round-trip byte-exact).</summary>
+    public ushort TakeIndex { get; set; }
+
+    /// <summary>The take index as decoded from the file (change detection).</summary>
+    public ushort OriginalTakeIndex { get; set; }
 
     /// <summary>True for an empty / runtime-armed slot (id 0xFF) — the randomizer leaves these alone.</summary>
     public bool IsEmptySlot => OriginalItemId == EmptySlotId;

@@ -68,11 +68,12 @@ public static class PickupModelImporter
 
     /// <summary>
     /// Find a home for <paramref name="cut"/> in the target room's VRAM: a 64-aligned texture
-    /// column in [512, 960] where the sub-rect — kept at its donor intra-page X offset and its Y —
-    /// collides with neither the target's own uploads nor <paramref name="staged"/> (rects already
-    /// claimed by earlier imports into this room), and a free CLUT row (X kept, Y scanned upward
-    /// from the bottom). Fail-closed: no free column/row → <c>false</c> (caller falls back to the
-    /// Lever-A generic panel).
+    /// column inside the room arena <c>[512,768)</c> (<see cref="TextureImporter.RoomArenaX"/> —
+    /// everything past it is engine-global icon/font VRAM) where the sub-rect — kept at its donor
+    /// intra-page X offset and its Y — collides with neither the target's own uploads nor
+    /// <paramref name="staged"/> (rects already claimed by earlier imports into this room), and a
+    /// free vanilla-witnessed CLUT row (<see cref="TextureImporter.RoomClutRows"/>, X kept).
+    /// Fail-closed: no free column/row → <c>false</c> (caller falls back to the Lever-A generic panel).
     /// </summary>
     public static bool TryPlace(ReadOnlySpan<byte> targetFile, IReadOnlyCollection<VramRect> staged,
                                 PickupTextureCut cut, out PickupTexturePlacement? placement)
@@ -86,10 +87,10 @@ public static class PickupModelImporter
 
         VramRect texAt = default;
         int col = -1;
-        for (int x = 512; x <= 960; x += 64)
+        for (int x = TextureImporter.RoomArenaX; x < TextureImporter.RoomArenaEnd; x += 64)
         {
             var cand = cut.TexRect with { X = x + intraX };
-            if (cand.X + cand.W > TextureImporter.VramWidth) continue;
+            if (cand.X + cand.W > TextureImporter.RoomArenaEnd) continue;
             if (occupied.Any(r => Intersects(r, cand))) continue;
             col = x; texAt = cand; break;
         }
@@ -97,7 +98,7 @@ public static class PickupModelImporter
 
         VramRect clutAt = default;
         int row = -1;
-        for (int y = TextureImporter.VramHeight - 1; y >= 480; y--)
+        foreach (int y in TextureImporter.RoomClutRows)
         {
             var cand = cut.ClutRect with { Y = y };
             if (occupied.Any(r => Intersects(r, cand))) continue;

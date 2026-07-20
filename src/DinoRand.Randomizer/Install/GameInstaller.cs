@@ -926,6 +926,83 @@ public static class GameInstaller
     }
 
     /// <summary>
+    /// Apply the DC1 "door skip (experimental)" lever to <c>DINO.exe</c>: remove the door-transition swing so
+    /// room-to-room transitions are near-instant, while keeping the destination background/room-view commit
+    /// intact (cont.78, LIVE-CONFIRMED). Two small reversible <c>.text</c> windows via
+    /// <see cref="ExePatcher.ApplyDoorSkip"/>; idempotent and additive (composes with any other exe patch,
+    /// leaves the shared animation stepper untouched). Backs up the pristine exe once, records the patch in
+    /// the manifest, and is reversed byte-identically by <see cref="Restore"/>. Not seed-dependent.
+    /// </summary>
+    public static ExePatchResult PatchExeDoorSkip(string dataDir, string? seedLabel = null)
+    {
+        var exePath = ResolveExeForPatch(dataDir);
+
+        var backupDir = Path.Combine(dataDir, BackupDirName);
+        Directory.CreateDirectory(backupDir);
+        var exeBackup = Path.Combine(backupDir, ExeName);
+        if (!File.Exists(exeBackup))
+            File.Copy(exePath, exeBackup); // capture the pristine exe once (for --restore)
+
+        byte[] bytes = File.ReadAllBytes(exePath);
+        ExePatcher.ApplyDoorSkip(bytes); // idempotent + guarded against an unexpected build
+        File.WriteAllBytes(exePath, bytes);
+
+        string entry = $"door skip (experimental): state-1 leaf-sweep skipped @0x{ExePatcher.DoorSkipSwingVa:X}, " +
+                       $"bg hold {ExePatcher.DoorHoldPristine}->{ExePatcher.DoorHoldPatched} frames @0x{ExePatcher.DoorHoldGateVa:X}";
+        const string key = "door skip";
+        var manifest = ReadManifest(dataDir) ?? new InstallManifest(seedLabel, DateTime.UtcNow.ToString("o"),
+            Array.Empty<string>());
+        var repoints = (manifest.ExeRepoints ?? Array.Empty<string>())
+            .Where(r => !r.StartsWith(key, StringComparison.Ordinal))
+            .Append(entry)
+            .ToList();
+        manifest = manifest with { ExePatched = true, ExeRepoints = repoints };
+        File.WriteAllText(Path.Combine(backupDir, ManifestName),
+            JsonSerializer.Serialize(manifest, JsonOpts));
+
+        return new ExePatchResult(exePath, exeBackup, new[] { entry });
+    }
+
+    /// <summary>
+    /// Apply the DC1 "fast-forward cutscenes (experimental / crash risk)" lever to <c>DINO.exe</c>: repoint the
+    /// SCD-VM runner's sole call site into a guarded tick-multiplier cave (cont.79 v2), so dead air inside
+    /// cutscenes compresses while every side-effect op still commits, message/voice pacing is preserved, and
+    /// runnable poll waits (incl. async model loads) are never outrun. One reversible <c>.text</c> hook + a
+    /// zero-slack code cave via <see cref="ExePatcher.ApplyCutsceneFastForward"/>; idempotent and additive.
+    /// Backs up the pristine exe once, records the patch in the manifest, and is reversed byte-identically by
+    /// <see cref="Restore"/>. Not seed-dependent.
+    /// </summary>
+    public static ExePatchResult PatchExeFastForwardCutscenes(string dataDir, string? seedLabel = null)
+    {
+        var exePath = ResolveExeForPatch(dataDir);
+
+        var backupDir = Path.Combine(dataDir, BackupDirName);
+        Directory.CreateDirectory(backupDir);
+        var exeBackup = Path.Combine(backupDir, ExeName);
+        if (!File.Exists(exeBackup))
+            File.Copy(exePath, exeBackup); // capture the pristine exe once (for --restore)
+
+        byte[] bytes = File.ReadAllBytes(exePath);
+        ExePatcher.ApplyCutsceneFastForward(bytes); // idempotent + guarded against an unexpected build
+        File.WriteAllBytes(exePath, bytes);
+
+        string entry = $"fast-forward cutscenes (experimental): SCD-VM tick multiplier hook @0x{ExePatcher.CutsceneFfHookVa:X} " +
+                       $"-> cave @0x{ExePatcher.CutsceneFfCaveVa:X}";
+        const string key = "fast-forward cutscenes";
+        var manifest = ReadManifest(dataDir) ?? new InstallManifest(seedLabel, DateTime.UtcNow.ToString("o"),
+            Array.Empty<string>());
+        var repoints = (manifest.ExeRepoints ?? Array.Empty<string>())
+            .Where(r => !r.StartsWith(key, StringComparison.Ordinal))
+            .Append(entry)
+            .ToList();
+        manifest = manifest with { ExePatched = true, ExeRepoints = repoints };
+        File.WriteAllText(Path.Combine(backupDir, ManifestName),
+            JsonSerializer.Serialize(manifest, JsonOpts));
+
+        return new ExePatchResult(exePath, exeBackup, new[] { entry });
+    }
+
+    /// <summary>
     /// Scramble the DC1 keypad-code puzzle family (Management Office / Lounge / Computer-Room-gas safes +
     /// the Stabilizer codes) so each lock's accepted 4-digit code is seed-derived, and keep the in-game
     /// document that states the code in sync — the <b>displayed == checked</b> invariant
