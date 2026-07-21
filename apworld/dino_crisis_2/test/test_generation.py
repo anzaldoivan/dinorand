@@ -29,6 +29,21 @@ class TestGeneration(DinoCrisis2TestBase):
             sorted(dc2.ITEM_NAMES[item_id] for item_id in dc2.POOL_ITEM_IDS),
         )
 
+    def test_local_items_are_restricted_to_writer_compatibility_class(self) -> None:
+        for row in dc2.LOCATIONS:
+            location = self.multiworld.get_location(row["name"], 1)
+            self.assertTrue(location.item_rule(self.world.create_item(row["itemName"])))
+            incompatible_id = next(
+                item_id for item_id in dc2.POOL_ITEM_IDS
+                if dc2.ITEM_PLACEMENT_CLASSES[item_id] != row["placementClass"]
+            )
+            self.assertFalse(
+                location.item_rule(self.world.create_item(dc2.ITEM_NAMES[incompatible_id]))
+            )
+            remote = self.world.create_item(row["itemName"])
+            remote.player = 2
+            self.assertFalse(location.item_rule(remote))
+
     def test_catalog_and_location_ids_are_contract_backed(self) -> None:
         self.assertEqual(
             dc2.ITEM_NAME_TO_ID,

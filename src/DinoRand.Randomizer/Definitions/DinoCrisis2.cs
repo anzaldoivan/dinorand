@@ -8,10 +8,8 @@ namespace DinoRand.Randomizer.Definitions;
 /// (docs/parity/BIORAND-REUSE-VALIDATION.md Q3). Mirrors BioRand registering a new per-game module
 /// (<c>Re2Randomiser</c>) next to the others.
 ///
-/// <para><b>⚠ STUB.</b> Room discovery is real (<c>rebirth/Data/ST*.DAT</c>); everything that depends
-/// on the in-room record decode — key items, item pool, scripted rooms, door gating, start/goal —
-/// is a placeholder pending docs/reference/dc2/_registries/KNOWLEDGE-AND-QUESTIONS.md OPEN&#160;#1/#2/#5/#6. The
-/// <see cref="EnemyHelper"/> (BioRand <c>IEnemyHelper</c> port) is the one piece that is ready.</para>
+/// Item/key behavior is loaded from the generated v2 fixture contract and is restricted to its
+/// 42 proven op-0x35/op-0x2c writer sites; SAT-1 physical triggers remain a separate surface.
 /// </summary>
 public sealed class DinoCrisis2 : GameDefinition
 {
@@ -19,16 +17,10 @@ public sealed class DinoCrisis2 : GameDefinition
     public override string DisplayName => "Dino Crisis 2";
     public override string ExecutableName => "Dino2.exe";
 
-    /// <summary>Implemented (generate/installable from the frontend) as of the cross-species enemy
-    /// randomizer shipping (docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md). DC2 still supports only
-    /// <see cref="GameFeature.Enemies"/> — item/key/door randomization stay greyed until their in-room
-    /// record decode lands (KaQ OPEN #2/#5/#6) — but it is no longer fenced out of Generate/Install.
-    /// docs/decisions/cross/GAME-SELECTOR-PLAN.md §8.</summary>
+    /// <summary>The generate/install pipeline supports the feature set declared below.</summary>
     public override bool IsImplemented => true;
 
-    /// <summary>DC2 opts into <see cref="GameFeature.Enemies"/> — the cross-species enemy randomizer is the
-    /// first shipped DC2 feature (the room-file slot-5 TYPE swap, docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md), so
-    /// the UI's "Randomize enemies" option (plus the DC2 setpiece/boss donor sub-toggles) enables for DC2.
+    /// <summary>DC2 opts into its implemented item, key, enemy, player-model, and voice surfaces.
     /// <see cref="GameFeature.PlayerModel"/> is the <b>character-skin swap</b> (Dylan renders as
     /// Extra Crisis Gail/Rick via their engine-native WP graft files + the WP-gate exe patch,
     /// docs/reference/dc2/models/DC2-EXTRA-CRISIS-ROSTER-DECODE.md §7–9, in-game verified) — it replaces the withdrawn
@@ -37,9 +29,16 @@ public sealed class DinoCrisis2 : GameDefinition
     /// <see cref="GameFeature.Voices"/> exposes the DC2 voice UI (cast labelled by the 2026-07-05
     /// folder-curation pass, data/dc2/voice.json); emission itself still waits on
     /// <see cref="Voice.Dc2VoiceManifestLayout.IsDecoded"/>.
-    /// Every other option group stays fenced until its in-room record decode lands (KaQ OPEN #2/#5/#6).</summary>
+    /// Other option groups stay fenced until their required contracts land.</summary>
     public override IReadOnlySet<GameFeature> SupportedFeatures { get; } =
-        new HashSet<GameFeature> { GameFeature.Enemies, GameFeature.PlayerModel, GameFeature.Voices };
+        new HashSet<GameFeature>
+        {
+            GameFeature.Items,
+            GameFeature.KeyItems,
+            GameFeature.Enemies,
+            GameFeature.PlayerModel,
+            GameFeature.Voices,
+        };
 
     /// <summary>
     /// DC2-specific enemy abstraction (BioRand <c>IEnemyHelper</c> analogue). Deliberately a member of
@@ -49,14 +48,21 @@ public sealed class DinoCrisis2 : GameDefinition
     /// </summary>
     public IDc2EnemyHelper EnemyHelper { get; } = new Dc2EnemyHelper();
 
-    // --- Placeholders below: DC2 item/key/door semantics are OPEN until the records decode. ---
+    public override IReadOnlySet<int> KeyItemIds { get; } =
+        Enumerable.Range(0x21, 0x34 - 0x21 + 1).ToHashSet();
 
-    public override IReadOnlySet<int> KeyItemIds { get; } = new HashSet<int>();          // TODO(dc2): OPEN #5
-    public override IReadOnlyList<ItemPoolEntry> ItemPool { get; } = Array.Empty<ItemPoolEntry>(); // TODO(dc2)
+    /// <summary>The exact health multiset at the v2 fillable writer sites. Entries have neutral
+    /// weight because standalone DC2 permutes the fixture multiset rather than sampling it.</summary>
+    public override IReadOnlyList<ItemPoolEntry> ItemPool { get; } =
+        Dc2ItemData.LoadEmbedded().Locations
+            .Where(x => x.RewriteClass == FileFormats.Stage.Dc2.Dc2ItemEditor.ItemRewriteClass.Health)
+            .Select(x => new ItemPoolEntry(x.ItemId, x.ItemName, 1d, ItemCategory.Health))
+            .ToArray();
+
     public override IReadOnlySet<int> ScriptedEnemyRoomCodes { get; } = new HashSet<int>(); // TODO(dc2)
-    public override int StartRoomCode => 0x000;  // TODO(dc2): real start room (KaQ K14 id space)
-    public override int GoalRoomCode => 0x000;   // TODO(dc2): real goal room
-    public override IReadOnlyCollection<int> KeyItemsForDoor(int doorType) => Array.Empty<int>(); // TODO(dc2): OPEN #2
+    public override int StartRoomCode => 0x101;
+    public override int GoalRoomCode => 0x504;
+    public override IReadOnlyCollection<int> KeyItemsForDoor(int doorType) => Array.Empty<int>();
 
     // ST + decimal stage digit + two hexadecimal room digits (KaQ K14).
     private static readonly System.Text.RegularExpressions.Regex RoomPattern =

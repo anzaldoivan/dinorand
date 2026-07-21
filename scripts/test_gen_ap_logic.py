@@ -68,6 +68,38 @@ class Dc2LogicV2Tests(unittest.TestCase):
         self.assertNotIn(0x33, pooled)
         self.assertNotIn(0x34, pooled)
 
+    def test_locations_and_items_publish_writer_compatibility_classes(self) -> None:
+        item_classes = {
+            int(item_id): rewrite_class
+            for item_id, rewrite_class in self.data["items"]["rewriteClasses"].items()
+        }
+        self.assertEqual("health", item_classes[0x1A])
+        self.assertNotIn(0x1E, item_classes)
+        self.assertEqual("generic_key", item_classes[0x2E])
+        self.assertEqual("special_key_2f", item_classes[0x2F])
+        for location in self.data["locations"]:
+            self.assertEqual(
+                item_classes[location["itemId"]],
+                location["rewriteClass"],
+                location["sourceId"],
+            )
+
+    def test_nonprogression_temporary_ownership_items_have_fixed_placement_classes(self) -> None:
+        self.assertEqual(
+            [0x22, 0x23, 0x2B],
+            self.data["items"]["fixedLifecycleItemIds"],
+        )
+        in_pool = {
+            location["itemId"]: location
+            for location in self.data["locations"]
+            if location["itemId"] in {0x22, 0x2B}
+        }
+        self.assertEqual({0x22, 0x2B}, set(in_pool))
+        self.assertEqual("fixed_lifecycle_22", in_pool[0x22]["placementClass"])
+        self.assertEqual("fixed_lifecycle_2b", in_pool[0x2B]["placementClass"])
+        gas = next(location for location in self.data["locations"] if location["itemId"] == 0x2E)
+        self.assertEqual("generic_key", gas["placementClass"])
+
     def test_all_conditional_commits_have_one_disposition(self) -> None:
         rows = self.data["conditionalCommitDispositions"]
         self.assertEqual(91, len(rows))
@@ -79,6 +111,34 @@ class Dc2LogicV2Tests(unittest.TestCase):
             row["disposition"] == "excluded_sat1_physical_trigger"
             for row in item_rows
         ))
+
+    def test_door_dispositions_preserve_resolved_native_predicates(self) -> None:
+        dispositions = {
+            row["id"]: row
+            for row in self.data["conditionalCommitDispositions"]
+            if row["kind"] == "door"
+        }
+        for guard in self.guards["door_guards"]:
+            identity = (
+                f"ST{guard['room']}:door@{guard['commit_off']}->ST{guard['dest_id']}"
+            )
+            self.assertEqual(
+                [clause["expr"] for clause in guard["guards"]],
+                dispositions[identity]["nativeConditions"],
+                identity,
+            )
+        item_dispositions = {
+            row["id"]: row
+            for row in self.data["conditionalCommitDispositions"]
+            if row["kind"] == "item"
+        }
+        for guard in self.guards["item_guards"]:
+            identity = f"ST{guard['room']}:item@{guard['commit_off']}"
+            self.assertEqual(
+                [clause["expr"] for clause in guard["guards"]],
+                item_dispositions[identity]["nativeConditions"],
+                identity,
+            )
 
     def test_gas_mask_gate_occurs_exactly_once(self) -> None:
         gas_edges = [

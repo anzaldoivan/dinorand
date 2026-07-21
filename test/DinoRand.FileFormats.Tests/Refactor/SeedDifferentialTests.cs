@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -215,7 +216,9 @@ public sealed class SeedDifferentialTests
         InputFingerprint? inputFingerprint = null;
         try
         {
-            string install = game == "dc1" ? SyntheticInputs.CreateDc1Install(root) : SyntheticInputs.CreateDc2Install(root);
+            string install = game == "dc1"
+                ? SyntheticInputs.CreateDc1Install(root)
+                : SyntheticInputs.CreateDc2Install(root, config);
             string output = Path.Combine(root, "output");
             inputFingerprint = SyntheticInputs.Fingerprint(install, game);
             int discovered;
@@ -359,7 +362,7 @@ internal static class SyntheticInputs
         return Path.Combine(root, "install");
     }
 
-    public static string CreateDc2Install(string root)
+    public static string CreateDc2Install(string root, RandomizerConfig config)
     {
         string data = Directory.CreateDirectory(Path.Combine(root, "install", "rebirth", "Data")).FullName;
         File.WriteAllBytes(Path.Combine(data, "ST104.DAT"), BigBlobRoom(0x1000,
@@ -373,6 +376,14 @@ internal static class SyntheticInputs
                 PadScdBlob(Dc2CircuitPatchTests.MakePackage(spec), 0x1A000));
         File.WriteAllBytes(Path.Combine(data, "ST205.DAT"),
             PadScdBlob(Dc2PlateKeyPatchTests.MakePackage(), 0x1A000));
+        if (config.RandomizeItems)
+        {
+            foreach (string roomId in new[] { "ST104", "ST202", "ST402" })
+            {
+                string path = Path.Combine(data, roomId + ".DAT");
+                File.WriteAllBytes(path, AddItemSites(File.ReadAllBytes(path), roomId));
+            }
+        }
         return Path.Combine(root, "install");
     }
 
@@ -395,6 +406,67 @@ internal static class SyntheticInputs
         return SyntheticRoom.Package(GianPackage.Dc2EntrySize,
             (GianEntryType.Lzss0, Lzss.Compress(blob)),
             (GianEntryType.Data, new byte[16]));
+    }
+
+    private static byte[] AddItemSites(byte[] packageBytes, string roomId)
+    {
+        Dc2ItemEditor.ItemSiteSpec[] sites = Dc2ItemData.LoadEmbedded().Locations
+            .Where(location => location.RoomId == roomId)
+            .Select(location => location.Site).ToArray();
+        Assert.NotEmpty(sites);
+        Assert.All(sites, site =>
+        {
+            Assert.Equal(0, site.RoutineOrdinal);
+            Assert.Equal(0, site.VmDirectoryIndex);
+            Assert.Equal(new[] { 0 }, site.VmDirectoryIndices);
+        });
+
+        var package = GianPackage.TryParse(packageBytes)!;
+        int entryIndex = package.Entries.ToList().FindIndex(entry => entry.Type == GianEntryType.Lzss0);
+        var entry = package.Entries[entryIndex];
+        byte[] blob = Lzss.Decompress(packageBytes.AsSpan(entry.PayloadOffset, (int)entry.DeclaredSize));
+        int requiredLength = Math.Max(blob.Length, sites.Max(site => site.OpOffset) + 0x100);
+        Array.Resize(ref blob, requiredLength);
+        blob.AsSpan(0, 0x80).Clear();
+
+        const int sectionStart = 0x80;
+        const int opBase = sectionStart + 0x1c;
+        int routineStart = sites[0].RoutineStart;
+        Assert.All(sites, site => Assert.Equal(routineStart, site.RoutineStart));
+        BinaryPrimitives.WriteUInt32LittleEndian(blob.AsSpan(0x14, 4),
+            Dc2DoorEditor.BlobBaseVa + sectionStart);
+        BinaryPrimitives.WriteUInt32LittleEndian(blob.AsSpan(opBase, 4),
+            (uint)(routineStart - opBase));
+        BinaryPrimitives.WriteUInt32LittleEndian(blob.AsSpan(opBase + 4, 4),
+            (uint)(blob.Length - sectionStart));
+
+        int routineEnd = sites.Max(site => site.OpOffset) + 2;
+        blob.AsSpan(routineStart, routineEnd - routineStart).Clear();
+        for (int offset = routineStart; offset < routineEnd; offset += 2)
+            blob[offset] = 0x10;
+        foreach (Dc2ItemEditor.ItemSiteSpec site in sites)
+        {
+            int firstPush = site.SlotOperand?.PushOffset ?? site.KindOperand!.PushOffset;
+            for (int push = firstPush; push < site.OpOffset; push += 4)
+            {
+                blob[push] = 0x05;
+                blob[push + 1] = 0;
+                BinaryPrimitives.WriteInt16LittleEndian(blob.AsSpan(push + 2, 2), 0);
+            }
+            foreach (Dc2ItemEditor.OperandPin pin in new[]
+                     {
+                         site.ItemOperand, site.P3Operand, site.Flag5Operand, site.CleanupOperand,
+                         site.KindOperand, site.SlotOperand,
+                     }.OfType<Dc2ItemEditor.OperandPin>())
+            {
+                blob[pin.PushOffset] = 0x05;
+                blob[pin.PushOffset + 1] = pin.Mode;
+                BinaryPrimitives.WriteInt16LittleEndian(blob.AsSpan(pin.ValueOffset, 2), pin.ExpectedValue);
+            }
+            blob[site.OpOffset] = site.Opcode;
+            blob[site.OpOffset + 1] = 0;
+        }
+        return PackageRepacker.ReplaceEntryDc2(packageBytes, entryIndex, Lzss.Compress(blob));
     }
 
     public static InputFingerprint Fingerprint(string install, string game)

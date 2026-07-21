@@ -278,7 +278,8 @@ public class MainWindowViewModelTests
         vm.SelectedGameIndex = 1;                         // → DC2
 
         Assert.Equal("dc2", vm.SelectedGame.Id);
-        Assert.False(vm.CanRandomizeItems);               // DC2 doesn't support items → greyed
+        Assert.True(vm.CanRandomizeItems);                // DC2 v2 supports direct-source item shuffle
+        Assert.True(vm.CanShuffleKeyItems);
         Assert.True(vm.Dc2RaptorPanelVisible);
         Assert.NotEqual(@"X:\only-dc1", vm.GamePath);     // DC2 slice starts blank, not DC1's path
 

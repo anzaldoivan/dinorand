@@ -125,6 +125,23 @@ def main() -> int:
     assert sorted(item.name for item in mw.itempool) == sorted(
         dc2.ITEM_NAMES[item_id] for item_id in dc2.POOL_ITEM_IDS
     )
+    # D3 item-ID writes are class-preserving. AP's generic fill must never seat one of this
+    # world's health items in a key operand (or vice versa), because the static installer would
+    # correctly reject that placement.
+    fillable_by_name = {location.name: location for location in fillable}
+    for row in dc2.LOCATIONS:
+        location = fillable_by_name[row["name"]]
+        vanilla = world.create_item(dc2.ITEM_NAMES[row["itemId"]])
+        assert location.item_rule(vanilla), row["sourceId"]
+        incompatible_id = next(
+            item_id for item_id in dc2.POOL_ITEM_IDS
+            if dc2.ITEM_PLACEMENT_CLASSES[item_id] != row["placementClass"]
+        )
+        incompatible = world.create_item(dc2.ITEM_NAMES[incompatible_id])
+        assert not location.item_rule(incompatible), row["sourceId"]
+        remote = world.create_item(dc2.ITEM_NAMES[row["itemId"]])
+        remote.player = 2
+        assert not location.item_rule(remote), row["sourceId"]
     assert 1 in mw.completion_condition, "completion condition not set"
 
     # Simulate a completed AP fill so slot_data can close the install/runtime loop.

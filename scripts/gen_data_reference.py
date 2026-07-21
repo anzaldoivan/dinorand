@@ -136,36 +136,47 @@ def build_dc2_doc():
                     [(e["id"], e["name"], e.get("category", "—")) for e in items["catalog"]])
     lines += ["", f"Key item ids: {', '.join(items['keyItemIds'])}.", ""]
 
-    ft = items.get("_field_pickup_types", {}).get("types", {})
-    if ft:
-        lines += ["## Field-pickup types (op-0x31 id space — separate from the catalog; "
-                  "item lever unverified, K77)", ""]
-        lines += _table(["Type", "Meaning"], sorted(ft.items(), key=lambda kv: int(kv[0])))
-        lines += [""]
-
     placements = _load(DATA2, "item-placements.json")["rooms"]
     room_name = {r["id"]: r.get("name") or r.get("zone") or r["id"] for r in rooms}
-    lines += ["## Vanilla pickup locations", "",
-              "One row per op-0x31 field pickup (the ONE DC2 item path — SAT-1 touch trigger "
-              "in the room's slot-5 script; `data/dc2/item-placements.json` is canonical). "
-              "X,Z = the trigger quad's first corner (signed; rec+4/rec+6). `Type` is the "
-              "op-0x31 id byte = the VM-thread slot, empirically 1:1 with the nominal item "
-              "class (K77) — it is NOT the granted catalog id: the grant is produced at "
-              "runtime by `routine[param]` + native code and is difficulty-remapped for "
-              "health items (K98/K99; e.g. a type-1 \"Med Pak S\" pickup granted catalog "
-              "0x1c Med Pak M on Normal). Types 3/4/6/8/9 have no witnessed name yet. "
-              "Shop stock, emergency boxes and cutscene awards are separate systems, not "
-              "rows here.", ""]
+    lines += ["## SAT-1 physical triggers (op-0x31; not catalog items)", "",
+              "One row per SAT-1/op-`0x31` VM-thread trigger in "
+              "`data/dc2/item-placements.json`. The record's `thread` byte selects a VM-thread "
+              "slot and `routine` selects a slot-5 routine; neither is a catalog id, item class, "
+              "quantity, or rewrite lever (K77/K129). X,Z is the trigger quad's first signed "
+              "corner. Catalog-bearing acquisition sites are listed separately below.", ""]
     prows = []
     for st, its in sorted(placements.items()):
         code = st[2:]
         for it in sorted(its, key=lambda i: i["slot"]):
             pos = it.get("pos") or ["?", "?"]
-            prows.append((code, room_name.get(code, code), it["id"],
-                          it.get("name") or ft.get(str(it["id"]), "—").split(" (")[0],
-                          f"{pos[0]},{pos[1]}", it["slot"], it["param"]))
-    lines += _table(["Room", "Room name", "Type", "Nominal item", "X,Z", "Slot", "Routine"],
-                    prows)
+            prows.append((code, room_name.get(code, code), it["source_id"],
+                          f"{pos[0]},{pos[1]}", it["slot"], it["thread"], it["routine"],
+                          it["vm_directory_index"]))
+    lines += _table(["Room", "Room name", "Source", "X,Z", "SAT slot", "VM thread",
+                     "Target routine", "VM directory"], prows)
+    lines += [""]
+
+    source_doc = _load(DATA2, "item-sources.json")
+    catalog_names = {int(row["id"], 16): row.get("name") or "—" for row in items["catalog"]}
+    direct = [row for row in source_doc["sources"]
+              if row["source_type"] in ("op35_take", "op2c_give")]
+    lines += ["## Direct catalog-bearing acquisition sources", "",
+              "Literal in-catalog SAT-5/op-`0x35` TAKE and kind-1 op-`0x2C` GIVE sites from "
+              "`data/dc2/item-sources.json`. Writer eligibility proves an item-id-only edit; AP "
+              "availability is the stricter cross-difficulty/non-missable placement contract. "
+              "Site flags, cleanup handles, opcode identity, modes, offsets, and expected values "
+              "remain pinned and are never shuffled with the catalog id.", ""]
+    drows = []
+    for row in sorted(direct, key=lambda value: value["source_id"]):
+        item_id = int(row["catalog_id"], 16)
+        availability = row.get("ap_availability", {})
+        drows.append((row["source_id"], row["source_type"], row["catalog_id"],
+                      catalog_names.get(item_id, "—"), row.get("rewrite_class", "—"),
+                      "yes" if row.get("eligible_item_rewrite") else "no",
+                      availability.get("disposition", "excluded"),
+                      availability.get("reason") or row.get("reason", "—")))
+    lines += _table(["Source", "Record", "Catalog", "Item", "Rewrite class", "Writer", "AP",
+                     "Disposition"], drows)
     lines += [""]
 
     lines += ["## Enemy roster", ""]

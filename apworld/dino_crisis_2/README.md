@@ -8,6 +8,12 @@ places the Victory event in ST504 behind the guarded ST503→ST504 transition.
 SAT-1/op-`0x31` VM triggers are not treated as catalog items. Unsupported, dynamic, missable, and
 unproven-availability sources remain explicit exclusions in the contract and slot data.
 
+Every physical source is local-only and accepts exactly its generated writer/lifecycle class. This
+is required by the output-only v2 installer: remote item delivery and live check polling remain
+deferred until a separate runtime protocol is decoded. Slot data closes the static install contract
+with complete placement and source-ID maps; the installer fails closed on remote, incomplete, stale,
+or incompatible placements.
+
 ## Layout
 | File | Role |
 |------|------|

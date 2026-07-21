@@ -341,6 +341,17 @@ DC2_PROGRESSION_ITEMS = [0x2E]
 DC2_OPTIONAL_FIXED_ITEMS = [0x33, 0x34]
 
 
+def _dc2_rewrite_class(item_id: int) -> str | None:
+    """Return the D3 item-ID-only writer compatibility class, if supported."""
+    if 0x1A <= item_id <= 0x1F and item_id != 0x1E:
+        return "health"
+    if item_id == 0x2F:
+        return "special_key_2f"
+    if 0x21 <= item_id <= 0x2E or 0x30 <= item_id <= 0x34:
+        return "generic_key"
+    return None
+
+
 def _stable_dc2_source_id(source_id: str) -> int:
     """Addition-stable AP id derived directly from the immutable source identity."""
     value = 0x811C9DC5
@@ -410,6 +421,12 @@ def build_dc2() -> dict:
     if source_doc.get("schema_version") != 2:
         raise SystemExit("gen_ap_logic: DC2 item-sources schema v2 with ap_availability required")
     catalog_names, key_ids, catalog_rows = _dc2_catalog()
+    fixed_lifecycle_ids = sorted({
+        _item_id(source["catalog_id"])
+        for source in source_doc["sources"]
+        if source["source_type"] == "group9_clear" and source.get("catalog_id")
+        and _item_id(source["catalog_id"]) not in DC2_PROGRESSION_ITEMS
+    })
     stage_rooms = json.loads((DC2 / "stage-room-map.json").read_text(encoding="utf-8"))["rooms"]
     supported = {row["st_id"] for row in stage_rooms} - DC2_EXCLUDED_ROOMS
     regions = {code: f"ST{code}" for code in sorted(supported)}
@@ -457,6 +474,9 @@ def build_dc2() -> dict:
                 continue
             identity = (src, row["commit_off"], encoded_dest)
             guard = guarded_door.get(identity)
+            native_conditions = [
+                clause["expr"] for clause in (guard or {}).get("guards", [])
+            ]
             disposition = (
                 "modeled_resolved_computed_destination"
                 if physical and physical.get("conditional_dests")
@@ -489,6 +509,7 @@ def build_dc2() -> dict:
                     "commitOff": row["commit_off"],
                     "requiresItems": required_items,
                     "requiresRooms": rooms,
+                    "nativeConditions": native_conditions,
                     "disposition": disposition,
                 })
 
@@ -500,6 +521,7 @@ def build_dc2() -> dict:
         dispositions.append({
             "id": f"ST{row['room']}:door@{row['commit_off']}->ST{row['dest_id']}",
             "kind": "door",
+            "nativeConditions": [clause["expr"] for clause in row["guards"]],
             "disposition": door_disposition(prov, row),
         })
     source_by_offset = {
@@ -516,6 +538,7 @@ def build_dc2() -> dict:
             "id": f"ST{row['room']}:item@{row['commit_off']}",
             "kind": "item",
             "sourceId": source["source_id"],
+            "nativeConditions": [clause["expr"] for clause in row["guards"]],
             "disposition": "excluded_sat1_physical_trigger",
         })
     dispositions.sort(key=lambda row: row["id"])
@@ -533,6 +556,12 @@ def build_dc2() -> dict:
             exclusion_reason[source_id] = reason
             continue
         iid = _item_id(source["catalog_id"])
+        rewrite_class = source["rewrite_class"]
+        if _dc2_rewrite_class(iid) != rewrite_class:
+            raise AssertionError(
+                f"fixture rewrite class mismatch: {source_id} item 0x{iid:02X} "
+                f"is {rewrite_class!r}"
+            )
         ap_id = _stable_dc2_source_id(source_id)
         if ap_id in used_ap_ids:
             raise AssertionError(
@@ -551,6 +580,10 @@ def build_dc2() -> dict:
             "requiresItems": [],
             "requiresRooms": required_rooms,
             "sourceType": source["source_type"],
+            "rewriteClass": rewrite_class,
+            "placementClass": (
+                f"fixed_lifecycle_{iid:02x}" if iid in fixed_lifecycle_ids else rewrite_class
+            ),
             "collectedFlag": f"5:{source['flag5']}",
         })
     locations.sort(key=lambda row: row["sourceId"])
@@ -592,6 +625,17 @@ def build_dc2() -> dict:
             "keyItemIds": key_ids,
             "progressionItemIds": DC2_PROGRESSION_ITEMS,
             "optionalFixedItemIds": DC2_OPTIONAL_FIXED_ITEMS,
+            "fixedLifecycleItemIds": fixed_lifecycle_ids,
+            "rewriteClasses": {
+                str(iid): rewrite_class
+                for iid in sorted(catalog_names)
+                if (rewrite_class := _dc2_rewrite_class(iid)) is not None
+            },
+            "placementClasses": {
+                str(iid): (f"fixed_lifecycle_{iid:02x}" if iid in fixed_lifecycle_ids else rewrite_class)
+                for iid in sorted(catalog_names)
+                if (rewrite_class := _dc2_rewrite_class(iid)) is not None
+            },
             "poolItemIds": pool_ids,
             "pool": [
                 {"id": iid, "name": catalog_names[iid], "count": count}
@@ -602,12 +646,11 @@ def build_dc2() -> dict:
 
 
 def _reachable_rooms(data: dict, held: set[int]) -> set[str]:
-    """Simulate the apworld's region model (star topology + gated-edge overlay) to a fixpoint.
+    """Simulate either generated topology to a reachability fixpoint.
 
-    Every room that is NOT the target of a gated edge is freely reachable from the origin.
-    Gated-target rooms open only through their edge once its items/visit-gates are satisfied.
-    Mirrors DinoCrisis1World.create_regions/set_rules so `--check` proves the graph is solvable
-    without an Archipelago checkout.
+    DC2 v2 starts at its byte-proven room and follows only physical edges. The historical DC1
+    contract retains its Menu-star plus gated-edge overlay. This mirrors each apworld closely
+    enough for ``--check`` to prove the authored graph without an Archipelago checkout.
     """
     if data.get("topology") == "physical":
         reach = {data["startRoom"]}
@@ -650,7 +693,7 @@ def _forward_fill_beatable(data: dict) -> bool:
 
 
 def _check_common(data: dict) -> dict:
-    """Schema/structural invariants that hold for every game (vacuous on an empty stub).
+    """Schema/structural invariants shared by every generated game contract.
     Returns the int-keyed item-name map for the caller."""
     for field in ("startRoom", "goalRoom", "regions", "edges", "locations"):
         assert field in data, f"missing contract field: {field}"

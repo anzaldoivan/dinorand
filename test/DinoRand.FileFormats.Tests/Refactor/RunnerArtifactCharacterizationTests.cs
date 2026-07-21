@@ -39,12 +39,13 @@ public sealed class RunnerArtifactCharacterizationTests
         string root = Directory.CreateTempSubdirectory("dinorand-w1-art-dc2-").FullName;
         try
         {
-            string install = SyntheticInputs.CreateDc2Install(root);
+            var config = new RandomizerConfig();
+            string install = SyntheticInputs.CreateDc2Install(root, config);
             string a = Path.Combine(root, "a");
             string b = Path.Combine(root, "b");
             var runner = new Dc2RandomizerRunner(new DinoCrisis2());
-            var first = runner.Run(install, a, new Seed(1001), new RandomizerConfig());
-            var second = runner.Run(install, b, new Seed(1001), new RandomizerConfig());
+            var first = runner.Run(install, a, new Seed(1001), config);
+            var second = runner.Run(install, b, new Seed(1001), config);
             Assert.Equal(5, first.RoomCount);
             Assert.True(first.RoomsWritten > 0);
             Assert.Contains("ST104.DAT", first.WrittenFiles, StringComparer.OrdinalIgnoreCase);

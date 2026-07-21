@@ -112,6 +112,7 @@
       "commitOff": "0x7e80",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -121,6 +122,7 @@
       "commitOff": "0x7ed4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -130,6 +132,7 @@
       "commitOff": "0x130e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -139,6 +142,7 @@
       "commitOff": "0x11368",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -148,6 +152,9 @@
       "commitOff": "0x200fc",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(6,14)"
+      ],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -157,6 +164,7 @@
       "commitOff": "0x20c52",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "modeled_resolved_computed_destination"
     },
     {
@@ -166,6 +174,7 @@
       "commitOff": "0x20c52",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "modeled_resolved_computed_destination"
     },
     {
@@ -175,6 +184,7 @@
       "commitOff": "0x20c52",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "modeled_resolved_computed_destination"
     },
     {
@@ -184,6 +194,7 @@
       "commitOff": "0x21356",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -193,6 +204,7 @@
       "commitOff": "0x239e2",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -202,6 +214,7 @@
       "commitOff": "0x14c0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -211,6 +224,7 @@
       "commitOff": "0x1514",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -220,6 +234,7 @@
       "commitOff": "0x751c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -229,6 +244,7 @@
       "commitOff": "0x7570",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -240,6 +256,9 @@
       "requiresRooms": [
         "002"
       ],
+      "nativeConditions": [
+        "flag(6,15)"
+      ],
       "disposition": "modeled_monotonic_story"
     },
     {
@@ -249,6 +268,7 @@
       "commitOff": "0x37e4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -258,6 +278,7 @@
       "commitOff": "0x39d8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -267,6 +288,7 @@
       "commitOff": "0x3a2c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -276,6 +298,7 @@
       "commitOff": "0xa800",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -285,6 +308,7 @@
       "commitOff": "0xa800",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -294,6 +318,7 @@
       "commitOff": "0xa8f4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -303,6 +328,7 @@
       "commitOff": "0xae5e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -312,6 +338,7 @@
       "commitOff": "0xaf3a",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -323,6 +350,9 @@
       "requiresRooms": [
         "002"
       ],
+      "nativeConditions": [
+        "flag(6,15)"
+      ],
       "disposition": "modeled_monotonic_story"
     },
     {
@@ -332,6 +362,7 @@
       "commitOff": "0x1d10",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -341,6 +372,7 @@
       "commitOff": "0x1d64",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -350,6 +382,7 @@
       "commitOff": "0x3358",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -359,6 +392,7 @@
       "commitOff": "0x33ac",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -368,6 +402,7 @@
       "commitOff": "0x8880",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -377,6 +412,7 @@
       "commitOff": "0x88d4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -386,6 +422,7 @@
       "commitOff": "0x9f44",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -395,6 +432,9 @@
       "commitOff": "0x9fbc",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(8,3)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     },
     {
@@ -404,6 +444,7 @@
       "commitOff": "0xa050",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -413,6 +454,7 @@
       "commitOff": "0x4dae",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -422,6 +464,7 @@
       "commitOff": "0x4e02",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -431,6 +474,7 @@
       "commitOff": "0x7406",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -440,6 +484,7 @@
       "commitOff": "0x745a",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -449,6 +494,7 @@
       "commitOff": "0x83f4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -458,6 +504,7 @@
       "commitOff": "0x8448",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -467,6 +514,7 @@
       "commitOff": "0x26ec",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -476,6 +524,7 @@
       "commitOff": "0x2740",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -485,6 +534,7 @@
       "commitOff": "0x3a8c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -494,6 +544,7 @@
       "commitOff": "0x3ae0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -503,6 +554,7 @@
       "commitOff": "0x3b34",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -512,6 +564,7 @@
       "commitOff": "0x11056",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -521,6 +574,7 @@
       "commitOff": "0x110aa",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -530,6 +584,7 @@
       "commitOff": "0xe3f4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -539,6 +594,7 @@
       "commitOff": "0xe448",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -550,6 +606,9 @@
         46
       ],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(9,46)"
+      ],
       "disposition": "modeled_item_gate"
     },
     {
@@ -559,6 +618,9 @@
       "commitOff": "0xcc2c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(8,3)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     },
     {
@@ -568,6 +630,7 @@
       "commitOff": "0xccc0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -577,6 +640,7 @@
       "commitOff": "0xce6e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -586,6 +650,7 @@
       "commitOff": "0x6140",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -595,6 +660,7 @@
       "commitOff": "0x61ca",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -604,6 +670,7 @@
       "commitOff": "0x2de4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -613,6 +680,7 @@
       "commitOff": "0x2e38",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -622,6 +690,7 @@
       "commitOff": "0xf24c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -631,6 +700,7 @@
       "commitOff": "0xf2a0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -640,6 +710,7 @@
       "commitOff": "0xf2f4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -649,6 +720,7 @@
       "commitOff": "0x2098",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -658,6 +730,7 @@
       "commitOff": "0x20ec",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -667,6 +740,7 @@
       "commitOff": "0x24c8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -676,6 +750,7 @@
       "commitOff": "0x251c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -685,6 +760,7 @@
       "commitOff": "0x25a4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -694,6 +770,7 @@
       "commitOff": "0x25e2",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -703,6 +780,7 @@
       "commitOff": "0x4082",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -712,6 +790,7 @@
       "commitOff": "0xd1d6",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -721,6 +800,7 @@
       "commitOff": "0xedac",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -730,6 +810,7 @@
       "commitOff": "0xf784",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -739,6 +820,7 @@
       "commitOff": "0x5094",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -748,6 +830,7 @@
       "commitOff": "0x50e8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -757,6 +840,7 @@
       "commitOff": "0x513c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -766,6 +850,7 @@
       "commitOff": "0x904e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -775,6 +860,7 @@
       "commitOff": "0x61c8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -784,6 +870,7 @@
       "commitOff": "0x6324",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -793,6 +880,7 @@
       "commitOff": "0x4eba",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -802,6 +890,7 @@
       "commitOff": "0x4f86",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -811,6 +900,7 @@
       "commitOff": "0x4fda",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -820,6 +910,7 @@
       "commitOff": "0x50aa",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -829,6 +920,7 @@
       "commitOff": "0x73f0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -838,6 +930,7 @@
       "commitOff": "0x74bc",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -847,6 +940,7 @@
       "commitOff": "0x3f82",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -856,6 +950,7 @@
       "commitOff": "0x3fd6",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -865,6 +960,7 @@
       "commitOff": "0x2b94",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -874,6 +970,7 @@
       "commitOff": "0xc5f0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -883,6 +980,7 @@
       "commitOff": "0xc644",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -892,6 +990,7 @@
       "commitOff": "0x7b0e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -901,6 +1000,7 @@
       "commitOff": "0x7f2e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -910,6 +1010,7 @@
       "commitOff": "0x1a8c2",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -919,6 +1020,7 @@
       "commitOff": "0x12eaa",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -928,6 +1030,7 @@
       "commitOff": "0x3028",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -937,6 +1040,7 @@
       "commitOff": "0x307c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -946,6 +1050,7 @@
       "commitOff": "0x2c68",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -955,6 +1060,7 @@
       "commitOff": "0x2cbc",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -964,6 +1070,7 @@
       "commitOff": "0xa59c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -973,6 +1080,7 @@
       "commitOff": "0x18f8c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -982,6 +1090,10 @@
       "commitOff": "0x126c8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
@@ -991,6 +1103,10 @@
       "commitOff": "0x12874",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
@@ -1000,6 +1116,12 @@
       "commitOff": "0x13a4c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(flag(7,29))",
+        "ELSE",
+        "1",
+        "syscall(fam=0,arg=30)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1009,6 +1131,10 @@
       "commitOff": "0x12430",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
@@ -1018,6 +1144,10 @@
       "commitOff": "0x12484",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
@@ -1027,6 +1157,10 @@
       "commitOff": "0x12600",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
@@ -1036,6 +1170,10 @@
       "commitOff": "0x12654",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
@@ -1045,6 +1183,12 @@
       "commitOff": "0x12ac4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(flag(7,29))",
+        "ELSE",
+        "1",
+        "syscall(fam=0,arg=30)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1054,6 +1198,7 @@
       "commitOff": "0xcb6c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1063,6 +1208,7 @@
       "commitOff": "0xcbc0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1072,6 +1218,7 @@
       "commitOff": "0x1168",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1081,6 +1228,7 @@
       "commitOff": "0x11bc",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1090,6 +1238,7 @@
       "commitOff": "0x2190",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1099,6 +1248,7 @@
       "commitOff": "0x21e4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1108,6 +1258,7 @@
       "commitOff": "0x2a70",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1117,6 +1268,7 @@
       "commitOff": "0x2ac4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1126,6 +1278,7 @@
       "commitOff": "0x267f4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1135,6 +1288,7 @@
       "commitOff": "0x26848",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1144,6 +1298,10 @@
       "commitOff": "0x15f56",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(flag(6,44))",
+        "ELSE"
+      ],
       "disposition": "modeled_victory_commit"
     },
     {
@@ -1153,6 +1311,7 @@
       "commitOff": "0x2120",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1162,6 +1321,7 @@
       "commitOff": "0x2174",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1171,6 +1331,7 @@
       "commitOff": "0x20f8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1180,6 +1341,7 @@
       "commitOff": "0x214c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1189,6 +1351,7 @@
       "commitOff": "0x1d6c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1198,6 +1361,7 @@
       "commitOff": "0x1dc0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1207,6 +1371,7 @@
       "commitOff": "0x3c24",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1216,6 +1381,7 @@
       "commitOff": "0x3c78",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1225,6 +1391,9 @@
       "commitOff": "0x3cf0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(8,9)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     },
     {
@@ -1234,6 +1403,7 @@
       "commitOff": "0x4aaa",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1243,6 +1413,7 @@
       "commitOff": "0x2ea4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1252,6 +1423,7 @@
       "commitOff": "0x2ef8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1261,6 +1433,7 @@
       "commitOff": "0x11262",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1270,6 +1443,7 @@
       "commitOff": "0x112b6",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1279,6 +1453,9 @@
       "commitOff": "0x14362",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1288,6 +1465,9 @@
       "commitOff": "0xe400",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(flag(6,20))"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1297,6 +1477,9 @@
       "commitOff": "0xf126",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1306,6 +1489,7 @@
       "commitOff": "0xb1f8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1315,6 +1499,11 @@
       "commitOff": "0xe586",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(6,52)",
+        "(CHARACTER(+0x108F) == 0)",
+        "flag(5,2)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
@@ -1324,6 +1513,7 @@
       "commitOff": "0x4670",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1333,6 +1523,7 @@
       "commitOff": "0x38f8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1342,6 +1533,7 @@
       "commitOff": "0x394c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1351,6 +1543,7 @@
       "commitOff": "0x262c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1360,6 +1553,7 @@
       "commitOff": "0x2680",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1369,6 +1563,7 @@
       "commitOff": "0x6a6c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1378,6 +1573,7 @@
       "commitOff": "0x6ac0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1387,6 +1583,7 @@
       "commitOff": "0x6b14",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1396,6 +1593,7 @@
       "commitOff": "0xae60",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1405,6 +1603,7 @@
       "commitOff": "0xaeb4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1414,6 +1613,7 @@
       "commitOff": "0xaf08",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1423,6 +1623,7 @@
       "commitOff": "0x53f6",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1432,6 +1633,7 @@
       "commitOff": "0x544a",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1441,6 +1643,7 @@
       "commitOff": "0xd3b4",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1450,6 +1653,9 @@
       "commitOff": "0x10894",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1459,6 +1665,10 @@
       "commitOff": "0x18516",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "((word(scene+0x10A8) == 1798) && !(flag(5,17)))",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1468,6 +1678,9 @@
       "commitOff": "0x18610",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(6,22)"
+      ],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1477,6 +1690,7 @@
       "commitOff": "0x1a0b0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1486,6 +1700,7 @@
       "commitOff": "0x1a138",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1495,6 +1710,9 @@
       "commitOff": "0x1a952",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
@@ -1504,6 +1722,7 @@
       "commitOff": "0x463e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1513,6 +1732,7 @@
       "commitOff": "0x470a",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1522,6 +1742,7 @@
       "commitOff": "0x475e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1531,6 +1752,7 @@
       "commitOff": "0x2df8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1540,6 +1762,7 @@
       "commitOff": "0x89e0",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1549,6 +1772,7 @@
       "commitOff": "0x8a34",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1558,6 +1782,7 @@
       "commitOff": "0x1c98",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1567,6 +1792,7 @@
       "commitOff": "0x1cec",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1576,6 +1802,7 @@
       "commitOff": "0x784a",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1585,6 +1812,7 @@
       "commitOff": "0x789e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1594,6 +1822,7 @@
       "commitOff": "0xb874",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1603,6 +1832,7 @@
       "commitOff": "0xb8c8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1612,6 +1842,7 @@
       "commitOff": "0x581a",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1621,6 +1852,7 @@
       "commitOff": "0x586e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1630,6 +1862,7 @@
       "commitOff": "0xc342",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1639,6 +1872,7 @@
       "commitOff": "0xfca6",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1648,6 +1882,7 @@
       "commitOff": "0x19aae",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1657,6 +1892,7 @@
       "commitOff": "0x4df60",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1666,6 +1902,7 @@
       "commitOff": "0x319e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1675,6 +1912,7 @@
       "commitOff": "0x31f2",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1684,6 +1922,7 @@
       "commitOff": "0x38fc",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1693,6 +1932,7 @@
       "commitOff": "0x3950",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1702,6 +1942,7 @@
       "commitOff": "0x1d7c",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1711,6 +1952,7 @@
       "commitOff": "0x19d8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1720,6 +1962,9 @@
       "commitOff": "0x1b40",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [
+        "flag(8,27)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     },
     {
@@ -1729,6 +1974,7 @@
       "commitOff": "0x1d80",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "fixed_vanilla_variant"
     },
     {
@@ -1738,6 +1984,7 @@
       "commitOff": "0xc91e",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     },
     {
@@ -1747,6 +1994,7 @@
       "commitOff": "0x90c8",
       "requiresItems": [],
       "requiresRooms": [],
+      "nativeConditions": [],
       "disposition": "unconditional_physical_door"
     }
   ],
@@ -1762,6 +2010,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:103"
     },
     {
@@ -1775,6 +2025,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:77"
     },
     {
@@ -1788,6 +2040,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:74"
     },
     {
@@ -1801,6 +2055,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:66"
     },
     {
@@ -1814,6 +2070,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:83"
     },
     {
@@ -1827,6 +2085,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:72"
     },
     {
@@ -1840,6 +2100,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:110"
     },
     {
@@ -1853,6 +2115,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op2c_give",
+      "rewriteClass": "generic_key",
+      "placementClass": "generic_key",
       "collectedFlag": "5:16"
     },
     {
@@ -1866,6 +2130,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:78"
     },
     {
@@ -1879,6 +2145,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:86"
     },
     {
@@ -1892,6 +2160,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:100"
     },
     {
@@ -1905,6 +2175,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:71"
     },
     {
@@ -1918,6 +2190,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:101"
     },
     {
@@ -1931,6 +2205,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op2c_give",
+      "rewriteClass": "generic_key",
+      "placementClass": "fixed_lifecycle_2b",
       "collectedFlag": "5:12"
     },
     {
@@ -1944,6 +2220,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:87"
     },
     {
@@ -1957,6 +2235,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:88"
     },
     {
@@ -1970,6 +2250,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:109"
     },
     {
@@ -1983,6 +2265,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:94"
     },
     {
@@ -1996,6 +2280,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:104"
     },
     {
@@ -2009,6 +2295,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:65"
     },
     {
@@ -2022,6 +2310,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:89"
     },
     {
@@ -2035,6 +2325,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "generic_key",
+      "placementClass": "generic_key",
       "collectedFlag": "5:15"
     },
     {
@@ -2048,6 +2340,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:95"
     },
     {
@@ -2061,6 +2355,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:96"
     },
     {
@@ -2074,6 +2370,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "generic_key",
+      "placementClass": "generic_key",
       "collectedFlag": "5:3"
     },
     {
@@ -2087,6 +2385,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:97"
     },
     {
@@ -2100,6 +2400,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:98"
     },
     {
@@ -2115,6 +2417,8 @@
         "701"
       ],
       "sourceType": "op35_take",
+      "rewriteClass": "generic_key",
+      "placementClass": "fixed_lifecycle_22",
       "collectedFlag": "5:17"
     },
     {
@@ -2128,6 +2432,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:76"
     },
     {
@@ -2141,6 +2447,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:90"
     },
     {
@@ -2154,6 +2462,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:91"
     },
     {
@@ -2167,6 +2477,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:92"
     },
     {
@@ -2180,6 +2492,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:79"
     },
     {
@@ -2193,6 +2507,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:105"
     },
     {
@@ -2206,6 +2522,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:107"
     },
     {
@@ -2219,6 +2537,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:80"
     },
     {
@@ -2232,6 +2552,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:80"
     },
     {
@@ -2245,6 +2567,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:106"
     },
     {
@@ -2258,6 +2582,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:111"
     },
     {
@@ -2271,6 +2597,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "health",
+      "placementClass": "health",
       "collectedFlag": "5:99"
     },
     {
@@ -2284,6 +2612,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "generic_key",
+      "placementClass": "generic_key",
       "collectedFlag": "5:19"
     },
     {
@@ -2297,6 +2627,8 @@
       "requiresItems": [],
       "requiresRooms": [],
       "sourceType": "op35_take",
+      "rewriteClass": "generic_key",
+      "placementClass": "generic_key",
       "collectedFlag": "5:10"
     }
   ],
@@ -3687,519 +4019,866 @@
       "id": "ST000:item@0x80a4",
       "kind": "item",
       "sourceId": "ST000:r0:op31@0x80a4",
+      "nativeConditions": [
+        "(flag(6,117) && !(flag(6,125)))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST002:item@0x11504",
       "kind": "item",
       "sourceId": "ST002:r0:op31@0x11504",
+      "nativeConditions": [
+        "flag(6,16)",
+        "!(flag(6,121))",
+        "(CHARACTER(+0x108F) == 1)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST002:item@0x116a0",
       "kind": "item",
       "sourceId": "ST002:r0:op31@0x116a0",
+      "nativeConditions": [
+        "flag(6,17)",
+        "!(flag(6,18))",
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,127)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST002:item@0x11748",
       "kind": "item",
       "sourceId": "ST002:r0:op31@0x11748",
+      "nativeConditions": [
+        "flag(6,17)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST003:door@0x200fc->ST002",
       "kind": "door",
+      "nativeConditions": [
+        "flag(6,14)"
+      ],
       "disposition": "fixed_vanilla_variant"
     },
     {
       "id": "ST003:item@0x20410",
       "kind": "item",
       "sourceId": "ST003:r0:op31@0x20410",
+      "nativeConditions": [
+        "flag(6,117)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST003:item@0x204bc",
       "kind": "item",
       "sourceId": "ST003:r0:op31@0x204bc",
+      "nativeConditions": [
+        "flag(6,117)",
+        "ELSE",
+        "flag(6,18)",
+        "ELSE",
+        "flag(6,17)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST005:item@0x76f6",
       "kind": "item",
       "sourceId": "ST005:r0:op31@0x76f6",
+      "nativeConditions": [
+        "(flag(6,117) && !(flag(6,125)))",
+        "!(flag(7,16))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST100:door@0x3424->ST110",
       "kind": "door",
+      "nativeConditions": [
+        "flag(6,15)"
+      ],
       "disposition": "modeled_monotonic_story"
     },
     {
       "id": "ST102:door@0xafe6->ST110",
       "kind": "door",
+      "nativeConditions": [
+        "flag(6,15)"
+      ],
       "disposition": "modeled_monotonic_story"
     },
     {
       "id": "ST102:item@0xb190",
       "kind": "item",
       "sourceId": "ST102:r0:op31@0xb190",
+      "nativeConditions": [
+        "(!(flag(6,2)) && (CHARACTER(+0x108F) == 1))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST106:door@0x9fbc->ST10E",
       "kind": "door",
+      "nativeConditions": [
+        "flag(8,3)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     },
     {
       "id": "ST106:item@0xa1ec",
       "kind": "item",
       "sourceId": "ST106:r0:op31@0xa1ec",
+      "nativeConditions": [
+        "!(flag(5,50))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST107:item@0x5030",
       "kind": "item",
       "sourceId": "ST107:r0:op31@0x5030",
+      "nativeConditions": [
+        "flag(6,8)",
+        "ELSE",
+        "(CHARACTER(+0x108F) == 0)",
+        "flag(6,9)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST10C:item@0x11204",
       "kind": "item",
       "sourceId": "ST10C:r0:op31@0x11204",
+      "nativeConditions": [
+        "!(flag(6,7))",
+        "(CHARACTER(+0x108F) == 0)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST10D:door@0xe4c0->ST10F",
       "kind": "door",
+      "nativeConditions": [
+        "flag(9,46)"
+      ],
       "disposition": "modeled_item_gate"
     },
     {
       "id": "ST10E:door@0xcc2c->ST106",
       "kind": "door",
+      "nativeConditions": [
+        "flag(8,3)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     },
     {
       "id": "ST10E:item@0xcc6c",
       "kind": "item",
       "sourceId": "ST10E:r0:op31@0xcc6c",
+      "nativeConditions": [
+        "flag(8,3)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST110:item@0x2f88",
       "kind": "item",
       "sourceId": "ST110:r0:op31@0x2f88",
+      "nativeConditions": [
+        "!(flag(5,16))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST201:item@0x2288",
       "kind": "item",
       "sourceId": "ST201:r0:op31@0x2288",
+      "nativeConditions": [
+        "!(flag(5,48))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST205:item@0xd8d0",
       "kind": "item",
       "sourceId": "ST205:r0:op31@0xd8d0",
+      "nativeConditions": [
+        "(flag(6,6) && !(flag(6,12)))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST205:item@0xd954",
       "kind": "item",
       "sourceId": "ST205:r0:op31@0xd954",
+      "nativeConditions": [
+        "(flag(6,6) && !(flag(6,12)))",
+        "!(flag(6,112))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST302:item@0x6444",
       "kind": "item",
       "sourceId": "ST302:r0:op31@0x6444",
+      "nativeConditions": [
+        "flag(6,8)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST304:item@0x76e8",
       "kind": "item",
       "sourceId": "ST304:r0:op31@0x76e8",
+      "nativeConditions": [
+        "!(flag(5,45))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST304:item@0x7ed6",
       "kind": "item",
       "sourceId": "ST304:r0:op31@0x7ed6",
+      "nativeConditions": [
+        "flag(6,109)",
+        "ELSE",
+        "ELSE",
+        "flag(6,108)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST304:item@0x7f22",
       "kind": "item",
       "sourceId": "ST304:r0:op31@0x7f22",
+      "nativeConditions": [
+        "flag(6,109)",
+        "ELSE",
+        "ELSE",
+        "flag(6,108)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST304:item@0x94a2",
       "kind": "item",
       "sourceId": "ST304:r18:op31@0x94a2",
+      "nativeConditions": [
+        "(vmEntryState == 0)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST306:item@0x2cac",
       "kind": "item",
       "sourceId": "ST306:r0:op31@0x2cac",
+      "nativeConditions": [
+        "!(flag(5,12))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST401:item@0x59d6",
       "kind": "item",
       "sourceId": "ST401:r0:op31@0x59d6",
+      "nativeConditions": [
+        "flag(5,1)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST401:item@0x5b8a",
       "kind": "item",
       "sourceId": "ST401:r0:op31@0x5b8a",
+      "nativeConditions": [
+        "!(flag(5,49))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST402:item@0x16c4a",
       "kind": "item",
       "sourceId": "ST402:r0:op31@0x16c4a",
+      "nativeConditions": [
+        "(!(flag(6,33)) || flag(6,62))",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST402:item@0x16d56",
       "kind": "item",
       "sourceId": "ST402:r0:op31@0x16d56",
+      "nativeConditions": [
+        "!(flag(6,63))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST402:item@0x16d92",
       "kind": "item",
       "sourceId": "ST402:r0:op31@0x16d92",
+      "nativeConditions": [
+        "!(flag(6,63))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST402:item@0x1d7c2",
       "kind": "item",
       "sourceId": "ST402:r26:op31@0x1d7c2",
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST402:item@0x1dbde",
       "kind": "item",
       "sourceId": "ST402:r27:op31@0x1dbde",
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST408:door@0x126c8->ST409",
       "kind": "door",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
       "id": "ST408:door@0x12874->ST409",
       "kind": "door",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
       "id": "ST408:door@0x13a4c->ST409",
       "kind": "door",
+      "nativeConditions": [
+        "!(flag(7,29))",
+        "ELSE",
+        "1",
+        "syscall(fam=0,arg=30)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST408:door@0x13b0e->ST409",
       "kind": "door",
+      "nativeConditions": [
+        "flag(7,29)"
+      ],
       "disposition": "excluded_unsupported_duplicate"
     },
     {
       "id": "ST408:item@0x127d4",
       "kind": "item",
       "sourceId": "ST408:r0:op31@0x127d4",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST409:door@0x12430->ST40A",
       "kind": "door",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
       "id": "ST409:door@0x12484->ST408",
       "kind": "door",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
       "id": "ST409:door@0x12600->ST40A",
       "kind": "door",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
       "id": "ST409:door@0x12654->ST408",
       "kind": "door",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
       "id": "ST409:door@0x12ac4->ST40A",
       "kind": "door",
+      "nativeConditions": [
+        "!(flag(7,29))",
+        "ELSE",
+        "1",
+        "syscall(fam=0,arg=30)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST409:door@0x12b9a->ST40A",
       "kind": "door",
+      "nativeConditions": [
+        "flag(7,29)"
+      ],
       "disposition": "excluded_unsupported_duplicate"
     },
     {
       "id": "ST409:item@0x124c4",
       "kind": "item",
       "sourceId": "ST409:r0:op31@0x124c4",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "flag(6,119)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST502:item@0x27430",
       "kind": "item",
       "sourceId": "ST502:r0:op31@0x27430",
+      "nativeConditions": [
+        "!(flag(6,42))",
+        "ELSE",
+        "!(flag(6,146))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST503:door@0x15f56->ST504",
       "kind": "door",
+      "nativeConditions": [
+        "!(flag(6,44))",
+        "ELSE"
+      ],
       "disposition": "modeled_victory_commit"
     },
     {
       "id": "ST603:door@0x3cf0->ST604",
       "kind": "door",
+      "nativeConditions": [
+        "flag(8,9)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     },
     {
       "id": "ST603:item@0x3ef0",
       "kind": "item",
       "sourceId": "ST603:r0:op31@0x3ef0",
+      "nativeConditions": [
+        "!(flag(5,53))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST605:door@0x14362->ST606",
       "kind": "door",
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST605:item@0x1166c",
       "kind": "item",
       "sourceId": "ST605:r0:op31@0x1166c",
+      "nativeConditions": [
+        "!(flag(5,54))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST605:item@0x11864",
       "kind": "item",
       "sourceId": "ST605:r0:op31@0x11864",
+      "nativeConditions": [
+        "flag(6,20)",
+        "ELSE",
+        "!(flag(6,113))",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST605:item@0x13326",
       "kind": "item",
       "sourceId": "ST605:r5:op31@0x13326",
+      "nativeConditions": [
+        "((((vmEntryState == code0(+0x1204)) && (vmEntryState == code1(+0x1205))) && (vmEntryState == code2(+0x1206))) && (vmEntryState == code3(+0x1207)))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST606:door@0xe400->ST607",
       "kind": "door",
+      "nativeConditions": [
+        "!(flag(6,20))"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST606:door@0xf126->ST605",
       "kind": "door",
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST607:door@0xe586->ST700",
       "kind": "door",
+      "nativeConditions": [
+        "flag(6,52)",
+        "(CHARACTER(+0x108F) == 0)",
+        "flag(5,2)"
+      ],
       "disposition": "fixed_vanilla_character_sequence"
     },
     {
       "id": "ST607:item@0xb7da",
       "kind": "item",
       "sourceId": "ST607:r2:op31@0xb7da",
+      "nativeConditions": [
+        "!(flag(5,2))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST701:item@0x3828",
       "kind": "item",
       "sourceId": "ST701:r0:op31@0x3828",
+      "nativeConditions": [
+        "flag(6,59)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST703:item@0x6d50",
       "kind": "item",
       "sourceId": "ST703:r0:op31@0x6d50",
+      "nativeConditions": [
+        "flag(6,130)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST703:item@0x6dc4",
       "kind": "item",
       "sourceId": "ST703:r0:op31@0x6dc4",
+      "nativeConditions": [
+        "flag(6,130)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST703:item@0x79ba",
       "kind": "item",
       "sourceId": "ST703:r2:op31@0x79ba",
+      "nativeConditions": [
+        "(vmEntryState == 0)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST704:item@0xb008",
       "kind": "item",
       "sourceId": "ST704:r0:op31@0xb008",
+      "nativeConditions": [
+        "flag(6,114)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST704:item@0xb044",
       "kind": "item",
       "sourceId": "ST704:r0:op31@0xb044",
+      "nativeConditions": [
+        "flag(6,114)",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST705:item@0x5902",
       "kind": "item",
       "sourceId": "ST705:r0:op31@0x5902",
+      "nativeConditions": [
+        "flag(6,59)",
+        "!(flag(5,55))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:door@0x10894->ST800",
       "kind": "door",
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST706:item@0x1205a",
       "kind": "item",
       "sourceId": "ST706:r15:op31@0x1205a",
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xd424",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xd424",
+      "nativeConditions": [
+        "!(flag(6,144))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xd4a0",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xd4a0",
+      "nativeConditions": [
+        "!(flag(6,144))",
+        "ELSE"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xd946",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xd946",
+      "nativeConditions": [
+        "!(flag(4,16))",
+        "!(flag(6,99))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xd982",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xd982",
+      "nativeConditions": [
+        "!(flag(4,16))",
+        "!(flag(6,99))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xd9be",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xd9be",
+      "nativeConditions": [
+        "!(flag(4,16))",
+        "!(flag(6,99))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xdb60",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xdb60",
+      "nativeConditions": [
+        "!(flag(4,16))",
+        "!(flag(6,100))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xdb9c",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xdb9c",
+      "nativeConditions": [
+        "!(flag(4,16))",
+        "!(flag(6,100))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST706:item@0xdbd8",
       "kind": "item",
       "sourceId": "ST706:r0:op31@0xdbd8",
+      "nativeConditions": [
+        "!(flag(4,16))",
+        "!(flag(6,100))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST800:door@0x18516->ST005",
       "kind": "door",
+      "nativeConditions": [
+        "((word(scene+0x10A8) == 1798) && !(flag(5,17)))",
+        "ELSE"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST800:door@0x18610->ST801",
       "kind": "door",
+      "nativeConditions": [
+        "flag(6,22)"
+      ],
       "disposition": "fixed_vanilla_variant"
     },
     {
       "id": "ST800:door@0x1a952->ST706",
       "kind": "door",
+      "nativeConditions": [
+        "!(vmEntryState)"
+      ],
       "disposition": "fixed_vanilla_nonmonotonic"
     },
     {
       "id": "ST800:item@0x18748",
       "kind": "item",
       "sourceId": "ST800:r0:op31@0x18748",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 0)",
+        "flag(6,144)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST800:item@0x18858",
       "kind": "item",
       "sourceId": "ST800:r0:op31@0x18858",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 0)",
+        "flag(5,17)",
+        "(!(flag(6,22)) && (word(scene+0x10A8) == 1798))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST801:item@0x421e",
       "kind": "item",
       "sourceId": "ST801:r0:op31@0x421e",
+      "nativeConditions": [
+        "flag(6,101)",
+        "!(flag(5,36))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST801:item@0x4c3c",
       "kind": "item",
       "sourceId": "ST801:r2:op31@0x4c3c",
+      "nativeConditions": [
+        "1",
+        "(1 == 6)"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST803:item@0x8b62",
       "kind": "item",
       "sourceId": "ST803:r0:op31@0x8b62",
+      "nativeConditions": [
+        "!(flag(6,23))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST808:item@0xc440",
       "kind": "item",
       "sourceId": "ST808:r0:op31@0xc440",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "!(flag(6,25))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST808:item@0xc47c",
       "kind": "item",
       "sourceId": "ST808:r0:op31@0xc47c",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "!(flag(6,25))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST808:item@0xc4b8",
       "kind": "item",
       "sourceId": "ST808:r0:op31@0xc4b8",
+      "nativeConditions": [
+        "(CHARACTER(+0x108F) == 1)",
+        "!(flag(6,25))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST809:item@0x179ee",
       "kind": "item",
       "sourceId": "ST809:r0:op31@0x179ee",
+      "nativeConditions": [
+        "!(flag(5,56))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST809:item@0x17d7a",
       "kind": "item",
       "sourceId": "ST809:r0:op31@0x17d7a",
+      "nativeConditions": [
+        "(!(flag(6,26)) && (CHARACTER(+0x108F) == 1))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST900:item@0x3bec",
       "kind": "item",
       "sourceId": "ST900:r0:op31@0x3bec",
+      "nativeConditions": [
+        "!(flag(5,52))"
+      ],
       "disposition": "excluded_sat1_physical_trigger"
     },
     {
       "id": "ST902:door@0x1b40->ST903",
       "kind": "door",
+      "nativeConditions": [
+        "flag(8,27)"
+      ],
       "disposition": "fixed_vanilla_subweapon"
     }
   ],
@@ -4645,6 +5324,65 @@
       51,
       52
     ],
+    "fixedLifecycleItemIds": [
+      34,
+      35,
+      43
+    ],
+    "rewriteClasses": {
+      "26": "health",
+      "27": "health",
+      "28": "health",
+      "29": "health",
+      "31": "health",
+      "33": "generic_key",
+      "34": "generic_key",
+      "35": "generic_key",
+      "36": "generic_key",
+      "37": "generic_key",
+      "38": "generic_key",
+      "39": "generic_key",
+      "40": "generic_key",
+      "41": "generic_key",
+      "42": "generic_key",
+      "43": "generic_key",
+      "44": "generic_key",
+      "45": "generic_key",
+      "46": "generic_key",
+      "47": "special_key_2f",
+      "48": "generic_key",
+      "49": "generic_key",
+      "50": "generic_key",
+      "51": "generic_key",
+      "52": "generic_key"
+    },
+    "placementClasses": {
+      "26": "health",
+      "27": "health",
+      "28": "health",
+      "29": "health",
+      "31": "health",
+      "33": "generic_key",
+      "34": "fixed_lifecycle_22",
+      "35": "fixed_lifecycle_23",
+      "36": "generic_key",
+      "37": "generic_key",
+      "38": "generic_key",
+      "39": "generic_key",
+      "40": "generic_key",
+      "41": "generic_key",
+      "42": "generic_key",
+      "43": "fixed_lifecycle_2b",
+      "44": "generic_key",
+      "45": "generic_key",
+      "46": "generic_key",
+      "47": "special_key_2f",
+      "48": "generic_key",
+      "49": "generic_key",
+      "50": "generic_key",
+      "51": "generic_key",
+      "52": "generic_key"
+    },
     "poolItemIds": [
       28,
       27,

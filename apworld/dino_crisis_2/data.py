@@ -23,6 +23,14 @@ ITEM_CATEGORIES: dict[int, str] = {
 KEY_ITEM_IDS: set[int] = set(_DATA["items"]["keyItemIds"])
 PROGRESSION_ITEM_IDS: set[int] = set(_DATA["items"]["progressionItemIds"])
 OPTIONAL_FIXED_ITEM_IDS: set[int] = set(_DATA["items"]["optionalFixedItemIds"])
+ITEM_REWRITE_CLASSES: dict[int, str] = {
+    int(item_id): rewrite_class
+    for item_id, rewrite_class in _DATA["items"]["rewriteClasses"].items()
+}
+ITEM_PLACEMENT_CLASSES: dict[int, str] = {
+    int(item_id): placement_class
+    for item_id, placement_class in _DATA["items"]["placementClasses"].items()
+}
 POOL_ITEM_IDS: list[int] = _DATA["items"]["poolItemIds"]
 PROGRESSION_ITEM_NAMES: set[str] = {ITEM_NAMES[item_id] for item_id in PROGRESSION_ITEM_IDS}
 

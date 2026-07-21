@@ -12,17 +12,17 @@ namespace DinoRand.Randomizer.Dc2;
 /// the game registers its helpers, the runner drives the shared loop.
 ///
 /// <para>Loads rooms and runs the DC2 passes, writing the randomized room files <b>non-destructively</b>
-/// to <paramref name="outputDir"/> (via <see cref="Dc2OutputDirSink"/>). The enemy pass is live
-/// (cross-species TYPE swap); item/door passes are still no-ops pending their record decodes. Install
-/// overlays the output dir onto the game's Data via <see cref="Install.GameInstaller"/>.</para>
+/// to <paramref name="outputDir"/> (via <see cref="Dc2OutputDirSink"/>). Install overlays the output
+/// directory onto the game's Data via <see cref="Install.GameInstaller"/>.</para>
 /// </summary>
 public sealed class Dc2RandomizerRunner
 {
     private readonly DinoCrisis2 _game;
 
-    // DC2 pass order (will grow as decoders land). Items/doors are blocked on their record decodes.
+    // DC2 pass order. Gameplay/data passes precede model, voice, and title output/cosmetic passes.
     private readonly IReadOnlyList<IDc2RandomizationPass> _passes = new IDc2RandomizationPass[]
     {
+        new Dc2ItemRandomizer(),
         new Dc2EnemyRandomizer(),
         new Dc2RaptorTierRandomizer(), // after the enemy pass: reads its working bytes, skips converted raptors
         new Dc2PlayerModelSwap(),
@@ -32,8 +32,6 @@ public sealed class Dc2RandomizerRunner
         // Always-on cosmetic: seed watermark into TITLE.DAT/TITLE2.DAT (BioRand parity;
         // docs/decisions/cross/SEED-WATERMARK-PLAN.md). Last — it touches nothing other passes read.
         new Passes.Dc2TitleWatermarkPass(),
-
-        // TODO(dc2): new Dc2DoorRandomizer(), new Dc2ItemRandomizer(), once OPEN #2/#5 decode.
     };
 
     public Dc2RandomizerRunner(DinoCrisis2 game) => _game = game;
@@ -49,7 +47,7 @@ public sealed class Dc2RandomizerRunner
         var logLines = new List<string>();
         void Log(string line) => logLines.Add(line);
 
-        Log($"DinoRand — {_game.DisplayName} (DC2 scaffold; record decoders pending)");
+        Log($"DinoRand — {_game.DisplayName}");
         Log($"seed={seed}  install={installDir}");
 
         // 0. Prepare the (reused) working dir for this run.

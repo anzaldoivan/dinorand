@@ -32,6 +32,9 @@
     <!-- BGM mood-tag manifests (BGM-RANDO-PLAN.md) so BgmManifest.LoadDefault finds them. -->
     <EmbeddedResource Include="..\..\data\dc1\bgm.json" LogicalName="DinoRand.Randomizer.Data.dc1.bgm.json" />
     <EmbeddedResource Include="..\..\data\dc2\bgm.json" LogicalName="DinoRand.Randomizer.Data.dc2.bgm.json" />
+    <EmbeddedResource Include="..\..\data\dc2\items.json" LogicalName="DinoRand.Randomizer.Data.dc2.items.json" />
+    <EmbeddedResource Include="..\..\data\dc2\item-sources.json" LogicalName="DinoRand.Randomizer.Data.dc2.item-sources.json" />
+    <EmbeddedResource Include="..\..\apworld\dino_crisis_2\data\dc2_logic.json" LogicalName="DinoRand.Randomizer.Data.dc2.dc2_logic.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NVorbis" Version="0.10.5" />

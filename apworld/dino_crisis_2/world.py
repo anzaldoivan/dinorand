@@ -62,6 +62,7 @@ class DinoCrisis2World(World):
             ap_location.access_rule = self._requirement_rule(
                 location["requiresItems"], location["requiresRooms"]
             )
+            ap_location.item_rule = self._item_rule(location["placementClass"])
             parent.locations.append(ap_location)
 
         goal = regions[dc2.GOAL_ROOM]
@@ -82,6 +83,18 @@ class DinoCrisis2World(World):
             return state.has_all(item_names, player) and all(
                 state.can_reach_region(room, player) for room in room_names
             )
+
+        return rule
+
+    def _item_rule(self, placement_class: str) -> Callable[[Item], bool]:
+        """Keep every static-install placement local and within its compatibility class."""
+        player, game = self.player, self.game
+
+        def rule(item: Item) -> bool:
+            if item.player != player or item.game != game:
+                return False
+            item_id = dc2.GAME_ITEM_ID.get(item.name)
+            return dc2.ITEM_PLACEMENT_CLASSES.get(item_id) == placement_class
 
         return rule
 
