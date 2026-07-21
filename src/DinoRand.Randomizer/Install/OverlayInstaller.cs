@@ -6,6 +6,14 @@ namespace DinoRand.Randomizer.Install;
 
 internal static class OverlayInstaller
 {
+    private sealed record PendingOverlay(
+        string Key, string TargetPath, string BackupPath,
+        byte[] LiveBefore, byte[] Pristine, byte[] Replacement, bool BackupExists);
+
+    private sealed record PendingExe(
+        string TargetPath, string BackupPath, byte[] LiveBefore, byte[] Pristine,
+        ExePatchInstaller.ComposedExePatch Composed, bool BackupExists);
+
     private const string BackupDirName = GameInstaller.BackupDirName;
     private const string ExeName = GameInstaller.ExeName;
     private const string LooseBackupSubdir = GameInstaller.LooseBackupSubdir;
@@ -22,17 +30,16 @@ internal static class OverlayInstaller
         WriteIndented = true,
     };
 
+    // Deterministic test seam for the bounded rollback path. Thread-local keeps parallel installer tests isolated.
+    [ThreadStatic]
+    internal static Action<int>? CommitStepProbe;
+
     private static string GameRoot(string dataDir) => Path.GetDirectoryName(Path.GetFullPath(
         dataDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)))!;
 
     private static void EnsureNotDrmProtected(string dataDir) => GameInstaller.EnsureNotDrmProtected(dataDir);
     private static InstallManifest? ReadManifest(string dataDir) => BackupManifestStore.ReadManifest(dataDir);
-    private static void CapturePristine(string originalPath, string backupPath) =>
-        BackupManifestStore.CapturePristine(originalPath, backupPath);
     private static string HashFile(string path) => BackupManifestStore.HashFile(path);
-    private static IReadOnlyList<ExePatchResult> ApplyExePatchPlan(
-        string dataDir, ExePatchPlan plan, string donorDir, string? seed = null) =>
-        ExePatchInstaller.ApplyExePatchPlan(dataDir, plan, donorDir, seed);
     private static string ExePath(string dataDir) => GameInstaller.ExePath(dataDir);
 
     internal static InstallResult Install(string dataDir, string modDir, string? seed = null,
@@ -49,7 +56,6 @@ internal static class OverlayInstaller
             : new HashSet<string>(onlyFiles.Select(Path.GetFileName)!, StringComparer.OrdinalIgnoreCase);
 
         var backupDir = Path.Combine(dataDir, BackupDirName);
-        Directory.CreateDirectory(backupDir);
 
         // Map of the real Data files by name, matched case-insensitively: the randomizer
         // may emit mixed-case names (e.g. St502.dat) while the originals are lowercase
@@ -64,8 +70,21 @@ internal static class OverlayInstaller
         var hashes = new Dictionary<string, string>(
             existing?.OriginalHashes ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
 
-        int backedUp = 0, overlaid = 0;
-        var files = new List<string>();
+        var pending = new List<PendingOverlay>();
+
+        PendingOverlay PrepareOverlay(string key, string targetPath, string modPath, string backupPath)
+        {
+            bool backupExists = File.Exists(backupPath);
+            byte[] pristine = backupExists
+                ? File.ReadAllBytes(backupPath)
+                : BackupManifestStore.ReadPristineBytes(targetPath);
+            if (backupExists && hashes.TryGetValue(key, out var expected)
+                && !string.Equals(BackupManifestStore.HashBytes(pristine), expected,
+                    StringComparison.OrdinalIgnoreCase))
+                throw new BackupIntegrityException(key, backupPath);
+            return new PendingOverlay(key, targetPath, backupPath,
+                File.ReadAllBytes(targetPath), pristine, File.ReadAllBytes(modPath), backupExists);
+        }
 
         // No "*.dat" glob: it is case-sensitive on Linux/WSL and would skip DC2's uppercase ST*.DAT
         // (the St502 case-glob bug class — dc1-st502-case-glob-bug).
@@ -82,26 +101,8 @@ internal static class OverlayInstaller
                 continue;
             var targetName = Path.GetFileName(targetPath);
 
-            var backupPath = Path.Combine(backupDir, targetName);
-            if (!File.Exists(backupPath))
-            {
-                CapturePristine(targetPath, backupPath); // capture pristine original once (sibling-validated)
-                hashes[targetName] = HashFile(backupPath);
-                backedUp++;
-            }
-            else if (hashes.TryGetValue(targetName, out var expected))
-            {
-                // A backup already exists and we know its pristine hash: validate it is still pristine
-                // before overlaying. A mismatch means the backup is not the true original (tampered, or a
-                // re-captured already-modded file), so refuse rather than overwrite — Restore must remain trustworthy.
-                if (!string.Equals(HashFile(backupPath), expected, StringComparison.OrdinalIgnoreCase))
-                    throw new BackupIntegrityException(targetName, backupPath);
-            }
-            else
-            {
-                // Legacy backup with no recorded hash (pre-hash install): record it now, best-effort.
-                hashes[targetName] = HashFile(backupPath);
-            }
+            var overlay = PrepareOverlay(targetName, targetPath, modPath,
+                Path.Combine(backupDir, targetName));
 
             // Container-format guard: a room's Gian entry stride (DC1 16-byte vs DC2 32-byte) must never
             // change across an overlay. A flipped stride means the mod file was written in the wrong
@@ -109,17 +110,14 @@ internal static class OverlayInstaller
             // output dir), which the engine misreads into an out-of-range GPU-resource index → a hard
             // crash on room load (docs/decisions/dc2/crash-rcas/DC2-ROOM-CONTAINER-STRIDE-CRASH-RCA.md). The pristine backup is
             // the oracle; skip files that are not Gian containers (nothing to compare).
-            var pristinePkg = GianPackage.TryParse(File.ReadAllBytes(backupPath));
+            var pristinePkg = GianPackage.TryParse(overlay.Pristine);
             if (pristinePkg is not null)
             {
-                var modPkg = GianPackage.TryParse(File.ReadAllBytes(modPath));
+                var modPkg = GianPackage.TryParse(overlay.Replacement);
                 if (modPkg is null || modPkg.IsDc2 != pristinePkg.IsDc2)
                     throw new ContainerFormatMismatchException(targetName, pristinePkg.IsDc2);
             }
-
-            File.Copy(modPath, targetPath, overwrite: true);
-            overlaid++;
-            files.Add(targetName);
+            pending.Add(overlay);
         }
 
         // Loose-file overlay: voice banks etc. under known subdirs of modDir → the game ROOT (parent of
@@ -141,42 +139,105 @@ internal static class OverlayInstaller
             if (!File.Exists(target))
                 continue; // only overlay a real existing bank; never create a stray file
 
-            var backupPath = Path.Combine(looseBackupRoot, rel.Replace('/', Path.DirectorySeparatorChar));
-            if (!File.Exists(backupPath))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
-                CapturePristine(target, backupPath);       // capture pristine original once (sibling-validated)
-                hashes[rel] = HashFile(backupPath);
-                backedUp++;
-            }
-            else if (hashes.TryGetValue(rel, out var expected))
-            {
-                if (!string.Equals(HashFile(backupPath), expected, StringComparison.OrdinalIgnoreCase))
-                    throw new BackupIntegrityException(rel, backupPath);
-            }
-            else
-            {
-                hashes[rel] = HashFile(backupPath); // legacy backup with no recorded hash; record now
-            }
-
-            File.Copy(modPath, target, overwrite: true);
-            overlaid++;
-            files.Add(rel);
+            pending.Add(PrepareOverlay(rel, target, modPath,
+                Path.Combine(looseBackupRoot, rel.Replace('/', Path.DirectorySeparatorChar))));
         }
 
-        var manifest = new InstallManifest(seed, DateTime.UtcNow.ToString("o"), files,
-            OriginalHashes: hashes, Applied: true);
-        File.WriteAllText(Path.Combine(backupDir, ManifestName),
-            JsonSerializer.Serialize(manifest, JsonOpts));
-
-        // Apply any EXE-patch plan the runner emitted beside the room files (the cross-species pass declares
-        // its cat-slot / hit-reaction / enemy-SE edits there). Each request maps to a PatchExe* method, which
-        // backs the exe up once and merges into the manifest just written, so Restore reverses it too.
+        // The EXE sidecar is part of the same preflight. Compose every compatible request on one pristine
+        // buffer now, before any target overlay write; invalid versions/kinds/donors/addresses/build guards
+        // therefore fail without changing rooms, loose files, the executable or the manifest.
         var plan = ExePatchPlan.TryRead(modDir);
+        PendingExe? pendingExe = null;
         if (plan is not null)
-            ApplyExePatchPlan(dataDir, plan, modDir, seed);
+        {
+            ExePatchInstaller.ValidatePlanVersion(plan);
+            if (plan.Requests.Count > 0)
+            {
+                var exePath = ExePatchInstaller.ResolveExeForPatch(dataDir);
+                var exeBackup = Path.Combine(backupDir, ExeName);
+                bool backupExists = File.Exists(exeBackup);
+                byte[] pristine = backupExists
+                    ? File.ReadAllBytes(exeBackup)
+                    : BackupManifestStore.ReadPristineBytes(exePath);
+                if (backupExists && hashes.TryGetValue(ExeName, out var expected)
+                    && !string.Equals(BackupManifestStore.HashBytes(pristine), expected,
+                        StringComparison.OrdinalIgnoreCase))
+                    throw new BackupIntegrityException(ExeName, exeBackup);
+                var composed = ExePatchInstaller.ComposeExePatchPlan(pristine, plan, modDir, dataDir);
+                pendingExe = new PendingExe(exePath, exeBackup, File.ReadAllBytes(exePath),
+                    pristine, composed, backupExists);
+            }
+        }
 
-        return new InstallResult(backedUp, overlaid, backupDir);
+        // Commit the already-validated plan. The manifest is deliberately last: it never claims success
+        // before every overlay and the single composed executable result have landed. Portable filesystems
+        // cannot atomically replace this whole set, so retain bounded in-memory live snapshots and roll back
+        // every target plus the prior manifest on an unexpected I/O failure.
+        var manifestPath = Path.Combine(backupDir, ManifestName);
+        byte[]? manifestBefore = File.Exists(manifestPath) ? File.ReadAllBytes(manifestPath) : null;
+        var createdBackups = new List<string>();
+        try
+        {
+            Directory.CreateDirectory(backupDir);
+            foreach (var overlay in pending)
+            {
+                if (!overlay.BackupExists)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(overlay.BackupPath)!);
+                    File.WriteAllBytes(overlay.BackupPath, overlay.Pristine);
+                    createdBackups.Add(overlay.BackupPath);
+                }
+                hashes[overlay.Key] = BackupManifestStore.HashBytes(overlay.Pristine);
+            }
+            if (pendingExe is not null)
+            {
+                if (!pendingExe.BackupExists)
+                {
+                    File.WriteAllBytes(pendingExe.BackupPath, pendingExe.Pristine);
+                    createdBackups.Add(pendingExe.BackupPath);
+                }
+                hashes[ExeName] = BackupManifestStore.HashBytes(pendingExe.Pristine);
+            }
+
+            int commitStep = 0;
+            foreach (var overlay in pending)
+            {
+                File.WriteAllBytes(overlay.TargetPath, overlay.Replacement);
+                CommitStepProbe?.Invoke(++commitStep);
+            }
+            if (pendingExe is not null)
+            {
+                File.WriteAllBytes(pendingExe.TargetPath, pendingExe.Composed.Bytes);
+                CommitStepProbe?.Invoke(++commitStep);
+            }
+
+            var files = pending.Select(p => p.Key).ToList();
+            var manifest = new InstallManifest(seed, DateTime.UtcNow.ToString("o"), files,
+                ExePatched: pendingExe is not null,
+                ExeRepoints: pendingExe?.Composed.Repoints,
+                OriginalHashes: hashes, Applied: true);
+            File.WriteAllText(manifestPath, JsonSerializer.Serialize(manifest, JsonOpts));
+            CommitStepProbe?.Invoke(++commitStep);
+
+            int backedUp = pending.Count(p => !p.BackupExists);
+            return new InstallResult(backedUp, pending.Count, backupDir);
+        }
+        catch
+        {
+            foreach (var overlay in pending)
+                File.WriteAllBytes(overlay.TargetPath, overlay.LiveBefore);
+            if (pendingExe is not null)
+                File.WriteAllBytes(pendingExe.TargetPath, pendingExe.LiveBefore);
+            if (manifestBefore is null)
+            {
+                if (File.Exists(manifestPath)) File.Delete(manifestPath);
+            }
+            else
+                File.WriteAllBytes(manifestPath, manifestBefore);
+            foreach (var backup in createdBackups)
+                if (File.Exists(backup)) File.Delete(backup);
+            throw;
+        }
     }
 
     internal static RestoreResult Restore(string dataDir)

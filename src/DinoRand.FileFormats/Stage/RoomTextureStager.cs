@@ -55,4 +55,6 @@ internal sealed class RoomTextureStager
         => _inserts is { Count: > 0 }
             ? PackageRepacker.InsertEntriesBeforeRdt(roomBytes, _inserts)
             : roomBytes;
+
+    internal void Clear() => _inserts = null;
 }

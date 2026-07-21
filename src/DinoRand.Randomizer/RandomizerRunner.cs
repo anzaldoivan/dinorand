@@ -32,13 +32,15 @@ public sealed class RandomizerRunner
         // relocation handles the new gotos as ordinary branch sites.
         new CutsceneShortenPass(),
         new EnemyRandomizer(),
-        // Gated off by default: per-placement enemy maxHP override (writes +6). Runs after the permute so it
-        // sets HP on the final species assignment. docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
-        new EnemyHpRandomizer(),
-        // Experimental, gated off by default: runs after the in-room permute and imports a foreign species
+        // Default DC1 enemy-randomizer extension: runs after the in-room permute and imports a foreign species
         // into eligible rooms, declaring the EXE patches they need on the context (the installer applies them).
         // docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.
         new CrossSpeciesEnemyPass(),
+        // Gated off by default: per-placement enemy maxHP override (writes +6). Runs after both the in-room
+        // permute and cross-species import so a newly imported presettable cat-2 record receives the same
+        // named enemy-hp RNG stream as a native cat-2. Theri remains a cat-8 output override and is ineligible.
+        // docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
+        new EnemyHpRandomizer(),
         // Gated off by default (ImportPickupModels, Lever B): donor ground meshes for relocated
         // pickups. MUST run after every ScriptInjector-splicing pass (the enemy passes above) — a
         // later mid-script insertion would shift the appended mesh out from under the record's

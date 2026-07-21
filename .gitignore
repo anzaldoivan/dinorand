@@ -15,7 +15,6 @@
 !/test/
 
 # Authored game data & docs (JSON / markdown only — enforced by the backstop)
-!/data/
 # !/docs/  (held back from publish for now — kept local)
 
 # Archipelago multiworld integration (authored Python apworld + distilled logic JSON)
@@ -27,6 +26,14 @@
 !/.github/
 !/.githooks/
 !/.config/
+
+# Narrowly tracked authored DC2 item-parity sources (the surrounding research
+# trees remain held back by the fail-closed allowlist).
+!/data/
+/data/*
+!/data/dc2/
+/data/dc2/*
+!/data/dc2/item-sources.json
 
 # Top-level project files
 !/.gitignore

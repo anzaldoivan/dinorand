@@ -431,18 +431,15 @@ public sealed class RandomizerConfig
     public bool NormalizePickupVisuals { get; set; } = false;
 
     /// <summary>
-    /// DC1 Lever B (<b>ON by default for the in-game witness session — the render is not yet
-    /// human-confirmed; disable with the flag off if a seed misbehaves</b>). On top of Lever A: a
+    /// DC1 Lever B (<b>OFF by default; explicit Advanced GUI/CLI opt-in only</b>). On top of Lever A: a
     /// relocated key/weapon whose id has a vanilla bespoke ground mesh anywhere in the game gets that
     /// donor mesh imported into its destination room (mesh appended to the RDT, texture UV sub-rect +
     /// CLUT re-uploaded at a free VRAM column, texrefs rewritten), so the pickup shows its OWN model
     /// instead of the generic panel. Ids without a donor and every failure path (no free VRAM, RDT
     /// ceiling) fall back to the Lever-A generic panel — implies the Lever-A marking even when
-    /// <see cref="NormalizePickupVisuals"/> is off. CLI <c>--pickup-ground-models</c> (redundant while
-    /// the default is on). docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md ("Lever B
-    /// plan"), STATIC-SCD-RE cont.73.
+    /// <see cref="NormalizePickupVisuals"/> is off. CLI <c>--pickup-ground-models</c>. docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md ("Lever B"), STATIC-SCD-RE cont.73.
     /// </summary>
-    public bool ImportPickupModels { get; set; } = true;
+    public bool ImportPickupModels { get; set; } = false;
 
     /// <summary>Phase 3. Off until the door-graph pass lands.</summary>
     public bool RandomizeDoors { get; set; } = false;
@@ -510,13 +507,14 @@ public sealed class RandomizerConfig
     public string? BgmPacksRoot { get; set; }
 
     /// <summary>
-    /// Phase 2 (experimental, off by default). Import a <i>foreign</i> dinosaur species into a room
+    /// DC1 enemy-randomizer extension (on by default). Import a <i>foreign</i> dinosaur species into a room
     /// that did not ship with it, by copying its model+motion into the room's RDT and repointing one
     /// enemy record (docs/decisions/dc1/enemies/CROSS-ROOM-SPECIES-PLAN.md, increment 1: geometry only — imported species may
     /// render mis-coloured until textures are imported). Conservative: grounded species only, one per
-    /// room, scripted/cutscene rooms excluded. Not yet CE-validated, hence off and experimental.
+    /// room, scripted/cutscene rooms excluded. Set false for the compatibility opt-out; the pass also
+    /// requires <see cref="RandomizeEnemies"/>, so the enemy-randomizer master switch remains authoritative.
     /// </summary>
-    public bool CrossRoomEnemySpecies { get; set; } = false;
+    public bool CrossRoomEnemySpecies { get; set; } = true;
 
     /// <summary>
     /// Opt-in (default off; DC1 only). Cutscene-safe enemy randomization: rooms in the derived

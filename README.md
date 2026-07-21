@@ -11,6 +11,8 @@ chunk: default
 related: []
 ---
 
+<!-- Audience: new users and builders. Keep this page a brief orientation; detailed player steps belong in USER-GUIDE.md. -->
+
 # DinoRand
 
 [![CI](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml/badge.svg)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)

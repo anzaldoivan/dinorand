@@ -19,8 +19,8 @@ internal static class CliOutput
             "\r\n" +
             "Usage:\r\n" +
             "  dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]\r\n" +
-            "           [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items] [--exotic-enemies]\r\n" +
-            "           [--dc1-cutscene-safe] [--dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--no-pickup-ground-models]   (dc1)\r\n" +
+            "           [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items]\r\n" +
+            "           [--dc1-cutscene-safe] [--dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--pickup-ground-models] [--no-pickup-ground-models]   (dc1)\r\n" +
             "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
             "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
             "           [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)\r\n" +
@@ -81,7 +81,7 @@ internal static class CliOutput
             "  - --dc1-cutscene-safe (dc1 enemy rando, off) cutscene-safe mode: rooms in the derived\r\n" +
             "    choreography census (data/dc1/cutscene-rooms.json flagged tier — a script binds an\r\n" +
             "    enemy slot and drives it through authored waypoints, STATIC-SCD-RE cont.49/59) are\r\n" +
-            "    excluded from the in-room permute and from --exotic-enemies imports, and get a seeded\r\n" +
+            "    excluded from the in-room permute and from foreign-species imports, and get a seeded\r\n" +
             "    palette tint instead (the cont.51/57 \"Blue Raptor\" lever). Off = byte-identical.\r\n" +
             "  - --dc1-door-skip (dc1, off; EXPERIMENTAL) PATCHES DINO.exe: removes the door-transition\r\n" +
             "    swing so room-to-room transitions are near-instant, keeping the destination background\r\n" +
@@ -169,12 +169,13 @@ internal static class CliOutput
             "    pairs (overlay-requires gated) AND scatters keys into static ammo/health pickups\r\n" +
             "    (not only other door-key spots); discs/items conserved. (The old --scatter-key-items\r\n" +
             "    flag is now redundant — scatter is on by default with --shuffle-keys.)\r\n" +
-            "  - --exotic-enemies (EXPERIMENTAL, off by default) imports FOREIGN species into\r\n" +
-            "    eligible rooms — the cat8 Therizinosaurus (stages 1-2) and the grounded\r\n" +
-            "    RaptorHeavy — and, with --install-to-data, applies the EXE patches they need\r\n" +
+            "  - DC1 enemy randomization includes FOREIGN-species imports by default: the cat8\r\n" +
+            "    Therizinosaurus (stages 1-2) and grounded RaptorHeavy in eligible rooms. With\r\n" +
+            "    --install-to-data it applies the EXE patches they need\r\n" +
             "    (cat-slot / hit-reaction / enemy-SE). Stage-scoped + CE-sensitive: CLOSE the game\r\n" +
             "    first (it writes DINO.exe), then relaunch and CE-verify. Reversed by --restore.\r\n" +
-            "    T-Rex/flyer/swarm are registered but gated off (docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md).\r\n" +
+            "    --no-enemies disables both normal and foreign-species randomization. The legacy\r\n" +
+            "    --exotic-enemies flag is a redundant no-op. T-Rex/flyer/swarm remain gated off.\r\n" +
             "  - --voice-preview (EXPERIMENTAL, docs/decisions/dc1/voice/VOICE-RANDO-PLAN.md §12) auditions the cutscene\r\n" +
             "    voice swap: it overwrites one labelled Regina bank (or --all-banks) with a CROSS-GAME donor's\r\n" +
             "    line transcoded to DC1's format, so you can launch the game and HEAR it. --voice-packs must\r\n" +

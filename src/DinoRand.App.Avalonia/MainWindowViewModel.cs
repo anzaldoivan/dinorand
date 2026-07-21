@@ -146,7 +146,13 @@ namespace DinoRand.App
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Dc2EnemyOptionsVisible))]
+        [NotifyPropertyChangedFor(nameof(EnemyDifficultyEnabled))]
         private bool _randomizeEnemies;
+
+        // DC1-only per-placement maxHP override. Seed-encoded, advanced, and default OFF.
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EnemyDifficultyEnabled))]
+        private bool _randomizeEnemyHp;
 
         // DC2-only cross-species donor-pool sub-options (docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md). They map to
         // RandomizerConfig.IncludeDc2{Setpiece,Boss}Enemies and show only for DC2 with enemy rando on.
@@ -321,6 +327,7 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _randomizeDoors;
         [ObservableProperty] private bool _shuffleKeyItems;
+        [ObservableProperty] private bool _shuffledKeyItemsModelChange;
         // On by default; NOT seed-encoded (like RelocateDdkDiscs) — a cosmetic/QoL placement constraint,
         // not part of the seed identity. PICKUP-VISUAL-PLACEMENT-PLAN.md.
         [ObservableProperty] private bool _avoidHiddenPickupSpots = true;
@@ -376,6 +383,8 @@ namespace DinoRand.App
         //     doesn't support a feature greys its option (and the option is force-unchecked on switch). ---
         public bool CanRandomizeItems => SelectedGame.Supports(GameFeature.Items);
         public bool CanRandomizeEnemies => SelectedGame.Supports(GameFeature.Enemies);
+        public bool CanRandomizeEnemyHp => SelectedGame.Id == "dc1";
+        public bool EnemyDifficultyEnabled => RandomizeEnemies || RandomizeEnemyHp;
 
         /// <summary>The DC2 cross-species donor sub-options (setpiece/boss) show only for DC2 with enemy
         /// randomization on — they have no meaning for DC1. docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.</summary>
@@ -386,6 +395,7 @@ namespace DinoRand.App
         public bool CanSwapDc2PlayerCharacters => SelectedGame.Supports(GameFeature.PlayerModel);
         public bool CanRandomizeDoors => SelectedGame.Supports(GameFeature.Doors);
         public bool CanShuffleKeyItems => SelectedGame.Supports(GameFeature.KeyItems);
+        public bool CanShuffleKeyItemsModelChange => SelectedGame.Id == "dc1";
         // Cutscene shortening is DC1-only today (the flag(2,2) bracket protocol is a DC1 decode, cont.74).
         public bool CanShortenCutscenes => SelectedGame.Id == "dc1";
 
@@ -421,6 +431,7 @@ namespace DinoRand.App
             _suspend = true;
             if (!CanRandomizeItems) RandomizeItems = false;
             if (!CanRandomizeEnemies) RandomizeEnemies = false;
+            if (!CanRandomizeEnemyHp) RandomizeEnemyHp = false;
             // DC2-only sub-options: clear on any game that can't host them, so a greyed/hidden toggle
             // never leaks a true into the config (DC1 ignores these fields anyway).
             if (SelectedGame.Id != "dc2")
@@ -466,6 +477,7 @@ namespace DinoRand.App
             // otherwise. Like the DC2 defaults above, this wins over a persisted seed on startup/game-switch
             // but not on paste (this hook doesn't run on seed paste); the RandomizerConfig/CLI default stays off.
             ShuffleKeyItems = CanShuffleKeyItems;
+            if (!CanShuffleKeyItemsModelChange) ShuffledKeyItemsModelChange = false;
             // GUI default: Insert upgraded weapons starts ON (item-pool block; DC1-only visible, harmless for DC2).
             PreUpgradedWeapons = true;
             if (!CanShortenCutscenes) ShortenCutscenes = false;
@@ -481,11 +493,14 @@ namespace DinoRand.App
 
             OnPropertyChanged(nameof(CanRandomizeItems));
             OnPropertyChanged(nameof(CanRandomizeEnemies));
+            OnPropertyChanged(nameof(CanRandomizeEnemyHp));
+            OnPropertyChanged(nameof(EnemyDifficultyEnabled));
             OnPropertyChanged(nameof(Dc2EnemyOptionsVisible));
             OnPropertyChanged(nameof(Dc2RaptorPanelVisible));
             OnPropertyChanged(nameof(CanSwapDc2PlayerCharacters));
             OnPropertyChanged(nameof(CanRandomizeDoors));
             OnPropertyChanged(nameof(CanShuffleKeyItems));
+            OnPropertyChanged(nameof(CanShuffleKeyItemsModelChange));
             OnPropertyChanged(nameof(CanShortenCutscenes));
             OnPropertyChanged(nameof(CanDc1DoorSkip));
             OnPropertyChanged(nameof(CanDc1FastForwardCutscenes));
@@ -657,6 +672,7 @@ namespace DinoRand.App
 
         partial void OnRandomizeItemsChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeEnemiesChanged(bool value) => UpdateSeedFromUi();
+        partial void OnRandomizeEnemyHpChanged(bool value) => UpdateSeedFromUi();
         // The pool toggles also drive weight-row visibility — refreshed OUTSIDE UpdateSeedFromUi so
         // it happens on every path (user click, seed paste, game switch), _suspend included.
         partial void OnIncludeDc2SetpieceEnemiesChanged(bool value)
@@ -720,6 +736,7 @@ namespace DinoRand.App
         // Key shuffle is a single toggle: scatter (into ammo/health) and DDK-disc relocation ride on it,
         // config-built as ShuffleKeyItemsIntoPickups = RelocateDdkDiscs = ShuffleKeyItems.
         partial void OnShuffleKeyItemsChanged(bool value) => UpdateSeedFromUi();
+        partial void OnShuffledKeyItemsModelChangeChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeStartingInventoryChanged(bool value) => UpdateSeedFromUi();
         // Import external music: its only effect path is config.RandomizeBgm (UpdateSeedFromUi) → the
         // BgmRandomizer pass. Without this trigger the derivation was dead — a toggle never reached the

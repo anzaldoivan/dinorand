@@ -610,9 +610,8 @@ public class PickupModelImportTests
     [Fact]
     public void ImportPass_Gating()
     {
-        // Default ON for the in-game witness session (user decision 2026-07-17); the flag remains
-        // the kill-switch (CLI --no-pickup-ground-models).
-        Assert.True(new PickupModelImportPass().IsEnabled(new RandomizerConfig()));
+        // Default OFF: the GUI exposes the model change as an explicit Advanced option.
+        Assert.False(new PickupModelImportPass().IsEnabled(new RandomizerConfig()));
         Assert.False(new PickupModelImportPass().IsEnabled(new RandomizerConfig { ImportPickupModels = false }));
         // Lever B implies the Lever-A fallback marking even when NormalizePickupVisuals is off.
         Assert.True(new NormalizePickupVisualsPass().IsEnabled(

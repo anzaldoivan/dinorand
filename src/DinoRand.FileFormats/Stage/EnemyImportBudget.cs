@@ -35,6 +35,7 @@ public enum ImportFitConstraint
 /// <param name="Limiting">The constraint that decided the verdict.</param>
 /// <param name="TextureRect">The relocated donor-texture VRAM rect (when a texture was evaluated and fits).</param>
 /// <param name="PaletteRect">The relocated donor-palette VRAM rect (when a texture was evaluated and fits).</param>
+/// <param name="TextureOutcome">Whether texture placement used fresh VRAM or exact victim reclamation.</param>
 /// <param name="Reason">A human-readable one-line explanation (the refusal cause, or "fits").</param>
 public sealed record EnemyImportFit(
     bool Fits,
@@ -44,6 +45,7 @@ public sealed record EnemyImportFit(
     ImportFitConstraint Limiting,
     VramRect? TextureRect,
     VramRect? PaletteRect,
+    RoomFile.TextureImportOutcome? TextureOutcome,
     string Reason);
 
 /// <summary>
@@ -110,25 +112,25 @@ public static class EnemyImportBudget
         }
         catch (InvalidOperationException ex)
         {
-            return new EnemyImportFit(false, 0, 0, 0, ImportFitConstraint.RdtBudget, null, null, ex.Message);
+            return new EnemyImportFit(false, 0, 0, 0, ImportFitConstraint.RdtBudget, null, null, null, ex.Message);
         }
 
         int resultRdtLength = ((targetRdtLength + 3) & ~3) + prepared.Bytes.Length;
 
         if (droppedClips > maxClipDrops)
             return new EnemyImportFit(false, droppedClips, droppedBytes, resultRdtLength,
-                ImportFitConstraint.ClipStripBudget, null, null,
+                ImportFitConstraint.ClipStripBudget, null, null, null,
                 $"needs {droppedClips} clips dropped ({droppedBytes} B) to fit, over the cap of {maxClipDrops}");
 
-        var (vramOk, texRect, palRect, vramReason) = EvaluateVram(targetPackage, donorTexture);
+        var (vramOk, texRect, palRect, textureOutcome, vramReason) = EvaluateVram(targetPackage, donorTexture);
         if (!vramOk)
             return new EnemyImportFit(false, droppedClips, droppedBytes, resultRdtLength,
-                ImportFitConstraint.Vram, null, null, vramReason!);
+                ImportFitConstraint.Vram, null, null, null, vramReason!);
 
         preparedDonor = prepared;
         var constraint = droppedClips > 0 ? ImportFitConstraint.ClipStrip : ImportFitConstraint.None;
         return new EnemyImportFit(true, droppedClips, droppedBytes, resultRdtLength, constraint,
-            texRect, palRect, droppedClips > 0 ? $"fits after dropping {droppedClips} clips" : "fits");
+            texRect, palRect, textureOutcome, droppedClips > 0 ? $"fits after dropping {droppedClips} clips" : "fits");
     }
 
     /// <summary>
@@ -145,45 +147,71 @@ public static class EnemyImportBudget
     /// (<see cref="SpeciesImporter.EngineRoomRdtCeiling"/> for a non-pool species).</param>
     /// <param name="targetPackage">The target room package bytes, for the VRAM check (empty to skip).</param>
     /// <param name="donorTexture">The donor texture to relocate, or null to evaluate the RDT budget only.</param>
+    /// <param name="reclaimable">Exact texture/palette entries belonging to the replaced victim that may be
+    /// excluded from occupancy when fresh VRAM cannot fit the donor.</param>
+    /// <param name="requireTexture">Refuse a missing donor texture instead of accepting geometry-only output.</param>
     public static EnemyImportFit Evaluate(
         SpeciesBlock model, SpeciesBlock motion,
         int targetRdtLength, int rdtCeiling,
-        ReadOnlySpan<byte> targetPackage, TextureBlock? donorTexture)
+        ReadOnlySpan<byte> targetPackage, TextureBlock? donorTexture,
+        IReadOnlyCollection<VramRect>? reclaimable = null,
+        bool requireTexture = false)
     {
         // Mirror SpeciesImporter.Import's append: model at align4(len), then motion at align4 of that.
         int afterModel = ((targetRdtLength + 3) & ~3) + model.Bytes.Length;
         int resultRdtLength = ((afterModel + 3) & ~3) + motion.Bytes.Length;
 
         if (resultRdtLength > rdtCeiling)
-            return new EnemyImportFit(false, 0, 0, resultRdtLength, ImportFitConstraint.RdtBudget, null, null,
+            return new EnemyImportFit(false, 0, 0, resultRdtLength, ImportFitConstraint.RdtBudget, null, null, null,
                 $"appended RDT {resultRdtLength} B exceeds the ceiling {rdtCeiling} B by {resultRdtLength - rdtCeiling} B");
 
-        var (vramOk, texRect, palRect, vramReason) = EvaluateVram(targetPackage, donorTexture);
+        var (vramOk, texRect, palRect, textureOutcome, vramReason) =
+            EvaluateVram(targetPackage, donorTexture, reclaimable, requireTexture);
         if (!vramOk)
-            return new EnemyImportFit(false, 0, 0, resultRdtLength, ImportFitConstraint.Vram, null, null, vramReason!);
+            return new EnemyImportFit(false, 0, 0, resultRdtLength, ImportFitConstraint.Vram, null, null, null, vramReason!);
 
-        return new EnemyImportFit(true, 0, 0, resultRdtLength, ImportFitConstraint.None, texRect, palRect, "fits");
+        return new EnemyImportFit(true, 0, 0, resultRdtLength, ImportFitConstraint.None,
+            texRect, palRect, textureOutcome, "fits");
     }
 
     /// <summary>
     /// The VRAM half of the fit check: can <paramref name="donorTexture"/> relocate to a free region of
-    /// <paramref name="targetPackage"/> (<see cref="TextureImporter.PickFreeRegion"/>)? A null texture is
-    /// trivially OK (geometry-only, or a fixed-column texture path the caller handles itself). Returns the
-    /// placed texture/palette rects on success, or a reason on failure.
+    /// <paramref name="targetPackage"/> (<see cref="TextureImporter.PickFreeRegion"/>)? When fresh VRAM is
+    /// full, the exact <paramref name="reclaimable"/> victim entries may be reused. A null texture is accepted
+    /// only when <paramref name="requireTexture"/> is false. Returns the placement outcome and rects on success,
+    /// or a reason on failure.
     /// </summary>
-    public static (bool Ok, VramRect? Texture, VramRect? Palette, string? Reason) EvaluateVram(
-        ReadOnlySpan<byte> targetPackage, TextureBlock? donorTexture)
+    public static (bool Ok, VramRect? Texture, VramRect? Palette,
+                   RoomFile.TextureImportOutcome? Outcome, string? Reason) EvaluateVram(
+        ReadOnlySpan<byte> targetPackage, TextureBlock? donorTexture,
+        IReadOnlyCollection<VramRect>? reclaimable = null,
+        bool requireTexture = false)
     {
         if (donorTexture is null)
-            return (true, null, null, null);
+            return requireTexture
+                ? (false, null, null, null, "donor texture is missing; geometry-only placement is forbidden")
+                : (true, null, null, null, null);
         try
         {
             var placed = TextureImporter.PickFreeRegion(targetPackage, donorTexture);
-            return (true, placed.Texture.Dst, placed.Palette.Dst, null);
+            return (true, placed.Texture.Dst, placed.Palette.Dst,
+                RoomFile.TextureImportOutcome.Relocated, null);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException first)
         {
-            return (false, null, null, ex.Message);
+            if (reclaimable is not { Count: > 0 })
+                return (false, null, null, null, first.Message);
+            try
+            {
+                var placed = TextureImporter.PickFreeRegion(targetPackage, donorTexture, reclaimable);
+                return (true, placed.Texture.Dst, placed.Palette.Dst,
+                    RoomFile.TextureImportOutcome.ReclaimedVictim, null);
+            }
+            catch (InvalidOperationException reclaim)
+            {
+                return (false, null, null, null,
+                    $"{first.Message}; victim reclaim also failed: {reclaim.Message}");
+            }
         }
     }
 }

@@ -349,11 +349,21 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <!-- Enemy Difficulty (fine-tuning of Randomize Enemies). -->
+                            <CheckBox Content="Shuffled Key Items Model Change (Experimental/Crash Risk)" Margin="0,8,0,0"
+                                      IsVisible="{Binding CanShuffleKeyItemsModelChange}"
+                                      IsChecked="{Binding ShuffledKeyItemsModelChange, Mode=TwoWay}"
+                                      ToolTip.Tip="DC1 only, off by default. Experimental / crash risk: import donor ground meshes and textures so relocated key and weapon pickups can show their own models. Leave off for the safer generic pickup visuals; in-game verification is still required." />
+
+                            <CheckBox Content="Randomize Enemy HP" Margin="0,8,0,0"
+                                      IsVisible="{Binding CanRandomizeEnemyHp}"
+                                      IsChecked="{Binding RandomizeEnemyHp, Mode=TwoWay}"
+                                      ToolTip.Tip="DC1 only, off by default. Give eligible RaptorHeavy and Pteranodon placements a seeded, difficulty-scaled max-HP override. Velociraptor, Swarm, Therizinosaurus, scripted T-Rex and cutscene placements are unchanged. This is a room-file edit; it does not patch DINO.exe." />
+
+                            <!-- Enemy Difficulty tunes normal enemy randomization and DC1 HP overrides. -->
                             <local:RandoSlider Margin="0,8,0,0"
                                                Heading="Enemy Difficulty" LowText="Easy" HighText="Hard" Maximum="31"
                                                Value="{Binding Difficulty, Mode=TwoWay}"
-                                               IsEnabled="{Binding RandomizeEnemies}" />
+                                               IsEnabled="{Binding EnemyDifficultyEnabled}" />
 
                             <!-- Emergency-box mode (the master checkbox stays in the Common view above). -->
                             <StackPanel Orientation="Horizontal" Margin="0,8,0,0" Spacing="6">
@@ -575,6 +585,7 @@
              optional password / one Connect–Disconnect toggle / scrolling status log). Everything
              it drives is Dc1ApRunner — the same session the CLI's ap-connect command runs. -->
         <TabItem Header="Archipelago"
+                 IsVisible="False"
                  IsEnabled="{Binding ApTabEnabled}"
                  ToolTip.Tip="Set your Dino Crisis game location on the Randomizer tab first — connecting installs the multiworld's item placement into that game.">
             <DockPanel Margin="8">

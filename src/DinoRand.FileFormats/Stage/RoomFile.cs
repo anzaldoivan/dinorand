@@ -214,6 +214,48 @@ public sealed class RoomFile
         return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr, reclaim);
     }
 
+    /// <summary>
+    /// Budget and apply a production grounded-species import as one commit. The complete RDT + texture fit is
+    /// evaluated on a fresh parse of the room's current serialized bytes; geometry, model-code rewrites and
+    /// texture staging then happen only on that private copy. This instance adopts the final serialized room
+    /// only after the import remains textured (<see cref="TextureImportOutcome.Relocated"/> or
+    /// <see cref="TextureImportOutcome.ReclaimedVictim"/>) and reparses cleanly. Every refusal or exception
+    /// before that point leaves this room byte-identical and semantically unchanged.
+    /// </summary>
+    public bool TryImportSpeciesTexturedAtomic(
+        SpeciesDonor donor, int enemyIndex, int rdtCeiling,
+        out EnemyImportFit fit, out TexturedImportResult? texture)
+    {
+        texture = null;
+        var work = Read(Stage, Room, Write());
+        if (enemyIndex < 0 || enemyIndex >= work.Enemies.Count)
+            throw new ArgumentOutOfRangeException(nameof(enemyIndex));
+
+        var reclaim = RoomSpeciesEditor.VictimReclaimableRects(work, enemyIndex);
+        fit = EnemyImportBudget.Evaluate(
+            donor.Model, donor.Motion, work.RdtBuffer.Length, rdtCeiling,
+            work.OriginalBytes, donor.Texture, reclaim, requireTexture: true);
+        if (!fit.Fits) return false;
+
+        var staged = work.ImportSpeciesTextured(donor, enemyIndex);
+        if (staged.Outcome is not (TextureImportOutcome.Relocated or TextureImportOutcome.ReclaimedVictim)
+            || staged.Outcome != fit.TextureOutcome)
+        {
+            fit = new EnemyImportFit(false, 0, 0, work.RdtBuffer.Length,
+                ImportFitConstraint.Vram, null, null, null,
+                $"texture staging produced {staged.Outcome} after a {fit.TextureOutcome} preflight");
+            return false;
+        }
+
+        var final = work.Write();
+        var committed = Read(Stage, Room, final);
+        if (!committed.ParsedCleanly)
+            throw new InvalidOperationException("grounded import serialized to an unparseable room");
+        Adopt(committed);
+        texture = staged;
+        return true;
+    }
+
     /// <summary>Multi-range (entangled species) sibling of
     /// <see cref="ImportSpeciesTextured(SpeciesDonor,int)"/>.</summary>
     public TexturedImportResult ImportSpeciesTextured(SpeciesDonorMulti donor, int enemyIndex)
@@ -389,6 +431,20 @@ public sealed class RoomFile
     internal void ReplaceRdtBuffer(byte[] buffer) => RdtBuffer = buffer;
 
     internal void MarkStructurallyEdited() => _structurallyEdited = true;
+
+    private void Adopt(RoomFile committed)
+    {
+        OriginalBytes = committed.OriginalBytes;
+        Package = committed.Package;
+        RdtBuffer = committed.RdtBuffer;
+        RdtCompressed = committed.RdtCompressed;
+        Script = committed.Script;
+        Items.Clear(); Items.AddRange(committed.Items);
+        Enemies.Clear(); Enemies.AddRange(committed.Enemies);
+        Doors.Clear(); Doors.AddRange(committed.Doors);
+        _structurallyEdited = false;
+        _textureStager.Clear();
+    }
 
     internal TexturedImportResult StageTexture(
         TextureBlock? texture, uint importedModelPtr, IReadOnlyList<VramRect>? reclaim = null)

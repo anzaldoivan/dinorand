@@ -100,4 +100,21 @@ if [ "$docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
   }
 fi
 
+# Public release-note contract: this is intentionally separate from the docs index
+# generator because tone cannot be generated, but obvious RE leakage and malformed
+# release bullets can be rejected mechanically. CI is the non-bypassable backstop.
+public_docs_touched=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    README.md|USER-GUIDE.md|MODDING.md|CONTRIBUTING.md|CHANGELOG.md|scripts/check_docs.py)
+      public_docs_touched=1; break ;;
+  esac
+done
+if [ "$public_docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
+  PYTHONDONTWRITEBYTECODE=1 python3 "$root/scripts/check_docs.py" --check || {
+    echo "pre-commit: public documentation contract failed — rewrite release notes for players" >&2
+    exit 1
+  }
+fi
+
 exec "$root/scripts/check-no-copyrighted-files.sh" "${staged[@]}"

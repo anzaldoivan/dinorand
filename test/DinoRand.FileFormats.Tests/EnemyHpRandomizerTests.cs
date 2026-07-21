@@ -3,6 +3,7 @@ using DinoRand.Randomizer;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Graph;
 using DinoRand.Randomizer.Passes;
+using System.Reflection;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -17,6 +18,77 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class EnemyHpRandomizerTests
 {
+    private sealed class ImportingFake : ICrossSpeciesImporter
+    {
+        private readonly DinoSpecies _species;
+
+        public ImportingFake(DinoSpecies species) => _species = species;
+
+        public IReadOnlyCollection<DinoSpecies> AvailableDonors => new[] { _species };
+
+        public bool TryImport(RandomizationContext context, RoomFile room, int victimIdx,
+                              ExoticSpeciesDef def, out IReadOnlyList<DinoRand.Randomizer.Install.ExePatchRequest> patches,
+                              out string note)
+        {
+            patches = Array.Empty<DinoRand.Randomizer.Install.ExePatchRequest>();
+            note = "synthetic import";
+            if (_species == DinoSpecies.Therizinosaurus)
+            {
+                context.SetRoomOutput(room, SyntheticRoom.Dc1Room(
+                    Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+                    new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 8, 22) }));
+                return true;
+            }
+
+            var model = new byte[EnemySkeleton.BoneArrayOffset + 21 * EnemySkeleton.BoneStride];
+            model[EnemySkeleton.BoneCountOffset] = 21;
+            var donor = new SpeciesDonor(DinoSpecies.RaptorHeavy, 2,
+                new SpeciesBlock(model, 0x100, Array.Empty<int>()),
+                new SpeciesBlock(new byte[0x20], 0x300, Array.Empty<int>()));
+            room.ImportSpecies(donor, victimIdx);
+            return true;
+        }
+    }
+
+    private static int SeedThatPlaces(DinoSpecies species, int stage)
+    {
+        var candidates = new[]
+        {
+            new RoomCandidate(stage, 3, true, new[] { DinoSpecies.Velociraptor }),
+        };
+        for (int seed = 1; seed < 10000; seed++)
+            if (CrossSpeciesPlanner.Plan(candidates, new[] { species }, 0.75,
+                    new Seed(seed).RngFor("cross-species-enemies")).Count == 1)
+                return seed;
+        throw new InvalidOperationException("no deterministic placement seed found");
+    }
+
+    private static (RandomizationContext Context, ushort Hp) RunCombined(RoomFile room, DinoSpecies species)
+    {
+        int seed = SeedThatPlaces(species, room.Stage);
+        var rooms = new[] { room };
+        var ctx = new RandomizationContext(
+            new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(seed),
+            new RandomizerConfig
+            {
+                CrossRoomEnemySpecies = true,
+                RandomizeEnemyHp = true,
+                EnemyDifficulty = 1.0,
+            }, _ => { });
+        new CrossSpeciesEnemyPass(_ => new ImportingFake(species)).Apply(ctx);
+        new EnemyHpRandomizer().Apply(ctx);
+        return (ctx, room.Enemies.Single().MaxHp);
+    }
+
+    [Fact]
+    public void Runner_OrdersCrossSpeciesBeforeEnemyHp()
+    {
+        var field = typeof(RandomizerRunner).GetField("_passes", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var passes = (IReadOnlyList<IRandomizationPass>)field.GetValue(new RandomizerRunner(new DinoCrisis1()))!;
+        int cross = passes.Select((p, i) => (p, i)).Single(x => x.p is CrossSpeciesEnemyPass).i;
+        int hp = passes.Select((p, i) => (p, i)).Single(x => x.p is EnemyHpRandomizer).i;
+        Assert.True(cross < hp, $"cross-species index {cross} must precede enemy-hp index {hp}");
+    }
     private static int BonesFor(byte category) => category switch
     {
         1 => 15, 2 => 21, 3 => 20, 4 => 10, 5 => 7, 7 => 18, 8 => 22, _ => 0,
@@ -200,5 +272,76 @@ public class EnemyHpRandomizerTests
             ushort got = (ushort)(reread.RdtBuffer[off] | (reread.RdtBuffer[off + 1] << 8));
             Assert.Equal(expected[i], got);
         }
+    }
+
+    [Fact]
+    public void CrossSpeciesOnly_RaptorHeavy_FinalSerializedPresetRemainsZero()
+    {
+        var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
+        var room = RoomFile.Read(3, 3, raw);
+        int seed = SeedThatPlaces(DinoSpecies.RaptorHeavy, room.Stage);
+        var rooms = new[] { room };
+        var ctx = new RandomizationContext(new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(seed),
+            new RandomizerConfig { CrossRoomEnemySpecies = true, EnemyDifficulty = 1.0 }, _ => { });
+
+        new CrossSpeciesEnemyPass(_ => new ImportingFake(DinoSpecies.RaptorHeavy)).Apply(ctx);
+
+        var final = RoomFile.Read(room.Stage, room.Room, room.Write());
+        Assert.Equal(DinoSpecies.RaptorHeavy, final.Enemies.Single().Species);
+        Assert.Equal(0, final.Enemies.Single().MaxHp);
+    }
+
+    [Fact]
+    public void CombinedRaptorHeavy_FinalSerializedRecordGetsHp_WithoutChangingHpStream()
+    {
+        var targetRaw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
+        var combined = RoomFile.Read(3, 3, targetRaw);
+        int seed = SeedThatPlaces(DinoSpecies.RaptorHeavy, combined.Stage);
+        var (_, combinedHp) = RunCombined(combined, DinoSpecies.RaptorHeavy);
+
+        var hpOnlyRaw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21) });
+        var hpOnly = RoomFile.Read(3, 3, hpOnlyRaw);
+        Run(hpOnly, seed, difficulty: 1.0);
+
+        Assert.NotEqual(0, combinedHp);
+        Assert.Equal(hpOnly.Enemies.Single().MaxHp, combinedHp);
+        var final = RoomFile.Read(combined.Stage, combined.Room, combined.Write());
+        var imported = final.Enemies.Single();
+        Assert.Equal(DinoSpecies.RaptorHeavy, imported.Species);
+        Assert.Equal(combinedHp, imported.MaxHp);
+        int hpOffset = imported.FileOffset + EnemyRecord.MaxHpOffset;
+        Assert.Equal(combinedHp,
+            (ushort)(final.RdtBuffer[hpOffset] | (final.RdtBuffer[hpOffset + 1] << 8)));
+    }
+
+    [Fact]
+    public void CombinedTherizinosaurus_PreservesOutputOverride_AndRemainsNonPresettable()
+    {
+        var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
+        var room = RoomFile.Read(1, 3, raw);
+        int seed = SeedThatPlaces(DinoSpecies.Therizinosaurus, room.Stage);
+        var rooms = new[] { room };
+        var ctx = new RandomizationContext(new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(seed),
+            new RandomizerConfig
+            {
+                CrossRoomEnemySpecies = true,
+                RandomizeEnemyHp = true,
+                EnemyDifficulty = 1.0,
+            }, _ => { });
+        new CrossSpeciesEnemyPass(_ => new ImportingFake(DinoSpecies.Therizinosaurus)).Apply(ctx);
+        Assert.True(ctx.TryGetRoomOutput(room, out var beforeHp));
+
+        new EnemyHpRandomizer().Apply(ctx);
+
+        Assert.True(ctx.TryGetRoomOutput(room, out var afterHp));
+        Assert.Equal(beforeHp, afterHp);
+        var final = RoomFile.Read(room.Stage, room.Room, afterHp);
+        Assert.Equal(DinoSpecies.Therizinosaurus, final.Enemies.Single().Species);
+        Assert.Equal(0, final.Enemies.Single().MaxHp);
+        Assert.Equal(0, room.Enemies.Single().MaxHp);
     }
 }

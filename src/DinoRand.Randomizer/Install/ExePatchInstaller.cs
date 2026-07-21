@@ -7,6 +7,8 @@ namespace DinoRand.Randomizer.Install;
 
 internal static class ExePatchInstaller
 {
+    internal sealed record ComposedExePatch(byte[] Bytes, IReadOnlyList<string> Repoints, int RequestCount);
+
     private const string BackupDirName = GameInstaller.BackupDirName;
     private const string ExeName = GameInstaller.ExeName;
     private const string LooseBackupSubdir = GameInstaller.LooseBackupSubdir;
@@ -29,34 +31,142 @@ internal static class ExePatchInstaller
     internal static IReadOnlyList<ExePatchResult> ApplyExePatchPlan(
         string dataDir, ExePatchPlan plan, string donorDir, string? seed = null)
     {
-        if (plan.Version != ExePatchPlan.CurrentVersion)
-            throw new InvalidOperationException(
-                $"exe-patch-plan version {plan.Version} is unsupported (expected {ExePatchPlan.CurrentVersion}).");
+        ValidatePlanVersion(plan);
+        if (plan.Requests.Count == 0) return Array.Empty<ExePatchResult>();
 
-        var results = new List<ExePatchResult>();
+        var exePath = ResolveExeForPatch(dataDir);
+        var backupDir = Path.Combine(dataDir, BackupDirName);
+        var exeBackup = Path.Combine(backupDir, ExeName);
+        var existing = ReadManifest(dataDir);
+        byte[] pristine = File.Exists(exeBackup)
+            ? File.ReadAllBytes(exeBackup)
+            : BackupManifestStore.ReadPristineBytes(exePath);
+        if (File.Exists(exeBackup)
+            && existing?.OriginalHashes?.TryGetValue(ExeName, out var expected) == true
+            && !string.Equals(BackupManifestStore.HashBytes(pristine), expected, StringComparison.OrdinalIgnoreCase))
+            throw new BackupIntegrityException(ExeName, exeBackup);
+
+        var composed = ComposeExePatchPlan(pristine, plan, donorDir, dataDir);
+        if (composed.RequestCount == 0) return Array.Empty<ExePatchResult>();
+
+        Directory.CreateDirectory(backupDir);
+        if (!File.Exists(exeBackup))
+            File.WriteAllBytes(exeBackup, pristine);
+        File.WriteAllBytes(exePath, composed.Bytes);
+
+        var hashes = new Dictionary<string, string>(
+            existing?.OriginalHashes ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase)
+        {
+            [ExeName] = BackupManifestStore.HashBytes(pristine),
+        };
+        var manifest = (existing ?? new InstallManifest(seed, DateTime.UtcNow.ToString("o"), Array.Empty<string>()))
+            with
+            {
+                Seed = seed ?? existing?.Seed,
+                ExePatched = true,
+                ExeRepoints = composed.Repoints,
+                OriginalHashes = hashes,
+                Applied = true,
+            };
+        File.WriteAllText(Path.Combine(backupDir, ManifestName), JsonSerializer.Serialize(manifest, JsonOpts));
+        return new[] { new ExePatchResult(exePath, exeBackup, composed.Repoints) };
+    }
+
+    internal static ComposedExePatch ComposeExePatchPlan(
+        byte[] pristine, ExePatchPlan plan, string donorDir, string dataDir)
+    {
+        ValidatePlanVersion(plan);
+
+        var byTarget = new Dictionary<string, ExePatchRequest>(StringComparer.OrdinalIgnoreCase);
         foreach (var req in plan.Requests)
+        {
+            string key = req.Kind switch
+            {
+                ExePatchKind.CatSlot => $"cat-slot:{req.Stage}:{req.Category}",
+                ExePatchKind.Cat8HitReaction => "cat8-hit-reaction",
+                ExePatchKind.RoomEnemySe => $"room-se:{req.Stage}:{req.Room}",
+                _ => throw new InvalidOperationException($"unknown exe-patch kind {req.Kind}"),
+            };
+            if (byTarget.TryGetValue(key, out var previous) && previous != req)
+                throw new InvalidOperationException(
+                    $"incompatible exe-patch requests target {key}: {previous} conflicts with {req}");
+            byTarget[key] = req;
+        }
+
+        var bytes = (byte[])pristine.Clone();
+        var entries = new List<string>();
+        foreach (var req in byTarget.Values
+                     .OrderBy(r => r.Kind).ThenBy(r => r.Stage).ThenBy(r => r.Room)
+                     .ThenBy(r => r.Category).ThenBy(r => r.DonorStage).ThenBy(r => r.DonorRoom))
         {
             switch (req.Kind)
             {
                 case ExePatchKind.CatSlot:
-                    results.Add(PatchExeCatSlot(dataDir, StageAiRecordVa(req.Stage), req.Category, req.HandlerVa, seed));
+                {
+                    uint recordVa = StageAiRecordVa(req.Stage);
+                    uint previous = ExePatcher.SetRecordCategoryHandler(bytes, recordVa, req.Category, req.HandlerVa);
+                    entries.Add($"record@0x{recordVa:X} cat{req.Category} = 0x{req.HandlerVa:X} " +
+                                $"(was 0x{previous:X} @ +0x{req.Category * 4:X})");
                     break;
+                }
                 case ExePatchKind.Cat8HitReaction:
                 {
                     var donorPath = ResolveDonorPath(donorDir, dataDir, req.DonorRoomFile
                         ?? throw new InvalidOperationException("Cat8HitReaction request has no donor room file."));
                     byte[] donorRdt = RoomFile.ReadFromFile(req.DonorStage, req.DonorRoom, donorPath).RdtBuffer;
-                    results.Add(PatchExeCat8HitReaction(dataDir, donorRdt, seed));
+                    entries.Add(ApplyCat8HitReaction(bytes, donorRdt));
                     break;
                 }
                 case ExePatchKind.RoomEnemySe:
-                    results.Add(PatchExeRoomEnemySe(dataDir, req.Stage, req.Room, req.DonorStage, req.DonorRoom, seed));
+                {
+                    byte[] donorSub = ExePatcher.ExtractRoomDinoSubBlock(bytes, req.DonorStage, req.DonorRoom);
+                    if (donorSub.Length == 0)
+                        throw new InvalidOperationException(
+                            $"donor room st{req.DonorStage}{req.DonorRoom:X2} has no enemy SE records — " +
+                            "cannot source the target species' sound set.");
+                    var result = ExePatcher.RetargetRoomDinoSe(bytes, req.Stage, req.Room, donorSub);
+                    entries.Add($"room enemy SE st{req.Stage}{req.Room:X2} -> donor " +
+                                $"st{req.DonorStage}{req.DonorRoom:X2} ({result.RecordsWritten}/{result.Capacity} " +
+                                $"dino records @ block 0x{result.TargetBlockVa:X})");
                     break;
-                default:
-                    throw new InvalidOperationException($"unknown exe-patch kind {req.Kind}");
+                }
             }
         }
-        return results;
+        return new ComposedExePatch(bytes, entries, byTarget.Count);
+    }
+
+    internal static void ValidatePlanVersion(ExePatchPlan plan)
+    {
+        if (plan.Version != ExePatchPlan.CurrentVersion)
+            throw new InvalidOperationException(
+                $"exe-patch-plan version {plan.Version} is unsupported (expected {ExePatchPlan.CurrentVersion}).");
+    }
+
+    private static string ApplyCat8HitReaction(byte[] bytes, byte[] donorRdt)
+    {
+        int off = ExePatcher.Cat8ReactionDonorRdtOffset, len = ExePatcher.Cat8ReactionStreamBytes;
+        int recSize = ExePatcher.HitDescriptorRecordSize;
+        if (off + len > donorRdt.Length)
+            throw new InvalidOperationException(
+                $"donor RDT (0x{donorRdt.Length:X} B) is too small for the cat-8 reaction stream at " +
+                $"0x{off:X}+0x{len:X} — wrong donor room (need a normal Theri room like st603).");
+        for (int i = 0; i < 23; i++)
+        {
+            int r = off + i * recSize;
+            byte state = donorRdt[r + 0x10], count = donorRdt[r + 0xe];
+            if (state > 7 || count > 0x10)
+                throw new InvalidOperationException(
+                    $"donor RDT offset 0x{r:X} is not a clean cat-8 reaction descriptor " +
+                    $"(state=0x{state:X2}, cnt=0x{count:X2}) — the donor is not a normal Theri room (st603).");
+        }
+        var stream = donorRdt.AsSpan(off, len).ToArray();
+        uint[] repointed = ExePatcher.RedirectCat8HitReaction(bytes, stream);
+        ExePatcher.InstallWalkerNullGuard(bytes);
+        ExePatcher.InstallRenderModelGuard(bytes);
+        return $"cat8 hit reaction -> cave 0x{ExePatcher.HitDescriptorCaveVa:X} " +
+               $"(0x{len:X} B from st603 RDT 0x{off:X}; {repointed.Length} entries) + walker null-guard " +
+               $"0x{ExePatcher.WalkerVa:X}->0x{ExePatcher.WalkerCaveVa:X} + render-model guard " +
+               $"0x{ExePatcher.RenderTransformHookVa:X}->0x{ExePatcher.RenderGuardCaveVa:X}";
     }
 
     internal static uint StageAiRecordVa(int stage) => stage switch

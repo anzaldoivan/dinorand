@@ -63,12 +63,14 @@ internal sealed partial class CliApplication
             // DC1 (OFF by default — pilot rooms not yet human-witnessed): shorten whitelisted cutscene brackets
             // to their side effects (in-place script rewrite, cont.74). docs/decisions/cross/CUTSCENE-SKIP-FEASIBILITY.md §9.3.
             ShortenCutscenes = argv.Contains("--dc1-shorten-cutscenes"),
-            // Default ON for the in-game witness session; --no-pickup-ground-models is the off-switch.
-            ImportPickupModels = !argv.Contains("--no-pickup-ground-models"),
-            // Experimental: import foreign species (cat8 Theri + grounded RaptorHeavy) into eligible rooms and queue
-            // the EXE patches they need. Off unless asked; with --install-to-data it patches DINO.exe (game must be
-            // CLOSED). docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.
-            CrossRoomEnemySpecies = argv.Contains("--exotic-enemies"),
+            // Default OFF: explicitly opt in to the crash-risk donor-model importer. Keep the legacy
+            // --no-pickup-ground-models spelling as a hard off switch for existing scripts.
+            ImportPickupModels = argv.Contains("--pickup-ground-models")
+                              && !argv.Contains("--no-pickup-ground-models"),
+            // DC1 enemy randomization includes foreign species (cat8 Theri + grounded RaptorHeavy) by default and
+            // queues the EXE patches they need. --no-enemies disables both passes; the old --exotic-enemies spelling
+            // remains a harmless compatibility no-op. With --install-to-data, CLOSE the game before DINO.exe patches.
+            CrossRoomEnemySpecies = !argv.Contains("--no-enemies"),
             // Experimental: with --install-to-data, patch DINO.exe so a new game starts with a randomized supply
             // kit (the Handgun + ammo are always granted, so it stays beatable). docs/reference/dc1/items/STARTING-INVENTORY.md.
             RandomizeStartingInventory = argv.Contains("--random-inventory"),
@@ -196,10 +198,10 @@ internal sealed partial class CliApplication
                 output: Console.WriteLine,
                 overlayFailure: ex =>
                 {
-                    // Only the exe-patch step (e.g. --exotic-enemies' cat-slot patch) writes DINO.exe, which Windows locks
+                    // Only the exe-patch step (e.g. enemy randomization's cat-slot patch) writes DINO.exe, which Windows locks
                     // while the game runs; the room overlay itself does not. Surface the close-the-game hint.
                     Console.Error.WriteLine($"error: could not write {GameInstaller.ExeName}: {ex.Message}");
-                    Console.Error.WriteLine("hint : --exotic-enemies patches DINO.exe — CLOSE the game and re-run (the room overlay is idempotent).");
+                    Console.Error.WriteLine("hint : DC1 enemy randomization may patch DINO.exe — CLOSE the game and re-run (the room overlay is idempotent).");
                 });
             if (installResult is null)
                 return 1;

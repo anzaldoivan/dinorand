@@ -1,7 +1,7 @@
 {
   "_source": "BYTE-GROUNDED catalog decoded 2026-07-10 from the ORIGINAL US PSX disc EXE (SLUS_012.79, name/desc glyph strings via catalog table RAM 0x80019770) cross-checked against the PC port table Dino2.exe VA 0x704260 (same 12-byte records, same flags/iconUV, JP glyph strings at ptr+0/ptr+4). Authored RE knowledge (offsets + names as identifiers), no game bytes. Supersedes the earlier guide-sourced placeholder file. See docs/decisions/dc2/ITEMS-KEYITEMS-RE-PLAN.md and K75.",
   "_encoding_note": "US SLUS names are word-per-glyph strings: glyph/2 -> 1..26=A..Z, 27..52=a..z, 0=space, 0x6a+2n=digit n, 0x82='?', 0x90='-', 0x9a='.', 0x9c=',', 0x9e=apostrophe; 0xf000=line break, 0x4000=end. PC port carries the same table with JAPANESE katakana/kanji glyph strings (0x7244c4 region).",
-  "_id_spaces": "TWO DISTINCT id spaces. (1) THIS catalog id = the INVENTORY item id (record scene_mgr+0x10bc + slot*12, byte+1; equipped main/sub at scene_mgr+0x10b4/+0x10b5, sub stored as id|0x10; ITEM.DAT icon block index == this id, loader 0x403ed0). (2) The op-0x31 room-script byte (data/dc2/item-placements.json, ids 1..9) is the AOT SAT-1 VM-THREAD SLOT, param = routine index -- NOT this catalog id (see K77). The field-type -> catalog-id give mapping is the open decode.",
+  "_id_spaces": "TWO DISTINCT id spaces. (1) THIS catalog id = the INVENTORY item id (record scene_mgr+0x10bc + slot*12, byte+1; equipped main/sub at scene_mgr+0x10b4/+0x10b5, sub stored as id|0x10; ITEM.DAT icon block index == this id, loader 0x403ed0). (2) The op-0x31 room-script byte (data/dc2/item-placements.json, ids 1..9) is the AOT SAT-1 VM-THREAD SLOT, param = routine index -- NOT this catalog id (K77/K129). Catalog-bearing room sources are normalized separately in data/dc2/item-sources.json.",
   "currency": {
     "name": "Extinct Points",
     "alias": "Vital Credits",
@@ -69,24 +69,13 @@
   ],
   "keyItemIds": ["0x21", "0x22", "0x23", "0x24", "0x25", "0x26", "0x27", "0x28", "0x29", "0x2a", "0x2b", "0x2c", "0x2d", "0x2e", "0x2f", "0x30", "0x31", "0x32", "0x33", "0x34"],
   "_owner_flags_note": "flags word (rec+0xA, PSX-truth per data/dc2/weapon-catalog.json): 0x01 Regina / 0x02 Dylan / 0x04 David owner bits + 0x08 MAIN / 0x10 SUB class + 0x20 wide-icon. Weapon rows carry the weapon-catalog.json values; item rows (0x1a+) are flags 0x0000.",
-  "_field_pickup_types": {
-    "_source": "CE live capture 2026-06-27 + decode_script op-0x31 census (165 items / 54 rooms, data/dc2/item-placements.json). This is the SEPARATE op-0x31 id space (SAT-1 VM-thread slot, K77) whose item correlation is empirical, id histogram 1=95,2=31,3=14,4=6,5=8,6=5,7=3,8=2,9=1.",
-    "types": {
-      "1": "Med Pak S (nominal) -- but the GRANTED catalog id is NOT fixed: live 2026-07-12, a type-1 ST102 pickup on Normal (byte[scene+0x108E]=1) granted catalog 0x1c (Med Pak M), NOT 0x1b. type != catalog; health ids are difficulty-remapped at give time (K98).",
-      "2": "Resusc. Pak (nominal; catalog 0x1e -- but see type-1 note: verify per difficulty)",
-      "3": "unnamed (14 occurrences)",
-      "4": "unnamed",
-      "5": "Dino File (live-witnessed; dino-file log, NOT an inventory catalog row)",
-      "6": "unnamed",
-      "7": "ammo pickup (live qty 7; ammo merges into the weapon record +8, no catalog row)",
-      "8": "unnamed",
-      "9": "unnamed"
-    },
-    "_give_path": "RESOLVED (LIVE, K98, 2026-07-12). The granted catalog id = word[itemRec+2] set by the pickup routine[param] (K77), NOT the op-0x31 id byte (byte=1 != granted 0x1c). Give core 0x40CE70: SetFlag(9, word[itemRec+2], 1) @0x40CE79 = ownership (bank 9 = 0x878098). Consumables (health 0x1a-0x1f) ALSO get a bag count record via 0x49F900 (bag = scene+0x11AC; find-in-bag 0x496010). Key items (0x21-0x34) = ownership flag ONLY, no record (live: City Keycard = catalog 0x22 -> flag(9,0x22), both banks byte-identical). Dino files (type 5) = flag/log only. Lever for a shuffler = the routine's granted catalog id (word[itemRec+2]); health is difficulty-scaled at give time.",
-    "_mapping_open": "CLOSED as a NEGATIVE (K101/K102, 2026-07-12): the field-CONSUMABLE per-pickup catalog id is genuinely RUNTIME-seeded -- there is NO native per-pickup catalog table and NO field-pickup entry in the give-card screen table 0x71e130 (the give 0x40CE79 is the only variable-id SetFlag(9,.) in .text); the 9 op-0x31 TYPES are categories, not the ~40 catalog ids. K102 confirmed the give-card +0x50 writer via a live data-write BP: the id is difficulty-remapped at give time (type-1 health -> 0x1c on Normal). So item-placements.json is deliberately NOT given a fabricated per-pickup catalogId (guessing a runtime value would be wrong). The ONE statically-resolvable slice is KEY-ITEM ownership: scripted SetFlag(9, literal) grants (door-gating.json rooms[].sets, group 9 id 0x21-0x34) -- see keyItemGrantSites below."
+  "_sat1_triggers": {
+    "_source": "decode_script op-0x31 census: 168 SAT-1 physical VM triggers in 54 rooms (data/dc2/item-placements.json).",
+    "_semantics": "block+0x04 is the VM-thread slot and block+0x00 is the slot-5 routine index. Neither is an item type, quantity, catalog id, or rewrite lever. The old empirical item-name/type mapping is retracted by K129.",
+    "_catalog_sources": "Use data/dc2/item-sources.json: op-0x35 SAT-5 TAKE-ITEM and only kind-1 op-0x2C GiveItem rows carry catalog-bearing item operands."
   },
   "keyItemGrantSites": {
-    "_source": "BYTE-GROUNDED (K101, 2026-07-12): op-0x1c SetFlag(9, literal, 1) grant sites decoded from the slot-5 SCD script (door-gating.json rooms[].sets, group 9, id 0x21-0x34, value 1), each bound to its source room by the op-0x39 examine record's routine or the op-0x31 pickup mini-routine. This is the ONLY statically-resolvable per-item identity in DC2 (consumable field ids are runtime-seeded -- see _field_pickup_types._mapping_open). value:=0 rows are CLEARS, not grants, and are excluded.",
+    "_source": "Legacy grouped view of literal op-0x1c/op-0x33 SetFlag(9,id,1) writes (K101). It is no longer the complete acquisition-source model: data/dc2/item-sources.json preserves every individual grant/clear site plus op-0x35 TAKE-ITEM, kind-1 op-0x2C GiveItem, shop and native classifications. value:=0 rows are clears, not grants.",
     "grants": [
       { "catalogId": "0x23", "name": "Research Facility Keycard", "rooms": ["302", "303"], "routines": { "302": [5], "303": [6, 7] } },
       { "catalogId": "0x25", "name": "Key plate", "rooms": ["205"], "routines": { "205": [21] } },
@@ -98,8 +87,8 @@
       { "catalogId": "0x2e", "name": "Gas Mask", "rooms": ["10F"], "routines": { "10F": [2, 3] } },
       { "catalogId": "0x30", "name": "Mechanic's ID Card", "rooms": ["605"], "routines": { "605": [5] } }
     ],
-    "_runtime_or_native": "City Keycard 0x22 has NO scripted grant (runtime card, K98; room 800 only clears it). All other key ids (Plug 0x21, Living quarters key 0x24, Starter Battery 0x2b, 3rd Energy Disk 0x2c, Diving Suit 0x2d, Signal Bullet 0x2f, Key for the box 0x31, 3E Facility Keycard 0x32, Light-weight Armor 0x33, Inner suit 0x34) have no group-9 :=1 script grant -> granted by native/cutscene code, offline-unverifiable, left unmodelled (Law 2). See K107.",
-    "_no_door_gate": "IMPORTANT (K107): possessing these keys does NOT gate any traceable DOOR. DC2 doors unlock via the equipped-weapon class byte (op-0x3a consumer 0x48b790, scene_mgr+0x10b5) or same-room story flags (groups 6/7), NOT a held-key-item test. The only group-9 held-item TESTS (0x2c/0x2e/0x33/0x38 in rooms 400/10D/808-809/402) are environmental/state, with no CFG proof of blocking a warp. So NO requiresItems door gate is authorable offline; dc2_logic.json stays visit-gated. Mirrors the DC1 gate-authoring outcome."
+    "_runtime_or_native": "Absence of a group-9 :=1 write is not an absence of a static item source. K129 attributes previously unmodelled keys through op-0x35, kind-1 op-0x2C, or the native shop surface; consult item-sources.json for the tested disposition of every supported and unsupported record.",
+    "_door_gate_note": "K119/K121 supersede K107: the corpus has exactly one cross-room held-item gate. ST10D->ST10F commits only while flag(9,0x2e) owns the Gas Mask. Other locked doors use equipped-subweapon classes or story/event flags; no second held-key door gate is proven."
   },
   "dinoFiles": {
     "_source": "guide-sourced (FAQ); dino files route to the log, not inventory -- no catalog rows",

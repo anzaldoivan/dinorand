@@ -11,6 +11,8 @@ chunk: default
 related: []
 ---
 
+<!-- Audience: players. Keep descriptions task-oriented; `dinorand --help` is the exhaustive CLI source of truth. -->
+
 # DinoRand — User Guide
 
 DinoRand randomizes **Dino Crisis 1 & 2** (PC): give it your unmodified install and a seed,

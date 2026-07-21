@@ -102,13 +102,21 @@ internal static class BackupManifestStore
 
     internal static void CapturePristine(string originalPath, string backupPath)
     {
+        File.WriteAllBytes(backupPath, ReadPristineBytes(originalPath));
+    }
+
+    internal static byte[] ReadPristineBytes(string originalPath)
+    {
         var sibling = originalPath + SiblingBackupSuffix;
         var source = File.Exists(sibling)
                      && !string.Equals(HashFile(sibling), HashFile(originalPath), StringComparison.OrdinalIgnoreCase)
             ? sibling
             : originalPath;
-        File.Copy(source, backupPath);
+        return File.ReadAllBytes(source);
     }
+
+    internal static string HashBytes(ReadOnlySpan<byte> bytes)
+        => Convert.ToHexString(SHA256.HashData(bytes));
 
     internal static string HashFile(string path)
     {

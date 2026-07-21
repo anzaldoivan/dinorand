@@ -1,45 +1,47 @@
-"""Load the distilled DC2 logic contract and derive Archipelago name<->id maps.
-
-The contract (data/dc2_logic.json) is produced by scripts/gen_ap_logic.py. Today it is an EMPTY
-stub (DC2 has a decoded door-graph + item spots but no key-item ids / door→key gating yet), so the
-maps below come out empty and the world ships only a free "Victory" event. The moment the DC2
-builder populates the contract, this module and world.py light up with no structural change.
-
-Mirror of dino_crisis_1/data.py — kept self-contained because AP apworlds are separate zips that
-cannot share runtime code (imports are relative within a package). The shared machinery is the
-repo-side distiller, not this file.
-"""
+"""Load the generated Dino Crisis 2 logic contract for Archipelago."""
 from __future__ import annotations
 
 import json
-from pathlib import Path
+import pkgutil
 
-_DATA = json.loads((Path(__file__).parent / "data" / "dc2_logic.json").read_text(encoding="utf-8"))
+# pkgutil keeps loading working when the package is distributed as a zipped .apworld.
+_DATA = json.loads(pkgutil.get_data(__name__, "data/dc2_logic.json").decode("utf-8"))
 
 VERSION: int = _DATA["version"]
 START_ROOM: str = _DATA["startRoom"]
 GOAL_ROOM: str = _DATA["goalRoom"]
-REGIONS: dict[str, str] = _DATA["regions"]        # room code -> name (empty in the stub)
-EDGES: list[dict] = _DATA["edges"]                # {from,to,requiresItems,requiresRooms}
-LOCATIONS: list[dict] = _DATA["locations"]        # {key,name,room,itemId,itemName,pos,collectedFlag}
-ITEM_NAMES: dict[int, str] = {int(k): v for k, v in _DATA["items"]["names"].items()}
-PROGRESSION_ITEM_IDS: list[int] = _DATA["items"]["progressionItemIds"]
-PROGRESSION_ITEM_NAMES: set[str] = {ITEM_NAMES[i] for i in PROGRESSION_ITEM_IDS}
-FILLER_NAMES: list[str] = [p["name"] for p in _DATA["items"]["pool"]]
+VICTORY: dict = _DATA["victory"]
+REGIONS: dict[str, str] = _DATA["regions"]
+EDGES: list[dict] = _DATA["edges"]
+LOCATIONS: list[dict] = _DATA["locations"]
+EXCLUSIONS: list[dict] = _DATA["exclusions"]
 
-# DinoRand DC2 id space (distinct from DC1's 0x0DC1_0000). Ids are assigned deterministically from
-# sorted names so they are stable as long as the name set is stable.
-_BASE_ID = 0x0DC2_0000
+ITEM_NAMES: dict[int, str] = {int(key): value for key, value in _DATA["items"]["names"].items()}
+ITEM_CATEGORIES: dict[int, str] = {
+    row["id"]: row["category"] for row in _DATA["items"]["catalog"]
+}
+KEY_ITEM_IDS: set[int] = set(_DATA["items"]["keyItemIds"])
+PROGRESSION_ITEM_IDS: set[int] = set(_DATA["items"]["progressionItemIds"])
+OPTIONAL_FIXED_ITEM_IDS: set[int] = set(_DATA["items"]["optionalFixedItemIds"])
+POOL_ITEM_IDS: list[int] = _DATA["items"]["poolItemIds"]
+PROGRESSION_ITEM_NAMES: set[str] = {ITEM_NAMES[item_id] for item_id in PROGRESSION_ITEM_IDS}
 
+# Catalog-backed item ids remain stable when names or unrelated catalog rows change. Location ids
+# are generated from each byte-provenanced source identity and therefore remain stable when other
+# sources are added or removed.
+BASE_ID = 0x0DC2_0000
 ITEM_NAME_TO_ID: dict[str, int] = {
-    name: _BASE_ID + i for i, name in enumerate(sorted(set(ITEM_NAMES.values())))
+    name: BASE_ID + item_id for item_id, name in ITEM_NAMES.items()
 }
 LOCATION_NAME_TO_ID: dict[str, int] = {
-    loc["name"]: _BASE_ID + 0x1_0000 + i
-    for i, loc in enumerate(sorted(LOCATIONS, key=lambda l: l["name"]))
+    location["name"]: location["apId"] for location in LOCATIONS
 }
+
+OTHER_WORLD_MARKER = -1
+GAME_ITEM_ID: dict[str, int] = {name: item_id for item_id, name in ITEM_NAMES.items()}
+LOCATION_BY_AP_ID: dict[int, dict] = {location["apId"]: location for location in LOCATIONS}
 
 
 def region_name(code: str) -> str:
-    """Region display name: '<name> (<code>)' — unique because the code is unique."""
-    return f"{REGIONS.get(code, code)} ({code})"
+    """Return the unique display name for a physical ST room."""
+    return f"{REGIONS.get(code, f'ST{code}')} ({code})"

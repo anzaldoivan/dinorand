@@ -35,7 +35,7 @@ internal static class RandomizationInstallCoordinator
 
         Emit($"installed to {dataDir}: {installResult.Overlaid} room files overlaid, "
             + $"{installResult.BackedUp} originals backed up");
-        if (config.CrossRoomEnemySpecies)
+        if (config.RandomizeEnemies && config.CrossRoomEnemySpecies)
             Emit("exotic enemies: any queued EXE patches were applied; CLOSE/relaunch + CE-verify the swaps.");
 
         var inventoryPlan = createStartingInventoryPlan();

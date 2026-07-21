@@ -146,81 +146,104 @@ def build_dc1_doc() -> tuple[str, dict]:
     return "\n".join(lines), data
 
 
-def _dc2_waves(data: dict) -> list[list[str]]:
-    """Visit-gate cascade: wave 0 = every non-gated-target room; wave N = rooms whose edge opens
-    once waves < N are reachable. Mirrors ap._reachable_rooms iteration-by-iteration (asserted)."""
-    gated_targets = {e["to"] for e in data["edges"]}
-    reach = {c for c in data["regions"] if c not in gated_targets}
-    waves = [sorted(reach)]
+def _dc2_spheres(data: dict) -> list[dict]:
+    """Collect reachable vanilla progression sources over the physical room graph."""
+    progression = set(data["items"]["progressionItemIds"])
+    held: set[int] = set()
+    collected: set[str] = set()
+    spheres: list[dict] = []
     while True:
-        opened = []
-        for e in data["edges"]:
-            if e["to"] in reach or e["from"] not in reach:
+        reach = ap._reachable_rooms(data, held)
+        available = []
+        for location in data["locations"]:
+            if location["sourceId"] in collected or location["itemId"] not in progression:
                 continue
-            if not e["requiresItems"] and all(r in reach for r in e["requiresRooms"]):
-                opened.append(e["to"])
-        if not opened:
-            break
-        reach.update(opened)
-        waves.append(sorted(set(opened)))
-    assert reach == ap._reachable_rooms(data, set()), "wave cascade diverged from the checker model"
-    return waves
+            if (
+                location["room"] in reach
+                and set(location["requiresItems"]).issubset(held)
+                and set(location["requiresRooms"]).issubset(reach)
+            ):
+                available.append(location)
+        if available or not spheres or spheres[-1]["collected"]:
+            spheres.append({"index": len(spheres), "reach": reach, "collected": available})
+        if not available:
+            return spheres
+        for location in available:
+            collected.add(location["sourceId"])
+            held.add(location["itemId"])
 
 
 def build_dc2_doc() -> tuple[str, dict]:
     data = ap.build_dc2()
-    waves = _dc2_waves(data)
-    all_reach = {r for w in waves for r in w}
-    assert data["goalRoom"] in all_reach, "DC2 goal unreachable in distilled model"
+    names = {int(key): value for key, value in data["items"]["names"].items()}
+    spheres = _dc2_spheres(data)
+    final_reach = spheres[-1]["reach"]
+    assert data["goalRoom"] in final_reach, "DC2 goal unreachable in vanilla physical model"
+    assert len(final_reach) == len(data["regions"]), "supported DC2 graph is not fully reachable"
+    gated = [edge for edge in data["edges"] if edge["requiresItems"] or edge["requiresRooms"]]
 
     lines = [
-        _frontmatter("DC2 vanilla reachability — visit-gate waves + door graph (generated)",
+        _frontmatter("DC2 vanilla reachability - item spheres + physical graph (generated)",
                      "dc2-reachability-generated", "dc2"),
-        "# DC2 vanilla reachability — visit-gate waves + door graph",
+        "# DC2 vanilla reachability - item spheres + physical graph",
         "",
         GENERATED_BANNER,
         "",
-        "Source model: the **distilled logic** the DC2 apworld runs (v1 contract: visit-gated, "
-        "no key-item shuffle — the op-0x31 item lever is still unverified, K77). Wave 0 is every "
-        "room the star model frees; each later wave lists rooms whose gate opens once the "
-        "earlier waves are reachable. Door topology below is the K81 decode "
-        "(`data/dc2/door-graph.json`).",
-        "", "## Visit-gate cascade (vanilla)", "",
-        "| Wave | Rooms opened |", "|---|---|",
+        "Source model: the **v2 physical-room contract** the DC2 apworld runs, distilled from "
+        "byte-provenanced item sources, door commits, door guards, and the item catalog. "
+        "SAT-1/op-`0x31` triggers are excluded from item placement; only sources explicitly "
+        "classified as AP-available enter the 42-location pool.",
+        "",
+        f"Start `ST{data['startRoom']}`; guarded victory transition "
+        f"`ST{data['victory']['from']}->ST{data['victory']['to']}`; goal "
+        f"`ST{data['goalRoom']}`.",
+        "", "## Vanilla progression spheres", "",
+        "| Sphere | Rooms reachable | Progression collected |", "|---|---|---|",
     ]
-    for i, w in enumerate(waves):
-        rooms = f"{len(w)} rooms (star-free)" if i == 0 else ", ".join(f"ST{r}" for r in w)
-        lines.append(f"| {i} | {rooms} |")
-    lines += ["", f"Goal ST{data['goalRoom']} reachable; "
-              f"{len(all_reach)}/{len(data['regions'])} rooms in the playable set.",
-              "", "## Door graph (K81 decode) — per stage", ""]
+    for sphere in spheres:
+        collected = "; ".join(
+            f"{names[location['itemId']]} @ ST{location['room']}"
+            for location in sphere["collected"]
+        ) or "-"
+        lines.append(
+            f"| {sphere['index']} | {len(sphere['reach'])} / {len(data['regions'])} | "
+            f"{collected} |"
+        )
+    lines += [
+        "",
+        f"Goal `ST{data['goalRoom']}` and all {len(data['regions'])} supported rooms are "
+        "reachable after the vanilla Gas Mask source is collected.",
+        "", "## Modeled progression and visit gates", "",
+        "| From | To | Needs item(s) | Needs visit | Disposition |",
+        "|---|---|---|---|---|",
+    ]
+    for edge in gated:
+        items = ", ".join(names[item_id] for item_id in edge["requiresItems"]) or "-"
+        visits = ", ".join(f"ST{room}" for room in edge["requiresRooms"]) or "-"
+        lines.append(
+            f"| ST{edge['from']} | ST{edge['to']} | {items} | {visits} | "
+            f"`{edge['disposition']}` |"
+        )
 
-    graph = ap.json.loads((ap.DC2 / "door-graph.json").read_text(encoding="utf-8"))
-    edges: set[tuple[str, str]] = set()
-    for src, rec in graph["rooms"].items():
-        for d in rec.get("doors", []):
-            dest = d.get("dest_id")
-            if dest:
-                edges.add((src, dest))
-    stages = sorted({r[0] for r in graph["rooms"]})
-    for st in stages:
-        lines += [f"### Stage {st}xx", "", "```mermaid", "graph LR"]
-        drawn: set[frozenset] = set()
-        for a, b in sorted(edges):
-            if a[0] != st and b[0] != st:
+    lines += ["", "## Supported physical door graph - per stage", ""]
+    stages = sorted({room[0] for room in data["regions"]})
+    for stage in stages:
+        lines += [f"### Stage {stage}xx", "", "```mermaid", "graph LR"]
+        for edge in data["edges"]:
+            source, target = edge["from"], edge["to"]
+            if source[0] != stage and target[0] != stage:
                 continue
-            pair = frozenset((a, b))
-            if pair in drawn:
-                continue
-            if (b, a) in edges and a != b:
-                drawn.add(pair)
-                lines.append(f"    s{a}[ST{a}] --- s{b}[ST{b}]")
-            else:
-                drawn.add(pair)
-                lines.append(f"    s{a}[ST{a}] --> s{b}[ST{b}]")
+            requirements = ", ".join(names[item_id] for item_id in edge["requiresItems"])
+            if edge["requiresRooms"]:
+                visit = "visit " + ", ".join(f"ST{room}" for room in edge["requiresRooms"])
+                requirements = " + ".join(part for part in (requirements, visit) if part)
+            arrow = f"-->|{requirements}|" if requirements else "-->"
+            lines.append(f"    s{source}[ST{source}] {arrow} s{target}[ST{target}]")
         lines += ["```", ""]
-    lines += ["One-way arrows are doors with no decoded return door — review them as "
-              "potential no-return transitions.", ""]
+    lines += [
+        "The graph contains only the 85 supported physical rooms. Character-lockout rooms "
+        "ST608/ST707 and no-start-site rooms ST905/ST906 are excluded by the v2 contract.", ""
+    ]
     return "\n".join(lines), data
 
 

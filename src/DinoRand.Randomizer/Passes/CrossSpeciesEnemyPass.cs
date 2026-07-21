@@ -4,7 +4,8 @@ using DinoRand.Randomizer.Definitions;
 namespace DinoRand.Randomizer.Passes;
 
 /// <summary>
-/// Phase 2 (experimental, gated by <see cref="RandomizerConfig.CrossRoomEnemySpecies"/>, default off). Places
+/// DC1 enemy-randomizer extension, gated by <see cref="RandomizerConfig.RandomizeEnemies"/> and the
+/// default-on <see cref="RandomizerConfig.CrossRoomEnemySpecies"/> compatibility switch. Places
 /// <b>foreign</b> dinosaur species into rooms that did not ship with them — the integrated successor to the
 /// dormant cross-room pass and the standalone <c>--swap-species</c> CLI lab command. Unlike the same-species
 /// in-room permute (<see cref="EnemyRandomizer"/>) this imports a species the room (and, for cat8/cat3, the
@@ -27,7 +28,8 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
 
     public string Name => "cross-species-enemies";
 
-    public bool IsEnabled(RandomizerConfig config) => config.CrossRoomEnemySpecies;
+    public bool IsEnabled(RandomizerConfig config)
+        => config.RandomizeEnemies && config.CrossRoomEnemySpecies;
 
     public void Apply(RandomizationContext context)
     {

@@ -41,6 +41,7 @@ namespace DinoRand.App
 
                 RandomizeItems = _appSeed.Config.RandomizeItems;
                 RandomizeEnemies = _appSeed.Config.RandomizeEnemies;
+                RandomizeEnemyHp = _appSeed.Config.RandomizeEnemyHp;
                 IncludeDc2SetpieceEnemies = _appSeed.Config.IncludeDc2SetpieceEnemies;
                 IncludeDc2BossEnemies = _appSeed.Config.IncludeDc2BossEnemies;
                 Dc2EnemyModeIndex = _appSeed.Config.Dc2EnemyMode == Dc2EnemyDistributionMode.Fixed ? 1 : 0;
@@ -71,6 +72,7 @@ namespace DinoRand.App
                     row.Weight = effTierWeights.GetValueOrDefault(row.Type);
                 RandomizeDoors = _appSeed.Config.RandomizeDoors;
                 ShuffleKeyItems = _appSeed.Config.ShuffleKeyItems;
+                ShuffledKeyItemsModelChange = _appSeed.Config.ImportPickupModels;
                 ShortenCutscenes = _appSeed.Config.ShortenCutscenes;
                 Dc2DoorSkip = _appSeed.Config.Dc2DoorSkip;
                 RandomizeStartingInventory = _appSeed.Config.RandomizeStartingInventory;
@@ -133,6 +135,7 @@ namespace DinoRand.App
             {
                 RandomizeItems = RandomizeItems,
                 RandomizeEnemies = RandomizeEnemies,
+                RandomizeEnemyHp = RandomizeEnemyHp && CanRandomizeEnemyHp,
                 IncludeDc2SetpieceEnemies = IncludeDc2SetpieceEnemies,
                 IncludeDc2BossEnemies = IncludeDc2BossEnemies,
                 Dc2AllowWaterLevelEnemySwaps = Dc2AllowWaterLevelEnemySwaps,
@@ -159,6 +162,9 @@ namespace DinoRand.App
                 Dc2BlueRaptorComboThreshold = (int)Math.Round(Dc2BlueRaptorCombo),
                 RandomizeDoors = RandomizeDoors,
                 ShuffleKeyItems = ShuffleKeyItems,
+                // Explicit Advanced DC1 opt-in; this session-only render lever is intentionally not
+                // seed-encoded, so sharing a seed never silently enables the crash-risk importer.
+                ImportPickupModels = ShuffledKeyItemsModelChange && CanShuffleKeyItemsModelChange,
                 // Scatter (into ammo/health pickups) and DDK disc relocation ride on the key shuffle — no
                 // separate GUI toggles; "Shuffle Key Items" turns on all three key-shuffle behaviors.
                 // PROGRESSION-KEY-RELOCATION-RESEARCH.md / KEY-ITEM-SCATTER-DATA-AUDIT.md.

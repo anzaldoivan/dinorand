@@ -52,6 +52,7 @@ public class Dc2RoomFileTests
     public void ToString_FormatsStId()
     {
         Assert.Equal("ST407", Dc2RoomFile.Read(4, 7, new byte[1]).ToString());
-        Assert.Equal("ST112", Dc2RoomFile.Read(1, 12, new byte[1]).ToString());
+        Assert.Equal("ST40A", Dc2RoomFile.Read(4, 0x0A, new byte[1]).ToString());
+        Assert.Equal("ST112", Dc2RoomFile.Read(1, 0x12, new byte[1]).ToString());
     }
 }

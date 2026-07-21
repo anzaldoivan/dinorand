@@ -45,6 +45,9 @@ jobs:
             *)   echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
           esac
 
+      - name: Validate curated release notes
+        run: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check_docs.py --version "${{ steps.ver.outputs.version }}"
+
       - name: Build self-contained release binaries
         run: bash scripts/publish-release.sh win-x64 linux-x64 osx-arm64
 

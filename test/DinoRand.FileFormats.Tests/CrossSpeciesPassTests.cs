@@ -173,10 +173,14 @@ public class CrossSpeciesPassTests
     // ---- Pass gating ----
 
     [Fact]
-    public void Pass_IsDisabledByDefault()
+    public void Pass_RidesTheEnemyRandomizerByDefault()
     {
-        Assert.False(new CrossSpeciesEnemyPass().IsEnabled(new RandomizerConfig()));
-        Assert.True(new CrossSpeciesEnemyPass().IsEnabled(new RandomizerConfig { CrossRoomEnemySpecies = true }));
+        var pass = new CrossSpeciesEnemyPass();
+
+        Assert.True(new RandomizerConfig().CrossRoomEnemySpecies);
+        Assert.True(pass.IsEnabled(new RandomizerConfig()));
+        Assert.False(pass.IsEnabled(new RandomizerConfig { RandomizeEnemies = false }));
+        Assert.False(pass.IsEnabled(new RandomizerConfig { CrossRoomEnemySpecies = false }));
     }
 
     [Fact]
@@ -348,6 +352,8 @@ public class CrossSpeciesPassTests
         var rooms = LoadInstall();
         if (rooms is null) return; // no game files (CI) — skip
 
+        var before = rooms.ToDictionary(r => r, r => r.Write());
+
         var log = new List<string>();
         var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(seed),
             // Max difficulty raises the placement chance so a placement is reliably attempted.
@@ -366,15 +372,23 @@ public class CrossSpeciesPassTests
             Assert.True(reread.ParsedCleanly, $"{room} override did not reparse");
         }
 
-        // RaptorHeavy rooms mutate in place; they must round-trip and carry the foreign grounded species.
-        var foreign = new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus };
+        // RaptorHeavy rooms commit atomically into the shared RoomFile. Every changed grounded room must
+        // stay within the resident-pool budget and its final imported model must resolve to a texture upload;
+        // GeometryOnly is never an installed production outcome.
         foreach (var room in rooms)
         {
-            if (!room.Enemies.Any(e => e.IsEdited)) continue;
+            if (before[room].AsSpan().SequenceEqual(room.Write())) continue;
             var reread = RoomFile.Read(room.Stage, room.Room, room.Write());
             Assert.True(reread.ParsedCleanly, $"{room} did not reparse after import");
-            Assert.Contains(reread.Enemies, e => foreign.Contains(e.Species) && e.SpeciesMatchesCategory);
+            Assert.True(reread.RdtBuffer.Length <= SpeciesImporter.ResidentPoolFloor,
+                $"{room} grounded import exceeded the resident-pool floor");
+            var imported = Assert.Single(reread.Enemies, e =>
+                e.Species == DinoSpecies.RaptorHeavy && e.SpeciesMatchesCategory);
+            var codes = TextureImporter.ReadModelTextureCodes(reread.RdtBuffer, imported.ModelPtr);
+            Assert.NotNull(TextureImporter.ExtractSpeciesTexture(reread.OriginalBytes, codes.Tpages, codes.Clut));
         }
+
+        Assert.DoesNotContain(log, l => l.Contains("geometry only", StringComparison.OrdinalIgnoreCase));
 
         // If a Theri was placed, the pass must have queued its three EXE patches for a free stage (1/2).
         if (log.Any(l => l.Contains("-> Therizinosaurus")))

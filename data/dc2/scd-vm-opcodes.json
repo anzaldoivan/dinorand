@@ -374,7 +374,7 @@
    "op_hex": "0x2c",
    "handler": "0x004895d0",
    "nop": false,
-   "note": "EVENT-FLAG PREDICATE (DECODED 2026-06-30). return 0x46fa70(type=2, id=6) -> 1 iff bank-2 scripted-event flag 6 set. Sibling of op-0x41/0x42 barrier ops (same bank-2 group). See _scene_cutscene."
+   "note": "SCRIPTED GiveItem CONSTRUCTOR (K129 correction). If flag(2,6) is set, returns 1; otherwise falls through 0x4895E6..0x48962D, reads a five-word push block and calls GiveItem 0x496170 at 0x489618. Mapping: kind=block+0x10, itemId=+0x0C, p3=+0x08, flag5=+0x04, cleanup=+0x00. Only kind 1 is a direct acquisition class; kinds 2-5 select different constructor behavior and are not item locations. Corpus: 47 rows; 26 kind-1 (5 in catalog, 21 out of range), 21 kinds 2-5."
   },
   {
    "op": 45,
@@ -405,7 +405,8 @@
    "op": 49,
    "op_hex": "0x31",
    "handler": "0x00489880",
-   "nop": false
+   "nop": false,
+   "note": "SAT-1 VM-trigger builder. block+0x04 is the VM-thread slot; block+0x00 is the slot-5 routine index; block+0x30 is the AOT slot. Neither routing field is a catalog item id, item type, count, or rewrite lever (K77/K129)."
   },
   {
    "op": 50,
@@ -429,7 +430,8 @@
    "op": 53,
    "op_hex": "0x35",
    "handler": "0x00489b10",
-   "nop": false
+   "nop": false,
+   "note": "SAT-5 TAKE-ITEM builder (K113/K129). itemId=block+0x10, group-5 taken flag=+0x14, opaque kind-associated p3=+0x0C, cleanup secondary source=+0x04, slot=+0x40. Consumer 0x48B650 calls GiveItem kind 1. Corpus: 71 rows (70 literal item operands, one dynamic); literal in-catalog item operands are the supported rewrite surface except 0x1E, which GiveItem remaps to 0x1D on Easy."
   },
   {
    "op": 54,

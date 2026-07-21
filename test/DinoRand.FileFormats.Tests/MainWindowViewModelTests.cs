@@ -75,6 +75,80 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
+    public void Shuffle_key_items_does_not_enable_pickup_model_import_by_default()
+    {
+        var vm = NewVm();
+        vm.ShuffleKeyItems = true;
+
+        Assert.True(vm.CanShuffleKeyItemsModelChange);
+        Assert.False(vm.ShuffledKeyItemsModelChange);
+        Assert.False(vm.CurrentConfig.ImportPickupModels);
+
+        vm.ShuffledKeyItemsModelChange = true;
+
+        Assert.True(vm.CurrentConfig.ImportPickupModels);
+    }
+
+    [Fact]
+    public void Shuffled_key_item_model_change_is_cleared_for_dc2()
+    {
+        var vm = NewVm();
+        vm.ShuffledKeyItemsModelChange = true;
+
+        vm.SelectedGameIndex = 1;
+
+        Assert.False(vm.CanShuffleKeyItemsModelChange);
+        Assert.False(vm.ShuffledKeyItemsModelChange);
+        Assert.False(vm.CurrentConfig.ImportPickupModels);
+    }
+
+    [Fact]
+    public void Dc1_enemy_hp_option_defaults_off_and_round_trips_through_the_seed()
+    {
+        var vm = NewVm();
+        vm.RandomizeEnemies = false;
+
+        Assert.True(vm.CanRandomizeEnemyHp);
+        Assert.False(vm.RandomizeEnemyHp);
+        Assert.False(vm.CurrentConfig.RandomizeEnemyHp);
+        Assert.False(vm.EnemyDifficultyEnabled);
+
+        vm.RandomizeEnemyHp = true;
+
+        Assert.True(vm.CurrentConfig.RandomizeEnemyHp);
+        Assert.True(vm.EnemyDifficultyEnabled);
+        var seed = vm.SeedText;
+
+        var pasted = NewVm();
+        pasted.SeedText = seed;
+
+        Assert.True(pasted.RandomizeEnemyHp);
+        Assert.True(pasted.CurrentConfig.RandomizeEnemyHp);
+        Assert.Equal(seed, pasted.SeedText);
+    }
+
+    [Fact]
+    public void Enemy_hp_option_is_dc1_only_and_preserved_in_its_game_slice()
+    {
+        var vm = NewVm();
+        vm.RandomizeEnemyHp = true;
+
+        vm.SelectedGameIndex = 1;
+
+        Assert.Equal("dc2", vm.SelectedGame.Id);
+        Assert.False(vm.CanRandomizeEnemyHp);
+        Assert.False(vm.RandomizeEnemyHp);
+        Assert.False(vm.CurrentConfig.RandomizeEnemyHp);
+
+        vm.SelectedGameIndex = 0;
+
+        Assert.Equal("dc1", vm.SelectedGame.Id);
+        Assert.True(vm.CanRandomizeEnemyHp);
+        Assert.True(vm.RandomizeEnemyHp);
+        Assert.True(vm.CurrentConfig.RandomizeEnemyHp);
+    }
+
+    [Fact]
     public void Dc2_randomized_weapons_clears_and_disables_shared_weapons_then_roundtrips()
     {
         var vm = NewVm();

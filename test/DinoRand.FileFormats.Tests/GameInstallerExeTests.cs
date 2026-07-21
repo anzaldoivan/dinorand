@@ -1197,4 +1197,162 @@ public class GameInstallerExeTests : IDisposable
         var manifest = GameInstaller.ReadManifest(DataDir);
         Assert.False(manifest!.ExePatched);
     }
+
+    [Fact]
+    public void Install_InvalidNthExeRequest_LeavesPriorRoomLooseExeAndManifestUnchanged()
+    {
+        var modDir = Path.Combine(_root, "transaction-mod");
+        Directory.CreateDirectory(modDir);
+        var liveVoiceDir = Path.Combine(_root, "Sound", "VOICE");
+        var modVoiceDir = Path.Combine(modDir, "Sound", "VOICE");
+        Directory.CreateDirectory(liveVoiceDir);
+        Directory.CreateDirectory(modVoiceDir);
+        var liveVoice = Path.Combine(liveVoiceDir, "0001.dat");
+        var modVoice = Path.Combine(modVoiceDir, "0001.dat");
+        File.WriteAllBytes(liveVoice, new byte[] { 1, 1, 1 });
+        File.WriteAllBytes(modVoice, new byte[] { 5, 5, 5 });
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 6, 6, 6, 6 });
+        GameInstaller.Install(DataDir, modDir, seed: "installed-seed");
+
+        var roomBefore = File.ReadAllBytes(Path.Combine(DataDir, "st101.dat"));
+        var looseBefore = File.ReadAllBytes(liveVoice);
+        var exeBefore = File.ReadAllBytes(ExePath);
+        var manifestPath = Path.Combine(DataDir, GameInstaller.BackupDirName, "manifest.json");
+        var manifestBefore = File.ReadAllBytes(manifestPath);
+
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 7, 7, 7, 7 });
+        File.WriteAllBytes(modVoice, new byte[] { 8, 8, 8 });
+        new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
+        {
+            ExePatchRequest.CatSlot(2, 8, ExePatcher.TheriCat8HandlerVa),
+            ExePatchRequest.CatSlot(3, 8, ExePatcher.TheriCat8HandlerVa), // stage 3 is not verified free
+        }).Write(modDir);
+
+        Assert.Throws<InvalidOperationException>(() =>
+            GameInstaller.Install(DataDir, modDir, seed: "rejected-seed"));
+
+        Assert.Equal(roomBefore, File.ReadAllBytes(Path.Combine(DataDir, "st101.dat")));
+        Assert.Equal(looseBefore, File.ReadAllBytes(liveVoice));
+        Assert.Equal(exeBefore, File.ReadAllBytes(ExePath));
+        Assert.Equal(manifestBefore, File.ReadAllBytes(manifestPath));
+    }
+
+    [Fact]
+    public void Install_MissingExeDonor_PreflightLeavesOverlayAndManifestUntouched()
+    {
+        var modDir = Path.Combine(_root, "missing-donor-mod");
+        Directory.CreateDirectory(modDir);
+        var roomPath = Path.Combine(DataDir, "st101.dat");
+        var roomBefore = File.ReadAllBytes(roomPath);
+        var exeBefore = File.ReadAllBytes(ExePath);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 9, 9, 9, 9 });
+        new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
+        {
+            ExePatchRequest.Cat8HitReaction(6, 3, "missing-st603.dat"),
+        }).Write(modDir);
+
+        Assert.Throws<FileNotFoundException>(() => GameInstaller.Install(DataDir, modDir, seed: "missing"));
+
+        Assert.Equal(roomBefore, File.ReadAllBytes(roomPath));
+        Assert.Equal(exeBefore, File.ReadAllBytes(ExePath));
+        Assert.False(File.Exists(Path.Combine(DataDir, GameInstaller.BackupDirName, "manifest.json")));
+    }
+
+    [Fact]
+    public void Install_ConflictingComposedRequests_AreRefusedBeforeMutation()
+    {
+        var modDir = Path.Combine(_root, "conflict-mod");
+        Directory.CreateDirectory(modDir);
+        var roomPath = Path.Combine(DataDir, "st101.dat");
+        var roomBefore = File.ReadAllBytes(roomPath);
+        var exeBefore = File.ReadAllBytes(ExePath);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 9, 9, 9, 9 });
+        new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
+        {
+            ExePatchRequest.CatSlot(2, 8, ExePatcher.TheriCat8HandlerVa),
+            ExePatchRequest.CatSlot(2, 8, ExePatcher.SetupFnBasicRaptor),
+        }).Write(modDir);
+
+        Assert.Throws<InvalidOperationException>(() => GameInstaller.Install(DataDir, modDir, seed: "conflict"));
+
+        Assert.Equal(roomBefore, File.ReadAllBytes(roomPath));
+        Assert.Equal(exeBefore, File.ReadAllBytes(ExePath));
+        Assert.False(File.Exists(Path.Combine(DataDir, GameInstaller.BackupDirName, "manifest.json")));
+    }
+
+    [Fact]
+    public void Install_CommitIoFailure_RollsBackEveryTargetAndNewBackup()
+    {
+        var roomPath = Path.Combine(DataDir, "st101.dat");
+        var roomBefore = File.ReadAllBytes(roomPath);
+        var exeBefore = File.ReadAllBytes(ExePath);
+        var liveVoiceDir = Path.Combine(_root, "Sound", "VOICE");
+        Directory.CreateDirectory(liveVoiceDir);
+        var liveVoice = Path.Combine(liveVoiceDir, "0001.dat");
+        File.WriteAllBytes(liveVoice, new byte[] { 1, 1, 1 });
+
+        var modDir = Path.Combine(_root, "rollback-mod");
+        var modVoiceDir = Path.Combine(modDir, "Sound", "VOICE");
+        Directory.CreateDirectory(modVoiceDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 9, 9, 9, 9 });
+        File.WriteAllBytes(Path.Combine(modVoiceDir, "0001.dat"), new byte[] { 8, 8, 8 });
+        new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
+        {
+            ExePatchRequest.CatSlot(2, 8, ExePatcher.TheriCat8HandlerVa),
+        }).Write(modDir);
+
+        OverlayInstaller.CommitStepProbe = step =>
+        {
+            if (step == 1) throw new IOException("injected commit failure");
+        };
+        try
+        {
+            Assert.Throws<IOException>(() => GameInstaller.Install(DataDir, modDir, seed: "rollback"));
+        }
+        finally
+        {
+            OverlayInstaller.CommitStepProbe = null;
+        }
+
+        Assert.Equal(roomBefore, File.ReadAllBytes(roomPath));
+        Assert.Equal(new byte[] { 1, 1, 1 }, File.ReadAllBytes(liveVoice));
+        Assert.Equal(exeBefore, File.ReadAllBytes(ExePath));
+        var backupDir = Path.Combine(DataDir, GameInstaller.BackupDirName);
+        Assert.False(File.Exists(Path.Combine(backupDir, "st101.dat")));
+        Assert.False(File.Exists(Path.Combine(backupDir, GameInstaller.ExeName)));
+        Assert.False(File.Exists(Path.Combine(backupDir, "loose", "Sound", "VOICE", "0001.dat")));
+        Assert.False(File.Exists(Path.Combine(backupDir, "manifest.json")));
+    }
+
+    [Fact]
+    public void Install_ComposesMultipleCompatibleRequests_Idempotently_AndRestoreReverses()
+    {
+        var pristineExe = File.ReadAllBytes(ExePath);
+        var pristineRoom = File.ReadAllBytes(Path.Combine(DataDir, "st101.dat"));
+        var modDir = Path.Combine(_root, "composed-mod");
+        Directory.CreateDirectory(modDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 4, 3, 2, 1 });
+        new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
+        {
+            ExePatchRequest.CatSlot(1, 8, ExePatcher.TheriCat8HandlerVa),
+            ExePatchRequest.CatSlot(2, 8, ExePatcher.TheriCat8HandlerVa),
+        }).Write(modDir);
+
+        GameInstaller.Install(DataDir, modDir, seed: "first");
+        var first = File.ReadAllBytes(ExePath);
+        Assert.Equal(ExePatcher.TheriCat8HandlerVa,
+            ExePatcher.ReadUInt32AtVa(first, ExePatcher.Stage1AiRecordVa + 8 * 4));
+        Assert.Equal(ExePatcher.TheriCat8HandlerVa,
+            ExePatcher.ReadUInt32AtVa(first, ExePatcher.Stage2AiRecordVa + 8 * 4));
+
+        GameInstaller.Install(DataDir, modDir, seed: "second");
+        Assert.Equal(first, File.ReadAllBytes(ExePath));
+        Assert.Equal(pristineExe,
+            File.ReadAllBytes(Path.Combine(DataDir, GameInstaller.BackupDirName, GameInstaller.ExeName)));
+        Assert.Equal("second", GameInstaller.ReadManifest(DataDir)!.Seed);
+
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristineExe, File.ReadAllBytes(ExePath));
+        Assert.Equal(pristineRoom, File.ReadAllBytes(Path.Combine(DataDir, "st101.dat")));
+    }
 }

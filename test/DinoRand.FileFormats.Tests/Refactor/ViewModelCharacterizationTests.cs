@@ -37,7 +37,7 @@ public sealed class ViewModelCharacterizationTests
         Assert.True(vm.RandomizeEnemies);
         Assert.False(cli.NormalizePickupVisuals);
         Assert.True(vm.CurrentConfig.NormalizePickupVisuals);
-        Assert.True(vm.CurrentConfig.ImportPickupModels);
+        Assert.False(vm.CurrentConfig.ImportPickupModels);
         Assert.Equal("DINO-", vm.SeedText[..5]);
     }
 

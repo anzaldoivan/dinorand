@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Public documentation contract
+        run: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check_docs.py --check
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x

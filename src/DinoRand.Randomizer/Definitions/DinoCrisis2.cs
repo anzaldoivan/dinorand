@@ -58,9 +58,9 @@ public sealed class DinoCrisis2 : GameDefinition
     public override int GoalRoomCode => 0x000;   // TODO(dc2): real goal room
     public override IReadOnlyCollection<int> KeyItemsForDoor(int doorType) => Array.Empty<int>(); // TODO(dc2): OPEN #2
 
-    // ST + stage digit + room. Exact DC2 room-id scheme is TBD (KaQ K14); two-digit room assumed for now.
+    // ST + decimal stage digit + two hexadecimal room digits (KaQ K14).
     private static readonly System.Text.RegularExpressions.Regex RoomPattern =
-        new(@"^ST(\d)(\d{2})\.DAT$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        new(@"^ST(\d)([0-9A-F]{2})\.DAT$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
     // Case-INSENSITIVE room glob so a differently-cased room file is never dropped on Linux/WSL/CI
     // (the DC1-side St502.dat class of bug — STATIC-SCD-RE cont.42). RoomPattern (IgnoreCase) filters.
@@ -80,7 +80,7 @@ public sealed class DinoCrisis2 : GameDefinition
             var m = RoomPattern.Match(Path.GetFileName(path));
             if (!m.Success) continue;
             int stage = Convert.ToInt32(m.Groups[1].Value, 10);
-            int room = Convert.ToInt32(m.Groups[2].Value, 10);
+            int room = Convert.ToInt32(m.Groups[2].Value, 16);
             rooms.Add(new RoomFileRef(stage, room, path));
         }
         return rooms.OrderBy(r => r.Stage).ThenBy(r => r.Room).ToList();

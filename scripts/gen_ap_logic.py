@@ -4,7 +4,7 @@
 Each supported game distils into apworld/<pkg>/data/<game>_logic.json — the stable input the
 .apworld consumes to build regions/locations/items/rules. Shared schema + structural checks live
 here (repo-side); the shipped apworlds stay self-contained (AP zips can't share runtime code).
-See docs/decisions/cross/ARCHIPELAGO-INCREMENT-1-PLAN.md and ARCHIPELAGO-DC2-STUB-PLAN.md.
+See the per-game Archipelago and item/key-item decision records under docs/decisions/.
 
     python3 scripts/gen_ap_logic.py            --check    # every game (used by pre-commit + CI)
     python3 scripts/gen_ap_logic.py            --apply    # regenerate every game's contract
@@ -16,15 +16,17 @@ DC1: the logic graph is authored in map.json (door edges + `requires` item-id ga
 `requiresRoom` visit gates); per-location pickup data comes from room-data.json item_control;
 item names from items.json (clean source of truth).
 
-DC2: intentionally an EMPTY stub — data/dc2 has a decoded door-graph + item spots but no key-item
-ids or door→key gating yet, so there is no logically-gated graph to distil. The contract carries
-the full schema with empty locations/items/edges so enabling DC2 later is populating data (a DC2
-builder), not rewriting the world. See the DC2 stub decision record.
+DC2: the v2 physical-room contract consumes byte-provenanced acquisition sources, the item
+catalog, decoded door commits, door guards, and story-flag setters. It exposes only sources with
+proven AP availability, records every excluded source and conditional-commit disposition, and
+models ST101 start, the Gas Mask gate, and guarded ST503→ST504 victory.
 """
 from __future__ import annotations
 
 import json
+import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -334,100 +336,267 @@ def _dc2_unlock_rooms(gate: dict, gating: dict, dest: str) -> list[list[str]]:
     return alts
 
 
-def build_dc2() -> dict:
-    """Populated DC2 contract (ITEMS-KEYITEMS-RE-PLAN Phase 4) from the byte-grounded
-    data/dc2 artifacts: door-graph.json (op-0x30 doors + K78 gate fields), door-gating.json
-    (flag-dataflow facts + resolved unlock sources) and item-placements.json (165 op-0x31
-    field pickups). Star topology + gated-edge overlay, same model as DC1: only gated
-    targets' edges are emitted; every other room hangs off Menu.
+DC2_EXCLUDED_ROOMS = {"608", "707", "905", "906"}
+DC2_PROGRESSION_ITEMS = [0x2E]
+DC2_OPTIONAL_FIXED_ITEMS = [0x33, 0x34]
 
-    v1 scope (until the Phase-2 give-path decode): progression is ROOM-VISIT gates only
-    (requiresRooms); requiresItems stays empty because key items are not yet relocatable —
-    DC2 progression is flag-driven (K78) and the field-pickup lever is unverified (K77)."""
+
+def _stable_dc2_source_id(source_id: str) -> int:
+    """Addition-stable AP id derived directly from the immutable source identity."""
+    value = 0x811C9DC5
+    for byte in source_id.encode("utf-8"):
+        value = ((value ^ byte) * 0x01000193) & 0xFFFFFFFF
+    return 0x40000000 | (value & 0x3FFFFFFF)
+
+
+def _dc2_catalog() -> tuple[dict[int, str], list[int], list[dict]]:
+    raw = json.loads((DC2 / "items.json").read_text(encoding="utf-8"))
+    base_names = [row.get("name") for row in raw["catalog"] if row.get("name")]
+    duplicates = Counter(base_names)
+    names: dict[int, str] = {}
+    rows: list[dict] = []
+    for row in raw["catalog"]:
+        iid = _item_id(row["id"])
+        base = row.get("name") or f"Catalog entry 0x{iid:02X}"
+        name = f"{base} [0x{iid:02X}]" if duplicates[base] > 1 else base
+        names[iid] = name
+        rows.append({"id": iid, "name": name, "category": row["category"]})
+    key_ids = sorted(_item_id(value) for value in raw["keyItemIds"])
+    return names, key_ids, rows
+
+
+def _dc2_story_setter_rooms(gating: dict, group: int, flag_id: int) -> list[str]:
+    return sorted({
+        room
+        for room, routines in gating["rooms"].items()
+        for routine in routines
+        if [group, flag_id, 1] in routine["sets"]
+    })
+
+
+def _dc2_source_availability(source: dict, gating: dict) -> tuple[bool, list[str], str]:
+    """Translate fixture-owned AP availability; writer eligibility alone is insufficient."""
+    if not source.get("eligible_item_rewrite"):
+        return False, [], source.get("reason", f"not_fillable_{source['source_type']}")
+    availability = source.get("ap_availability")
+    if not availability:
+        return False, [], "missing_ap_availability"
+    disposition = availability["disposition"]
+    if disposition == "excluded":
+        return False, [], availability["reason"]
+    if disposition == "unconditional":
+        return True, [], availability["reason"]
+    if disposition != "modelable":
+        return False, [], f"unsupported_ap_availability:{disposition}"
+    rooms: set[str] = set()
+    for requirement in availability["requirements"]:
+        if requirement.get("kind") != "story_flag_set":
+            return False, [], f"unsupported_availability_requirement:{requirement.get('kind')}"
+        setters = _dc2_story_setter_rooms(
+            gating, int(requirement["group"]), int(requirement["id"])
+        )
+        if len(setters) != 1:
+            return False, [], "unresolved_story_flag_producer"
+        rooms.add(setters[0])
+    return True, sorted(rooms), availability["reason"]
+
+
+def build_dc2() -> dict:
+    """Build the DC2 AP v2 physical campaign contract from maintained decoded fixtures."""
     doors = json.loads((DC2 / "door-graph.json").read_text(encoding="utf-8"))["rooms"]
     gating = json.loads((DC2 / "door-gating.json").read_text(encoding="utf-8"))
-    placements = json.loads((DC2 / "item-placements.json").read_text(encoding="utf-8"))["rooms"]
-    room_data = json.loads((DC2 / "room-data.json").read_text(encoding="utf-8"))
+    guards = json.loads((DC2 / "door-guards.json").read_text(encoding="utf-8"))
+    source_doc = json.loads((DC2 / "item-sources.json").read_text(encoding="utf-8"))
+    if source_doc.get("schema_version") != 2:
+        raise SystemExit("gen_ap_logic: DC2 item-sources schema v2 with ap_availability required")
+    catalog_names, key_ids, catalog_rows = _dc2_catalog()
+    stage_rooms = json.loads((DC2 / "stage-room-map.json").read_text(encoding="utf-8"))["rooms"]
+    supported = {row["st_id"] for row in stage_rooms} - DC2_EXCLUDED_ROOMS
+    regions = {code: f"ST{code}" for code in sorted(supported)}
 
-    regions = {st: room_data.get(st, {}).get("zone", st) for st in doors}
+    graph_door = {
+        (room, row["commit_off"], row["dest_id"]): row
+        for room, entry in doors.items()
+        for row in entry.get("doors", [])
+    }
+    guarded_door = {
+        (row["room"], row["commit_off"], row["dest_id"]): row
+        for row in guards["door_guards"]
+    }
+    provenance = guards["_door_commit_provenance"]["doors"]
+    pair_counts = Counter((row["room"], row["dest"]) for row in provenance)
 
-    # Gated edges: one edge per unlock ALTERNATIVE (multiple edges same from->to = OR).
+    def door_disposition(row: dict, guard: dict | None) -> str:
+        if row["class"] == "no-start-site-found":
+            return "excluded_unsupported_duplicate"
+        identity = (row["room"], row["commit_off"], row["dest"])
+        if identity == ("10D", "0xe4c0", "10F"):
+            return "modeled_item_gate"
+        if identity == ("503", "0x15f56", "504"):
+            return "modeled_victory_commit"
+        exprs = [value["expr"] for value in (guard or {}).get("guards", [])]
+        if any("flag(8," in value for value in exprs):
+            return "fixed_vanilla_subweapon"
+        if any("CHARACTER(" in value for value in exprs):
+            return "fixed_vanilla_character_sequence"
+        if any("vmEntryState" in value or "!(" in value for value in exprs):
+            return "fixed_vanilla_nonmonotonic"
+        if pair_counts[(row["room"], row["dest"])] > 1:
+            return "fixed_vanilla_variant"
+        return "modeled_monotonic_story" if guard else "unconditional_physical_door"
+
     edges: list[dict] = []
-    gated_targets: set[str] = set()
-    for st, entry in doors.items():
-        for dr in entry["doors"]:
-            if "lock_index" not in dr or dr["dest_id"] not in regions:
-                continue
-            dest = dr["dest_id"]
-            gate = gating["locked_doors"].get(f"{st}->{dest}")
-            alts = _dc2_unlock_rooms(gate, gating, dest) if gate else []
-            gated_targets.add(dest)
-            for req in (alts or [[]]):
-                edges.append({
-                    "from": st, "to": dest, "requiresItems": [],
-                    # a requirement equal to the edge's own source room is vacuous
-                    "requiresRooms": [r for r in req if r not in (st, dest)],
-                })
-    # Overlay: UNLOCKED doors into gated-target rooms (so an alternate free path in the
-    # real graph is not modelled as locked).
-    for st, entry in doors.items():
-        for dr in entry["doors"]:
-            if "lock_index" in dr or dr["dest_id"] not in gated_targets:
-                continue
-            edges.append({"from": st, "to": dr["dest_id"],
-                          "requiresItems": [], "requiresRooms": []})
-
-    unique_edges: list[dict] = []
-    seen_edge_signatures: set[tuple] = set()
-    for edge in edges:
-        signature = (
-            edge["from"], edge["to"],
-            tuple(edge["requiresItems"]), tuple(edge["requiresRooms"]),
-        )
-        if signature in seen_edge_signatures:
+    for row in provenance:
+        src, encoded_dest = row["room"], row["dest"]
+        physical = graph_door.get((src, row["commit_off"], encoded_dest))
+        destinations = (physical or {}).get("conditional_dests") or [encoded_dest]
+        if src not in regions or row["class"] == "no-start-site-found":
             continue
-        seen_edge_signatures.add(signature)
-        unique_edges.append(edge)
-    edges = unique_edges
+        for dest in destinations:
+            if dest not in regions:
+                continue
+            identity = (src, row["commit_off"], encoded_dest)
+            guard = guarded_door.get(identity)
+            disposition = (
+                "modeled_resolved_computed_destination"
+                if physical and physical.get("conditional_dests")
+                else door_disposition(row, guard)
+            )
+            required_items = [0x2E] if disposition == "modeled_item_gate" else []
+            required_rooms: set[str] = set()
+            for clause in (guard or {}).get("guards", []):
+                match = re.fullmatch(r"flag\((\d+),(\d+)\)", clause["expr"])
+                if not match:
+                    continue
+                setters = _dc2_story_setter_rooms(
+                    gating, int(match.group(1)), int(match.group(2))
+                )
+                if len(setters) == 1 and setters[0] not in (src, dest):
+                    required_rooms.add(setters[0])
+            lock_alternatives: list[list[str]] = []
+            if physical and "lock_index" in physical:
+                gate = gating["locked_doors"].get(f"{src}->{encoded_dest}")
+                lock_alternatives = _dc2_unlock_rooms(gate, gating, dest) if gate else []
+            for alt_index, alt in enumerate(lock_alternatives or [[]]):
+                rooms = sorted(
+                    required_rooms | {value for value in alt if value not in (src, dest)}
+                )
+                suffix = f":alt{alt_index}" if len(lock_alternatives) > 1 else ""
+                edges.append({
+                    "id": f"ST{src}:door@{row['commit_off']}->ST{dest}{suffix}",
+                    "from": src,
+                    "to": dest,
+                    "commitOff": row["commit_off"],
+                    "requiresItems": required_items,
+                    "requiresRooms": rooms,
+                    "disposition": disposition,
+                })
 
-    locs = []
-    for st_room, items in placements.items():
-        code = st_room[2:]  # "ST304" -> "304"
-        zone = regions.get(code, code)
-        for it in items:
-            tname = DC2_FIELD_TYPES.get(it["id"], f"Field item {it['id']}")
-            locs.append({
-                "key": f"{code}:{it['slot']}:{it['id_blob_off']}",
-                "name": f"{zone} (ST{code}) - {tname} @slot{it['slot']}/0x{it['id_blob_off']:x}",
-                "room": code,
-                "itemId": it["id"],
-                "itemName": tname,
-                # trigger-quad first corner (item-placements pos, 2026-07-12); old blob-off fallback
-                "pos": it.get("pos") or [it["id_blob_off"], 0],
-                "collectedFlag": None,
-            })
+    dispositions: list[dict] = []
+    for row in guards["door_guards"]:
+        identity = (row["room"], row["commit_off"], row["dest_id"])
+        prov = next(value for value in provenance
+                    if (value["room"], value["commit_off"], value["dest"]) == identity)
+        dispositions.append({
+            "id": f"ST{row['room']}:door@{row['commit_off']}->ST{row['dest_id']}",
+            "kind": "door",
+            "disposition": door_disposition(prov, row),
+        })
+    source_by_offset = {
+        (source.get("provenance", {}).get("room", "")[2:],
+         source.get("provenance", {}).get("op_blob_off")): source
+        for source in source_doc["sources"]
+        if "op_blob_off" in source.get("provenance", {})
+    }
+    for row in guards["item_guards"]:
+        source = source_by_offset[(row["room"], int(row["commit_off"], 16))]
+        if source["source_type"] != "sat1_trigger":
+            raise AssertionError(f"conditional item commit is not SAT-1: {source['source_id']}")
+        dispositions.append({
+            "id": f"ST{row['room']}:item@{row['commit_off']}",
+            "kind": "item",
+            "sourceId": source["source_id"],
+            "disposition": "excluded_sat1_physical_trigger",
+        })
+    dispositions.sort(key=lambda row: row["id"])
 
-    from collections import Counter
-    hist = Counter(loc["itemId"] for loc in locs)
-    pool = [{"id": i, "name": DC2_FIELD_TYPES[i], "weight": float(n)}
-            for i, n in sorted(hist.items())]
+    locations: list[dict] = []
+    exclusion_reason: dict[str, str] = {}
+    used_ap_ids: dict[int, str] = {}
+    for source in source_doc["sources"]:
+        source_id = source["source_id"]
+        include, required_rooms, reason = _dc2_source_availability(source, gating)
+        room = source.get("provenance", {}).get("room", "")[2:]
+        if room and room not in supported:
+            include, reason = False, "unsupported_campaign_room"
+        if not include:
+            exclusion_reason[source_id] = reason
+            continue
+        iid = _item_id(source["catalog_id"])
+        ap_id = _stable_dc2_source_id(source_id)
+        if ap_id in used_ap_ids:
+            raise AssertionError(
+                f"DC2 source AP id collision: {source_id} and {used_ap_ids[ap_id]} -> {ap_id}"
+            )
+        used_ap_ids[ap_id] = source_id
+        short_source = source_id.split(":", 1)[1]
+        locations.append({
+            "key": source_id,
+            "sourceId": source_id,
+            "apId": ap_id,
+            "name": f"ST{room} - {catalog_names[iid]} [{short_source}]",
+            "room": room,
+            "itemId": iid,
+            "itemName": catalog_names[iid],
+            "requiresItems": [],
+            "requiresRooms": required_rooms,
+            "sourceType": source["source_type"],
+            "collectedFlag": f"5:{source['flag5']}",
+        })
+    locations.sort(key=lambda row: row["sourceId"])
+    exclusions = [
+        {
+            "sourceId": source["source_id"],
+            "sourceType": source["source_type"],
+            "reason": exclusion_reason[source["source_id"]],
+        }
+        for source in source_doc["sources"]
+        if source["source_id"] in exclusion_reason
+    ]
+    pool_ids = [row["itemId"] for row in locations]
+    pool_counts = Counter(pool_ids)
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
-        "_source": "data/dc2/{door-graph,door-gating,item-placements,room-data}.json (byte-grounded, "
-        "K74-K78). v1: visit-gated edges only; key items are flag-driven and not yet relocatable "
-        "(requiresItems empty until the Phase-2 give-path decode) — see "
-        "docs/decisions/dc2/ITEMS-KEYITEMS-RE-PLAN.md.",
-        "version": 1,
-        "startRoom": "000",
-        "goalRoom": "904",
+        "_source": "data/dc2/{items,item-sources,door-graph,door-gating,door-guards,"
+        "stage-room-map}.json (byte-grounded; K119/K122/K129).",
+        "version": 2,
+        "topology": "physical",
+        "startRoom": "101",
+        "goalRoom": "504",
+        "victory": {
+            "kind": "guarded_door_commit",
+            "from": "503",
+            "to": "504",
+            "commitOff": "0x15f56",
+        },
+        "excludedRooms": sorted(DC2_EXCLUDED_ROOMS),
         "regions": regions,
         "edges": edges,
-        "locations": locs,
+        "locations": locations,
+        "exclusions": exclusions,
+        "conditionalCommitDispositions": dispositions,
         "items": {
-            "names": {str(i): DC2_FIELD_TYPES[i] for i in sorted(hist)},
-            "keyItemIds": [],
-            "progressionItemIds": [],
-            "pool": pool,
+            "names": {str(i): name for i, name in sorted(catalog_names.items())},
+            "catalog": catalog_rows,
+            "catalogItemIds": sorted(catalog_names),
+            "keyItemIds": key_ids,
+            "progressionItemIds": DC2_PROGRESSION_ITEMS,
+            "optionalFixedItemIds": DC2_OPTIONAL_FIXED_ITEMS,
+            "poolItemIds": pool_ids,
+            "pool": [
+                {"id": iid, "name": catalog_names[iid], "count": count}
+                for iid, count in sorted(pool_counts.items())
+            ],
         },
     }
 
@@ -440,8 +609,11 @@ def _reachable_rooms(data: dict, held: set[int]) -> set[str]:
     Mirrors DinoCrisis1World.create_regions/set_rules so `--check` proves the graph is solvable
     without an Archipelago checkout.
     """
-    gated_targets = {e["to"] for e in data["edges"]}
-    reach = {c for c in data["regions"] if c not in gated_targets}
+    if data.get("topology") == "physical":
+        reach = {data["startRoom"]}
+    else:
+        gated_targets = {e["to"] for e in data["edges"]}
+        reach = {c for c in data["regions"] if c not in gated_targets}
     changed = True
     while changed:
         changed = False
@@ -502,34 +674,45 @@ def _check_common(data: dict) -> dict:
 
 def check_dc2(data: dict) -> None:
     names = _check_common(data)
-    edge_signatures = [
-        (e["from"], e["to"], tuple(e["requiresItems"]), tuple(e["requiresRooms"]))
-        for e in data["edges"]
-    ]
-    assert len(edge_signatures) == len(set(edge_signatures)), (
-        "duplicate DC2 logical edge signatures"
-    )
-    assert data["startRoom"] == "000" and data["goalRoom"] == "904", (
+    assert data["version"] == 2 and data["topology"] == "physical", (
+        data["version"], data.get("topology"))
+    assert data["startRoom"] == "101" and data["goalRoom"] == "504", (
         data["startRoom"], data["goalRoom"])
-    assert len(data["regions"]) == 89, len(data["regions"])
-    # 168 since the 2026-07-10 slot-5 routine-directory fix (decode_script.subprograms):
-    # +3 op-0x31 items recovered from previously capped tail routines (ST003, ST402 x2).
-    assert len(data["locations"]) == 168, len(data["locations"])
-    assert len(names) == 9, names  # the op-0x31 field-type space (K77)
-    # Known K78 gates present: the ST101<->ST102 crank pair and the ST302->ST303 keycard door.
-    assert any(e["from"] == "101" and e["to"] == "102" for e in data["edges"])
-    assert any(e["from"] == "302" and e["to"] == "303" for e in data["edges"])
-    # v1 progression = visit gates only; solvability: everything (incl. the goal and every
-    # location's room) must be reachable with NO items.
-    reach = _reachable_rooms(data, set())
-    assert data["goalRoom"] in reach, "goal unreachable"
-    unreachable = {loc["room"] for loc in data["locations"]} - reach
+    assert set(data["excludedRooms"]) == DC2_EXCLUDED_ROOMS
+    assert len(data["regions"]) == 85, len(data["regions"])
+    assert len(data["locations"]) == 42, len(data["locations"])
+    assert len(names) == 58, len(names)
+    assert [loc["itemId"] for loc in data["locations"]] == data["items"]["poolItemIds"]
+    assert data["items"]["progressionItemIds"] == [0x2E]
+    assert data["items"]["optionalFixedItemIds"] == [0x33, 0x34]
+    assert all(room in data["regions"] for loc in data["locations"]
+               for room in loc["requiresRooms"])
+    assert len(data["conditionalCommitDispositions"]) == 91
+    assert sum(row["kind"] == "door" for row in data["conditionalCommitDispositions"]) == 27
+    assert sum(row["kind"] == "item" for row in data["conditionalCommitDispositions"]) == 64
+    gas_edges = [edge for edge in data["edges"] if 0x2E in edge["requiresItems"]]
+    assert len(gas_edges) == 1 and (gas_edges[0]["from"], gas_edges[0]["to"]) == ("10D", "10F")
+    assert any(edge["from"] == "003" and edge["to"] == "004"
+               and edge["disposition"] == "modeled_resolved_computed_destination"
+               for edge in data["edges"])
+    assert data["victory"] == {
+        "kind": "guarded_door_commit", "from": "503", "to": "504",
+        "commitOff": "0x15f56",
+    }
+    progression = set(data["items"]["progressionItemIds"])
+    reach_none = _reachable_rooms(data, set())
+    reach_all = _reachable_rooms(data, progression)
+    assert data["goalRoom"] not in reach_none, "Gas Mask gate does not constrain victory path"
+    assert data["goalRoom"] in reach_all, "goal unreachable with all progression items"
+    unreachable = {loc["room"] for loc in data["locations"]} - reach_all
     assert not unreachable, f"locations in unreachable rooms: {sorted(unreachable)}"
+    assert any(loc["room"] in reach_none for loc in data["locations"]), "no free fill seed"
+    assert _forward_fill_beatable(data), "no beatable DC2 progression placement"
     print(
         f"OK: {len(data['regions'])} regions, {len(data['edges'])} edges "
-        f"({sum(1 for e in data['edges'] if e['requiresRooms'])} with visit-gates), "
-        f"{len(data['locations'])} locations, {len(names)} field-type names, "
-        f"goal {data['goalRoom']} reachable (visit-gated model, no key-item shuffle yet)"
+        f"({sum(1 for e in data['edges'] if e['requiresRooms'])} with visit gates), "
+        f"{len(data['locations'])} fillable direct sources, {len(data['exclusions'])} exclusions, "
+        f"91 conditional-commit dispositions; goal {data['goalRoom']} Gas-Mask gated"
     )
 
 
@@ -616,12 +799,14 @@ def _run_game(game: str, apply: bool) -> int:
     print(f"[{game}]")
     if apply:
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(expected, encoding="utf-8")
+        with out.open("w", encoding="utf-8", newline="\n") as stream:
+            stream.write(expected)
         check(data)
         print(f"wrote {out.relative_to(REPO)}")
         return 0
     # Non-mutating derived-data contract: the committed file must equal a fresh regeneration.
-    if not out.exists() or out.read_text(encoding="utf-8") != expected:
+    actual = out.open(encoding="utf-8", newline="").read() if out.exists() else None
+    if actual != expected:
         print(
             f"gen_ap_logic: {out.relative_to(REPO)} is stale or missing — "
             f"run 'python3 scripts/gen_ap_logic.py {game} --apply' and stage it",

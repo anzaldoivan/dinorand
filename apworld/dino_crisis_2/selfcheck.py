@@ -1,9 +1,7 @@
-"""AP-INDEPENDENT self-check for DinoCrisis2World generation (no Archipelago install needed).
+"""AP-independent self-check for the generated Dino Crisis 2 world.
 
-Mirror of dino_crisis_1/selfcheck.py. Drives create_regions()/set_rules()/create_items() against a
-minimal AP stub and asserts the stub world wires up: only the Menu region, a single locked "Victory"
-event location, an empty item pool, and a completion condition set. When the DC2 contract is
-populated later, extend these assertions the way DC1's did.
+Drives the world against a small Archipelago API stub and verifies the physical room graph, exact
+item multiset, guarded Victory event, and installer-facing slot-data contract.
 
 Named without a `test_` prefix so pytest inside a real Archipelago checkout won't collect it.
 
@@ -29,12 +27,15 @@ def _install_ap_stubs() -> None:
 
     class Location:
         def __init__(self, player, name, code, parent):
-            self.player, self.name, self.code, self.parent_region = player, name, code, parent
+            self.player, self.name, self.code, self.address = player, name, code, code
+            self.parent_region = parent
             self.locked_item = None
+            self.item = None
             self.access_rule = lambda state: True
 
         def place_locked_item(self, item):
             self.locked_item = item
+            self.item = item
 
     class Item:
         def __init__(self, name, classification, code, player):
@@ -42,6 +43,7 @@ def _install_ap_stubs() -> None:
 
     class ItemClassification:
         progression = "progression"
+        useful = "useful"
         filler = "filler"
 
     class CollectionState:  # only referenced in type hints / rule bodies, never built here
@@ -84,6 +86,12 @@ class _MultiWorld:
     def __init__(self):
         self.regions, self.itempool, self.completion_condition = [], [], {}
 
+    def get_locations(self, player):
+        return [loc for region in self.regions for loc in region.locations if loc.player == player]
+
+    def register_indirect_condition(self, region, entrance):
+        pass
+
 
 def main() -> int:
     _install_ap_stubs()
@@ -99,17 +107,38 @@ def main() -> int:
 
     assert len(mw.regions) == len(dc2.REGIONS) + 1, "expected one region per room plus Menu"
 
-    # The Victory event: a single id-less locked location that makes the world beatable.
+    menu = next(region for region in mw.regions if region.name == "Menu")
+    assert len(menu.exits) == 1, "Menu must connect only to the proven ST101 start"
+    assert menu.exits[0][0].name == dc2.region_name(dc2.START_ROOM)
+
+    # The Victory event is locked in the selected ST504 goal region.
     all_locs = [loc for r in mw.regions for loc in r.locations]
     events = [loc for loc in all_locs if loc.code is None]
     assert len(events) == 1 and events[0].name == VICTORY, "expected exactly one Victory event"
     assert events[0].locked_item is not None and events[0].locked_item.name == VICTORY
+    assert events[0].parent_region.name == dc2.region_name(dc2.GOAL_ROOM)
 
-    # Fillable locations + itempool stay balanced (both empty in the stub).
+    # Fillable locations + exact source-item pool stay balanced.
     fillable = [loc for loc in all_locs if loc.code is not None]
     assert len(fillable) == len(dc2.LOCATIONS), (len(fillable), len(dc2.LOCATIONS))
     assert len(mw.itempool) == len(dc2.LOCATIONS), (len(mw.itempool), len(dc2.LOCATIONS))
+    assert sorted(item.name for item in mw.itempool) == sorted(
+        dc2.ITEM_NAMES[item_id] for item_id in dc2.POOL_ITEM_IDS
+    )
     assert 1 in mw.completion_condition, "completion condition not set"
+
+    # Simulate a completed AP fill so slot_data can close the install/runtime loop.
+    for location, item in zip(sorted(fillable, key=lambda loc: loc.address), mw.itempool):
+        location.item = item
+    slot_data = world.fill_slot_data()
+    assert slot_data["logic_version"] == 2
+    assert slot_data["start_room"] == "101"
+    assert slot_data["goal_room"] == "504"
+    assert slot_data["victory"] == dc2.VICTORY
+    assert len(slot_data["placements"]) == len(fillable)
+    assert len(slot_data["source_ids"]) == len(fillable)
+    assert slot_data["exclusions"] == dc2.EXCLUSIONS
+    assert set(slot_data["item_ids"].values()) == set(dc2.ITEM_NAMES)
 
     print(
         f"selfcheck OK: {len(mw.regions)} regions, {len(fillable)} fillable locations + "

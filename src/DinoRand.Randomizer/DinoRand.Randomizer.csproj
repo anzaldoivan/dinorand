@@ -39,5 +39,6 @@
   <ItemGroup>
     <InternalsVisibleTo Include="dinorand" />
     <InternalsVisibleTo Include="DinoRand.Avalonia" />
+    <InternalsVisibleTo Include="DinoRand.FileFormats.Tests" />
   </ItemGroup>
 </Project>

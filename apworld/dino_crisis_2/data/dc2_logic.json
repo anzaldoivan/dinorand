@@ -1,2353 +1,4744 @@
 {
   "_generated_by": "scripts/gen_ap_logic.py",
-  "_source": "data/dc2/{door-graph,door-gating,item-placements,room-data}.json (byte-grounded, K74-K78). v1: visit-gated edges only; key items are flag-driven and not yet relocatable (requiresItems empty until the Phase-2 give-path decode) \u2014 see docs/decisions/dc2/ITEMS-KEYITEMS-RE-PLAN.md.",
-  "version": 1,
-  "startRoom": "000",
-  "goalRoom": "904",
+  "_source": "data/dc2/{items,item-sources,door-graph,door-gating,door-guards,stage-room-map}.json (byte-grounded; K119/K122/K129).",
+  "version": 2,
+  "topology": "physical",
+  "startRoom": "101",
+  "goalRoom": "504",
+  "victory": {
+    "kind": "guarded_door_commit",
+    "from": "503",
+    "to": "504",
+    "commitOff": "0x15f56"
+  },
+  "excludedRooms": [
+    "608",
+    "707",
+    "905",
+    "906"
+  ],
   "regions": {
-    "000": "000",
-    "001": "001",
-    "002": "002",
-    "003": "003",
-    "004": "004",
-    "005": "005",
-    "100": "100",
-    "101": "101",
-    "102": "102",
-    "103": "103",
-    "104": "104",
-    "105": "105",
-    "106": "106",
-    "107": "107",
-    "108": "108",
-    "109": "109",
-    "10A": "10A",
-    "10B": "10B",
-    "10C": "10C",
-    "10D": "10D",
-    "10E": "10E",
-    "10F": "10F",
-    "110": "110",
-    "200": "200",
-    "201": "201",
-    "202": "202",
-    "203": "203",
-    "204": "204",
-    "205": "205",
-    "300": "300",
-    "301": "301",
-    "302": "302",
-    "303": "303",
-    "304": "304",
-    "305": "305",
-    "306": "306",
-    "400": "400",
-    "401": "401",
-    "402": "402",
-    "403": "403",
-    "404": "404",
-    "405": "405",
-    "406": "406",
-    "407": "407",
-    "408": "408",
-    "409": "409",
-    "40A": "40A",
-    "40B": "40B",
-    "500": "500",
-    "501": "501",
-    "502": "502",
-    "503": "503",
-    "504": "504",
-    "600": "600",
-    "601": "601",
-    "602": "602",
-    "603": "603",
-    "604": "604",
-    "605": "605",
-    "606": "606",
-    "607": "607",
-    "608": "608",
-    "700": "700",
-    "701": "701",
-    "702": "702",
-    "703": "703",
-    "704": "704",
-    "705": "705",
-    "706": "706",
-    "707": "707",
-    "800": "800",
-    "801": "801",
-    "802": "802",
-    "803": "803",
-    "804": "804",
-    "805": "805",
-    "806": "806",
-    "807": "807",
-    "808": "808",
-    "809": "809",
-    "80A": "80A",
-    "80B": "80B",
-    "900": "900",
-    "901": "901",
-    "902": "902",
-    "903": "903",
-    "904": "904",
-    "905": "905",
-    "906": "906"
+    "000": "ST000",
+    "001": "ST001",
+    "002": "ST002",
+    "003": "ST003",
+    "004": "ST004",
+    "005": "ST005",
+    "100": "ST100",
+    "101": "ST101",
+    "102": "ST102",
+    "103": "ST103",
+    "104": "ST104",
+    "105": "ST105",
+    "106": "ST106",
+    "107": "ST107",
+    "108": "ST108",
+    "109": "ST109",
+    "10A": "ST10A",
+    "10B": "ST10B",
+    "10C": "ST10C",
+    "10D": "ST10D",
+    "10E": "ST10E",
+    "10F": "ST10F",
+    "110": "ST110",
+    "200": "ST200",
+    "201": "ST201",
+    "202": "ST202",
+    "203": "ST203",
+    "204": "ST204",
+    "205": "ST205",
+    "300": "ST300",
+    "301": "ST301",
+    "302": "ST302",
+    "303": "ST303",
+    "304": "ST304",
+    "305": "ST305",
+    "306": "ST306",
+    "400": "ST400",
+    "401": "ST401",
+    "402": "ST402",
+    "403": "ST403",
+    "404": "ST404",
+    "405": "ST405",
+    "406": "ST406",
+    "407": "ST407",
+    "408": "ST408",
+    "409": "ST409",
+    "40A": "ST40A",
+    "40B": "ST40B",
+    "500": "ST500",
+    "501": "ST501",
+    "502": "ST502",
+    "503": "ST503",
+    "504": "ST504",
+    "600": "ST600",
+    "601": "ST601",
+    "602": "ST602",
+    "603": "ST603",
+    "604": "ST604",
+    "605": "ST605",
+    "606": "ST606",
+    "607": "ST607",
+    "700": "ST700",
+    "701": "ST701",
+    "702": "ST702",
+    "703": "ST703",
+    "704": "ST704",
+    "705": "ST705",
+    "706": "ST706",
+    "800": "ST800",
+    "801": "ST801",
+    "802": "ST802",
+    "803": "ST803",
+    "804": "ST804",
+    "805": "ST805",
+    "806": "ST806",
+    "807": "ST807",
+    "808": "ST808",
+    "809": "ST809",
+    "80A": "ST80A",
+    "80B": "ST80B",
+    "900": "ST900",
+    "901": "ST901",
+    "902": "ST902",
+    "903": "ST903",
+    "904": "ST904"
   },
   "edges": [
     {
-      "from": "100",
-      "to": "109",
+      "id": "ST000:door@0x7e80->ST003",
+      "from": "000",
+      "to": "003",
+      "commitOff": "0x7e80",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
-      "from": "100",
-      "to": "101",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "101",
-      "to": "102",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "101",
-      "to": "100",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "102",
-      "to": "101",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "109",
-      "to": "100",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "202",
-      "to": "204",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "300",
-      "to": "302",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "302",
-      "to": "300",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "302",
-      "to": "303",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "303",
-      "to": "304",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "303",
-      "to": "302",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "303",
-      "to": "306",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "304",
-      "to": "303",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "304",
-      "to": "305",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "305",
-      "to": "304",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "801",
-      "to": "803",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
+      "id": "ST000:door@0x7ed4->ST100",
       "from": "000",
       "to": "100",
+      "commitOff": "0x7ed4",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST001:door@0x130e->ST003",
+      "from": "001",
+      "to": "003",
+      "commitOff": "0x130e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST002:door@0x11368->ST003",
+      "from": "002",
+      "to": "003",
+      "commitOff": "0x11368",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST003:door@0x200fc->ST002",
+      "from": "003",
+      "to": "002",
+      "commitOff": "0x200fc",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST003:door@0x20c52->ST005",
+      "from": "003",
+      "to": "005",
+      "commitOff": "0x20c52",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "modeled_resolved_computed_destination"
+    },
+    {
+      "id": "ST003:door@0x20c52->ST000",
+      "from": "003",
+      "to": "000",
+      "commitOff": "0x20c52",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "modeled_resolved_computed_destination"
+    },
+    {
+      "id": "ST003:door@0x20c52->ST004",
+      "from": "003",
+      "to": "004",
+      "commitOff": "0x20c52",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "modeled_resolved_computed_destination"
+    },
+    {
+      "id": "ST003:door@0x21356->ST002",
+      "from": "003",
+      "to": "002",
+      "commitOff": "0x21356",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST003:door@0x239e2->ST001",
+      "from": "003",
+      "to": "001",
+      "commitOff": "0x239e2",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST004:door@0x14c0->ST003",
+      "from": "004",
+      "to": "003",
+      "commitOff": "0x14c0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST004:door@0x1514->ST600",
+      "from": "004",
+      "to": "600",
+      "commitOff": "0x1514",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST005:door@0x751c->ST003",
+      "from": "005",
+      "to": "003",
+      "commitOff": "0x751c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST005:door@0x7570->ST800",
+      "from": "005",
+      "to": "800",
+      "commitOff": "0x7570",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST100:door@0x3424->ST110",
+      "from": "100",
+      "to": "110",
+      "commitOff": "0x3424",
+      "requiresItems": [],
+      "requiresRooms": [
+        "002"
+      ],
+      "disposition": "modeled_monotonic_story"
+    },
+    {
+      "id": "ST100:door@0x37e4->ST000",
+      "from": "100",
+      "to": "000",
+      "commitOff": "0x37e4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST100:door@0x39d8->ST109",
+      "from": "100",
+      "to": "109",
+      "commitOff": "0x39d8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST100:door@0x3a2c->ST101",
+      "from": "100",
+      "to": "101",
+      "commitOff": "0x3a2c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST101:door@0xa800->ST102:alt0",
+      "from": "101",
+      "to": "102",
+      "commitOff": "0xa800",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST101:door@0xa800->ST102:alt1",
+      "from": "101",
+      "to": "102",
+      "commitOff": "0xa800",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST101:door@0xa8f4->ST100",
+      "from": "101",
+      "to": "100",
+      "commitOff": "0xa8f4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST102:door@0xae5e->ST101",
+      "from": "102",
+      "to": "101",
+      "commitOff": "0xae5e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST102:door@0xaf3a->ST105",
+      "from": "102",
+      "to": "105",
+      "commitOff": "0xaf3a",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST102:door@0xafe6->ST110",
+      "from": "102",
+      "to": "110",
+      "commitOff": "0xafe6",
+      "requiresItems": [],
+      "requiresRooms": [
+        "002"
+      ],
+      "disposition": "modeled_monotonic_story"
+    },
+    {
+      "id": "ST103:door@0x1d10->ST105",
+      "from": "103",
+      "to": "105",
+      "commitOff": "0x1d10",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST103:door@0x1d64->ST104",
+      "from": "103",
+      "to": "104",
+      "commitOff": "0x1d64",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST104:door@0x3358->ST103",
+      "from": "104",
+      "to": "103",
+      "commitOff": "0x3358",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST104:door@0x33ac->ST106",
+      "from": "104",
+      "to": "106",
+      "commitOff": "0x33ac",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST105:door@0x8880->ST102",
       "from": "105",
       "to": "102",
+      "commitOff": "0x8880",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST105:door@0x88d4->ST103",
+      "from": "105",
+      "to": "103",
+      "commitOff": "0x88d4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST106:door@0x9f44->ST107",
+      "from": "106",
+      "to": "107",
+      "commitOff": "0x9f44",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST106:door@0x9fbc->ST10E",
+      "from": "106",
+      "to": "10E",
+      "commitOff": "0x9fbc",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_subweapon"
+    },
+    {
+      "id": "ST106:door@0xa050->ST104",
+      "from": "106",
+      "to": "104",
+      "commitOff": "0xa050",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST107:door@0x4dae->ST108",
+      "from": "107",
+      "to": "108",
+      "commitOff": "0x4dae",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST107:door@0x4e02->ST106",
+      "from": "107",
+      "to": "106",
+      "commitOff": "0x4e02",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST108:door@0x7406->ST107",
+      "from": "108",
+      "to": "107",
+      "commitOff": "0x7406",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST108:door@0x745a->ST200",
+      "from": "108",
+      "to": "200",
+      "commitOff": "0x745a",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST109:door@0x83f4->ST10A",
+      "from": "109",
+      "to": "10A",
+      "commitOff": "0x83f4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST109:door@0x8448->ST100",
+      "from": "109",
+      "to": "100",
+      "commitOff": "0x8448",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10A:door@0x26ec->ST10B",
+      "from": "10A",
+      "to": "10B",
+      "commitOff": "0x26ec",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10A:door@0x2740->ST109",
       "from": "10A",
       "to": "109",
+      "commitOff": "0x2740",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST10B:door@0x3a8c->ST10D",
+      "from": "10B",
+      "to": "10D",
+      "commitOff": "0x3a8c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10B:door@0x3ae0->ST10A",
+      "from": "10B",
+      "to": "10A",
+      "commitOff": "0x3ae0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10B:door@0x3b34->ST10C",
+      "from": "10B",
+      "to": "10C",
+      "commitOff": "0x3b34",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10C:door@0x11056->ST10B",
+      "from": "10C",
+      "to": "10B",
+      "commitOff": "0x11056",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10C:door@0x110aa->ST300",
       "from": "10C",
       "to": "300",
+      "commitOff": "0x110aa",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST10D:door@0xe3f4->ST10B",
+      "from": "10D",
+      "to": "10B",
+      "commitOff": "0xe3f4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10D:door@0xe448->ST10E",
+      "from": "10D",
+      "to": "10E",
+      "commitOff": "0xe448",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10D:door@0xe4c0->ST10F",
+      "from": "10D",
+      "to": "10F",
+      "commitOff": "0xe4c0",
+      "requiresItems": [
+        46
+      ],
+      "requiresRooms": [],
+      "disposition": "modeled_item_gate"
+    },
+    {
+      "id": "ST10E:door@0xcc2c->ST106",
+      "from": "10E",
+      "to": "106",
+      "commitOff": "0xcc2c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_subweapon"
+    },
+    {
+      "id": "ST10E:door@0xccc0->ST10D",
+      "from": "10E",
+      "to": "10D",
+      "commitOff": "0xccc0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10E:door@0xce6e->ST106",
+      "from": "10E",
+      "to": "106",
+      "commitOff": "0xce6e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST10F:door@0x6140->ST10D",
+      "from": "10F",
+      "to": "10D",
+      "commitOff": "0x6140",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST10F:door@0x61ca->ST40B",
+      "from": "10F",
+      "to": "40B",
+      "commitOff": "0x61ca",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST110:door@0x2de4->ST100",
       "from": "110",
       "to": "100",
+      "commitOff": "0x2de4",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST110:door@0x2e38->ST102",
       "from": "110",
       "to": "102",
+      "commitOff": "0x2e38",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST200:door@0xf24c->ST108",
+      "from": "200",
+      "to": "108",
+      "commitOff": "0xf24c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST200:door@0xf2a0->ST201",
+      "from": "200",
+      "to": "201",
+      "commitOff": "0xf2a0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST200:door@0xf2f4->ST205",
+      "from": "200",
+      "to": "205",
+      "commitOff": "0xf2f4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST201:door@0x2098->ST200",
+      "from": "201",
+      "to": "200",
+      "commitOff": "0x2098",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST201:door@0x20ec->ST202",
+      "from": "201",
+      "to": "202",
+      "commitOff": "0x20ec",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST202:door@0x24c8->ST201",
+      "from": "202",
+      "to": "201",
+      "commitOff": "0x24c8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST202:door@0x251c->ST203",
+      "from": "202",
+      "to": "203",
+      "commitOff": "0x251c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST202:door@0x25a4->ST204",
+      "from": "202",
+      "to": "204",
+      "commitOff": "0x25a4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST203:door@0x25e2->ST202",
+      "from": "203",
+      "to": "202",
+      "commitOff": "0x25e2",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST204:door@0x4082->ST202",
+      "from": "204",
+      "to": "202",
+      "commitOff": "0x4082",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST205:door@0xd1d6->ST200",
+      "from": "205",
+      "to": "200",
+      "commitOff": "0xd1d6",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST205:door@0xedac->ST100",
       "from": "205",
       "to": "100",
+      "commitOff": "0xedac",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST205:door@0xf784->ST003",
+      "from": "205",
+      "to": "003",
+      "commitOff": "0xf784",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST300:door@0x5094->ST10C",
+      "from": "300",
+      "to": "10C",
+      "commitOff": "0x5094",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST300:door@0x50e8->ST301",
+      "from": "300",
+      "to": "301",
+      "commitOff": "0x50e8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST300:door@0x513c->ST302",
+      "from": "300",
+      "to": "302",
+      "commitOff": "0x513c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST301:door@0x904e->ST300",
       "from": "301",
       "to": "300",
+      "commitOff": "0x904e",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST302:door@0x61c8->ST300",
+      "from": "302",
+      "to": "300",
+      "commitOff": "0x61c8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST302:door@0x6324->ST303",
+      "from": "302",
+      "to": "303",
+      "commitOff": "0x6324",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST303:door@0x4eba->ST304",
+      "from": "303",
+      "to": "304",
+      "commitOff": "0x4eba",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST303:door@0x4f86->ST305",
       "from": "303",
       "to": "305",
+      "commitOff": "0x4f86",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST303:door@0x4fda->ST302",
+      "from": "303",
+      "to": "302",
+      "commitOff": "0x4fda",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST303:door@0x50aa->ST306",
+      "from": "303",
+      "to": "306",
+      "commitOff": "0x50aa",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST304:door@0x73f0->ST303",
+      "from": "304",
+      "to": "303",
+      "commitOff": "0x73f0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST304:door@0x74bc->ST305",
+      "from": "304",
+      "to": "305",
+      "commitOff": "0x74bc",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST305:door@0x3f82->ST303",
       "from": "305",
       "to": "303",
+      "commitOff": "0x3f82",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST305:door@0x3fd6->ST304",
+      "from": "305",
+      "to": "304",
+      "commitOff": "0x3fd6",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST306:door@0x2b94->ST303",
       "from": "306",
       "to": "303",
+      "commitOff": "0x2b94",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     },
     {
+      "id": "ST400:door@0xc5f0->ST401",
+      "from": "400",
+      "to": "401",
+      "commitOff": "0xc5f0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST400:door@0xc644->ST40B",
+      "from": "400",
+      "to": "40B",
+      "commitOff": "0xc644",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST401:door@0x7b0e->ST402",
+      "from": "401",
+      "to": "402",
+      "commitOff": "0x7b0e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST401:door@0x7f2e->ST400",
+      "from": "401",
+      "to": "400",
+      "commitOff": "0x7f2e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST402:door@0x1a8c2->ST403",
+      "from": "402",
+      "to": "403",
+      "commitOff": "0x1a8c2",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST403:door@0x12eaa->ST404",
+      "from": "403",
+      "to": "404",
+      "commitOff": "0x12eaa",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST404:door@0x3028->ST403",
+      "from": "404",
+      "to": "403",
+      "commitOff": "0x3028",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST404:door@0x307c->ST405",
+      "from": "404",
+      "to": "405",
+      "commitOff": "0x307c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST405:door@0x2c68->ST404",
+      "from": "405",
+      "to": "404",
+      "commitOff": "0x2c68",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST405:door@0x2cbc->ST406",
+      "from": "405",
+      "to": "406",
+      "commitOff": "0x2cbc",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST406:door@0xa59c->ST407",
+      "from": "406",
+      "to": "407",
+      "commitOff": "0xa59c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST407:door@0x18f8c->ST408",
+      "from": "407",
+      "to": "408",
+      "commitOff": "0x18f8c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST408:door@0x126c8->ST409",
+      "from": "408",
+      "to": "409",
+      "commitOff": "0x126c8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST408:door@0x12874->ST409",
+      "from": "408",
+      "to": "409",
+      "commitOff": "0x12874",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST408:door@0x13a4c->ST409",
+      "from": "408",
+      "to": "409",
+      "commitOff": "0x13a4c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST409:door@0x12430->ST40A",
+      "from": "409",
+      "to": "40A",
+      "commitOff": "0x12430",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12484->ST408",
+      "from": "409",
+      "to": "408",
+      "commitOff": "0x12484",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12600->ST40A",
+      "from": "409",
+      "to": "40A",
+      "commitOff": "0x12600",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12654->ST408",
+      "from": "409",
+      "to": "408",
+      "commitOff": "0x12654",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12ac4->ST40A",
+      "from": "409",
+      "to": "40A",
+      "commitOff": "0x12ac4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST40A:door@0xcb6c->ST409",
+      "from": "40A",
+      "to": "409",
+      "commitOff": "0xcb6c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST40A:door@0xcbc0->ST500",
+      "from": "40A",
+      "to": "500",
+      "commitOff": "0xcbc0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST40B:door@0x1168->ST10F",
+      "from": "40B",
+      "to": "10F",
+      "commitOff": "0x1168",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST40B:door@0x11bc->ST400",
+      "from": "40B",
+      "to": "400",
+      "commitOff": "0x11bc",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST500:door@0x2190->ST40A",
+      "from": "500",
+      "to": "40A",
+      "commitOff": "0x2190",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST500:door@0x21e4->ST501",
+      "from": "500",
+      "to": "501",
+      "commitOff": "0x21e4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST501:door@0x2a70->ST500",
+      "from": "501",
+      "to": "500",
+      "commitOff": "0x2a70",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST501:door@0x2ac4->ST502",
+      "from": "501",
+      "to": "502",
+      "commitOff": "0x2ac4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST502:door@0x267f4->ST503",
+      "from": "502",
+      "to": "503",
+      "commitOff": "0x267f4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST502:door@0x26848->ST501",
+      "from": "502",
+      "to": "501",
+      "commitOff": "0x26848",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST503:door@0x15f56->ST504",
+      "from": "503",
+      "to": "504",
+      "commitOff": "0x15f56",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "modeled_victory_commit"
+    },
+    {
+      "id": "ST600:door@0x2120->ST601",
+      "from": "600",
+      "to": "601",
+      "commitOff": "0x2120",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST600:door@0x2174->ST004",
+      "from": "600",
+      "to": "004",
+      "commitOff": "0x2174",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST601:door@0x20f8->ST600",
+      "from": "601",
+      "to": "600",
+      "commitOff": "0x20f8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST601:door@0x214c->ST602",
+      "from": "601",
+      "to": "602",
+      "commitOff": "0x214c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST602:door@0x1d6c->ST601",
+      "from": "602",
+      "to": "601",
+      "commitOff": "0x1d6c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST602:door@0x1dc0->ST603",
+      "from": "602",
+      "to": "603",
+      "commitOff": "0x1dc0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST603:door@0x3c24->ST602",
+      "from": "603",
+      "to": "602",
+      "commitOff": "0x3c24",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST603:door@0x3c78->ST605",
+      "from": "603",
+      "to": "605",
+      "commitOff": "0x3c78",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST603:door@0x3cf0->ST604",
+      "from": "603",
+      "to": "604",
+      "commitOff": "0x3cf0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_subweapon"
+    },
+    {
+      "id": "ST603:door@0x4aaa->ST604",
+      "from": "603",
+      "to": "604",
+      "commitOff": "0x4aaa",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST604:door@0x2ea4->ST603",
+      "from": "604",
+      "to": "603",
+      "commitOff": "0x2ea4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST604:door@0x2ef8->ST605",
+      "from": "604",
+      "to": "605",
+      "commitOff": "0x2ef8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST605:door@0x11262->ST603",
+      "from": "605",
+      "to": "603",
+      "commitOff": "0x11262",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST605:door@0x112b6->ST604",
+      "from": "605",
+      "to": "604",
+      "commitOff": "0x112b6",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST605:door@0x14362->ST606",
+      "from": "605",
+      "to": "606",
+      "commitOff": "0x14362",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST606:door@0xe400->ST607",
+      "from": "606",
+      "to": "607",
+      "commitOff": "0xe400",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST606:door@0xf126->ST605",
+      "from": "606",
+      "to": "605",
+      "commitOff": "0xf126",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST607:door@0xb1f8->ST606",
+      "from": "607",
+      "to": "606",
+      "commitOff": "0xb1f8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST607:door@0xe586->ST700",
+      "from": "607",
+      "to": "700",
+      "commitOff": "0xe586",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST700:door@0x4670->ST701",
+      "from": "700",
+      "to": "701",
+      "commitOff": "0x4670",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST701:door@0x38f8->ST700",
+      "from": "701",
+      "to": "700",
+      "commitOff": "0x38f8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST701:door@0x394c->ST702",
+      "from": "701",
+      "to": "702",
+      "commitOff": "0x394c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST702:door@0x262c->ST701",
+      "from": "702",
+      "to": "701",
+      "commitOff": "0x262c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST702:door@0x2680->ST703",
+      "from": "702",
+      "to": "703",
+      "commitOff": "0x2680",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST703:door@0x6a6c->ST702",
+      "from": "703",
+      "to": "702",
+      "commitOff": "0x6a6c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST703:door@0x6ac0->ST704",
+      "from": "703",
+      "to": "704",
+      "commitOff": "0x6ac0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST703:door@0x6b14->ST704",
+      "from": "703",
+      "to": "704",
+      "commitOff": "0x6b14",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST704:door@0xae60->ST703",
+      "from": "704",
+      "to": "703",
+      "commitOff": "0xae60",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST704:door@0xaeb4->ST705",
+      "from": "704",
+      "to": "705",
+      "commitOff": "0xaeb4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST704:door@0xaf08->ST703",
+      "from": "704",
+      "to": "703",
+      "commitOff": "0xaf08",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST705:door@0x53f6->ST704",
+      "from": "705",
+      "to": "704",
+      "commitOff": "0x53f6",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST705:door@0x544a->ST706",
+      "from": "705",
+      "to": "706",
+      "commitOff": "0x544a",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST706:door@0xd3b4->ST705",
+      "from": "706",
+      "to": "705",
+      "commitOff": "0xd3b4",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST706:door@0x10894->ST800",
+      "from": "706",
+      "to": "800",
+      "commitOff": "0x10894",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST800:door@0x18516->ST005",
+      "from": "800",
+      "to": "005",
+      "commitOff": "0x18516",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST800:door@0x18610->ST801",
+      "from": "800",
+      "to": "801",
+      "commitOff": "0x18610",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST800:door@0x1a0b0->ST005",
+      "from": "800",
+      "to": "005",
+      "commitOff": "0x1a0b0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST800:door@0x1a138->ST801",
+      "from": "800",
+      "to": "801",
+      "commitOff": "0x1a138",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST800:door@0x1a952->ST706",
+      "from": "800",
+      "to": "706",
+      "commitOff": "0x1a952",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST801:door@0x463e->ST803",
+      "from": "801",
+      "to": "803",
+      "commitOff": "0x463e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST801:door@0x470a->ST802",
+      "from": "801",
+      "to": "802",
+      "commitOff": "0x470a",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST801:door@0x475e->ST800",
+      "from": "801",
+      "to": "800",
+      "commitOff": "0x475e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST802:door@0x2df8->ST801",
+      "from": "802",
+      "to": "801",
+      "commitOff": "0x2df8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST803:door@0x89e0->ST804",
+      "from": "803",
+      "to": "804",
+      "commitOff": "0x89e0",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST803:door@0x8a34->ST801",
+      "from": "803",
+      "to": "801",
+      "commitOff": "0x8a34",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST804:door@0x1c98->ST805",
+      "from": "804",
+      "to": "805",
+      "commitOff": "0x1c98",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST804:door@0x1cec->ST803",
       "from": "804",
       "to": "803",
+      "commitOff": "0x1cec",
       "requiresItems": [],
-      "requiresRooms": []
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST805:door@0x784a->ST804",
+      "from": "805",
+      "to": "804",
+      "commitOff": "0x784a",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST805:door@0x789e->ST80B",
+      "from": "805",
+      "to": "80B",
+      "commitOff": "0x789e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST806:door@0xb874->ST80B",
+      "from": "806",
+      "to": "80B",
+      "commitOff": "0xb874",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST806:door@0xb8c8->ST807",
+      "from": "806",
+      "to": "807",
+      "commitOff": "0xb8c8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST807:door@0x581a->ST806",
+      "from": "807",
+      "to": "806",
+      "commitOff": "0x581a",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST807:door@0x586e->ST808",
+      "from": "807",
+      "to": "808",
+      "commitOff": "0x586e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST808:door@0xc342->ST807",
+      "from": "808",
+      "to": "807",
+      "commitOff": "0xc342",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST808:door@0xfca6->ST809",
+      "from": "808",
+      "to": "809",
+      "commitOff": "0xfca6",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST809:door@0x19aae->ST80A",
+      "from": "809",
+      "to": "80A",
+      "commitOff": "0x19aae",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST80A:door@0x4df60->ST900",
+      "from": "80A",
+      "to": "900",
+      "commitOff": "0x4df60",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST80B:door@0x319e->ST805",
+      "from": "80B",
+      "to": "805",
+      "commitOff": "0x319e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST80B:door@0x31f2->ST806",
+      "from": "80B",
+      "to": "806",
+      "commitOff": "0x31f2",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST900:door@0x38fc->ST901",
+      "from": "900",
+      "to": "901",
+      "commitOff": "0x38fc",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST900:door@0x3950->ST902",
+      "from": "900",
+      "to": "902",
+      "commitOff": "0x3950",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST901:door@0x1d7c->ST900",
+      "from": "901",
+      "to": "900",
+      "commitOff": "0x1d7c",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST902:door@0x19d8->ST900",
+      "from": "902",
+      "to": "900",
+      "commitOff": "0x19d8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST902:door@0x1b40->ST903",
+      "from": "902",
+      "to": "903",
+      "commitOff": "0x1b40",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_subweapon"
+    },
+    {
+      "id": "ST902:door@0x1d80->ST903",
+      "from": "902",
+      "to": "903",
+      "commitOff": "0x1d80",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST903:door@0xc91e->ST904",
+      "from": "903",
+      "to": "904",
+      "commitOff": "0xc91e",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
+    },
+    {
+      "id": "ST904:door@0x90c8->ST003",
+      "from": "904",
+      "to": "003",
+      "commitOff": "0x90c8",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "disposition": "unconditional_physical_door"
     }
   ],
   "locations": [
     {
-      "key": "000:9:32926",
-      "name": "000 (ST000) - Field item 3 @slot9/0x809e",
-      "room": "000",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        2680,
-        12800
-      ],
-      "collectedFlag": null
+      "key": "ST100:r0:op35@0x3770",
+      "sourceId": "ST100:r0:op35@0x3770",
+      "apId": 1834602709,
+      "name": "ST100 - Med Pak M [r0:op35@0x3770]",
+      "room": "100",
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:103"
     },
     {
-      "key": "002:0:70910",
-      "name": "002 (ST002) - Resusc. Pak @slot0/0x114fe",
-      "room": "002",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        1600,
-        0
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "002:0:71322",
-      "name": "002 (ST002) - Resusc. Pak @slot0/0x1169a",
-      "room": "002",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        1600,
-        0
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "002:5:71490",
-      "name": "002 (ST002) - Field item 3 @slot5/0x11742",
-      "room": "002",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        640,
-        -560
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "003:0:131198",
-      "name": "003 (ST003) - Med Pak S @slot0/0x2007e",
-      "room": "003",
-      "itemId": 1,
+      "key": "ST101:r0:op35@0xa680",
+      "sourceId": "ST101:r0:op35@0xa680",
+      "apId": 2101895142,
+      "name": "ST101 - Med Pak S [r0:op35@0xa680]",
+      "room": "101",
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        2800,
-        3100
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:77"
     },
     {
-      "key": "003:2:131442",
-      "name": "003 (ST003) - Med Pak S @slot2/0x20172",
-      "room": "003",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        2500,
-        1000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "003:3:132106",
-      "name": "003 (ST003) - Med Pak S @slot3/0x2040a",
-      "room": "003",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        400,
-        -1200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "003:3:132278",
-      "name": "003 (ST003) - Med Pak S @slot3/0x204b6",
-      "room": "003",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        400,
-        -1200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "003:3:141632",
-      "name": "003 (ST003) - Med Pak S @slot3/0x22940",
-      "room": "003",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        400,
-        -1200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "003:3:145800",
-      "name": "003 (ST003) - Med Pak S @slot3/0x23988",
-      "room": "003",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        600,
-        0
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "003:4:149276",
-      "name": "003 (ST003) - Med Pak S @slot4/0x2471c",
-      "room": "003",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -1200,
-        3200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "003:5:152296",
-      "name": "003 (ST003) - Med Pak S @slot5/0x252e8",
-      "room": "003",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -1200,
-        3200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "005:9:30448",
-      "name": "005 (ST005) - Field item 3 @slot9/0x76f0",
-      "room": "005",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        2700,
-        -7400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "102:5:45450",
-      "name": "102 (ST102) - Med Pak S @slot5/0xb18a",
+      "key": "ST102:r0:op35@0xb082",
+      "sourceId": "ST102:r0:op35@0xb082",
+      "apId": 1196460766,
+      "name": "ST102 - Med Pak M [r0:op35@0xb082]",
       "room": "102",
-      "itemId": 1,
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:74"
+    },
+    {
+      "key": "ST104:r0:op35@0x34c8",
+      "sourceId": "ST104:r0:op35@0x34c8",
+      "apId": 1959032296,
+      "name": "ST104 - Med Pak S [r0:op35@0x34c8]",
+      "room": "104",
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        16000,
-        -12400
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:66"
     },
     {
-      "key": "106:12:41446",
-      "name": "106 (ST106) - Dino File @slot12/0xa1e6",
-      "room": "106",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        200,
-        -3600
-      ],
-      "collectedFlag": null
+      "key": "ST104:r0:op35@0x3514",
+      "sourceId": "ST104:r0:op35@0x3514",
+      "apId": 1237280837,
+      "name": "ST104 - Med Pak L [r0:op35@0x3514]",
+      "room": "104",
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:83"
     },
     {
-      "key": "106:7:41510",
-      "name": "106 (ST106) - Resusc. Pak @slot7/0xa226",
-      "room": "106",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -1000,
-        -4000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "107:5:20522",
-      "name": "107 (ST107) - Med Pak S @slot5/0x502a",
+      "key": "ST107:r0:op35@0x4cfe",
+      "sourceId": "ST107:r0:op35@0x4cfe",
+      "apId": 1361810675,
+      "name": "ST107 - Med Pak M [r0:op35@0x4cfe]",
       "room": "107",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        9700,
-        9100
-      ],
-      "collectedFlag": null
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:72"
     },
     {
-      "key": "109:6:34332",
-      "name": "109 (ST109) - Field item 9 @slot6/0x861c",
-      "room": "109",
-      "itemId": 9,
-      "itemName": "Field item 9",
-      "pos": [
-        11210,
-        -1700
-      ],
-      "collectedFlag": null
+      "key": "ST10D:r0:op35@0xe54c",
+      "sourceId": "ST10D:r0:op35@0xe54c",
+      "apId": 1958477315,
+      "name": "ST10D - Med Pak M [r0:op35@0xe54c]",
+      "room": "10D",
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:110"
     },
     {
-      "key": "109:8:36312",
-      "name": "109 (ST109) - Ammo pickup @slot8/0x8dd8",
-      "room": "109",
-      "itemId": 7,
-      "itemName": "Ammo pickup",
-      "pos": [
-        4500,
-        2000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "10C:3:70142",
-      "name": "10C (ST10C) - Resusc. Pak @slot3/0x111fe",
-      "room": "10C",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -3800,
-        8200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "10E:0:52326",
-      "name": "10E (ST10E) - Resusc. Pak @slot0/0xcc66",
-      "room": "10E",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        6650,
-        15100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "10F:0:24334",
-      "name": "10F (ST10F) - Med Pak S @slot0/0x5f0e",
-      "room": "10F",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        800,
-        20700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "10F:1:24394",
-      "name": "10F (ST10F) - Med Pak S @slot1/0x5f4a",
-      "room": "10F",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -100,
-        -24900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "110:2:12034",
-      "name": "110 (ST110) - Med Pak S @slot2/0x2f02",
+      "key": "ST110:r4:op2c@0x3b86",
+      "sourceId": "ST110:r4:op2c@0x3b86",
+      "apId": 1590160581,
+      "name": "ST110 - 3rd Energy Facility Keycard [r4:op2c@0x3b86]",
       "room": "110",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -3200,
-        13800
-      ],
-      "collectedFlag": null
+      "itemId": 50,
+      "itemName": "3rd Energy Facility Keycard",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op2c_give",
+      "collectedFlag": "5:16"
     },
     {
-      "key": "110:3:12162",
-      "name": "110 (ST110) - Med Pak S @slot3/0x2f82",
-      "room": "110",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -4500,
-        2600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "200:3:66190",
-      "name": "200 (ST200) - Med Pak S @slot3/0x1028e",
+      "key": "ST200:r0:op35@0xf340",
+      "sourceId": "ST200:r0:op35@0xf340",
+      "apId": 1522006876,
+      "name": "ST200 - Med Pak L [r0:op35@0xf340]",
       "room": "200",
-      "itemId": 1,
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:78"
+    },
+    {
+      "key": "ST202:r0:op35@0x1494",
+      "sourceId": "ST202:r0:op35@0x1494",
+      "apId": 2016218285,
+      "name": "ST202 - Med Pak M [r0:op35@0x1494]",
+      "room": "202",
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:86"
+    },
+    {
+      "key": "ST300:r0:op35@0x5200",
+      "sourceId": "ST300:r0:op35@0x5200",
+      "apId": 1630350685,
+      "name": "ST300 - Med Pak S [r0:op35@0x5200]",
+      "room": "300",
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        -12400,
-        7900
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:100"
     },
     {
-      "key": "201:0:8834",
-      "name": "201 (ST201) - Med Pak S @slot0/0x2282",
-      "room": "201",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -2000,
-        -2700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "203:1:9820",
-      "name": "203 (ST203) - Resusc. Pak @slot1/0x265c",
-      "room": "203",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -3300,
-        -1100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "204:0:13356",
-      "name": "204 (ST204) - Med Pak S @slot0/0x342c",
-      "room": "204",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -902,
-        5100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "204:1:13416",
-      "name": "204 (ST204) - Resusc. Pak @slot1/0x3468",
-      "room": "204",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -990,
-        5000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "204:2:13476",
-      "name": "204 (ST204) - Field item 3 @slot2/0x34a4",
-      "room": "204",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        -3600,
-        400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "205:2:53832",
-      "name": "205 (ST205) - Med Pak S @slot2/0xd248",
-      "room": "205",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -5300,
-        -500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "205:3:55498",
-      "name": "205 (ST205) - Resusc. Pak @slot3/0xd8ca",
-      "room": "205",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        1600,
-        -400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "205:17:55630",
-      "name": "205 (ST205) - Resusc. Pak @slot17/0xd94e",
-      "room": "205",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        4200,
-        -700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "301:4:37716",
-      "name": "301 (ST301) - Med Pak S @slot4/0x9354",
-      "room": "301",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -5200,
-        3300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "301:5:41132",
-      "name": "301 (ST301) - Med Pak S @slot5/0xa0ac",
-      "room": "301",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        2600,
-        4200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "302:3:25206",
-      "name": "302 (ST302) - Med Pak S @slot3/0x6276",
-      "room": "302",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -3800,
-        -6300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "302:2:25662",
-      "name": "302 (ST302) - Med Pak S @slot2/0x643e",
-      "room": "302",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4200,
-        7200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "302:4:30710",
-      "name": "302 (ST302) - Resusc. Pak @slot4/0x77f6",
-      "room": "302",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        4300,
-        7100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "302:5:30770",
-      "name": "302 (ST302) - Resusc. Pak @slot5/0x7832",
-      "room": "302",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -2400,
-        8000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "303:11:20828",
-      "name": "303 (ST303) - Resusc. Pak @slot11/0x515c",
-      "room": "303",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        6300,
-        6400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "303:12:20888",
-      "name": "303 (ST303) - Resusc. Pak @slot12/0x5198",
-      "room": "303",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -9300,
-        7100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "303:13:20948",
-      "name": "303 (ST303) - Resusc. Pak @slot13/0x51d4",
-      "room": "303",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -100,
-        400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:21:30058",
-      "name": "304 (ST304) - Med Pak S @slot21/0x756a",
+      "key": "ST304:r0:op35@0x7990",
+      "sourceId": "ST304:r0:op35@0x7990",
+      "apId": 1838799327,
+      "name": "ST304 - Med Pak S [r0:op35@0x7990]",
       "room": "304",
-      "itemId": 1,
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        -9300,
-        5300
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:71"
     },
     {
-      "key": "304:6:30254",
-      "name": "304 (ST304) - Med Pak S @slot6/0x762e",
+      "key": "ST304:r0:op35@0x79dc",
+      "sourceId": "ST304:r0:op35@0x79dc",
+      "apId": 1326968743,
+      "name": "ST304 - Med Pak L [r0:op35@0x79dc]",
       "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -5900,
-        600
-      ],
-      "collectedFlag": null
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:101"
     },
     {
-      "key": "304:7:30434",
-      "name": "304 (ST304) - Med Pak S @slot7/0x76e2",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -2600,
-        6700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:8:30558",
-      "name": "304 (ST304) - Med Pak S @slot8/0x775e",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        900,
-        3600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:9:30618",
-      "name": "304 (ST304) - Med Pak S @slot9/0x779a",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        3500,
-        9500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:10:30678",
-      "name": "304 (ST304) - Med Pak S @slot10/0x77d6",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4400,
-        -900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:15:30798",
-      "name": "304 (ST304) - Med Pak S @slot15/0x784e",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        12500,
-        3900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:16:30858",
-      "name": "304 (ST304) - Med Pak S @slot16/0x788a",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4400,
-        -5000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:17:30918",
-      "name": "304 (ST304) - Med Pak S @slot17/0x78c6",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        6000,
-        -7700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:12:30978",
-      "name": "304 (ST304) - Med Pak S @slot12/0x7902",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        11500,
-        -1000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:11:31342",
-      "name": "304 (ST304) - Med Pak S @slot11/0x7a6e",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        9900,
-        -5200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:18:31402",
-      "name": "304 (ST304) - Med Pak S @slot18/0x7aaa",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        6300,
-        9200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:5:31462",
-      "name": "304 (ST304) - Med Pak S @slot5/0x7ae6",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -9300,
-        2800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:13:32464",
-      "name": "304 (ST304) - Med Pak S @slot13/0x7ed0",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        9700,
-        9400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:13:32540",
-      "name": "304 (ST304) - Med Pak S @slot13/0x7f1c",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        9700,
-        9400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "304:13:38044",
-      "name": "304 (ST304) - Med Pak S @slot13/0x949c",
-      "room": "304",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        9700,
-        9400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "305:2:16516",
-      "name": "305 (ST305) - Med Pak S @slot2/0x4084",
-      "room": "305",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -1100,
-        6400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "305:3:16576",
-      "name": "305 (ST305) - Med Pak S @slot3/0x40c0",
-      "room": "305",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -3500,
-        500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "305:4:16676",
-      "name": "305 (ST305) - Med Pak S @slot4/0x4124",
-      "room": "305",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        5000,
-        -3500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "305:6:16920",
-      "name": "305 (ST305) - Med Pak S @slot6/0x4218",
-      "room": "305",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -4500,
-        -8100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "305:7:16980",
-      "name": "305 (ST305) - Med Pak S @slot7/0x4254",
-      "room": "305",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -4900,
-        8500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "305:10:17200",
-      "name": "305 (ST305) - Med Pak S @slot10/0x4330",
-      "room": "305",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -2200,
-        9400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "306:3:11210",
-      "name": "306 (ST306) - Med Pak S @slot3/0x2bca",
+      "key": "ST306:r2:op2c@0x305a",
+      "sourceId": "ST306:r2:op2c@0x305a",
+      "apId": 1740350962,
+      "name": "ST306 - Starter Battery [r2:op2c@0x305a]",
       "room": "306",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        1700,
-        5800
-      ],
-      "collectedFlag": null
+      "itemId": 43,
+      "itemName": "Starter Battery",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op2c_give",
+      "collectedFlag": "5:12"
     },
     {
-      "key": "306:2:11430",
-      "name": "306 (ST306) - Resusc. Pak @slot2/0x2ca6",
-      "room": "306",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        1200,
-        -3700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "400:0:50522",
-      "name": "400 (ST400) - Med Pak S @slot0/0xc55a",
-      "room": "400",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -7800,
-        -9900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "400:1:50582",
-      "name": "400 (ST400) - Med Pak S @slot1/0xc596",
-      "room": "400",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -8200,
-        -7700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "401:3:22832",
-      "name": "401 (ST401) - Med Pak S @slot3/0x5930",
-      "room": "401",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -1699,
-        5601
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "401:5:22992",
-      "name": "401 (ST401) - Med Pak S @slot5/0x59d0",
-      "room": "401",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        2000,
-        2900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "401:2:23428",
-      "name": "401 (ST401) - Med Pak S @slot2/0x5b84",
-      "room": "401",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        2800,
-        5100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:0:91868",
-      "name": "402 (ST402) - Ammo pickup @slot0/0x166dc",
+      "key": "ST402:r0:op35@0x16882",
+      "sourceId": "ST402:r0:op35@0x16882",
+      "apId": 1983404646,
+      "name": "ST402 - Med Pak L [r0:op35@0x16882]",
       "room": "402",
-      "itemId": 7,
-      "itemName": "Ammo pickup",
-      "pos": [
-        397,
-        10209
-      ],
-      "collectedFlag": null
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:87"
     },
     {
-      "key": "402:1:91928",
-      "name": "402 (ST402) - Field item 8 @slot1/0x16718",
+      "key": "ST402:r0:op35@0x168ce",
+      "sourceId": "ST402:r0:op35@0x168ce",
+      "apId": 1217230556,
+      "name": "ST402 - Med Pak M [r0:op35@0x168ce]",
       "room": "402",
-      "itemId": 8,
-      "itemName": "Field item 8",
-      "pos": [
-        397,
-        10209
-      ],
-      "collectedFlag": null
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:88"
     },
     {
-      "key": "402:2:92068",
-      "name": "402 (ST402) - Dino File @slot2/0x167a4",
-      "room": "402",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        -9100,
-        -16400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:3:92208",
-      "name": "402 (ST402) - Field item 6 @slot3/0x16830",
-      "room": "402",
-      "itemId": 6,
-      "itemName": "Field item 6",
-      "pos": [
-        13700,
-        -14100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:5:93252",
-      "name": "402 (ST402) - Field item 4 @slot5/0x16c44",
-      "room": "402",
-      "itemId": 4,
-      "itemName": "Field item 4",
-      "pos": [
-        9600,
-        19700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:8:93520",
-      "name": "402 (ST402) - Field item 4 @slot8/0x16d50",
-      "room": "402",
-      "itemId": 4,
-      "itemName": "Field item 4",
-      "pos": [
-        -1200,
-        5100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:9:93580",
-      "name": "402 (ST402) - Field item 4 @slot9/0x16d8c",
-      "room": "402",
-      "itemId": 4,
-      "itemName": "Field item 4",
-      "pos": [
-        3700,
-        2400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:5:100078",
-      "name": "402 (ST402) - Field item 4 @slot5/0x186ee",
-      "room": "402",
-      "itemId": 4,
-      "itemName": "Field item 4",
-      "pos": [
-        9600,
-        19700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:8:120764",
-      "name": "402 (ST402) - Field item 4 @slot8/0x1d7bc",
-      "room": "402",
-      "itemId": 4,
-      "itemName": "Field item 4",
-      "pos": [
-        -1200,
-        5100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "402:7:121816",
-      "name": "402 (ST402) - Med Pak S @slot7/0x1dbd8",
-      "room": "402",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        2500,
-        3500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "403:0:77536",
-      "name": "403 (ST403) - Med Pak S @slot0/0x12ee0",
-      "room": "403",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4000,
-        -3600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "403:1:77596",
-      "name": "403 (ST403) - Med Pak S @slot1/0x12f1c",
-      "room": "403",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4100,
-        -400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "403:3:77656",
-      "name": "403 (ST403) - Field item 4 @slot3/0x12f58",
-      "room": "403",
-      "itemId": 4,
-      "itemName": "Field item 4",
-      "pos": [
-        2200,
-        7600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "408:0:75726",
-      "name": "408 (ST408) - Field item 3 @slot0/0x127ce",
-      "room": "408",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        4500,
-        -16500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "409:0:74942",
-      "name": "409 (ST409) - Med Pak S @slot0/0x124be",
-      "room": "409",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        3000,
-        -14500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "40A:8:52920",
-      "name": "40A (ST40A) - Med Pak S @slot8/0xceb8",
+      "key": "ST40A:r0:op35@0xcb18",
+      "sourceId": "ST40A:r0:op35@0xcb18",
+      "apId": 1822254004,
+      "name": "ST40A - Med Pak M [r0:op35@0xcb18]",
       "room": "40A",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        3400,
-        11400
-      ],
-      "collectedFlag": null
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:109"
     },
     {
-      "key": "40A:3:53384",
-      "name": "40A (ST40A) - Med Pak S @slot3/0xd088",
-      "room": "40A",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -4000,
-        9000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "40A:4:53444",
-      "name": "40A (ST40A) - Med Pak S @slot4/0xd0c4",
-      "room": "40A",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        6500,
-        9000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "40A:5:53504",
-      "name": "40A (ST40A) - Med Pak S @slot5/0xd100",
-      "room": "40A",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -12500,
-        6900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "40A:6:53564",
-      "name": "40A (ST40A) - Med Pak S @slot6/0xd13c",
-      "room": "40A",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        14300,
-        7100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "40A:7:53624",
-      "name": "40A (ST40A) - Med Pak S @slot7/0xd178",
-      "room": "40A",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -1100,
-        9200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "40A:8:53956",
-      "name": "40A (ST40A) - Med Pak S @slot8/0xd2c4",
-      "room": "40A",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        3400,
-        11400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "40B:2:5030",
-      "name": "40B (ST40B) - Med Pak S @slot2/0x13a6",
-      "room": "40B",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -1200,
-        -3400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "501:10:11658",
-      "name": "501 (ST501) - Med Pak S @slot10/0x2d8a",
+      "key": "ST501:r0:op35@0x2e6c",
+      "sourceId": "ST501:r0:op35@0x2e6c",
+      "apId": 1118643015,
+      "name": "ST501 - Med Pak L [r0:op35@0x2e6c]",
       "room": "501",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -4100,
-        -3600
-      ],
-      "collectedFlag": null
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:94"
     },
     {
-      "key": "502:2:157822",
-      "name": "502 (ST502) - Med Pak S @slot2/0x2687e",
-      "room": "502",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        3300,
-        3700
-      ],
-      "collectedFlag": null
+      "key": "ST600:r0:op35@0x22bc",
+      "sourceId": "ST600:r0:op35@0x22bc",
+      "apId": 2050048448,
+      "name": "ST600 - Med Pak M [r0:op35@0x22bc]",
+      "room": "600",
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:104"
     },
     {
-      "key": "502:3:157882",
-      "name": "502 (ST502) - Med Pak S @slot3/0x268ba",
-      "room": "502",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4500,
-        4500
-      ],
-      "collectedFlag": null
+      "key": "ST601:r0:op35@0x2198",
+      "sourceId": "ST601:r0:op35@0x2198",
+      "apId": 1923481294,
+      "name": "ST601 - Med Pak L [r0:op35@0x2198]",
+      "room": "601",
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:65"
     },
     {
-      "key": "502:4:157942",
-      "name": "502 (ST502) - Med Pak S @slot4/0x268f6",
-      "room": "502",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        3000,
-        12600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "502:5:158002",
-      "name": "502 (ST502) - Med Pak S @slot5/0x26932",
-      "room": "502",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        2600,
-        12100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "502:16:160810",
-      "name": "502 (ST502) - Dino File @slot16/0x2742a",
-      "room": "502",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        2000,
-        -15300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "502:16:183222",
-      "name": "502 (ST502) - Dino File @slot16/0x2cbb6",
-      "room": "502",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        2000,
-        -15300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "503:1:88202",
-      "name": "503 (ST503) - Field item 3 @slot1/0x1588a",
-      "room": "503",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        19800,
-        -18800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "503:7:88262",
-      "name": "503 (ST503) - Resusc. Pak @slot7/0x158c6",
-      "room": "503",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        4400,
-        15550
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "503:2:88342",
-      "name": "503 (ST503) - Resusc. Pak @slot2/0x15916",
-      "room": "503",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -16200,
-        14100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "503:3:88402",
-      "name": "503 (ST503) - Resusc. Pak @slot3/0x15952",
-      "room": "503",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        10600,
-        -11500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "503:4:88462",
-      "name": "503 (ST503) - Resusc. Pak @slot4/0x1598e",
-      "room": "503",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        1100,
-        16100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "503:6:104050",
-      "name": "503 (ST503) - Resusc. Pak @slot6/0x19672",
-      "room": "503",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        4300,
-        -7700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "603:7:16106",
-      "name": "603 (ST603) - Field item 8 @slot7/0x3eea",
+      "key": "ST603:r0:op35@0x3e34",
+      "sourceId": "ST603:r0:op35@0x3e34",
+      "apId": 1494284623,
+      "name": "ST603 - Med Pak S [r0:op35@0x3e34]",
       "room": "603",
-      "itemId": 8,
-      "itemName": "Field item 8",
-      "pos": [
-        2900,
-        -1500
-      ],
-      "collectedFlag": null
+      "itemId": 27,
+      "itemName": "Med Pak S",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:89"
     },
     {
-      "key": "603:4:16410",
-      "name": "603 (ST603) - Resusc. Pak @slot4/0x401a",
-      "room": "603",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -2000,
-        -3800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "605:4:70380",
-      "name": "605 (ST605) - Med Pak S @slot4/0x112ec",
+      "key": "ST605:r0:op35@0x115dc",
+      "sourceId": "ST605:r0:op35@0x115dc",
+      "apId": 2012507718,
+      "name": "ST605 - Key for the box [r0:op35@0x115dc]",
       "room": "605",
-      "itemId": 1,
+      "itemId": 49,
+      "itemName": "Key for the box",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:15"
+    },
+    {
+      "key": "ST700:r0:op35@0x4558",
+      "sourceId": "ST700:r0:op35@0x4558",
+      "apId": 1151994356,
+      "name": "ST700 - Med Pak S [r0:op35@0x4558]",
+      "room": "700",
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        7500,
-        -1500
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:95"
     },
     {
-      "key": "605:5:70440",
-      "name": "605 (ST605) - Med Pak S @slot5/0x11328",
-      "room": "605",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        5700,
-        -1700
-      ],
-      "collectedFlag": null
+      "key": "ST700:r0:op35@0x45a4",
+      "sourceId": "ST700:r0:op35@0x45a4",
+      "apId": 1210630548,
+      "name": "ST700 - Med Pak L [r0:op35@0x45a4]",
+      "room": "700",
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:96"
     },
     {
-      "key": "605:6:70500",
-      "name": "605 (ST605) - Med Pak S @slot6/0x11364",
-      "room": "605",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4100,
-        -1300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "605:7:70560",
-      "name": "605 (ST605) - Med Pak S @slot7/0x113a0",
-      "room": "605",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4500,
-        1200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "605:13:70620",
-      "name": "605 (ST605) - Field item 3 @slot13/0x113dc",
-      "room": "605",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        1000,
-        -5300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "605:10:71270",
-      "name": "605 (ST605) - Field item 6 @slot10/0x11666",
-      "room": "605",
-      "itemId": 6,
-      "itemName": "Field item 6",
-      "pos": [
-        -900,
-        -2100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "605:21:71774",
-      "name": "605 (ST605) - Dino File @slot21/0x1185e",
-      "room": "605",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        -500,
-        3800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "605:21:78624",
-      "name": "605 (ST605) - Dino File @slot21/0x13320",
-      "room": "605",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        -500,
-        3800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "606:6:58226",
-      "name": "606 (ST606) - Resusc. Pak @slot6/0xe372",
-      "room": "606",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        500,
-        10800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "606:2:58486",
-      "name": "606 (ST606) - Med Pak S @slot2/0xe476",
-      "room": "606",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        649,
-        7800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "606:3:58546",
-      "name": "606 (ST606) - Med Pak S @slot3/0xe4b2",
-      "room": "606",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        349,
-        5800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "607:12:45674",
-      "name": "607 (ST607) - Med Pak S @slot12/0xb26a",
-      "room": "607",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        4000,
-        -6200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "607:4:46238",
-      "name": "607 (ST607) - Med Pak S @slot4/0xb49e",
-      "room": "607",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -8500,
-        -6000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "607:10:47060",
-      "name": "607 (ST607) - Med Pak S @slot10/0xb7d4",
-      "room": "607",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        8200,
-        -4000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "608:0:674",
-      "name": "608 (ST608) - Med Pak S @slot0/0x2a2",
-      "room": "608",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -500,
-        -900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "701:3:14014",
-      "name": "701 (ST701) - Field item 4 @slot3/0x36be",
-      "room": "701",
-      "itemId": 4,
-      "itemName": "Field item 4",
-      "pos": [
-        -6300,
-        2900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "701:2:14370",
-      "name": "701 (ST701) - Med Pak S @slot2/0x3822",
-      "room": "701",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -3600,
-        -1500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "703:4:27978",
-      "name": "703 (ST703) - Med Pak S @slot4/0x6d4a",
+      "key": "ST703:r0:op35@0x69d8",
+      "sourceId": "ST703:r0:op35@0x69d8",
+      "apId": 1754716432,
+      "name": "ST703 - Plug [r0:op35@0x69d8]",
       "room": "703",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        7300,
-        3700
-      ],
-      "collectedFlag": null
+      "itemId": 33,
+      "itemName": "Plug",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:3"
     },
     {
-      "key": "703:6:28094",
-      "name": "703 (ST703) - Med Pak S @slot6/0x6dbe",
-      "room": "703",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        5500,
-        7600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "703:4:31156",
-      "name": "703 (ST703) - Med Pak S @slot4/0x79b4",
-      "room": "703",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        7300,
-        3700
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "704:6:45058",
-      "name": "704 (ST704) - Med Pak S @slot6/0xb002",
+      "key": "ST704:r0:op35@0xadc0",
+      "sourceId": "ST704:r0:op35@0xadc0",
+      "apId": 1794689412,
+      "name": "ST704 - Med Pak S [r0:op35@0xadc0]",
       "room": "704",
-      "itemId": 1,
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        -11400,
-        1800
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:97"
     },
     {
-      "key": "704:7:45118",
-      "name": "704 (ST704) - Resusc. Pak @slot7/0xb03e",
+      "key": "ST704:r0:op35@0xae0c",
+      "sourceId": "ST704:r0:op35@0xae0c",
+      "apId": 1373653229,
+      "name": "ST704 - Med Pak M [r0:op35@0xae0c]",
       "room": "704",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -10900,
-        5500
-      ],
-      "collectedFlag": null
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:98"
     },
     {
-      "key": "705:0:21632",
-      "name": "705 (ST705) - Med Pak S @slot0/0x5480",
+      "key": "ST705:r0:op35@0x5892",
+      "sourceId": "ST705:r0:op35@0x5892",
+      "apId": 2078087105,
+      "name": "ST705 - City Keycard [r0:op35@0x5892]",
       "room": "705",
-      "itemId": 1,
+      "itemId": 34,
+      "itemName": "City Keycard",
+      "requiresItems": [],
+      "requiresRooms": [
+        "701"
+      ],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:17"
+    },
+    {
+      "key": "ST706:r0:op35@0xd564",
+      "sourceId": "ST706:r0:op35@0xd564",
+      "apId": 1346324697,
+      "name": "ST706 - Med Pak L [r0:op35@0xd564]",
+      "room": "706",
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:76"
+    },
+    {
+      "key": "ST706:r0:op35@0xd5b0",
+      "sourceId": "ST706:r0:op35@0xd5b0",
+      "apId": 1559970193,
+      "name": "ST706 - Med Pak M [r0:op35@0xd5b0]",
+      "room": "706",
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:90"
+    },
+    {
+      "key": "ST706:r0:op35@0xd5fc",
+      "sourceId": "ST706:r0:op35@0xd5fc",
+      "apId": 1107640236,
+      "name": "ST706 - Med Pak S [r0:op35@0xd5fc]",
+      "room": "706",
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        7700,
-        -3900
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:91"
     },
     {
-      "key": "705:1:21692",
-      "name": "705 (ST705) - Med Pak S @slot1/0x54bc",
-      "room": "705",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        7700,
-        -3900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "705:2:21752",
-      "name": "705 (ST705) - Med Pak S @slot2/0x54f8",
-      "room": "705",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -6300,
-        4100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "705:3:21812",
-      "name": "705 (ST705) - Med Pak S @slot3/0x5534",
-      "room": "705",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -6300,
-        4100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "705:6:21872",
-      "name": "705 (ST705) - Resusc. Pak @slot6/0x5570",
-      "room": "705",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        9400,
-        -4900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "705:8:22780",
-      "name": "705 (ST705) - Field item 3 @slot8/0x58fc",
-      "room": "705",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        -7400,
-        8000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:14:54302",
-      "name": "706 (ST706) - Med Pak S @slot14/0xd41e",
+      "key": "ST706:r0:op35@0xd648",
+      "sourceId": "ST706:r0:op35@0xd648",
+      "apId": 1187485666,
+      "name": "ST706 - Med Pak L [r0:op35@0xd648]",
       "room": "706",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -6000,
-        25300
-      ],
-      "collectedFlag": null
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:92"
     },
     {
-      "key": "706:13:54426",
-      "name": "706 (ST706) - Field item 6 @slot13/0xd49a",
-      "room": "706",
-      "itemId": 6,
-      "itemName": "Field item 6",
-      "pos": [
-        -7000,
-        25300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:7:55616",
-      "name": "706 (ST706) - Resusc. Pak @slot7/0xd940",
-      "room": "706",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -6100,
-        16600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:8:55676",
-      "name": "706 (ST706) - Resusc. Pak @slot8/0xd97c",
-      "room": "706",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -6100,
-        16600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:9:55736",
-      "name": "706 (ST706) - Resusc. Pak @slot9/0xd9b8",
-      "room": "706",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -6100,
-        16600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:10:56154",
-      "name": "706 (ST706) - Field item 3 @slot10/0xdb5a",
-      "room": "706",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        -6100,
-        19900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:11:56214",
-      "name": "706 (ST706) - Field item 3 @slot11/0xdb96",
-      "room": "706",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        -6100,
-        19900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:12:56274",
-      "name": "706 (ST706) - Field item 3 @slot12/0xdbd2",
-      "room": "706",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        -6100,
-        19900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "706:13:73812",
-      "name": "706 (ST706) - Field item 6 @slot13/0x12054",
-      "room": "706",
-      "itemId": 6,
-      "itemName": "Field item 6",
-      "pos": [
-        -7000,
-        25300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "707:0:674",
-      "name": "707 (ST707) - Med Pak S @slot0/0x2a2",
-      "room": "707",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -500,
-        -900
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "800:0:99974",
-      "name": "800 (ST800) - Med Pak S @slot0/0x18686",
-      "room": "800",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        2300,
-        3400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "800:1:100034",
-      "name": "800 (ST800) - Resusc. Pak @slot1/0x186c2",
-      "room": "800",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -2400,
-        4000
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "800:10:100162",
-      "name": "800 (ST800) - Field item 6 @slot10/0x18742",
-      "room": "800",
-      "itemId": 6,
-      "itemName": "Field item 6",
-      "pos": [
-        6100,
-        4400
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "800:2:100434",
-      "name": "800 (ST800) - Field item 3 @slot2/0x18852",
-      "room": "800",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        -1200,
-        1800
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "801:8:16920",
-      "name": "801 (ST801) - Dino File @slot8/0x4218",
+      "key": "ST801:r0:op35@0x47aa",
+      "sourceId": "ST801:r0:op35@0x47aa",
+      "apId": 2040696275,
+      "name": "ST801 - Med Pak S [r0:op35@0x47aa]",
       "room": "801",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        -1000,
-        16600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "801:8:19510",
-      "name": "801 (ST801) - Dino File @slot8/0x4c36",
-      "room": "801",
-      "itemId": 5,
-      "itemName": "Dino File",
-      "pos": [
-        -1000,
-        16600
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "802:7:11822",
-      "name": "802 (ST802) - Field item 3 @slot7/0x2e2e",
-      "room": "802",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        9500,
-        14100
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "803:2:35676",
-      "name": "803 (ST803) - Resusc. Pak @slot2/0x8b5c",
-      "room": "803",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        12200,
-        -2200
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "808:7:49696",
-      "name": "808 (ST808) - Ammo pickup @slot7/0xc220",
-      "room": "808",
-      "itemId": 7,
-      "itemName": "Ammo pickup",
-      "pos": [
-        -20100,
-        13300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "808:0:50234",
-      "name": "808 (ST808) - Med Pak S @slot0/0xc43a",
-      "room": "808",
-      "itemId": 1,
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        -15500,
-        17100
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:79"
     },
     {
-      "key": "808:1:50294",
-      "name": "808 (ST808) - Med Pak S @slot1/0xc476",
+      "key": "ST805:r0:op35@0x7956",
+      "sourceId": "ST805:r0:op35@0x7956",
+      "apId": 1902150587,
+      "name": "ST805 - Med Pak L [r0:op35@0x7956]",
+      "room": "805",
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:105"
+    },
+    {
+      "key": "ST807:r0:op35@0x5c1e",
+      "sourceId": "ST807:r0:op35@0x5c1e",
+      "apId": 1232147320,
+      "name": "ST807 - Med Pak M [r0:op35@0x5c1e]",
+      "room": "807",
+      "itemId": 28,
+      "itemName": "Med Pak M",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:107"
+    },
+    {
+      "key": "ST808:r0:op35@0xc670",
+      "sourceId": "ST808:r0:op35@0xc670",
+      "apId": 1324759947,
+      "name": "ST808 - Med Pak S [r0:op35@0xc670]",
       "room": "808",
-      "itemId": 1,
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        6300,
-        600
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:80"
     },
     {
-      "key": "808:2:50354",
-      "name": "808 (ST808) - Med Pak S @slot2/0xc4b2",
+      "key": "ST808:r0:op35@0xc6bc",
+      "sourceId": "ST808:r0:op35@0xc6bc",
+      "apId": 1891868275,
+      "name": "ST808 - Med Pak S [r0:op35@0xc6bc]",
       "room": "808",
-      "itemId": 1,
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        13200,
-        -17700
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:80"
     },
     {
-      "key": "808:1:62364",
-      "name": "808 (ST808) - Med Pak S @slot1/0xf39c",
-      "room": "808",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        13200,
-        -17700
-      ],
-      "collectedFlag": null
+      "key": "ST80B:r0:op35@0x3292",
+      "sourceId": "ST80B:r0:op35@0x3292",
+      "apId": 1452003521,
+      "name": "ST80B - Med Pak L [r0:op35@0x3292]",
+      "room": "80B",
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:106"
     },
     {
-      "key": "809:0:96744",
-      "name": "809 (ST809) - Field item 3 @slot0/0x179e8",
-      "room": "809",
-      "itemId": 3,
-      "itemName": "Field item 3",
-      "pos": [
-        -13100,
-        6500
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "809:8:97252",
-      "name": "809 (ST809) - Resusc. Pak @slot8/0x17be4",
-      "room": "809",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        -13800,
-        4300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "809:9:97652",
-      "name": "809 (ST809) - Med Pak S @slot9/0x17d74",
-      "room": "809",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -3700,
-        10300
-      ],
-      "collectedFlag": null
-    },
-    {
-      "key": "900:10:15334",
-      "name": "900 (ST900) - Med Pak S @slot10/0x3be6",
+      "key": "ST900:r0:op35@0x3b7c",
+      "sourceId": "ST900:r0:op35@0x3b7c",
+      "apId": 1434153339,
+      "name": "ST900 - Med Pak L [r0:op35@0x3b7c]",
       "room": "900",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -5900,
-        6800
-      ],
-      "collectedFlag": null
+      "itemId": 29,
+      "itemName": "Med Pak L",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:111"
     },
     {
-      "key": "901:9:7602",
-      "name": "901 (ST901) - Med Pak S @slot9/0x1db2",
+      "key": "ST901:r0:op35@0x1c60",
+      "sourceId": "ST901:r0:op35@0x1c60",
+      "apId": 1722481787,
+      "name": "ST901 - Med Pak S [r0:op35@0x1c60]",
       "room": "901",
-      "itemId": 1,
+      "itemId": 27,
       "itemName": "Med Pak S",
-      "pos": [
-        4100,
-        2100
-      ],
-      "collectedFlag": null
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:99"
     },
     {
-      "key": "901:6:8038",
-      "name": "901 (ST901) - Med Pak S @slot6/0x1f66",
+      "key": "ST901:r0:op35@0x1d18",
+      "sourceId": "ST901:r0:op35@0x1d18",
+      "apId": 1751329921,
+      "name": "ST901 - Living quarters key [r0:op35@0x1d18]",
       "room": "901",
-      "itemId": 1,
-      "itemName": "Med Pak S",
-      "pos": [
-        -3600,
-        -900
-      ],
-      "collectedFlag": null
+      "itemId": 36,
+      "itemName": "Living quarters key",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:19"
     },
     {
-      "key": "903:0:47322",
-      "name": "903 (ST903) - Resusc. Pak @slot0/0xb8da",
-      "room": "903",
-      "itemId": 2,
-      "itemName": "Resusc. Pak",
-      "pos": [
-        21100,
-        7500
-      ],
-      "collectedFlag": null
+      "key": "ST904:r0:op35@0x6d5c",
+      "sourceId": "ST904:r0:op35@0x6d5c",
+      "apId": 1774636390,
+      "name": "ST904 - Gas Mask [r0:op35@0x6d5c]",
+      "room": "904",
+      "itemId": 46,
+      "itemName": "Gas Mask",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "sourceType": "op35_take",
+      "collectedFlag": "5:10"
+    }
+  ],
+  "exclusions": [
+    {
+      "sourceId": "ST000:r0:op31@0x80a4",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST002:r0:op31@0x11504",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST002:r0:op31@0x116a0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST002:r0:op31@0x11748",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r0:op31@0x20084",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r0:op31@0x20178",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r0:op31@0x20410",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r0:op31@0x204bc",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r10:op1c@0x228de",
+      "sourceType": "group9_clear",
+      "reason": "not_fillable_group9_clear"
+    },
+    {
+      "sourceId": "ST003:r10:op31@0x22946",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r11:op2c@0x22c9c",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST003:r13:op31@0x2398e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r17:op2c@0x2445c",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST003:r18:op31@0x24722",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r23:op31@0x252ee",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST003:r3:op2c@0x208ec",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST005:r0:op31@0x76f6",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST100:r1:op1c@0x3ba8",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST100:r1:op2c@0x3bc4",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST100:r1:op2c@0x3be0",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST102:r0:op31@0xb190",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST106:r0:op31@0xa1ec",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST106:r0:op31@0xa22c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST106:r0:op35@0xa3ca",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST106:r1:op2c@0xa50a",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST106:r2:op2c@0xa774",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST106:r9:op35@0xba4c",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST107:r0:op31@0x5030",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST109:r0:op31@0x8622",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST109:r0:op35@0x86aa",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST109:r1:op2c@0x88ce",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST109:r4:op31@0x8dde",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST10C:r0:op31@0x11204",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST10C:r0:op35@0x110f6",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST10E:r0:op31@0xcc6c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST10F:r0:op31@0x5f14",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST10F:r0:op31@0x5f50",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST10F:r1:op1c@0x60c2",
+      "sourceType": "group9_clear",
+      "reason": "not_fillable_group9_clear"
+    },
+    {
+      "sourceId": "ST10F:r2:op1c@0x60ec",
+      "sourceType": "group9_regrant",
+      "reason": "not_fillable_group9_regrant"
+    },
+    {
+      "sourceId": "ST10F:r3:op1c@0x6176",
+      "sourceType": "group9_regrant",
+      "reason": "not_fillable_group9_regrant"
+    },
+    {
+      "sourceId": "ST110:r0:op31@0x2f08",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST110:r0:op31@0x2f88",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST110:r4:op1c@0x3bd2",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST110:r4:op1c@0x3be6",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST110:r4:op2c@0x3c20",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST200:r3:op31@0x10294",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST201:r0:op31@0x2288",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST201:r3:op2c@0x2708",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST203:r0:op31@0x2662",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST203:r0:op35@0x2936",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST203:r0:op35@0x29be",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST203:r0:op35@0x2a5e",
+      "sourceType": "op35_take",
+      "reason": "guard_expression_unpublished"
+    },
+    {
+      "sourceId": "ST203:r4:op2c@0x3096",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST204:r0:op31@0x3432",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST204:r0:op31@0x346e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST204:r0:op31@0x34aa",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST204:r0:op35@0x34f6",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST204:r4:op35@0x508a",
+      "sourceType": "unsupported",
+      "reason": "dynamic_item_operand"
+    },
+    {
+      "sourceId": "ST205:r0:op31@0xd24e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST205:r0:op31@0xd8d0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST205:r0:op31@0xd954",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST205:r0:op35@0xd34e",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST205:r13:op35@0xfe9a",
+      "sourceType": "op35_take",
+      "reason": "guard_expression_unpublished"
+    },
+    {
+      "sourceId": "ST205:r14:op1c@0x10220",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST205:r15:op1c@0x10320",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST205:r16:op1c@0x10420",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST205:r17:op1c@0x10520",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST205:r18:op1c@0x10620",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST205:r21:op1c@0x109fa",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST205:r23:op35@0x10d38",
+      "sourceType": "op35_take",
+      "reason": "negated_nonmonotonic_or_compound_predicate"
+    },
+    {
+      "sourceId": "ST301:r0:op31@0x935a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST301:r0:op35@0x93ea",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST301:r5:op31@0xa0b2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST301:r8:op2c@0xa884",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST302:r0:op31@0x627c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST302:r0:op31@0x6444",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST302:r5:op1c@0x750a",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST302:r6:op31@0x77fc",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST302:r6:op31@0x7838",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST303:r0:op31@0x5162",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST303:r0:op31@0x519e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST303:r0:op31@0x51da",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST303:r10:op1c@0x6712",
+      "sourceType": "group9_clear",
+      "reason": "not_fillable_group9_clear"
+    },
+    {
+      "sourceId": "ST303:r10:op1c@0x6bba",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST303:r10:op2c@0x6bd6",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST303:r6:op1c@0x5b74",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST303:r7:op1c@0x5cfa",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7570",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7634",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x76e8",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7764",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x77a0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x77dc",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7854",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7890",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x78cc",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7908",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7a74",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7ab0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7aec",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7ed6",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op31@0x7f22",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r0:op35@0x7d7c",
+      "sourceType": "op35_take",
+      "reason": "unresolved_story_flag_producer"
+    },
+    {
+      "sourceId": "ST304:r10:op2c@0x8a5a",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST304:r17:op2c@0x9302",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST304:r18:op31@0x94a2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST304:r20:op1c@0xa0cc",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST304:r20:op2c@0x9b9a",
+      "sourceType": "op2c_give",
+      "reason": "conditional_start_not_monotonic"
+    },
+    {
+      "sourceId": "ST304:r20:op2c@0x9dce",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST304:r20:op2c@0xa0e8",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST304:r2:op35@0x81aa",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST305:r0:op31@0x408a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST305:r0:op31@0x40c6",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST305:r0:op31@0x412a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST305:r0:op31@0x421e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST305:r0:op31@0x425a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST305:r0:op31@0x4336",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST305:r8:op35@0x4dbe",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST306:r0:op31@0x2bd0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST306:r0:op31@0x2cac",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST306:r0:op35@0x2c1c",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST306:r2:op1c@0x303e",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST306:r2:op2c@0x30a8",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST306:r2:op2c@0x30c4",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST400:r0:op31@0xc560",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST400:r0:op31@0xc59c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST401:r0:op31@0x5936",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST401:r0:op31@0x59d6",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST401:r0:op31@0x5b8a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST401:r0:op35@0x5b1a",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST401:r2:op1c@0x6470",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST401:r2:op2c@0x62b2",
+      "sourceType": "op2c_give",
+      "reason": "guard_expression_unpublished"
+    },
+    {
+      "sourceId": "ST401:r2:op2c@0x648c",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST401:r6:op2c@0x7c66",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST402:r0:op31@0x166e2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r0:op31@0x1671e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r0:op31@0x167aa",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r0:op31@0x16836",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r0:op31@0x16c4a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r0:op31@0x16d56",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r0:op31@0x16d92",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r26:op31@0x1d7c2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r27:op31@0x1dbde",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST402:r3:op31@0x186f4",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST403:r0:op31@0x12ee6",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST403:r0:op31@0x12f22",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST403:r0:op31@0x12f5e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST403:r9:op2c@0x1492e",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST408:r0:op31@0x127d4",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST409:r0:op31@0x124c4",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40A:r1:op31@0xcebe",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40A:r2:op31@0xd08e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40A:r2:op31@0xd0ca",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40A:r2:op31@0xd106",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40A:r2:op31@0xd142",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40A:r2:op31@0xd17e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40A:r2:op31@0xd2ca",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40B:r0:op31@0x13ac",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST40B:r1:op2c@0x159a",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST500:r0:op35@0x20fc",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST501:r0:op31@0x2d90",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST501:r0:op35@0x29dc",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST501:r0:op35@0x2e20",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST501:r1:op2c@0x31e6",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST502:r0:op31@0x26884",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST502:r0:op31@0x268c0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST502:r0:op31@0x268fc",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST502:r0:op31@0x26938",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST502:r0:op31@0x27430",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST502:r9:op31@0x2cbbc",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST503:r0:op31@0x15890",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST503:r0:op31@0x158cc",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST503:r0:op31@0x1591c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST503:r0:op31@0x15958",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST503:r0:op31@0x15994",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST503:r10:op31@0x19678",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST603:r0:op31@0x3ef0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST603:r0:op31@0x4020",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST603:r0:op35@0x3e80",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST603:r10:op2c@0x5478",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST603:r3:op35@0x4762",
+      "sourceType": "op35_take",
+      "reason": "guard_expression_unpublished"
+    },
+    {
+      "sourceId": "ST603:r9:op1c@0x538c",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST603:r9:op2c@0x53a8",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST603:r9:op2c@0x53c4",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST604:r0:op35@0x3164",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST604:r4:op35@0x3b76",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST605:r0:op31@0x112f2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r0:op31@0x1132e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r0:op31@0x1136a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r0:op31@0x113a6",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r0:op31@0x113e2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r0:op31@0x1166c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r0:op31@0x11864",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r0:op35@0x11570",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST605:r5:op1c@0x133b0",
+      "sourceType": "group9_grant",
+      "reason": "not_fillable_group9_grant"
+    },
+    {
+      "sourceId": "ST605:r5:op31@0x13326",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST605:r6:op2c@0x13684",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST605:r9:op2c@0x145a4",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST606:r0:op31@0xe378",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST606:r0:op31@0xe47c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST606:r0:op31@0xe4b8",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST607:r0:op31@0xb270",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST607:r0:op35@0xb2f8",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST607:r1:op31@0xb4a4",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST607:r20:op35@0xe914",
+      "sourceType": "op35_take",
+      "reason": "guard_expression_unpublished"
+    },
+    {
+      "sourceId": "ST607:r2:op31@0xb7da",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST608:r0:op31@0x2a8",
+      "sourceType": "sat1_trigger",
+      "reason": "unsupported_campaign_room"
+    },
+    {
+      "sourceId": "ST701:r0:op31@0x36c4",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST701:r0:op31@0x3828",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST701:r0:op35@0x3874",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST701:r6:op2c@0x4b84",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST703:r0:op31@0x6d50",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST703:r0:op31@0x6dc4",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST703:r2:op31@0x79ba",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST704:r0:op31@0xb008",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST704:r0:op31@0xb044",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST705:r0:op31@0x5486",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST705:r0:op31@0x54c2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST705:r0:op31@0x54fe",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST705:r0:op31@0x553a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST705:r0:op31@0x5576",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST705:r0:op31@0x5902",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST705:r5:op2c@0x742c",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST705:r7:op2c@0x7702",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xd424",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xd4a0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xd946",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xd982",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xd9be",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xdb60",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xdb9c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r0:op31@0xdbd8",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST706:r15:op31@0x1205a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST707:r0:op31@0x2a8",
+      "sourceType": "sat1_trigger",
+      "reason": "unsupported_campaign_room"
+    },
+    {
+      "sourceId": "ST800:r0:op31@0x1868c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST800:r0:op31@0x186c8",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST800:r0:op31@0x18748",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST800:r0:op31@0x18858",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST800:r5:op1c@0x1a34a",
+      "sourceType": "group9_clear",
+      "reason": "not_fillable_group9_clear"
+    },
+    {
+      "sourceId": "ST800:r5:op1c@0x1a3cc",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST800:r5:op1c@0x1a3e0",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST800:r5:op2c@0x1a3fc",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST801:r0:op31@0x421e",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST801:r2:op31@0x4c3c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST801:r4:op2c@0x4dbe",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST802:r0:op31@0x2e34",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST802:r3:op2c@0x3480",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST803:r0:op31@0x8b62",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST808:r0:op31@0xc226",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST808:r0:op31@0xc440",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST808:r0:op31@0xc47c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST808:r0:op31@0xc4b8",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST808:r18:op2c@0x109c2",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST808:r2:op2c@0xe566",
+      "sourceType": "op2c_give",
+      "reason": "negated_nonmonotonic_or_compound_predicate"
+    },
+    {
+      "sourceId": "ST808:r6:op31@0xf3a2",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST808:r8:op2c@0xfc46",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST809:r0:op31@0x179ee",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST809:r0:op31@0x17bea",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST809:r0:op31@0x17d7a",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST809:r3:op2c@0x19cb8",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST809:r6:op2c@0x1a5c4",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST900:r0:op31@0x3bec",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST900:r2:op2c@0x3d76",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST900:r4:op1c@0x48b4",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST900:r4:op2c@0x48d0",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST901:r0:op31@0x1db8",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST901:r0:op31@0x1f6c",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST901:r0:op35@0x1cac",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST901:r1:op2c@0x2352",
+      "sourceType": "unsupported",
+      "reason": "op2c_non_grant_kind"
+    },
+    {
+      "sourceId": "ST902:r0:op35@0x1c0c",
+      "sourceType": "op35_take",
+      "reason": "cross_difficulty_remap_0x1e_to_0x1d"
+    },
+    {
+      "sourceId": "ST903:r4:op31@0xb8e0",
+      "sourceType": "sat1_trigger",
+      "reason": "physical_vm_trigger_not_catalog_item"
+    },
+    {
+      "sourceId": "ST904:r6:op1c@0x8f02",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "ST904:r6:op1c@0x8f16",
+      "sourceType": "unsupported",
+      "reason": "catalog_id_out_of_range"
+    },
+    {
+      "sourceId": "native:item-use-consumption@0x4925bf",
+      "sourceType": "native_consumption",
+      "reason": "generic_runtime_owned-item_clear; item id is runtime-selected"
+    },
+    {
+      "sourceId": "native:shop@0x71dc28:item33",
+      "sourceType": "shop_acquisition",
+      "reason": "optional_shop_item_out_of_progression"
+    },
+    {
+      "sourceId": "native:shop@0x71dc2a:item34",
+      "sourceType": "shop_acquisition",
+      "reason": "optional_shop_item_out_of_progression"
+    }
+  ],
+  "conditionalCommitDispositions": [
+    {
+      "id": "ST000:item@0x80a4",
+      "kind": "item",
+      "sourceId": "ST000:r0:op31@0x80a4",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST002:item@0x11504",
+      "kind": "item",
+      "sourceId": "ST002:r0:op31@0x11504",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST002:item@0x116a0",
+      "kind": "item",
+      "sourceId": "ST002:r0:op31@0x116a0",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST002:item@0x11748",
+      "kind": "item",
+      "sourceId": "ST002:r0:op31@0x11748",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST003:door@0x200fc->ST002",
+      "kind": "door",
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST003:item@0x20410",
+      "kind": "item",
+      "sourceId": "ST003:r0:op31@0x20410",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST003:item@0x204bc",
+      "kind": "item",
+      "sourceId": "ST003:r0:op31@0x204bc",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST005:item@0x76f6",
+      "kind": "item",
+      "sourceId": "ST005:r0:op31@0x76f6",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST100:door@0x3424->ST110",
+      "kind": "door",
+      "disposition": "modeled_monotonic_story"
+    },
+    {
+      "id": "ST102:door@0xafe6->ST110",
+      "kind": "door",
+      "disposition": "modeled_monotonic_story"
+    },
+    {
+      "id": "ST102:item@0xb190",
+      "kind": "item",
+      "sourceId": "ST102:r0:op31@0xb190",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST106:door@0x9fbc->ST10E",
+      "kind": "door",
+      "disposition": "fixed_vanilla_subweapon"
+    },
+    {
+      "id": "ST106:item@0xa1ec",
+      "kind": "item",
+      "sourceId": "ST106:r0:op31@0xa1ec",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST107:item@0x5030",
+      "kind": "item",
+      "sourceId": "ST107:r0:op31@0x5030",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST10C:item@0x11204",
+      "kind": "item",
+      "sourceId": "ST10C:r0:op31@0x11204",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST10D:door@0xe4c0->ST10F",
+      "kind": "door",
+      "disposition": "modeled_item_gate"
+    },
+    {
+      "id": "ST10E:door@0xcc2c->ST106",
+      "kind": "door",
+      "disposition": "fixed_vanilla_subweapon"
+    },
+    {
+      "id": "ST10E:item@0xcc6c",
+      "kind": "item",
+      "sourceId": "ST10E:r0:op31@0xcc6c",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST110:item@0x2f88",
+      "kind": "item",
+      "sourceId": "ST110:r0:op31@0x2f88",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST201:item@0x2288",
+      "kind": "item",
+      "sourceId": "ST201:r0:op31@0x2288",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST205:item@0xd8d0",
+      "kind": "item",
+      "sourceId": "ST205:r0:op31@0xd8d0",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST205:item@0xd954",
+      "kind": "item",
+      "sourceId": "ST205:r0:op31@0xd954",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST302:item@0x6444",
+      "kind": "item",
+      "sourceId": "ST302:r0:op31@0x6444",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST304:item@0x76e8",
+      "kind": "item",
+      "sourceId": "ST304:r0:op31@0x76e8",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST304:item@0x7ed6",
+      "kind": "item",
+      "sourceId": "ST304:r0:op31@0x7ed6",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST304:item@0x7f22",
+      "kind": "item",
+      "sourceId": "ST304:r0:op31@0x7f22",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST304:item@0x94a2",
+      "kind": "item",
+      "sourceId": "ST304:r18:op31@0x94a2",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST306:item@0x2cac",
+      "kind": "item",
+      "sourceId": "ST306:r0:op31@0x2cac",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST401:item@0x59d6",
+      "kind": "item",
+      "sourceId": "ST401:r0:op31@0x59d6",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST401:item@0x5b8a",
+      "kind": "item",
+      "sourceId": "ST401:r0:op31@0x5b8a",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST402:item@0x16c4a",
+      "kind": "item",
+      "sourceId": "ST402:r0:op31@0x16c4a",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST402:item@0x16d56",
+      "kind": "item",
+      "sourceId": "ST402:r0:op31@0x16d56",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST402:item@0x16d92",
+      "kind": "item",
+      "sourceId": "ST402:r0:op31@0x16d92",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST402:item@0x1d7c2",
+      "kind": "item",
+      "sourceId": "ST402:r26:op31@0x1d7c2",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST402:item@0x1dbde",
+      "kind": "item",
+      "sourceId": "ST402:r27:op31@0x1dbde",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST408:door@0x126c8->ST409",
+      "kind": "door",
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST408:door@0x12874->ST409",
+      "kind": "door",
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST408:door@0x13a4c->ST409",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST408:door@0x13b0e->ST409",
+      "kind": "door",
+      "disposition": "excluded_unsupported_duplicate"
+    },
+    {
+      "id": "ST408:item@0x127d4",
+      "kind": "item",
+      "sourceId": "ST408:r0:op31@0x127d4",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST409:door@0x12430->ST40A",
+      "kind": "door",
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12484->ST408",
+      "kind": "door",
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12600->ST40A",
+      "kind": "door",
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12654->ST408",
+      "kind": "door",
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST409:door@0x12ac4->ST40A",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST409:door@0x12b9a->ST40A",
+      "kind": "door",
+      "disposition": "excluded_unsupported_duplicate"
+    },
+    {
+      "id": "ST409:item@0x124c4",
+      "kind": "item",
+      "sourceId": "ST409:r0:op31@0x124c4",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST502:item@0x27430",
+      "kind": "item",
+      "sourceId": "ST502:r0:op31@0x27430",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST503:door@0x15f56->ST504",
+      "kind": "door",
+      "disposition": "modeled_victory_commit"
+    },
+    {
+      "id": "ST603:door@0x3cf0->ST604",
+      "kind": "door",
+      "disposition": "fixed_vanilla_subweapon"
+    },
+    {
+      "id": "ST603:item@0x3ef0",
+      "kind": "item",
+      "sourceId": "ST603:r0:op31@0x3ef0",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST605:door@0x14362->ST606",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST605:item@0x1166c",
+      "kind": "item",
+      "sourceId": "ST605:r0:op31@0x1166c",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST605:item@0x11864",
+      "kind": "item",
+      "sourceId": "ST605:r0:op31@0x11864",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST605:item@0x13326",
+      "kind": "item",
+      "sourceId": "ST605:r5:op31@0x13326",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST606:door@0xe400->ST607",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST606:door@0xf126->ST605",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST607:door@0xe586->ST700",
+      "kind": "door",
+      "disposition": "fixed_vanilla_character_sequence"
+    },
+    {
+      "id": "ST607:item@0xb7da",
+      "kind": "item",
+      "sourceId": "ST607:r2:op31@0xb7da",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST701:item@0x3828",
+      "kind": "item",
+      "sourceId": "ST701:r0:op31@0x3828",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST703:item@0x6d50",
+      "kind": "item",
+      "sourceId": "ST703:r0:op31@0x6d50",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST703:item@0x6dc4",
+      "kind": "item",
+      "sourceId": "ST703:r0:op31@0x6dc4",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST703:item@0x79ba",
+      "kind": "item",
+      "sourceId": "ST703:r2:op31@0x79ba",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST704:item@0xb008",
+      "kind": "item",
+      "sourceId": "ST704:r0:op31@0xb008",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST704:item@0xb044",
+      "kind": "item",
+      "sourceId": "ST704:r0:op31@0xb044",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST705:item@0x5902",
+      "kind": "item",
+      "sourceId": "ST705:r0:op31@0x5902",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:door@0x10894->ST800",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST706:item@0x1205a",
+      "kind": "item",
+      "sourceId": "ST706:r15:op31@0x1205a",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xd424",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xd424",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xd4a0",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xd4a0",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xd946",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xd946",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xd982",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xd982",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xd9be",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xd9be",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xdb60",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xdb60",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xdb9c",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xdb9c",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST706:item@0xdbd8",
+      "kind": "item",
+      "sourceId": "ST706:r0:op31@0xdbd8",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST800:door@0x18516->ST005",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST800:door@0x18610->ST801",
+      "kind": "door",
+      "disposition": "fixed_vanilla_variant"
+    },
+    {
+      "id": "ST800:door@0x1a952->ST706",
+      "kind": "door",
+      "disposition": "fixed_vanilla_nonmonotonic"
+    },
+    {
+      "id": "ST800:item@0x18748",
+      "kind": "item",
+      "sourceId": "ST800:r0:op31@0x18748",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST800:item@0x18858",
+      "kind": "item",
+      "sourceId": "ST800:r0:op31@0x18858",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST801:item@0x421e",
+      "kind": "item",
+      "sourceId": "ST801:r0:op31@0x421e",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST801:item@0x4c3c",
+      "kind": "item",
+      "sourceId": "ST801:r2:op31@0x4c3c",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST803:item@0x8b62",
+      "kind": "item",
+      "sourceId": "ST803:r0:op31@0x8b62",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST808:item@0xc440",
+      "kind": "item",
+      "sourceId": "ST808:r0:op31@0xc440",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST808:item@0xc47c",
+      "kind": "item",
+      "sourceId": "ST808:r0:op31@0xc47c",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST808:item@0xc4b8",
+      "kind": "item",
+      "sourceId": "ST808:r0:op31@0xc4b8",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST809:item@0x179ee",
+      "kind": "item",
+      "sourceId": "ST809:r0:op31@0x179ee",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST809:item@0x17d7a",
+      "kind": "item",
+      "sourceId": "ST809:r0:op31@0x17d7a",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST900:item@0x3bec",
+      "kind": "item",
+      "sourceId": "ST900:r0:op31@0x3bec",
+      "disposition": "excluded_sat1_physical_trigger"
+    },
+    {
+      "id": "ST902:door@0x1b40->ST903",
+      "kind": "door",
+      "disposition": "fixed_vanilla_subweapon"
     }
   ],
   "items": {
     "names": {
-      "1": "Med Pak S",
-      "2": "Resusc. Pak",
-      "3": "Field item 3",
-      "4": "Field item 4",
-      "5": "Dino File",
-      "6": "Field item 6",
-      "7": "Ammo pickup",
-      "8": "Field item 8",
-      "9": "Field item 9"
+      "0": "(placeholder '???' row) [0x00]",
+      "1": "Shotgun",
+      "2": "Hand gun",
+      "3": "Rocket Launcher",
+      "4": "Solid Cannon",
+      "5": "Flame Launcher",
+      "6": "Submachine gun",
+      "7": "Heavy Machine gun",
+      "8": "Missile Pod",
+      "9": "Antitank Rifle",
+      "10": "Needle gun",
+      "11": "Aquagrenade",
+      "12": "Catalog entry 0x0C",
+      "13": "Catalog entry 0x0D",
+      "14": "Catalog entry 0x0E",
+      "15": "Catalog entry 0x0F",
+      "16": "(placeholder '???' row) [0x10]",
+      "17": "Machete",
+      "18": "Large Stungun",
+      "19": "Firewall",
+      "20": "Shockwave [0x14]",
+      "21": "Shockwave [0x15]",
+      "22": "Chainmine",
+      "23": "Machete Improved",
+      "24": "Large Stungun (improved)",
+      "25": "Signal bullet",
+      "26": "Hemostat",
+      "27": "Med Pak S",
+      "28": "Med Pak M",
+      "29": "Med Pak L",
+      "30": "Resusc. Pak",
+      "31": "Food",
+      "32": "(placeholder '???' row) [0x20]",
+      "33": "Plug",
+      "34": "City Keycard",
+      "35": "Research Facility Keycard",
+      "36": "Living quarters key",
+      "37": "Key plate [0x25]",
+      "38": "Key plate [0x26]",
+      "39": "Key plate [0x27]",
+      "40": "Key plate [0x28]",
+      "41": "Key plate [0x29]",
+      "42": "Key plate [0x2A]",
+      "43": "Starter Battery",
+      "44": "3rd Energy Disk",
+      "45": "Diving Suit",
+      "46": "Gas Mask",
+      "47": "Signal Bullet",
+      "48": "Mechanic's ID Card",
+      "49": "Key for the box",
+      "50": "3rd Energy Facility Keycard",
+      "51": "Light-weight Armor",
+      "52": "Inner suit",
+      "53": "EPS Platinum Card",
+      "54": "EPS Gold Card",
+      "55": "Heavy Blade",
+      "56": "Power Battery",
+      "57": "EPS Silver Card"
     },
-    "keyItemIds": [],
-    "progressionItemIds": [],
-    "pool": [
+    "catalog": [
+      {
+        "id": 0,
+        "name": "(placeholder '???' row) [0x00]",
+        "category": "meta"
+      },
       {
         "id": 1,
-        "name": "Med Pak S",
-        "weight": 97.0
+        "name": "Shotgun",
+        "category": "weapon-main"
       },
       {
         "id": 2,
-        "name": "Resusc. Pak",
-        "weight": 31.0
+        "name": "Hand gun",
+        "category": "weapon-main"
       },
       {
         "id": 3,
-        "name": "Field item 3",
-        "weight": 14.0
+        "name": "Rocket Launcher",
+        "category": "weapon-main"
       },
       {
         "id": 4,
-        "name": "Field item 4",
-        "weight": 7.0
+        "name": "Solid Cannon",
+        "category": "weapon-main"
       },
       {
         "id": 5,
-        "name": "Dino File",
-        "weight": 8.0
+        "name": "Flame Launcher",
+        "category": "weapon-main"
       },
       {
         "id": 6,
-        "name": "Field item 6",
-        "weight": 5.0
+        "name": "Submachine gun",
+        "category": "weapon-main"
       },
       {
         "id": 7,
-        "name": "Ammo pickup",
-        "weight": 3.0
+        "name": "Heavy Machine gun",
+        "category": "weapon-main"
       },
       {
         "id": 8,
-        "name": "Field item 8",
-        "weight": 2.0
+        "name": "Missile Pod",
+        "category": "weapon-main"
       },
       {
         "id": 9,
-        "name": "Field item 9",
-        "weight": 1.0
+        "name": "Antitank Rifle",
+        "category": "weapon-main"
+      },
+      {
+        "id": 10,
+        "name": "Needle gun",
+        "category": "weapon-main"
+      },
+      {
+        "id": 11,
+        "name": "Aquagrenade",
+        "category": "weapon-main"
+      },
+      {
+        "id": 12,
+        "name": "Catalog entry 0x0C",
+        "category": "empty"
+      },
+      {
+        "id": 13,
+        "name": "Catalog entry 0x0D",
+        "category": "empty"
+      },
+      {
+        "id": 14,
+        "name": "Catalog entry 0x0E",
+        "category": "empty"
+      },
+      {
+        "id": 15,
+        "name": "Catalog entry 0x0F",
+        "category": "empty"
+      },
+      {
+        "id": 16,
+        "name": "(placeholder '???' row) [0x10]",
+        "category": "meta"
+      },
+      {
+        "id": 17,
+        "name": "Machete",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 18,
+        "name": "Large Stungun",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 19,
+        "name": "Firewall",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 20,
+        "name": "Shockwave [0x14]",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 21,
+        "name": "Shockwave [0x15]",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 22,
+        "name": "Chainmine",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 23,
+        "name": "Machete Improved",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 24,
+        "name": "Large Stungun (improved)",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 25,
+        "name": "Signal bullet",
+        "category": "weapon-sub"
+      },
+      {
+        "id": 26,
+        "name": "Hemostat",
+        "category": "health"
+      },
+      {
+        "id": 27,
+        "name": "Med Pak S",
+        "category": "health"
+      },
+      {
+        "id": 28,
+        "name": "Med Pak M",
+        "category": "health"
+      },
+      {
+        "id": 29,
+        "name": "Med Pak L",
+        "category": "health"
+      },
+      {
+        "id": 30,
+        "name": "Resusc. Pak",
+        "category": "health"
+      },
+      {
+        "id": 31,
+        "name": "Food",
+        "category": "health"
+      },
+      {
+        "id": 32,
+        "name": "(placeholder '???' row) [0x20]",
+        "category": "meta"
+      },
+      {
+        "id": 33,
+        "name": "Plug",
+        "category": "key"
+      },
+      {
+        "id": 34,
+        "name": "City Keycard",
+        "category": "key"
+      },
+      {
+        "id": 35,
+        "name": "Research Facility Keycard",
+        "category": "key"
+      },
+      {
+        "id": 36,
+        "name": "Living quarters key",
+        "category": "key"
+      },
+      {
+        "id": 37,
+        "name": "Key plate [0x25]",
+        "category": "key"
+      },
+      {
+        "id": 38,
+        "name": "Key plate [0x26]",
+        "category": "key"
+      },
+      {
+        "id": 39,
+        "name": "Key plate [0x27]",
+        "category": "key"
+      },
+      {
+        "id": 40,
+        "name": "Key plate [0x28]",
+        "category": "key"
+      },
+      {
+        "id": 41,
+        "name": "Key plate [0x29]",
+        "category": "key"
+      },
+      {
+        "id": 42,
+        "name": "Key plate [0x2A]",
+        "category": "key"
+      },
+      {
+        "id": 43,
+        "name": "Starter Battery",
+        "category": "key"
+      },
+      {
+        "id": 44,
+        "name": "3rd Energy Disk",
+        "category": "key"
+      },
+      {
+        "id": 45,
+        "name": "Diving Suit",
+        "category": "key"
+      },
+      {
+        "id": 46,
+        "name": "Gas Mask",
+        "category": "key"
+      },
+      {
+        "id": 47,
+        "name": "Signal Bullet",
+        "category": "key"
+      },
+      {
+        "id": 48,
+        "name": "Mechanic's ID Card",
+        "category": "key"
+      },
+      {
+        "id": 49,
+        "name": "Key for the box",
+        "category": "key"
+      },
+      {
+        "id": 50,
+        "name": "3rd Energy Facility Keycard",
+        "category": "key"
+      },
+      {
+        "id": 51,
+        "name": "Light-weight Armor",
+        "category": "key-equip"
+      },
+      {
+        "id": 52,
+        "name": "Inner suit",
+        "category": "key-equip"
+      },
+      {
+        "id": 53,
+        "name": "EPS Platinum Card",
+        "category": "shop-perk"
+      },
+      {
+        "id": 54,
+        "name": "EPS Gold Card",
+        "category": "shop-perk"
+      },
+      {
+        "id": 55,
+        "name": "Heavy Blade",
+        "category": "shop-perk"
+      },
+      {
+        "id": 56,
+        "name": "Power Battery",
+        "category": "shop-perk"
+      },
+      {
+        "id": 57,
+        "name": "EPS Silver Card",
+        "category": "shop-perk"
+      }
+    ],
+    "catalogItemIds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57
+    ],
+    "keyItemIds": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52
+    ],
+    "progressionItemIds": [
+      46
+    ],
+    "optionalFixedItemIds": [
+      51,
+      52
+    ],
+    "poolItemIds": [
+      28,
+      27,
+      28,
+      27,
+      29,
+      28,
+      28,
+      50,
+      29,
+      28,
+      27,
+      27,
+      29,
+      43,
+      29,
+      28,
+      28,
+      29,
+      28,
+      29,
+      27,
+      49,
+      27,
+      29,
+      33,
+      27,
+      28,
+      34,
+      29,
+      28,
+      27,
+      29,
+      27,
+      29,
+      28,
+      27,
+      27,
+      29,
+      29,
+      27,
+      36,
+      46
+    ],
+    "pool": [
+      {
+        "id": 27,
+        "name": "Med Pak S",
+        "count": 12
+      },
+      {
+        "id": 28,
+        "name": "Med Pak M",
+        "count": 11
+      },
+      {
+        "id": 29,
+        "name": "Med Pak L",
+        "count": 12
+      },
+      {
+        "id": 33,
+        "name": "Plug",
+        "count": 1
+      },
+      {
+        "id": 34,
+        "name": "City Keycard",
+        "count": 1
+      },
+      {
+        "id": 36,
+        "name": "Living quarters key",
+        "count": 1
+      },
+      {
+        "id": 43,
+        "name": "Starter Battery",
+        "count": 1
+      },
+      {
+        "id": 46,
+        "name": "Gas Mask",
+        "count": 1
+      },
+      {
+        "id": 49,
+        "name": "Key for the box",
+        "count": 1
+      },
+      {
+        "id": 50,
+        "name": "3rd Energy Facility Keycard",
+        "count": 1
       }
     ]
   }
