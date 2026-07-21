@@ -116,6 +116,7 @@
                          property (not its visual parent), so this is a pure presentation regroup — seed
                          encoding, per-game gating and round-trip are unchanged. -->
                     <CheckBox Content="Randomize Items" Margin="0,2"
+                              IsVisible="{Binding PrimaryItemOptionsVisible}"
                               IsEnabled="{Binding CanRandomizeItems}"
                               IsChecked="{Binding RandomizeItems, Mode=TwoWay}" />
 
@@ -125,6 +126,7 @@
                               IsChecked="{Binding RandomizeEnemies, Mode=TwoWay}" />
 
                     <CheckBox Content="Shuffle Key Items (Normal/Original Mode Only)" Margin="0,2"
+                              IsVisible="{Binding PrimaryItemOptionsVisible}"
                               IsEnabled="{Binding CanShuffleKeyItems}"
                               ToolTip.Tip="Relocate the door-gating key items (Entrance / BG Area / C.O. Area keys, Key Card Lv. A) plus the DDK disc pairs to new spots, and also into static ammo/health pickups — kept provably beatable under the door-graph logic (a layout that can't be proven beatable reverts to vanilla); progression keys are never seated in one-way ending rooms; items conserved."
                               IsChecked="{Binding ShuffleKeyItems, Mode=TwoWay}" />
@@ -295,6 +297,20 @@
                          bindings / per-game gating verbatim — living here changes nothing about the seed. -->
                     <Expander Header="Advanced options" Margin="0,10,0,0" IsExpanded="False">
                         <StackPanel>
+                            <StackPanel IsVisible="{Binding Dc2ExperimentalItemOptionsVisible}"
+                                        Margin="0,0,0,8">
+                                <TextBlock Text="DC2 Item Randomization — Experimental Options"
+                                           FontWeight="SemiBold" Margin="0,0,0,4" />
+                                <CheckBox Content="Randomize Items (Experimental)" Margin="0,2"
+                                          IsEnabled="{Binding CanRandomizeItems}"
+                                          IsChecked="{Binding RandomizeItems, Mode=TwoWay}"
+                                          ToolTip.Tip="Experimental DC2 item shuffle over the proof-grade direct-grant surface. Off by default; unsupported, dynamic and missable sources remain excluded." />
+                                <CheckBox Content="Shuffle Key Items (Experimental)" Margin="0,2"
+                                          IsEnabled="{Binding CanShuffleKeyItems}"
+                                          IsChecked="{Binding ShuffleKeyItems, Mode=TwoWay}"
+                                          ToolTip.Tip="Experimental DC2 key-item shuffle with lifecycle constraints and a generated reachability proof. Off by default." />
+                            </StackPanel>
+
                             <!-- Item-pool mode + pickup distribution; shown only while Randomize Items is on. -->
                             <CheckBox Content="Replace item pool (random pickups)" Margin="0,2,0,0"
                                       ToolTip.Tip="Checked: every non-key pickup becomes a weighted-random item. Unchecked: keep the game's items but shuffle their locations."

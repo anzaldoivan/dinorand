@@ -272,6 +272,8 @@ public class MainWindowViewModelTests
         var vm = NewVm();
         Assert.Equal("dc1", vm.SelectedGame.Id);
         Assert.True(vm.CanRandomizeItems);                // DC1 supports items
+        Assert.True(vm.PrimaryItemOptionsVisible);
+        Assert.False(vm.Dc2ExperimentalItemOptionsVisible);
         Assert.False(vm.Dc2RaptorPanelVisible);
 
         vm.GamePath = @"X:\only-dc1";
@@ -280,11 +282,35 @@ public class MainWindowViewModelTests
         Assert.Equal("dc2", vm.SelectedGame.Id);
         Assert.True(vm.CanRandomizeItems);                // DC2 v2 supports direct-source item shuffle
         Assert.True(vm.CanShuffleKeyItems);
+        Assert.False(vm.PrimaryItemOptionsVisible);
+        Assert.True(vm.Dc2ExperimentalItemOptionsVisible);
+        Assert.False(vm.RandomizeItems);                  // DC2 experimental options default off
+        Assert.False(vm.ShuffleKeyItems);
         Assert.True(vm.Dc2RaptorPanelVisible);
         Assert.NotEqual(@"X:\only-dc1", vm.GamePath);     // DC2 slice starts blank, not DC1's path
 
         vm.SelectedGameIndex = 0;                         // back to DC1
         Assert.Equal(@"X:\only-dc1", vm.GamePath);        // DC1's path restored from its slice
+    }
+
+    [Fact]
+    public void Dc2_experimental_item_options_can_be_explicitly_enabled_by_a_pasted_seed()
+    {
+        var author = NewVm();
+        author.SelectedGameIndex = 1;
+        author.RandomizeItems = true;
+        author.ShuffleKeyItems = true;
+        string seed = author.SeedText;
+
+        var pasted = NewVm();
+        pasted.SelectedGameIndex = 1;
+        Assert.False(pasted.RandomizeItems);
+        Assert.False(pasted.ShuffleKeyItems);
+
+        pasted.SeedText = seed;
+
+        Assert.True(pasted.RandomizeItems);
+        Assert.True(pasted.ShuffleKeyItems);
     }
 
     [Fact]

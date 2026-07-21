@@ -55,6 +55,10 @@ public sealed class ViewModelCharacterizationTests
         Assert.Equal("dc2", vm.SelectedGame.Id);
         Assert.True(vm.CanRandomizeItems);
         Assert.True(vm.CanShuffleKeyItems);
+        Assert.True(vm.Dc2ExperimentalItemOptionsVisible);
+        Assert.False(vm.PrimaryItemOptionsVisible);
+        Assert.False(vm.RandomizeItems);
+        Assert.False(vm.ShuffleKeyItems);
         Assert.True(vm.Dc2EnemyOptionsVisible);
         Assert.True(vm.CurrentConfig.IncludeDc2BossEnemies);
         Assert.True(vm.CurrentConfig.Dc2RandomizeRaptorTiers);

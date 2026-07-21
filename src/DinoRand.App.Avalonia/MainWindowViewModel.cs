@@ -356,8 +356,8 @@ namespace DinoRand.App
         [ObservableProperty] private bool _weaponGrenade;
 
         // Computed visibility / enablement (were imperative IsVisible/IsEnabled writes in UpdateUiFromSeed).
-        public bool ReplacePoolVisible => RandomizeItems;
-        public bool ItemRatiosVisible => RandomizeItems && ReplaceItemPool;
+        public bool ReplacePoolVisible => RandomizeItems && SelectedGame.Id == "dc1";
+        public bool ItemRatiosVisible => ReplacePoolVisible && ReplaceItemPool;
         public bool CustomSupplyEnabled => !RandomizeStartingInventory;
         public string CustomSupplyLabel => RandomizeStartingInventory
             ? "Custom supply slots (disabled while 'Randomize starting inventory' is on)"
@@ -382,6 +382,8 @@ namespace DinoRand.App
         //     option's IsEnabled; they recompute on game switch via ApplyGameCapabilities(). A game that
         //     doesn't support a feature greys its option (and the option is force-unchecked on switch). ---
         public bool CanRandomizeItems => SelectedGame.Supports(GameFeature.Items);
+        public bool PrimaryItemOptionsVisible => SelectedGame.Id == "dc1";
+        public bool Dc2ExperimentalItemOptionsVisible => SelectedGame.Id == "dc2";
         public bool CanRandomizeEnemies => SelectedGame.Supports(GameFeature.Enemies);
         public bool CanRandomizeEnemyHp => SelectedGame.Id == "dc1";
         public bool EnemyDifficultyEnabled => RandomizeEnemies || RandomizeEnemyHp;
@@ -461,6 +463,9 @@ namespace DinoRand.App
             }
             else
             {
+                // DC2 item/key randomization is exposed as an explicit experimental opt-in under
+                // Advanced options. A pasted seed may still enable it after this switch-time default.
+                RandomizeItems = false;
                 // GUI defaults for DC2: these start ON (DC2-PUZZLE-RANDO-PLAN.md + maintainer request).
                 // Runs after UpdateUiFromSeed on startup/game-switch, so it wins over a persisted
                 // seed's cleared bits; the RandomizerConfig/CLI defaults stay off, and a seed pasted
@@ -476,7 +481,7 @@ namespace DinoRand.App
             // GUI default: Shuffle Key Items starts ON where the game supports it (DC1), forced OFF
             // otherwise. Like the DC2 defaults above, this wins over a persisted seed on startup/game-switch
             // but not on paste (this hook doesn't run on seed paste); the RandomizerConfig/CLI default stays off.
-            ShuffleKeyItems = CanShuffleKeyItems;
+            ShuffleKeyItems = CanShuffleKeyItems && SelectedGame.Id == "dc1";
             if (!CanShuffleKeyItemsModelChange) ShuffledKeyItemsModelChange = false;
             // GUI default: Insert upgraded weapons starts ON (item-pool block; DC1-only visible, harmless for DC2).
             PreUpgradedWeapons = true;
@@ -492,6 +497,10 @@ namespace DinoRand.App
             _suspend = prevSuspend;
 
             OnPropertyChanged(nameof(CanRandomizeItems));
+            OnPropertyChanged(nameof(PrimaryItemOptionsVisible));
+            OnPropertyChanged(nameof(Dc2ExperimentalItemOptionsVisible));
+            OnPropertyChanged(nameof(ReplacePoolVisible));
+            OnPropertyChanged(nameof(ItemRatiosVisible));
             OnPropertyChanged(nameof(CanRandomizeEnemies));
             OnPropertyChanged(nameof(CanRandomizeEnemyHp));
             OnPropertyChanged(nameof(EnemyDifficultyEnabled));
