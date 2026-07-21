@@ -103,6 +103,21 @@ public static class Dc2MusicTablePatch
                 assigned[members[i]] = CanonicalNames[members[perm[i]]];
         }
 
+        return ApplyPlan(exe, assigned);
+    }
+
+    /// <summary>Validate and apply an explicit slot-to-name plan produced by the Randomizer layer.</summary>
+    internal static MusicShuffleEntry[] ApplyPlan(byte[] exe, IReadOnlyList<string> assigned)
+    {
+        ArgumentNullException.ThrowIfNull(exe);
+        ArgumentNullException.ThrowIfNull(assigned);
+        Validate(exe);
+        if (assigned.Count != MusicSlotCount)
+            throw new ArgumentException($"music plan has {assigned.Count} slots; expected {MusicSlotCount}.", nameof(assigned));
+        if (!assigned.OrderBy(n => n, StringComparer.Ordinal)
+                     .SequenceEqual(CanonicalNames.OrderBy(n => n, StringComparer.Ordinal)))
+            throw new ArgumentException("music plan is not a permutation of the canonical filename set.", nameof(assigned));
+
         var result = new MusicShuffleEntry[MusicSlotCount];
         for (int k = 0; k < MusicSlotCount; k++)
         {

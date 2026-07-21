@@ -29,4 +29,7 @@
     <Content Include="..\..\data\dc1\voice.json" Link="data\dc1\voice.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc2\door-guards.json" Link="data\dc2\door-guards.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Refactor\Baselines\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

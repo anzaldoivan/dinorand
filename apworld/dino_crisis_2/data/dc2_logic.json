@@ -116,12 +116,6 @@
     },
     {
       "from": "101",
-      "to": "102",
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "101",
       "to": "100",
       "requiresItems": [],
       "requiresRooms": []

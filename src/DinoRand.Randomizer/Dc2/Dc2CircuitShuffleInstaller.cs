@@ -87,7 +87,8 @@ public static class Dc2CircuitShuffleInstaller
             Dc2CircuitPatch.RoutineResult[] results;
             try
             {
-                bytes = Dc2CircuitPatch.ShuffleRoom(pristine, room, rng, out results);
+                var sequences = PlanRoom(pristine, room, rng);
+                bytes = Dc2CircuitPatch.ApplyRoomPlan(pristine, room, sequences, out results);
             }
             catch (InvalidOperationException ex)
             {
@@ -106,5 +107,20 @@ public static class Dc2CircuitShuffleInstaller
         }
         log?.Invoke($"[circuits] seed {seed}: blink order shuffled in {outputs.Count} room(s) (backups: ST*.DAT.bak)");
         return Dc2CircuitShuffleOutcome.Applied;
+    }
+
+    internal static int[][] PlanRoom(
+        byte[] packageBytes, Dc2CircuitPatch.RoomSpec room, Random rng)
+    {
+        byte[] blob = Dc2DoorEditor.DecompressScdBlob(packageBytes);
+        var sequences = new int[room.Routines.Count][];
+        for (int r = 0; r < room.Routines.Count; r++)
+        {
+            var routine = room.Routines[r];
+            Dc2CircuitPatch.LocateBlinkIdOffsets(blob, room, routine);
+            var singleRoutine = room with { Routines = new[] { routine } };
+            sequences[r] = Dc2ExecutablePatchPlanner.PlanCircuits(singleRoutine, rng).CircuitSequences![0];
+        }
+        return sequences;
     }
 }

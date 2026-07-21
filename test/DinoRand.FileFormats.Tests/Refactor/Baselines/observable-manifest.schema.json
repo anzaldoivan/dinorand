@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dinorand.invalid/schemas/refactor-observable-manifest.json",
+  "title": "DinoRand refactor observable manifest",
+  "type": "object",
+  "required": ["schemaVersion", "caseId", "game", "seed", "configuration", "inputFingerprint", "runtimeFingerprint", "evidence", "result", "artifacts"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "caseId": { "type": "string", "minLength": 1 },
+    "game": { "enum": ["dc1", "dc2"] },
+    "seed": {
+      "type": "object",
+      "required": ["numeric", "string", "encoded"],
+      "properties": {
+        "numeric": { "type": "integer" },
+        "string": { "type": "string" },
+        "encoded": { "type": "string", "pattern": "^DINO-" }
+      },
+      "additionalProperties": false
+    },
+    "configuration": { "type": "object" },
+    "inputFingerprint": {
+      "type": "object",
+      "required": ["kind", "sha256", "files"],
+      "properties": {
+        "kind": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "files": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      },
+      "additionalProperties": false
+    },
+    "runtimeFingerprint": { "$ref": "#/$defs/runtimeFingerprint" },
+    "evidence": {
+      "type": "object",
+      "required": ["baselineSha", "sourceFingerprint", "sourceFiles", "runtimeFingerprint"],
+      "properties": {
+        "baselineSha": { "const": "b15bbd04328e3c3bf338593f5d64eaff7c13088f" },
+        "sourceFingerprint": { "$ref": "#/$defs/sha256" },
+        "sourceFiles": {
+          "type": "array",
+          "minItems": 11,
+          "items": {
+            "type": "object",
+            "required": ["path", "length", "sha256"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "length": { "type": "integer" },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "runtimeFingerprint": { "$ref": "#/$defs/runtimeFingerprint" }
+      },
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "required": ["roomsDiscovered", "roomsWritten", "log"],
+      "properties": {
+        "roomsDiscovered": { "type": "integer" },
+        "roomsWritten": { "type": "integer" },
+        "log": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "length", "sha256", "comparison"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "length": { "type": "integer" },
+          "sha256": { "$ref": "#/$defs/sha256" },
+          "comparison": { "enum": ["exact", "canonical-text"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "runtimeFingerprint": {
+      "type": "object",
+      "required": ["framework", "os", "processArchitecture", "assemblyVersion"],
+      "properties": {
+        "framework": { "type": "string" },
+        "os": { "type": "string" },
+        "processArchitecture": { "type": "string" },
+        "assemblyVersion": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

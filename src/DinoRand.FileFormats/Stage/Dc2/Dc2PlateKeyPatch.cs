@@ -75,6 +75,13 @@ public static class Dc2PlateKeyPatch
     /// <summary>Uniformly pick one of the six key-plate catalog ids for the terminal to accept.</summary>
     public static int SelectRequiredPlate(Random rng) => PlateIds[rng.Next(PlateIds.Count)];
 
+    /// <summary>Validate an explicit key-plate plan before room application.</summary>
+    internal static void ValidatePlan(int targetPlate)
+    {
+        if (!PlateIds.Contains(targetPlate))
+            throw new ArgumentOutOfRangeException(nameof(targetPlate), $"0x{targetPlate:X} is not a key-plate id");
+    }
+
     /// <summary>Walk <see cref="ScriptRoutineIndex"/> of a <b>decompressed</b> SCD blob, collect its 18
     /// op-0x39 records, and verify they match <see cref="VanillaRecords"/> exactly. Throws
     /// <see cref="InvalidOperationException"/> ("refusing to re-key") on any deviation.</summary>
@@ -97,8 +104,7 @@ public static class Dc2PlateKeyPatch
     /// <paramref name="targetPlate"/> == <see cref="VanillaCorrectPlate"/>. Never mutates its input.</summary>
     public static byte[] ApplyRoom(ReadOnlySpan<byte> packageBytes, int targetPlate, out Result result)
     {
-        if (!PlateIds.Contains(targetPlate))
-            throw new ArgumentOutOfRangeException(nameof(targetPlate), $"0x{targetPlate:X} is not a key-plate id");
+        ValidatePlan(targetPlate);
 
         var records = LocateRecords(Dc2ScdBlob.Decompress(packageBytes)); // validates the vanilla signature
         if (targetPlate == VanillaCorrectPlate)

@@ -24,7 +24,8 @@ public sealed class Dc2PlateKeyRekey : IDc2RandomizationPass
             context.Log("[dc2-plate-key] ST205 not among the loaded rooms; skipped");
             return;
         }
-        int plate = Dc2PlateKeyPatch.SelectRequiredPlate(context.Seed.RngFor("DC2 Plate Key"));
+        var patchPlan = Dc2ExecutablePatchPlanner.PlanRequiredPlate(context.Seed.RngFor("DC2 Plate Key"));
+        int plate = patchPlan.RequiredPlate!.Value;
         byte[] bytes;
         Dc2PlateKeyPatch.Result result;
         try

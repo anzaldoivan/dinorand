@@ -79,75 +79,62 @@ public static class ExePatcher
     /// every runtime-only / BSS address, which by design must never be written to disk.
     /// </summary>
     public static int VaToFileOffset(uint va)
-    {
-        if (va < ImageBase)
-            throw new ArgumentOutOfRangeException(nameof(va), $"VA 0x{va:X} is below the image base 0x{ImageBase:X}.");
-        uint rva = va - ImageBase;
-        if (rva < FileBackedRvaLo || rva >= FileBackedRvaHi)
-            throw new ArgumentOutOfRangeException(nameof(va),
-                $"VA 0x{va:X} (RVA 0x{rva:X}) is outside the file-backed window " +
-                $"[0x{ImageBase + FileBackedRvaLo:X}, 0x{ImageBase + FileBackedRvaHi:X}); " +
-                "it is BSS/runtime-only or non-raw-aligned and cannot be patched on disk.");
-        return (int)rva; // raw == virtual ⇒ file offset == RVA, delta 0
-    }
+        => ExeAddressTranslator.VaToFileOffset(va);
 
     /// <summary>True when <paramref name="va"/> lies in the file-backed window and can be patched.</summary>
     public static bool IsFileBacked(uint va)
-        => va >= ImageBase && (va - ImageBase) >= FileBackedRvaLo && (va - ImageBase) < FileBackedRvaHi;
+        => ExeAddressTranslator.IsFileBacked(va);
 
     // ---- Raw reads/writes at a file offset ----
 
     /// <summary>Read a little-endian <c>ushort</c> at <paramref name="fileOffset"/>.</summary>
     public static ushort ReadUInt16(ReadOnlySpan<byte> exe, int fileOffset)
-        => BinaryPrimitives.ReadUInt16LittleEndian(Slice(exe, fileOffset, 2));
+        => ExeAddressTranslator.ReadUInt16(exe, fileOffset);
 
     /// <summary>Read a little-endian <c>uint</c> at <paramref name="fileOffset"/>.</summary>
     public static uint ReadUInt32(ReadOnlySpan<byte> exe, int fileOffset)
-        => BinaryPrimitives.ReadUInt32LittleEndian(Slice(exe, fileOffset, 4));
+        => ExeAddressTranslator.ReadUInt32(exe, fileOffset);
 
     /// <summary>Write a little-endian <c>ushort</c> at <paramref name="fileOffset"/>.</summary>
     public static void WriteUInt16(Span<byte> exe, int fileOffset, ushort value)
-        => BinaryPrimitives.WriteUInt16LittleEndian(Slice(exe, fileOffset, 2), value);
+        => ExeAddressTranslator.WriteUInt16(exe, fileOffset, value);
 
     /// <summary>Write a little-endian <c>uint</c> at <paramref name="fileOffset"/>.</summary>
     public static void WriteUInt32(Span<byte> exe, int fileOffset, uint value)
-        => BinaryPrimitives.WriteUInt32LittleEndian(Slice(exe, fileOffset, 4), value);
+        => ExeAddressTranslator.WriteUInt32(exe, fileOffset, value);
 
     // ---- Reads/writes addressed by VA (section rule applied) ----
 
     /// <summary>Read a <c>uint</c> at virtual address <paramref name="va"/>.</summary>
     public static uint ReadUInt32AtVa(ReadOnlySpan<byte> exe, uint va)
-        => ReadUInt32(exe, VaToFileOffset(va));
+        => ExeAddressTranslator.ReadUInt32AtVa(exe, va);
 
     /// <summary>Read a <c>ushort</c> at virtual address <paramref name="va"/>.</summary>
     public static ushort ReadUInt16AtVa(ReadOnlySpan<byte> exe, uint va)
-        => ReadUInt16(exe, VaToFileOffset(va));
+        => ExeAddressTranslator.ReadUInt16AtVa(exe, va);
 
     /// <summary>Write a <c>uint</c> at virtual address <paramref name="va"/>.</summary>
     public static void WriteUInt32AtVa(Span<byte> exe, uint va, uint value)
-        => WriteUInt32(exe, VaToFileOffset(va), value);
+        => ExeAddressTranslator.WriteUInt32AtVa(exe, va, value);
 
     /// <summary>Write a <c>ushort</c> at virtual address <paramref name="va"/>.</summary>
     public static void WriteUInt16AtVa(Span<byte> exe, uint va, ushort value)
-        => WriteUInt16(exe, VaToFileOffset(va), value);
+        => ExeAddressTranslator.WriteUInt16AtVa(exe, va, value);
 
     // ---- Record-table helpers (the lever) ----
 
     /// <summary>VA of <c>record[<paramref name="index"/>]</c> in the per-stage table.</summary>
     public static uint RecordVa(int index)
-    {
-        if (index < 0)
-            throw new ArgumentOutOfRangeException(nameof(index), index, "record index must be ≥ 0.");
-        return RecordTableBaseVa + (uint)index * RecordStride;
-    }
+        => Dc1EnemyExePatch.RecordVa(index);
 
     /// <summary>VA of the setup-fn pointer field (<c>+0x0E</c>) of <c>record[<paramref name="index"/>]</c>.
     /// Since <c>index = roomId &gt;&gt; 8</c>, pass the room's stage number.</summary>
-    public static uint SetupFnFieldVa(int index) => RecordVa(index) + SetupFnFieldOffset;
+    public static uint SetupFnFieldVa(int index)
+        => Dc1EnemyExePatch.SetupFnFieldVa(index);
 
     /// <summary>Read the current setup-fn pointer of <c>record[<paramref name="index"/>]</c>.</summary>
     public static uint ReadSetupFn(ReadOnlySpan<byte> exe, int index)
-        => ReadUInt32AtVa(exe, SetupFnFieldVa(index));
+        => Dc1EnemyExePatch.ReadSetupFn(exe, index);
 
     /// <summary>
     /// Repoint <c>record[<paramref name="index"/>]</c>'s setup-fn pointer to <paramref name="donorFnVa"/>
@@ -158,15 +145,7 @@ public static class ExePatcher
     /// whose <c>roomId &gt;&gt; 8 == index</c>.
     /// </summary>
     public static uint RepointSetupFn(Span<byte> exe, int index, uint donorFnVa)
-    {
-        if (!IsFileBacked(donorFnVa))
-            throw new ArgumentOutOfRangeException(nameof(donorFnVa),
-                $"donor setup-fn VA 0x{donorFnVa:X} is not a file-backed code address.");
-        int off = VaToFileOffset(SetupFnFieldVa(index));
-        uint previous = ReadUInt32(exe, off);
-        WriteUInt32(exe, off, donorFnVa);
-        return previous;
-    }
+        => Dc1EnemyExePatch.RepointSetupFn(exe, index, donorFnVa);
 
     // ---- Surgical per-category AI-handler slot (the precise cross-species lever) ----
 
@@ -240,17 +219,7 @@ public static class ExePatcher
     /// native enemies. Returns the previous slot value (for logging / reversal). Both VAs must be file-backed.
     /// </summary>
     public static uint SetRecordCategoryHandler(Span<byte> exe, uint recordVa, int category, uint handlerVa)
-    {
-        if (category is < 0 or > 31)
-            throw new ArgumentOutOfRangeException(nameof(category), category, "category must be 0..31.");
-        if (!IsFileBacked(handlerVa))
-            throw new ArgumentOutOfRangeException(nameof(handlerVa),
-                $"handler VA 0x{handlerVa:X} is not a file-backed code address.");
-        int off = VaToFileOffset(recordVa + (uint)category * 4);
-        uint previous = ReadUInt32(exe, off);
-        WriteUInt32(exe, off, handlerVa);
-        return previous;
-    }
+        => Dc1EnemyExePatch.SetRecordCategoryHandler(exe, recordVa, category, handlerVa);
 
     // ---- Cat-8 hit/death descriptor redirect (defect B; docs/decisions/dc1/theri/THERI-0102-PLAYABLE-FIX-PLAN.md) ----
 
@@ -325,7 +294,7 @@ public static class ExePatcher
     /// <summary>True when <paramref name="v"/> is a file-form RDT-base-relative descriptor pointer
     /// (<c>[0x80100000, 0x80200000)</c>) — the values repointed; <c>0x0056xxxx</c> code-handler entries
     /// (the tables' indices ≥ 5) are left untouched.</summary>
-    private static bool IsRdtFileFormPtr(uint v) => v >= 0x80100000u && v < 0x80200000u;
+    internal static bool IsRdtFileFormPtr(uint v) => v >= 0x80100000u && v < 0x80200000u;
 
     /// <summary>
     /// Corrected defect-B fix (comprehensive): write the cat-8 reaction descriptor <paramref name="stream"/>
@@ -346,37 +315,7 @@ public static class ExePatcher
     /// </summary>
     public static uint[] RedirectCat8HitReaction(
         Span<byte> exe, ReadOnlySpan<byte> stream, uint caveVa = HitDescriptorCaveVa)
-    {
-        if (stream.Length == 0)
-            throw new ArgumentException("reaction stream is empty.", nameof(stream));
-        uint caveEnd = caveVa + (uint)stream.Length;
-        if (caveVa < ImageBase || !IsFileBacked(caveVa) || caveEnd > TextRawEndVa)
-            throw new ArgumentOutOfRangeException(nameof(caveVa),
-                $"cave [0x{caveVa:X}, 0x{caveEnd:X}) must lie in the .text raw-slack window [{ImageBase:X}.., 0x{TextRawEndVa:X}).");
-        if (caveVa >= 0x80000000)
-            throw new ArgumentOutOfRangeException(nameof(caveVa), "cave VA must be < 0x80000000 (non-file-form).");
-
-        int caveOff = VaToFileOffset(caveVa);
-        // Clean-cave / idempotent guard: each target byte must be zero-slack or already the stream byte we write.
-        for (int i = 0; i < stream.Length; i++)
-            if (exe[caveOff + i] != 0 && exe[caveOff + i] != stream[i])
-                throw new InvalidOperationException(
-                    $"cave at VA 0x{caveVa:X} byte 0x{i:X} = 0x{exe[caveOff + i]:X2} is neither zero-slack nor the " +
-                    $"intended stream byte 0x{stream[i]:X2}; refusing to overwrite (not a clean cave).");
-        stream.CopyTo(exe.Slice(caveOff, stream.Length));
-
-        // Repoint every file-form descriptor entry across all 9 tables; leave code-handler entries untouched.
-        var previous = new List<uint>();
-        for (uint va = Cat8ReactionTableLoVa; va < Cat8ReactionTableHiVa; va += 4)
-        {
-            int eoff = VaToFileOffset(va);
-            uint cur = ReadUInt32(exe, eoff);
-            if (!IsRdtFileFormPtr(cur) && cur != caveVa) continue; // skip code handlers / already-caved
-            previous.Add(cur);
-            WriteUInt32(exe, eoff, caveVa);
-        }
-        return previous.ToArray();
-    }
+        => Dc1EnemyExePatch.RedirectCat8HitReaction(exe, stream, caveVa);
 
     // ---- Universal walker NULL-guard (defect B, live-verified 2026-06-23) ----
     // The cat-8 Theri reaction system reads descriptor tables across MANY sets (the whole-.text scan found 214
@@ -403,7 +342,7 @@ public static class ExePatcher
     /// <summary>The NULL-guarded walker (37 bytes): <c>push ebp; mov ebp,esp; loop { if(count==0) break;
     /// if(node==0) break; next=[node+0x34]; if(next==0) break; node=next; count--; } return node;</c> —
     /// equivalent to the original for valid counts, but stops at the chain end instead of derefing NULL.</summary>
-    private static readonly byte[] NullGuardedWalker =
+    internal static readonly byte[] NullGuardedWalker =
     {
         0x55,             // push ebp
         0x8B, 0xEC,       // mov  ebp, esp
@@ -433,28 +372,7 @@ public static class ExePatcher
     /// all enemies — it only changes the overrun (crash → graceful stop), never a valid walk.
     /// </summary>
     public static byte[] InstallWalkerNullGuard(Span<byte> exe)
-    {
-        uint caveEnd = WalkerCaveVa + (uint)NullGuardedWalker.Length;
-        if (!IsFileBacked(WalkerCaveVa) || caveEnd > TextRawEndVa)
-            throw new ArgumentOutOfRangeException(nameof(WalkerCaveVa),
-                $"walker cave [0x{WalkerCaveVa:X}, 0x{caveEnd:X}) must lie in the .text raw-slack window (.., 0x{TextRawEndVa:X}).");
-
-        int caveOff = VaToFileOffset(WalkerCaveVa);
-        for (int i = 0; i < NullGuardedWalker.Length; i++)
-            if (exe[caveOff + i] != 0 && exe[caveOff + i] != NullGuardedWalker[i])
-                throw new InvalidOperationException(
-                    $"walker cave at 0x{WalkerCaveVa:X} byte 0x{i:X} = 0x{exe[caveOff + i]:X2} is neither zero-slack " +
-                    $"nor the intended byte 0x{NullGuardedWalker[i]:X2}; refusing to overwrite.");
-        NullGuardedWalker.CopyTo(exe.Slice(caveOff, NullGuardedWalker.Length));
-
-        // jmp rel32 from WalkerVa to the cave.
-        int jmpOff = VaToFileOffset(WalkerVa);
-        var original = exe.Slice(jmpOff, 5).ToArray();
-        int rel = (int)WalkerCaveVa - ((int)WalkerVa + 5);
-        exe[jmpOff] = 0xE9;
-        BinaryPrimitives.WriteInt32LittleEndian(exe.Slice(jmpOff + 1, 4), rel);
-        return original;
-    }
+        => Dc1EnemyExePatch.InstallWalkerNullGuard(exe);
 
     // ---- Render-model display-node guard (060F elevator / 0511 cross-stage; docs/decisions/dc1/crash-rcas/ELEVATOR-060F-HANDGUN-CRASH.md) ----
     // The per-frame object-transform pass sub_44CED6 walks the display-object work array (base 0x6DBB28,
@@ -507,7 +425,7 @@ public static class ExePatcher
     /// (<see cref="PsxFileFormLo"/>..<see cref="PsxFileFormHi"/>); a valid heap header takes the normal
     /// deref/render path. Widens the deprecated <c>apply_nullguard.py</c> cave (<c>==0</c> only), which the
     /// file-form 060F crash sailed through.</summary>
-    private static byte[] BuildRenderModelGuardCave(uint caveVa)
+    internal static byte[] BuildRenderModelGuardCave(uint caveVa)
     {
         var cave = new byte[]
         {
@@ -544,33 +462,7 @@ public static class ExePatcher
     /// a valid heap header renders unchanged.
     /// </summary>
     public static byte[] InstallRenderModelGuard(Span<byte> exe)
-    {
-        byte[] cave = BuildRenderModelGuardCave(RenderGuardCaveVa);
-        uint caveEnd = RenderGuardCaveVa + (uint)cave.Length;
-        // The render-guard cave must sit in the .text raw-slack window and not run into the descriptor cave.
-        if (!IsFileBacked(RenderGuardCaveVa) || caveEnd > HitDescriptorCaveVa)
-            throw new ArgumentOutOfRangeException(nameof(RenderGuardCaveVa),
-                $"render-guard cave [0x{RenderGuardCaveVa:X}, 0x{caveEnd:X}) must lie in .text slack before the " +
-                $"descriptor cave (0x{HitDescriptorCaveVa:X}).");
-
-        int caveOff = VaToFileOffset(RenderGuardCaveVa);
-        for (int i = 0; i < cave.Length; i++)
-            if (exe[caveOff + i] != 0 && exe[caveOff + i] != cave[i])
-                throw new InvalidOperationException(
-                    $"render-guard cave at 0x{RenderGuardCaveVa:X} byte 0x{i:X} = 0x{exe[caveOff + i]:X2} is neither " +
-                    $"zero-slack nor the intended byte 0x{cave[i]:X2}; refusing to overwrite (revert a prior/narrow " +
-                    "guard or restore the pristine exe first).");
-        cave.CopyTo(exe.Slice(caveOff, cave.Length));
-
-        // Hook: jmp rel32 to the cave + 7 nops (fills the 12-byte original instruction block).
-        int hookOff = VaToFileOffset(RenderTransformHookVa);
-        var original = exe.Slice(hookOff, RenderGuardOriginalHook.Length).ToArray();
-        int rel = (int)RenderGuardCaveVa - ((int)RenderTransformHookVa + 5);
-        exe[hookOff] = 0xE9;
-        BinaryPrimitives.WriteInt32LittleEndian(exe.Slice(hookOff + 1, 4), rel);
-        for (int i = 5; i < RenderGuardOriginalHook.Length; i++) exe[hookOff + i] = 0x90;
-        return original;
-    }
+        => Dc1EnemyExePatch.InstallRenderModelGuard(exe);
 
     /// <summary>
     /// Fix defect B: copy the canonical cat-8 hit/death descriptor records into the EXE cave and repoint
@@ -586,46 +478,7 @@ public static class ExePatcher
     /// </summary>
     public static uint[] RedirectCat8HitDescriptors(
         Span<byte> exe, ReadOnlySpan<byte> records, uint caveVa = HitDescriptorCaveVa)
-    {
-        int expected = HitDescriptorTotalRecords * HitDescriptorRecordSize;
-        if (records.Length != expected)
-            throw new ArgumentException(
-                $"expected {expected} bytes ({HitDescriptorTotalRecords} × 0x{HitDescriptorRecordSize:X} records), got {records.Length}.",
-                nameof(records));
-        uint caveEnd = caveVa + (uint)expected;
-        if (caveVa < ImageBase || !IsFileBacked(caveVa) || caveEnd > TextRawEndVa)
-            throw new ArgumentOutOfRangeException(nameof(caveVa),
-                $"cave [0x{caveVa:X}, 0x{caveEnd:X}) must lie in the .text raw-slack window [{ImageBase:X}.., 0x{TextRawEndVa:X}).");
-        // A non-file-form sentinel is required so the engine's file-form relocations leave it verbatim.
-        if (caveVa >= 0x80000000)
-            throw new ArgumentOutOfRangeException(nameof(caveVa), "cave VA must be < 0x80000000 (non-file-form).");
-        // Safety: never write over real code — each cave byte must be zero-slack, or already equal the
-        // record byte we are about to write (so re-applying the patch on a live exe is idempotent; real
-        // code can't coincidentally equal all 200 record bytes).
-        int caveOff = VaToFileOffset(caveVa);
-        for (int i = 0; i < expected; i++)
-            if (exe[caveOff + i] != 0 && exe[caveOff + i] != records[i])
-                throw new InvalidOperationException(
-                    $"cave at VA 0x{caveVa:X} byte 0x{i:X} = 0x{exe[caveOff + i]:X2} is neither zero-slack nor the " +
-                    $"intended record byte 0x{records[i]:X2}; refusing to overwrite (not a clean cave).");
-
-        // Lay the records into the cave.
-        records.CopyTo(exe.Slice(caveOff, expected));
-
-        // Repoint the 10 table dwords: table17[0..4] then table15[0..4], matching the records order.
-        var previous = new uint[HitDescriptorTotalRecords];
-        int r = 0;
-        foreach (uint tableVa in new[] { Cat8HitTable17Va, Cat8HitTable15Va })
-            for (int i = 0; i < HitDescriptorIndexCount; i++, r++)
-            {
-                uint entryVa = tableVa + (uint)i * 4;
-                uint recordVa = caveVa + (uint)r * (uint)HitDescriptorRecordSize;
-                int eoff = VaToFileOffset(entryVa);
-                previous[r] = ReadUInt32(exe, eoff);
-                WriteUInt32(exe, eoff, recordVa);
-            }
-        return previous;
-    }
+        => Dc1EnemyExePatch.RedirectCat8HitDescriptors(exe, records, caveVa);
 
     // ---- Per-room enemy SE (sound-effect) bank redirect (docs/reference/dc1/se/ENEMY-SOUND-SYSTEM.md) ----
     // The PC build loads each room's enemy SFX from a per-room SE manifest in DINO.exe: an array of
@@ -666,27 +519,16 @@ public static class ExePatcher
 
     /// <summary>VA of the SE manifest block for a room: <c>*(SeDirectoryBaseVa + (stage*32+room)*4)</c>.</summary>
     public static uint SeBlockVa(ReadOnlySpan<byte> exe, int stage, int room)
-    {
-        if (stage < 0) throw new ArgumentOutOfRangeException(nameof(stage), stage, "stage must be ≥ 0.");
-        if (room is < 0 or > 31) throw new ArgumentOutOfRangeException(nameof(room), room, "room must be 0..31.");
-        return ReadUInt32AtVa(exe, SeDirectoryBaseVa + (uint)(stage * 32 + room) * 4);
-    }
+        => Dc1AudioExePatch.SeBlockVa(exe, stage, room);
 
     /// <summary>Read a NUL-terminated ASCII string at a VA, or <c>null</c> if not file-backed, unterminated
     /// within <paramref name="maxLen"/>, or empty.</summary>
     public static string? ReadCStringAtVa(ReadOnlySpan<byte> exe, uint va, int maxLen = 64)
-    {
-        if (!IsFileBacked(va)) return null;
-        int off = VaToFileOffset(va);
-        int end = off;
-        while (end < exe.Length && end - off < maxLen && exe[end] != 0) end++;
-        if (end >= exe.Length || end - off >= maxLen || end == off) return null;
-        return System.Text.Encoding.ASCII.GetString(exe.Slice(off, end - off));
-    }
+        => Dc1AudioExePatch.ReadCStringAtVa(exe, va, maxLen);
 
     /// <summary>True when <paramref name="blockVa"/> is a plausible SE manifest block start (file-backed
     /// and inside the table region).</summary>
-    private static bool IsSeBlockVa(uint blockVa)
+    internal static bool IsSeBlockVa(uint blockVa)
         => IsFileBacked(blockVa) && blockVa >= SeManifestLoVa && blockVa < SeManifestHiVa;
 
     /// <summary>
@@ -695,25 +537,7 @@ public static class ExePatcher
     /// target species (e.g. a Theri room st603/st605). Returns empty if the room has no dino SE records.
     /// </summary>
     public static byte[] ExtractRoomDinoSubBlock(ReadOnlySpan<byte> exe, int stage, int room)
-    {
-        uint blockVa = SeBlockVa(exe, stage, room);
-        if (!IsSeBlockVa(blockVa))
-            throw new InvalidOperationException(
-                $"donor SE block for st{stage}{room:X2} (VA 0x{blockVa:X}) is outside the manifest table " +
-                $"[0x{SeManifestLoVa:X},0x{SeManifestHiVa:X}) — unexpected build/locale.");
-        uint startVa = 0; int count = 0;
-        for (uint va = blockVa; ; va += (uint)SeRecordStride)
-        {
-            uint namePtr = ReadUInt32AtVa(exe, va + (uint)SeRecordNameOffset);
-            if (namePtr == 0) break; // block terminator
-            string? nm = ReadCStringAtVa(exe, namePtr);
-            bool dino = nm != null && nm.StartsWith(SeDinoPrefix, StringComparison.OrdinalIgnoreCase);
-            if (dino) { if (startVa == 0) startVa = va; count++; }
-            else if (startVa != 0) break; // dino run ended (dino records sit at the block tail)
-        }
-        if (startVa == 0) return Array.Empty<byte>();
-        return exe.Slice(VaToFileOffset(startVa), count * SeRecordStride).ToArray();
-    }
+        => Dc1AudioExePatch.ExtractRoomDinoSubBlock(exe, stage, room);
 
     /// <summary>Outcome of <see cref="RetargetRoomDinoSe"/>: how many records were written and the room's
     /// dino-record capacity (for logging).</summary>
@@ -729,49 +553,7 @@ public static class ExePatcher
     /// donor count). Returns a summary.
     /// </summary>
     public static SeRetargetResult RetargetRoomDinoSe(Span<byte> exe, int stage, int room, ReadOnlySpan<byte> donorSubBlock)
-    {
-        if (donorSubBlock.Length == 0 || donorSubBlock.Length % SeRecordStride != 0)
-            throw new ArgumentException(
-                $"donor sub-block must be a non-empty multiple of 0x{SeRecordStride:X} bytes; got {donorSubBlock.Length}.",
-                nameof(donorSubBlock));
-        int donorCount = donorSubBlock.Length / SeRecordStride;
-
-        uint blockVa = SeBlockVa(exe, stage, room);
-        if (!IsSeBlockVa(blockVa))
-            throw new InvalidOperationException(
-                $"room st{stage}{room:X2} SE block (VA 0x{blockVa:X}) is outside the manifest table " +
-                $"[0x{SeManifestLoVa:X},0x{SeManifestHiVa:X}) — unexpected build/locale.");
-
-        // Find the room's contiguous dino sub-block (start + capacity).
-        uint dinoStartVa = 0; int capacity = 0;
-        for (uint va = blockVa; ; va += (uint)SeRecordStride)
-        {
-            uint namePtr = ReadUInt32AtVa(exe, va + (uint)SeRecordNameOffset);
-            if (namePtr == 0) break;
-            string? nm = ReadCStringAtVa(exe, namePtr);
-            bool dino = nm != null && nm.StartsWith(SeDinoPrefix, StringComparison.OrdinalIgnoreCase);
-            if (dino) { if (dinoStartVa == 0) dinoStartVa = va; capacity++; }
-            else if (dinoStartVa != 0) break;
-        }
-        if (dinoStartVa == 0)
-            throw new InvalidOperationException(
-                $"room st{stage}{room:X2} has no enemy (se\\dino\\) SE records to retarget.");
-        if (donorCount > capacity)
-            throw new InvalidOperationException(
-                $"donor SE sub-block ({donorCount} records) exceeds room st{stage}{room:X2} dino capacity ({capacity}).");
-
-        int dinoStartOff = VaToFileOffset(dinoStartVa);
-        donorSubBlock.CopyTo(exe.Slice(dinoStartOff, donorSubBlock.Length));
-
-        // Early-terminate: zero the namePtr of the record right after the copied sub-block so the loader
-        // stops there (the residual raptor records + the original pad after it are left unread).
-        if (donorCount < capacity)
-        {
-            uint termVa = dinoStartVa + (uint)(donorCount * SeRecordStride) + (uint)SeRecordNameOffset;
-            WriteUInt32(exe, VaToFileOffset(termVa), 0);
-        }
-        return new SeRetargetResult(blockVa, donorCount, capacity);
-    }
+        => Dc1AudioExePatch.RetargetRoomDinoSe(exe, stage, room, donorSubBlock);
 
     // ---- BGM catalog shuffle (the music randomizer lever; docs/reference/dc1/bgm/BGM-SYSTEM.md §4) ----
     // DC1 resolves every BGM request through one global id→file catalog in DINO.exe: 99 × 16-byte records
@@ -799,10 +581,10 @@ public static class ExePatcher
     /// is left in place, so the permutation runs over ids <see cref="BgmFirstShuffledId"/>..<see cref="BgmRecordCount"/>.</summary>
     public const int BgmFirstShuffledId = 2;
 
-    private const int BgmNamePtrOffset = 0x00;
-    private const int BgmSizeOffset = 0x04;
-    private const int BgmIdOffset = 0x08;
-    private const int BgmFlagsOffset = 0x0C;
+    internal const int BgmNamePtrOffset = 0x00;
+    internal const int BgmSizeOffset = 0x04;
+    internal const int BgmIdOffset = 0x08;
+    internal const int BgmFlagsOffset = 0x0C;
 
     /// <summary>Path prefix every shuffled catalog name carries (e.g. <c>bgm\me_00SL</c>) — the validation key
     /// that the table is the expected build/locale before any record is moved.</summary>
@@ -810,11 +592,7 @@ public static class ExePatcher
 
     /// <summary>VA of BGM catalog <c>record(id)</c> for <paramref name="id"/> in 1..99.</summary>
     public static uint BgmRecordVa(int id)
-    {
-        if (id is < 1 or > BgmRecordCount)
-            throw new ArgumentOutOfRangeException(nameof(id), id, $"BGM id must be 1..{BgmRecordCount}.");
-        return BgmCatalogBaseVa + (uint)(id - 1) * BgmRecordStride;
-    }
+        => Dc1AudioExePatch.BgmRecordVa(id);
 
     /// <summary>One catalog record's identity, plus the <c>{namePtr,size}</c> pair before and after a shuffle.
     /// <see cref="OldNamePtr"/>/<see cref="NewNamePtr"/> are equal for a record the permutation left in place.</summary>
@@ -833,79 +611,15 @@ public static class ExePatcher
     /// Reversal is normally via the installer's pristine backup (<c>Restore</c>), like every other EXE patch.
     /// </summary>
     public static BgmShuffleEntry[] ShuffleBgmCatalog(Span<byte> exe, int seed)
-    {
-        // Validate + snapshot the records we will move (ids 2..99).
-        int n = BgmRecordCount - (BgmFirstShuffledId - 1);
-        var ids = new int[n];
-        var flags = new uint[n];
-        var namePtr = new uint[n];
-        var size = new uint[n];
-        var name = new string?[n];
-        for (int k = 0; k < n; k++)
-        {
-            int id = BgmFirstShuffledId + k;
-            int off = VaToFileOffset(BgmRecordVa(id));
-            uint recId = ReadUInt32(exe, off + BgmIdOffset);
-            if (recId != (uint)id)
-                throw new InvalidOperationException(
-                    $"BGM catalog record {id} has id field 0x{recId:X} (expected {id}) — unexpected build/locale; refusing to shuffle.");
-            uint np = ReadUInt32(exe, off + BgmNamePtrOffset);
-            string? nm = ReadCStringAtVa(exe, np);
-            if (nm is null || !nm.StartsWith(BgmNamePrefix, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException(
-                    $"BGM catalog record {id} namePtr 0x{np:X} does not resolve to a '{BgmNamePrefix}' string " +
-                    "— unexpected build/locale; refusing to shuffle.");
-            ids[k] = id;
-            flags[k] = ReadUInt32(exe, off + BgmFlagsOffset);
-            namePtr[k] = np;
-            size[k] = ReadUInt32(exe, off + BgmSizeOffset);
-            name[k] = nm;
-        }
+        => Dc1AudioExePatch.ShuffleBgmCatalog(exe, seed);
 
-        // Group record indices by flags class, then permute the {namePtr,size} pairs within each class.
-        // Classes are processed in ascending flags order, members in ascending id order, so the result is a
-        // pure deterministic function of (seed, table) — independent of dictionary iteration order.
-        uint rng = (uint)seed;
-        var newNamePtr = (uint[])namePtr.Clone();
-        var newSize = (uint[])size.Clone();
-        var newName = (string?[])name.Clone();
-        foreach (uint cls in flags.Distinct().OrderBy(f => f))
-        {
-            var members = new List<int>();
-            for (int k = 0; k < n; k++) if (flags[k] == cls) members.Add(k);
-            // Fisher–Yates over the member slots: pick a source pair for each destination slot.
-            int m = members.Count;
-            var perm = new int[m];
-            for (int i = 0; i < m; i++) perm[i] = i;
-            for (int i = m - 1; i > 0; i--)
-            {
-                int j = (int)(NextRand(ref rng) % (uint)(i + 1));
-                (perm[i], perm[j]) = (perm[j], perm[i]);
-            }
-            for (int i = 0; i < m; i++)
-            {
-                int dst = members[i], src = members[perm[i]];
-                newNamePtr[dst] = namePtr[src];
-                newSize[dst] = size[src];
-                newName[dst] = name[src];
-            }
-        }
-
-        // Write back the permuted pairs and build the change list.
-        var result = new BgmShuffleEntry[n];
-        for (int k = 0; k < n; k++)
-        {
-            int off = VaToFileOffset(BgmRecordVa(ids[k]));
-            WriteUInt32(exe, off + BgmNamePtrOffset, newNamePtr[k]);
-            WriteUInt32(exe, off + BgmSizeOffset, newSize[k]);
-            result[k] = new BgmShuffleEntry(ids[k], flags[k], namePtr[k], size[k], newNamePtr[k], newSize[k], name[k], newName[k]);
-        }
-        return result;
-    }
+    /// <summary>Validate and apply an explicit source-id assignment for BGM ids 2..99.</summary>
+    internal static BgmShuffleEntry[] ApplyBgmCatalogPlan(Span<byte> exe, IReadOnlyList<int> sourceIds)
+        => Dc1AudioExePatch.ApplyBgmCatalogPlan(exe, sourceIds);
 
     /// <summary>Deterministic splitmix32 step — a stable PRNG for the catalog shuffle (independent of
     /// <see cref="Random"/>'s cross-runtime behaviour, so a seed reproduces byte-identically).</summary>
-    private static uint NextRand(ref uint state)
+    internal static uint NextRand(ref uint state)
     {
         state += 0x9E3779B9u;
         uint z = state;
@@ -957,44 +671,12 @@ public static class ExePatcher
     /// patch. Returns one entry per moved slot (for logging). docs/reference/dc1/items/EMERGENCY-BOX-DATA.md.
     /// </summary>
     public static EmergencyBoxShuffleEntry[] ShuffleEmergencyBoxContents(Span<byte> exe, int seed)
-    {
-        uint rng = (uint)seed;
-        var result = new List<EmergencyBoxShuffleEntry>(EmergencyBoxBlockVas.Length * EmergencyBoxesPerBlock);
-        var scratch = new byte[EmergencyBoxesPerBlock * EmergencyBoxRecordStride];
+        => Dc1InventoryExePatch.ShuffleEmergencyBoxContents(exe, seed);
 
-        foreach (uint blockVa in EmergencyBoxBlockVas)
-        {
-            int blockOff = VaToFileOffset(blockVa);
-            CheckBounds(exe.Length, blockOff, EmergencyBoxesPerBlock * EmergencyBoxRecordStride);
-
-            // Validate the table shape: every record must lead with the 10-slot marker. A mismatch means
-            // the offsets do not point at the box table (wrong build/locale) — refuse rather than corrupt.
-            for (int i = 0; i < EmergencyBoxesPerBlock; i++)
-                if (exe[blockOff + i * EmergencyBoxRecordStride] != EmergencyBoxSlotMarker)
-                    throw new InvalidOperationException(
-                        $"Emergency-box block 0x{blockVa:X} record {i} does not start with the 0x{EmergencyBoxSlotMarker:X2} " +
-                        "slot marker — unexpected build/locale; refusing to shuffle.");
-
-            // Snapshot the 17 records, then Fisher–Yates a permutation and write each destination from its
-            // source snapshot (records are equal-size, so this is a pure reorder — multiset preserved).
-            exe.Slice(blockOff, scratch.Length).CopyTo(scratch);
-            var perm = new int[EmergencyBoxesPerBlock];
-            for (int i = 0; i < EmergencyBoxesPerBlock; i++) perm[i] = i;
-            for (int i = EmergencyBoxesPerBlock - 1; i > 0; i--)
-            {
-                int j = (int)(NextRand(ref rng) % (uint)(i + 1));
-                (perm[i], perm[j]) = (perm[j], perm[i]);
-            }
-            for (int dst = 0; dst < EmergencyBoxesPerBlock; dst++)
-            {
-                int src = perm[dst];
-                scratch.AsSpan(src * EmergencyBoxRecordStride, EmergencyBoxRecordStride)
-                       .CopyTo(exe.Slice(blockOff + dst * EmergencyBoxRecordStride, EmergencyBoxRecordStride));
-                result.Add(new EmergencyBoxShuffleEntry(blockVa, dst, src));
-            }
-        }
-        return result.ToArray();
-    }
+    /// <summary>Validate and apply one explicit 17-slot permutation per International difficulty block.</summary>
+    internal static EmergencyBoxShuffleEntry[] ApplyEmergencyBoxShufflePlan(
+        Span<byte> exe, IReadOnlyList<int[]> sourceSlotsByBlock)
+        => Dc1InventoryExePatch.ApplyEmergencyBoxShufflePlan(exe, sourceSlotsByBlock);
 
     /// <summary>Lowest box item id (<c>SG Bullets</c>) — the start of the box-item id range.</summary>
     public const byte EmergencyBoxFirstItemId = 0x10;
@@ -1013,61 +695,16 @@ public static class ExePatcher
     /// build. Reversal is via the installer's pristine backup. docs/reference/dc1/items/EMERGENCY-BOX-DATA.md.
     /// </summary>
     public static EmergencyBoxShuffleEntry[] RerollEmergencyBoxContents(Span<byte> exe, int seed)
-    {
-        uint rng = (uint)seed;
-        var result = new List<EmergencyBoxShuffleEntry>(EmergencyBoxBlockVas.Length * EmergencyBoxesPerBlock);
+        => Dc1InventoryExePatch.RerollEmergencyBoxContents(exe, seed);
 
-        foreach (uint blockVa in EmergencyBoxBlockVas)
-        {
-            int blockOff = VaToFileOffset(blockVa);
-            CheckBounds(exe.Length, blockOff, EmergencyBoxesPerBlock * EmergencyBoxRecordStride);
+    /// <summary>Read validated emergency-box records in block-major, slot-major order.</summary>
+    internal static byte[][] ReadEmergencyBoxRecords(ReadOnlySpan<byte> exe)
+        => Dc1InventoryExePatch.ReadEmergencyBoxRecords(exe);
 
-            for (int i = 0; i < EmergencyBoxesPerBlock; i++)
-                if (exe[blockOff + i * EmergencyBoxRecordStride] != EmergencyBoxSlotMarker)
-                    throw new InvalidOperationException(
-                        $"Emergency-box block 0x{blockVa:X} record {i} does not start with the 0x{EmergencyBoxSlotMarker:X2} " +
-                        "slot marker — unexpected build/locale; refusing to reroll.");
-
-            // Build this block's pool from its own records: weightedItems (one entry per occurrence) and the
-            // set of amounts each item is seen with. Slot count of a record = its run of valid (id,count) pairs.
-            var weightedItems = new List<byte>();
-            var amountsOf = new Dictionary<byte, List<byte>>();
-            var slotCount = new int[EmergencyBoxesPerBlock];
-            for (int i = 0; i < EmergencyBoxesPerBlock; i++)
-            {
-                int rec = blockOff + i * EmergencyBoxRecordStride;
-                int slots = 0;
-                for (int k = 0; k < 10; k++)
-                {
-                    byte id = exe[rec + 1 + 2 * k];
-                    if (id < EmergencyBoxFirstItemId || id > EmergencyBoxLastItemId) break;
-                    byte amt = exe[rec + 2 + 2 * k];
-                    weightedItems.Add(id);
-                    if (!amountsOf.TryGetValue(id, out var list)) amountsOf[id] = list = new List<byte>();
-                    if (!list.Contains(amt)) list.Add(amt);
-                    slots++;
-                }
-                slotCount[i] = slots;
-            }
-            if (weightedItems.Count == 0) continue; // empty block (no loot to draw from)
-
-            // Reroll each record's slots in place from the block pool (item, then amount for that item).
-            for (int i = 0; i < EmergencyBoxesPerBlock; i++)
-            {
-                int rec = blockOff + i * EmergencyBoxRecordStride;
-                for (int k = 0; k < slotCount[i]; k++)
-                {
-                    byte item = weightedItems[(int)(NextRand(ref rng) % (uint)weightedItems.Count)];
-                    var amts = amountsOf[item];
-                    byte amount = amts[(int)(NextRand(ref rng) % (uint)amts.Count)];
-                    exe[rec + 1 + 2 * k] = item;
-                    exe[rec + 2 + 2 * k] = amount;
-                }
-                result.Add(new EmergencyBoxShuffleEntry(blockVa, i, i));
-            }
-        }
-        return result.ToArray();
-    }
+    /// <summary>Validate and apply explicit emergency-box records in block-major, slot-major order.</summary>
+    internal static EmergencyBoxShuffleEntry[] ApplyEmergencyBoxRerollPlan(
+        Span<byte> exe, IReadOnlyList<byte[]> records)
+        => Dc1InventoryExePatch.ApplyEmergencyBoxRerollPlan(exe, records);
 
     // ---- Starting inventory (the new-game starting-inventory randomizer lever) ----
     // DC1's starting inventory is NOT a flat data table — it is an init-code "give item" sequence in
@@ -1097,7 +734,7 @@ public static class ExePatcher
 
     /// <summary>The opcode of a slot store: <c>mov byte ptr [eax + disp32], imm8</c> = <c>C6 80</c>.
     /// The <c>imm8</c> is the 7th byte (instruction start = imm VA − 6). <c>[verified]</c></summary>
-    private static readonly byte[] SlotStoreOpcode = { 0xC6, 0x80 };
+    internal static readonly byte[] SlotStoreOpcode = { 0xC6, 0x80 };
 
     /// <summary>One supply slot's two immediate sites (the <c>id</c> and <c>qty</c> bytes of its store
     /// instruction) plus its slot index (which fixes the expected store displacement).</summary>
@@ -1150,26 +787,28 @@ public static class ExePatcher
 
     /// <summary>Max items a CUSTOM starting inventory may have: the supply-slot count common to every
     /// difficulty block (blocks 1 and 2 have 3 slots), so the same list fits all difficulties.</summary>
-    public static int StartingInventoryMaxCustomItems => StartingInventoryBlocks.Min(b => b.Slots.Length);
+    public static int StartingInventoryMaxCustomItems => Dc1InventoryExePatch.StartingInventoryMaxCustomItems;
 
     /// <summary>9mm Parabellum — the Handgun's ammo, forced into slot 0 of every block by the RANDOM mode
     /// so the always-flag-granted Handgun is usable (beatability).</summary>
     public const byte StartingInvHandgunAmmoId = 0x16;
-    private const byte StartingInvHandgunAmmoFull = 0x22; // 34, the 9mm max stack (full mag)
+    internal const byte StartingInvHandgunAmmoFull = 0x22; // 34, the 9mm max stack (full mag)
 
     /// <summary>The RANDOM mode's draw pool: <c>(supply id, max stack)</c> for ammo + health only — every
     /// drawn <c>(id, count)</c> is a valid supply item with a realistic count (<c>1..max</c>).</summary>
-    private static readonly (byte Id, byte Max)[] StartingInvRandomPool =
+    internal static readonly (byte Id, byte Max)[] StartingInvRandomPool =
     {
         (0x16, 34), (0x11, 10), (0x10, 10), (0x12, 3), (0x13, 3), (0x14, 3), (0x18, 6), (0x19, 6),
         (0x1B, 3), (0x1C, 2), (0x1D, 2), (0x1E, 1), (0x1F, 1),
     };
 
     /// <summary>Read a byte at virtual address <paramref name="va"/>.</summary>
-    public static byte ReadUInt8AtVa(ReadOnlySpan<byte> exe, uint va) => Slice(exe, VaToFileOffset(va), 1)[0];
+    public static byte ReadUInt8AtVa(ReadOnlySpan<byte> exe, uint va)
+        => Dc1InventoryExePatch.ReadUInt8AtVa(exe, va);
 
     /// <summary>Write a byte at virtual address <paramref name="va"/>.</summary>
-    public static void WriteUInt8AtVa(Span<byte> exe, uint va, byte value) => Slice(exe, VaToFileOffset(va), 1)[0] = value;
+    public static void WriteUInt8AtVa(Span<byte> exe, uint va, byte value)
+        => Dc1InventoryExePatch.WriteUInt8AtVa(exe, va, value);
 
     // ---- Door skip (Experimental): remove the door-transition swing, keep the room load ----
     // cont.78 (LIVE-CONFIRMED 2026-07-18): the mode-6 door transition's state-1 (0x4710b7) is three
@@ -1195,17 +834,17 @@ public static class ExePatcher
     /// <summary>Live-tuned hold threshold (frames) written by the door-skip patch.</summary>
     public const byte DoorHoldPatched = 0x04;
 
-    private static readonly byte[] DoorSkipSwingPristine =
+    internal static readonly byte[] DoorSkipSwingPristine =
         { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F };
 
-    private static readonly byte[] DoorSkipSwingCode =
+    internal static readonly byte[] DoorSkipSwingCode =
         { 0x8B, 0x45, 0x08, 0x66, 0xC7, 0x40, 0x02, 0x01, 0x00, 0xE9, 0x6A, 0x03, 0x00, 0x00 };
 
-    private static readonly byte[] DoorHoldGateSig = { 0x83, 0xFA }; // `cmp edx, imm8`
+    internal static readonly byte[] DoorHoldGateSig = { 0x83, 0xFA }; // `cmp edx, imm8`
 
     /// <summary>True when the door-skip patch is already applied (idempotency check).</summary>
     public static bool IsDoorSkipApplied(ReadOnlySpan<byte> exe)
-        => Slice(exe, VaToFileOffset(DoorSkipSwingVa), DoorSkipSwingCode.Length).SequenceEqual(DoorSkipSwingCode);
+        => Dc1TransitionExePatch.IsDoorSkipApplied(exe);
 
     /// <summary>
     /// Apply the reversible "door skip" lever to <paramref name="exe"/> in place. Idempotent: a no-op if
@@ -1215,22 +854,7 @@ public static class ExePatcher
     /// <see cref="VaToFileOffset"/>).
     /// </summary>
     public static void ApplyDoorSkip(Span<byte> exe)
-    {
-        var swing = Slice(exe, VaToFileOffset(DoorSkipSwingVa), DoorSkipSwingCode.Length);
-        bool pristine = swing.SequenceEqual(DoorSkipSwingPristine);
-        bool patched = swing.SequenceEqual(DoorSkipSwingCode);
-        if (!pristine && !patched)
-            throw new InvalidOperationException(
-                $"door-skip window @0x{DoorSkipSwingVa:X} is neither pristine nor already patched; refusing to overwrite an unexpected build.");
-
-        int gate = VaToFileOffset(DoorHoldGateVa);
-        if (!Slice(exe, gate, DoorHoldGateSig.Length).SequenceEqual(DoorHoldGateSig))
-            throw new InvalidOperationException(
-                $"door-skip hold gate @0x{DoorHoldGateVa:X} guard mismatch (expected `cmp edx,imm8`); refusing.");
-
-        DoorSkipSwingCode.CopyTo(swing);   // A: skip the leaf-sweep
-        exe[gate + 2] = DoorHoldPatched;   // B: shorten the 60-frame hold
-    }
+        => Dc1TransitionExePatch.ApplyDoorSkip(exe);
 
     // ---- Fast-forward cutscenes (Experimental / crash risk): guarded SCD-VM tick multiplier ----
     // cont.79 v2 (STATIC-SCD-RE): DC1 cutscene choreography is script-authored inside the flag(2,2)
@@ -1254,15 +878,15 @@ public static class ExePatcher
     /// hit-descriptor + walker caves at <c>0x61F900..0x61FC00</c>). <c>[verified]</c></summary>
     public const uint CutsceneFfCaveVa = 0x0061FF80;
 
-    private static readonly byte[] CutsceneFfHookPristine = { 0xE8, 0xAB, 0xB5, 0xFF, 0xFF }; // call 0x46AA41
+    internal static readonly byte[] CutsceneFfHookPristine = { 0xE8, 0xAB, 0xB5, 0xFF, 0xFF }; // call 0x46AA41
 
     // Repoint the hook: `call CutsceneFfCaveVa`. rel32 = cave - (hook + 5).
-    private static readonly byte[] CutsceneFfHookPatched =
+    internal static readonly byte[] CutsceneFfHookPatched =
         BuildRel32Call(CutsceneFfHookVa, CutsceneFfCaveVa);
 
     // The 72-byte v2 cave, assembled offline for SPEED=8 at CutsceneFfCaveVa (absolute refs to the runner
     // 0x46AA41, group-2 flag bank [0x643018], and task array 0x6B4660 are baked for this build).
-    private static readonly byte[] CutsceneFfCave =
+    internal static readonly byte[] CutsceneFfCave =
     {
         0xE8, 0xBC, 0xAA, 0xE4, 0xFF, 0x56, 0xBE, 0x07, 0x00, 0x00, 0x00, 0xA1, 0x18, 0x30, 0x64, 0x00,
         0x8B, 0x00, 0x83, 0xE0, 0x07, 0x83, 0xF8, 0x04, 0x75, 0x2C, 0xB9, 0x60, 0x46, 0x6B, 0x00, 0xBA,
@@ -1271,7 +895,7 @@ public static class ExePatcher
         0xAA, 0xE4, 0xFF, 0x4E, 0x75, 0xC5, 0x5E, 0xC3,
     };
 
-    private static byte[] BuildRel32Call(uint fromVa, uint toVa)
+    internal static byte[] BuildRel32Call(uint fromVa, uint toVa)
     {
         int rel = unchecked((int)(toVa - (fromVa + 5)));
         return new byte[] { 0xE8, (byte)rel, (byte)(rel >> 8), (byte)(rel >> 16), (byte)(rel >> 24) };
@@ -1279,7 +903,7 @@ public static class ExePatcher
 
     /// <summary>True when the cutscene fast-forward patch is already applied (idempotency check).</summary>
     public static bool IsCutsceneFastForwardApplied(ReadOnlySpan<byte> exe)
-        => Slice(exe, VaToFileOffset(CutsceneFfHookVa), CutsceneFfHookPatched.Length).SequenceEqual(CutsceneFfHookPatched);
+        => Dc1TransitionExePatch.IsCutsceneFastForwardApplied(exe);
 
     /// <summary>
     /// Apply the reversible "fast-forward cutscenes (experimental)" lever to <paramref name="exe"/> in place.
@@ -1289,28 +913,7 @@ public static class ExePatcher
     /// hook and the cave are file-backed <c>.text</c>.
     /// </summary>
     public static void ApplyCutsceneFastForward(Span<byte> exe)
-    {
-        var hook = Slice(exe, VaToFileOffset(CutsceneFfHookVa), CutsceneFfHookPristine.Length);
-        bool pristine = hook.SequenceEqual(CutsceneFfHookPristine);
-        bool patched = hook.SequenceEqual(CutsceneFfHookPatched);
-        if (!pristine && !patched)
-            throw new InvalidOperationException(
-                $"cutscene fast-forward hook @0x{CutsceneFfHookVa:X} is neither pristine `call 0x46AA41` nor already patched; refusing to overwrite an unexpected build.");
-
-        uint caveEnd = CutsceneFfCaveVa + (uint)CutsceneFfCave.Length;
-        if (!IsFileBacked(CutsceneFfCaveVa) || caveEnd > TextRawEndVa)
-            throw new ArgumentOutOfRangeException(nameof(CutsceneFfCaveVa),
-                $"fast-forward cave [0x{CutsceneFfCaveVa:X}, 0x{caveEnd:X}) must lie in the .text raw-slack window (.., 0x{TextRawEndVa:X}).");
-
-        int caveOff = VaToFileOffset(CutsceneFfCaveVa);
-        for (int i = 0; i < CutsceneFfCave.Length; i++)
-            if (exe[caveOff + i] != 0 && exe[caveOff + i] != CutsceneFfCave[i])
-                throw new InvalidOperationException(
-                    $"fast-forward cave at 0x{CutsceneFfCaveVa:X} byte 0x{i:X} = 0x{exe[caveOff + i]:X2} is neither zero-slack nor the intended cave byte; refusing (not a clean cave).");
-
-        CutsceneFfCave.CopyTo(exe.Slice(caveOff, CutsceneFfCave.Length));
-        CutsceneFfHookPatched.CopyTo(hook);
-    }
+        => Dc1TransitionExePatch.ApplyCutsceneFastForward(exe);
 
     /// <summary>One slot written by a starting-inventory patch (for logging).</summary>
     public readonly record struct StartingInvWrite(string Block, int Slot, byte Id, byte Count);
@@ -1323,21 +926,9 @@ public static class ExePatcher
     /// (unexpected build/locale) — so a patch never corrupts a mismatched executable.
     /// </summary>
     public static void ValidateStartingInventory(ReadOnlySpan<byte> exe)
-    {
-        foreach (var block in StartingInventoryBlocks)
-            foreach (var slot in block.Slots)
-            {
-                CheckSlotStore(exe, slot.IdImmVa, InventorySlotIdBaseDisp + (uint)slot.Slot * 4, block.Name, slot.Slot, "id");
-                CheckSlotStore(exe, slot.QtyImmVa, InventorySlotIdBaseDisp + (uint)slot.Slot * 4 + 1, block.Name, slot.Slot, "qty");
-                byte id = ReadUInt8AtVa(exe, slot.IdImmVa);
-                if (id != 0 && (id < StartingInvFirstItemId || id > StartingInvLastItemId))
-                    throw new InvalidOperationException(
-                        $"Starting-inventory {block.Name} slot {slot.Slot} id immediate is 0x{id:X2} " +
-                        "(not 0 or a valid item id) — unexpected build/locale; refusing to patch.");
-            }
-    }
+        => Dc1InventoryExePatch.ValidateStartingInventory(exe);
 
-    private static void CheckSlotStore(ReadOnlySpan<byte> exe, uint immVa, uint expectedDisp, string block, int slot, string field)
+    internal static void CheckSlotStore(ReadOnlySpan<byte> exe, uint immVa, uint expectedDisp, string block, int slot, string field)
     {
         uint instrVa = immVa - 6;
         if (ReadUInt8AtVa(exe, instrVa) != SlotStoreOpcode[0] || ReadUInt8AtVa(exe, instrVa + 1) != SlotStoreOpcode[1]
@@ -1358,32 +949,12 @@ public static class ExePatcher
     /// docs/reference/dc1/items/STARTING-INVENTORY.md.
     /// </summary>
     public static StartingInvWrite[] RandomizeStartingInventory(Span<byte> exe, int seed)
-    {
-        ValidateStartingInventory(exe);
-        uint rng = (uint)seed;
-        var result = new List<StartingInvWrite>();
-        foreach (var block in StartingInventoryBlocks)
-            for (int i = 0; i < block.Slots.Length; i++)
-            {
-                var slot = block.Slots[i];
-                byte id, count;
-                if (i == 0)
-                {
-                    id = StartingInvHandgunAmmoId;
-                    count = StartingInvHandgunAmmoFull;
-                }
-                else
-                {
-                    var (pid, pmax) = StartingInvRandomPool[(int)(NextRand(ref rng) % (uint)StartingInvRandomPool.Length)];
-                    id = pid;
-                    count = (byte)(1 + NextRand(ref rng) % pmax);
-                }
-                WriteUInt8AtVa(exe, slot.IdImmVa, id);
-                WriteUInt8AtVa(exe, slot.QtyImmVa, count);
-                result.Add(new StartingInvWrite(block.Name, slot.Slot, id, count));
-            }
-        return result.ToArray();
-    }
+        => Dc1InventoryExePatch.RandomizeStartingInventory(exe, seed);
+
+    /// <summary>Validate and apply explicit per-block starting-inventory slot assignments.</summary>
+    internal static StartingInvWrite[] ApplyStartingInventoryPlan(
+        Span<byte> exe, IReadOnlyList<IReadOnlyList<(int Id, int Count)>> blocks)
+        => Dc1InventoryExePatch.ApplyStartingInventoryPlan(exe, blocks);
 
     /// <summary>
     /// CUSTOM starting inventory (EXPERIMENTAL): write the explicit <paramref name="items"/>
@@ -1395,37 +966,7 @@ public static class ExePatcher
     /// written (for logging). docs/reference/dc1/items/STARTING-INVENTORY.md.
     /// </summary>
     public static StartingInvWrite[] SetStartingInventory(Span<byte> exe, IReadOnlyList<(int Id, int Count)> items)
-    {
-        if (items is null || items.Count == 0)
-            throw new ArgumentException("custom starting inventory is empty.", nameof(items));
-        if (items.Count > StartingInventoryMaxCustomItems)
-            throw new ArgumentException(
-                $"custom starting inventory has {items.Count} items but at most {StartingInventoryMaxCustomItems} " +
-                "fit every difficulty block.", nameof(items));
-        for (int i = 0; i < items.Count; i++)
-        {
-            var (id, count) = items[i];
-            if (id < StartingInvFirstItemId || id > StartingInvLastItemId)
-                throw new ArgumentException(
-                    $"item {i} id 0x{id:X} is out of range 0x{StartingInvFirstItemId:X2}..0x{StartingInvLastItemId:X2}.", nameof(items));
-            if (count is < 1 or > 0xFF)
-                throw new ArgumentException($"item {i} count {count} is out of range 1..255.", nameof(items));
-        }
-        ValidateStartingInventory(exe);
-
-        var result = new List<StartingInvWrite>();
-        foreach (var block in StartingInventoryBlocks)
-            for (int i = 0; i < block.Slots.Length; i++)
-            {
-                var slot = block.Slots[i];
-                byte id = i < items.Count ? (byte)items[i].Id : (byte)0;
-                byte count = i < items.Count ? (byte)items[i].Count : (byte)0;
-                WriteUInt8AtVa(exe, slot.IdImmVa, id);
-                WriteUInt8AtVa(exe, slot.QtyImmVa, count);
-                result.Add(new StartingInvWrite(block.Name, slot.Slot, id, count));
-            }
-        return result.ToArray();
-    }
+        => Dc1InventoryExePatch.SetStartingInventory(exe, items);
 
     // ---- Starting weapon (the group-11 weapon-grant lever) ----
     // The starting WEAPON is not a supply slot — each difficulty block of the new-game init 0x441033
@@ -1474,30 +1015,14 @@ public static class ExePatcher
 
     /// <summary>The opcode of an <c>SetFlag</c> argument push: <c>push imm8</c> = <c>6A</c>; the
     /// <c>imm8</c> is the byte after it (so the instruction start = imm VA − 1). <c>[verified]</c></summary>
-    private const byte PushImm8Opcode = 0x6A;
+    internal const byte PushImm8Opcode = 0x6A;
 
     /// <summary>Validate that the build's weapon-grant sites match the decoded shape: each grant's
     /// <c>val</c>/<c>idx</c> bytes must be the <c>imm8</c> of a <c>push imm8</c> (<c>6A</c>) instruction,
     /// the <c>val</c> currently 1, and the <c>idx</c> a weapon id (<c>0x01..0x0A</c>). Throws
     /// <see cref="InvalidOperationException"/> otherwise (unexpected build/locale).</summary>
     public static void ValidateStartingWeaponGrants(ReadOnlySpan<byte> exe)
-    {
-        foreach (var block in StartingWeaponGrantBlocks)
-            foreach (var site in block.Sites)
-            {
-                if (ReadUInt8AtVa(exe, site.ValImmVa - 1) != PushImm8Opcode
-                    || ReadUInt8AtVa(exe, site.IdxImmVa - 1) != PushImm8Opcode
-                    || ReadUInt8AtVa(exe, site.ValImmVa) != 1)
-                    throw new InvalidOperationException(
-                        $"Starting-weapon {block.Name} grant at VA 0x{site.ValImmVa - 1:X} is not the expected " +
-                        "`push 1; push idx` SetFlag(11,…) form — unexpected build/locale; refusing to patch.");
-                byte idx = ReadUInt8AtVa(exe, site.IdxImmVa);
-                if (idx < StartingWeaponFirstId || idx > StartingWeaponLastId)
-                    throw new InvalidOperationException(
-                        $"Starting-weapon {block.Name} grant idx 0x{idx:X2} is not a weapon id " +
-                        $"(0x{StartingWeaponFirstId:X2}..0x{StartingWeaponLastId:X2}) — unexpected build/locale; refusing to patch.");
-            }
-    }
+        => Dc1InventoryExePatch.ValidateStartingWeaponGrants(exe);
 
     /// <summary>
     /// Set the new-game starting weapon (EXPERIMENTAL): make every difficulty block grant exactly
@@ -1509,42 +1034,7 @@ public static class ExePatcher
     /// Returns the per-block weapon id now granted (<c>0</c> = none), for logging. docs/reference/dc1/items/STARTING-INVENTORY.md.
     /// </summary>
     public static (string Block, byte WeaponId)[] SetStartingWeapon(Span<byte> exe, int? weaponId)
-    {
-        // A weaponless start ("None") is NOT supported yet: clearing the group-11 owned-flag is not enough —
-        // the engine re-equips a default Handgun through an as-yet-undecoded equipped-weapon path (confirmed
-        // in-game: None still starts Regina with the pistol). So null would silently leave her armed; reject
-        // it rather than lie. Needs a runtime (CE) decode of the equipped-weapon source. docs/reference/dc1/items/STARTING-INVENTORY.md.
-        if (weaponId is null)
-            throw new ArgumentException(
-                "a weaponless start ('None') is not supported yet — the engine re-equips a default Handgun via an " +
-                "undecoded path, so it can't be reliably removed. Choose a weapon id (0x01..0x0A).", nameof(weaponId));
-        if (weaponId is { } w && (w < StartingWeaponFirstId || w > StartingWeaponLastId))
-            throw new ArgumentOutOfRangeException(nameof(weaponId), weaponId,
-                $"starting weapon id must be 0x{StartingWeaponFirstId:X2}..0x{StartingWeaponLastId:X2}.");
-        ValidateStartingWeaponGrants(exe);
-
-        var result = new List<(string, byte)>();
-        foreach (var block in StartingWeaponGrantBlocks)
-        {
-            byte granted = 0;
-            for (int i = 0; i < block.Sites.Length; i++)
-            {
-                var site = block.Sites[i];
-                if (i == 0 && weaponId is { } id)
-                {
-                    WriteUInt8AtVa(exe, site.IdxImmVa, (byte)id);
-                    WriteUInt8AtVa(exe, site.ValImmVa, 1);
-                    granted = (byte)id;
-                }
-                else
-                {
-                    WriteUInt8AtVa(exe, site.ValImmVa, 0); // disable this grant (SetFlag(11,idx,0) — clear)
-                }
-            }
-            result.Add((block.Name, granted));
-        }
-        return result.ToArray();
-    }
+        => Dc1InventoryExePatch.SetStartingWeapon(exe, weaponId);
 
     // ---- DC1 character-renderer vertex-table expansion (the 400-vertex ceiling lift) ----
     //
@@ -1583,10 +1073,10 @@ public static class ExePatcher
 
     // PE header field positions, verified against the stock image (e_lfanew 0xF8, 7 sections,
     // section table 0x1F0..0x308 with a zeroed 8th slot, SizeOfImage 0x2FC000, checksum 0).
-    private const int PeSigOffset = 0xF8;
-    private const int NumberOfSectionsOffset = 0xFE;
-    private const int SizeOfImageOffset = 0x148;
-    private const int NewSectionHeaderOffset = 0x308;
+    internal const int PeSigOffset = 0xF8;
+    internal const int NumberOfSectionsOffset = 0xFE;
+    internal const int SizeOfImageOffset = 0x148;
+    internal const int NewSectionHeaderOffset = 0x308;
 
     /// <summary>
     /// Every code reference to the three tables, as the file offset of the 32-bit address operand
@@ -1611,7 +1101,7 @@ public static class ExePatcher
         (0x005F176Du, Dc1OtzTableVa), (0x005F1774u, Dc1OtzTableVa), (0x005F177Fu, Dc1OtzTableVa), (0x005F1793u, Dc1OtzTableVa),
     };
 
-    private static uint Dc1NewTableVaFor(uint stockVa) => stockVa switch
+    internal static uint Dc1NewTableVaFor(uint stockVa) => stockVa switch
     {
         Dc1ColorTableVa => Dc1NewColorTableVa,
         Dc1OtzTableVa => Dc1NewOtzTableVa,
@@ -1629,65 +1119,25 @@ public static class ExePatcher
     /// it never writes a byte it cannot verify. Reversal is the installer's backup file.
     /// </summary>
     public static byte[] ExpandDc1CharacterVertexTables(ReadOnlySpan<byte> exe)
-    {
-        if (exe.Length != Dc1StockExeLength)
-            throw new InvalidOperationException(
-                $"DINO.exe is 0x{exe.Length:X} bytes, expected stock 0x{Dc1StockExeLength:X}.");
-        if (exe[0] != 'M' || exe[1] != 'Z' || ReadUInt32(exe, 0x3C) != PeSigOffset
-            || ReadUInt32(exe, PeSigOffset) != 0x00004550) // "PE\0\0"
-            throw new InvalidOperationException("Not the expected PE layout (MZ/PE anchors mismatch).");
-        if (ReadUInt16(exe, NumberOfSectionsOffset) != 7)
-            throw new InvalidOperationException("Expected 7 PE sections (stock image).");
-        if (ReadUInt32(exe, SizeOfImageOffset) != Dc1NewTableSectionRva)
-            throw new InvalidOperationException("SizeOfImage is not the stock 0x2FC000.");
-        for (int i = 0; i < 0x28; i++)
-            if (exe[NewSectionHeaderOffset + i] != 0)
-                throw new InvalidOperationException("The 8th section-header slot is not empty.");
-        foreach (var (va, stock) in Dc1VertexTableOperands)
-            if (ReadUInt32AtVa(exe, va) != stock)
-                throw new InvalidOperationException(
-                    $"Operand at VA 0x{va:X} does not hold stock table address 0x{stock:X} " +
-                    "(already expanded, or an unknown build).");
-
-        var outBuf = new byte[Dc1StockExeLength + Dc1NewTableSectionSize];
-        exe.CopyTo(outBuf);
-        var span = outBuf.AsSpan();
-
-        // header: 8th section ".dinovtx", RW initialized data, raw == appended zero tail
-        WriteUInt16(span, NumberOfSectionsOffset, 8);
-        WriteUInt32(span, SizeOfImageOffset, Dc1NewTableSectionRva + Dc1NewTableSectionSize);
-        System.Text.Encoding.ASCII.GetBytes(".dinovtx").CopyTo(span.Slice(NewSectionHeaderOffset, 8));
-        WriteUInt32(span, NewSectionHeaderOffset + 0x08, Dc1NewTableSectionSize); // VirtualSize
-        WriteUInt32(span, NewSectionHeaderOffset + 0x0C, Dc1NewTableSectionRva);  // VirtualAddress
-        WriteUInt32(span, NewSectionHeaderOffset + 0x10, Dc1NewTableSectionSize); // SizeOfRawData
-        WriteUInt32(span, NewSectionHeaderOffset + 0x14, Dc1StockExeLength);      // PointerToRawData
-        WriteUInt32(span, NewSectionHeaderOffset + 0x24, 0xC0000040);             // RW initialized data
-
-        foreach (var (va, stock) in Dc1VertexTableOperands)
-            WriteUInt32AtVa(span, va, Dc1NewTableVaFor(stock));
-
-        return outBuf;
-    }
+        => Dc1VertexExePatch.ExpandDc1CharacterVertexTables(exe);
 
     /// <summary>True when <paramref name="exe"/> already carries the expanded vertex tables.</summary>
     public static bool IsDc1CharacterVertexTablesExpanded(ReadOnlySpan<byte> exe)
-        => exe.Length == Dc1StockExeLength + Dc1NewTableSectionSize
-           && ReadUInt16(exe, NumberOfSectionsOffset) == 8
-           && ReadUInt32AtVa(exe, Dc1VertexTableOperands[0].OperandVa) == Dc1NewXyTableVa;
+        => Dc1VertexExePatch.IsDc1CharacterVertexTablesExpanded(exe);
 
-    private static Span<byte> Slice(Span<byte> buf, int off, int len)
+    internal static Span<byte> Slice(Span<byte> buf, int off, int len)
     {
         CheckBounds(buf.Length, off, len);
         return buf.Slice(off, len);
     }
 
-    private static ReadOnlySpan<byte> Slice(ReadOnlySpan<byte> buf, int off, int len)
+    internal static ReadOnlySpan<byte> Slice(ReadOnlySpan<byte> buf, int off, int len)
     {
         CheckBounds(buf.Length, off, len);
         return buf.Slice(off, len);
     }
 
-    private static void CheckBounds(int bufLen, int off, int len)
+    internal static void CheckBounds(int bufLen, int off, int len)
     {
         if (off < 0 || len < 0 || off + len > bufLen)
             throw new ArgumentOutOfRangeException(nameof(off),

@@ -36,4 +36,8 @@
   <ItemGroup>
     <PackageReference Include="NVorbis" Version="0.10.5" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="dinorand" />
+    <InternalsVisibleTo Include="DinoRand.Avalonia" />
+  </ItemGroup>
 </Project>

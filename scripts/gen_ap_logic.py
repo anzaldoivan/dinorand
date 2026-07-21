@@ -377,6 +377,19 @@ def build_dc2() -> dict:
             edges.append({"from": st, "to": dr["dest_id"],
                           "requiresItems": [], "requiresRooms": []})
 
+    unique_edges: list[dict] = []
+    seen_edge_signatures: set[tuple] = set()
+    for edge in edges:
+        signature = (
+            edge["from"], edge["to"],
+            tuple(edge["requiresItems"]), tuple(edge["requiresRooms"]),
+        )
+        if signature in seen_edge_signatures:
+            continue
+        seen_edge_signatures.add(signature)
+        unique_edges.append(edge)
+    edges = unique_edges
+
     locs = []
     for st_room, items in placements.items():
         code = st_room[2:]  # "ST304" -> "304"
@@ -489,6 +502,13 @@ def _check_common(data: dict) -> dict:
 
 def check_dc2(data: dict) -> None:
     names = _check_common(data)
+    edge_signatures = [
+        (e["from"], e["to"], tuple(e["requiresItems"]), tuple(e["requiresRooms"]))
+        for e in data["edges"]
+    ]
+    assert len(edge_signatures) == len(set(edge_signatures)), (
+        "duplicate DC2 logical edge signatures"
+    )
     assert data["startRoom"] == "000" and data["goalRoom"] == "904", (
         data["startRoom"], data["goalRoom"])
     assert len(data["regions"]) == 89, len(data["regions"])

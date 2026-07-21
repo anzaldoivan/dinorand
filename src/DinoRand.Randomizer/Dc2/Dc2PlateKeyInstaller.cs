@@ -69,7 +69,8 @@ public static class Dc2PlateKeyInstaller
 
         // Re-key from the PRISTINE bytes (the .bak when one exists) so re-running never compounds.
         byte[] pristine = File.ReadAllBytes(File.Exists(bak) ? bak : path);
-        int plate = Dc2PlateKeyPatch.SelectRequiredPlate(new Seed(seed).RngFor("DC2 Plate Key"));
+        var patchPlan = Dc2ExecutablePatchPlanner.PlanRequiredPlate(new Seed(seed).RngFor("DC2 Plate Key"));
+        int plate = patchPlan.RequiredPlate!.Value;
         byte[] bytes;
         Dc2PlateKeyPatch.Result result;
         try

@@ -5,4 +5,7 @@
   <ItemGroup>
     <EmbeddedResource Include="..\..\data\dc2\puzzle-codes.json" LogicalName="DinoRand.FileFormats.Data.dc2.puzzle-codes.json" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DinoRand.Randomizer" />
+  </ItemGroup>
 </Project>

@@ -1,10 +1,9 @@
-"""Integration tests: Archipelago generation over the DC2 stub world.
+"""Integration tests: Archipelago generation over the DC2 world.
 
-DC2 has no gated logic yet, so this is a minimal "it generates and is completable" proof.
 WorldTestBase also contributes AP's generic tests automatically (test_fill,
 test_all_state_can_reach_everything, test_empty_state_can_reach_something, id uniqueness).
-When the DC2 contract is populated, add gate/beatability tests mirroring DC1's.
 """
+from .. import data as dc2
 from .bases import DinoCrisis2TestBase
 
 
@@ -17,7 +16,9 @@ class TestStubGeneration(DinoCrisis2TestBase):
         self.collect_all_but([])
         self.assertBeatable(True)
 
-    def test_no_fillable_locations_yet(self) -> None:
-        # Stub carries no real (id-bearing) locations; only the Victory event.
+    def test_fillable_locations_match_contract(self) -> None:
         real = [loc for loc in self.multiworld.get_locations(1) if loc.address is not None]
-        self.assertEqual(real, [])
+        self.assertEqual(
+            sorted(loc.name for loc in real),
+            sorted(loc["name"] for loc in dc2.LOCATIONS),
+        )

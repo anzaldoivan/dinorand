@@ -30,7 +30,9 @@ public sealed class Dc2CircuitShuffle : IDc2RandomizationPass
                 continue;
             }
             var rng = context.Seed.RngFor($"{Name}:{spec.FileName}");
-            var bytes = Dc2CircuitPatch.ShuffleRoom(context.CurrentBytes(room), spec, rng, out var results);
+            var currentBytes = context.CurrentBytes(room);
+            var sequences = Dc2CircuitShuffleInstaller.PlanRoom(currentBytes, spec, rng);
+            var bytes = Dc2CircuitPatch.ApplyRoomPlan(currentBytes, spec, sequences, out var results);
             context.EmitRoom(room, bytes);
             foreach (var r in results)
             {

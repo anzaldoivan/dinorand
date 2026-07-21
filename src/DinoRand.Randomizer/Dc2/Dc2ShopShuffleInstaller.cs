@@ -78,7 +78,9 @@ public static class Dc2ShopShuffleInstaller
         if (!File.Exists(backupPath))
             File.Copy(exePath, backupPath);
 
-        var entries = Dc2ShopTablePatch.Shuffle(bytes, seed, shuffleCatalogMasks);
+        var patchPlan = Dc2ExecutablePatchPlanner.PlanShop(seed, bytes, shuffleCatalogMasks);
+        var entries = Dc2ShopTablePatch.ApplyPlan(bytes, patchPlan.ShopPrices!, patchPlan.ShopMasks!,
+            patchPlan.RecoveryPrices!, shuffleCatalogMasks);
         File.WriteAllBytes(exePath, bytes);
         int moved = entries.Count(e => e.OldPrice != e.NewPrice || e.OldMask != e.NewMask);
         log?.Invoke($"[shop-shuffle] seed {seed}: {moved}/{entries.Length} shop items changed (backup: {Path.GetFileName(backupPath)})");
