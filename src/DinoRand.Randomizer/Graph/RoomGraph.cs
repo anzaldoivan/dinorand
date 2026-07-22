@@ -36,13 +36,13 @@ public sealed class RoomGraph
                     graph.GetOrAddRegion(room.Stage, room.Room, rd.Index, rd.Name);
                 var primary = graph.GetOrAddRegion(room.Stage, room.Room, 0, split.Regions[0].Name);
                 foreach (var item in room.Items)
-                    primary.Items.Add(new NodeItem(item));
+                    primary.Items.Add(new NodeItem(item, code));
             }
             else
             {
                 var node = graph.GetOrAdd(room.Stage, room.Room);
                 foreach (var item in room.Items)
-                    node.Items.Add(new NodeItem(item));
+                    node.Items.Add(new NodeItem(item, code));
             }
         }
 

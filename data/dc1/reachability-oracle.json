@@ -1,7 +1,7 @@
 {
   "_generated_by": "Dc1ReachabilityOracleTests (engine: KeyItemPlacer.Reachable over RoomGraph.Build(rooms, DinoCrisis1.Requirements) \u2014 the door .dat graph \u002B map.json overlay)",
-  "_source": "engine truth from the room .dat door graph (DINORAND_DC1_DIR) \u002B data/dc1/map.json; regenerate with DINORAND_UPDATE_ORACLE=1 dotnet test --filter Dc1ReachabilityOracleTests. NOT the AP star model \u2014 see GRAPH-LOGIC-PARITY parity contract.",
-  "version": 1,
+  "_source": "engine truth from the room .dat door graph (DINORAND_DC1_DIR) \u002B data/dc1/map.json; regenerate with DINORAND_UPDATE_ORACLE=1 dotnet test --filter Dc1ReachabilityOracleTests. Export contains derived topology only, never room bytes.",
+  "version": 2,
   "startRoom": "010d",
   "goalRoom": "060d",
   "gatingKeys": [
@@ -32,6 +32,4161 @@
   ],
   "nodeSplitRooms": [
     "0309"
+  ],
+  "itemProtectedRooms": [
+    "060d",
+    "0610",
+    "0612"
+  ],
+  "endingRooms": [
+    "040d",
+    "060c",
+    "0612",
+    "0613"
+  ],
+  "startNode": "010d",
+  "goalNode": "060d",
+  "nodes": [
+    {
+      "id": "0100",
+      "room": "0100",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0101",
+      "room": "0101",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0102",
+      "room": "0102",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0103",
+      "room": "0103",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0104",
+      "room": "0104",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0105",
+      "room": "0105",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0106",
+      "room": "0106",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0107",
+      "room": "0107",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0108",
+      "room": "0108",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0109",
+      "room": "0109",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010a",
+      "room": "010a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010b",
+      "room": "010b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010c",
+      "room": "010c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010d",
+      "room": "010d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010e",
+      "room": "010e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010f",
+      "room": "010f",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0110",
+      "room": "0110",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0111",
+      "room": "0111",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0112",
+      "room": "0112",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0113",
+      "room": "0113",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0114",
+      "room": "0114",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0200",
+      "room": "0200",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0201",
+      "room": "0201",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0202",
+      "room": "0202",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0203",
+      "room": "0203",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0204",
+      "room": "0204",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0205",
+      "room": "0205",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0206",
+      "room": "0206",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0300",
+      "room": "0300",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0301",
+      "room": "0301",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0302",
+      "room": "0302",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0303",
+      "room": "0303",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0304",
+      "room": "0304",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0305",
+      "room": "0305",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0306",
+      "room": "0306",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0307",
+      "room": "0307",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0308",
+      "room": "0308",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0309:west",
+      "room": "0309",
+      "primary": true,
+      "region": "west"
+    },
+    {
+      "id": "0309:shuttle",
+      "room": "0309",
+      "primary": false,
+      "region": "shuttle"
+    },
+    {
+      "id": "030a",
+      "room": "030a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030b",
+      "room": "030b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030c",
+      "room": "030c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030d",
+      "room": "030d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030e",
+      "room": "030e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0400",
+      "room": "0400",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0401",
+      "room": "0401",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0402",
+      "room": "0402",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0403",
+      "room": "0403",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0404",
+      "room": "0404",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0405",
+      "room": "0405",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0406",
+      "room": "0406",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0407",
+      "room": "0407",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0408",
+      "room": "0408",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0409",
+      "room": "0409",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040a",
+      "room": "040a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040b",
+      "room": "040b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040c",
+      "room": "040c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040d",
+      "room": "040d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0500",
+      "room": "0500",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0501",
+      "room": "0501",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0502",
+      "room": "0502",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0503",
+      "room": "0503",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0504",
+      "room": "0504",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0505",
+      "room": "0505",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0506",
+      "room": "0506",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0507",
+      "room": "0507",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0508",
+      "room": "0508",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0509",
+      "room": "0509",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050a",
+      "room": "050a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050b",
+      "room": "050b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050c",
+      "room": "050c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050d",
+      "room": "050d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050e",
+      "room": "050e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050f",
+      "room": "050f",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0510",
+      "room": "0510",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0511",
+      "room": "0511",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0600",
+      "room": "0600",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0601",
+      "room": "0601",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0602",
+      "room": "0602",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0603",
+      "room": "0603",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0604",
+      "room": "0604",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0605",
+      "room": "0605",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0606",
+      "room": "0606",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0607",
+      "room": "0607",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0608",
+      "room": "0608",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0609",
+      "room": "0609",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060a",
+      "room": "060a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060b",
+      "room": "060b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060c",
+      "room": "060c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060d",
+      "room": "060d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060e",
+      "room": "060e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060f",
+      "room": "060f",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0610",
+      "room": "0610",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0611",
+      "room": "0611",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0612",
+      "room": "0612",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0613",
+      "room": "0613",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0614",
+      "room": "0614",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0615",
+      "room": "0615",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0701",
+      "room": "0701",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0702",
+      "room": "0702",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0703",
+      "room": "0703",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0704",
+      "room": "0704",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0705",
+      "room": "0705",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0706",
+      "room": "0706",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0707",
+      "room": "0707",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0709",
+      "room": "0709",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "070d",
+      "room": "070d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0800",
+      "room": "0800",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0801",
+      "room": "0801",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0802",
+      "room": "0802",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0804",
+      "room": "0804",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0805",
+      "room": "0805",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0806",
+      "room": "0806",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0807",
+      "room": "0807",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0808",
+      "room": "0808",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0900",
+      "room": "0900",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0902",
+      "room": "0902",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0903",
+      "room": "0903",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0904",
+      "room": "0904",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0905",
+      "room": "0905",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0906",
+      "room": "0906",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0908",
+      "room": "0908",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0910",
+      "room": "0910",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a02",
+      "room": "0a02",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a03",
+      "room": "0a03",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a04",
+      "room": "0a04",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a05",
+      "room": "0a05",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a07",
+      "room": "0a07",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a08",
+      "room": "0a08",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a0a",
+      "room": "0a0a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a0b",
+      "room": "0a0b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a13",
+      "room": "0a13",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b01",
+      "room": "0b01",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b02",
+      "room": "0b02",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b03",
+      "room": "0b03",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b04",
+      "room": "0b04",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b05",
+      "room": "0b05",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b06",
+      "room": "0b06",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b07",
+      "room": "0b07",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b09",
+      "room": "0b09",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b0d",
+      "room": "0b0d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c00",
+      "room": "0c00",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c02",
+      "room": "0c02",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c03",
+      "room": "0c03",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c04",
+      "room": "0c04",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c05",
+      "room": "0c05",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c06",
+      "room": "0c06",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c08",
+      "room": "0c08",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c10",
+      "room": "0c10",
+      "primary": true,
+      "region": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "0100",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0101",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0101",
+      "to": "0111",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0102",
+      "to": "0100",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0102",
+      "to": "0101",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0107",
+        "0202"
+      ]
+    },
+    {
+      "from": "0102",
+      "to": "0103",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0102",
+      "to": "0104",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0107",
+        "0202"
+      ]
+    },
+    {
+      "from": "0102",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106"
+      ]
+    },
+    {
+      "from": "0102",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0103",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0103",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0104",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0105",
+      "to": "0103",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0105",
+      "to": "0106",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0105",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0105",
+      "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0109",
+        "030b"
+      ]
+    },
+    {
+      "from": "0106",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0106",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0106",
+      "to": "0205",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0300"
+      ]
+    },
+    {
+      "from": "0107",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0107",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0107",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        99,
+        106
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0107",
+      "to": "0206",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0107",
+      "to": "0400",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        46
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0108",
+      "to": "0109",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0101"
+      ]
+    },
+    {
+      "from": "0108",
+      "to": "010b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0108",
+      "to": "0111",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0108",
+      "to": "0113",
+      "requiresLatch": 6,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0113"
+      ]
+    },
+    {
+      "from": "0109",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0107",
+        "0202"
+      ]
+    },
+    {
+      "from": "010a",
+      "to": "010b",
+      "requiresLatch": 7,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010b",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010b",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": 7,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0101"
+      ]
+    },
+    {
+      "from": "010c",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010d",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0114"
+      ]
+    },
+    {
+      "from": "010d",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0114"
+      ]
+    },
+    {
+      "from": "010d",
+      "to": "010c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010d",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010d",
+      "to": "030b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        47
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "010e",
+      "to": "010f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010e",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010f",
+      "to": "010e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010f",
+      "to": "0114",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010f",
+      "to": "0114",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0110",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0110",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0110",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0111",
+      "to": "0101",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0202"
+      ]
+    },
+    {
+      "from": "0111",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "010e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        48
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "0114",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        48
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "0404",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0109"
+      ]
+    },
+    {
+      "from": "0112",
+      "to": "0404",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0109"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0113",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": 6,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0113",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0113",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        65
+      ],
+      "requiresRooms": [
+        "010b"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        65
+      ],
+      "requiresRooms": [
+        "010b"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        65
+      ],
+      "requiresRooms": [
+        "010b"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0506"
+      ]
+    },
+    {
+      "from": "0113",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0506"
+      ]
+    },
+    {
+      "from": "0114",
+      "to": "010f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0114",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0200",
+      "to": "0201",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0201",
+      "to": "0200",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0201",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0201",
+      "to": "0205",
+      "requiresLatch": 11,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0300"
+      ]
+    },
+    {
+      "from": "0201",
+      "to": "0205",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0300"
+      ]
+    },
+    {
+      "from": "0201",
+      "to": "0205",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0300"
+      ]
+    },
+    {
+      "from": "0202",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0203",
+      "to": "0201",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0203",
+      "to": "0202",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        98,
+        105
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0203",
+      "to": "0204",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0203",
+      "to": "0206",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0204",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0205",
+      "to": "0106",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0205",
+      "to": "0201",
+      "requiresLatch": null,
+      "setsLatch": 11,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0206",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0206",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0300",
+      "to": "0304",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0300",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0301",
+      "to": "0302",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0301",
+      "to": "0304",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0301",
+      "to": "0305",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0302",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0302",
+      "to": "0303",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0303",
+      "to": "0302",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        71,
+        72,
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        71,
+        72,
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        71,
+        72,
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        71,
+        72,
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        71,
+        72,
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        71,
+        72,
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        71,
+        72,
+        101,
+        108
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0305",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0305",
+      "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0306",
+      "to": "0304",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030c"
+      ]
+    },
+    {
+      "from": "0306",
+      "to": "0305",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0306",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "0308",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "030e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0308",
+      "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:west",
+      "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:west",
+      "to": "030a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:west",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:shuttle",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:shuttle",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:shuttle",
+      "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        100,
+        107
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:shuttle",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0401"
+      ]
+    },
+    {
+      "from": "0309:shuttle",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "050b"
+      ]
+    },
+    {
+      "from": "030a",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030a",
+      "to": "030b",
+      "requiresLatch": null,
+      "setsLatch": 15,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030a",
+      "to": "030c",
+      "requiresLatch": 16,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030a",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030b",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030b",
+      "to": "030a",
+      "requiresLatch": 15,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030b",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030a",
+      "requiresLatch": null,
+      "setsLatch": 16,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": 16,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "060f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "030b",
+      "requiresLatch": null,
+      "setsLatch": 15,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "030c",
+      "requiresLatch": 16,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030e",
+      "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030e",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0400",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0400",
+      "to": "0401",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0109",
+        "0205"
+      ]
+    },
+    {
+      "from": "0401",
+      "to": "0400",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0401",
+      "to": "0402",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0401",
+      "to": "0403",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0402",
+      "to": "0401",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0402",
+      "to": "0403",
+      "requiresLatch": null,
+      "setsLatch": 18,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0402",
+      "to": "040d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0403",
+      "to": "0402",
+      "requiresLatch": 18,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0403",
+      "to": "0409",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0404",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0404",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0405",
+      "to": "0404",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0405",
+      "to": "0406",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0405",
+      "to": "060f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "0406",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0406",
+      "to": "0407",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0407",
+      "to": "0406",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0407",
+      "to": "0408",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0408",
+      "to": "0407",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0409",
+      "to": "040a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040a",
+      "to": "040b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040a",
+      "to": "040c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040b",
+      "to": "040a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040c",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040c",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040c",
+      "to": "040a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040c",
+      "to": "040a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0501",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0506",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0501",
+      "to": "0500",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0501",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0501",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0503",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        56,
+        57,
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0504",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        56,
+        57,
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0505",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0507",
+      "requiresLatch": 21,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0511",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        56,
+        57,
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0503",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0503",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0503",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0503",
+      "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0503",
+      "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0504",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0505",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0505",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0505",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0506",
+      "to": "0500",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0506",
+      "to": "0507",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        103,
+        110
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0507",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": 21,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0507",
+      "to": "0506",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0507",
+      "to": "0508",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        104,
+        111
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0508",
+      "to": "0507",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0508",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "0508",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "050a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "050e",
+      "requiresLatch": 25,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "0510",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050a",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "050c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0510",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050c",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050c",
+      "to": "050d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "050b"
+      ]
+    },
+    {
+      "from": "050d",
+      "to": "050c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050d",
+      "to": "050e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050e",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": 25,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050e",
+      "to": "050d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050e",
+      "to": "050f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050f",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050f",
+      "to": "050e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050f",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0510",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0510",
+      "to": "050f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0511",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "0601",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "0602",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        49
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "0602",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        49
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "0603",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        49
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "0603",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        49
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "060f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        49
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "060f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        49
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0601",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0602",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0602",
+      "to": "0605",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0602",
+      "to": "0615",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0603",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0603",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0603",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        102,
+        109
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0605",
+      "to": "0602",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0605",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0605",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0607",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0615",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
+      "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
+      "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0608",
+      "to": "0500",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0608",
+      "to": "0500",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0608",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0608",
+      "to": "0614",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0609",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0609",
+      "to": "060b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0609",
+      "to": "060b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060a",
+      "to": "060b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060a",
+      "to": "0610",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060a",
+      "to": "0610",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060b",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060b",
+      "to": "060a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060d",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060f",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060f",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060f",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b",
+        "0401"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b",
+        "0401"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b",
+        "0401"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b",
+        "0401"
+      ]
+    },
+    {
+      "from": "060f",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "030b",
+        "0401"
+      ]
+    },
+    {
+      "from": "0610",
+      "to": "060a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0610",
+      "to": "0612",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0610",
+      "to": "0613",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0610",
+      "to": "0613",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "0505",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "0614",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0612",
+      "to": "060c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0613",
+      "to": "0613",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0614",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0614",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0615",
+      "to": "0602",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0615",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0910",
+      "to": "0910",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0100",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0101",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0202"
+      ]
+    },
+    {
+      "from": "0a02",
+      "to": "0104",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0202"
+      ]
+    },
+    {
+      "from": "0a02",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0a03",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0a04",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0a07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a03",
+      "to": "0a02",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a03",
+      "to": "0a05",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a04",
+      "to": "0a02",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0106",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0a03",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0b07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0206",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0206",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0400",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0a02",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0a0a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0a13",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a08",
+      "to": "0109",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0101"
+      ]
+    },
+    {
+      "from": "0a08",
+      "to": "0111",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a08",
+      "to": "0a0b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a08",
+      "to": "0a13",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "0a07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "0a0b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0b",
+      "to": "0a08",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0b",
+      "to": "0a0a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0a07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0a08",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0b09",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0c04",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0c10",
+      "to": "0910",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    }
   ],
   "probes": [
     {

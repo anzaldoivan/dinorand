@@ -16,8 +16,8 @@ namespace DinoRand.FileFormats.Tests;
 /// 0309's node-split flattens the descent-key probes → mismatch). It is the engine-side counterpart to the
 /// source-side <see cref="Dc1MapContractTests"/> and the fail-closed <c>gen_ap_logic.py</c> tripwire.
 ///
-/// <para>Install-gated on <c>DINORAND_DC1_DIR</c> (the oracle is derived from the room .dat door graph, which
-/// the star-topology overlay alone cannot supply), like every other <c>RealInstall_*</c> test — CI without an
+/// <para>Install-gated on <c>DINORAND_DC1_DIR</c> (the oracle is derived from the room .dat door graph),
+/// like every other <c>RealInstall_*</c> test — CI without an
 /// install regenerates nothing; the no-install oracle↔source consistency tripwire in <c>gen_ap_logic --check</c>
 /// is the CI backstop. Regenerate after an intended change with
 /// <c>DINORAND_UPDATE_ORACLE=1 dotnet test --filter Dc1ReachabilityOracleTests</c>, then stage the file.</para>
@@ -25,6 +25,26 @@ namespace DinoRand.FileFormats.Tests;
 public class Dc1ReachabilityOracleTests
 {
     private static readonly DinoCrisis1 Game = new();
+
+    [Fact]
+    public void CommittedOracle_ExportsInstallFreePhysicalNodesAndEdges()
+    {
+        var path = FindRepoFile(Path.Combine("data", "dc1", "reachability-oracle.json"));
+        using var doc = JsonDocument.Parse(File.ReadAllBytes(path));
+        var root = doc.RootElement;
+
+        Assert.Equal(2, root.GetProperty("version").GetInt32());
+        Assert.NotEmpty(root.GetProperty("nodes").EnumerateArray());
+        Assert.NotEmpty(root.GetProperty("edges").EnumerateArray());
+        Assert.All(root.GetProperty("edges").EnumerateArray(), edge =>
+        {
+            Assert.True(edge.TryGetProperty("requiresAnyItems", out _));
+            Assert.True(edge.TryGetProperty("requiresItems", out _));
+            Assert.True(edge.TryGetProperty("requiresRooms", out _));
+            Assert.True(edge.TryGetProperty("requiresLatch", out _));
+            Assert.True(edge.TryGetProperty("setsLatch", out _));
+        });
+    }
 
     [Fact]
     public void RealInstall_Oracle_MatchesEngine_ByteIdentical()
@@ -78,12 +98,65 @@ public class Dc1ReachabilityOracleTests
                 + "RoomGraph.Build(rooms, DinoCrisis1.Requirements) — the door .dat graph + map.json overlay)");
             w.WriteString("_source", "engine truth from the room .dat door graph (DINORAND_DC1_DIR) + "
                 + "data/dc1/map.json; regenerate with DINORAND_UPDATE_ORACLE=1 dotnet test --filter "
-                + "Dc1ReachabilityOracleTests. NOT the AP star model — see GRAPH-LOGIC-PARITY parity contract.");
-            w.WriteNumber("version", 1);
+                + "Dc1ReachabilityOracleTests. Export contains derived topology only, never room bytes.");
+            w.WriteNumber("version", 2);
             w.WriteString("startRoom", $"{Game.StartRoomCode:x4}");
             w.WriteString("goalRoom", $"{Game.GoalRoomCode:x4}");
             WriteHexArray(w, "gatingKeys", gatingKeys, "x2");
             WriteHexArray(w, "nodeSplitRooms", splitRooms, "x4");
+            WriteHexArray(w, "itemProtectedRooms", Game.ItemProtectedRoomCodes.OrderBy(value => value), "x4");
+            WriteHexArray(w, "endingRooms", Game.EndingZoneRoomCodes.OrderBy(value => value), "x4");
+
+            var orderedNodes = graph.Nodes.OrderBy(node => node.Code)
+                .ThenBy(node => node.RegionIndex).ToList();
+            var splitCodes = orderedNodes.GroupBy(node => node.Code)
+                .Where(group => group.Count() > 1).Select(group => group.Key).ToHashSet();
+            string NodeId(RoomNode node) => splitCodes.Contains(node.Code)
+                ? $"{node.Code:x4}:{node.RegionName ?? node.RegionIndex.ToString()}"
+                : $"{node.Code:x4}";
+
+            w.WriteString("startNode", NodeId(orderedNodes.First(node =>
+                node.Code == Game.StartRoomCode && node.RegionIndex == 0)));
+            w.WriteString("goalNode", NodeId(orderedNodes.First(node =>
+                node.Code == Game.GoalRoomCode && node.RegionIndex == 0)));
+            w.WriteStartArray("nodes");
+            foreach (var node in orderedNodes)
+            {
+                w.WriteStartObject();
+                w.WriteString("id", NodeId(node));
+                w.WriteString("room", $"{node.Code:x4}");
+                w.WriteBoolean("primary", node.RegionIndex == 0);
+                if (node.RegionName is null) w.WriteNull("region");
+                else w.WriteString("region", node.RegionName);
+                w.WriteEndObject();
+            }
+            w.WriteEndArray();
+
+            w.WriteStartArray("edges");
+            foreach (var source in orderedNodes)
+                foreach (var edge in source.Edges.OrderBy(edge => NodeId(edge.Target))
+                             .ThenBy(edge => edge.Door.FileOffset))
+                {
+                    w.WriteStartObject();
+                    w.WriteString("from", NodeId(source));
+                    w.WriteString("to", NodeId(edge.Target));
+                    if (edge.Door.GatesOnStoryLatch) w.WriteNumber("requiresLatch", edge.Door.LockId);
+                    else w.WriteNull("requiresLatch");
+                    if (edge.Door.SetsStoryLatch) w.WriteNumber("setsLatch", edge.Door.LockId);
+                    else w.WriteNull("setsLatch");
+                    WriteNumberArray(w, "requiresAnyItems",
+                        Game.KeyItemsForDoor(edge.Door.DoorType).Distinct().OrderBy(value => value));
+                    WriteNumberArray(w, "requiresItems",
+                        (edge.Requires.Items ?? Array.Empty<int>())
+                            .Concat(edge.Target.Requires.Items ?? Array.Empty<int>())
+                            .Distinct().OrderBy(value => value));
+                    WriteHexArray(w, "requiresRooms",
+                        (edge.Requires.RoomsVisited ?? Array.Empty<int>())
+                            .Concat(edge.Target.Requires.RoomsVisited ?? Array.Empty<int>())
+                            .Distinct().OrderBy(value => value), "x4");
+                    w.WriteEndObject();
+                }
+            w.WriteEndArray();
 
             w.WriteStartArray("probes");
             WriteProbe(w, "empty", Array.Empty<int>(), Reach);
@@ -118,6 +191,13 @@ public class Dc1ReachabilityOracleTests
     {
         w.WriteStartArray(field);
         foreach (var i in ids) w.WriteStringValue(i.ToString(fmt));
+        w.WriteEndArray();
+    }
+
+    private static void WriteNumberArray(Utf8JsonWriter w, string field, IEnumerable<int> values)
+    {
+        w.WriteStartArray(field);
+        foreach (var value in values) w.WriteNumberValue(value);
         w.WriteEndArray();
     }
 

@@ -251,6 +251,10 @@ public sealed class ItemRecord
     /// detection (so an unedited room round-trips byte-exact) and the empty-slot check.</summary>
     public int OriginalItemId { get; set; }
 
+    /// <summary>The count word as decoded from the file, before any randomizer edit. Used for
+    /// amount-only change detection and byte-exact no-op writes.</summary>
+    public int OriginalAmount { get; set; }
+
     /// <summary>Take-index word (<see cref="TakeIndexOffset"/>) — written back only when it
     /// differs from <see cref="OriginalTakeIndex"/> (the AP client's rekey; the standalone
     /// randomizer never changes it, so its rooms round-trip byte-exact).</summary>

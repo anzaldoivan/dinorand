@@ -8,8 +8,9 @@ namespace DinoRand.Randomizer.Passes;
 /// <summary>
 /// Phase 3. Progression logic on the real door graph (<see cref="KeyItemPlacer"/>). When
 /// <see cref="RandomizerConfig.ShuffleKeyItems"/> is on it relocates the door-gating key items into
-/// new, progression-safe spots; either way it then proves the goal room is still reachable and logs
-/// the result. Runs first so a later item/enemy shuffle builds on a beatable, key-settled baseline.
+/// new, progression-safe spots; either way it then proves the goal room is still reachable. Failure
+/// throws before installable artifacts are published. Runs first so later passes build on a verified,
+/// key-settled baseline.
 /// </summary>
 public sealed class ProgressionPass : IRandomizationPass
 {
@@ -34,15 +35,14 @@ public sealed class ProgressionPass : IRandomizationPass
                                           KeyShuffleTransaction.KeysByRoom(graph, game));
         foreach (var line in result.Log) context.Log(line);
         if (!result.Success)
-            context.Log("[progression] WARNING: seed is not provably beatable under door-graph logic");
+            throw new InvalidOperationException(
+                "final progression verification failed; installable output is blocked");
 
         // The key-item section exists only when the shuffle ran (dynamic tables, SPOILER-LOG-PLAN.md
         // §4); the beatability verdict rides along as a note.
         if (context.Config.ShuffleKeyItems)
             context.Spoiler.Section(KeySpoilerTitle, KeySpoilerColumns)
-                .AddNote(result.Success
-                    ? "seed verified beatable under door-graph key logic"
-                    : "WARNING: seed is not provably beatable under door-graph logic");
+                .AddNote("seed verified beatable under authoritative door-graph key logic");
 
         RecordSpheres(context, result);
 

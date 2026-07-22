@@ -53,9 +53,9 @@ public class SpoilerRunnerTests
         Assert.Contains("## Items (DC1)", md);
         Assert.Contains("## Key items (DC1)", md);
 
-        // Key-item rows match the pass's own relocation count.
-        int relocated = ParseCount(result.Log, "[keyshuffle] relocated ", " door keys");
-        Assert.Equal(relocated, CountTableRows(md, "## Key items (DC1)"));
+        // Key-item rows are the pass's immutable changed-physical-record ledger.
+        int changed = ParseCount(result.Log, "[keyshuffle] committed ", " changed physical records");
+        Assert.Equal(changed, CountTableRows(md, "## Key items (DC1)"));
     }
 
     [Fact]

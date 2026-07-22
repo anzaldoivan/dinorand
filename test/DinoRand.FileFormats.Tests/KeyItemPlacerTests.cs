@@ -225,7 +225,7 @@ public class KeyItemPlacerTests
         // The exact door-rando softlock DoorRandomizer.IsBeatable must catch: a shuffle strands the
         // goal behind a type-1 shortcut whose type-2 producer sits past that same locked door. The
         // beatability gate (Verify → the latch-aware Reachable) must report it unsolvable, so the pass
-        // rerolls / falls back to vanilla rather than shipping it.
+        // rejects the candidate rather than shipping it.
         var g = new RoomGraph();
         Link(g, 0x010d, 0x0100, 0x00);          // free
         Link(g, 0x0100, 0x0200, 0x01, 0x0f);    // type-1 reader gates the goal, lock 0x0f

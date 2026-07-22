@@ -1,9 +1,12 @@
 {
   "_generated_by": "scripts/gen_ap_logic.py",
-  "_source": "data/dc1/{map,items,room-data}.json (authored) + ap-client-checks.json",
-  "version": 2,
+  "_source": "data/dc1/{map,items,room-data,reachability-oracle}.json + ap-client-checks.json",
+  "version": 3,
+  "topology": "physical",
   "startRoom": "010d",
   "goalRoom": "060d",
+  "startNode": "010d",
+  "goalNode": "060d",
   "regions": {
     "0100": "Locker Room",
     "0101": "Toilet",
@@ -102,47 +105,1104 @@
     "0614": "Port Transport Passageway",
     "0615": "General Weapons Storage"
   },
+  "nodes": [
+    {
+      "id": "0100",
+      "room": "0100",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0101",
+      "room": "0101",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0102",
+      "room": "0102",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0103",
+      "room": "0103",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0104",
+      "room": "0104",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0105",
+      "room": "0105",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0106",
+      "room": "0106",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0107",
+      "room": "0107",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0108",
+      "room": "0108",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0109",
+      "room": "0109",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010a",
+      "room": "010a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010b",
+      "room": "010b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010c",
+      "room": "010c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010d",
+      "room": "010d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010e",
+      "room": "010e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "010f",
+      "room": "010f",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0110",
+      "room": "0110",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0111",
+      "room": "0111",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0112",
+      "room": "0112",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0113",
+      "room": "0113",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0114",
+      "room": "0114",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0200",
+      "room": "0200",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0201",
+      "room": "0201",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0202",
+      "room": "0202",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0203",
+      "room": "0203",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0204",
+      "room": "0204",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0205",
+      "room": "0205",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0206",
+      "room": "0206",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0300",
+      "room": "0300",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0301",
+      "room": "0301",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0302",
+      "room": "0302",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0303",
+      "room": "0303",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0304",
+      "room": "0304",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0305",
+      "room": "0305",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0306",
+      "room": "0306",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0307",
+      "room": "0307",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0308",
+      "room": "0308",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0309:west",
+      "room": "0309",
+      "primary": true,
+      "region": "west"
+    },
+    {
+      "id": "0309:shuttle",
+      "room": "0309",
+      "primary": false,
+      "region": "shuttle"
+    },
+    {
+      "id": "030a",
+      "room": "030a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030b",
+      "room": "030b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030c",
+      "room": "030c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030d",
+      "room": "030d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "030e",
+      "room": "030e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0400",
+      "room": "0400",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0401",
+      "room": "0401",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0402",
+      "room": "0402",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0403",
+      "room": "0403",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0404",
+      "room": "0404",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0405",
+      "room": "0405",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0406",
+      "room": "0406",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0407",
+      "room": "0407",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0408",
+      "room": "0408",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0409",
+      "room": "0409",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040a",
+      "room": "040a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040b",
+      "room": "040b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040c",
+      "room": "040c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "040d",
+      "room": "040d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0500",
+      "room": "0500",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0501",
+      "room": "0501",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0502",
+      "room": "0502",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0503",
+      "room": "0503",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0504",
+      "room": "0504",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0505",
+      "room": "0505",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0506",
+      "room": "0506",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0507",
+      "room": "0507",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0508",
+      "room": "0508",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0509",
+      "room": "0509",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050a",
+      "room": "050a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050b",
+      "room": "050b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050c",
+      "room": "050c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050d",
+      "room": "050d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050e",
+      "room": "050e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "050f",
+      "room": "050f",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0510",
+      "room": "0510",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0511",
+      "room": "0511",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0600",
+      "room": "0600",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0601",
+      "room": "0601",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0602",
+      "room": "0602",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0603",
+      "room": "0603",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0604",
+      "room": "0604",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0605",
+      "room": "0605",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0606",
+      "room": "0606",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0607",
+      "room": "0607",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0608",
+      "room": "0608",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0609",
+      "room": "0609",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060a",
+      "room": "060a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060b",
+      "room": "060b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060c",
+      "room": "060c",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060d",
+      "room": "060d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060e",
+      "room": "060e",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "060f",
+      "room": "060f",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0610",
+      "room": "0610",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0611",
+      "room": "0611",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0612",
+      "room": "0612",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0613",
+      "room": "0613",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0614",
+      "room": "0614",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0615",
+      "room": "0615",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0701",
+      "room": "0701",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0702",
+      "room": "0702",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0703",
+      "room": "0703",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0704",
+      "room": "0704",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0705",
+      "room": "0705",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0706",
+      "room": "0706",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0707",
+      "room": "0707",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0709",
+      "room": "0709",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "070d",
+      "room": "070d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0800",
+      "room": "0800",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0801",
+      "room": "0801",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0802",
+      "room": "0802",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0804",
+      "room": "0804",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0805",
+      "room": "0805",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0806",
+      "room": "0806",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0807",
+      "room": "0807",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0808",
+      "room": "0808",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0900",
+      "room": "0900",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0902",
+      "room": "0902",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0903",
+      "room": "0903",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0904",
+      "room": "0904",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0905",
+      "room": "0905",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0906",
+      "room": "0906",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0908",
+      "room": "0908",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0910",
+      "room": "0910",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a02",
+      "room": "0a02",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a03",
+      "room": "0a03",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a04",
+      "room": "0a04",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a05",
+      "room": "0a05",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a07",
+      "room": "0a07",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a08",
+      "room": "0a08",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a0a",
+      "room": "0a0a",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a0b",
+      "room": "0a0b",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0a13",
+      "room": "0a13",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b01",
+      "room": "0b01",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b02",
+      "room": "0b02",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b03",
+      "room": "0b03",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b04",
+      "room": "0b04",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b05",
+      "room": "0b05",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b06",
+      "room": "0b06",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b07",
+      "room": "0b07",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b09",
+      "room": "0b09",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0b0d",
+      "room": "0b0d",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c00",
+      "room": "0c00",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c02",
+      "room": "0c02",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c03",
+      "room": "0c03",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c04",
+      "room": "0c04",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c05",
+      "room": "0c05",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c06",
+      "room": "0c06",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c08",
+      "room": "0c08",
+      "primary": true,
+      "region": null
+    },
+    {
+      "id": "0c10",
+      "room": "0c10",
+      "primary": true,
+      "region": null
+    }
+  ],
   "edges": [
+    {
+      "from": "0100",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0101",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0101",
+      "to": "0111",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0102",
+      "to": "0100",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
     {
       "from": "0102",
       "to": "0101",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0106",
-        "0202",
-        "0107"
+        "0107",
+        "0202"
       ]
     },
     {
       "from": "0102",
+      "to": "0103",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0102",
       "to": "0104",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0106",
-        "0202",
-        "0107"
+        "0107",
+        "0202"
       ]
     },
     {
       "from": "0102",
       "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0106"
       ]
     },
     {
+      "from": "0102",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0103",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0103",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0104",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0105",
+      "to": "0103",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0105",
+      "to": "0106",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0105",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0105",
       "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
-        "030b",
-        "0109"
+        "0109",
+        "030b"
+      ]
+    },
+    {
+      "from": "0106",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0106",
+      "to": "0205",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0300"
       ]
     },
     {
       "from": "0107",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0107",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0107",
       "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         99,
         106
@@ -150,31 +1210,149 @@
       "requiresRooms": []
     },
     {
-      "from": "0108",
-      "to": "0113",
+      "from": "0107",
+      "to": "0206",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": []
     },
     {
-      "from": "010a",
-      "to": "0107",
+      "from": "0107",
+      "to": "0400",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        46
+      ],
       "requiresItems": [],
-      "requiresRooms": [
-        "0106",
-        "0202"
-      ]
+      "requiresRooms": []
     },
     {
-      "from": "010b",
-      "to": "010a",
+      "from": "0108",
+      "to": "0109",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0101"
       ]
     },
     {
+      "from": "0108",
+      "to": "010b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0108",
+      "to": "0111",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0108",
+      "to": "0113",
+      "requiresLatch": 6,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0113"
+      ]
+    },
+    {
+      "from": "0109",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0106",
+        "0107",
+        "0202"
+      ]
+    },
+    {
+      "from": "010a",
+      "to": "010b",
+      "requiresLatch": 7,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010a",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010b",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010b",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": 7,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0101"
+      ]
+    },
+    {
+      "from": "010c",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "010d",
       "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0114"
@@ -182,15 +1360,142 @@
     },
     {
       "from": "010d",
+      "to": "010c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010d",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010d",
       "to": "030b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         47
       ],
       "requiresRooms": []
     },
     {
+      "from": "010e",
+      "to": "010f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010e",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010f",
+      "to": "010e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "010f",
+      "to": "0114",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0110",
+      "to": "0102",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0110",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0110",
+      "to": "010a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0111",
+      "to": "0101",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0202"
+      ]
+    },
+    {
+      "from": "0111",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0112",
+      "to": "010e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        48
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0112",
       "to": "0114",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         48
       ],
@@ -199,6 +1504,9 @@
     {
       "from": "0112",
       "to": "0404",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0106",
@@ -207,7 +1515,37 @@
     },
     {
       "from": "0113",
-      "to": "0309",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0113",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": 6,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0113",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0113",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         65
       ],
@@ -218,6 +1556,9 @@
     {
       "from": "0113",
       "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0506"
@@ -226,14 +1567,105 @@
     {
       "from": "0113",
       "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0506"
       ]
     },
     {
+      "from": "0114",
+      "to": "010f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0114",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0200",
+      "to": "0201",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0201",
+      "to": "0200",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0201",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0201",
+      "to": "0205",
+      "requiresLatch": 11,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0300"
+      ]
+    },
+    {
+      "from": "0201",
+      "to": "0205",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0300"
+      ]
+    },
+    {
+      "from": "0202",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0203",
+      "to": "0201",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0203",
       "to": "0202",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         98,
         105
@@ -241,27 +1673,306 @@
       "requiresRooms": []
     },
     {
+      "from": "0203",
+      "to": "0204",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0203",
+      "to": "0206",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0204",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0205",
+      "to": "0106",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0205",
+      "to": "0201",
+      "requiresLatch": null,
+      "setsLatch": 11,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0206",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0206",
+      "to": "0203",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0300",
+      "to": "0304",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0300",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0301",
+      "to": "0302",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0301",
+      "to": "0304",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0301",
+      "to": "0305",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0302",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0302",
+      "to": "0303",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0303",
+      "to": "0302",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0304",
       "to": "0300",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
-        101,
-        108,
         71,
-        72
+        72,
+        101,
+        108
       ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0304",
+      "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0305",
+      "to": "0301",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0305",
+      "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
       "requiresRooms": []
     },
     {
       "from": "0306",
       "to": "0304",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "030c"
       ]
     },
     {
-      "from": "0309",
+      "from": "0306",
+      "to": "0305",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0306",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "0105",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "0308",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0307",
+      "to": "030e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0308",
+      "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:west",
+      "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:west",
+      "to": "030a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:west",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:shuttle",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0309:shuttle",
       "to": "0306",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         100,
         107
@@ -269,49 +1980,610 @@
       "requiresRooms": []
     },
     {
-      "from": "0309",
+      "from": "0309:shuttle",
       "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "0401"
       ]
     },
     {
-      "from": "0309",
+      "from": "0309:shuttle",
       "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "050b"
       ]
     },
     {
+      "from": "030a",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030a",
+      "to": "030b",
+      "requiresLatch": null,
+      "setsLatch": 15,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030a",
+      "to": "030c",
+      "requiresLatch": 16,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030a",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030b",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030b",
+      "to": "030a",
+      "requiresLatch": 15,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030b",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030a",
+      "requiresLatch": null,
+      "setsLatch": 16,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": 16,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030c",
+      "to": "060f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "030b",
+      "requiresLatch": null,
+      "setsLatch": 15,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "030c",
+      "requiresLatch": 16,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030d",
+      "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030e",
+      "to": "0307",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "030e",
+      "to": "030d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0400",
+      "to": "0107",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0400",
       "to": "0401",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
-        "0205",
-        "0109"
+        "0109",
+        "0205"
       ]
+    },
+    {
+      "from": "0401",
+      "to": "0400",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0401",
+      "to": "0402",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0401",
+      "to": "0403",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0402",
+      "to": "0401",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0402",
+      "to": "0403",
+      "requiresLatch": null,
+      "setsLatch": 18,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0402",
+      "to": "040d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0403",
+      "to": "0402",
+      "requiresLatch": 18,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0403",
+      "to": "0409",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0404",
+      "to": "0112",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0404",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0405",
+      "to": "0404",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0405",
+      "to": "0406",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
     },
     {
       "from": "0405",
       "to": "060f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "030b"
       ]
     },
     {
+      "from": "0406",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0406",
+      "to": "0407",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0407",
+      "to": "0406",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0407",
+      "to": "0408",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0408",
+      "to": "0407",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0409",
+      "to": "040a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040a",
+      "to": "040b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040a",
+      "to": "040c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040b",
+      "to": "040a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040c",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "040c",
+      "to": "040a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0501",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0506",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0500",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0501",
+      "to": "0500",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0501",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0501",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0503",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        56,
+        57,
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0504",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        56,
+        57,
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0505",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0507",
+      "requiresLatch": 21,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0502",
+      "to": "0511",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        56,
+        57,
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0503",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0503",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0503",
       "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         58
       ],
       "requiresRooms": []
     },
     {
+      "from": "0504",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0505",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0505",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0506",
+      "to": "0500",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0506",
       "to": "0507",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         103,
         110
@@ -320,7 +2592,28 @@
     },
     {
       "from": "0507",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": 21,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0507",
+      "to": "0506",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0507",
       "to": "0508",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         104,
         111
@@ -328,32 +2621,316 @@
       "requiresRooms": []
     },
     {
+      "from": "0508",
+      "to": "0507",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0508",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "0508",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "050a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "050e",
+      "requiresLatch": 25,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0509",
+      "to": "0510",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050a",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "050c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0510",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050b",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050c",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "050c",
       "to": "050d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "050b"
       ]
     },
     {
+      "from": "050d",
+      "to": "050c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050d",
+      "to": "050e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050e",
+      "to": "0509",
+      "requiresLatch": null,
+      "setsLatch": 25,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050e",
+      "to": "050d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050e",
+      "to": "050f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050f",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050f",
+      "to": "050e",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "050f",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0510",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0510",
+      "to": "050f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0511",
+      "to": "0502",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "0601",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0600",
       "to": "0602",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         49
       ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0600",
+      "to": "0603",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        49
+      ],
+      "requiresItems": [],
       "requiresRooms": []
     },
     {
       "from": "0600",
       "to": "060f",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         49
       ],
       "requiresRooms": []
     },
     {
+      "from": "0601",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0602",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0602",
       "to": "0605",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         58
       ],
@@ -362,14 +2939,83 @@
     {
       "from": "0602",
       "to": "0615",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         58
       ],
       "requiresRooms": []
     },
     {
+      "from": "0603",
+      "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0603",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0113",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0309:shuttle",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0603",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0604",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0604",
       "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         102,
         109
@@ -377,8 +3023,53 @@
       "requiresRooms": []
     },
     {
+      "from": "0605",
+      "to": "0602",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0605",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0606",
       "to": "0605",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [
+        58
+      ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0607",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0606",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
       "requiresItems": [
         58
       ],
@@ -387,14 +3078,9 @@
     {
       "from": "0606",
       "to": "0615",
-      "requiresItems": [
-        58
-      ],
-      "requiresRooms": []
-    },
-    {
-      "from": "0606",
-      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         58
       ],
@@ -402,7 +3088,28 @@
     },
     {
       "from": "0607",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0607",
       "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         58
       ],
@@ -410,15 +3117,104 @@
     },
     {
       "from": "0608",
+      "to": "0500",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0608",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0608",
       "to": "0614",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
       "requiresItems": [
         58
       ],
       "requiresRooms": []
     },
     {
+      "from": "0609",
+      "to": "0604",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0609",
+      "to": "060b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060a",
+      "to": "060b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060a",
+      "to": "0610",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060b",
+      "to": "0609",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060b",
+      "to": "060a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060d",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "060f",
       "to": "030c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "030b"
@@ -426,7 +3222,19 @@
     },
     {
       "from": "060f",
+      "to": "0405",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "060f",
       "to": "0600",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": [
         "030b",
@@ -434,11 +3242,476 @@
       ]
     },
     {
+      "from": "0610",
+      "to": "060a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0610",
+      "to": "0612",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0610",
+      "to": "0613",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
       "from": "0611",
       "to": "0505",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
       "requiresItems": [
         58
       ],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "060d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0611",
+      "to": "0614",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0612",
+      "to": "060c",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0613",
+      "to": "0613",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0614",
+      "to": "0608",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [
+        58
+      ],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0614",
+      "to": "0611",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0615",
+      "to": "0602",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0615",
+      "to": "0606",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0910",
+      "to": "0910",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0100",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0101",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0202"
+      ]
+    },
+    {
+      "from": "0a02",
+      "to": "0104",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0202"
+      ]
+    },
+    {
+      "from": "0a02",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0a03",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0a04",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a02",
+      "to": "0a07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a03",
+      "to": "0a02",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a03",
+      "to": "0a05",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a04",
+      "to": "0a02",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0106",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0a03",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a05",
+      "to": "0b07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0206",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0400",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0a02",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0a0a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a07",
+      "to": "0a13",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a08",
+      "to": "0109",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": [
+        "0101"
+      ]
+    },
+    {
+      "from": "0a08",
+      "to": "0111",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a08",
+      "to": "0a0b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a08",
+      "to": "0a13",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "010d",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "0110",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "0a07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0a",
+      "to": "0a0b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0b",
+      "to": "0a08",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a0b",
+      "to": "0a0a",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0108",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0309:west",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "050b",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0a07",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0a08",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0b09",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0a13",
+      "to": "0c04",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
+      "requiresRooms": []
+    },
+    {
+      "from": "0c10",
+      "to": "0910",
+      "requiresLatch": null,
+      "setsLatch": null,
+      "requiresAnyItems": [],
+      "requiresItems": [],
       "requiresRooms": []
     }
   ],
@@ -458,7 +3731,46 @@
         "bit": 18
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0100:0x393b8"
+      ],
+      "recordOffsets": [
+        234424
+      ],
+      "node": "0100",
+      "apId": 230817867,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0100:69:-1088,2976",
@@ -475,7 +3787,46 @@
         "bit": 105
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0100:0x393e4"
+      ],
+      "recordOffsets": [
+        234468
+      ],
+      "node": "0100",
+      "apId": 230817868,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0103:01:2288,-2224",
@@ -492,7 +3843,46 @@
         "bit": 1
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0103:0x128ec"
+      ],
+      "recordOffsets": [
+        76012
+      ],
+      "node": "0103",
+      "apId": 230817878,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0103:3e:-2800,992",
@@ -509,7 +3899,46 @@
         "bit": 62
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0103:0x1292c"
+      ],
+      "recordOffsets": [
+        76076
+      ],
+      "node": "0103",
+      "apId": 230817876,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0103:62:-512,1072",
@@ -527,7 +3956,20 @@
       },
       "source": "event-granted",
       "visual": "bespoke-mesh",
-      "gateFlag": "7:84"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0103:0x12d48"
+      ],
+      "recordOffsets": [
+        77128
+      ],
+      "gateFlag": "7:84",
+      "node": "0103",
+      "apId": 230817874,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0103:2b:-544,640",
@@ -544,7 +3986,20 @@
         "bit": 43
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0103:0x12dac"
+      ],
+      "recordOffsets": [
+        77228
+      ],
+      "node": "0103",
+      "apId": 230817877,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0103:20:-2576,3008",
@@ -561,7 +4016,46 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0103:0x1320c"
+      ],
+      "recordOffsets": [
+        78348
+      ],
+      "node": "0103",
+      "apId": 230817873,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0103:2e:-2576,3008",
@@ -578,7 +4072,46 @@
         "bit": 46
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0103:0x13244"
+      ],
+      "recordOffsets": [
+        78404
+      ],
+      "node": "0103",
+      "apId": 230817875,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0104:41:-2352,-272",
@@ -595,7 +4128,46 @@
         "bit": 65
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0104:0x3480c"
+      ],
+      "recordOffsets": [
+        215052
+      ],
+      "node": "0104",
+      "apId": 230817932,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0104:6c:-528,1280",
@@ -612,7 +4184,46 @@
         "bit": 108
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0104:0x3484c"
+      ],
+      "recordOffsets": [
+        215116
+      ],
+      "node": "0104",
+      "apId": 230817931,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0104:2b:-2880,-2032",
@@ -629,7 +4240,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0104:0x34884"
+      ],
+      "recordOffsets": [
+        215172
+      ],
+      "node": "0104",
+      "apId": 230817933,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0105:16:-4096,3072",
@@ -646,7 +4296,46 @@
         "bit": 22
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0105:0x42990"
+      ],
+      "recordOffsets": [
+        272784
+      ],
+      "node": "0105",
+      "apId": 230817813,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0107:20:2384,-2208",
@@ -663,7 +4352,46 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0107:0x13940"
+      ],
+      "recordOffsets": [
+        80192
+      ],
+      "node": "0107",
+      "apId": 230817871,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0108:2b:-8256,-7904",
@@ -681,7 +4409,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "excluded": true
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0108:0x3d82c"
+      ],
+      "recordOffsets": [
+        251948
+      ],
+      "excluded": true,
+      "node": "0108",
+      "apId": 230817862,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0108:2b:-8240,-7904",
@@ -699,8 +4440,21 @@
       },
       "source": "event-granted",
       "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0108:0x3db08"
+      ],
+      "recordOffsets": [
+        252680
+      ],
       "gateFlag": "7:99",
-      "excluded": true
+      "excluded": true,
+      "node": "0108",
+      "apId": 230817861,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0109:2f:2560,-1632",
@@ -717,7 +4471,46 @@
         "bit": 47
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0109:0x545ac"
+      ],
+      "recordOffsets": [
+        345516
+      ],
+      "node": "0109",
+      "apId": 230817860,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "010b:36:5008,-840",
@@ -734,7 +4527,20 @@
         "bit": 54
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "010b:0x38c50"
+      ],
+      "recordOffsets": [
+        232528
+      ],
+      "node": "010b",
+      "apId": 230817889,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "010c:1d:704,2928",
@@ -751,7 +4557,46 @@
         "bit": 29
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "010c:0xd948"
+      ],
+      "recordOffsets": [
+        55624
+      ],
+      "node": "010c",
+      "apId": 230817880,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "010c:30:-2992,2720",
@@ -768,7 +4613,46 @@
         "bit": 48
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "010c:0xd980"
+      ],
+      "recordOffsets": [
+        55680
+      ],
+      "node": "010c",
+      "apId": 230817879,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "010d:20:-6144,768",
@@ -785,7 +4669,48 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [
+        47
+      ],
+      "requiresRooms": [],
+      "physicalIds": [
+        "010d:0x3e910"
+      ],
+      "recordOffsets": [
+        256272
+      ],
+      "node": "010d",
+      "apId": 230817796,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "010e:20:-9024,-7760",
@@ -802,7 +4727,23 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "010e:0x1ca50"
+      ],
+      "recordOffsets": [
+        117328
+      ],
+      "node": "010e",
+      "apId": 230817895,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "010f:40:-5120,3584",
@@ -820,7 +4761,20 @@
       },
       "source": "event-granted",
       "visual": "interaction-only",
-      "excluded": true
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "010f:0x16710"
+      ],
+      "recordOffsets": [
+        91920
+      ],
+      "excluded": true,
+      "node": "010f",
+      "apId": 230817792,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0113:2b:-7008,2928",
@@ -837,7 +4791,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0113:0x10134"
+      ],
+      "recordOffsets": [
+        65844
+      ],
+      "node": "0113",
+      "apId": 230817821,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0114:20:5632,3184",
@@ -854,7 +4847,23 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0114:0x3ffd4"
+      ],
+      "recordOffsets": [
+        262100
+      ],
+      "node": "0114",
+      "apId": 230817896,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0202:63:-3568,720",
@@ -871,7 +4880,46 @@
         "bit": 99
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0202:0x4ff0c"
+      ],
+      "recordOffsets": [
+        327436
+      ],
+      "node": "0202",
+      "apId": 230817802,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0202:10:2020,-1392",
@@ -888,7 +4936,46 @@
         "bit": 16
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0202:0x5001c"
+      ],
+      "recordOffsets": [
+        327708
+      ],
+      "node": "0202",
+      "apId": 230817805,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0202:3d:-1792,1792",
@@ -905,7 +4992,20 @@
         "bit": 61
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0202:0x5042c"
+      ],
+      "recordOffsets": [
+        328748
+      ],
+      "node": "0202",
+      "apId": 230817804,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0202:47:-3468,2768",
@@ -923,7 +5023,20 @@
       },
       "source": "event-granted",
       "visual": "interaction-only",
-      "gateFlag": "2:11"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0202:0x51a74"
+      ],
+      "recordOffsets": [
+        334452
+      ],
+      "gateFlag": "2:11",
+      "node": "0202",
+      "apId": 230817803,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0203:10:4800,4100",
@@ -940,7 +5053,46 @@
         "bit": 16
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0203:0x3cda4"
+      ],
+      "recordOffsets": [
+        249252
+      ],
+      "node": "0203",
+      "apId": 230817839,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0204:13:3800,2800",
@@ -957,7 +5109,46 @@
         "bit": 19
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0204:0x3baa0"
+      ],
+      "recordOffsets": [
+        244384
+      ],
+      "node": "0204",
+      "apId": 230817869,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0204:0e:2000,-3000",
@@ -975,7 +5166,46 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "2:11"
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0204:0x3bdfc"
+      ],
+      "recordOffsets": [
+        245244
+      ],
+      "gateFlag": "2:11",
+      "node": "0204",
+      "apId": 230817870,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0205:11:-208,-1248",
@@ -992,7 +5222,46 @@
         "bit": 17
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0205:0xc2cc"
+      ],
+      "recordOffsets": [
+        49868
+      ],
+      "node": "0205",
+      "apId": 230817807,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0205:45:-2032,1632",
@@ -1010,7 +5279,20 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "7:38"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0205:0xc4e0"
+      ],
+      "recordOffsets": [
+        50400
+      ],
+      "gateFlag": "7:38",
+      "node": "0205",
+      "apId": 230817806,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0206:20:-656,-3168",
@@ -1027,7 +5309,46 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0206:0x105a8"
+      ],
+      "recordOffsets": [
+        66984
+      ],
+      "node": "0206",
+      "apId": 230817872,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0300:0c:4512,-944",
@@ -1044,7 +5365,46 @@
         "bit": 12
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0300:0xf970"
+      ],
+      "recordOffsets": [
+        63856
+      ],
+      "node": "0300",
+      "apId": 230817827,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0300:14:-8048,4560",
@@ -1061,7 +5421,46 @@
         "bit": 20
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0300:0xf99c"
+      ],
+      "recordOffsets": [
+        63900
+      ],
+      "node": "0300",
+      "apId": 230817826,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0302:2b:2880,-3056",
@@ -1078,7 +5477,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0302:0x3d3a4"
+      ],
+      "recordOffsets": [
+        250788
+      ],
+      "node": "0302",
+      "apId": 230817905,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0302:65:-1280,1152",
@@ -1095,7 +5510,46 @@
         "bit": 101
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0302:0x3d4e8"
+      ],
+      "recordOffsets": [
+        251112
+      ],
+      "node": "0302",
+      "apId": 230817904,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0303:21:512,-2048",
@@ -1112,7 +5566,46 @@
         "bit": 33
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0303:0x4fa68"
+      ],
+      "recordOffsets": [
+        326248
+      ],
+      "node": "0303",
+      "apId": 230817833,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0303:2d:3088,-1008",
@@ -1130,7 +5623,22 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:90"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0303:0x4fc70",
+        "0303:0x50b70"
+      ],
+      "recordOffsets": [
+        326768,
+        330608
+      ],
+      "gateFlag": "0:90",
+      "node": "0303",
+      "apId": 230817834,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0303:46:3088,-1008",
@@ -1148,7 +5656,22 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:86"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0303:0x4fd5c",
+        "0303:0x50700"
+      ],
+      "recordOffsets": [
+        327004,
+        329472
+      ],
+      "gateFlag": "0:86",
+      "node": "0303",
+      "apId": 230817831,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0303:46:3328,-2560",
@@ -1166,7 +5689,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:86"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0303:0x50b20"
+      ],
+      "recordOffsets": [
+        330528
+      ],
+      "gateFlag": "0:86",
+      "node": "0303",
+      "apId": 230817832,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0304:2b:-4700,6100",
@@ -1183,7 +5719,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0304:0x25698"
+      ],
+      "recordOffsets": [
+        153240
+      ],
+      "node": "0304",
+      "apId": 230817808,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0304:44:-1500,0",
@@ -1201,7 +5776,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "7:37"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0304:0x25eac"
+      ],
+      "recordOffsets": [
+        155308
+      ],
+      "gateFlag": "7:37",
+      "node": "0304",
+      "apId": 230817809,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0305:1d:-6864,5888",
@@ -1218,7 +5806,46 @@
         "bit": 29
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0305:0x370a0"
+      ],
+      "recordOffsets": [
+        225440
+      ],
+      "node": "0305",
+      "apId": 230817866,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0305:0d:-2176,2032",
@@ -1235,7 +5862,46 @@
         "bit": 13
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0305:0x370cc"
+      ],
+      "recordOffsets": [
+        225484
+      ],
+      "node": "0305",
+      "apId": 230817864,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0305:5e:-6400,-4864",
@@ -1253,7 +5919,22 @@
       },
       "source": "event-granted",
       "visual": "interaction-only",
-      "gateFlag": "0:96"
+      "priority": "fixed",
+      "requiresItems": [
+        70
+      ],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0305:0x377c0"
+      ],
+      "recordOffsets": [
+        227264
+      ],
+      "gateFlag": "0:96",
+      "node": "0305",
+      "apId": 230817863,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0305:48:2304,2560",
@@ -1270,7 +5951,25 @@
         "bit": 72
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [
+        70
+      ],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0305:0x37964"
+      ],
+      "recordOffsets": [
+        227684
+      ],
+      "node": "0305",
+      "apId": 230817865,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0308:1d:1536,-2464",
@@ -1287,7 +5986,22 @@
         "bit": 29
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0308:0x42250",
+        "0308:0x4227c"
+      ],
+      "recordOffsets": [
+        270928,
+        270972
+      ],
+      "node": "0308",
+      "apId": 230817885,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0308:2b:-368,2512",
@@ -1304,7 +6018,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0308:0x422a8"
+      ],
+      "recordOffsets": [
+        271016
+      ],
+      "node": "0308",
+      "apId": 230817887,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0308:34:-128,-1792",
@@ -1321,7 +6051,46 @@
         "bit": 52
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0308:0x422d4"
+      ],
+      "recordOffsets": [
+        271060
+      ],
+      "node": "0308",
+      "apId": 230817883,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0308:23:-1185,1451",
@@ -1338,7 +6107,23 @@
         "bit": 35
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0308:0x42b20"
+      ],
+      "recordOffsets": [
+        273184
+      ],
+      "node": "0308",
+      "apId": 230817886,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0308:1d:-1185,1451",
@@ -1355,7 +6140,22 @@
         "bit": 29
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0308:0x42b4c",
+        "0308:0x42ba8"
+      ],
+      "recordOffsets": [
+        273228,
+        273320
+      ],
+      "node": "0308",
+      "apId": 230817884,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0308:1f:-1185,1451",
@@ -1372,7 +6172,23 @@
         "bit": 31
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0308:0x42b7c"
+      ],
+      "recordOffsets": [
+        273276
+      ],
+      "node": "0308",
+      "apId": 230817888,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "030b:2b:-4272,-1296",
@@ -1389,7 +6205,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "030b:0x19514"
+      ],
+      "recordOffsets": [
+        103700
+      ],
+      "node": "030b",
+      "apId": 230817793,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "030b:40:-5120,3584",
@@ -1407,7 +6262,20 @@
       },
       "source": "event-granted",
       "visual": "interaction-only",
-      "excluded": true
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "030b:0x1a0fc"
+      ],
+      "recordOffsets": [
+        106748
+      ],
+      "excluded": true,
+      "node": "030b",
+      "apId": 230817794,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "030c:13:-7700,6900",
@@ -1424,7 +6292,20 @@
         "bit": 19
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "030c:0x49ba0"
+      ],
+      "recordOffsets": [
+        301984
+      ],
+      "node": "030c",
+      "apId": 230817797,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "030c:35:-7700,6900",
@@ -1441,7 +6322,20 @@
         "bit": 53
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "030c:0x4c044"
+      ],
+      "recordOffsets": [
+        311364
+      ],
+      "node": "030c",
+      "apId": 230817798,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0400:6a:13264,1792",
@@ -1458,7 +6352,46 @@
         "bit": 106
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0400:0x2c99c"
+      ],
+      "recordOffsets": [
+        182684
+      ],
+      "node": "0400",
+      "apId": 230817829,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0400:20:12576,1328",
@@ -1475,7 +6408,23 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0400:0x2ca00"
+      ],
+      "recordOffsets": [
+        182784
+      ],
+      "node": "0400",
+      "apId": 230817828,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0400:10:7984,1104",
@@ -1492,7 +6441,46 @@
         "bit": 16
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0400:0x2ca2c"
+      ],
+      "recordOffsets": [
+        182828
+      ],
+      "node": "0400",
+      "apId": 230817830,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0402:18:5888,-12960",
@@ -1509,7 +6497,46 @@
         "bit": 24
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0402:0x21bb8"
+      ],
+      "recordOffsets": [
+        138168
+      ],
+      "node": "0402",
+      "apId": 230817841,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0402:18:-4352,-12992",
@@ -1526,7 +6553,46 @@
         "bit": 24
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0402:0x21bf0"
+      ],
+      "recordOffsets": [
+        138224
+      ],
+      "node": "0402",
+      "apId": 230817840,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0402:09:-5888,-11520",
@@ -1543,7 +6609,46 @@
         "bit": 9
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0402:0x21c28"
+      ],
+      "recordOffsets": [
+        138280
+      ],
+      "node": "0402",
+      "apId": 230817842,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0404:11:-4200,3200",
@@ -1560,7 +6665,46 @@
         "bit": 17
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0404:0x3ab0c"
+      ],
+      "recordOffsets": [
+        240396
+      ],
+      "node": "0404",
+      "apId": 230817858,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0404:11:5300,3000",
@@ -1577,7 +6721,46 @@
         "bit": 17
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0404:0x3ab44"
+      ],
+      "recordOffsets": [
+        240452
+      ],
+      "node": "0404",
+      "apId": 230817859,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0405:2b:1008,11296",
@@ -1594,7 +6777,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0405:0x54ef8"
+      ],
+      "recordOffsets": [
+        347896
+      ],
+      "node": "0405",
+      "apId": 230817850,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0406:64:-3456,1280",
@@ -1611,7 +6810,46 @@
         "bit": 100
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0406:0x37544"
+      ],
+      "recordOffsets": [
+        226628
+      ],
+      "node": "0406",
+      "apId": 230817857,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0406:6b:-3956,-1600",
@@ -1629,7 +6867,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:1"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0406:0x37674"
+      ],
+      "recordOffsets": [
+        226932
+      ],
+      "gateFlag": "0:1",
+      "node": "0406",
+      "apId": 230817855,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0406:6b:-4352,224",
@@ -1646,7 +6897,20 @@
         "bit": 107
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0406:0x37fa0"
+      ],
+      "recordOffsets": [
+        229280
+      ],
+      "node": "0406",
+      "apId": 230817856,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0408:43:-2576,-5568",
@@ -1663,7 +6927,46 @@
         "bit": 67
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0408:0x1a350"
+      ],
+      "recordOffsets": [
+        107344
+      ],
+      "node": "0408",
+      "apId": 230817822,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "040b:20:240,-2266",
@@ -1680,7 +6983,23 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "040b:0x13db0"
+      ],
+      "recordOffsets": [
+        81328
+      ],
+      "node": "040b",
+      "apId": 230817881,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "040b:3c:2816,-2496",
@@ -1697,7 +7016,46 @@
         "bit": 60
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "040b:0x13e74"
+      ],
+      "recordOffsets": [
+        81524
+      ],
+      "node": "040b",
+      "apId": 230817882,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0500:20:-7568,6672",
@@ -1714,7 +7072,46 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0500:0x3ddb8"
+      ],
+      "recordOffsets": [
+        253368
+      ],
+      "node": "0500",
+      "apId": 230817897,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0502:38:-9472,3840",
@@ -1731,7 +7128,46 @@
         "bit": 56
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0502:0x47ff8"
+      ],
+      "recordOffsets": [
+        294904
+      ],
+      "node": "0502",
+      "apId": 230817824,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0502:21:-16384,-4352",
@@ -1748,7 +7184,46 @@
         "bit": 33
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0502:0x48030"
+      ],
+      "recordOffsets": [
+        294960
+      ],
+      "node": "0502",
+      "apId": 230817825,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0502:14:4480,-6656",
@@ -1765,7 +7240,46 @@
         "bit": 20
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0502:0x48068"
+      ],
+      "recordOffsets": [
+        295016
+      ],
+      "node": "0502",
+      "apId": 230817823,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0503:4c:-3468,2768",
@@ -1783,7 +7297,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "11:83"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4c5f0"
+      ],
+      "recordOffsets": [
+        312816
+      ],
+      "gateFlag": "11:83",
+      "node": "0503",
+      "apId": 230817927,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0503:4d:-3468,2768",
@@ -1801,7 +7328,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "11:83"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4c6c4"
+      ],
+      "recordOffsets": [
+        313028
+      ],
+      "gateFlag": "11:83",
+      "node": "0503",
+      "apId": 230817922,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0503:51:-3468,2768",
@@ -1818,7 +7358,23 @@
         "bit": 81
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4cc00"
+      ],
+      "recordOffsets": [
+        314368
+      ],
+      "node": "0503",
+      "apId": 230817924,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0503:2b:-10240,-5248",
@@ -1835,7 +7391,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4d168"
+      ],
+      "recordOffsets": [
+        315752
+      ],
+      "node": "0503",
+      "apId": 230817923,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0503:6f:-2800,-3088",
@@ -1852,7 +7447,46 @@
         "bit": 111
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4d194"
+      ],
+      "recordOffsets": [
+        315796
+      ],
+      "node": "0503",
+      "apId": 230817921,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0503:0b:-10240,4480",
@@ -1870,8 +7504,21 @@
       },
       "source": "static",
       "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4d4fc"
+      ],
+      "recordOffsets": [
+        316668
+      ],
       "gateFlag": "2:11",
-      "excluded": true
+      "excluded": true,
+      "node": "0503",
+      "apId": 230817926,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0503:5b:-1792,1792",
@@ -1888,7 +7535,20 @@
         "bit": 91
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4dd50"
+      ],
+      "recordOffsets": [
+        318800
+      ],
+      "node": "0503",
+      "apId": 230817925,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0504:6d:-1632,2304",
@@ -1905,7 +7565,46 @@
         "bit": 109
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0504:0x4f8b8"
+      ],
+      "recordOffsets": [
+        325816
+      ],
+      "node": "0504",
+      "apId": 230817915,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0504:4f:-2912,3872",
@@ -1923,8 +7622,21 @@
       },
       "source": "event-granted",
       "visual": "bespoke-mesh",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0504:0x4fbf0"
+      ],
+      "recordOffsets": [
+        326640
+      ],
       "gateFlag": "2:11",
-      "excluded": true
+      "excluded": true,
+      "node": "0504",
+      "apId": 230817919,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0504:50:4896,-3840",
@@ -1942,8 +7654,21 @@
       },
       "source": "event-granted",
       "visual": "bespoke-mesh",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0504:0x4feb4"
+      ],
+      "recordOffsets": [
+        327348
+      ],
       "gateFlag": "2:11",
-      "excluded": true
+      "excluded": true,
+      "node": "0504",
+      "apId": 230817918,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0504:4e:2256,-3840",
@@ -1961,7 +7686,22 @@
       },
       "source": "event-granted",
       "visual": "bespoke-mesh",
-      "gateFlag": "2:11"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0504:0x4fee0",
+        "0504:0x501a8"
+      ],
+      "recordOffsets": [
+        327392,
+        328104
+      ],
+      "gateFlag": "2:11",
+      "node": "0504",
+      "apId": 230817916,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0504:4f:4896,-3840",
@@ -1979,8 +7719,21 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0504:0x500f8"
+      ],
+      "recordOffsets": [
+        327928
+      ],
       "gateFlag": "7:49",
-      "excluded": true
+      "excluded": true,
+      "node": "0504",
+      "apId": 230817920,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0504:50:-2912,3872",
@@ -1998,7 +7751,20 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "excluded": true
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0504:0x5028c"
+      ],
+      "recordOffsets": [
+        328332
+      ],
+      "excluded": true,
+      "node": "0504",
+      "apId": 230817917,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0505:2b:-1100,1800",
@@ -2015,7 +7781,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0505:0x47cd4"
+      ],
+      "recordOffsets": [
+        294100
+      ],
+      "node": "0505",
+      "apId": 230817906,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0506:56:-5696,-1232",
@@ -2032,7 +7814,46 @@
         "bit": 86
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0506:0x227a0"
+      ],
+      "recordOffsets": [
+        141216
+      ],
+      "node": "0506",
+      "apId": 230817908,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0506:67:3840,2592",
@@ -2049,7 +7870,46 @@
         "bit": 103
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0506:0x227d8"
+      ],
+      "recordOffsets": [
+        141272
+      ],
+      "node": "0506",
+      "apId": 230817909,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0506:2b:-6144,128",
@@ -2066,7 +7926,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0506:0x22830"
+      ],
+      "recordOffsets": [
+        141360
+      ],
+      "node": "0506",
+      "apId": 230817911,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0506:3b:-6912,3328",
@@ -2084,7 +7960,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "2:4"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0506:0x23234"
+      ],
+      "recordOffsets": [
+        143924
+      ],
+      "gateFlag": "2:4",
+      "node": "0506",
+      "apId": 230817910,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0507:2b:6144,3088",
@@ -2101,7 +7990,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0507:0x413e4"
+      ],
+      "recordOffsets": [
+        267236
+      ],
+      "node": "0507",
+      "apId": 230817893,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0507:0f:-4352,10000",
@@ -2118,7 +8046,46 @@
         "bit": 15
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0507:0x41410"
+      ],
+      "recordOffsets": [
+        267280
+      ],
+      "node": "0507",
+      "apId": 230817892,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0507:52:4352,7824",
@@ -2136,7 +8103,22 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "0:213"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0507:0x416fc",
+        "0507:0x42ad8"
+      ],
+      "recordOffsets": [
+        268028,
+        273112
+      ],
+      "gateFlag": "0:213",
+      "node": "0507",
+      "apId": 230817890,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0507:53:4352,9616",
@@ -2154,7 +8136,22 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "0:213"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0507:0x41734",
+        "0507:0x42b10"
+      ],
+      "recordOffsets": [
+        268084,
+        273168
+      ],
+      "gateFlag": "0:213",
+      "node": "0507",
+      "apId": 230817891,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0508:20:-1728,-9456",
@@ -2171,7 +8168,46 @@
         "bit": 32
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0508:0x4defc"
+      ],
+      "recordOffsets": [
+        319228
+      ],
+      "node": "0508",
+      "apId": 230817894,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "050a:2b:7344,4736",
@@ -2188,7 +8224,20 @@
         "bit": 43
       },
       "source": "event-granted",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050a:0x355e4"
+      ],
+      "recordOffsets": [
+        218596
+      ],
+      "node": "050a",
+      "apId": 230817934,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "050b:2b:6656,-3328",
@@ -2205,7 +8254,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050b:0x30a48"
+      ],
+      "recordOffsets": [
+        199240
+      ],
+      "node": "050b",
+      "apId": 230817935,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "050c:5d:-3328,5616",
@@ -2223,7 +8311,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "7:162"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050c:0x43bcc"
+      ],
+      "recordOffsets": [
+        277452
+      ],
+      "gateFlag": "7:162",
+      "node": "050c",
+      "apId": 230817903,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "050e:2b:-2100,-2700",
@@ -2240,7 +8341,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050e:0x3e05c"
+      ],
+      "recordOffsets": [
+        254044
+      ],
+      "node": "050e",
+      "apId": 230817820,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "050e:3a:-7700,6900",
@@ -2257,7 +8374,23 @@
         "bit": 58
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050e:0x3f870"
+      ],
+      "recordOffsets": [
+        260208
+      ],
+      "node": "050e",
+      "apId": 230817818,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "050e:61:-7700,6900",
@@ -2275,7 +8408,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:5"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050e:0x40360"
+      ],
+      "recordOffsets": [
+        263008
+      ],
+      "gateFlag": "0:5",
+      "node": "050e",
+      "apId": 230817819,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "050f:1d:-1100,-2100",
@@ -2292,7 +8438,46 @@
         "bit": 29
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050f:0x2c558"
+      ],
+      "recordOffsets": [
+        181592
+      ],
+      "node": "050f",
+      "apId": 230817816,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "050f:58:-7700,6900",
@@ -2309,7 +8494,20 @@
         "bit": 88
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "050f:0x2db84"
+      ],
+      "recordOffsets": [
+        187268
+      ],
+      "node": "050f",
+      "apId": 230817817,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0510:39:4336,3344",
@@ -2326,7 +8524,46 @@
         "bit": 57
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0510:0x305b0"
+      ],
+      "recordOffsets": [
+        198064
+      ],
+      "node": "0510",
+      "apId": 230817937,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0510:22:0,-5280",
@@ -2343,7 +8580,46 @@
         "bit": 34
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0510:0x30664"
+      ],
+      "recordOffsets": [
+        198244
+      ],
+      "node": "0510",
+      "apId": 230817936,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0511:2b:-10240,-5248",
@@ -2360,7 +8636,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0511:0x5722c"
+      ],
+      "recordOffsets": [
+        356908
+      ],
+      "node": "0511",
+      "apId": 230817929,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0511:6f:-2800,-3088",
@@ -2377,7 +8692,46 @@
         "bit": 111
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0511:0x57258"
+      ],
+      "recordOffsets": [
+        356952
+      ],
+      "node": "0511",
+      "apId": 230817928,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0511:0b:-10240,4480",
@@ -2395,8 +8749,21 @@
       },
       "source": "static",
       "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0511:0x575c0"
+      ],
+      "recordOffsets": [
+        357824
+      ],
       "gateFlag": "2:11",
-      "excluded": true
+      "excluded": true,
+      "node": "0511",
+      "apId": 230817930,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0600:18:-1616,4480",
@@ -2413,7 +8780,46 @@
         "bit": 24
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0600:0x542b8"
+      ],
+      "recordOffsets": [
+        344760
+      ],
+      "node": "0600",
+      "apId": 230817799,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0600:5a:-5120,3584",
@@ -2431,7 +8837,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "2:4"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0600:0x55598"
+      ],
+      "recordOffsets": [
+        349592
+      ],
+      "gateFlag": "2:4",
+      "node": "0600",
+      "apId": 230817800,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0601:5a:-5120,3584",
@@ -2449,7 +8868,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "2:4"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0601:0x10f74"
+      ],
+      "recordOffsets": [
+        69492
+      ],
+      "gateFlag": "2:4",
+      "node": "0601",
+      "apId": 230817795,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0602:2b:1856,4224",
@@ -2466,7 +8898,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0602:0x169c0"
+      ],
+      "recordOffsets": [
+        92608
+      ],
+      "node": "0602",
+      "apId": 230817812,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0602:49:-3072,4096",
@@ -2483,7 +8954,46 @@
         "bit": 73
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0602:0x16a2c"
+      ],
+      "recordOffsets": [
+        92716
+      ],
+      "node": "0602",
+      "apId": 230817810,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0602:4a:2608,-32",
@@ -2500,7 +9010,46 @@
         "bit": 74
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0602:0x16a90"
+      ],
+      "recordOffsets": [
+        92816
+      ],
+      "node": "0602",
+      "apId": 230817811,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0604:2b:3024,224",
@@ -2517,7 +9066,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0604:0x3fb88"
+      ],
+      "recordOffsets": [
+        261000
+      ],
+      "node": "0604",
+      "apId": 230817907,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0605:1b:12032,384",
@@ -2534,7 +9099,46 @@
         "bit": 27
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0605:0x5c0b0"
+      ],
+      "recordOffsets": [
+        377008
+      ],
+      "node": "0605",
+      "apId": 230817836,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0605:66:-3072,3328",
@@ -2552,7 +9156,20 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "excluded": true
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0605:0x5c0dc"
+      ],
+      "recordOffsets": [
+        377052
+      ],
+      "excluded": true,
+      "node": "0605",
+      "apId": 230817835,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0606:2b:6144,-2560",
@@ -2569,7 +9186,20 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0606:0x3e5a0"
+      ],
+      "recordOffsets": [
+        255392
+      ],
+      "node": "0606",
+      "apId": 230817941,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0606:2b:6912,-11392",
@@ -2586,7 +9216,20 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0606:0x3e5cc"
+      ],
+      "recordOffsets": [
+        255436
+      ],
+      "node": "0606",
+      "apId": 230817942,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0606:18:3328,-2560",
@@ -2603,7 +9246,23 @@
         "bit": 24
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0606:0x3e5f8"
+      ],
+      "recordOffsets": [
+        255480
+      ],
+      "node": "0606",
+      "apId": 230817940,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0606:31:-7648,2880",
@@ -2620,7 +9279,46 @@
         "bit": 49
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0606:0x3e624"
+      ],
+      "recordOffsets": [
+        255524
+      ],
+      "node": "0606",
+      "apId": 230817939,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0606:4b:-7680,3392",
@@ -2637,7 +9335,46 @@
         "bit": 75
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0606:0x3e65c"
+      ],
+      "recordOffsets": [
+        255580
+      ],
+      "node": "0606",
+      "apId": 230817938,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0607:4d:4480,640",
@@ -2655,7 +9392,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:4"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0607:0x51048"
+      ],
+      "recordOffsets": [
+        331848
+      ],
+      "gateFlag": "0:4",
+      "node": "0607",
+      "apId": 230817912,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0607:4c:4480,640",
@@ -2673,7 +9423,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:4"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0607:0x51074"
+      ],
+      "recordOffsets": [
+        331892
+      ],
+      "gateFlag": "0:4",
+      "node": "0607",
+      "apId": 230817914,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0607:5b:-1792,1792",
@@ -2690,7 +9453,20 @@
         "bit": 91
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0607:0x51d64"
+      ],
+      "recordOffsets": [
+        335204
+      ],
+      "node": "0607",
+      "apId": 230817913,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0608:2b:-7936,6400",
@@ -2707,7 +9483,46 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0608:0x3fbf8"
+      ],
+      "recordOffsets": [
+        261112
+      ],
+      "node": "0608",
+      "apId": 230817801,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0609:57:-1360,1152",
@@ -2724,7 +9539,46 @@
         "bit": 87
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0609:0x4a9b4"
+      ],
+      "recordOffsets": [
+        305588
+      ],
+      "node": "0609",
+      "apId": 230817814,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0609:2b:5760,512",
@@ -2741,7 +9595,23 @@
         "bit": 43
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0609:0x4a9ec"
+      ],
+      "recordOffsets": [
+        305644
+      ],
+      "node": "0609",
+      "apId": 230817815,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "060a:21:10064,15104",
@@ -2758,7 +9628,46 @@
         "bit": 33
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060a:0x2aa2c"
+      ],
+      "recordOffsets": [
+        174636
+      ],
+      "node": "060a",
+      "apId": 230817901,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "060a:55:-5120,3584",
@@ -2775,7 +9684,20 @@
         "bit": 85
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060a:0x2b128"
+      ],
+      "recordOffsets": [
+        176424
+      ],
+      "node": "060a",
+      "apId": 230817900,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "060b:6e:2736,-6656",
@@ -2792,7 +9714,46 @@
         "bit": 110
       },
       "source": "static",
-      "visual": "bespoke-mesh"
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060b:0x1e9e8"
+      ],
+      "recordOffsets": [
+        125416
+      ],
+      "node": "060b",
+      "apId": 230817898,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "060b:23:-4480,5760",
@@ -2809,7 +9770,46 @@
         "bit": 35
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060b:0x1ea20"
+      ],
+      "recordOffsets": [
+        125472
+      ],
+      "node": "060b",
+      "apId": 230817899,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "060d:09:-2816,10368",
@@ -2827,7 +9827,21 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "11:10"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060d:0x2d1b8"
+      ],
+      "recordOffsets": [
+        184760
+      ],
+      "gateFlag": "11:10",
+      "node": "060d",
+      "protected": true,
+      "apId": 230817944,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "060d:2b:-2816,10368",
@@ -2845,7 +9859,23 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "11:10"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060d:0x2d1f8",
+        "060d:0x2d2a4"
+      ],
+      "recordOffsets": [
+        184824,
+        184996
+      ],
+      "gateFlag": "11:10",
+      "node": "060d",
+      "protected": true,
+      "apId": 230817945,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "060d:18:-2816,10368",
@@ -2863,7 +9893,27 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "11:10"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060d:0x2d230",
+        "060d:0x2d268",
+        "060d:0x2d2dc",
+        "060d:0x2d314"
+      ],
+      "recordOffsets": [
+        184880,
+        184936,
+        185052,
+        185108
+      ],
+      "gateFlag": "11:10",
+      "node": "060d",
+      "protected": true,
+      "apId": 230817943,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "060f:68:4128,448",
@@ -2881,7 +9931,20 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "0:184"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060f:0x3bb48"
+      ],
+      "recordOffsets": [
+        244552
+      ],
+      "gateFlag": "0:184",
+      "node": "060f",
+      "apId": 230817851,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "060f:32:288,-1920",
@@ -2899,7 +9962,20 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "0:184"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060f:0x3bb80"
+      ],
+      "recordOffsets": [
+        244608
+      ],
+      "gateFlag": "0:184",
+      "node": "060f",
+      "apId": 230817854,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "060f:2b:864,8240",
@@ -2917,7 +9993,20 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "0:184"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060f:0x3bbac"
+      ],
+      "recordOffsets": [
+        244652
+      ],
+      "gateFlag": "0:184",
+      "node": "060f",
+      "apId": 230817852,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "060f:15:3344,1264",
@@ -2934,7 +10023,23 @@
         "bit": 21
       },
       "source": "static",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "060f:0x3cc40"
+      ],
+      "recordOffsets": [
+        248896
+      ],
+      "node": "060f",
+      "apId": 230817853,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0610:54:-1664,-2016",
@@ -2952,7 +10057,21 @@
       },
       "source": "static",
       "visual": "interaction-only",
-      "gateFlag": "2:18"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0610:0x22aa0"
+      ],
+      "recordOffsets": [
+        141984
+      ],
+      "gateFlag": "2:18",
+      "node": "0610",
+      "protected": true,
+      "apId": 230817846,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0610:09:-1024,-2048",
@@ -2970,7 +10089,21 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "11:10"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0610:0x237e8"
+      ],
+      "recordOffsets": [
+        145384
+      ],
+      "gateFlag": "11:10",
+      "node": "0610",
+      "protected": true,
+      "apId": 230817848,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0610:2b:-1024,-2048",
@@ -2988,7 +10121,23 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "11:10"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0610:0x23820",
+        "0610:0x238a8"
+      ],
+      "recordOffsets": [
+        145440,
+        145576
+      ],
+      "gateFlag": "11:10",
+      "node": "0610",
+      "protected": true,
+      "apId": 230817849,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0610:18:-1024,-2048",
@@ -3006,7 +10155,27 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "gateFlag": "11:10"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0610:0x2384c",
+        "0610:0x23878",
+        "0610:0x238d4",
+        "0610:0x23900"
+      ],
+      "recordOffsets": [
+        145484,
+        145528,
+        145620,
+        145664
+      ],
+      "gateFlag": "11:10",
+      "node": "0610",
+      "protected": true,
+      "apId": 230817847,
+      "placementClass": "fixed",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0612:2b:-896,0",
@@ -3023,7 +10192,22 @@
         "bit": 43
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0612:0x232c8"
+      ],
+      "recordOffsets": [
+        144072
+      ],
+      "node": "0612",
+      "protected": true,
+      "ending": true,
+      "apId": 230817845,
+      "placementClass": "ending",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0612:09:-896,0",
@@ -3041,7 +10225,22 @@
       },
       "source": "event-granted",
       "visual": "interaction-only",
-      "gateFlag": "11:10"
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0612:0x23304"
+      ],
+      "recordOffsets": [
+        144132
+      ],
+      "gateFlag": "11:10",
+      "node": "0612",
+      "protected": true,
+      "ending": true,
+      "apId": 230817844,
+      "placementClass": "ending",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0612:18:-896,0",
@@ -3058,7 +10257,24 @@
         "bit": 24
       },
       "source": "event-granted",
-      "visual": "interaction-only"
+      "visual": "interaction-only",
+      "priority": "fixed",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0612:0x23330",
+        "0612:0x2335c"
+      ],
+      "recordOffsets": [
+        144176,
+        144220
+      ],
+      "node": "0612",
+      "protected": true,
+      "ending": true,
+      "apId": 230817843,
+      "placementClass": "ending",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0613:21:10064,15104",
@@ -3075,7 +10291,21 @@
         "bit": 33
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0613:0x3f100"
+      ],
+      "recordOffsets": [
+        258304
+      ],
+      "node": "0613",
+      "ending": true,
+      "apId": 230817902,
+      "placementClass": "ending",
+      "allowedProgressionItemIds": []
     },
     {
       "key": "0615:1b:12032,384",
@@ -3092,7 +10322,46 @@
         "bit": 27
       },
       "source": "static",
-      "visual": "generic-panel"
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0615:0x21c90"
+      ],
+      "recordOffsets": [
+        138384
+      ],
+      "node": "0615",
+      "apId": 230817838,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     },
     {
       "key": "0615:66:-3072,3328",
@@ -3110,7 +10379,20 @@
       },
       "source": "static",
       "visual": "bespoke-mesh",
-      "excluded": true
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0615:0x21cbc"
+      ],
+      "recordOffsets": [
+        138428
+      ],
+      "excluded": true,
+      "node": "0615",
+      "apId": 230817837,
+      "placementClass": "excluded",
+      "allowedProgressionItemIds": []
     }
   ],
   "items": {
@@ -3302,11 +10584,15 @@
       111
     ],
     "progressionItemIds": [
+      46,
       47,
       48,
       49,
+      56,
+      57,
       58,
       65,
+      70,
       71,
       72,
       98,
@@ -3324,6 +10610,119 @@
       110,
       111
     ],
+    "hiddenProgressionItemIds": [
+      58,
+      72
+    ],
+    "completionItemIds": [
+      46
+    ],
+    "apIds": {
+      "40S&W Bullets": 230752256,
+      "9mm Parabellum": 230752257,
+      "An. Aid": 230752258,
+      "An. Darts L": 230752259,
+      "An. Darts M": 230752260,
+      "An. Darts S": 230752261,
+      "Antenna Key": 230752262,
+      "B1 Crane Card": 230752263,
+      "B1 Key Chip": 230752264,
+      "B1 Key Chip \" with number \"(3695)": 230752265,
+      "B2 Key Chip 1": 230752266,
+      "B2 Key Chip 1 \" without number \"": 230752267,
+      "B2 Key Chip 2": 230752268,
+      "B2 Key Chip 2 \" with number \" (0392)": 230752269,
+      "B3 Crane Card 1": 230752270,
+      "B3 Crane Card 2": 230752271,
+      "B3 Crane Card 3": 230752272,
+      "BG Area Key": 230752273,
+      "BG Room B1 Key": 230752274,
+      "C. O. Area Key": 230752275,
+      "C. O. Pass Card": 230752276,
+      "Core Parts 1": 230752277,
+      "Core Parts 2": 230752278,
+      "Custom part For \" Ancient Type Regina \"": 230752279,
+      "DDK Code Disc D": 230752280,
+      "DDK Code Disc E": 230752281,
+      "DDK Code Disc H": 230752282,
+      "DDK Code Disc L": 230752283,
+      "DDK Code Disc N": 230752284,
+      "DDK Code Disc S": 230752285,
+      "DDK Code Disc W": 230752286,
+      "DDK Input Disc D": 230752287,
+      "DDK Input Disc E": 230752288,
+      "DDK Input Disc H": 230752289,
+      "DDK Input Disc L": 230752290,
+      "DDK Input Disc N": 230752291,
+      "DDK Input Disc S": 230752292,
+      "DDK Input Disc W": 230752293,
+      "Energy Tank": 230752294,
+      "Entrance Key": 230752295,
+      "F. C. Device \" With FingerPrint \"": 230752296,
+      "F. C. Device \" without FingerPrint \"": 230752297,
+      "Grenade Bullets": 230752298,
+      "Grenade Gun": 230752299,
+      "Grenade Gun (40mmHK)": 230752300,
+      "Grenade Gun Custom (40mmHK) \"Regina Custom\"": 230752301,
+      "Handgun (Glock 34)": 230752302,
+      "Handgun + Sight (Glock 34)": 230752303,
+      "Handgun Custom (Glock 35)": 230752304,
+      "Handgun Custom + Sight (Glock 35)": 230752305,
+      "Handgun Sights (critical hit)": 230752306,
+      "Handgun Slides (upgrade To Glock 35)": 230752307,
+      "Heat Bullets": 230752308,
+      "Hemostat": 230752309,
+      "ID Card Type \" Colonel \"": 230752310,
+      "ID Card Type \" Communicator \"": 230752311,
+      "ID Card Type \" Project Superintendent \" (Dr. Kirk)": 230752312,
+      "ID Card Type \" Researcher \"": 230752313,
+      "Initializer": 230752314,
+      "Intensifier": 230752315,
+      "Key Card L": 230752316,
+      "Key Card Lv. A": 230752317,
+      "Key Card Lv. B": 230752318,
+      "Key Card Lv. C": 230752319,
+      "Key Card Lv. D": 230752320,
+      "Key Card R": 230752321,
+      "Med. Pak L": 230752322,
+      "Med. Pak M": 230752323,
+      "Med. Pak S": 230752324,
+      "Multiplier": 230752325,
+      "Nucleum": 230752326,
+      "Panel Key 1": 230752327,
+      "Panel Key 2": 230752328,
+      "Planning Disc": 230752329,
+      "Plug": 230752330,
+      "Poison Dart": 230752331,
+      "Port Card Key": 230752332,
+      "Protect P. 1-A": 230752333,
+      "Protect P. 1-B": 230752334,
+      "Protect P. 2-A": 230752335,
+      "Protect P. 2-B": 230752336,
+      "Pulse Receiver": 230752337,
+      "Recovery Aid": 230752338,
+      "Researcher Memo \" with number \"(1281)": 230752339,
+      "Resuscitation": 230752340,
+      "SG Bullets": 230752341,
+      "Screwdriver": 230752342,
+      "Secret Disc \" With Data \"": 230752343,
+      "Shotgun \"Model PA3\" (pump-action)": 230752344,
+      "Shotgun + Stock \"Model PA3\"": 230752345,
+      "Shotgun Custom \"Model SPAS12\" (military shotgun)": 230752346,
+      "Shotgun Custom + Stock \"Model SPAS12\"": 230752347,
+      "Shotgun Parts (upgrade To SPAS12)": 230752348,
+      "Shotgun Stock": 230752349,
+      "Slag Bullets": 230752350,
+      "Small Size Key": 230752351,
+      "Stabilizer": 230752352,
+      "Startup Battery. R \" Charged \"": 230752353,
+      "Startup Battery. R \" Large \"": 230752354,
+      "Startup Battery. R \" Uncharged \"": 230752355,
+      "Startup Battery. W \" Large \"": 230752356,
+      "inf. Grenades": 230752357,
+      "locker Room Key": 230752358
+    },
+    "aliases": {},
     "pool": [
       {
         "id": 16,

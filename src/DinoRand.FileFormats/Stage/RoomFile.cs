@@ -474,7 +474,8 @@ public sealed class RoomFile
 
         bool changed = _structurallyEdited;
         foreach (var item in Items)
-            if (!item.IsEmptySlot && (item.ItemId != item.OriginalItemId || item.NormalizeVisual
+            if (!item.IsEmptySlot && (item.ItemId != item.OriginalItemId || item.Amount != item.OriginalAmount
+                || item.NormalizeVisual
                 || item.TakeIndex != item.OriginalTakeIndex)) { changed = true; break; }
         if (!changed)
             foreach (var enemy in Enemies)

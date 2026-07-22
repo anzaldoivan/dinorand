@@ -34,15 +34,11 @@ DC1 = REPO / "data" / "dc1"
 
 EMPTY_SLOT_ID = 0xFF  # DC1 empty item slot sentinel
 
-# Constructs the AP star-topology model CANNOT faithfully represent (GRAPH-LOGIC-PARITY "parity
-# contract"). Today: rooms with an entry-direction node-split ("nodeSplit": true) — the star model has
-# no door topology, so it cannot see the sub-region partition (the 0309 shuttle fence). Each such room is
-# a DECLARED, bounded debt, deferred to the apworld region-graph follow-up (REGION-SCHEMA-PLAN §2). The
-# distiller FAILS CLOSED if map.json grows a node-split not listed here, so a new inexpressible construct
-# can never be silently dropped the way 0309 was for weeks. Must equal the live map.json node-split set.
-AP_UNREPRESENTABLE: set[str] = {"0309"}
-
+# Engine-truth physical topology exported by Dc1ReachabilityOracleTests. The distiller fails closed
+# unless every authored node split is represented, and check_dc1 rejects any edge construct the AP
+# world cannot consume.
 ORACLE = DC1 / "reachability-oracle.json"  # engine-truth golden snapshot (Dc1ReachabilityOracleTests)
+AP_ID_REGISTRY = DC1 / "ap-id-registry.json"
 
 
 def _dc1_node_split_rooms() -> set[str]:
@@ -52,23 +48,8 @@ def _dc1_node_split_rooms() -> set[str]:
 
 
 def _assert_dc1_parity(require_oracle: bool) -> None:
-    """Gap B (fail-closed) + Gap C (oracle↔source) tripwire — no game install needed, so it runs on CI.
-
-    Errors (loudly, with the offending rooms) when the AP star model would silently misrepresent the
-    authored graph: a node-split not on AP_UNREPRESENTABLE, a stale allow-list entry, or a
-    reachability-oracle that no longer agrees with map.json's node-split set (i.e. the golden snapshot
-    went stale — e.g. someone removed the 0309 split from map.json but did not regenerate the oracle)."""
+    """Fail closed unless the install-free engine export represents every authored node split."""
     live = _dc1_node_split_rooms()
-    if live != AP_UNREPRESENTABLE:
-        added = sorted(live - AP_UNREPRESENTABLE)
-        removed = sorted(AP_UNREPRESENTABLE - live)
-        raise SystemExit(
-            "gen_ap_logic: map.json node-split set != AP_UNREPRESENTABLE allow-list.\n"
-            + (f"  NEW node-split(s) the AP star model cannot represent: {added} — either author the "
-               "apworld region-graph for them or add them to AP_UNREPRESENTABLE with a rationale.\n" if added else "")
-            + (f"  allow-list has stale ent(s) no longer in map.json: {removed} — shrink AP_UNREPRESENTABLE.\n" if removed else "")
-            + "  (GRAPH-LOGIC-PARITY parity contract.)"
-        )
     if require_oracle:
         if not ORACLE.exists():
             raise SystemExit(
@@ -76,6 +57,12 @@ def _assert_dc1_parity(require_oracle: bool) -> None:
                 "DINORAND_UPDATE_ORACLE=1 dotnet test --filter Dc1ReachabilityOracleTests and stage it."
             )
         oracle = json.loads(ORACLE.read_text(encoding="utf-8"))
+        if oracle.get("version") != 2 or not oracle.get("nodes") or not oracle.get("edges"):
+            raise SystemExit(
+                "gen_ap_logic: reachability-oracle.json must be v2 with physical nodes/edges; "
+                "regenerate it with DINORAND_UPDATE_ORACLE=1 dotnet test --filter "
+                "Dc1ReachabilityOracleTests"
+            )
         oset = {_code(c) for c in oracle.get("nodeSplitRooms", [])}
         if oset != live:
             raise SystemExit(
@@ -115,13 +102,73 @@ def load_items() -> dict:
     return {"names": names, "keyItemIds": key_ids, "pool": pool}
 
 
+def load_ap_id_registry() -> dict:
+    """Load the explicit append-only DC1 AP numeric namespace."""
+    if not AP_ID_REGISTRY.exists():
+        raise SystemExit(f"gen_ap_logic: {AP_ID_REGISTRY.relative_to(REPO)} missing")
+    registry = json.loads(AP_ID_REGISTRY.read_text(encoding="utf-8"))
+    if registry.get("version") != 1:
+        raise SystemExit(f"gen_ap_logic: unsupported AP id registry version {registry.get('version')}")
+    return registry
+
+
+def _registered_ap_ids(item_names: set[str], locations: list[dict], registry: dict
+                       ) -> tuple[dict[str, int], dict[str, int]]:
+    """Resolve current catalog rows through the explicit registry without sorting/re-numbering."""
+    item_rows = registry["items"]
+    location_rows = registry["locations"]
+    all_rows = [*item_rows, *location_rows]
+    ids = [row["id"] for row in all_rows]
+    if len(ids) != len(set(ids)):
+        raise SystemExit("gen_ap_logic: AP id registry contains duplicate numeric ids")
+    for kind, rows in (("item", item_rows), ("location", location_rows)):
+        keys = [row["key"] for row in rows]
+        if len(keys) != len(set(keys)):
+            raise SystemExit(f"gen_ap_logic: AP id registry contains duplicate {kind} keys")
+
+    item_ids: dict[str, int] = {}
+    for name in sorted(item_names):
+        matches = [row for row in item_rows
+                   if name == row["name"] or name in row.get("aliases", [])]
+        if len(matches) != 1:
+            raise SystemExit(f"gen_ap_logic: AP item '{name}' has {len(matches)} registry rows; "
+                             "append or repair data/dc1/ap-id-registry.json")
+        item_ids[name] = matches[0]["id"]
+
+    location_ids: dict[str, int] = {}
+    for location in locations:
+        matches = [row for row in location_rows if location["key"] == row["key"]]
+        if len(matches) != 1:
+            raise SystemExit(f"gen_ap_logic: AP location key '{location['key']}' has {len(matches)} "
+                             "registry rows; append or repair data/dc1/ap-id-registry.json")
+        location_ids[location["key"]] = matches[0]["id"]
+    return item_ids, location_ids
+
+
 def load_map() -> dict:
     raw = json.loads((DC1 / "map.json").read_text(encoding="utf-8"))
     regions: dict[str, str] = {}
     edges: list[dict] = []
+    item_groups: dict[str, list[dict]] = {}
+    fixed_records: dict[str, set[int]] = {}
+    item_requirements: dict[str, dict[int, dict]] = {}
     for code, room in raw["rooms"].items():
         c = _code(code)
         regions[c] = room.get("name", c)
+        item_groups[c] = room.get("itemGroups") or []
+        fixed_records[c] = {
+            int(offset, 16)
+            for entry in (room.get("itemPriorities") or [])
+            if str(entry.get("priority", "")).lower() == "fixed"
+            for offset in entry.get("records", [])
+        }
+        item_requirements[c] = {
+            _item_id(item_id): {
+                "requiresItems": [_item_id(value) for value in rule.get("requires", [])],
+                "requiresRooms": [_code(value) for value in rule.get("requiresRoom", [])],
+            }
+            for item_id, rule in (room.get("items") or {}).items()
+        }
         for target, door in (room.get("doors") or {}).items():
             tc = _code(target)
             # Drop self-referential visit gates (a door to X gated on visiting X is vacuous here).
@@ -165,7 +212,9 @@ def load_map() -> dict:
     end = _code(raw["beginEnd"]["end"])
     regions.setdefault(start, start)
     regions.setdefault(end, end)
-    return {"regions": regions, "edges": edges, "startRoom": start, "goalRoom": end}
+    return {"regions": regions, "edges": edges, "startRoom": start, "goalRoom": end,
+            "itemGroups": item_groups, "fixedRecords": fixed_records,
+            "itemRequirements": item_requirements}
 
 
 def _source(rec) -> str:
@@ -179,28 +228,77 @@ def _source(rec) -> str:
     return "static" if kind in ("init", "init_gosub", "aot_zone") else "event-granted"
 
 
-def load_locations(item_names: dict[int, str]) -> list[dict]:
+def _explicit_logical_groups(room: str, records: list[dict], groups: list[dict]) -> list[dict]:
+    """Return ordered physical membership using only explicit record-offset groups."""
+    by_offset = {int(rec["rec_offset"], 16): rec for rec in records}
+    membership: dict[int, str] = {}
+    members_by_id: dict[str, list[int]] = {}
+    for group in groups:
+        logical_id = group["id"]
+        offsets = [int(value, 16) for value in group["records"]]
+        if len(offsets) < 2:
+            raise SystemExit(f"gen_ap_logic: {room} group {logical_id} must have multiple records")
+        for offset in offsets:
+            if offset not in by_offset:
+                raise SystemExit(f"gen_ap_logic: {room} group {logical_id} missing record {offset:#x}")
+            if offset in membership:
+                raise SystemExit(f"gen_ap_logic: {room} record {offset:#x} belongs to multiple groups")
+            membership[offset] = logical_id
+        members_by_id[logical_id] = offsets
+
+    bases = []
+    for rec in records:
+        iid = _item_id(rec["item_id"])
+        pos = rec.get("pos") or [0, 0]
+        bases.append(f"{room}:{iid:02x}:{int(pos[0])},{int(pos[1])}")
+    base_counts = {base: bases.count(base) for base in set(bases)}
+
+    emitted: set[str] = set()
+    result = []
+    for rec, base in zip(records, bases):
+        offset = int(rec["rec_offset"], 16)
+        logical_id = membership.get(offset)
+        if logical_id is not None:
+            if logical_id in emitted:
+                continue
+            offsets = members_by_id[logical_id]
+        else:
+            logical_id = base if base_counts[base] == 1 else f"{base}:rec@{offset:x}"
+            offsets = [offset]
+        emitted.add(logical_id)
+        result.append({"logicalId": logical_id, "recordOffsets": offsets,
+                       "records": [by_offset[x] for x in offsets]})
+    return result
+
+
+def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]] | None = None,
+                   fixed_records: dict[str, set[int]] | None = None,
+                   item_requirements: dict[str, dict[int, dict]] | None = None) -> list[dict]:
     """ALL decoded pickup rows, each tagged `source` — nothing is silently dropped here;
     build_dc1 filters what the AP contract can actually place."""
     raw = json.loads((DC1 / "room-data.json").read_text(encoding="utf-8"))
     rooms = raw["rooms"]
     room_name = {_code(c): r.get("name", c) for c, r in rooms.items()}
     locs: list[dict] = []
-    seen: set[str] = set()  # collapse relocation-twins (same item+pos = one logical pickup)
+    item_groups = item_groups or {}
+    fixed_records = fixed_records or {}
+    item_requirements = item_requirements or {}
     for code, room in rooms.items():
         ic = room.get("item_control")
         if not ic:
             continue
         c = _code(code)
-        for rec in ic["records"]:
+        for group in _explicit_logical_groups(c, ic["records"], item_groups.get(c, [])):
+            rec = group["records"][0]
             iid = _item_id(rec["item_id"])
             pos = rec.get("pos") or [0, 0]
             x, y = int(pos[0]), int(pos[1])
-            key = f"{c}:{iid:02x}:{x},{y}"
-            if key in seen:
-                continue
-            seen.add(key)
+            key = group["logicalId"]
             iname = item_names.get(iid, _clean(rec.get("item_name", f"0x{iid:02x}")))
+            requirements = item_requirements.get(c, {}).get(iid, {})
+            visual_rank = {"generic-panel": 0, "bespoke-mesh": 1, "interaction-only": 2}
+            visual = max((member.get("visual") or "generic-panel" for member in group["records"]),
+                         key=lambda value: visual_rank.get(value, 99))
             loc = {
                 "key": key,
                 "name": f"{room_name.get(c, c)} ({c}) - {iname} @{x},{y}",
@@ -213,7 +311,14 @@ def load_locations(item_names: dict[int, str]) -> list[dict]:
                 # Ground-visual class (item_control `visual`, STATIC-SCD-RE cont.72): generic-panel /
                 # bespoke-mesh / interaction-only. Informational (DATA-REFERENCE / hint text) — the AP
                 # contract places against ids and rooms, never the visual.
-                "visual": rec.get("visual"),
+                "visual": visual,
+                "priority": ("fixed" if any(offset in fixed_records.get(c, set())
+                                                for offset in group["recordOffsets"])
+                             else "normal"),
+                "requiresItems": requirements.get("requiresItems", []),
+                "requiresRooms": requirements.get("requiresRooms", []),
+                "physicalIds": [f"{c}:0x{offset:x}" for offset in group["recordOffsets"]],
+                "recordOffsets": group["recordOffsets"],
             }
             fl = (rec.get("gate") or {}).get("flag")
             if fl:
@@ -238,10 +343,12 @@ def _load_client_checks() -> dict[str, dict]:
 
 
 def build_dc1() -> dict:
-    _assert_dc1_parity(require_oracle=False)  # fail closed: never silently drop an unrepresentable construct
+    _assert_dc1_parity(require_oracle=True)
     items = load_items()
     m = load_map()
-    all_locs = load_locations(items["names"])
+    oracle = json.loads(ORACLE.read_text(encoding="utf-8"))
+    all_locs = load_locations(items["names"], m["itemGroups"], m["fixedRecords"],
+                              m["itemRequirements"])
     # AP contract: only real-id pickups in rooms on the door graph are placeable checks.
     # Runtime-armed 0xff slots (no id to place against) and alt-room copies outside the
     # graph stay visible in DATA-REFERENCE.md via load_locations' `source` tag.
@@ -266,20 +373,103 @@ def build_dc1() -> dict:
     for l in locs:
         if checks[l["name"]].get("excluded"):
             l["excluded"] = True
-    progression = sorted({i for e in m["edges"] for i in e["requiresItems"]})
+
+    nodes_by_room: dict[str, list[dict]] = {}
+    for node in oracle["nodes"]:
+        nodes_by_room.setdefault(node["room"], []).append(node)
+    protected_rooms = set(oracle["itemProtectedRooms"])
+    ending_rooms = set(oracle["endingRooms"])
+    for location in locs:
+        nodes = nodes_by_room.get(location["room"], [])
+        primary = next((node for node in nodes if node["primary"]), None)
+        if primary is None:
+            raise SystemExit(f"gen_ap_logic: location {location['name']} has no physical primary node")
+        location["node"] = primary["id"]
+        if location["room"] in protected_rooms:
+            location["protected"] = True
+        if location["room"] in ending_rooms:
+            location["ending"] = True
+    registry = load_ap_id_registry()
+    item_ap_ids, location_ap_ids = _registered_ap_ids(
+        set(items["names"].values()), locs, registry)
+    location_rows = {row["key"]: row for row in registry["locations"]}
+    for location in locs:
+        row = location_rows[location["key"]]
+        location["apId"] = location_ap_ids[location["key"]]
+        if row.get("aliases"):
+            location["aliases"] = row["aliases"]
+
+    # Engine-truth gating catalog: unlike the old overlay-only union, this includes physical
+    # door-type requirements (Entrance Key and the Key Card ladder) proven by the C# graph oracle.
+    progression = sorted(
+        {int(value, 16) for value in oracle["gatingKeys"]}
+        | {item_id for location in locs for item_id in location["requiresItems"]}
+    )
+    physical_edges = []
+    seen_edges = set()
+    for edge in oracle["edges"]:
+        identity = (
+            edge["from"], edge["to"], edge["requiresLatch"], edge["setsLatch"],
+            tuple(edge["requiresAnyItems"]), tuple(edge["requiresItems"]),
+            tuple(edge["requiresRooms"]),
+        )
+        if identity not in seen_edges:
+            seen_edges.add(identity)
+            physical_edges.append(edge)
+    hidden_progression = sorted({
+        location["itemId"] for location in locs
+        if location["itemId"] in progression
+        and location["visual"] == "interaction-only"
+        and location["priority"] != "fixed"
+        and not location.get("protected")
+        and not location.get("ending")
+        and not location.get("excluded")
+    })
+    for location in locs:
+        if location.get("excluded"):
+            placement_class = "excluded"
+            allowed = []
+        elif location.get("ending"):
+            placement_class = "ending"
+            allowed = []
+        elif location["priority"] == "fixed" or location.get("protected"):
+            placement_class = "fixed"
+            allowed = []
+        elif location["visual"] == "interaction-only":
+            placement_class = "hidden-no-worse-than-vanilla"
+            allowed = hidden_progression
+        else:
+            placement_class = "progression"
+            allowed = progression
+        location["placementClass"] = placement_class
+        location["allowedProgressionItemIds"] = list(allowed)
+    item_rows = registry["items"]
+    item_aliases = {
+        alias: row["name"]
+        for row in item_rows
+        for alias in row.get("aliases", [])
+    }
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
-        "_source": "data/dc1/{map,items,room-data}.json (authored) + ap-client-checks.json",
-        "version": 2,
+        "_source": "data/dc1/{map,items,room-data,reachability-oracle}.json + ap-client-checks.json",
+        "version": 3,
+        "topology": "physical",
         "startRoom": m["startRoom"],
         "goalRoom": m["goalRoom"],
+        "startNode": oracle["startNode"],
+        "goalNode": oracle["goalNode"],
         "regions": m["regions"],
-        "edges": m["edges"],
+        "nodes": oracle["nodes"],
+        "edges": physical_edges,
         "locations": locs,
         "items": {
             "names": {str(i): n for i, n in sorted(items["names"].items())},
             "keyItemIds": items["keyItemIds"],
             "progressionItemIds": progression,
+            "hiddenProgressionItemIds": hidden_progression,
+            "completionItemIds": [0x2E],
+            "apIds": item_ap_ids,
+            "aliases": item_aliases,
             "pool": items["pool"],
         },
     }
@@ -645,30 +835,60 @@ def build_dc2() -> dict:
     }
 
 
-def _reachable_rooms(data: dict, held: set[int]) -> set[str]:
-    """Simulate either generated topology to a reachability fixpoint.
+def _reachable_nodes(data: dict, held: set[int]) -> set[str]:
+    """Flood the exact generated node graph, including item-OR door gates and room-state gates."""
+    reach = {data.get("startNode", data["startRoom"])}
+    latches: set[int] = set()
 
-    DC2 v2 starts at its byte-proven room and follows only physical edges. The historical DC1
-    contract retains its Menu-star plus gated-edge overlay. This mirrors each apworld closely
-    enough for ``--check`` to prove the authored graph without an Archipelago checkout.
-    """
-    if data.get("topology") == "physical":
-        reach = {data["startRoom"]}
-    else:
-        gated_targets = {e["to"] for e in data["edges"]}
-        reach = {c for c in data["regions"] if c not in gated_targets}
+    def requirements_met(edge: dict, reached_rooms: set[str]) -> bool:
+        any_items = edge.get("requiresAnyItems", [])
+        return ((not any_items or any(item in held for item in any_items))
+                and all(item in held for item in edge["requiresItems"])
+                and all(room in reached_rooms for room in edge["requiresRooms"]))
+
     changed = True
     while changed:
         changed = False
+        reached_rooms = {
+            node["room"] for node in data.get("nodes", []) if node["id"] in reach
+        } if data.get("nodes") else set(reach)
+        for edge in data["edges"]:
+            latch = edge.get("setsLatch")
+            if (latch is not None and latch not in latches and edge["from"] in reach
+                    and requirements_met(edge, reached_rooms)):
+                latches.add(latch)
+                changed = True
         for e in data["edges"]:
             if e["to"] in reach or e["from"] not in reach:
                 continue
-            if all(i in held for i in e["requiresItems"]) and all(
-                r in reach for r in e["requiresRooms"]
-            ):
+            if (e.get("requiresLatch") is None or e["requiresLatch"] in latches) \
+                    and requirements_met(e, reached_rooms):
                 reach.add(e["to"])
                 changed = True
     return reach
+
+
+def _reachable_rooms(data: dict, held: set[int]) -> set[str]:
+    """Return room codes reached by the generated physical node graph."""
+    nodes = _reachable_nodes(data, held)
+    if data.get("nodes"):
+        return {node["room"] for node in data["nodes"] if node["id"] in nodes}
+    return nodes
+
+
+def _location_reachable(data: dict, location: dict, held: set[int],
+                        reach_nodes: set[str], reach_rooms: set[str]) -> bool:
+    node = location.get("node", location["room"])
+    return (node in reach_nodes
+            and all(item in held for item in location.get("requiresItems", []))
+            and all(room in reach_rooms for room in location.get("requiresRooms", [])))
+
+
+def _goal_reachable(data: dict, held: set[int]) -> bool:
+    """AP completion contract: reach the goal region and hold every proven completion entitlement."""
+    return data["goalRoom"] in _reachable_rooms(data, held) and all(
+        item_id in held for item_id in data["items"].get("completionItemIds", [])
+    )
 
 
 def _forward_fill_beatable(data: dict) -> bool:
@@ -680,16 +900,34 @@ def _forward_fill_beatable(data: dict) -> bool:
     held: set[int] = set()
     used: set[str] = set()
     while remaining:
-        reach = _reachable_rooms(data, held)
-        slot = next(
-            (loc for loc in data["locations"] if loc["room"] in reach and loc["key"] not in used),
-            None,
-        )
-        if slot is None:
+        reach_nodes = _reachable_nodes(data, held)
+        reach_rooms = _reachable_rooms(data, held)
+        helpful = [
+            item_id for item_id in remaining
+            if len(_reachable_nodes(data, held | {item_id})) > len(reach_nodes)
+        ]
+        if not helpful:
+            helpful = [
+                item_id for item_id in remaining
+                if any(location.get("node", location["room"]) in reach_nodes
+                       and item_id in location.get("requiresItems", [])
+                       for location in data["locations"] if location["key"] not in used)
+            ]
+        candidates = helpful or remaining
+        choice = next(
+            ((item_id, loc) for item_id in reversed(candidates)
+             for loc in data["locations"]
+             if loc["key"] not in used
+             and item_id in loc.get("allowedProgressionItemIds", remaining)
+             and _location_reachable(data, loc, held, reach_nodes, reach_rooms)),
+            None)
+        if choice is None:
             return False
+        item_id, slot = choice
         used.add(slot["key"])
-        held.add(remaining.pop())
-    return data["goalRoom"] in _reachable_rooms(data, held)
+        remaining.remove(item_id)
+        held.add(item_id)
+    return _goal_reachable(data, held)
 
 
 def _check_common(data: dict) -> dict:
@@ -700,18 +938,27 @@ def _check_common(data: dict) -> dict:
     names = {int(k): v for k, v in data["items"]["names"].items()}
     # Every referenced item id resolves to a name.
     for e in data["edges"]:
-        for i in e["requiresItems"]:
+        for i in [*e["requiresItems"], *e.get("requiresAnyItems", [])]:
             assert i in names, f"edge requires unknown item 0x{i:02x}"
     for loc in data["locations"]:
         assert loc["itemId"] in names, loc
+        for item_id in loc.get("requiresItems", []):
+            assert item_id in names, f"location requires unknown item 0x{item_id:02x}"
     # Location keys and display names are unique (AP needs stable, unique location names).
     keys = [loc["key"] for loc in data["locations"]]
     assert len(keys) == len(set(keys)), "duplicate location keys"
     disp = [loc["name"] for loc in data["locations"]]
     assert len(disp) == len(set(disp)), "duplicate location display names"
-    # Every edge endpoint is a known region.
+    if data.get("version") == 3:
+        location_ids = [loc["apId"] for loc in data["locations"]]
+        assert len(location_ids) == len(set(location_ids)), "duplicate AP location ids"
+        item_ids = list(data["items"]["apIds"].values())
+        assert len(item_ids) == len(set(item_ids)), "duplicate AP item ids"
+    # Every edge endpoint is a known physical node (DC1) or room region (DC2).
+    endpoints = ({node["id"] for node in data["nodes"]}
+                 if data.get("nodes") else set(data["regions"]))
     for e in data["edges"]:
-        assert e["from"] in data["regions"] and e["to"] in data["regions"], e
+        assert e["from"] in endpoints and e["to"] in endpoints, e
     return names
 
 
@@ -762,22 +1009,20 @@ def check_dc2(data: dict) -> None:
 def check_dc1(data: dict) -> None:
     _assert_dc1_parity(require_oracle=True)  # + oracle golden snapshot still agrees with the source
     names = _check_common(data)
-    assert data["version"] == 2, data["version"]  # v2 = runtime-client fields (excluded)
+    assert data["version"] == 3 and data["topology"] == "physical", (
+        data["version"], data.get("topology"))
     assert data["startRoom"] == "010d", data["startRoom"]
     assert data["goalRoom"] == "060d", data["goalRoom"]
     # Runtime-client check contract: name parity is enforced in build_dc1 (fail-closed); here,
     # non-excluded locations must have pairwise-unique check flags (the client's attribution
     # guarantee) and the excluded set must stay a small tail, never a silent majority.
     checks = _load_client_checks()
-    # apId parity: the checks file carries the apworld's sorted-name location ids so the C#
-    # client never re-derives the scheme — assert the two derivations agree (id-scheme guard).
-    expected_ap = {name: 0x0DC1_0000 + 0x1_0000 + i
-                   for i, name in enumerate(sorted(l["name"] for l in data["locations"]))}
+    # apId parity: both generated artifacts consume the explicit append-only registry.
     flag_users: dict[int, str] = {}
     excluded = 0
     for loc in data["locations"]:
         e = checks[loc["name"]]
-        assert e["apId"] == expected_ap[loc["name"]], (loc["name"], e["apId"])
+        assert e["apId"] == loc["apId"], (loc["name"], e["apId"], loc["apId"])
         assert e["predicate"]["kind"] == "flag" and e["predicate"]["anyOf"], e
         if loc.get("excluded"):
             excluded += 1
@@ -786,31 +1031,57 @@ def check_dc1(data: dict) -> None:
             assert f not in flag_users, f"flag 7:{f} shared by '{flag_users[f]}' and '{loc['name']}'"
             assert 0 < f < 256, f
             flag_users[f] = loc["name"]
-    assert excluded <= len(data["locations"]) // 4, f"{excluded} excluded locations — checks data suspect"
+    assert excluded == 12, f"excluded location membership drifted: {excluded}"
+    node_ids = {node["id"] for node in data["nodes"]}
+    assert data["startNode"] in node_ids and data["goalNode"] in node_ids
+    assert {node["room"] for node in data["nodes"] if node["region"] is not None} == {"0309"}
+    edge_fields = {"from", "to", "requiresLatch", "setsLatch",
+                   "requiresAnyItems", "requiresItems", "requiresRooms"}
+    assert all(set(edge) == edge_fields for edge in data["edges"]), "unknown physical edge construct"
+    assert all(location["node"] in node_ids for location in data["locations"])
     # A known key gate: some door from room 0112 to 0114 requires the BG Area key (0x30).
     gate = [e for e in data["edges"] if e["from"] == "0112" and e["to"] == "0114"]
-    assert gate and 0x30 in gate[0]["requiresItems"], gate
+    assert gate and 0x30 in (gate[0]["requiresAnyItems"] + gate[0]["requiresItems"]), gate
     assert names.get(0x2E) == "Entrance Key", names.get(0x2E)
     # Solvability: holding all progression items, every location's room + the goal are reachable;
     # and with no items there are already reachable locations to seed the fill.
     prog = set(data["items"]["progressionItemIds"])
+    oracle = json.loads(ORACLE.read_text(encoding="utf-8"))
+    expected_progression = ({int(value, 16) for value in oracle["gatingKeys"]}
+                            | {item_id for location in data["locations"]
+                               for item_id in location["requiresItems"]})
+    assert prog == expected_progression
+    assert data["items"]["progressionItemIds"].count(0x2E) == 1
     reach_all = _reachable_rooms(data, prog)
     assert data["goalRoom"] in reach_all, "goal unreachable even with all keys"
     loc_rooms = {loc["room"] for loc in data["locations"]}
     unreachable = loc_rooms - reach_all
     assert not unreachable, f"locations in unreachable rooms: {sorted(unreachable)}"
+    all_nodes = _reachable_nodes(data, prog)
+    assert all(_location_reachable(data, location, prog, all_nodes, reach_all)
+               for location in data["locations"]), "physically unreachable AP location"
     reach_none = _reachable_rooms(data, set())
     assert any(loc["room"] in reach_none for loc in data["locations"]), "no free locations to seed fill"
-    # Gate bites: the goal must NOT be reachable without Key Card Lv. A (0x3a), and holding it
-    # (alone) must open the goal. A test that only ever passes with all keys proves nothing.
+    for probe in oracle["probes"]:
+        held = {int(value, 16) for value in probe["held"]}
+        assert _reachable_rooms(data, held) == set(probe["reach"]), probe["name"]
+    for location in data["locations"]:
+        allowed = set(location["allowedProgressionItemIds"])
+        assert allowed <= prog, location
+        if (location["priority"] == "fixed" or location.get("protected")
+                or location.get("ending") or location.get("excluded")):
+            assert not allowed, location
+    # Gate bites: completion must fail without either the physical goal card or the proven hard
+    # Entrance-Key entitlement in the physical graph.
     assert data["goalRoom"] not in _reachable_rooms(data, prog - {0x3A}), "goal reachable without Key Card"
-    assert data["goalRoom"] in _reachable_rooms(data, {0x3A}), "Key Card alone does not open the goal"
+    assert not _goal_reachable(data, prog - {0x2E}), "AP completion succeeds without Entrance Key"
+    assert _goal_reachable(data, prog), "AP completion fails with every progression entitlement"
     # Beatability: a forward fill can place every progression key into an already-reachable spot
     # (i.e. no key is locked behind its own gate) and the goal is then reachable.
     assert _forward_fill_beatable(data), "no beatable placement of progression keys exists"
     print(
         f"  solvable: {len(reach_none)} rooms free, {len(reach_all)} with all keys, "
-        f"goal {data['goalRoom']} gated by Key Card, forward-fill beatable"
+        f"goal {data['goalRoom']} gated by Key Card + Entrance entitlement, forward-fill beatable"
     )
     print(
         f"OK: {len(data['regions'])} regions, {len(data['edges'])} edges, "

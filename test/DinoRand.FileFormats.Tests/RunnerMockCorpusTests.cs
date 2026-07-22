@@ -3,6 +3,7 @@ using DinoRand.Randomizer;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Spoiler;
+using DinoRand.Randomizer.Logic;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -49,7 +50,8 @@ public class RunnerMockCorpusTests
             var install = NewDc1Install(root);
             var outDir = Path.Combine(root, "out");
             var result = new RandomizerRunner(new DinoCrisis1())
-                .Run(install, outDir, new Seed(12345), new RandomizerConfig());
+                .Run(install, outDir, new Seed(12345),
+                    new RandomizerConfig { EnsureBeatable = false });
 
             Assert.Equal(12, result.RoomsWritten);
             // RoomCount = graph nodes, which includes phantom door-destination rooms outside the corpus
@@ -79,7 +81,7 @@ public class RunnerMockCorpusTests
         {
             var install = NewDc1Install(root);
             var runner = new RandomizerRunner(new DinoCrisis1());
-            var config = new RandomizerConfig();
+            var config = new RandomizerConfig { EnsureBeatable = false };
             runner.Run(install, Path.Combine(root, "a"), new Seed(777), config);
             runner.Run(install, Path.Combine(root, "b"), new Seed(777), config);
 
@@ -128,12 +130,43 @@ public class RunnerMockCorpusTests
             File.WriteAllText(Path.Combine(outDir, SpoilerLogBuilder.FileName), "stale");
 
             var result = new RandomizerRunner(new DinoCrisis1())
-                .Run(install, outDir, new Seed(9), new RandomizerConfig(), emitSpoiler: false);
+                .Run(install, outDir, new Seed(9),
+                    new RandomizerConfig { EnsureBeatable = false }, emitSpoiler: false);
 
             Assert.False(File.Exists(Path.Combine(outDir, "stZ99.dat")), "stale .dat survived the run");
             Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.FileName)),
                 "suppressed spoiler left a stale SPOILER.md behind");
             Assert.Contains(result.Log, l => l.Contains("[clean]"));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Dc1_InjectedFinalVerificationFailure_ProducesNoInstallableArtifacts()
+    {
+        var root = NewTemp();
+        try
+        {
+            var install = NewDc1Install(root);
+            var outDir = Directory.CreateDirectory(Path.Combine(root, "out")).FullName;
+            File.WriteAllBytes(Path.Combine(outDir, "st100.dat"), new byte[] { 1 });
+            File.WriteAllText(Path.Combine(outDir, "exe-patch-plan.json"), "stale");
+            var staleLoose = Path.Combine(outDir, "Sound", "VOICE", "stale.wav");
+            Directory.CreateDirectory(Path.GetDirectoryName(staleLoose)!);
+            File.WriteAllBytes(staleLoose, new byte[] { 2 });
+            var runner = new RandomizerRunner(new DinoCrisis1())
+            {
+                FinalProgressionVerifier = _ => new KeyItemPlacer.PlacementResult(
+                    false, Array.Empty<(KeyItemPlacer.Spot, int)>(), new[] { "injected failure" })
+            };
+
+            Assert.Throws<InvalidOperationException>(() =>
+                runner.Run(install, outDir, new Seed(1),
+                    new RandomizerConfig { EnsureBeatable = false }));
+            Assert.False(Directory.Exists(outDir)
+                         && Directory.EnumerateFiles(outDir, "*.dat").Any());
+            Assert.False(File.Exists(Path.Combine(outDir, "exe-patch-plan.json")));
+            Assert.False(File.Exists(staleLoose));
         }
         finally { Directory.Delete(root, recursive: true); }
     }

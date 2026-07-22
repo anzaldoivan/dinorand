@@ -1,14 +1,4 @@
-"""Dino Crisis 1 Archipelago world — increment 1 (generation only).
-
-Proves the pipeline: AP can generate a logically-valid DC1 seed from DinoRand's authored logic.
-It does NOT patch the game or sync a multiworld — that needs the runtime client (deferred; see
-docs/decisions/cross/ARCHIPELAGO-INTEGRATION-FEASIBILITY.md).
-
-Region model (increment 1): star topology + gated-edge overlay. Every room is a region; every
-room that is NOT the target of a gated door hangs off "Menu" freely (full room connectivity lives
-in the .dat files, not the authored data — deferred). The 16 authored gated edges are applied as
-an overlay, so the real key gates (BG Area / C.O. Area / Key Card Lv. A) still constrain the goal.
-"""
+"""Dino Crisis 1 Archipelago world over DinoRand's physical v3 logic contract."""
 from __future__ import annotations
 
 from typing import Any, Callable, Mapping
@@ -29,7 +19,7 @@ class DinoCrisis1Location(Location):
 
 
 class DinoCrisis1World(World):
-    """Dino Crisis 1 randomizer (DinoRand), Archipelago integration increment 1."""
+    """Dino Crisis 1 randomizer with physical topology and runtime-client integration."""
 
     game = "Dino Crisis 1"
     options_dataclass = DinoCrisis1Options
@@ -44,49 +34,102 @@ class DinoCrisis1World(World):
         mw.regions.append(menu)
 
         regions: dict[str, Region] = {}
-        for code in dc1.REGIONS:
-            r = Region(dc1.region_name(code), player, mw)
-            regions[code] = r
+        room_regions: dict[str, list[Region]] = {}
+        for node in dc1.NODES:
+            r = Region(dc1.node_name(node["id"]), player, mw)
+            regions[node["id"]] = r
+            room_regions.setdefault(node["room"], []).append(r)
             mw.regions.append(r)
 
         for loc in dc1.LOCATIONS:
-            parent = regions[loc["room"]]
-            ap_loc = DinoCrisis1Location(player, loc["name"], dc1.LOCATION_NAME_TO_ID[loc["name"]], parent)
+            parent = regions[loc["node"]]
+            ap_loc = DinoCrisis1Location(player, loc["name"], loc["apId"], parent)
             # Shared-taken-flag locations the runtime client cannot attribute individually
             # (ap-client-checks.json `excluded`): keep progression out; the client fires the
             # whole shared group when the flag flips, so anything here must be low-stakes.
             if loc.get("excluded"):
                 ap_loc.progress_type = LocationProgressType.EXCLUDED
+            required_items = [dc1.ITEM_NAMES[item_id] for item_id in loc["requiresItems"]]
+            required_rooms = [room_regions[room] for room in loc["requiresRooms"]]
+            ap_loc.access_rule = self._requirement_rule(required_items, [], required_rooms)
+            allowed = {dc1.ITEM_NAMES[item_id] for item_id in loc["allowedProgressionItemIds"]}
+            if allowed != dc1.PROGRESSION_ITEM_NAMES:
+                ap_loc.item_rule = lambda item, allowed=allowed: (
+                    not item.advancement
+                    or (item.game == self.game and item.name in allowed)
+                )
             parent.locations.append(ap_loc)
 
-        gated_targets = {e["to"] for e in dc1.EDGES}
-        for code, r in regions.items():
-            if code not in gated_targets:
-                menu.connect(r)
+        menu.connect(regions[dc1.START_NODE])
+        latch_setters: dict[int, list[dict]] = {}
+        for edge in dc1.EDGES:
+            if edge["setsLatch"] is not None:
+                latch_setters.setdefault(edge["setsLatch"], []).append(edge)
         for e in dc1.EDGES:
-            items = [dc1.ITEM_NAMES[i] for i in e["requiresItems"]]
-            rooms = [dc1.region_name(r) for r in e["requiresRooms"]]
-            entrance = regions[e["from"]].connect(regions[e["to"]], rule=self._edge_rule(items, rooms))
+            if e["from"] == e["to"]:
+                continue  # physical same-node doors add no AP reachability and AP rejects self-connects
+            entrance = regions[e["from"]].connect(
+                regions[e["to"]],
+                rule=self._edge_rule(e, room_regions, latch_setters),
+            )
             # A rule that calls state.can_reach_region must register the dependency, or AP's
             # region cache can serve stale reachability during fill (several requiresRooms
             # targets are themselves gated regions).
-            for room in e["requiresRooms"]:
-                mw.register_indirect_condition(regions[room], entrance)
+            indirect = [region for room in e["requiresRooms"] for region in room_regions[room]]
+            if e["requiresLatch"] is not None:
+                for setter in latch_setters.get(e["requiresLatch"], []):
+                    indirect.append(regions[setter["from"]])
+                    indirect.extend(region for room in setter["requiresRooms"]
+                                    for region in room_regions[room])
+            for region in dict.fromkeys(indirect):
+                mw.register_indirect_condition(region, entrance)
 
-    def _edge_rule(self, items: list[str], rooms: list[str]) -> Callable[[CollectionState], bool]:
+    def _requirement_rule(self, items: list[str], any_items: list[str],
+                          rooms: list[list[Region]]) -> Callable[[CollectionState], bool]:
         player = self.player
 
         def rule(state: CollectionState) -> bool:
-            return state.has_all(items, player) and all(
-                state.can_reach_region(rn, player) for rn in rooms
+            return (state.has_all(items, player)
+                    and (not any_items or any(state.has(item, player) for item in any_items))
+                    and all(any(state.can_reach_region(region.name, player) for region in variants)
+                            for variants in rooms))
+
+        return rule
+
+    def _edge_rule(self, edge: dict, room_regions: dict[str, list[Region]],
+                   latch_setters: dict[int, list[dict]]) -> Callable[[CollectionState], bool]:
+        player = self.player
+        items = [dc1.ITEM_NAMES[item_id] for item_id in edge["requiresItems"]]
+        any_items = [dc1.ITEM_NAMES[item_id] for item_id in edge["requiresAnyItems"]]
+        rooms = [room_regions[room] for room in edge["requiresRooms"]]
+        base = self._requirement_rule(items, any_items, rooms)
+        latch = edge["requiresLatch"]
+        if latch is None:
+            return base
+
+        setter_rules = [
+            (dc1.node_name(setter["from"]), self._requirement_rule(
+                [dc1.ITEM_NAMES[item_id] for item_id in setter["requiresItems"]],
+                [dc1.ITEM_NAMES[item_id] for item_id in setter["requiresAnyItems"]],
+                [room_regions[room] for room in setter["requiresRooms"]],
+            ))
+            for setter in latch_setters.get(latch, [])
+        ]
+
+        def rule(state: CollectionState) -> bool:
+            return base(state) and any(
+                state.can_reach_region(source, player) and setter_rule(state)
+                for source, setter_rule in setter_rules
             )
 
         return rule
 
     def set_rules(self) -> None:
-        goal = dc1.region_name(dc1.GOAL_ROOM)
+        goal = dc1.node_name(dc1.GOAL_NODE)
+        completion_items = [dc1.ITEM_NAMES[i] for i in dc1.COMPLETION_ITEM_IDS]
         self.multiworld.completion_condition[self.player] = (
             lambda state: state.can_reach_region(goal, self.player)
+            and state.has_all(completion_items, self.player)
         )
 
     def create_item(self, name: str) -> DinoCrisis1Item:

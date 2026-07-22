@@ -22,7 +22,8 @@ namespace DinoRand.Randomizer.Passes;
 /// remaining free ends are then paired at random (only ever adding edges, so reachability cannot
 /// drop) and a lone odd end loops back to its own room (BioRand's <c>FinalChecks</c> self-lock).
 /// Success requires <see cref="DoorMap.EndCode"/> to be reachable from start over the new pairing;
-/// otherwise the caller retries with a fresh sub-seed or falls back to vanilla (plan §5, §8).</para>
+/// otherwise the caller retries with a fresh sub-seed and ultimately aborts without publishable
+/// output if no verified candidate exists (plan §5, §8).</para>
 ///
 /// <para>This is topology only — it never reads or writes the (undecoded) entry pose. The door
 /// pass applies the pose carry separately, behind the HARD GATE.</para>

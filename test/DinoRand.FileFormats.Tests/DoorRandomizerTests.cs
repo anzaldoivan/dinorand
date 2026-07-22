@@ -382,7 +382,7 @@ public class DoorRandomizerTests
         => Assert.False(new DoorRandomizer().IsEnabled(new RandomizerConfig()));
 
     [Fact]
-    public void DoorRandomizer_ConnectorCannotReachGoal_FallsBackToVanillaAfterMaxAttempts()
+    public void DoorRandomizer_ConnectorCannotReachGoal_AbortsAfterMaxAttemptsWithoutMutation()
     {
         // A world that never contains the goal room (060d): every connector attempt fails, and the
         // pass must exhaust MaxAttempts then fall back to vanilla — an unbeatable seed is never
@@ -394,9 +394,9 @@ public class DoorRandomizerTests
         var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(11),
                                            new RandomizerConfig { RandomizeDoors = true }, log.Add);
 
-        new DoorRandomizer().Apply(ctx);
+        var error = Assert.Throws<InvalidOperationException>(() => new DoorRandomizer().Apply(ctx));
 
-        Assert.Contains(log, l => l.Contains("falling back to vanilla doors"));
+        Assert.Contains("no beatable door/key layout", error.Message);
         Assert.Equal(DoorRandomizer.MaxAttempts,
             log.Count(l => l.Contains("connector could not reach the goal")));
         Assert.DoesNotContain(rooms.SelectMany(r => r.Doors), d => d.IsEdited);

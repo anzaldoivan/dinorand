@@ -204,11 +204,13 @@ public sealed class RoomScript
             {
                 byte id = buffer[pos + ItemRecord.IdOffset];
                 ushort take = (ushort)ReadU16(buffer, pos + ItemRecord.TakeIndexOffset);
+                int amount = ReadU16(buffer, pos + ItemRecord.CountOffset);
                 items.Add(new ItemRecord
                 {
                     ItemId = id,
                     OriginalItemId = id,
-                    Amount = ReadU16(buffer, pos + ItemRecord.CountOffset),
+                    Amount = amount,
+                    OriginalAmount = amount,
                     TakeIndex = take,
                     OriginalTakeIndex = take,
                     Raw = buffer.Slice(pos, len).ToArray(),
@@ -292,12 +294,29 @@ public sealed class RoomScript
     /// </summary>
     public void ApplyEdits(byte[] buffer, IReadOnlyList<ItemRecord> edited)
     {
+        // Validate the complete amount batch before changing the caller's buffer. Item counts are
+        // encoded as an unsigned 16-bit word at record+0x1e (STATIC-SCD-RE cont.9).
+        foreach (var item in edited)
+        {
+            if (item.FileOffset < 0 || item.IsEmptySlot) continue;
+            if (item.Amount is < ushort.MinValue or > ushort.MaxValue)
+                throw new InvalidDataException(
+                    $"Item amount {item.Amount} at RDT offset 0x{item.FileOffset:X} is outside the unsigned 16-bit count range.");
+        }
+
         foreach (var item in edited)
         {
             if (item.FileOffset < 0 || item.IsEmptySlot) continue;
             int idPos = item.FileOffset + ItemRecord.IdOffset;
             if (idPos >= 0 && idPos < buffer.Length)
                 buffer[idPos] = (byte)item.ItemId;
+
+            if (item.Amount != item.OriginalAmount)
+            {
+                int countPos = item.FileOffset + ItemRecord.CountOffset;
+                if (countPos + 2 <= buffer.Length)
+                    WriteU16(buffer, countPos, (ushort)item.Amount);
+            }
 
             // Take-index rekey (AP client only — EXE-SYMBOLS cont.81): both the registration's
             // suppress check and the take commit read this word from the record, so rewriting it

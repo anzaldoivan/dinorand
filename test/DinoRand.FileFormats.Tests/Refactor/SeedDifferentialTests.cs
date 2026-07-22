@@ -359,6 +359,17 @@ internal static class SyntheticInputs
         string data = Directory.CreateDirectory(Path.Combine(root, "install", "Data")).FullName;
         foreach (string path in Directory.EnumerateFiles(MockRooms.Dc1DataDir(), "*.dat"))
             File.Copy(path, Path.Combine(data, Path.GetFileName(path)));
+        // Runner fixtures must model the production start/goal contract now that final progression
+        // verification is a hard publication gate. These authored rooms contain only a reciprocal,
+        // free synthetic door pair; no game bytes and no extra randomizable records.
+        File.WriteAllBytes(Path.Combine(data, "st10d.dat"), SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(),
+            new[] { new SyntheticRoom.Door(6, 0x0d, 0, 0) },
+            Array.Empty<SyntheticRoom.Enemy>()));
+        File.WriteAllBytes(Path.Combine(data, "st60d.dat"), SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(),
+            new[] { new SyntheticRoom.Door(1, 0x0d, 0, 0) },
+            Array.Empty<SyntheticRoom.Enemy>()));
         return Path.Combine(root, "install");
     }
 

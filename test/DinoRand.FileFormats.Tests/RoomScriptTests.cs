@@ -165,6 +165,40 @@ public class RoomScriptTests
     }
 
     [Fact]
+    public void ApplyEdits_AmountOnly_RoundTripsAndChangesOnlyCountWord()
+    {
+        var rdt = BuildRdt(ItemRec(0x16, 17, slot: 5, model: 0x80123456));
+        var script = RoomScript.Parse(rdt);
+        var item = Assert.Single(script.Items);
+        item.Amount = 0x1234;
+
+        var edited = (byte[])rdt.Clone();
+        script.ApplyEdits(edited, script.Items);
+
+        Assert.Equal(0x1234, Assert.Single(RoomScript.Parse(edited).Items).Amount);
+        int countOffset = item.FileOffset + ItemRecord.CountOffset;
+        for (int i = 0; i < rdt.Length; i++)
+        {
+            if (i == countOffset || i == countOffset + 1) continue;
+            Assert.Equal(rdt[i], edited[i]);
+        }
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(65536)]
+    public void ApplyEdits_InvalidAmount_FailsClosed(int amount)
+    {
+        var rdt = BuildRdt(ItemRec(0x16, 17));
+        var script = RoomScript.Parse(rdt);
+        Assert.Single(script.Items).Amount = amount;
+        var edited = (byte[])rdt.Clone();
+
+        Assert.Throws<InvalidDataException>(() => script.ApplyEdits(edited, script.Items));
+        Assert.Equal(rdt, edited);
+    }
+
+    [Fact]
     public void ApplyEdits_NormalizeVisual_WritesChosenSlotAndGenericPanel()
     {
         // A relocated key in a bespoke-mesh spot (slot 5, old model): reuse the slot, repoint the model.
@@ -269,6 +303,21 @@ public class RoomScriptTests
         Assert.Equal(0x2b, reread.Items[1].ItemId);
         Assert.Equal(17, reread.Items[0].Amount);
         Assert.Equal(room.RdtBuffer.Length, reread.RdtBuffer.Length);
+    }
+
+    [Fact]
+    public void RoomFile_ScatterItemAndAmount_RoundTripTogether()
+    {
+        var file = BuildLzssPackage(BuildRdt(ItemRec(0x16, 17)));
+        var room = RoomFile.Read(1, 0, file);
+        var item = Assert.Single(room.Items);
+        item.ItemId = 0x30;
+        item.Amount = 5;
+
+        var reread = RoomFile.Read(1, 0, room.Write());
+
+        var scattered = Assert.Single(reread.Items);
+        Assert.Equal((0x30, 5), (scattered.ItemId, scattered.Amount));
     }
 
     [Fact]

@@ -22,6 +22,7 @@ public sealed class Dc1ClientChecks
         /// gen_ap_logic --check) — what LocationChecks sends and slot_data placements key on.</summary>
         [JsonPropertyName("apId")] public required long ApId { get; init; }
         [JsonPropertyName("key")] public required string Key { get; init; }
+        [JsonPropertyName("logicalId")] public required string LogicalId { get; init; }
         [JsonPropertyName("room")] public required string Room { get; init; }
         [JsonPropertyName("predicate")] public required Predicate Predicate { get; init; }
         [JsonPropertyName("records")] public required IReadOnlyList<RecordPlan> Records { get; init; }
@@ -43,12 +44,19 @@ public sealed class Dc1ClientChecks
         /// <summary>Record offset in the room's decompressed RDT buffer, hex ("0x393b8") —
         /// the same coordinate space as <c>ItemRecord.FileOffset</c>.</summary>
         [JsonPropertyName("rec")] public required string Rec { get; init; }
+        [JsonPropertyName("expectedOpcode")] public required int ExpectedOpcode { get; init; }
+        [JsonPropertyName("expectedSubtype")] public required int ExpectedSubtype { get; init; }
+        [JsonPropertyName("expectedLength")] public required int ExpectedLength { get; init; }
+        [JsonPropertyName("vanillaItemId")] public required int VanillaItemId { get; init; }
+        [JsonPropertyName("vanillaAmount")] public required int VanillaAmount { get; init; }
         [JsonPropertyName("vanillaTake")] public required int VanillaTake { get; init; }
+        [JsonPropertyName("geometry")] public required IReadOnlyList<int> Geometry { get; init; }
         /// <summary>The FINAL take index the installer writes at rec+0x20 (== VanillaTake
         /// unless this location was rekeyed).</summary>
         [JsonPropertyName("take")] public required int Take { get; init; }
 
         [JsonIgnore] public int RecOffset => Convert.ToInt32(Rec, 16);
+        [JsonIgnore] public string PhysicalId => $"{Room}:0x{RecOffset:x}";
     }
 
     private sealed class FileShape
@@ -70,7 +78,7 @@ public sealed class Dc1ClientChecks
     {
         var shape = JsonSerializer.Deserialize<FileShape>(stream)
                     ?? throw new InvalidOperationException("ap-client-checks.json: empty");
-        if (shape.Version != 1 || shape.FlagGroup != 7)
+        if (shape.Version != 2 || shape.FlagGroup != 7)
             throw new InvalidOperationException(
                 $"ap-client-checks.json: unsupported version {shape.Version}/group {shape.FlagGroup}");
         return new Dc1ClientChecks { Locations = shape.Locations };

@@ -6,7 +6,7 @@ NOT be picked up by pytest when the package is dropped into a real Archipelago c
 `test/` subpackage and run under Archipelago's own test runner.
 
 This stubs just enough of the AP API to drive create_regions()/create_items() and assert the world's
-structural wiring (no self-loops, region/itempool counts, gate overlay). Logic/solvability (gate
+structural wiring (physical-node/edge and itempool counts, start connection). Logic/solvability (gate
 bites, forward-fill beatability) is covered AP-independently by `scripts/gen_ap_logic.py --check`.
 
 Run:  python3 apworld/dino_crisis_1/selfcheck.py
@@ -96,14 +96,15 @@ def main() -> int:
     world.set_rules()
     world.create_items()
 
-    assert len(mw.regions) == len(dc1.REGIONS) + 1, "expected one region per room plus Menu"
+    assert len(mw.regions) == len(dc1.NODES) + 1, "expected one region per physical node plus Menu"
     total_locs = sum(len(r.locations) for r in mw.regions)
     assert total_locs == len(dc1.LOCATIONS), (total_locs, len(dc1.LOCATIONS))
 
     menu = next(r for r in mw.regions if r.name == "Menu")
-    gated_targets = {dc1.region_name(e["to"]) for e in dc1.EDGES}
     menu_dsts = {other.name for other, _ in menu.exits}
-    assert menu_dsts.isdisjoint(gated_targets), "a gated room is reachable free from Menu"
+    assert menu_dsts == {dc1.node_name(dc1.START_NODE)}, "Menu must connect only to the physical start"
+    physical_exits = sum(len(region.exits) for region in mw.regions if region is not menu)
+    assert physical_exits == sum(e["from"] != e["to"] for e in dc1.EDGES)
 
     assert len(mw.itempool) == len(dc1.LOCATIONS), (len(mw.itempool), len(dc1.LOCATIONS))
     prog = [i for i in mw.itempool if i.classification == "progression"]
@@ -113,7 +114,8 @@ def main() -> int:
 
     print(
         f"selfcheck OK: {len(mw.regions)} regions, {total_locs} locations, "
-        f"{len(mw.itempool)} items ({len(prog)} progression), Menu -> {len(menu_dsts)} free rooms"
+        f"{len(mw.itempool)} items ({len(prog)} progression), "
+        f"{physical_exits} physical AP edges, Menu -> start"
     )
     return 0
 

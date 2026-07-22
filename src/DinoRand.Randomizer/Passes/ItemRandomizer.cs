@@ -23,8 +23,38 @@ public sealed class ItemRandomizer : IRandomizationPass
 
     public bool IsEnabled(RandomizerConfig config) => config.RandomizeItems;
 
-    private readonly record struct Slot(int Room, ItemRecord Record, string? Link = null,
-                                        PickupVisual Visual = PickupVisual.GenericPanel);
+    private sealed class Slot
+    {
+        internal Slot(int room, LogicalPickupId logicalId, IReadOnlyList<NodeItem> members)
+        {
+            Room = room;
+            LogicalId = logicalId;
+            Members = members;
+            Visual = members.Max(member => member.Visual);
+        }
+
+        internal int Room { get; }
+        internal LogicalPickupId LogicalId { get; }
+        internal IReadOnlyList<NodeItem> Members { get; }
+        internal ItemRecord Record => Members[0].Record;
+        internal PickupVisual Visual { get; }
+        internal IReadOnlyList<PickupPlacementEdit> Edits { get; private set; } =
+            Array.Empty<PickupPlacementEdit>();
+
+        internal void Set(int itemId, int amount, string? note = null)
+        {
+            if (Edits.Count != 0)
+                throw new InvalidOperationException($"logical pickup {LogicalId} was assigned more than once");
+            Edits = Members.Select(member => new PickupPlacementEdit(
+                member.Location, member.Record, member.Record.ItemId, member.Record.Amount,
+                itemId, amount, note)).ToArray();
+            foreach (var member in Members)
+            {
+                member.Record.ItemId = itemId;
+                member.Record.Amount = amount;
+            }
+        }
+    }
 
     public void Apply(RandomizationContext context)
     {
@@ -33,30 +63,55 @@ public sealed class ItemRandomizer : IRandomizationPass
         var graph = context.Graph;
         var keyItems = game.KeyItemIds;
 
-        // Reachable playable world (door keys already seated by ProgressionPass) and the no-key
-        // starting region — the two reachability frontiers the fill respects.
-        var doorKeys = DoorKeys(graph, game);
-        var reach = KeyItemPlacer.Reachable(graph, game, game.StartRoomCode, doorKeys);
+        // Reachable playable world (all physical progression entitlements already seated by
+        // ProgressionPass, including overlay-only DDK gates) and the no-key starting region.
+        var playableKeys = KeyPlacementPlanner.PlayableKeyEntitlements(graph, game);
+        var reach = KeyItemPlacer.Reachable(graph, game, game.StartRoomCode, playableKeys);
         var startRegion = KeyItemPlacer.Reachable(graph, game, game.StartRoomCode, new HashSet<int>());
 
-        // Rerollable pickups: real (non-empty), non-key records in reachable rooms. (A key seated
-        // here by ProgressionPass is left alone.) Reading off the graph nodes scopes us to `reach`.
-        var slots = new List<Slot>();
+        // Canonical logical pickups in original graph enumeration order. Physical identity and group
+        // membership are explicit; equal ids or geometry never imply one pickup.
+        var physical = new HashSet<PhysicalPickupId>();
+        var groups = new Dictionary<LogicalPickupId, List<NodeItem>>();
+        var groupOrder = new List<LogicalPickupId>();
         foreach (var node in graph.Nodes)
         {
-            if (!reach.Contains(node.Code)) continue;
-            // Set-piece rooms whose specific items are progression-critical (e.g. the Grenade Launcher
-            // finale caches) stay vanilla — never collected as slots, so never rerolled/pool-placed.
-            if (game.ItemProtectedRoomCodes.Contains(node.Code)) continue;
             foreach (var ni in node.Items)
             {
-                var r = ni.Record;
-                if (r.IsEmptySlot || keyItems.Contains(r.ItemId)) continue;
-                // Fixed-priority pickups (map.json item overlay) stay exactly vanilla — the per-item
-                // form of room protection: never collected, so never rerolled or pool-placed.
-                if (ni.Priority == ItemPriority.Fixed) continue;
-                slots.Add(new Slot(node.Code, r, ni.Link, ni.Visual));
+                var location = ni.Location;
+                if (!physical.Add(location.PhysicalId))
+                    throw new InvalidOperationException(
+                        $"duplicate physical pickup identity {location.PhysicalId}");
+                if (!groups.TryGetValue(location.LogicalId, out var members))
+                {
+                    groups[location.LogicalId] = members = new List<NodeItem>();
+                    groupOrder.Add(location.LogicalId);
+                }
+                members.Add(ni);
             }
+        }
+
+        var slots = new List<Slot>();
+        foreach (var logicalId in groupOrder)
+        {
+            var members = groups[logicalId];
+            var first = members[0];
+            var tuple = (first.Record.ItemId, first.Record.Amount);
+            if (members.Any(member => (member.Record.ItemId, member.Record.Amount) != tuple))
+                throw new InvalidOperationException(
+                    $"logical pickup {logicalId} has divergent physical record contents");
+            if (members.Any(member =>
+                    !reach.Contains(member.RoomCode)
+                    || game.EndingZoneRoomCodes.Contains(member.RoomCode)
+                    || game.ItemProtectedRoomCodes.Contains(member.RoomCode)
+                    || member.Record.IsEmptySlot
+                    || keyItems.Contains(member.Record.ItemId)
+                    || member.Priority == ItemPriority.Fixed
+                    || member.Excluded
+                    || member.AllowedPlacementClass != PickupPlacementClass.Ordinary
+                    || !member.Requires.SatisfiedBy(playableKeys, reach)))
+                continue;
+            slots.Add(new Slot(first.RoomCode, logicalId, members));
         }
 
         if (slots.Count == 0)
@@ -67,10 +122,7 @@ public sealed class ItemRandomizer : IRandomizationPass
             return;
         }
 
-        // Vanilla amounts, snapshotted before any mutation, so the spoiler can detect an
-        // amount-only change (e.g. the ammo-quantity dial landing on the vanilla item id).
-        // ItemRecord has identity equality, so the default comparer is per-record.
-        var vanillaAmounts = slots.ToDictionary(s => s.Record, s => s.Record.Amount);
+        var spoilerSlots = slots.ToArray();
 
         // Beatability coupling for the starting-inventory feature: any vanilla starting weapon the config
         // REMOVES from the start kit (StartingWeapons override) must be obtainable in the world, reachable
@@ -86,6 +138,8 @@ public sealed class ItemRandomizer : IRandomizationPass
         if (slots.Count == 0)
         {
             context.Log("[items] all rerollable pickups consumed by forced start-weapon placement");
+            RecordSpoiler(context, spoilerSlots,
+                context.Config.ReplaceItemPool ? "rerolled" : "shuffled");
             return;
         }
 
@@ -94,57 +148,35 @@ public sealed class ItemRandomizer : IRandomizationPass
         else
             ShuffleExisting(slots, rng);
 
-        // A single physical pickup can decode as several 0x28 AOT records at one position quad (camera-
-        // cut / state copies — e.g. st308's Med Pak ×2). The steps above assign each record
-        // independently, so a spot could otherwise show different items per camera angle. Collapse each
-        // group of same-(room, quad, original-id) records onto its first record's result. Runs after
-        // assignment and never touches the RNG, so non-duplicate pickups stay byte-identical.
-        SyncDuplicatePickups(slots);
-
-        // Relocation twins authored at *different* positions (the map.json itemLinks overlay) are one
-        // logical pickup the quad grouping above can't see — mirror them onto the group's first result
-        // so a linked id can't desync or duplicate across its copies. Inert for today's data (every
-        // shuffleable record is unlinked; linked twins are key items the slot collection already
-        // excludes), correct for any future non-key twin.
-        SyncLinkedPickups(slots);
-
         var mode = context.Config.ReplaceItemPool ? "rerolled" : "shuffled";
-        context.Log($"[items] {mode} {slots.Count} non-key pickups across " +
+        context.Log($"[items] {mode} {slots.Count} logical non-key pickups across " +
                     $"{slots.Select(s => s.Room).Distinct().Count()} reachable rooms");
 
-        RecordSpoiler(context, slots, vanillaAmounts, mode);
+        RecordSpoiler(context, spoilerSlots, mode);
     }
 
     private const string SpoilerSectionTitle = "Items (DC1)";
     private static readonly string[] SpoilerColumns = { "Room", "Vanilla item", "New item" };
 
     /// <summary>
-    /// Record the per-pickup diff (docs/decisions/cross/SPOILER-LOG-PLAN.md §4): one row per <b>physical</b>
-    /// pickup whose item or amount changed — AOT copies and relocation twins collapse onto their
-    /// canonical record, mirroring exactly how <see cref="SyncDuplicatePickups"/> /
-    /// <see cref="SyncLinkedPickups"/> grouped them. Runs after all assignment; no RNG, no I/O.
+    /// Project the committed assignment ledger: one row per changed physical record. Runs after
+    /// assignment and consumes captured before/after values only; no RNG, mutable-state inference, or I/O.
     /// </summary>
-    private static void RecordSpoiler(RandomizationContext context, List<Slot> slots,
-                                      Dictionary<ItemRecord, int> vanillaAmounts, string mode)
+    private static void RecordSpoiler(RandomizationContext context, IReadOnlyList<Slot> slots, string mode)
     {
         var section = context.Spoiler.Section(SpoilerSectionTitle, SpoilerColumns);
-        var seenQuads = new HashSet<(int, int, string)>();
-        var seenLinks = new HashSet<(int, string?)>();
         int changed = 0;
-        foreach (var s in slots)
+        foreach (var edit in slots.SelectMany(slot => slot.Edits).Where(edit => edit.Changed))
         {
-            if (HasQuad(s.Record) && !seenQuads.Add(PickupKey(s))) continue;   // AOT copy
-            if (s.Link is not null && !seenLinks.Add((s.Room, s.Link))) continue; // relocation twin
-            var rec = s.Record;
-            int vanillaAmount = vanillaAmounts.GetValueOrDefault(rec, rec.Amount);
-            if (rec.ItemId == rec.OriginalItemId && rec.Amount == vanillaAmount) continue;
-            section.AddRow(Spoiler.Dc1RoomNames.Describe(s.Room),
-                           Describe(rec.OriginalItemId, vanillaAmount),
-                           Describe(rec.ItemId, rec.Amount));
+            section.AddRow(
+                $"{Spoiler.Dc1RoomNames.Describe(edit.Location.RoomCode)} " +
+                $"[record 0x{edit.Location.RecordOffset:X}]",
+                Describe(edit.BeforeItemId, edit.BeforeAmount),
+                Describe(edit.ItemId, edit.Amount) + (edit.Note is null ? "" : $" ({edit.Note})"));
             changed++;
         }
         section.AddNote($"mode: {mode} ({(context.Config.ReplaceItemPool ? "replace-with-pool" : "shuffle existing")}); "
-            + $"{changed} of {slots.Count} rerollable pickup(s) changed");
+            + $"{changed} of {slots.Sum(slot => slot.Members.Count)} rerollable physical record(s) changed");
     }
 
     /// <summary>"Med. Pak S" / "9mm Parabellum ×15".</summary>
@@ -158,7 +190,7 @@ public sealed class ItemRandomizer : IRandomizationPass
     {
         var game = context.Game;
         var cfg = context.Config;
-        var assigned = new HashSet<ItemRecord>();
+        var assigned = new HashSet<Slot>();
 
         // 1. Weapons/parts: the distinct vanilla weapon set present in these spots, pool-placed into
         //    random reachable slots (so each stays obtainable — the min-weapon guarantee — and never
@@ -219,9 +251,8 @@ public sealed class ItemRandomizer : IRandomizationPass
                     }
                 }
                 var spot = free[fi++];
-                spot.Record.ItemId = placeId;
-                spot.Record.Amount = Math.Max(1, spot.Record.Amount);
-                assigned.Add(spot.Record);
+                spot.Set(placeId, Math.Max(1, spot.Record.Amount));
+                assigned.Add(spot);
                 placedWeapons.Add(placeId);
             }
         }
@@ -231,8 +262,8 @@ public sealed class ItemRandomizer : IRandomizationPass
             foreach (var s in slots)
                 if (weaponSet.Contains(s.Record.OriginalItemId))
                 {
-                    s.Record.ItemId = s.Record.OriginalItemId;
-                    assigned.Add(s.Record);
+                    s.Set(s.Record.OriginalItemId, Math.Max(1, s.Record.Amount));
+                    assigned.Add(s);
                     placedWeapons.Add(s.Record.OriginalItemId);
                 }
         }
@@ -259,7 +290,7 @@ public sealed class ItemRandomizer : IRandomizationPass
         var weights = EffectiveWeights(consumables, cfg);
         var total = weights.Sum();
 
-        var fill = slots.Where(s => !assigned.Contains(s.Record)).OrderBy(_ => rng.Next()).ToList();
+        var fill = slots.Where(s => !assigned.Contains(s)).OrderBy(_ => rng.Next()).ToList();
         var early = fill.Where(s => startRegion.Contains(s.Room)).ToList();
 
         // The floor obeys the same enable-test as the fill weights (docs/decisions/cross/ITEM-RATIO-ZERO-PLAN.md): a
@@ -289,14 +320,14 @@ public sealed class ItemRandomizer : IRandomizationPass
         {
             ammoFloor = healthFloor = 0;
         }
-        var floored = new HashSet<ItemRecord>();
-        for (int i = 0; i < ammoFloor; i++) { SetItem(early[i].Record, WeightedPick(ammo, rng), cfg); floored.Add(early[i].Record); }
-        for (int i = 0; i < healthFloor; i++) { SetItem(early[ammoFloor + i].Record, WeightedPick(health, rng), cfg); floored.Add(early[ammoFloor + i].Record); }
+        var floored = new HashSet<Slot>();
+        for (int i = 0; i < ammoFloor; i++) { SetItem(early[i], WeightedPick(ammo, rng), cfg); floored.Add(early[i]); }
+        for (int i = 0; i < healthFloor; i++) { SetItem(early[ammoFloor + i], WeightedPick(health, rng), cfg); floored.Add(early[ammoFloor + i]); }
 
         foreach (var s in fill)
         {
-            if (floored.Contains(s.Record)) continue;
-            SetItem(s.Record, WeightedPick(consumables, weights, total, rng), cfg);
+            if (floored.Contains(s)) continue;
+            SetItem(s, WeightedPick(consumables, weights, total, rng), cfg);
         }
     }
 
@@ -307,7 +338,11 @@ public sealed class ItemRandomizer : IRandomizationPass
     private static void ForcePlaceRemovedStartWeapons(List<Slot> slots, IReadOnlyList<int> weapons,
                                                       IReadOnlySet<int> startRegion, Random rng, RandomizationContext context)
     {
-        var shuffled = slots.Where(s => startRegion.Contains(s.Room)).OrderBy(_ => rng.Next()).ToList();
+        var noKeys = new HashSet<int>();
+        var shuffled = slots.Where(s => startRegion.Contains(s.Room)
+                                      && s.Members.All(member =>
+                                          member.Requires.SatisfiedBy(noKeys, startRegion)))
+                            .OrderBy(_ => rng.Next()).ToList();
         // A forced start weapon is important — prefer a spot with a ground visual (same overflow rule
         // as the weapon pool-place; flag off keeps the plain shuffled order, byte-identical).
         var early = context.Config.AvoidHiddenPickupSpots
@@ -324,23 +359,17 @@ public sealed class ItemRandomizer : IRandomizationPass
                 continue;
             }
             var slot = early[taken++];
-            slot.Record.ItemId = weapon;
-            slot.Record.Amount = 1;
+            slot.Set(weapon, 1, "removed start weapon, force-placed");
             slots.Remove(slot);
             context.Log($"[items] start weapon 0x{weapon:X2} removed from inventory → placed in start-region room 0x{slot.Room:X3}");
-            // Locked out of the rerollable set above, so the main spoiler sweep never sees it —
-            // record the forced placement here (docs/decisions/cross/SPOILER-LOG-PLAN.md §4).
-            context.Spoiler.Section(SpoilerSectionTitle, SpoilerColumns)
-                .AddRow(Spoiler.Dc1RoomNames.Describe(slot.Room),
-                        Spoiler.Dc1ItemNames.NameOf(slot.Record.OriginalItemId),
-                        $"{Spoiler.Dc1ItemNames.NameOf(weapon)} (removed start weapon, force-placed)");
         }
     }
 
-    private static void SetItem(ItemRecord rec, ItemPoolEntry pick, RandomizerConfig cfg)
+    private static void SetItem(Slot slot, ItemPoolEntry pick, RandomizerConfig cfg)
     {
-        rec.ItemId = pick.ItemId;
-        rec.Amount = ScaledAmount(pick.Category, Math.Max(1, rec.Amount), cfg.AmmoQuantity, cfg.AmmoReduction);
+        slot.Set(pick.ItemId,
+            ScaledAmount(pick.Category, Math.Max(1, slot.Record.Amount),
+                         cfg.AmmoQuantity, cfg.AmmoReduction));
     }
 
     /// <summary>Per-entry weight = intrinsic × category ratio; both ratios 0 ⇒ intrinsic (legacy
@@ -378,21 +407,18 @@ public sealed class ItemRandomizer : IRandomizationPass
         return pool[^1];
     }
 
-    /// <summary>Shuffle mode: keep the vanilla multiset of items but reassign which slot each lands in
-    /// (Fisher–Yates over the ids). Each slot keeps its own count. Reach-filtered slots only.</summary>
+    /// <summary>Shuffle mode: conserve the logical-pickup multiset of (item id, amount) tuples and
+    /// reassign each tuple with the established Fisher–Yates order. Reach-filtered logical slots only.</summary>
     private static void ShuffleExisting(List<Slot> slots, Random rng)
     {
-        var ids = slots.Select(s => s.Record.ItemId).ToArray();
-        for (int i = ids.Length - 1; i > 0; i--)
+        var items = slots.Select(s => (s.Record.ItemId, s.Record.Amount)).ToArray();
+        for (int i = items.Length - 1; i > 0; i--)
         {
             int j = rng.Next(i + 1);
-            (ids[i], ids[j]) = (ids[j], ids[i]);
+            (items[i], items[j]) = (items[j], items[i]);
         }
         for (int i = 0; i < slots.Count; i++)
-        {
-            slots[i].Record.ItemId = ids[i];
-            slots[i].Record.Amount = Math.Max(1, slots[i].Record.Amount);
-        }
+            slots[i].Set(items[i].ItemId, Math.Max(1, items[i].Amount));
     }
 
     /// <summary>Scale an ammo stack by the average-quantity dial (0–7). 0 leaves the amount unchanged.
@@ -408,62 +434,4 @@ public sealed class ItemRandomizer : IRandomizationPass
         return Math.Max(1, (int)Math.Round(amount * factor));
     }
 
-    /// <summary>Byte offset / length of the placement's 2D position quad within an item record's raw
-    /// bytes (four corner X/Z words; constant Y). Used only to identify co-located AOT duplicates.</summary>
-    private const int QuadOffset = 0x04;
-    private const int QuadLength = 0x10;
-
-    /// <summary>True when this record carries a decoded position quad (the real walker fills
-    /// <see cref="ItemRecord.Raw"/>; records without it — e.g. synthetic ones — are never grouped).</summary>
-    private static bool HasQuad(ItemRecord r) => r.Raw is { Length: >= QuadOffset + QuadLength };
-
-    /// <summary>Grouping key for one physical pickup: room + the position quad + the original item id.
-    /// Same key ⇒ the same pickup's AOT copies; a different id at the same quad is a different pickup.</summary>
-    private static (int, int, string) PickupKey(Slot s)
-        => (s.Room, s.Record.OriginalItemId, Convert.ToHexString(s.Record.Raw, QuadOffset, QuadLength));
-
-    /// <summary>Give every AOT copy of one physical pickup the same item as its first record, so a spot
-    /// can't show different items per camera angle. Records lacking a quad are each their own group.</summary>
-    private static void SyncDuplicatePickups(List<Slot> slots)
-    {
-        foreach (var group in slots.Where(s => HasQuad(s.Record)).GroupBy(PickupKey))
-        {
-            var copies = group.ToList();
-            if (copies.Count <= 1) continue;
-            var canon = copies[0].Record;
-            foreach (var s in copies.Skip(1))
-            {
-                s.Record.ItemId = canon.ItemId;
-                s.Record.Amount = canon.Amount;
-            }
-        }
-    }
-
-    /// <summary>Mirror every linked slot (a relocation twin tagged by the map.json <c>itemLinks</c>
-    /// overlay) onto the first record of its <c>(room, link)</c> group, so the one logical pickup keeps
-    /// a single assignment even when its copies sit at different positions.</summary>
-    private static void SyncLinkedPickups(List<Slot> slots)
-    {
-        foreach (var group in slots.Where(s => s.Link is not null).GroupBy(s => (s.Room, s.Link)))
-        {
-            var copies = group.ToList();
-            if (copies.Count <= 1) continue;
-            var canon = copies[0].Record;
-            foreach (var s in copies.Skip(1))
-            {
-                s.Record.ItemId = canon.ItemId;
-                s.Record.Amount = canon.Amount;
-            }
-        }
-    }
-
-    private static HashSet<int> DoorKeys(RoomGraph graph, GameDefinition game)
-    {
-        var keys = new HashSet<int>();
-        foreach (var node in graph.Nodes)
-            foreach (var edge in node.Edges)
-                foreach (var k in game.KeyItemsForDoor(edge.Door.DoorType))
-                    keys.Add(k);
-        return keys;
-    }
 }

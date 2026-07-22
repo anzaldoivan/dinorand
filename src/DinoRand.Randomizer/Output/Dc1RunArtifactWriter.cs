@@ -13,7 +13,27 @@ internal static class Dc1RunArtifactWriter
         // Clean stale room files from the (reused) working dir so it holds only this run's output
         // (docs/decisions/dc2/install/DC2-INSTALL-INTEGRITY-PLAN.md — same hygiene for both games).
         int cleared = RunOutputDir.ClearStaleRoomFiles(outputDir);
-        if (cleared > 0) log($"[clean] removed {cleared} stale room file(s) from {outputDir}");
+        if (Directory.Exists(outputDir))
+        {
+            cleared += DeleteIfPresent(Path.Combine(outputDir, ExePatchPlan.FileName));
+            cleared += DeleteIfPresent(Path.Combine(outputDir, "Data", "t_image.imd"));
+            foreach (var relative in new[] { "Sound/VOICE", "Sound/BGM", "Speech" })
+            {
+                var directory = Path.Combine(outputDir,
+                    relative.Replace('/', Path.DirectorySeparatorChar));
+                if (!Directory.Exists(directory)) continue;
+                foreach (var path in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
+                    cleared += DeleteIfPresent(path);
+            }
+        }
+        if (cleared > 0) log($"[clean] removed {cleared} stale installable file(s) from {outputDir}");
+    }
+
+    private static int DeleteIfPresent(string path)
+    {
+        if (!File.Exists(path)) return 0;
+        try { File.Delete(path); return 1; }
+        catch (IOException) { return 0; }
     }
 
     public static void Write(

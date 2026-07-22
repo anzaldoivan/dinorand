@@ -1,6 +1,7 @@
 using DinoRand.ApClient;
 using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Definitions;
+using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Install;
 using Xunit;
 
@@ -13,6 +14,15 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class ApClientTests
 {
+    [Fact]
+    public void Dc1Runner_RejectsObsoleteLogicBeforeInstallation_WithUpgradeGuidance()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => Dc1ApRunner.ValidateLogicVersion(2));
+        Assert.Contains("regenerate", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("v3", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Dc1ApRunner.ValidateLogicVersion(3);
+    }
+
     // ---- embedded checks contract -------------------------------------------------------
 
     [Fact]
@@ -262,7 +272,19 @@ public class ApClientTests
         var patches = new[]
         {
             new ApPlacementInstaller.RecordPatch(
-                rec.Room, rec.RecOffset, Dc1Symbols.OtherWorldMarkerItemId, (ushort)rec.Take),
+                rec.Room,
+                rec.RecOffset,
+                new Dc1ItemRecordClass(
+                    checked((byte)rec.ExpectedOpcode),
+                    checked((byte)rec.ExpectedSubtype),
+                    rec.ExpectedLength),
+                rec.VanillaItemId,
+                rec.VanillaAmount,
+                checked((ushort)rec.VanillaTake),
+                Dc1Symbols.OtherWorldMarkerItemId,
+                1,
+                checked((ushort)rec.Take),
+                Visual: null),
         };
 
         string outDir = Path.Combine(Path.GetTempPath(), $"dinorand_ap_test_{Guid.NewGuid():N}");

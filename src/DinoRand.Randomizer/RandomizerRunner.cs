@@ -1,6 +1,7 @@
 using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Graph;
+using DinoRand.Randomizer.Logic;
 using DinoRand.Randomizer.Output;
 using DinoRand.Randomizer.Passes;
 
@@ -65,6 +66,9 @@ public sealed class RandomizerRunner
 
     public RandomizerRunner(GameDefinition game) => _game = game;
 
+    /// <summary>Test seam for the mandatory post-pass verification gate.</summary>
+    internal Func<RandomizationContext, KeyItemPlacer.PlacementResult>? FinalProgressionVerifier { get; init; }
+
     /// <param name="emitSpoiler">Write <c>SPOILER.md</c> beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
     /// The spoiler is a pure projection of the passes' recorded decisions, built strictly AFTER every
     /// game file is written — turning it off changes no other output byte (regression-locked).</param>
@@ -98,11 +102,33 @@ public sealed class RandomizerRunner
 
         // 3. Run passes.
         var context = new RandomizationContext(_game, rooms, graph, seed, config, Log, installDir);
-        foreach (var pass in _passes)
+        var transaction = DoorKeyStateSnapshot.Capture(rooms);
+        try
         {
-            if (!pass.IsEnabled(config)) continue;
-            ct.ThrowIfCancellationRequested();   // between passes: nothing is written yet
-            pass.Apply(context);
+            foreach (var pass in _passes)
+            {
+                if (!pass.IsEnabled(config)) continue;
+                ct.ThrowIfCancellationRequested();   // between passes: nothing is written yet
+                pass.Apply(context);
+            }
+
+            if (FinalProgressionVerifier is not null
+                || config.EnsureBeatable || config.ShuffleKeyItems || config.RandomizeDoors)
+            {
+                var final = FinalProgressionVerifier?.Invoke(context)
+                    ?? KeyItemPlacer.Verify(context.Graph, _game, _game.StartRoomCode, _game.GoalRoomCode,
+                        KeyShuffleTransaction.KeysByRoom(context.Graph, _game));
+                foreach (var line in final.Log) Log(line);
+                if (!final.Success)
+                    throw new InvalidOperationException(
+                        "final door/key verification failed; installable output was not produced");
+            }
+        }
+        catch
+        {
+            transaction.Restore();
+            context.RebuildGraph();
+            throw;
         }
 
         // 4. Emit per-game artifacts after every pass has completed.

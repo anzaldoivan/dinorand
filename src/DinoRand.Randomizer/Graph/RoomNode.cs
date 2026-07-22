@@ -55,8 +55,8 @@ public sealed class RoomNode
 /// <summary>Randomization priority of a pickup (BioRand's <c>ItemPriority</c> subset, docs/decisions/cross/ITEM-RANDO-PLAN.md
 /// §7.1). <see cref="Normal"/> participates fully; <see cref="Fixed"/> stays exactly vanilla (never
 /// rerolled or pool-placed) — a per-item form of <see cref="Definitions.GameDefinition.ItemProtectedRoomCodes"/>.
-/// BioRand's <c>Low</c>/<c>Hidden</c> only affect <i>key</i> placement, which the item pass does not own,
-/// so they are deferred to a <see cref="Logic.KeyItemPlacer"/> increment.</summary>
+/// Progression eligibility and hidden-spot policy are represented separately by the shared pickup
+/// contract and key-placement planner.</summary>
 public enum ItemPriority
 {
     Normal,
@@ -78,8 +78,20 @@ public enum PickupVisual
 
 /// <summary>An item pickup attached to a <see cref="RoomNode"/>: the live record plus its optional
 /// guard (the map.json item <c>requires</c> case — a pickup reachable only once the guard is held).</summary>
-public sealed record NodeItem(ItemRecord Record)
+public sealed record NodeItem(ItemRecord Record, int RoomCode = 0)
 {
+    public PhysicalPickupId PhysicalId => new(RoomCode, Record.FileOffset);
+
+    /// <summary>Explicit logical group identity. Null means this physical record is a singleton.</summary>
+    public LogicalPickupId? LogicalId { get; set; }
+
+    public PickupSourceClass Source { get; set; } = PickupSourceClass.Unknown;
+    public bool Excluded { get; set; }
+    public PickupPlacementClass AllowedPlacementClass { get; set; } = PickupPlacementClass.Ordinary;
+
+    /// <summary>Immutable snapshot consumed by planners and output descriptions.</summary>
+    public PickupLocationContract Location => PickupLocationContract.Snapshot(this);
+
     public Requirement Requires { get; set; } = Requirement.None;
 
     /// <summary>Randomization priority, stamped from the map.json item overlay (default
@@ -97,8 +109,8 @@ public sealed record NodeItem(ItemRecord Record)
     /// <c>null</c> = unlinked). Records in the same room sharing a non-null <see cref="Link"/> are the
     /// same physical pickup duplicated across script states (the game relocates one logical item across
     /// several records), so they must take ONE shared assignment — the key shuffle / item pass mirror
-    /// the group's canonical record onto the rest, never desyncing or duplicating it. Today the key is
-    /// the original item-id hex (BioRand's <c>MapRoomItem.Link</c>, clean-room).</summary>
+    /// the group's canonical record onto the rest, never desyncing or duplicating it. Membership is
+    /// authored by stable record offsets; equal ids or coordinates never imply a link.</summary>
     public string? Link { get; set; }
 
     /// <summary>Ground-visual class of this spot, stamped from the map.json <c>itemVisuals</c> overlay
