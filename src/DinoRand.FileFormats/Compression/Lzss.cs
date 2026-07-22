@@ -12,9 +12,9 @@ namespace DinoRand.FileFormats.Compression;
 /// behind the current output position. Distances are 1..4095, lengths 2..17.
 ///
 /// The compressor is our own; it emits a stream this decoder reproduces exactly
-/// (<c>Decompress(Compress(x)) == x</c>), which the unit tests verify. Note that DC1
-/// PC room data is stored uncompressed (GPC_UNK/GPC_DATA), so editing room records does
-/// not depend on re-compression — this codec is for the texture/LZSS segments.
+/// (<c>Decompress(Compress(x)) == x</c>), which the unit tests verify. Most DC1 PC rooms
+/// store the RDT LZSS-compressed (GPC_UNK: 106/149 rooms; the rest are raw GPC_DATA), so
+/// room edits recompress through here — as do DC2 SCD blobs and texture/LZSS segments.
 /// </summary>
 public static class Lzss
 {
@@ -72,10 +72,20 @@ public static class Lzss
         return output.ToArray();
     }
 
-    /// <summary>Compress raw bytes into an LZSS stream (greedy longest-match).</summary>
+    /// <summary>
+    /// Compress raw bytes into an LZSS stream (greedy longest-match). The match finder walks a
+    /// hash chain over 2-byte prefixes instead of brute-scanning the whole 4 KiB window per byte
+    /// (which cost seconds per room-sized buffer); candidates are visited nearest-first with the
+    /// same strictly-greater acceptance, so the emitted stream is byte-identical to the old scan.
+    /// </summary>
     public static byte[] Compress(ReadOnlySpan<byte> input)
     {
         var output = new List<byte>(input.Length);
+        // head[pair] = most recent position starting with that 2-byte sequence; prev[] chains
+        // to older positions. A pair is 16 bits, so the "hash" is exact — no false candidates.
+        var head = new int[0x10000];
+        Array.Fill(head, -1);
+        var prev = new int[input.Length];
         int pos = 0;
 
         while (pos < input.Length)
@@ -86,7 +96,7 @@ public static class Lzss
 
             for (int bit = 0; bit < 8 && pos < input.Length; bit++)
             {
-                (int matchDistance, int matchLength) = FindLongestMatch(input, pos);
+                (int matchDistance, int matchLength) = FindLongestMatch(input, pos, head, prev);
 
                 if (matchLength >= MinMatch)
                 {
@@ -95,12 +105,15 @@ public static class Lzss
                     int t = ((matchDistance >> 8) & 0x0F) | (lenCode << 4);
                     output.Add((byte)ch);
                     output.Add((byte)t);
+                    for (int k = 0; k < matchLength; k++)
+                        InsertChain(input, pos + k, head, prev);
                     pos += matchLength;
                     // match → flag bit stays 0
                 }
                 else
                 {
                     flags |= 1 << bit; // literal → flag bit set
+                    InsertChain(input, pos, head, prev);
                     output.Add(input[pos++]);
                 }
             }
@@ -111,15 +124,32 @@ public static class Lzss
         return output.ToArray();
     }
 
-    private static (int distance, int length) FindLongestMatch(ReadOnlySpan<byte> input, int pos)
+    /// <summary>Record <paramref name="pos"/> as the newest occurrence of its 2-byte prefix.</summary>
+    private static void InsertChain(ReadOnlySpan<byte> input, int pos, int[] head, int[] prev)
     {
+        if (pos + 1 >= input.Length) return; // no pair starts at the last byte
+        int h = input[pos] | (input[pos + 1] << 8);
+        prev[pos] = head[h];
+        head[h] = pos;
+    }
+
+    private static (int distance, int length) FindLongestMatch(
+        ReadOnlySpan<byte> input, int pos, int[] head, int[] prev)
+    {
+        if (pos + 1 >= input.Length)
+            return (0, 0); // a match needs at least 2 bytes of lookahead
+
         int bestLength = 0;
         int bestDistance = 0;
         int windowStart = Math.Max(0, pos - WindowSize);
 
-        for (int start = pos - 1; start >= windowStart; start--)
+        // Chain positions are strictly decreasing, so the first entry below the window ends it.
+        // Every candidate shares pos's 2-byte prefix, so each match is at least MinMatch long;
+        // strictly-greater acceptance keeps the NEAREST start on ties, like the old full scan.
+        int h = input[pos] | (input[pos + 1] << 8);
+        for (int start = head[h]; start >= windowStart; start = prev[start])
         {
-            int length = 0;
+            int length = MinMatch;
             while (length < MaxMatch
                    && pos + length < input.Length
                    && input[start + length] == input[pos + length])

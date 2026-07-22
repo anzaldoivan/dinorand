@@ -5,8 +5,8 @@ from Options import PerGameCommonOptions
 
 @dataclass
 class DinoCrisis2Options(PerGameCommonOptions):
-    """No DC2-specific options yet — kept because World.options_dataclass is required.
+    """No DC2-specific AP options yet; the v2 contract defines the supported surface.
 
     DC2's shipped levers (enemy rando, --dc2-shuffle-bgm/-shop, voices, starting loadout, skins)
-    map onto RandomizerConfig flags and become options here once the DC2 AP loop is real.
+    can become options here if their runtime contracts are added later.
     """

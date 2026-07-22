@@ -27,7 +27,7 @@ public sealed class Dc2RoomFile
     /// <summary>Stage group 0–9 (DC2 has stages ST0..ST9 — docs/reference/dc2/rooms/ROOMS-DC2.md).</summary>
     public int Stage { get; }
 
-    /// <summary>Room id within the stage (the XX in <c>STNXX.DAT</c>); id scheme TBD (KaQ K14).</summary>
+    /// <summary>Room id within the stage (the hexadecimal XX in <c>STNXX.DAT</c>; KaQ K14).</summary>
     public int Room { get; }
 
     /// <summary>Raw file bytes as read (round-trip baseline until records decode).</summary>
@@ -74,5 +74,5 @@ public sealed class Dc2RoomFile
     /// (which will also require the re-LZSS / variable-segment-size tolerance gate, OPEN&#160;#9).</summary>
     public byte[] Write() => OriginalBytes;
 
-    public override string ToString() => $"ST{Stage}{Room:D2}";
+    public override string ToString() => $"ST{Stage}{Room:X2}";
 }

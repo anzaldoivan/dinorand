@@ -11,6 +11,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\DinoRand.FileFormats\DinoRand.FileFormats.csproj" />
     <ProjectReference Include="..\..\src\DinoRand.Randomizer\DinoRand.Randomizer.csproj" />
+    <ProjectReference Include="..\..\src\DinoRand.ApClient\DinoRand.ApClient.csproj" />
+    <!-- CLI characterization tests execute the CLI from its configuration-specific output. -->
+    <ProjectReference Include="..\..\src\DinoRand.Cli\DinoRand.Cli.csproj"
+                      ReferenceOutputAssembly="false" />
     <!-- Per-game settings isolation (GameSelectionTests) lives in the Avalonia app's AppSettings;
          the test only touches its Avalonia-free POCO surface (FromJson/ToJson/ForGame). -->
     <ProjectReference Include="..\..\src\DinoRand.App.Avalonia\DinoRand.App.Avalonia.csproj" />
@@ -26,5 +30,9 @@
     <Content Include="..\..\data\dc1\map.json" Link="data\dc1\map.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\room-data.json" Link="data\dc1\room-data.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\voice.json" Link="data\dc1\voice.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc2\door-guards.json" Link="data\dc2\door-guards.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Refactor\Baselines\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

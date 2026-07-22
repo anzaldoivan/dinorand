@@ -94,7 +94,9 @@ public class Dc1ReachabilityOracleTests
 
             w.WriteEndObject();
         }
-        return Encoding.UTF8.GetString(ms.ToArray()) + "\n";
+        // Utf8JsonWriter indents with Environment.NewLine on net8.0 — normalize so the oracle is
+        // byte-identical across Windows and WSL.
+        return Encoding.UTF8.GetString(ms.ToArray()).Replace("\r\n", "\n") + "\n";
     }
 
     private static void WriteProbe(Utf8JsonWriter w, string name, IEnumerable<int> held,

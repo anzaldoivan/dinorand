@@ -67,6 +67,23 @@ public static class Dc2ElevatorCodePatch
                 codes.Add(code);
         }
 
+        return ApplyPlan(exe, codes);
+    }
+
+    /// <summary>Validate and apply eight explicit distinct keypad codes.</summary>
+    internal static CodeEntry[] ApplyPlan(byte[] exe, IReadOnlyList<string> codes)
+    {
+        ArgumentNullException.ThrowIfNull(exe);
+        ArgumentNullException.ThrowIfNull(codes);
+        Validate(exe);
+        if (codes.Count != Imm32FileOffsets.Count)
+            throw new ArgumentException($"elevator-code plan has {codes.Count} slots; expected {Imm32FileOffsets.Count}.", nameof(codes));
+        if (codes.Distinct(StringComparer.Ordinal).Count() != codes.Count)
+            throw new ArgumentException("elevator-code plan contains duplicate codes.", nameof(codes));
+        for (int i = 0; i < codes.Count; i++)
+            if (codes[i].Length != DigitCount || codes[i].Any(c => c < '0' || c >= '0' + DigitAlphabet))
+                throw new ArgumentException($"elevator-code plan slot {i} must contain {DigitCount} digits in 0..{DigitAlphabet - 1}.", nameof(codes));
+
         var result = new CodeEntry[Imm32FileOffsets.Count];
         for (int i = 0; i < Imm32FileOffsets.Count; i++)
         {

@@ -77,7 +77,8 @@ public static class Dc2PuzzleCodeScrambleInstaller
         if (!File.Exists(backupPath))
             File.Copy(exePath, backupPath);
 
-        var entries = Dc2ElevatorCodePatch.Scramble(bytes, seed);
+        var patchPlan = Dc2ExecutablePatchPlanner.PlanElevatorCodes(seed);
+        var entries = Dc2ElevatorCodePatch.ApplyPlan(bytes, patchPlan.ElevatorCodes!);
         File.WriteAllBytes(exePath, bytes);
         log?.Invoke($"[puzzle-codes] seed {seed}: 8 elevator-code candidates rewritten (backup: {Path.GetFileName(backupPath)}); read the in-game file for the rolled code");
         foreach (var e in entries)

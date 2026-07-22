@@ -7,6 +7,50 @@ versions may include breaking changes).
 
 The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Directory.Build.props).
 
+## [Unreleased]
+
+<!-- Audience: players and release readers. Keep this section user-facing; technical evidence belongs in the
+     contributor/research records, not in the release notes. -->
+
+### Added
+
+- **Randomized DC2 weapons (experimental, off by default).** The six non-starter main weapons can
+  be shuffled between Regina and Dylan while each character keeps a usable starter and required
+  door tool. Enable it in Advanced options or with `--dc2-randomize-weapons`; it is incompatible
+  with Shared Weapons, and randomized weapons keep their original inventory icon.
+
+- **Shared DC2 weapons (experimental, off by default).** Regina and Dylan can use and buy the same
+  weapons. Enable it in Advanced options or with `--dc2-shared-weapons` (or the sub-weapons-only
+  `--dc2-shared-weapons-subs-only` option); use `--restore` to undo the change. The four largest
+  weapons still need broader in-game verification, and shared weapons keep their original icons.
+
+- **Archipelago runtime client for DC1.** Connect DinoRand to an existing Archipelago game with
+  `--ap-connect <host[:port]> --ap-slot <name> --install <dir>`: pickups become checks, items from
+  other players arrive in-game, and reconnecting keeps your progress. The client runs on Windows;
+  DC2 remains generation-only.
+
+- **Door Skip for DC1 (experimental, off by default).** The door-opening animation can be skipped
+  with the GUI option or `--dc1-door-skip` while the destination room still loads normally. It is
+  reversible with `--restore` and does not change the seed.
+
+- **Fast-forward cutscenes for DC1 (experimental, crash risk, off by default).**
+  `--dc1-fast-forward-cutscenes` shortens waiting between story moments while keeping dialogue,
+  voices, item grants, and story progress intact. It is reversible with `--restore`; broad in-game
+  verification is still pending.
+
+- **Ready-made Archipelago world downloads.** Releases now include `.apworld` files that can be
+  dropped directly into Archipelago's `custom_worlds/` folder. DC1 supports generation and the
+  runtime client; DC2 supports generation only.
+
+### Fixed
+
+- **Restoring DC2 shared weapons now returns the game to its original state.** Repeated apply and
+  restore cycles no longer risk changing weapons that were shared in the retail game.
+
+- **Archipelago release packages are more reliable.** The downloadable worlds now work from their
+  packaged files and remain compatible with the supported Archipelago release, while generation
+  keeps the same reachability rules.
+
 ## [0.5.2] - 2026-07-18
 
 ### Added
@@ -20,6 +64,10 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 - **Keep important items visible during swaps (DC1, on by default).**
 - **Pickup ground-visual data layer (DC1).**
 - **Normalize relocated pickup visuals (DC1).**
+- **Imported textures can no longer overwrite the game's icon/font graphics (DC1).** Pickup and
+  enemy texture imports now only use the video-memory space the game's own rooms use, and skip the
+  import (showing the generic pickup instead) when a room has no free space — previously a full room
+  could garble the inventory icons and on-screen text for the rest of the session.
 - **Crashes related to the Enemy Randomizer have been fixed (DC2).**
 
 ## [0.5.1] — 2026-07-15

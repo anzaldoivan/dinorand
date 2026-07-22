@@ -89,10 +89,10 @@ public static class Dc2ShopTablePatch
     /// splitmix32 Fisher–Yates permutations, keyed by <paramref name="seed"/>). Validates first
     /// via <see cref="Validate"/> and writes nothing on failure. Returns one entry per for-sale id.
     /// </summary>
-    public static ShopShuffleEntry[] Shuffle(byte[] exe, int seed)
+    public static ShopShuffleEntry[] Shuffle(byte[] exe, int seed, bool shuffleCatalogMasks = true)
     {
         ArgumentNullException.ThrowIfNull(exe);
-        Validate(exe);
+        Validate(exe, validateCatalogMasks: shuffleCatalogMasks);
 
         // Only the non-protected ids take part in the permutation; Firewall/Chain Mine stay put.
         int[] free = Enumerable.Range(0, ForSaleIds.Length)
@@ -106,25 +106,60 @@ public static class Dc2ShopTablePatch
 
         // Default every id to canonical, then permute the free ids among themselves.
         var newPrices = (uint[])CanonicalPrices.Clone();
-        var newMasks = (ushort[])CanonicalMasks.Clone();
+        var newMasks = ForSaleIds.Select(id => ReadMask(exe, id)).ToArray();
         for (int k = 0; k < free.Length; k++)
         {
             newPrices[free[k]] = CanonicalPrices[free[pricePerm[k]]];
-            newMasks[free[k]] = CanonicalMasks[free[maskPerm[k]]];
+            if (shuffleCatalogMasks)
+                newMasks[free[k]] = CanonicalMasks[free[maskPerm[k]]];
         }
+
+        var newRecoveryPrices = new ushort[RecoveryIds.Length];
+        for (int i = 0; i < RecoveryIds.Length; i++)
+            newRecoveryPrices[i] = CanonicalRecoveryPrices[recPerm[i]];
+        return ApplyPlan(exe, newPrices, newMasks, newRecoveryPrices, shuffleCatalogMasks);
+    }
+
+    /// <summary>Validate and apply explicit retail and recovery-price assignments.</summary>
+    internal static ShopShuffleEntry[] ApplyPlan(byte[] exe, IReadOnlyList<uint> newPrices,
+        IReadOnlyList<ushort> newMasks, IReadOnlyList<ushort> newRecoveryPrices,
+        bool applyCatalogMasks = true)
+    {
+        ArgumentNullException.ThrowIfNull(exe);
+        ArgumentNullException.ThrowIfNull(newPrices);
+        ArgumentNullException.ThrowIfNull(newMasks);
+        ArgumentNullException.ThrowIfNull(newRecoveryPrices);
+        Validate(exe, validateCatalogMasks: applyCatalogMasks);
+        if (newPrices.Count != ForSaleIds.Length || newMasks.Count != ForSaleIds.Length
+            || newRecoveryPrices.Count != RecoveryIds.Length)
+            throw new ArgumentException("shop plan dimensions do not match the recognized table slices.");
+
+        int[] free = Enumerable.Range(0, ForSaleIds.Length)
+            .Where(i => !ProtectedIds.Contains(ForSaleIds[i])).ToArray();
+        if (!free.Select(i => newPrices[i]).Order().SequenceEqual(free.Select(i => CanonicalPrices[i]).Order())
+            || ProtectedIds.Any(id => newPrices[Array.IndexOf(ForSaleIds, id)] != CanonicalPrices[Array.IndexOf(ForSaleIds, id)]))
+            throw new ArgumentException("shop price plan is not a protected-id-preserving permutation.", nameof(newPrices));
+        if (applyCatalogMasks
+            && (!free.Select(i => newMasks[i]).Order().SequenceEqual(free.Select(i => CanonicalMasks[i]).Order())
+                || ProtectedIds.Any(id => newMasks[Array.IndexOf(ForSaleIds, id)] != CanonicalMasks[Array.IndexOf(ForSaleIds, id)])))
+            throw new ArgumentException("shop mask plan is not a protected-id-preserving permutation.", nameof(newMasks));
+        if (!newRecoveryPrices.Order().SequenceEqual(CanonicalRecoveryPrices.Order()))
+            throw new ArgumentException("recovery-price plan is not a canonical permutation.", nameof(newRecoveryPrices));
 
         var result = new ShopShuffleEntry[ForSaleIds.Length + RecoveryIds.Length];
         for (int i = 0; i < ForSaleIds.Length; i++)
         {
             WritePrice(exe, ForSaleIds[i], newPrices[i]);
-            WriteMask(exe, ForSaleIds[i], newMasks[i]);
-            result[i] = new ShopShuffleEntry(ForSaleIds[i], CanonicalPrices[i], newPrices[i], CanonicalMasks[i], newMasks[i]);
+            if (applyCatalogMasks)
+                WriteMask(exe, ForSaleIds[i], newMasks[i]);
+            result[i] = new ShopShuffleEntry(ForSaleIds[i], CanonicalPrices[i], newPrices[i],
+                applyCatalogMasks ? CanonicalMasks[i] : newMasks[i], newMasks[i]);
         }
 
         // Tools economy: permute the recovery prices (no protected subset — none gate progression).
         for (int i = 0; i < RecoveryIds.Length; i++)
         {
-            ushort newRec = CanonicalRecoveryPrices[recPerm[i]];
+            ushort newRec = newRecoveryPrices[i];
             WriteRecoveryPrice(exe, i, newRec);
             result[ForSaleIds.Length + i] = new ShopShuffleEntry(RecoveryIds[i], CanonicalRecoveryPrices[i], newRec, 0, 0);
         }
@@ -168,7 +203,7 @@ public static class Dc2ShopTablePatch
     /// the canonical sets — i.e. pristine or previously shuffled by this patch, never anything
     /// else — and whose not-for-sale slice ids still carry the 999999 sentinel.
     /// </summary>
-    public static void Validate(byte[] exe)
+    public static void Validate(byte[] exe, bool validateCatalogMasks = true)
     {
         if (exe.Length != Dc2WpGatePatch.ExpectedLength)
             throw new InvalidOperationException(
@@ -177,9 +212,22 @@ public static class Dc2ShopTablePatch
         var prices = ForSaleIds.Select(id => ReadPrice(exe, id)).ToArray();
         var masks = ForSaleIds.Select(id => ReadMask(exe, id)).ToArray();
         if (!prices.Order().SequenceEqual(CanonicalPrices.Order()) ||
-            !masks.Order().SequenceEqual(CanonicalMasks.Order()))
+            (validateCatalogMasks && !masks.Order().SequenceEqual(CanonicalMasks.Order())))
             throw new InvalidOperationException(
                 "shop price/mask slice is not a permutation of the recognized retail set — unrecognized build; refusing to touch the shop tables.");
+
+        if (!validateCatalogMasks)
+        {
+            const ushort playableOwnerMask = 0x03;
+            for (int i = 0; i < ForSaleIds.Length; i++)
+            {
+                byte id = (byte)ForSaleIds[i];
+                ushort vanilla = Dc2OwnerBits.VanillaFlags[id];
+                if ((masks[i] & ~playableOwnerMask) != (vanilla & ~playableOwnerMask))
+                    throw new InvalidOperationException(
+                        $"shop catalog id 0x{id:X2} has unrecognized non-owner flags; refusing to shuffle prices.");
+            }
+        }
 
         var rec = Enumerable.Range(0, RecoveryIds.Length).Select(i => ReadRecoveryPrice(exe, i)).ToArray();
         if (!rec.Order().SequenceEqual(CanonicalRecoveryPrices.Order()))

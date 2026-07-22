@@ -1,9 +1,15 @@
-# Dino Crisis 1 — Archipelago world (increment 1)
+# Dino Crisis 1 — Archipelago world
 
 A Python [Archipelago](https://archipelago.gg) world that lets AP **generate** a logically-valid
-Dino Crisis 1 seed from DinoRand's authored logic. This is the generation half only — it does not
-patch the game or sync a multiworld yet (that needs the runtime client; see
-`docs/decisions/cross/ARCHIPELAGO-INTEGRATION-FEASIBILITY.md` and `ARCHIPELAGO-INCREMENT-1-PLAN.md`).
+Dino Crisis 1 seed from DinoRand's authored logic. The **runtime half ships too** (contract v2):
+slot_data carries AP's item placement (`placements` + `item_ids`), and the DinoRand CLI's
+`--ap-connect` client patches it into the local GOG install and syncs the running game
+(pickups → checks, received items → inventory, goal → completion) — live-verified end-to-end
+against AP 0.6.7. See `docs/decisions/cross/AP-CLIENT-PLAN.md` and the USER-GUIDE "Archipelago"
+section. Play-side requirements: Windows host (the client reads `DINO.exe` memory), server ≥ AP 0.6.x.
+
+Locations flagged `excluded` in the contract share an in-game taken-flag with a twin pickup
+(script-choreographed spots) — AP keeps progression items out of them automatically.
 
 ## Layout
 | File | Role |
@@ -15,6 +21,11 @@ patch the game or sync a multiworld yet (that needs the runtime client; see
 | `archipelago.json` | AP world manifest |
 | `test/` | AP-side integration tests (`WorldTestBase`) — run inside an AP checkout |
 | `selfcheck.py` | AP-independent structural check — runs anywhere, no AP install |
+
+## Install as a packaged .apworld (official AP installer)
+Zip this folder so the archive contains `dino_crisis_1/` at its top level, rename it
+`dino_crisis_1.apworld`, and drop it into the AP install's `custom_worlds/`. Generate with a
+player YAML as usual (`game: Dino Crisis 1`).
 
 ## Generate a seed with an Archipelago checkout
 ```bash

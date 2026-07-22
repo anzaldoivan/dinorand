@@ -11,6 +11,8 @@ chunk: default
 related: []
 ---
 
+<!-- Audience: modders. Summarize and link; detailed offsets and byte facts belong in the registries. -->
+
 # DinoRand — Modding & Format Guide
 
 For people who want to **build on top of** DinoRand's reverse-engineering: modders, tool

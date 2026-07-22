@@ -636,30 +636,57 @@ public static class TextureImporter
         });
     }
 
+    /// <summary>Room-class VRAM texture arena, corpus-witnessed (all 148 vanilla DC1 rooms surveyed
+    /// 2026-07-18): room packages only ever upload texture columns inside [512,768) — the four
+    /// 64-wide species slots at 512/576/640/704 — so anything a room writes there is per-room data
+    /// the engine reloads on every room entry. Everything at x&gt;=768 is engine-global (item-icon
+    /// atlas at (768,0), font glyphs, the small per-room (768,256) slot aside) and is uploaded once:
+    /// writing there garbles the HUD/menus for the rest of the session (witnessed: seed
+    /// DINO-WxCfArn_H_8vBw parked a pickup texture at (768,0) in st10d → icon strip + text trashed).
+    /// Import placement must stay inside the arena and otherwise fail closed.</summary>
+    public const int RoomArenaX = 512;
+
+    /// <summary>Exclusive right edge of the room-class texture arena (see <see cref="RoomArenaX"/>).</summary>
+    public const int RoomArenaEnd = 768;
+
+    /// <summary>CLUT rows vanilla room packages upload to (same 148-room survey): {497,498,505..511},
+    /// in placement-preference order (bottom rows first — farthest from the room's usual 505-508
+    /// block). Rows 499..504 are never room-written → engine-global CLUTs, off limits (the bad seed
+    /// parked a palette at (768,504) and corrupted UI colours).</summary>
+    public static readonly int[] RoomClutRows = { 511, 510, 509, 508, 507, 506, 505, 498, 497 };
+
     /// <summary>
     /// Relocate <paramref name="block"/> to a free VRAM region of <paramref name="targetBytes"/>: find
-    /// a clear 64-wide texture page column (X in [512,960], 64-aligned, the full texture height clear)
-    /// and a clear palette row, and return the block <see cref="TextureBlock.RelocateSplit"/>'d there
-    /// (with the rewritten tpage/CLUT codes the imported model must then carry). The texture keeps its
-    /// Y (page-row bit) and the palette keeps its X; only the free column / row move. Throws when the
-    /// target has no free column or palette row (caller falls back to a geometry-only import).
+    /// a clear 64-wide texture page column (64-aligned inside the room arena [512,768), the full
+    /// texture height clear) and a clear vanilla-witnessed palette row, and return the block
+    /// <see cref="TextureBlock.RelocateSplit"/>'d there (with the rewritten tpage/CLUT codes the
+    /// imported model must then carry). The texture keeps its Y (page-row bit) and the palette keeps
+    /// its X; only the free column / row move. Throws when the target has no free column or palette
+    /// row (caller falls back to a geometry-only import).
+    /// <paramref name="reclaimable"/>: VRAM rects (exact entry rects) whose current occupant is being
+    /// replaced by this import — e.g. the victim's own texture column + palette row when every model
+    /// sampling them is swapped out. They are treated as free, so a VRAM-crowded room can still place
+    /// the donor by reclaiming the victim's slot (the Theri fixed-column strategy, generalized; the
+    /// staged entry uploads after the original and wins the DMA — PackageRepacker order).
     /// </summary>
-    public static TextureBlock PickFreeRegion(ReadOnlySpan<byte> targetBytes, TextureBlock block)
+    public static TextureBlock PickFreeRegion(ReadOnlySpan<byte> targetBytes, TextureBlock block,
+                                              IReadOnlyCollection<VramRect>? reclaimable = null)
     {
         var occupied = ParseVramBlocks(targetBytes).Select(b => b.Dst).ToList();
+        if (reclaimable is { Count: > 0 }) occupied.RemoveAll(reclaimable.Contains);
         var tex = block.Texture.Dst;
         var pal = block.Palette.Dst;
 
         int texX = -1;
-        for (int x = 512; x <= 960; x += 64)
+        for (int x = RoomArenaX; x + tex.W <= RoomArenaEnd; x += 64)
         {
             var cand = tex with { X = x };
-            if (x + cand.W <= VramWidth && !occupied.Any(r => Intersects(r, cand))) { texX = x; break; }
+            if (!occupied.Any(r => Intersects(r, cand))) { texX = x; break; }
         }
         if (texX < 0) throw new InvalidOperationException("no free texture column in target VRAM for relocation");
 
         int palY = -1;
-        for (int y = VramHeight - 1; y >= 480; y--)
+        foreach (int y in RoomClutRows)
         {
             var cand = pal with { Y = y };
             if (!occupied.Any(r => Intersects(r, cand))) { palY = y; break; }

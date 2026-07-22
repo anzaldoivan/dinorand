@@ -272,6 +272,48 @@ public class PickupModelImportTests
         Assert.Equal(640 + 32, placed2!.TexRect.X);
     }
 
+    [Fact]
+    public void TryPlace_FailsClosed_WhenRoomArenaFull()
+    {
+        // Corpus rule (148-room survey, 2026-07-18): room packages only ever upload texture columns
+        // inside [512,768). x>=768 holds engine-global VRAM — the item-icon atlas at (768,0) and the
+        // font glyphs — which seed DINO-WxCfArn_H_8vBw garbled by parking a pickup texture there
+        // (st10d: atlas 320..576 + species columns 576/640/704 fill the whole arena). A full arena
+        // must fail closed (Lever-A generic panel), never spill past 768.
+        var target = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(320, 0, 256, 512), Lzss.Compress(PatternPixels(256, 512))),
+            (GianEntryType.Lzss2, new VramRect(576, 0, 64, 512), Lzss.Compress(PatternPixels(64, 512))),
+            (GianEntryType.Lzss2, new VramRect(640, 0, 64, 512), Lzss.Compress(PatternPixels(64, 512))),
+            (GianEntryType.Lzss2, new VramRect(704, 0, 64, 512), Lzss.Compress(PatternPixels(64, 512))),
+            (GianEntryType.Palette, new VramRect(768, 505, 256, 4), PatternPixels(256, 4)),
+            (GianEntryType.Data, default, new byte[4]));
+
+        var cut = new PickupTextureCut(TextureImporter.MakeTpage(512, 0, 0), TextureImporter.MakeClut(768, 511),
+                                       new VramRect(512, 0, 32, 128), PatternPixels(32, 128),
+                                       new VramRect(768, 511, 16, 1), PatternPixels(16, 1));
+
+        Assert.False(PickupModelImporter.TryPlace(target, Array.Empty<VramRect>(), cut, out _));
+    }
+
+    [Fact]
+    public void TryPlace_ClutRow_StaysOnVanillaWitnessedRows()
+    {
+        // Vanilla palette uploads only ever land on rows {497,498,505..511}; 499..504 hold engine
+        // CLUTs (the bad seed parked one at (768,504) and trashed the UI). With 505..511 taken the
+        // next candidate is 498 — not 504.
+        var target = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(320, 0, 192, 512), Lzss.Compress(PatternPixels(192, 512))),
+            (GianEntryType.Palette, new VramRect(768, 505, 256, 7), PatternPixels(256, 7)),
+            (GianEntryType.Data, default, new byte[4]));
+
+        var cut = new PickupTextureCut(TextureImporter.MakeTpage(512, 0, 0), TextureImporter.MakeClut(864, 507),
+                                       new VramRect(512, 0, 8, 16), PatternPixels(8, 16),
+                                       new VramRect(864, 507, 16, 1), PatternPixels(16, 1));
+
+        Assert.True(PickupModelImporter.TryPlace(target, Array.Empty<VramRect>(), cut, out var placed));
+        Assert.Equal(498, placed!.ClutRect.Y);
+    }
+
     // --- RoomScript.ApplyEdits: the VisualModelPtr write (Lever B repoint) -------------------------
 
     [Fact]
@@ -309,6 +351,74 @@ public class PickupModelImportTests
         var edited2 = (byte[])buf.Clone();
         RoomScript.Parse(buf).ApplyEdits(edited2, new[] { item2 });
         Assert.Equal(ItemRecord.GenericPanelModelPtr, ReadU32(edited2, item2.FileOffset + ItemRecord.ModelPtrOffset));
+    }
+
+    [Fact]
+    public void ImportPass_SharedDonorReuse_ReportsEveryPickup()
+    {
+        const ushort tpage = 0x0007;
+        ushort clut = TextureImporter.MakeClut(864, 507);
+
+        // Donor room: one visible 0x2e pickup points at a valid one-quad mesh in the pre-script gap.
+        var donorRdt = BuildMesh(0x24, Array.Empty<byte[]>(), new[] { QuadPrim(tpage, clut, UvQuad) });
+        int donorTable = donorRdt.Length;
+        Array.Resize(ref donorRdt, donorTable + 4 + DcOpcodes.ItemLength);
+        WriteU32(donorRdt, 0x14, PsxBase + (uint)donorTable);
+        WriteU32(donorRdt, donorTable, 4);
+        int donorRec = donorTable + 4;
+        donorRdt[donorRec] = DcOpcodes.Item;
+        donorRdt[donorRec + 2] = DcOpcodes.ItemSubtype;
+        donorRdt[donorRec + ItemRecord.IdOffset] = 0x2e;
+        donorRdt[donorRec + ItemRecord.CountOffset] = 1;
+        donorRdt[donorRec + ItemRecord.DisplaySlotOffset] = 1;
+        WriteU32(donorRdt, donorRec + ItemRecord.ModelPtrOffset, PsxBase + 0x24);
+
+        var donorBytes = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(448, 0, 96, 256),
+             Lzss.Compress(PatternPixels(96, 256))),
+            (GianEntryType.Palette, new VramRect(864, 507, 16, 1), PatternPixels(16, 1)),
+            (GianEntryType.Data, default, donorRdt));
+        var donor = RoomFile.Read(1, 1, donorBytes);
+
+        // Target room: two relocated records need the same donor. The pass should append/import once,
+        // repoint both records to that shared copy, and report both pickup outcomes in the spoiler.
+        const int targetTable = 0x24;
+        var targetRdt = new byte[targetTable + 4 + 2 * DcOpcodes.ItemLength];
+        WriteU32(targetRdt, 0x14, PsxBase + targetTable);
+        WriteU32(targetRdt, targetTable, 4);
+        for (int i = 0; i < 2; i++)
+        {
+            int rec = targetTable + 4 + i * DcOpcodes.ItemLength;
+            targetRdt[rec] = DcOpcodes.Item;
+            targetRdt[rec + 2] = DcOpcodes.ItemSubtype;
+            targetRdt[rec + ItemRecord.IdOffset] = (byte)(0x16 + i);
+            targetRdt[rec + ItemRecord.CountOffset] = 1;
+            targetRdt[rec + ItemRecord.DisplaySlotOffset] = (byte)(8 + i);
+            WriteU32(targetRdt, rec + ItemRecord.ModelPtrOffset, ItemRecord.GenericPanelModelPtr);
+        }
+        var targetBytes = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(320, 0, 192, 512),
+             Lzss.Compress(PatternPixels(192, 512))),
+            (GianEntryType.Data, default, targetRdt));
+        var target = RoomFile.Read(1, 2, targetBytes);
+        foreach (var item in target.Items)
+        {
+            item.ItemId = 0x2e;
+            item.NormalizeVisual = true;
+            item.NormalizeDisplaySlot = item.DisplaySlot;
+        }
+
+        var rooms = new List<RoomFile> { donor, target };
+        var context = new RandomizationContext(
+            new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(1),
+            new RandomizerConfig { ImportPickupModels = true }, _ => { });
+
+        new PickupModelImportPass().Apply(context);
+
+        Assert.All(target.Items, item => Assert.NotEqual(ItemRecord.GenericPanelModelPtr, item.VisualModelPtr));
+        Assert.Single(target.Items.Select(item => item.VisualModelPtr).Distinct());
+        var section = Assert.Single(context.Spoiler.Sections, s => s.Title == "Pickup models imported");
+        Assert.Equal(2, section.Rows.Count);
     }
 
     // --- real install ------------------------------------------------------------------------------
@@ -425,12 +535,39 @@ public class PickupModelImportTests
                         $"seed {seed}: texref tpage {tr.Tpage:x} bbox exceeds its upload rect");
                     Assert.True(texBlock.Dst.W % PickupModelImporter.BlitRowHalfwords == 0,
                         $"seed {seed}: upload W={texBlock.Dst.W} not a multiple of the blit row unit");
+                    // Imports never leave the room-class VRAM arena (x>=768 is the engine's
+                    // icon/font atlas; rows 499..504 its CLUTs — the DINO-WxCfArn_H_8vBw garble).
+                    Assert.True(texBlock.Dst.X >= TextureImporter.RoomArenaX
+                             && texBlock.Dst.X + texBlock.Dst.W <= TextureImporter.RoomArenaEnd,
+                        $"seed {seed}: import upload {texBlock.Dst} outside the room VRAM arena");
+                    Assert.Contains(cy, TextureImporter.RoomClutRows);
                     Assert.True(blocks.Any(b => b.Type == GianEntryType.Palette && b.Dst.Contains(cx, cy)),
                         $"seed {seed}: texref clut {tr.Clut:x} not covered by a palette upload");
                 }
             }
         }
         Assert.True(imported > 0, $"seed {seed}: no donor import happened at all ({fellBack} fallbacks)");
+    }
+
+    [Fact]
+    public void RealInstall_TryPlace_FailsClosed_St10d_FullArena()
+    {
+        // Direct repro of the DINO-WxCfArn_H_8vBw garble: pristine st10d's atlas (320,0,256,512) plus
+        // species columns 576/640/704 occupy the entire room VRAM arena — a pickup import there must
+        // fail closed, not land at (768,0) on top of the engine's item-icon atlas.
+        var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (string.IsNullOrEmpty(root)) return; // no game files (CI) — skip
+        var refs = Game.EnumerateRooms(root);
+        if (refs.Count == 0) return;
+        var st10d = refs.Single(r => r.Stage == 1 && r.Room == 0x0d);
+        var target = File.ReadAllBytes(st10d.Path);
+
+        var cut = new PickupTextureCut(TextureImporter.MakeTpage(512, 0, 0), TextureImporter.MakeClut(768, 511),
+                                       new VramRect(512, 0, 32, 128), PatternPixels(32, 128),
+                                       new VramRect(768, 511, 16, 1), PatternPixels(16, 1));
+
+        Assert.False(PickupModelImporter.TryPlace(target, Array.Empty<VramRect>(), cut, out var placed),
+            $"pickup import must fail closed in st10d, but landed at {placed?.TexRect}");
     }
 
     // --- design correction (2026-07-17): visual always matches the landed item ----------------------
@@ -541,9 +678,8 @@ public class PickupModelImportTests
     [Fact]
     public void ImportPass_Gating()
     {
-        // Default ON for the in-game witness session (user decision 2026-07-17); the flag remains
-        // the kill-switch (CLI --no-pickup-ground-models).
-        Assert.True(new PickupModelImportPass().IsEnabled(new RandomizerConfig()));
+        // Default OFF: the GUI exposes the model change as an explicit Advanced option.
+        Assert.False(new PickupModelImportPass().IsEnabled(new RandomizerConfig()));
         Assert.False(new PickupModelImportPass().IsEnabled(new RandomizerConfig { ImportPickupModels = false }));
         // Lever B implies the Lever-A fallback marking even when NormalizePickupVisuals is off.
         Assert.True(new NormalizePickupVisualsPass().IsEnabled(

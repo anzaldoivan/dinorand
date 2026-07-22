@@ -4,6 +4,10 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DinoRand.FileFormats\DinoRand.FileFormats.csproj" />
+    <!-- Archipelago runtime session (Ap/Dc1ApRunner) — the loop-closing install it drives lives
+         here (ApPlacementInstaller/GameInstaller), so the shared runner lives here too and both
+         front-ends bind it without either one re-implementing the flow (AP-CLIENT-PLAN.md D3). -->
+    <ProjectReference Include="..\DinoRand.ApClient\DinoRand.ApClient.csproj" />
   </ItemGroup>
   <!-- Ship the door-rando metadata (plan §6) inside the assembly so DoorMap.LoadDefault finds it. -->
   <ItemGroup>
@@ -28,8 +32,16 @@
     <!-- BGM mood-tag manifests (BGM-RANDO-PLAN.md) so BgmManifest.LoadDefault finds them. -->
     <EmbeddedResource Include="..\..\data\dc1\bgm.json" LogicalName="DinoRand.Randomizer.Data.dc1.bgm.json" />
     <EmbeddedResource Include="..\..\data\dc2\bgm.json" LogicalName="DinoRand.Randomizer.Data.dc2.bgm.json" />
+    <EmbeddedResource Include="..\..\data\dc2\items.json" LogicalName="DinoRand.Randomizer.Data.dc2.items.json" />
+    <EmbeddedResource Include="..\..\data\dc2\item-sources.json" LogicalName="DinoRand.Randomizer.Data.dc2.item-sources.json" />
+    <EmbeddedResource Include="..\..\apworld\dino_crisis_2\data\dc2_logic.json" LogicalName="DinoRand.Randomizer.Data.dc2.dc2_logic.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NVorbis" Version="0.10.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="dinorand" />
+    <InternalsVisibleTo Include="DinoRand.Avalonia" />
+    <InternalsVisibleTo Include="DinoRand.FileFormats.Tests" />
   </ItemGroup>
 </Project>

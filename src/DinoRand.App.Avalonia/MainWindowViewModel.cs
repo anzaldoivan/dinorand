@@ -4,15 +4,18 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Input;            // DataFormat
 using Avalonia.Input.Platform;   // IClipboard (+ SetValueAsync / TryGetTextAsync)
 using Avalonia.Media;            // IBrush / Brushes (foreground + border colours, lifted verbatim)
+using Avalonia.Threading;        // Dispatcher (AP log lines arrive on a background thread)
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DinoRand.App.Services;
 using DinoRand.FileFormats.Exe;
 using DinoRand.Randomizer;
+using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;   // Dc2CharacterSkin
 using DinoRand.Randomizer.Definitions;
@@ -77,13 +80,17 @@ namespace DinoRand.App
 
         // <paramref name="settings"/> defaults to the on-disk store (%APPDATA%\DinoRand\settings.json);
         // tests pass an in-memory AppSettings so they neither read nor depend on a real settings file.
+        // <paramref name="apRunner"/> / <paramref name="uiPost"/> are the AP connect tab's two seams
+        // (a fake runner + a synchronous post make the connect/disconnect state machine unit-testable).
         public MainWindowViewModel(IFilePicker filePicker, IDialogs dialogs, Func<IClipboard> clipboard,
-            AppSettings settings = null)
+            AppSettings settings = null, ApRunner apRunner = null, Action<Action> uiPost = null)
         {
             _filePicker = filePicker;
             _dialogs = dialogs;
             _clipboard = clipboard;
             _settings = settings ?? AppSettings.Load();
+            _apRunner = apRunner ?? Dc1ApRunner.Run;
+            _uiPost = uiPost ?? (a => Dispatcher.UIThread.Post(a));
 
             BuildStartingInventoryEditor();
 
@@ -109,6 +116,9 @@ namespace DinoRand.App
             IsVoicesChecked = _settings.RandomizeCutsceneVoices;
             CrossGameVoices = _settings.IncludeCrossGameVoices;
             BgmPacksRoot = _settings.BgmPacksRoot ?? "";
+            // AP connect tab: last-used server/slot (never the password).
+            ApHostPort = _settings.ApHostPort ?? DefaultApHostPort;
+            ApSlot = _settings.ApSlot ?? "";
             _suspend = false;
 
             if (slice.LastSeed is { } last && AppSeed.TryParse(last, out var parsed))
@@ -136,7 +146,13 @@ namespace DinoRand.App
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Dc2EnemyOptionsVisible))]
+        [NotifyPropertyChangedFor(nameof(EnemyDifficultyEnabled))]
         private bool _randomizeEnemies;
+
+        // DC1-only per-placement maxHP override. Seed-encoded, advanced, and default OFF.
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EnemyDifficultyEnabled))]
+        private bool _randomizeEnemyHp;
 
         // DC2-only cross-species donor-pool sub-options (docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md). They map to
         // RandomizerConfig.IncludeDc2{Setpiece,Boss}Enemies and show only for DC2 with enemy rando on.
@@ -222,6 +238,26 @@ namespace DinoRand.App
         [ObservableProperty]
         private bool _dc2RandomizePuzzles;
 
+        // DC2 cross-character weapons (DC2-CROSS-CHAR-WEAPON-MODEL-SWAP.md): each character can wield
+        // the other's weapons on their OWN body model. Eight WEP_P grafts built at install time from
+        // the user's own Data files + a Dino2.exe catalog/owner-flag patch.
+        // Seed-string byte 16 bit 6. Default OFF (four of the eight pairs await an in-game witness).
+        [ObservableProperty]
+        private bool _dc2CrossCharWeapons;
+
+        // DC2 randomized MAIN ownership: exact seeded three/three split. Implies the cross-character
+        // graft prerequisite and is mutually exclusive with shared weapons. Seed byte 16 bit 7.
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanUseDc2SharedWeapons))]
+        private bool _dc2RandomizeWeapons;
+
+        public bool CanUseDc2SharedWeapons => !Dc2RandomizeWeapons;
+
+        // DC2 EXPERIMENTAL: share the SUB weapons (Machete, Large Stungun) between Regina and Dylan
+        // via the item-catalog owner bits (K125). Not seed-encoded. Default OFF.
+        [ObservableProperty]
+        private bool _dc2SharedWeapons;
+
         // DC2 starting main weapon (docs/decisions/dc2/loadout/DC2-STARTING-LOADOUT-PLAN.md): new-game bootstrap
         // equip-immediate patch; subweapon bytes never touched (Machete/Stun Gun kept). Seed-string
         // byte 22. Dropdown index 0 = random-from-band, n = the band's (n-1)th id; names beyond the
@@ -291,6 +327,7 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _randomizeDoors;
         [ObservableProperty] private bool _shuffleKeyItems;
+        [ObservableProperty] private bool _shuffledKeyItemsModelChange;
         // On by default; NOT seed-encoded (like RelocateDdkDiscs) — a cosmetic/QoL placement constraint,
         // not part of the seed identity. PICKUP-VISUAL-PLACEMENT-PLAN.md.
         [ObservableProperty] private bool _avoidHiddenPickupSpots = true;
@@ -319,8 +356,8 @@ namespace DinoRand.App
         [ObservableProperty] private bool _weaponGrenade;
 
         // Computed visibility / enablement (were imperative IsVisible/IsEnabled writes in UpdateUiFromSeed).
-        public bool ReplacePoolVisible => RandomizeItems;
-        public bool ItemRatiosVisible => RandomizeItems && ReplaceItemPool;
+        public bool ReplacePoolVisible => RandomizeItems && SelectedGame.Id == "dc1";
+        public bool ItemRatiosVisible => ReplacePoolVisible && ReplaceItemPool;
         public bool CustomSupplyEnabled => !RandomizeStartingInventory;
         public string CustomSupplyLabel => RandomizeStartingInventory
             ? "Custom supply slots (disabled while 'Randomize starting inventory' is on)"
@@ -345,7 +382,11 @@ namespace DinoRand.App
         //     option's IsEnabled; they recompute on game switch via ApplyGameCapabilities(). A game that
         //     doesn't support a feature greys its option (and the option is force-unchecked on switch). ---
         public bool CanRandomizeItems => SelectedGame.Supports(GameFeature.Items);
+        public bool PrimaryItemOptionsVisible => SelectedGame.Id == "dc1";
+        public bool Dc2ExperimentalItemOptionsVisible => SelectedGame.Id == "dc2";
         public bool CanRandomizeEnemies => SelectedGame.Supports(GameFeature.Enemies);
+        public bool CanRandomizeEnemyHp => SelectedGame.Id == "dc1";
+        public bool EnemyDifficultyEnabled => RandomizeEnemies || RandomizeEnemyHp;
 
         /// <summary>The DC2 cross-species donor sub-options (setpiece/boss) show only for DC2 with enemy
         /// randomization on — they have no meaning for DC1. docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.</summary>
@@ -356,8 +397,15 @@ namespace DinoRand.App
         public bool CanSwapDc2PlayerCharacters => SelectedGame.Supports(GameFeature.PlayerModel);
         public bool CanRandomizeDoors => SelectedGame.Supports(GameFeature.Doors);
         public bool CanShuffleKeyItems => SelectedGame.Supports(GameFeature.KeyItems);
+        public bool CanShuffleKeyItemsModelChange => SelectedGame.Id == "dc1";
         // Cutscene shortening is DC1-only today (the flag(2,2) bracket protocol is a DC1 decode, cont.74).
         public bool CanShortenCutscenes => SelectedGame.Id == "dc1";
+
+        // Door skip is a DC1-only DINO.exe patch (mode-6 door machine, cont.78).
+        public bool CanDc1DoorSkip => SelectedGame.Id == "dc1";
+
+        // Fast-forward cutscenes is a DC1-only DINO.exe patch (SCD-VM tick multiplier, cont.79 v2).
+        public bool CanDc1FastForwardCutscenes => SelectedGame.Id == "dc1";
 
         // The key-item scatter (into ammo/health pickups) and the DDK Input/Code disc relocation have no
         // toggles: both ride on the key shuffle, config-built as ShuffleKeyItemsIntoPickups = ShuffleKeyItems
@@ -385,6 +433,7 @@ namespace DinoRand.App
             _suspend = true;
             if (!CanRandomizeItems) RandomizeItems = false;
             if (!CanRandomizeEnemies) RandomizeEnemies = false;
+            if (!CanRandomizeEnemyHp) RandomizeEnemyHp = false;
             // DC2-only sub-options: clear on any game that can't host them, so a greyed/hidden toggle
             // never leaks a true into the config (DC1 ignores these fields anyway).
             if (SelectedGame.Id != "dc2")
@@ -399,6 +448,9 @@ namespace DinoRand.App
                 Dc2RandomizeRaptorTiers = false;
                 Dc2ShuffleShop = false;
                 Dc2RandomizePuzzles = false;
+                Dc2CrossCharWeapons = false;
+                Dc2RandomizeWeapons = false;
+                Dc2SharedWeapons = false;
                 Dc2RandomizeStartWeapon = false;
                 Dc2AddAndEquipStartWeapon = false;
                 Dc2DoorSkip = false;
@@ -411,16 +463,31 @@ namespace DinoRand.App
             }
             else
             {
-                // GUI default for DC2: Randomize Puzzles starts ON (DC2-PUZZLE-RANDO-PLAN.md).
+                // DC2 item/key randomization is exposed as an explicit experimental opt-in under
+                // Advanced options. A pasted seed may still enable it after this switch-time default.
+                RandomizeItems = false;
+                // GUI defaults for DC2: these start ON (DC2-PUZZLE-RANDO-PLAN.md + maintainer request).
                 // Runs after UpdateUiFromSeed on startup/game-switch, so it wins over a persisted
-                // seed's cleared bits; the RandomizerConfig/CLI default stays off, and a seed pasted
+                // seed's cleared bits; the RandomizerConfig/CLI defaults stay off, and a seed pasted
                 // AFTER entering DC2 still round-trips exactly (this hook doesn't run on seed paste).
                 Dc2RandomizePuzzles = true;
+                IncludeDc2BossEnemies = true;      // T-Rex in the cross-species donor pool by default
+                Dc2ShuffleShop = true;
+                Dc2RandomizeRaptorTiers = true;
+                Dc2AddAndEquipStartWeapon = true;  // effective only when Randomize Starting Weapon is on
             }
             if (!CanSwapDc2PlayerCharacters) { Dc2CharacterSkinIndex = 0; Dc2ReginaSkinIndex = 0; }
             if (!CanRandomizeDoors) RandomizeDoors = false;
-            if (!CanShuffleKeyItems) ShuffleKeyItems = false;
+            // GUI default: Shuffle Key Items starts ON where the game supports it (DC1), forced OFF
+            // otherwise. Like the DC2 defaults above, this wins over a persisted seed on startup/game-switch
+            // but not on paste (this hook doesn't run on seed paste); the RandomizerConfig/CLI default stays off.
+            ShuffleKeyItems = CanShuffleKeyItems && SelectedGame.Id == "dc1";
+            if (!CanShuffleKeyItemsModelChange) ShuffledKeyItemsModelChange = false;
+            // GUI default: Insert upgraded weapons starts ON (item-pool block; DC1-only visible, harmless for DC2).
+            PreUpgradedWeapons = true;
             if (!CanShortenCutscenes) ShortenCutscenes = false;
+            if (!CanDc1DoorSkip) Dc1DoorSkip = false;
+            if (!CanDc1FastForwardCutscenes) Dc1FastForwardCutscenes = false;
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
             if (!CanRandomizeVoices) IsVoicesChecked = false;
             if (!CanShuffleBgm) ShuffleBgm = false;
@@ -430,13 +497,22 @@ namespace DinoRand.App
             _suspend = prevSuspend;
 
             OnPropertyChanged(nameof(CanRandomizeItems));
+            OnPropertyChanged(nameof(PrimaryItemOptionsVisible));
+            OnPropertyChanged(nameof(Dc2ExperimentalItemOptionsVisible));
+            OnPropertyChanged(nameof(ReplacePoolVisible));
+            OnPropertyChanged(nameof(ItemRatiosVisible));
             OnPropertyChanged(nameof(CanRandomizeEnemies));
+            OnPropertyChanged(nameof(CanRandomizeEnemyHp));
+            OnPropertyChanged(nameof(EnemyDifficultyEnabled));
             OnPropertyChanged(nameof(Dc2EnemyOptionsVisible));
             OnPropertyChanged(nameof(Dc2RaptorPanelVisible));
             OnPropertyChanged(nameof(CanSwapDc2PlayerCharacters));
             OnPropertyChanged(nameof(CanRandomizeDoors));
             OnPropertyChanged(nameof(CanShuffleKeyItems));
+            OnPropertyChanged(nameof(CanShuffleKeyItemsModelChange));
             OnPropertyChanged(nameof(CanShortenCutscenes));
+            OnPropertyChanged(nameof(CanDc1DoorSkip));
+            OnPropertyChanged(nameof(CanDc1FastForwardCutscenes));
             OnPropertyChanged(nameof(CanRandomizeStartingInventory));
             OnPropertyChanged(nameof(CanRandomizeVoices));
             OnPropertyChanged(nameof(ShowDc1VoiceCast));
@@ -445,6 +521,7 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanImportBgm));
             OnPropertyChanged(nameof(CanRandomizeBoxes));
             OnPropertyChanged(nameof(CanScramblePuzzleCodes));
+            OnPropertyChanged(nameof(CanUseArchipelago));
             OnPropertyChanged(nameof(GameContentPlaceholder));
 
             // Re-sync the seed to the (possibly forced-off) toggles so the seed string and the checkboxes
@@ -515,8 +592,12 @@ namespace DinoRand.App
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CanPlayNow))]
+        [NotifyPropertyChangedFor(nameof(ShouldConfirmClose))]
+        [NotifyPropertyChangedFor(nameof(CloseConfirmMessage))]
         private bool _isBusy;
-        [ObservableProperty] private bool _canInstall;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ApTabEnabled))]
+        private bool _canInstall;
         [ObservableProperty] private bool _canRestore;
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CanPlayNow))]
@@ -530,6 +611,13 @@ namespace DinoRand.App
         // --- Install options (bound) -------------------------------------------
 
         [ObservableProperty] private bool _shuffleBgm;
+
+        // Door skip (experimental, DC1): reversible DINO.exe patch applied at install (cont.78). Default OFF.
+        [ObservableProperty] private bool _dc1DoorSkip;
+
+        // Fast-forward cutscenes (experimental/crash risk, DC1): reversible DINO.exe patch applied at
+        // install (cont.79 v2 guarded tick multiplier). Default OFF, not seed-encoded.
+        [ObservableProperty] private bool _dc1FastForwardCutscenes;
 
         // External BGM import (DC1): overwrite Sound/BGM/ slots with tagged donor tracks from BgmPacksRoot.
         [ObservableProperty] private bool _importBgm;
@@ -593,6 +681,7 @@ namespace DinoRand.App
 
         partial void OnRandomizeItemsChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeEnemiesChanged(bool value) => UpdateSeedFromUi();
+        partial void OnRandomizeEnemyHpChanged(bool value) => UpdateSeedFromUi();
         // The pool toggles also drive weight-row visibility — refreshed OUTSIDE UpdateSeedFromUi so
         // it happens on every path (user click, seed paste, game switch), _suspend included.
         partial void OnIncludeDc2SetpieceEnemiesChanged(bool value)
@@ -635,6 +724,12 @@ namespace DinoRand.App
         partial void OnDc2RandomizeRaptorTiersChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2ShuffleShopChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2RandomizePuzzlesChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDc2CrossCharWeaponsChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDc2RandomizeWeaponsChanged(bool value)
+        {
+            if (value) Dc2SharedWeapons = false;
+            UpdateSeedFromUi();
+        }
         partial void OnShortenCutscenesChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2DoorSkipChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2RandomizeStartWeaponChanged(bool value) => UpdateSeedFromUi();
@@ -650,6 +745,7 @@ namespace DinoRand.App
         // Key shuffle is a single toggle: scatter (into ammo/health) and DDK-disc relocation ride on it,
         // config-built as ShuffleKeyItemsIntoPickups = RelocateDdkDiscs = ShuffleKeyItems.
         partial void OnShuffleKeyItemsChanged(bool value) => UpdateSeedFromUi();
+        partial void OnShuffledKeyItemsModelChangeChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeStartingInventoryChanged(bool value) => UpdateSeedFromUi();
         // Import external music: its only effect path is config.RandomizeBgm (UpdateSeedFromUi) → the
         // BgmRandomizer pass. Without this trigger the derivation was dead — a toggle never reached the
@@ -706,1017 +802,12 @@ namespace DinoRand.App
             UpdateSeedFromUi();
         }
 
-        // --- Seed <-> UI synchronisation (lifted verbatim) ---------------------
-
-        private void UpdateUiFromSeed(bool updateSeedText = true)
-        {
-            _suspend = true;
-            try
-            {
-                var seedString = _appSeed.ToString();
-                if (updateSeedText)
-                    SeedText = seedString;
-                SeedQrString = seedString;
-                SeedBorder = null;   // ClearValue equivalent (NullToUnsetConverter)
-
-                RandomizeItems = _appSeed.Config.RandomizeItems;
-                RandomizeEnemies = _appSeed.Config.RandomizeEnemies;
-                IncludeDc2SetpieceEnemies = _appSeed.Config.IncludeDc2SetpieceEnemies;
-                IncludeDc2BossEnemies = _appSeed.Config.IncludeDc2BossEnemies;
-                Dc2EnemyModeIndex = _appSeed.Config.Dc2EnemyMode == Dc2EnemyDistributionMode.Fixed ? 1 : 0;
-                SelectedDc2FixedSpecies = Dc2FixedSpeciesOptions
-                    .FirstOrDefault(o => o.Type == _appSeed.Config.Dc2FixedSpeciesType)
-                    ?? Dc2FixedSpeciesOptions[0];
-                var effWeights = Dc2Distribution.EffectiveWeights(_appSeed.Config.Dc2SpeciesWeights);
-                foreach (var row in Dc2WeightOptions)
-                    row.Weight = effWeights.GetValueOrDefault(row.Type);
-                Dc2CharacterSkinIndex = (int)_appSeed.Config.Dc2CharacterSkin;
-                Dc2ReginaSkinIndex = (int)_appSeed.Config.Dc2ReginaSkin;
-                Dc2RandomizeRaptorTiers = _appSeed.Config.Dc2RandomizeRaptorTiers;
-                Dc2ShuffleShop = _appSeed.Config.Dc2ShuffleShop;
-                Dc2RandomizePuzzles = _appSeed.Config.Dc2RandomizePuzzles;
-                Dc2RandomizeStartWeapon = _appSeed.Config.Dc2RandomizeStartWeapon;
-                Dc2AddAndEquipStartWeapon = _appSeed.Config.Dc2AddAndEquipStartWeapon;
-                Dc2DylanStartWeaponIndex = _appSeed.Config.Dc2DylanStartWeaponId is { } dId
-                    ? Array.IndexOf(Dc2StartingLoadoutPatch.SelectableDylanIds, dId) + 1 : 0;
-                Dc2ReginaStartWeaponIndex = _appSeed.Config.Dc2ReginaStartWeaponId is { } rId
-                    ? Array.IndexOf(Dc2StartingLoadoutPatch.SelectableReginaIds, rId) + 1 : 0;
-                Dc2BlueRaptorCombo = _appSeed.Config.Dc2BlueRaptorComboThreshold;
-                Dc2RaptorColourModeIndex = (int)_appSeed.Config.Dc2RaptorColourMode;
-                var effTierWeights = Dc2RaptorTiers.EffectiveWeights(_appSeed.Config.Dc2RaptorTierWeights);
-                foreach (var row in Dc2RaptorTierOptions)
-                    row.Weight = effTierWeights.GetValueOrDefault(row.Type);
-                RandomizeDoors = _appSeed.Config.RandomizeDoors;
-                ShuffleKeyItems = _appSeed.Config.ShuffleKeyItems;
-                ShortenCutscenes = _appSeed.Config.ShortenCutscenes;
-                Dc2DoorSkip = _appSeed.Config.Dc2DoorSkip;
-                RandomizeStartingInventory = _appSeed.Config.RandomizeStartingInventory;
-                Difficulty = Math.Round(_appSeed.Config.EnemyDifficulty * 31);
-
-                ReplaceItemPool = _appSeed.Config.ReplaceItemPool;
-                Ammo = _appSeed.Config.RatioAmmo;
-                Health = _appSeed.Config.RatioHealth;
-                int ammoQtyLevel = _appSeed.Config.AmmoQuantity - _appSeed.Config.AmmoReduction;
-                AmmoQuantity = Math.Clamp(AmmoQuantityCenter + ammoQtyLevel, 0, AmmoQuantityCenter * 2);
-                WeaponUpgrade = Math.Round(_appSeed.Config.WeaponUpgradeChance * 15);
-                UpdateRatioVanillaHint();
-                PreUpgradedWeapons = _appSeed.Config.PreUpgradedWeaponChance > 0;
-
-                var families = _appSeed.Config.EnabledWeaponFamilies;
-                WeaponHandgun = families.HasFlag(WeaponFamily.Handgun);
-                WeaponShotgun = families.HasFlag(WeaponFamily.Shotgun);
-                WeaponGrenade = families.HasFlag(WeaponFamily.GrenadeGun);
-
-                // ReplacePoolVisible / ItemRatiosVisible / CustomSupply* recompute off the properties above.
-                PieDataChanged?.Invoke();
-            }
-            finally
-            {
-                _suspend = false;
-            }
-        }
-
-        /// <summary>The weight-slider rows as a config override map — <c>null</c> when every row sits
-        /// on its curated default, so an untouched UI produces a default (block-free) seed.</summary>
-        private IReadOnlyDictionary<int, byte> CollectDc2Weights()
-        {
-            bool allDefault = Dc2WeightOptions.All(r =>
-                (byte)Math.Round(r.Weight) == Dc2Distribution.DefaultWeights.GetValueOrDefault(r.Type));
-            return allDefault
-                ? null
-                : Dc2WeightOptions.ToDictionary(r => r.Type, r => (byte)Math.Round(r.Weight));
-        }
-
-        /// <summary>Raptor-tier rows as a config override map — <c>null</c> on all-default rows,
-        /// same contract as <see cref="CollectDc2Weights"/>.</summary>
-        private IReadOnlyDictionary<int, byte> CollectDc2RaptorTierWeights()
-        {
-            bool allDefault = Dc2RaptorTierOptions.All(r =>
-                (byte)Math.Round(r.Weight) == Dc2RaptorTiers.DefaultWeights.GetValueOrDefault(r.Type));
-            return allDefault
-                ? null
-                : Dc2RaptorTierOptions.ToDictionary(r => r.Type, r => (byte)Math.Round(r.Weight));
-        }
-
-        private void UpdateSeedFromUi()
-        {
-            if (_suspend)
-                return;
-
-            var voicesOn = IsVoicesChecked == true;
-            var voiceDonors = CollectVoiceDonors();
-
-            var config = new RandomizerConfig
-            {
-                RandomizeItems = RandomizeItems,
-                RandomizeEnemies = RandomizeEnemies,
-                IncludeDc2SetpieceEnemies = IncludeDc2SetpieceEnemies,
-                IncludeDc2BossEnemies = IncludeDc2BossEnemies,
-                Dc2AllowWaterLevelEnemySwaps = Dc2AllowWaterLevelEnemySwaps,
-                Dc2EnemyMode = Dc2EnemyModeIndex == 1
-                    ? Dc2EnemyDistributionMode.Fixed : Dc2EnemyDistributionMode.Weighted,
-                Dc2FixedSpeciesType = Dc2EnemyModeIndex == 1 ? SelectedDc2FixedSpecies?.Type : null,
-                Dc2SpeciesWeights = CollectDc2Weights(),
-                Dc2CharacterSkin = (Dc2CharacterSkin)Dc2CharacterSkinIndex,
-                Dc2ReginaSkin = (Dc2CharacterSkin)Dc2ReginaSkinIndex,
-                Dc2RandomizeRaptorTiers = Dc2RandomizeRaptorTiers,
-                Dc2ShuffleShop = Dc2ShuffleShop,
-                Dc2RandomizePuzzles = Dc2RandomizePuzzles,
-                Dc2RandomizeStartWeapon = Dc2RandomizeStartWeapon,
-                Dc2AddAndEquipStartWeapon = Dc2AddAndEquipStartWeapon,
-                Dc2DylanStartWeaponId = Dc2DylanStartWeaponIndex > 0
-                    ? Dc2StartingLoadoutPatch.SelectableDylanIds[Dc2DylanStartWeaponIndex - 1] : null,
-                Dc2ReginaStartWeaponId = Dc2ReginaStartWeaponIndex > 0
-                    ? Dc2StartingLoadoutPatch.SelectableReginaIds[Dc2ReginaStartWeaponIndex - 1] : null,
-                Dc2RaptorTierWeights = CollectDc2RaptorTierWeights(),
-                Dc2RaptorColourMode = (Dc2RaptorColourMode)Dc2RaptorColourModeIndex,
-                Dc2BlueRaptorComboThreshold = (int)Math.Round(Dc2BlueRaptorCombo),
-                RandomizeDoors = RandomizeDoors,
-                ShuffleKeyItems = ShuffleKeyItems,
-                // Scatter (into ammo/health pickups) and DDK disc relocation ride on the key shuffle — no
-                // separate GUI toggles; "Shuffle Key Items" turns on all three key-shuffle behaviors.
-                // PROGRESSION-KEY-RELOCATION-RESEARCH.md / KEY-ITEM-SCATTER-DATA-AUDIT.md.
-                ShuffleKeyItemsIntoPickups = ShuffleKeyItems,
-                RelocateDdkDiscs = ShuffleKeyItems,
-                AvoidHiddenPickupSpots = AvoidHiddenPickupSpots,
-                // Session-only (not seed-encoded): the cutscene shorten lever (DC1, experimental) and the
-                // REbirth DoorSkip ini passthrough (DC2). Both are lost on seed paste by design.
-                ShortenCutscenes = ShortenCutscenes && CanShortenCutscenes,
-                Dc2DoorSkip = Dc2DoorSkip,
-                RandomizeStartingInventory = RandomizeStartingInventory,
-                RandomizeVoices = voicesOn,
-                IncludeCrossGameVoices = CrossGameVoices,
-                VoicePacksRoot = string.IsNullOrWhiteSpace(VoicePacksRoot) ? null : VoicePacksRoot.Trim(),
-                VoiceDonors = voiceDonors.Count > 0 ? voiceDonors : null,
-                RandomizeBgm = ImportBgm && CanImportBgm,
-                BgmPacksRoot = string.IsNullOrWhiteSpace(BgmPacksRoot) ? null : BgmPacksRoot.Trim(),
-                EnemyDifficulty = Difficulty / 31.0,
-                ReplaceItemPool = ReplaceItemPool,
-                RatioAmmo = (byte)Ammo,
-                RatioHealth = (byte)Health,
-                AmmoQuantity = (byte)Math.Clamp((int)Math.Round(AmmoQuantity) - AmmoQuantityCenter, 0, AmmoQuantityCenter),
-                AmmoReduction = (byte)Math.Clamp(AmmoQuantityCenter - (int)Math.Round(AmmoQuantity), 0, AmmoQuantityCenter),
-                WeaponUpgradeChance = WeaponUpgrade / 15.0,
-                PreUpgradedWeaponChance = PreUpgradedWeapons ? 0.13 : 0.0,
-                EnabledWeaponFamilies =
-                    (WeaponHandgun ? WeaponFamily.Handgun : WeaponFamily.None) |
-                    (WeaponShotgun ? WeaponFamily.Shotgun : WeaponFamily.None) |
-                    (WeaponGrenade ? WeaponFamily.GrenadeGun : WeaponFamily.None),
-            };
-            // Derive the no-toggle flags (NormalizePickupVisuals) from the options just built.
-            ApplyDerivedFlags(config);
-            // Voice donor settings are shared across games (cross-game datapacks).
-            _settings.VoicePacksRoot = config.VoicePacksRoot;
-            _settings.BgmPacksRoot = config.BgmPacksRoot;
-            _settings.RandomizeCutsceneVoices = config.RandomizeVoices;
-            _settings.IncludeCrossGameVoices = config.IncludeCrossGameVoices;
-            _settings.VoiceDonors = voiceDonors.Count > 0 ? voiceDonors : null;
-            _appSeed = _appSeed.WithConfig(config);
-            UpdateUiFromSeed();
-        }
-
-        private static AppSeed NormalizeSeed(AppSeed seed)
-        {
-            var config = seed.Config;
-            bool changed = config.NormalizeRatios();
-            changed |= ApplyDerivedFlags(config);
-            return changed ? seed.WithConfig(config) : seed;
-        }
-
-        /// <summary>Apply the config flags the GUI DERIVES rather than exposes as their own control, so
-        /// <see cref="CurrentConfig"/> is consistent no matter how the config was set (option toggle or a
-        /// pasted share-seed). Returns whether anything changed.
-        ///
-        /// <para><b>NormalizePickupVisuals</b> (Lever A, PICKUP-GROUND-MODEL-FEASIBILITY.md): on whenever ANY
-        /// item randomization runs — normal item pickups (<see cref="RandomizerConfig.RandomizeItems"/>) OR
-        /// key items (<see cref="RandomizerConfig.ShuffleKeyItems"/>) — so a relocated pickup never renders
-        /// as the wrong or an invisible item. It is not seed-encoded, so it must be re-derived here (a pasted
-        /// seed carries the two source flags, not this one).</para></summary>
-        private static bool ApplyDerivedFlags(RandomizerConfig config)
-        {
-            bool normalize = config.RandomizeItems || config.ShuffleKeyItems;
-            if (config.NormalizePickupVisuals == normalize) return false;
-            config.NormalizePickupVisuals = normalize;
-            return true;
-        }
-
-        private void UpdateRatioVanillaHint()
-        {
-            int ammo = _appSeed.Config.RatioAmmo, health = _appSeed.Config.RatioHealth;
-            if (ammo == health)
-            {
-                RatioVanillaText = "✓ Vanilla mix — equal bias keeps the game's own ammo/health split.";
-                RatioVanillaBrush = Brushes.SeaGreen;
-            }
-            else
-            {
-                RatioVanillaText = ammo > health ? "Biased toward ammo." : "Biased toward health.";
-                RatioVanillaBrush = Brushes.Gray;
-            }
-        }
-
-        [RelayCommand]
-        private void Randomize()
-        {
-            _appSeed = _appSeed.WithNewSeed();
-            UpdateUiFromSeed();
-        }
-
-        [RelayCommand]
-        private async Task Copy()
-        {
-            // Avalonia 12 clipboard is data-format based (the old SetTextAsync was removed).
-            try { if (_clipboard() is { } cb) await cb.SetValueAsync(DataFormat.Text, _appSeed.ToString()); }
-            catch { /* clipboard can be transiently locked; ignore */ }
-        }
-
-        [RelayCommand]
-        private async Task Paste()
-        {
-            try
-            {
-                var text = _clipboard() is { } cb ? await cb.TryGetTextAsync() : null;
-                if (!string.IsNullOrWhiteSpace(text))
-                    SeedText = text.Trim();   // change-hook parses it, exactly like the old TextChanged
-            }
-            catch { }
-        }
-
-        // --- Starting-inventory editor -----------------------------------------
-
-        private static readonly (int Id, string Name)[] SupplyItems =
-        {
-            (0x10, "SG Bullets"), (0x11, "Slag Bullets"), (0x12, "An. Darts S"), (0x13, "An. Darts M"),
-            (0x14, "An. Darts L"), (0x15, "Poison Dart"), (0x16, "9mm Parabellum"), (0x17, "40S&W Bullets"),
-            (0x18, "Grenade Bullets"), (0x19, "Heat Bullets"), (0x1A, "inf. Grenades"), (0x1B, "Hemostat"),
-            (0x1C, "Med. Pak S"), (0x1D, "Med. Pak M"), (0x1E, "Med. Pak L"), (0x1F, "Resuscitation"),
-            (0x20, "An. Aid"), (0x21, "Recovery Aid"), (0x22, "Intensifier"), (0x23, "Multiplier"),
-        };
-
-        /// <summary>Placeholder shown in a game-specific list (voice donors, supply items, weapons) and the
-        /// voice section when the selected game doesn't support that option yet — instead of DC1's cast/items.
-        /// Public so the view can bind the voice-section placeholder line.</summary>
-        public string GameContentPlaceholder => $"— not available for {SelectedGame.DisplayName} yet —";
-
-        /// <summary>Rebuild the starting-inventory editor lists for the selected game. DC1 lists its real
-        /// weapons/items; a game without StartingInventory support (DC2 stub) shows a single placeholder.</summary>
-        private void BuildStartingInventoryEditor()
-        {
-            StartWeapons.Clear();
-            SupplyItemsList.Clear();
-
-            if (CanRandomizeStartingInventory)
-            {
-                StartWeapons.Add(new StartWeaponOption("Vanilla (Handgun)", null));
-                foreach (var (id, name) in new[] { (0x05, "Handgun (Glock 34)"), (0x01, "Shotgun"), (0x09, "Grenade Gun") })
-                    StartWeapons.Add(new StartWeaponOption(name, id));
-
-                SupplyItemsList.Add(new SupplyOption("(empty)", 0));
-                foreach (var (id, name) in SupplyItems)
-                    SupplyItemsList.Add(new SupplyOption($"{name} (0x{id:X2})", id));
-            }
-            else
-            {
-                StartWeapons.Add(new StartWeaponOption(GameContentPlaceholder, null));
-                SupplyItemsList.Add(new SupplyOption(GameContentPlaceholder, 0));
-            }
-
-            SelectedStartWeapon = StartWeapons[0];
-            SelectedItem0 = SelectedItem1 = SelectedItem2 = SupplyItemsList[0];
-        }
-
-        // Returns null when nothing changes the starting inventory (callers use `is { }`).
-        private StartingInventoryPlan BuildStartingInventoryPlan(RandomizerConfig config)
-        {
-            bool setWeapon = false; int? weaponId = null;
-            if (SelectedStartWeapon?.WeaponId is int wid)
-            {
-                setWeapon = true; weaponId = wid; config.StartingWeapons = new[] { wid };
-            }
-            else
-            {
-                config.StartingWeapons = null;
-            }
-
-            bool randomize = config.RandomizeStartingInventory;
-            var custom = new List<(int Id, int Count)>();
-            if (!randomize)
-                foreach (var (item, count) in new[]
-                         {
-                             (SelectedItem0, Count0), (SelectedItem1, Count1), (SelectedItem2, Count2),
-                         })
-                    if (item is { Id: var id } && id != 0)
-                        custom.Add((id, int.TryParse(count, out var c) && c >= 1 ? Math.Min(c, 255) : 1));
-
-            if (!setWeapon && custom.Count == 0 && !randomize)
-                return null;
-
-            return new StartingInventoryPlan(
-                RandomizeSupply: randomize,
-                CustomSupply: custom.Count > 0 ? custom : null,
-                SetWeapon: setWeapon,
-                WeaponId: weaponId);
-        }
-
-        // --- Randomize Cutscene Voices -----------------------------------------
-
-        private static readonly string[] VoiceTargets = { "regina", "rick", "gail", "kirk" };
-
-        [RelayCommand]
-        private async Task BrowseVoicePacks()
-        {
-            var path = await _filePicker.PickFolderAsync(new FolderPickerRequest(
-                "Select the folder holding the voice donor datapacks",
-                SuggestedStartPath: Directory.Exists(VoicePacksRoot) ? VoicePacksRoot : null));
-            if (path is not null)
-            {
-                VoicePacksRoot = path;
-                OnVoicePacksRootChanged();
-            }
-        }
-
-        // Called by the view's LostFocus glue and by the folder picker.
-        public void OnVoicePacksRootChanged()
-        {
-            PopulateVoiceDonors();
-            UpdateSeedFromUi();
-        }
-
-        [RelayCommand]
-        private async Task BrowseBgmPacks()
-        {
-            var path = await _filePicker.PickFolderAsync(new FolderPickerRequest(
-                "Select the folder holding the BGM datapacks (each with data/bgm/<tag>/*.ogg|wav)",
-                SuggestedStartPath: Directory.Exists(BgmPacksRoot) ? BgmPacksRoot : null));
-            if (path is not null)
-                BgmPacksRoot = path;
-        }
-
-        private void PopulateVoiceDonors()
-        {
-            // A game without voice support (DC2 stub) shows a single placeholder instead of DC1's donor
-            // cast; the voice-target rows themselves are hidden in the view (bound to CanRandomizeVoices).
-            if (!CanRandomizeVoices)
-            {
-                bool wasSusp = _suspend;
-                _suspend = true;
-                VoiceDonorOptions.Clear();
-                VoiceDonorOptions.Add(new DonorOption(GameContentPlaceholder, null));
-                SelectedDonorRegina = SelectedDonorRick = SelectedDonorGail =
-                    SelectedDonorKirk = SelectedDonorDylan = SelectedDonorDc2Regina =
-                    SelectedDonorDavid = SelectedDonorOldDylan = VoiceDonorOptions[0];
-                _suspend = wasSusp;
-                SetVoicePacksStatus(0);
-                return;
-            }
-
-            var allActors = VoiceDataPack.ListActors(VoicePacksRoot).ToList();
-            SetVoicePacksStatus(allActors.Count);
-
-            bool crossGame = CrossGameVoices;
-            var donors = allActors
-                .Where(a => crossGame || string.Equals(a.Game, SelectedGame.Id, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(a => a.Actor, StringComparer.OrdinalIgnoreCase)
-                .ThenBy(a => a.Game, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            // Capture the previous selection (current pick, else the persisted pin) before the rebuild.
-            string prevRegina = PreviousDonorTag(SelectedDonorRegina, "regina");
-            string prevRick = PreviousDonorTag(SelectedDonorRick, "rick");
-            string prevGail = PreviousDonorTag(SelectedDonorGail, "gail");
-            string prevKirk = PreviousDonorTag(SelectedDonorKirk, "kirk");
-            string prevDylan = PreviousDonorTag(SelectedDonorDylan, "dylan");
-            string prevDc2Regina = PreviousDonorTag(SelectedDonorDc2Regina, "regina");
-            string prevDavid = PreviousDonorTag(SelectedDonorDavid, "david");
-            string prevOldDylan = PreviousDonorTag(SelectedDonorOldDylan, "old-dylan");
-
-            bool wasSuspended = _suspend;
-            _suspend = true;
-            try
-            {
-                VoiceDonorOptions.Clear();
-                VoiceDonorOptions.Add(new DonorOption("Default (keep own voice)", null));
-                VoiceDonorOptions.Add(new DonorOption("Random", RandomDonorTag));
-                foreach (var (actor, game) in donors)
-                    VoiceDonorOptions.Add(new DonorOption(
-                        $"{actor} ({game})", $"{actor}.{game}".ToLowerInvariant()));
-
-                SelectedDonorRegina = SelectDonor(prevRegina);
-                SelectedDonorRick = SelectDonor(prevRick);
-                SelectedDonorGail = SelectDonor(prevGail);
-                SelectedDonorKirk = SelectDonor(prevKirk);
-                SelectedDonorDylan = SelectDonor(prevDylan);
-                SelectedDonorDc2Regina = SelectDonor(prevDc2Regina);
-                SelectedDonorDavid = SelectDonor(prevDavid);
-                SelectedDonorOldDylan = SelectDonor(prevOldDylan);
-            }
-            finally
-            {
-                _suspend = wasSuspended;
-            }
-        }
-
-        private string PreviousDonorTag(DonorOption current, string target)
-        {
-            if (current is not null)
-                return current.Tag;
-            return _settings.VoiceDonors is { } d && d.TryGetValue(target, out var saved) ? saved : null;
-        }
-
-        private DonorOption SelectDonor(string tag)
-            => VoiceDonorOptions.FirstOrDefault(
-                   o => string.Equals(o.Tag, tag, StringComparison.OrdinalIgnoreCase))
-               ?? VoiceDonorOptions[0];
-
-        private void SetVoicePacksStatus(int count)
-        {
-            if (string.IsNullOrWhiteSpace(VoicePacksRoot))
-            {
-                VoicePacksValidationText = "";
-                return;
-            }
-            if (count > 0)
-            {
-                VoicePacksValidationText = $"✓ Found {count} character voice packs.";
-                VoicePacksValidationBrush = Brushes.Green;
-            }
-            else
-            {
-                VoicePacksValidationText =
-                    "No character voice packs (data/voice/<actor>.<game>/) found under this folder.";
-                VoicePacksValidationBrush = Brushes.Red;
-            }
-        }
-
-        private Dictionary<string, string> CollectVoiceDonors()
-        {
-            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            // Only the active game's cast is collected, so a DC1 pin never leaks into a DC2 config.
-            var picks = SelectedGame.Id == "dc2"
-                ? new[]
-                {
-                    ("dylan", SelectedDonorDylan), ("regina", SelectedDonorDc2Regina),
-                    ("david", SelectedDonorDavid), ("old-dylan", SelectedDonorOldDylan),
-                }
-                : new[]
-                {
-                    ("regina", SelectedDonorRegina), ("rick", SelectedDonorRick),
-                    ("gail", SelectedDonorGail), ("kirk", SelectedDonorKirk),
-                };
-            foreach (var (target, pick) in picks)
-                if (pick?.Tag is { Length: > 0 } donor)
-                    map[target] = donor;
-            return map;
-        }
-
-        // --- Game / output paths -----------------------------------------------
-
-        [RelayCommand]
-        private async Task BrowseGame()
-        {
-            var initialDir = ResolveGameDir(GamePath);
-            var request = BuildExecutablePickerRequest(
-                SelectedGame, Directory.Exists(initialDir) ? initialDir : null);
-            var path = await _filePicker.PickFileAsync(request);
-            if (path is not null)
-            {
-                GamePath = path;
-                ValidateGamePath();
-            }
-        }
-
-        /// <summary>The "Browse for game executable" picker request for a game — titled and filtered to
-        /// that game's <see cref="GameDefinition.ExecutableName"/> (DC1 DINO.exe / DC2 Dino2.exe), so
-        /// selecting DC2 asks for Dino2.exe, not DINO.exe. Pure (no picker call) for unit testing.</summary>
-        public static FilePickerRequest BuildExecutablePickerRequest(GameDefinition game, string suggestedStartPath)
-        {
-            var exe = game.ExecutableName;
-            return new FilePickerRequest(
-                $"Select the {game.DisplayName} executable ({exe})",
-                FileTypes: new[]
-                {
-                    new FilePickerFileFilter($"{game.DisplayName} executable ({exe})", new[] { exe }),
-                    new FilePickerFileFilter("Executable files (*.exe)", new[] { "*.exe" }),
-                    new FilePickerFileFilter("All files (*.*)", new[] { "*" }),
-                },
-                SuggestedStartPath: suggestedStartPath);
-        }
-
-        private static string ResolveGameDir(string pathOrExe)
-        {
-            if (string.IsNullOrWhiteSpace(pathOrExe))
-                return pathOrExe ?? "";
-            try
-            {
-                if (File.Exists(pathOrExe))
-                    return Path.GetDirectoryName(pathOrExe) ?? pathOrExe;
-            }
-            catch { }
-            return pathOrExe;
-        }
-
-        // Called by the view's LostFocus glue.
-        public void ValidateGamePath()
-        {
-            var raw = GamePath;
-            var folder = ResolveGameDir(raw);
-            try
-            {
-                if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
-                {
-                    GameValidationText = "Game folder / executable not found.";
-                    GameValidationBrush = Brushes.Red;
-                    _gameDrmProtected = false;
-                    RefreshInstallStatus();
-                    return;
-                }
-
-                var detection = InspectGameExe(raw);
-                if (detection.IsProtected)
-                {
-                    _gameDrmProtected = true;
-                    GameValidationText = "⛔ DRM-protected game (Steam/Enigma) — DinoRand cannot modify it. " +
-                                         "Use the DRM-free executable (Classic REbirth / GOG).";
-                    GameValidationBrush = Brushes.Red;
-                    RefreshInstallStatus();
-                    return;
-                }
-                _gameDrmProtected = false;
-
-                var rooms = SelectedGame.EnumerateRooms(folder);
-                if (rooms.Count > 0)
-                {
-                    GameValidationText = "✓ Game files found — ready to randomize.";
-                    GameValidationBrush = Brushes.Green;
-                }
-                else
-                {
-                    GameValidationText = "No Dino Crisis room files (st*.dat) found under this folder.";
-                    GameValidationBrush = Brushes.Red;
-                }
-            }
-            catch (Exception ex)
-            {
-                GameValidationText = ex.Message;
-                GameValidationBrush = Brushes.Red;
-            }
-            RefreshInstallStatus();
-        }
-
-        // --- Install / restore -------------------------------------------------
-        // (The standalone "Generate" command was removed — "Install to Game" regenerates via the same
-        //  runners and the runner still writes SPOILER.md, so no generate-only path is needed.)
-
-        private string CurrentDataDir() => ResolveDataDir(SelectedGame, GamePath);
-
-        /// <summary>Resolve the game's <c>Data\</c> directory for the given install path using the
-        /// <b>selected</b> game's resolver (DC1 → <c>english\Data</c>, DC2 → <c>rebirth\Data</c>), so the
-        /// backup folder (<c>&lt;dataDir&gt;\.dinorand_backup</c>) and install status are per-game and don't
-        /// collide. Pure for unit testing; <c>""</c> when nothing resolves. Was hardcoded to DC1.</summary>
-        public static string ResolveDataDir(GameDefinition game, string gamePath)
-        {
-            try
-            {
-                var folder = ResolveGameDir(gamePath);
-                return string.IsNullOrWhiteSpace(folder) ? "" : game.GetDataDir(folder) ?? "";
-            }
-            catch { return ""; }
-        }
-
-        /// <summary>The game executable that belongs to a resolved <c>Data\</c> dir — its sibling in the
-        /// game root (parent of <c>Data\</c>). A DC2 install ships a <c>Dino2.exe</c> in each of
-        /// <c>english/</c>, <c>japanese/</c> and <c>rebirth/</c>; this returns the one matching the resolved
-        /// data branch so the DRM check inspects the same build the installer would touch (not an arbitrary
-        /// recursive hit). <c>null</c> when no such exe exists. Pure for unit testing.</summary>
-        public static string LocateExeForDataDir(string dataDir, string exeName)
-        {
-            if (string.IsNullOrWhiteSpace(dataDir))
-                return null;
-            var gameRoot = Path.GetDirectoryName(
-                dataDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-            if (string.IsNullOrEmpty(gameRoot))
-                return null;
-            var candidate = Path.Combine(gameRoot, exeName);
-            return File.Exists(candidate) ? candidate : null;
-        }
-
-        /// <summary>The exe "Play" launches: the SELECTED game's executable, preferring the build beside the
-        /// resolved Data dir (so with DC2's english/japanese/rebirth copies present we launch the same build
-        /// the installer targets), falling back to a recursive search.</summary>
-        private string? ResolvePlayExe() =>
-            LocateExeForDataDir(CurrentDataDir(), SelectedGame.ExecutableName)
-            ?? GameInstaller.FindGameExe(GamePath, SelectedGame.ExecutableName);
-
-        private ExeProtectionResult InspectGameExe(string gamePathOrExe)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(gamePathOrExe))
-                    return ExeProtectionResult.Clean;
-
-                // Inspect the SELECTED game's executable (DC1 DINO.exe / DC2 Dino2.exe), so a DRM-wrapped
-                // (Enigma) DC2 Dino2.exe is detected too. ExeProtection.Inspect(path) names the file itself.
-                var exeName = SelectedGame.ExecutableName;
-
-                if (File.Exists(gamePathOrExe) &&
-                    string.Equals(Path.GetFileName(gamePathOrExe), exeName, StringComparison.OrdinalIgnoreCase))
-                    return ExeProtection.Inspect(gamePathOrExe);
-
-                // Prefer the exe beside the resolved Data dir, so with multiple build/language copies
-                // present (DC2's english/japanese/rebirth) we inspect the build matching the data branch.
-                var aligned = LocateExeForDataDir(ResolveDataDir(SelectedGame, gamePathOrExe), exeName);
-                if (aligned is not null)
-                    return ExeProtection.Inspect(aligned);
-
-                // Fallback: first matching exe anywhere under the folder (e.g. an unusual layout).
-                var folder = ResolveGameDir(gamePathOrExe);
-                if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
-                    return ExeProtectionResult.Clean;
-                var exePath = Directory
-                    .EnumerateFiles(folder, exeName, SearchOption.AllDirectories)
-                    .FirstOrDefault();
-                return exePath is null ? ExeProtectionResult.Clean : ExeProtection.Inspect(exePath);
-            }
-            catch { return ExeProtectionResult.Clean; }
-        }
-
-        private void UpdateInstallButtons()
-        {
-            var dataDir = CurrentDataDir();
-            CanInstall = !_gameDrmProtected && dataDir.Length > 0;
-            CanRestore = !_gameDrmProtected && dataDir.Length > 0 && GameInstaller.IsInstalled(dataDir);
-            CanPlay = !_gameDrmProtected && ResolvePlayExe() is not null;
-        }
-
-        private void RefreshInstallStatus()
-        {
-            UpdateInstallButtons();
-            var dataDir = CurrentDataDir();
-            if (dataDir.Length == 0)
-            {
-                InstallStatusText = "";
-            }
-            else if (GameInstaller.IsInstalled(dataDir))
-            {
-                var manifest = GameInstaller.ReadManifest(dataDir);
-                InstallStatusBrush = Brushes.Green;
-                InstallStatusText = manifest?.Seed is { } s
-                    ? $"Installed: seed {s}"
-                    : "Installed (originals backed up)";
-            }
-            else if (GameInstaller.HasBackup(dataDir))
-            {
-                InstallStatusBrush = null;
-                InstallStatusText = "Not installed — originals are backed up and kept for reuse.";
-            }
-            else
-            {
-                InstallStatusBrush = null;
-                InstallStatusText = "Not installed.";
-            }
-        }
-
-        [RelayCommand]
-        private async Task Install()
-        {
-            if (_gameDrmProtected)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = "DRM-protected game (Steam/Enigma) — DinoRand cannot install to it.";
-                return;
-            }
-            var game = SelectedGame;
-            if (!game.IsImplemented)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = $"⛔ {game.DisplayName} is experimental — not yet supported.";
-                return;
-            }
-            var dataDir = CurrentDataDir();
-            if (dataDir.Length == 0)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = "Set a valid game folder first.";
-                return;
-            }
-
-            bool firstInstall = !GameInstaller.HasBackup(dataDir);
-            var confirm = await _dialogs.ConfirmAsync(
-                "Install to Game",
-                "DinoRand will overlay the randomized rooms onto the game's Data folder"
-                + (firstInstall
-                    ? ", backing up your original files first to a backup folder that is kept for reuse."
-                    : " (your original files are already backed up and will be reused).")
-                + "\n\nThis is reversible at any time with “Restore Originals”. Close the game first if it's running."
-                + "\n\nProceed with install?");
-            if (!confirm)
-                return;
-
-            CanInstall = false;
-            CanRestore = false;
-            IsBusy = true;
-            InstallStatusBrush = null;
-            InstallStatusText = "Generating and installing…";
-            try
-            {
-                var gamePath = ResolveGameDir(GamePath);
-                var outPath = WorkingModDir;
-                var seed = _appSeed.Seed;
-                var config = _appSeed.Config;
-
-                // DC2: route to its runner (non-destructive → outPath), overlay via GameInstaller (the same
-                // .dinorand_backup contract as DC1, reversed by Restore), then apply the ddraw MotionTrail
-                // wrapper fix in place (best-effort). DC2 has no DINO.exe, so the DC1 BGM/box/inventory EXE
-                // patches below never apply — this branch returns before them. docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.
-                if (game is DinoCrisis2 dc2)
-                {
-                    var (ir2, trailNote) = await Task.Run(() =>
-                    {
-                        var runRes = new Dc2RandomizerRunner(dc2).Run(gamePath, outPath, seed, config);
-                        // Scope the overlay to THIS run's output so a stale/foreign *.dat left in the
-                        // reused mod dir is never installed (docs/decisions/dc2/install/DC2-INSTALL-INTEGRITY-PLAN.md).
-                        var res = GameInstaller.Install(dataDir, outPath, seed.ToString(), runRes.WrittenFiles);
-                        string tn = "";
-                        if (config.FixDc2MotionTrail)
-                            try { tn = $" {Dc2MotionTrailInstaller.Apply(gamePath)}"; }
-                            catch (Exception tex) { tn = $" (motion-trail fix skipped: {tex.Message})"; }
-                        // REbirth DoorSkip passthrough (K115): one config.ini [DLL] key, best-effort.
-                        // Restore does NOT undo it — flip the key back in config.ini / the REbirth launcher.
-                        if (config.Dc2DoorSkip)
-                        {
-                            try
-                            {
-                                tn += Dc2DoorSkipInstaller.Apply(gamePath)
-                                    ? " door-skip:on" : " (door-skip: config.ini not found)";
-                            }
-                            catch (Exception dex) { tn += $" (door-skip skipped: {dex.Message})"; }
-                        }
-                        // Character skin: the WP graft files are in the overlay; the exe gate patch
-                        // makes them load (docs/reference/dc2/models/DC2-EXTRA-CRISIS-ROSTER-DECODE.md §9).
-                        if (config.Dc2CharacterSkin != Dc2CharacterSkin.Stock
-                            || config.Dc2ReginaSkin != Dc2CharacterSkin.Stock)
-                        {
-                            try { tn += $" skin-gate:{Dc2CharacterSkinInstaller.Apply(gamePath)}"; }
-                            catch (Exception sex) { tn += $" (skin gate patch skipped: {sex.Message})"; }
-                            // Classic REbirth installs play SFX from CR\data\<pkg>\snd.wbk, not the
-                            // CORE SOUND bank — swap those too so the voice follows the skin.
-                            try
-                            {
-                                tn += $" voice:{Dc2CharacterSkinInstaller.ApplyCrWavebanks(gamePath,
-                                    Dc2PlayerModelSwap.ResolveSkin(config.Dc2CharacterSkin, seed),
-                                    Dc2PlayerModelSwap.ResolveSkin(config.Dc2ReginaSkin, seed, "dc2-regina-skin"))}";
-                            }
-                            catch (Exception vex) { tn += $" (CR voice swap skipped: {vex.Message})"; }
-                        }
-                        // Raptor tiers: room-file edits are in the overlay; the wave pair table +
-                        // blue-raptor combo threshold are exe patches (docs/reference/dc2/enemies/RAPTOR-TIER-RE.md §4).
-                        if (config.Dc2RandomizeRaptorTiers
-                            || config.Dc2BlueRaptorComboThreshold != DinoRand.FileFormats.Exe.Dc2RaptorPatch.VanillaComboThreshold)
-                        {
-                            try { tn += $" raptor-tiers:{Dc2RaptorTierInstaller.Apply(gamePath, seed, config)}"; }
-                            catch (Exception rex) { tn += $" (raptor tier exe patch skipped: {rex.Message})"; }
-                        }
-                        // Killable injected T-Rex: auto-applied whenever the run can spawn a T-Rex
-                        // (boss enemies / fixed-T-Rex pin), so a randomized T-Rex dies normally while the
-                        // vanilla boss rooms ST200/ST903 stay untouched (docs/decisions/dc2/enemies/DC2-TREX-KILLABLE-LEVER-PLAN.md).
-                        if (Dc2TrexKillableInstaller.WantedFor(config))
-                        {
-                            try { tn += $" trex-killable:{Dc2TrexKillableInstaller.Apply(gamePath, restore: false)}"; }
-                            catch (Exception tex) { tn += $" (killable-T-Rex exe patch skipped: {tex.Message})"; }
-                        }
-                        // In-bounds Mosasaurus grab: auto-applied whenever the run can inject an E80
-                        // (water-level swaps / fixed-mosa pin), so its grab no longer launches the player
-                        // out of bounds in land rooms while ST700/702/703/704 stay untouched
-                        // (docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md).
-                        if (Dc2MosaGrabSuppressInstaller.WantedFor(config))
-                        {
-                            try { tn += $" mosa-no-grab:{Dc2MosaGrabSuppressInstaller.Apply(gamePath, restore: false)}"; }
-                            catch (Exception mex) { tn += $" (mosa-no-grab exe patch skipped: {mex.Message})"; }
-                        }
-                        // Killable injected Triceratops: auto-applied whenever the run can inject an E70
-                        // (setpiece enemies / fixed-Triceratops pin), remapping its out-of-range death
-                        // animation index so it dies instead of crashing (RCA §7b).
-                        if (Dc2TriceratopsKillableInstaller.WantedFor(config))
-                        {
-                            try { tn += $" triceratops-killable:{Dc2TriceratopsKillableInstaller.Apply(gamePath, restore: false)}"; }
-                            catch (Exception cex) { tn += $" (killable-Triceratops exe patch skipped: {cex.Message})"; }
-                        }
-                        // Inostra spawn guard: a NULL-cursor guard on the shared PSX-recompiled emergence
-                        // emitter's tick driver. Auto-applied for ANY cross-species run — byte-identical
-                        // when the emitter is armed, so it only ever no-ops the un-armed crash path an
-                        // injected donor can trigger (docs/decisions/dc2/crash-rcas/DC2-INOSTRA-SPAWN-DESCRIPTOR-NULL-RCA.md).
-                        if (Dc2InostraSpawnGuardInstaller.WantedFor(config))
-                        {
-                            try { tn += $" inostra-spawn-guard:{Dc2InostraSpawnGuardInstaller.Apply(gamePath, restore: false)}"; }
-                            catch (Exception iex) { tn += $" (inostra-spawn-guard exe patch skipped: {iex.Message})"; }
-                        }
-                        // Shop shuffle: prices + stock-unlock masks inside Dino2.exe (shared .bak
-                        // contract, so the Restore button's full-exe restore reverts it too).
-                        if (config.Dc2ShuffleShop)
-                        {
-                            try { tn += $" shop:{Dc2ShopShuffleInstaller.Apply(gamePath, seed.Value)}"; }
-                            catch (Exception shex) { tn += $" (shop shuffle skipped: {shex.Message})"; }
-                        }
-                        // Elevator puzzle-code scramble: candidate imm32 table inside Dino2.exe (shared
-                        // .bak contract, so the Restore button's full-exe restore reverts it too).
-                        if (config.Dc2ScramblePuzzleCodes)
-                        {
-                            try { tn += $" puzzle-codes:{Dc2PuzzleCodeScrambleInstaller.Apply(gamePath, seed.Value)}"; }
-                            catch (Exception pcex) { tn += $" (puzzle-code scramble skipped: {pcex.Message})"; }
-                        }
-                        // Starting main weapon: bootstrap equip-immediate exe patch (shared .bak
-                        // contract, so the Restore button's full-exe restore reverts it too).
-                        if (config.Dc2RandomizeStartWeapon)
-                        {
-                            try
-                            {
-                                tn += $" start-weapon:{Dc2StartingLoadoutInstaller.Apply(gamePath, seed.Value,
-                                    config.Dc2DylanStartWeaponId, config.Dc2ReginaStartWeaponId,
-                                    addAndEquip: config.Dc2AddAndEquipStartWeapon)}";
-                            }
-                            catch (Exception swex) { tn += $" (start weapon skipped: {swex.Message})"; }
-                        }
-                        return (res, tn);
-                    });
-                    InstallStatusBrush = Brushes.Green;
-                    InstallStatusText = $"✓ Seed installed correctly.{trailNote} Restore to undo.";
-                    CurrentSlice.GamePath = GamePath;
-                    CurrentSlice.LastSeed = _appSeed.ToString();
-                    _settings.Save();
-                    return;
-                }
-
-                var shuffleBgm = ShuffleBgm;
-                var randomizeBoxes = RandomizeBoxes;
-                var boxReroll = BoxModeIndex == 1;
-                var scramblePuzzleCodes = ScramblePuzzleCodes;
-                var startInvPlan = BuildStartingInventoryPlan(config);
-                var (ir, bgmNote, bgmFailed, boxNote, boxFailed) = await Task.Run(() =>
-                {
-                    new RandomizerRunner(game).Run(gamePath, outPath, seed, config);
-                    var res = GameInstaller.Install(dataDir, outPath, seed.ToString());
-
-                    var (bn, bf) = ("", false);
-                    if (shuffleBgm)
-                        try
-                        {
-                            GameInstaller.PatchExeShuffleBgm(dataDir, seed.Value, seed.ToString());
-                            bn = "music shuffled (heard after the next launch)";
-                        }
-                        catch (IOException) { bn = "music NOT shuffled — DINO.exe is locked; close the game and re-install"; bf = true; }
-                        catch (Exception bex) { bn = $"music NOT shuffled — {bex.Message}"; bf = true; }
-
-                    var (xn, xf) = ("", false);
-                    if (randomizeBoxes)
-                        try
-                        {
-                            if (boxReroll) GameInstaller.PatchExeRerollBoxes(dataDir, seed.Value, seed.ToString());
-                            else GameInstaller.PatchExeShuffleBoxes(dataDir, seed.Value, seed.ToString());
-                            xn = (boxReroll ? "boxes rerolled" : "boxes shuffled") + " (seen after the next launch)";
-                        }
-                        catch (IOException) { xn = "boxes NOT randomized — DINO.exe is locked; close the game and re-install"; xf = true; }
-                        catch (Exception xex) { xn = $"boxes NOT randomized — {xex.Message}"; xf = true; }
-
-                    if (startInvPlan is { } sip)
-                        try
-                        {
-                            GameInstaller.PatchExeStartingInventory(dataDir, sip, seed.Value, seed.ToString());
-                            xn = (xn.Length == 0 ? "" : xn + ". ") + "starting inventory patched (seen on the next new game)";
-                        }
-                        catch (IOException) { xn = (xn.Length == 0 ? "" : xn + ". ") + "starting inventory NOT patched — DINO.exe is locked; close the game and re-install"; xf = true; }
-                        catch (Exception iex) { xn = (xn.Length == 0 ? "" : xn + ". ") + $"starting inventory NOT patched — {iex.Message}"; xf = true; }
-
-                    if (scramblePuzzleCodes)
-                        try
-                        {
-                            GameInstaller.PatchExeSyncPuzzleCodes(dataDir, seed.Value, seed.ToString());
-                            xn = (xn.Length == 0 ? "" : xn + ". ") + "puzzle codes scrambled (seen after the next launch)";
-                        }
-                        catch (IOException) { xn = (xn.Length == 0 ? "" : xn + ". ") + "puzzle codes NOT scrambled — DINO.exe is locked; close the game and re-install"; xf = true; }
-                        catch (Exception pex) { xn = (xn.Length == 0 ? "" : xn + ". ") + $"puzzle codes NOT scrambled — {pex.Message}"; xf = true; }
-
-                    return (res, bn, bf, xn, xf);
-                });
-                InstallStatusBrush = (bgmFailed || boxFailed) ? Brushes.OrangeRed : Brushes.Green;
-                var exeNote = bgmNote;
-                if (boxNote.Length > 0) exeNote = exeNote.Length == 0 ? boxNote : exeNote + ". " + boxNote;
-                InstallStatusText =
-                    "✓ Seed installed correctly."
-                    + (exeNote.Length == 0 ? " Restore to undo." : $" {exeNote}. Restore to undo.");
-
-                CurrentSlice.GamePath = GamePath;
-                CurrentSlice.LastSeed = _appSeed.ToString();
-                _settings.Save();
-            }
-            catch (Exception ex)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = FriendlyError(ex);
-            }
-            finally
-            {
-                IsBusy = false;
-                UpdateInstallButtons();
-            }
-        }
-
-        [RelayCommand]
-        private async Task Restore()
-        {
-            var dataDir = CurrentDataDir();
-            if (dataDir.Length == 0)
-                return;
-
-            CanInstall = false;
-            CanRestore = false;
-            IsBusy = true;                 // greys Play (CanPlayNow) and shows the busy bar during restore
-            InstallStatusBrush = null;
-            InstallStatusText = "Restoring…";
-            try
-            {
-                var rr = await Task.Run(() => GameInstaller.Restore(dataDir));
-                // DC2: also undo the character-skin WP-gate exe patch when its backup exists
-                // (best-effort; the motion-trail ddraw fix is deliberately left in place).
-                bool exeRestored = false;
-                if (SelectedGame is DinoCrisis2)
-                {
-                    var gameRoot = Path.GetDirectoryName(Path.GetFullPath(dataDir.TrimEnd(
-                        Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)))!;
-                    try
-                    {
-                        exeRestored = await Task.Run(() => Dc2CharacterSkinInstaller.Restore(
-                            Path.Combine(gameRoot, Dc2CharacterSkinInstaller.ExeName)));
-                    }
-                    catch { /* locked exe etc. — room restore already succeeded */ }
-                    try { await Task.Run(() => Dc2CharacterSkinInstaller.RestoreCrWavebanks(gameRoot)); }
-                    catch { /* CR wavebanks are cosmetic; room restore already succeeded */ }
-                }
-                InstallStatusBrush = Brushes.Green;
-                InstallStatusText = rr.Restored > 0
-                    ? $"✓ Restored {rr.Restored} original room files." + (exeRestored ? " Dino2.exe restored." : "")
-                    : exeRestored ? "✓ Dino2.exe restored." : "Nothing to restore.";
-            }
-            catch (Exception ex)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = FriendlyError(ex);
-            }
-            finally
-            {
-                IsBusy = false;
-                UpdateInstallButtons();
-            }
-        }
-
-        /// <summary>Map an install/restore exception to a short, actionable line for the status label,
-        /// keeping the raw exception out of the UI (it goes to the debug log only). Public + static so
-        /// it is unit-tested directly, like the other pure helpers here (<see cref="ResolveDataDir"/>).</summary>
-        public static string FriendlyError(Exception ex)
-        {
-            Debug.WriteLine(ex);   // raw detail stays in the log, never on the user-facing status line
-            return ex switch
-            {
-                IOException io when io.Message.Contains("being used by another process")
-                    => "Close the game (and any window open in its game folder), then install again.",
-                FileNotFoundException or DirectoryNotFoundException
-                    => "Couldn't find a game file — check the Game Location points at your DINO.exe / Dino2.exe folder.",
-                UnauthorizedAccessException
-                    => "Windows blocked the change — move the game out of Program Files, or run DinoRand as administrator.",
-                _ => "Install failed — see the log for details.",
-            };
-        }
-
-        [RelayCommand]
-        private void Play()
-        {
-            if (_gameDrmProtected)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = "DRM-protected game (Steam/Enigma) — launch it from its own launcher instead.";
-                return;
-            }
-            var exe = ResolvePlayExe();
-            if (exe is null)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = $"Couldn't find {SelectedGame.ExecutableName} to launch — check the game location.";
-                return;
-            }
-            try
-            {
-                Process.Start(new ProcessStartInfo(exe)
-                {
-                    UseShellExecute = true,
-                    WorkingDirectory = Path.GetDirectoryName(exe)!,
-                });
-            }
-            catch (Exception ex)
-            {
-                InstallStatusBrush = Brushes.Red;
-                InstallStatusText = $"Couldn't launch the game: {ex.Message}";
-            }
-        }
     }
+
+    /// <summary>The AP session entry point as a seam — <see cref="DinoRand.Randomizer.Ap.Dc1ApRunner.Run"/>
+    /// in production, a fake in the connect-tab state-machine tests.</summary>
+    public delegate int ApRunner(string hostPort, string slot, string password, string install,
+        string outDir, Action<string> log, Action<string> error, CancellationToken ct);
 
     /// <summary>A starting-weapon dropdown choice. <see cref="WeaponId"/> is null for "Vanilla".</summary>
     public sealed class StartWeaponOption

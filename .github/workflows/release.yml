@@ -45,6 +45,9 @@ jobs:
             *)   echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
           esac
 
+      - name: Validate curated release notes
+        run: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check_docs.py --version "${{ steps.ver.outputs.version }}"
+
       - name: Build self-contained release binaries
         run: bash scripts/publish-release.sh win-x64 linux-x64 osx-arm64
 
@@ -57,6 +60,9 @@ jobs:
           for rid in win-x64 linux-x64 osx-arm64; do
             ( cd "dist/$rid" && zip -r "../../dinorand-v$VERSION-$rid.zip" . )
           done
+
+      - name: Package .apworld release assets
+        run: python3 scripts/package_apworlds.py
 
       - name: Extract release notes from CHANGELOG.md
         id: notes
@@ -88,7 +94,7 @@ jobs:
           else
             NOTES="--generate-notes"
           fi
-          gh release create "v$VERSION" ./dinorand-v"$VERSION"-*.zip \
+          gh release create "v$VERSION" ./dinorand-v"$VERSION"-*.zip ./dist/*.apworld \
             --title "v$VERSION" \
             --target "$GITHUB_SHA" \
             $NOTES \

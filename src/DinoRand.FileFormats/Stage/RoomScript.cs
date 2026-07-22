@@ -203,11 +203,14 @@ public sealed class RoomScript
                 && buffer[pos + 2] == DcOpcodes.ItemSubtype)
             {
                 byte id = buffer[pos + ItemRecord.IdOffset];
+                ushort take = (ushort)ReadU16(buffer, pos + ItemRecord.TakeIndexOffset);
                 items.Add(new ItemRecord
                 {
                     ItemId = id,
                     OriginalItemId = id,
                     Amount = ReadU16(buffer, pos + ItemRecord.CountOffset),
+                    TakeIndex = take,
+                    OriginalTakeIndex = take,
                     Raw = buffer.Slice(pos, len).ToArray(),
                     FileOffset = pos,
                 });
@@ -295,6 +298,16 @@ public sealed class RoomScript
             int idPos = item.FileOffset + ItemRecord.IdOffset;
             if (idPos >= 0 && idPos < buffer.Length)
                 buffer[idPos] = (byte)item.ItemId;
+
+            // Take-index rekey (AP client only — EXE-SYMBOLS cont.81): both the registration's
+            // suppress check and the take commit read this word from the record, so rewriting it
+            // re-keys the pickup's taken flag coherently. Unchanged => byte-identical round-trip.
+            if (item.TakeIndex != item.OriginalTakeIndex)
+            {
+                int takePos = item.FileOffset + ItemRecord.TakeIndexOffset;
+                if (takePos + 2 <= buffer.Length)
+                    WriteU16(buffer, takePos, item.TakeIndex);
+            }
 
             if (item.NormalizeVisual)
             {

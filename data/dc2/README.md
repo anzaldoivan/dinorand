@@ -1,9 +1,9 @@
-# Dino Crisis 2 game data (placeholder dataset)
+# Dino Crisis 2 game data
 
-JSON/Markdown tables mirroring `data/dc1/`, built to seed a future DC2 randomizer. **This
-is an early, mixed-confidence dataset**: a thin layer of byte-confirmed facts over a larger
-layer of guide-sourced and placeholder content. Every record is provenance-tagged. Nothing
-here drives engine code yet.
+JSON/Markdown tables mirroring `data/dc1/`. Now predominantly byte-confirmed (items,
+doors, locks, placements, flag gating — see the table below); the guide-sourced and
+placeholder layers that remain are called out per-file and in the placeholder section.
+Every record is provenance-tagged.
 
 > **Provenance legend** (used in every file):
 > - `bytes` — decoded from the game files in `4249140_DinoCrisis2/` this session (game files
@@ -26,6 +26,7 @@ here drives engine code yet.
 | `item-placements.json` | per-room item commits (op 0x31): id (editable lever) + blob offset, 168 items / 54 rooms (K81) | **bytes** (static slot-5 decode; 3 live-validated) |
 | `door-connectivity.json` | room-level directed warp graph (outbound/inbound/degree, bidirectionality, dead-ends, hubs) from `door-graph.json` | **bytes** (derived; `gen_connectivity.py`) |
 | `door-gating.json` | per-room/per-routine flag dataflow (op-0x1d tests / op-0x1c+0x33 sets), items/examine/key_use, resolved `locked_doors`, + the K30 `entry_gate` flag list with native+script setters (K81) | **bytes** (static slot-5 decode + .text census; `gen_gating.py`) |
+| `door-guards.json` | conditional-commit + provenance census (K119–K123): every conditional door/item AOT commit with a SYMBOLICALLY-RESOLVED predicate (27 doors / 64 items, 0 unresolved — incl. the one held-key-item gate `10D->10F` requires Gas Mask `0x2e`, character & prev-room gates), subweapon key_use table (Stungun=Regina electric / Machete=Dylan vine), family-5 scene-property map, per-door provenance (134 on-entry / 17 guarded / 16 interaction / 12 event / 2 no-start-site) + the closed routine-invocation model | **bytes** (offline capstone decode + symbolic census; method in `_source`/`_semantics`) |
 | `enemies-static.json` | static per-room enemy set (65 rooms / 441 spawns) from the spawn-graph + TYPE→species table | **bytes** (derived; `gen_enemies_static.py`) |
 | `scd-vm-opcodes.json` | the slot-5 SCD-VM opcode + operand model (ALU table, stack-delta model, AOT builders) | **bytes** (offline disx, `AOT-SYSTEM-RE.md`) |
 | `room-data.json` | **consolidated per-room DB** — joins spawns+doors+connectivity+items+runtime-enemies per room (89), + **byte-derived `zone` per room** + 10-zone catalog. Mirrors `data/dc1/room-data.json` | **bytes** (pure join; `gen_room_data.py`). **ST→zone RESOLVED** (EXE 0x491c70, ZONE-MAPPING-RE.md) |
@@ -123,15 +124,20 @@ what is locked vs unresolved.
    [`docs/reference/dc2/enemies/EXE-ENEMY-TABLE.md`](../../docs/reference/dc2/enemies/EXE-ENEMY-TABLE.md) and `enemies.json` →
    `mapping.exe_id_table`). Resolving the 9 still needs the in-room spawn decode or a runtime
    RAM dump. See `enemies.json` → `mapping`.
-3. **All numeric item ids.** DC2 has no decoded item-id table (DC1's came from the forum +
-   file cross-check; no DC2 equivalent found). Every `id` is `null`.
-4. **Per-room door connections & exact spawn/item placements.** These live in the undecoded
-   room blob (`docs/reference/dc2/scd/SCRIPT-DC2.md`) and need runtime RAM inspection — out of scope here.
+3. ~~**All numeric item ids.**~~ **RESOLVED (K75):** the full 58-entry catalog (`0x704260`)
+   with English names is in `items.json` — ids 0x00–0x39 incl. key items 0x21–0x34.
+4. ~~**Per-room door connections & exact spawn/item placements.**~~ **RESOLVED (K78/K81/K99):**
+   decoded statically from the slot-5 SCD blob — see `door-graph.json`, `spawn-graph.json`,
+   `item-placements.json`, `door-gating.json`, `door-guards.json`. Still open on the item
+   axis: the per-pickup granted **consumable** catalog id is runtime-seeded (K99/K101/K102),
+   so `item-placements.json` deliberately carries no `catalogId`; key-item identities are in
+   `items.json.keyItemGrantSites`.
 
 ## How this differs from `data/dc1/`
 
 DC1's dataset is byte-validated end-to-end (decoded SCD records, real item ids, a reachable
-door graph). DC2's is the **opposite shape**: the *container/model* layer is solid from
-bytes, but the *gameplay/logic* layer (room names, spawns, placements, doors, item ids) is
-still guide-or-placeholder because the in-room record format is undecoded. Treat this dataset
-as scaffolding to be hardened as RE progresses, not as ground truth.
+door graph). DC2 has since caught up on the logic layer (items K75, doors/locks K78/K81,
+placements K99, flag gating K107, conditional commits K119): the remaining honest gaps are
+the ST-id→room-name mapping, the 9-way enemy model assignment, and the runtime-seeded
+consumable pickup ids above. Sections 1–2 of the placeholder list are still live; treat
+those as scaffolding, the rest as byte-backed ground truth.

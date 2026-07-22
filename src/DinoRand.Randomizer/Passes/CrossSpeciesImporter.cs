@@ -79,8 +79,20 @@ public sealed class CrossSpeciesImporter : ICrossSpeciesImporter
     {
         var donor = FindGroundedDonor(def.Species);
         if (donor is null) { note = $"no {def.Species} donor"; return false; }
-        var tex = room.ImportSpeciesTextured(donor, victimIdx);
-        note = tex.Outcome == RoomFile.TextureImportOutcome.Relocated ? "geometry + texture" : "geometry only";
+        if (!room.TryImportSpeciesTexturedAtomic(
+                donor, victimIdx, SpeciesImporter.ResidentPoolFloor, out var fit, out var tex))
+        {
+            note = fit.Limiting == ImportFitConstraint.RdtBudget
+                ? $"RDT refusal: {fit.Reason}"
+                : $"texture/VRAM refusal: {fit.Reason}";
+            return false;
+        }
+        note = tex!.Outcome switch
+        {
+            RoomFile.TextureImportOutcome.Relocated => "geometry + texture relocated",
+            RoomFile.TextureImportOutcome.ReclaimedVictim => "geometry + texture (victim column reclaimed)",
+            _ => throw new InvalidOperationException($"atomic grounded import returned {tex.Outcome}"),
+        };
         return true;
     }
 

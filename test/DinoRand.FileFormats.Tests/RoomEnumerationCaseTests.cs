@@ -88,4 +88,20 @@ public class RoomEnumerationCaseTests
         }
         finally { Directory.Delete(root, recursive: true); }
     }
+
+    [Fact]
+    public void Dc2_EnumerateRooms_parses_hexadecimal_room_suffixes()
+    {
+        var root = MakeInstall("ST10A.DAT", "st40f.dat");
+        try
+        {
+            var rooms = new DinoCrisis2().EnumerateRooms(root);
+            var codes = rooms.Select(r => (r.Stage << 8) | r.Room).ToHashSet();
+
+            Assert.Contains(0x010A, codes);
+            Assert.Contains(0x040F, codes);
+            Assert.Equal(2, codes.Count);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
 }

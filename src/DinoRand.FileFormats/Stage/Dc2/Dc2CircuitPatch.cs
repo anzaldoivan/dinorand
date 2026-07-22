@@ -70,6 +70,34 @@ public static class Dc2CircuitPatch
         return Dc2SpawnEditor.ApplyEdits(packageBytes, edits, Array.Empty<(int, byte)>());
     }
 
+    /// <summary>Validate and apply one explicit blink sequence per configured routine.</summary>
+    internal static byte[] ApplyRoomPlan(ReadOnlySpan<byte> packageBytes, RoomSpec room,
+                                       IReadOnlyList<int[]> sequences, out RoutineResult[] results)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        ArgumentNullException.ThrowIfNull(sequences);
+        if (sequences.Count != room.Routines.Count)
+            throw new ArgumentException($"circuit plan has {sequences.Count} routines; expected {room.Routines.Count}.", nameof(sequences));
+        var blob = Dc2ScdBlob.Decompress(packageBytes);
+        var edits = new List<(int Offset, short Value)>();
+        var res = new List<RoutineResult>(room.Routines.Count);
+        for (int r = 0; r < room.Routines.Count; r++)
+        {
+            var spec = room.Routines[r];
+            int[] offs = LocateBlinkIdOffsets(blob, room, spec);
+            int[] seq = sequences[r];
+            if (seq.Length != offs.Length || seq.Any(id => !room.BoxIds.Contains(id))
+                || seq.Zip(seq.Skip(1)).Any(pair => pair.First == pair.Second)
+                || room.BoxIds.Any(id => !seq.Contains(id)))
+                throw new ArgumentException($"circuit plan routine {spec.RoutineIndex} is not a covering, non-adjacent sequence of length {offs.Length}.", nameof(sequences));
+            for (int i = 0; i < offs.Length; i++)
+                edits.Add((offs[i], (short)seq[i]));
+            res.Add(new RoutineResult(spec.RoutineIndex, spec.VanillaIds.ToArray(), seq));
+        }
+        results = res.ToArray();
+        return Dc2SpawnEditor.ApplyEdits(packageBytes, edits, Array.Empty<(int, byte)>());
+    }
+
     /// <summary>
     /// Locate the blink box-id literal offsets of <paramref name="spec"/> in a <b>decompressed</b>
     /// SCD blob by walking the routine's opcodes, and verify the pre-write pin: the routine must

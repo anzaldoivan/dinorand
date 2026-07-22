@@ -113,6 +113,30 @@ public class EnemyImportBudgetTests
     private static SpeciesBlock Block(int len)
         => new(new byte[len], 0x100, Array.Empty<int>());
 
+    private static SpeciesDonor TexturedRaptorHeavyDonor(int modelLength = 0x1e0)
+    {
+        const int bones = 21;
+        const int packet = 0x1c0;
+        var model = new byte[modelLength];
+        if (modelLength > packet + 0x10)
+        {
+            PutU32(model, EnemySkeleton.BoneCountOffset, bones);
+            PutU32(model, EnemySkeleton.BoneArrayOffset + 8, B + 0x100 + packet);
+            model[packet + 0x0a] = 0xf0;
+            model[packet + 0x0b] = 0x7f;
+            model[packet + 0x0e] = 0x8a;
+        }
+        var texture = new TextureBlock(
+            new VramBlock(0, GianEntryType.Lzss2, new VramRect(640, 0, 64, 512), new byte[64 * 512 * 2]),
+            new VramBlock(1, GianEntryType.Palette, new VramRect(768, 511, 256, 1), new byte[512]),
+            new ushort[] { 0x8a }, 0x7ff0);
+        return new SpeciesDonor(
+            DinoSpecies.RaptorHeavy, 2,
+            new SpeciesBlock(model, 0x100, modelLength > packet + 0x10 ? new[] { EnemySkeleton.BoneArrayOffset + 8 } : Array.Empty<int>()),
+            Block(0x20))
+        { Texture = texture };
+    }
+
     [Fact]
     public void SingleRange_Fits_UnderEngineCeiling()
     {
@@ -208,6 +232,133 @@ public class EnemyImportBudgetTests
         Assert.False(fit.Fits);
         Assert.Equal(ImportFitConstraint.Vram, fit.Limiting);
         Assert.Null(fit.TextureRect);
+    }
+
+    [Fact]
+    public void Vram_ReclaimsVictimColumn_WhenFreshRelocationIsFull()
+    {
+        var tex = DonorTexture();
+        var target = BuildPackage(
+            (GianEntryType.Lzss2, 512, 0, 64, 512, Lzss.Compress(new byte[64])),
+            (GianEntryType.Lzss2, 576, 0, 64, 512, Lzss.Compress(new byte[64])),
+            (GianEntryType.Lzss2, 640, 0, 64, 512, Lzss.Compress(new byte[64])),
+            (GianEntryType.Lzss2, 704, 0, 64, 512, Lzss.Compress(new byte[64])),
+            (GianEntryType.Palette, 768, 511, 256, 1, new byte[512]),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 0x62 }));
+
+        var fit = EnemyImportBudget.Evaluate(Block(0x100), Block(0x80),
+            targetRdtLength: 0x1000, rdtCeiling: SpeciesImporter.ResidentPoolFloor,
+            targetPackage: target, donorTexture: tex,
+            reclaimable: new[] { new VramRect(640, 0, 64, 512), new VramRect(768, 511, 256, 1) },
+            requireTexture: true);
+
+        Assert.True(fit.Fits);
+        Assert.Equal(RoomFile.TextureImportOutcome.ReclaimedVictim, fit.TextureOutcome);
+        Assert.Equal(new VramRect(640, 0, 64, 512), fit.TextureRect);
+    }
+
+    [Fact]
+    public void Vram_RequiredTextureMissing_IsRefusedAsTextureFailure()
+    {
+        var fit = EnemyImportBudget.Evaluate(Block(0x100), Block(0x80),
+            targetRdtLength: 0x1000, rdtCeiling: SpeciesImporter.ResidentPoolFloor,
+            targetPackage: ReadOnlySpan<byte>.Empty, donorTexture: null,
+            requireTexture: true);
+
+        Assert.False(fit.Fits);
+        Assert.Equal(ImportFitConstraint.Vram, fit.Limiting);
+        Assert.Contains("texture", fit.Reason, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void AtomicGroundedImport_RdtRefusalLeavesRoomByteIdentical()
+    {
+        var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
+        var room = RoomFile.Read(3, 1, raw);
+        var donor = TexturedRaptorHeavyDonor(SpeciesImporter.ResidentPoolFloor);
+        var before = room.Write();
+
+        bool imported = room.TryImportSpeciesTexturedAtomic(
+            donor, 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
+
+        Assert.False(imported);
+        Assert.Equal(ImportFitConstraint.RdtBudget, fit.Limiting);
+        Assert.Null(texture);
+        Assert.Equal(before, room.Write());
+        Assert.Equal(DinoSpecies.Velociraptor, room.Enemies[0].Species);
+    }
+
+    [Fact]
+    public void AtomicGroundedImport_GeometryOnlyRefusalLeavesRoomByteIdentical()
+    {
+        var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
+        var room = RoomFile.Read(3, 1, raw);
+        var donor = TexturedRaptorHeavyDonor() with { Texture = null };
+        var before = room.Write();
+
+        bool imported = room.TryImportSpeciesTexturedAtomic(
+            donor, 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
+
+        Assert.False(imported);
+        Assert.Equal(ImportFitConstraint.Vram, fit.Limiting);
+        Assert.Null(texture);
+        Assert.Equal(before, room.Write());
+        Assert.Equal(DinoSpecies.Velociraptor, room.Enemies[0].Species);
+    }
+
+    [Fact]
+    public void AtomicGroundedImport_RelocatedTextureCommitsFinalRoomOnce()
+    {
+        var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
+        var room = RoomFile.Read(3, 1, raw);
+
+        bool imported = room.TryImportSpeciesTexturedAtomic(
+            TexturedRaptorHeavyDonor(), 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
+
+        Assert.True(imported);
+        Assert.True(fit.Fits);
+        Assert.Equal(RoomFile.TextureImportOutcome.Relocated, fit.TextureOutcome);
+        Assert.Equal(RoomFile.TextureImportOutcome.Relocated, texture!.Outcome);
+        Assert.True(room.RdtBuffer.Length <= SpeciesImporter.ResidentPoolFloor);
+        var reread = RoomFile.Read(room.Stage, room.Room, room.Write());
+        Assert.True(reread.ParsedCleanly);
+        Assert.Equal(DinoSpecies.RaptorHeavy, reread.Enemies[0].Species);
+        Assert.True(reread.Enemies[0].SpeciesMatchesCategory);
+    }
+
+    [Fact]
+    public void AtomicGroundedImport_ReclaimedVictimTextureCommitsFinalRoomOnce()
+    {
+        var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
+        var seeded = RoomFile.Read(3, 1, raw);
+        var first = seeded.ImportSpeciesTextured(TexturedRaptorHeavyDonor(), 0);
+        Assert.Equal(RoomFile.TextureImportOutcome.Relocated, first.Outcome);
+        seeded = RoomFile.Read(3, 1, seeded.Write());
+
+        var occupied = Enumerable.Range(0, 4)
+            .Select(i => 512 + i * 64)
+            .Where(x => x != first.TextureRect!.Value.X)
+            .Select(x => new PackageRepacker.NewEntry(
+                GianEntryType.Lzss2, new VramRect(x, 0, 64, 512), Lzss.Compress(new byte[64])))
+            .ToArray();
+        var room = RoomFile.Read(3, 1, PackageRepacker.InsertEntriesBeforeRdt(seeded.Write(), occupied));
+
+        bool imported = room.TryImportSpeciesTexturedAtomic(
+            TexturedRaptorHeavyDonor(), 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
+
+        Assert.True(imported);
+        Assert.True(fit.Fits);
+        Assert.Equal(RoomFile.TextureImportOutcome.ReclaimedVictim, fit.TextureOutcome);
+        Assert.Equal(RoomFile.TextureImportOutcome.ReclaimedVictim, texture!.Outcome);
+        var reread = RoomFile.Read(room.Stage, room.Room, room.Write());
+        Assert.True(reread.ParsedCleanly);
+        var importedEnemy = Assert.Single(reread.Enemies);
+        var codes = TextureImporter.ReadModelTextureCodes(reread.RdtBuffer, importedEnemy.ModelPtr);
+        Assert.NotNull(TextureImporter.ExtractSpeciesTexture(reread.OriginalBytes, codes.Tpages, codes.Clut));
     }
 
     [Fact]

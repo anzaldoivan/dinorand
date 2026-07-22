@@ -11,6 +11,8 @@ chunk: default
 related: []
 ---
 
+<!-- Audience: players. Keep descriptions task-oriented; `dinorand --help` is the exhaustive CLI source of truth. -->
+
 # DinoRand — User Guide
 
 DinoRand randomizes **Dino Crisis 1 & 2** (PC): give it your unmodified install and a seed,
@@ -158,8 +160,43 @@ Every run writes into the output folder:
 
 ## Archipelago (experimental)
 
-DinoRand ships Archipelago multiworld worlds under `apworld/` (DC1 + DC2, generation only —
-no in-game client yet). Setup: [apworld/dino_crisis_1/README.md](apworld/dino_crisis_1/README.md).
+DinoRand ships Archipelago multiworld worlds under `apworld/` (DC1 + DC2 generation), and —
+new — a **DC1 runtime client**: your pickups become multiworld checks and items other players
+find for you appear in your inventory.
+
+**Connecting joins a multiworld that already exists — it doesn't create one.** First install the
+apworld, write a player YAML and generate a seed, then have it hosted (a local
+`ArchipelagoServer` or archipelago.gg). All of that is one-time setup:
+[apworld/dino_crisis_1/README.md](apworld/dino_crisis_1/README.md).
+
+### Connect (GUI)
+
+1. **Close the game** — connecting rewrites room files, and a running game holds them locked.
+2. **Randomizer tab**: set your Game Location. (The Archipelago tab stays greyed out until it
+   resolves — it needs a game to install into.)
+3. **Archipelago tab**: server `host:port` (the default AP port is 38281), your slot name exactly
+   as it appears in your YAML's `name:`, password only if the room has one → **Connect**.
+4. Wait for the placement install — the log lists each room as it goes.
+5. Launch the game and start a **new game**, then leave DinoRand open while you play. Closing it
+   ends the session (it asks first).
+
+### Connect (CLI)
+
+```bat
+dinorand --ap-connect server.example:38281 --ap-slot MySlot --install "C:\...\Dino Crisis"
+```
+
+Same flow, headless: it installs the placement, then stays running — Ctrl-C to disconnect.
+
+- The placement install is the **same backup-and-swap as a normal seed** — undo it with "Restore
+  Originals" (GUI) or `--restore` (CLI).
+- Reconnect any time by connecting again: the server keeps your progress, and nothing is granted
+  twice. Verified against Archipelago 0.6.7.
+- **Windows only**: the client reads the running `DINO.exe`'s memory, so it must run on the
+  Windows host itself (not WSL). Antivirus may ask about the memory access — that's this feature;
+  nothing is injected into the game.
+- Locations holding another player's item show up as a spare "custom part" pickup — grabbing it
+  sends the check. DC2 client support is not built yet (generation only).
 
 ## Legal
 

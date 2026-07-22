@@ -94,7 +94,8 @@ public static class Dc2BgmShuffleInstaller
         if (!File.Exists(backupPath))
             File.Copy(exePath, backupPath);
 
-        var entries = Dc2MusicTablePatch.Shuffle(bytes, seed, classOf);
+        var patchPlan = Dc2ExecutablePatchPlanner.PlanMusic(seed, classOf);
+        var entries = Dc2MusicTablePatch.ApplyPlan(bytes, patchPlan.MusicNames!);
         File.WriteAllBytes(exePath, bytes);
         int moved = entries.Count(e => e.OldName != e.NewName);
         log?.Invoke($"[bgm-shuffle] seed {seed}: {moved}/{entries.Length} music slots rerouted (backup: {Path.GetFileName(backupPath)})");

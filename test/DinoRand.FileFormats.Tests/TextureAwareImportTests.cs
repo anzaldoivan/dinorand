@@ -119,6 +119,75 @@ public class TextureAwareImportTests
         Assert.Equal((768, 510), TextureImporter.ClutOrigin(placed.ClutCode));  // palette keeps X, row moves
     }
 
+    [Fact]
+    public void PickFreeRegion_Refuses_GlobalVramBeyondArena()
+    {
+        // Corpus rule (148-room survey, 2026-07-18): vanilla rooms only ever upload texture columns in
+        // [512,768); x>=768 is engine-global (item-icon atlas, font glyphs). Arena full → throw
+        // (geometry-only fallback), never relocate to 768+.
+        var target = Pkg(
+            (GianEntryType.Lzss2, 320, 0, 256, 512, Lzss.Compress(Px(256, 512, 1))),
+            (GianEntryType.Lzss2, 576, 0, 64, 512, Lzss.Compress(Px(64, 512, 2))),
+            (GianEntryType.Lzss2, 640, 0, 64, 512, Lzss.Compress(Px(64, 512, 3))),
+            (GianEntryType.Lzss2, 704, 0, 64, 512, Lzss.Compress(Px(64, 512, 4))),
+            (GianEntryType.Palette, 768, 511, 256, 1, Px(256, 1, 5)),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 1 }));
+        var donorPkg = Pkg(
+            (GianEntryType.Lzss2, 704, 0, 64, 512, Lzss.Compress(Px(64, 512, 0x55))),
+            (GianEntryType.Palette, 768, 511, 256, 1, Px(256, 1, 0x66)),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 1 }));
+        var block = TextureImporter.ExtractSpeciesTexture(donorPkg, new ushort[] { 0x8b, 0x9b }, 0x7ff0);
+
+        Assert.Throws<InvalidOperationException>(() => TextureImporter.PickFreeRegion(target, block));
+    }
+
+    [Fact]
+    public void PickFreeRegion_ReclaimableVictimRects_PlaceIntoTheVictimColumn()
+    {
+        // Same VRAM-crowded arena as the refusal test — but the X=704 column + palette row 511 belong
+        // to the victim being replaced, so passing them as reclaimable frees exactly that slot.
+        var target = Pkg(
+            (GianEntryType.Lzss2, 320, 0, 256, 512, Lzss.Compress(Px(256, 512, 1))),
+            (GianEntryType.Lzss2, 576, 0, 64, 512, Lzss.Compress(Px(64, 512, 2))),
+            (GianEntryType.Lzss2, 640, 0, 64, 512, Lzss.Compress(Px(64, 512, 3))),
+            (GianEntryType.Lzss2, 704, 0, 64, 512, Lzss.Compress(Px(64, 512, 4))),
+            (GianEntryType.Palette, 768, 511, 256, 1, Px(256, 1, 5)),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 1 }));
+        var donorPkg = Pkg(
+            (GianEntryType.Lzss2, 704, 0, 64, 512, Lzss.Compress(Px(64, 512, 0x55))),
+            (GianEntryType.Palette, 768, 511, 256, 1, Px(256, 1, 0x66)),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 1 }));
+        var block = TextureImporter.ExtractSpeciesTexture(donorPkg, new ushort[] { 0x8b, 0x9b }, 0x7ff0);
+
+        var reclaim = new[] { new VramRect(704, 0, 64, 512), new VramRect(768, 511, 256, 1) };
+        var placed = TextureImporter.PickFreeRegion(target, block, reclaim);
+
+        Assert.Equal(new VramRect(704, 0, 64, 512), placed.Texture.Dst);
+        Assert.Equal(new VramRect(768, 511, 256, 1), placed.Palette.Dst);
+        Assert.Equal(704, TextureImporter.TpageOrigin(placed.TpageCodes[0]).X);
+        Assert.Equal((768, 511), TextureImporter.ClutOrigin(placed.ClutCode));
+    }
+
+    [Fact]
+    public void PickFreeRegion_PaletteRow_StaysOnVanillaWitnessedRows()
+    {
+        // Vanilla palettes only ever land on rows {497,498,505..511}; 499..504 hold engine CLUTs.
+        // With 505..511 occupied the next free row is 498 — not 504.
+        var target = Pkg(
+            (GianEntryType.Lzss2, 320, 0, 224, 512, Lzss.Compress(Px(224, 512, 1))),
+            (GianEntryType.Palette, 768, 505, 256, 7, Px(256, 7, 3)),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 1 }));
+        var donorPkg = Pkg(
+            (GianEntryType.Lzss2, 704, 0, 64, 512, Lzss.Compress(Px(64, 512, 0x55))),
+            (GianEntryType.Palette, 768, 511, 256, 1, Px(256, 1, 0x66)),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 1 }));
+        var block = TextureImporter.ExtractSpeciesTexture(donorPkg, new ushort[] { 0x8b, 0x9b }, 0x7ff0);
+
+        var placed = TextureImporter.PickFreeRegion(target, block);
+
+        Assert.Equal(498, placed.Palette.Dst.Y);
+    }
+
     // ---- gated real-install ----
 
     private static string? DataDir()
@@ -202,6 +271,45 @@ public class TextureAwareImportTests
 
         // 2. The imported model's primitives all carry the relocated codes (sample the new column/row).
         var (tps, clut) = TextureImporter.ReadModelTextureCodes(trf.RdtBuffer, importedModel);
+        Assert.All(tps, t => Assert.Equal(res.TextureRect!.Value.X, TextureImporter.TpageOrigin(t).X));
+        Assert.Equal(TextureImporter.MakeClut(res.PaletteRect!.Value.X, res.PaletteRect!.Value.Y), clut);
+    }
+
+    [Fact]
+    public void RealInstall_TexturedSwap_ReclaimsVictimColumn_WhenVramIsFull()
+    {
+        var dir = DataDir();
+        if (dir is null) return;
+        var donorPath = Path.Combine(dir, "st100.dat");
+        var targetPath = Path.Combine(dir, "st112.dat");
+        if (!File.Exists(donorPath) || !File.Exists(targetPath)) return;
+
+        var drf = RoomFile.ReadFromFile(1, 0, donorPath);
+        var drec = drf.Enemies.First(e => e.IsRandomizableDino && e.Species == DinoSpecies.RaptorHeavy);
+        var donor = SpeciesImporter.ExtractDonor(drf.RdtBuffer, drec, Heads(drf))
+            with { Texture = SpeciesImporter.TryExtractTexture(drf.OriginalBytes, drf.RdtBuffer, drec.OriginalModelPtr) };
+        Assert.NotNull(donor.Texture);
+
+        // st112's VRAM has no free column (2026-07-19 census), but the victim's own texture is
+        // exclusive to it — the fallback must place the donor over the victim's column instead of
+        // degrading to geometry-only.
+        var trf = RoomFile.ReadFromFile(1, 0x12, targetPath);
+        var victim = trf.Enemies.First(e => e.IsRandomizableDino);
+        var victimTex = SpeciesImporter.TryExtractTexture(trf.OriginalBytes, trf.RdtBuffer, victim.OriginalModelPtr);
+        Assert.NotNull(victimTex);
+        int idx = trf.Enemies.IndexOf(victim);
+
+        var res = trf.ImportSpeciesTextured(donor, idx);
+        Assert.Equal(RoomFile.TextureImportOutcome.ReclaimedVictim, res.Outcome);
+        Assert.Equal(victimTex!.Texture.Dst, res.TextureRect);        // landed on the victim's column
+
+        // The written package uploads the donor texels at that rect AFTER the victim's original entry
+        // (last upload wins the DMA), with the imported model's codes pointing there.
+        byte[] final = trf.Write();
+        var atRect = TextureImporter.ParseVramBlocks(final).Where(b => b.Dst == res.TextureRect).ToList();
+        Assert.True(atRect.Count >= 2);                               // original + staged overwrite
+        Assert.Equal(donor.Texture!.Texture.Pixels, atRect[^1].Pixels);
+        var (tps, clut) = TextureImporter.ReadModelTextureCodes(trf.RdtBuffer, trf.Enemies[idx].ModelPtr);
         Assert.All(tps, t => Assert.Equal(res.TextureRect!.Value.X, TextureImporter.TpageOrigin(t).X));
         Assert.Equal(TextureImporter.MakeClut(res.PaletteRect!.Value.X, res.PaletteRect!.Value.Y), clut);
     }

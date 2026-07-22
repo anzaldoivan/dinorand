@@ -1,6 +1,3 @@
-using System.Buffers.Binary;
-using DinoRand.FileFormats.Compression;
-
 namespace DinoRand.FileFormats.Stage;
 
 /// <summary>
@@ -102,16 +99,10 @@ public sealed class RoomFile
     /// </summary>
     private bool _structurallyEdited;
 
+    private readonly RoomTextureStager _textureStager = new();
+
     /// <summary>True when the SCD script walked cleanly (writes are only applied then).</summary>
     public bool ParsedCleanly => Script?.ParsedCleanly ?? false;
-
-    /// <summary>Whether a package entry type stores its payload LZSS-compressed.</summary>
-    private static bool IsCompressed(GianEntryType type) => type switch
-    {
-        GianEntryType.Lzss0 or GianEntryType.Lzss1 or GianEntryType.Lzss2
-            or GianEntryType.Unknown => true,
-        _ => false,
-    };
 
     public static RoomFile Read(int stage, int room, ReadOnlySpan<byte> bytes)
     {
@@ -119,9 +110,7 @@ public sealed class RoomFile
         rf.Package = GianPackage.TryParse(bytes);
         if (rf.Package?.RoomDataEntry is { } rdt)
         {
-            var payload = bytes.Slice(rdt.PayloadOffset, (int)rdt.DeclaredSize);
-            rf.RdtCompressed = IsCompressed(rdt.Type);
-            rf.RdtBuffer = rf.RdtCompressed ? Lzss.Decompress(payload) : payload.ToArray();
+            (rf.RdtBuffer, rf.RdtCompressed) = RoomPackageCodec.DecodeRdt(bytes, rdt);
 
             rf.Script = RoomScript.Parse(rf.RdtBuffer);
             if (rf.Script.ParsedCleanly && DcOpcodes.IsTrustworthy)
@@ -145,19 +134,7 @@ public sealed class RoomFile
     /// being valid, should not crash — increment 2 adds textures).
     /// </summary>
     public void ImportSpecies(SpeciesDonor donor, int enemyIndex)
-    {
-        if (enemyIndex < 0 || enemyIndex >= Enemies.Count)
-            throw new ArgumentOutOfRangeException(nameof(enemyIndex));
-
-        var result = SpeciesImporter.Import(RdtBuffer, donor.Model, donor.Motion);
-        RdtBuffer = result.Rdt;
-
-        var e = Enemies[enemyIndex];
-        e.ModelPtr = result.ModelPtr;
-        e.MotionPtr = result.MotionPtr;
-        e.Category = donor.Category;
-        e.SpeciesBoneCount = EnemySkeleton.ReadBoneCount(donor.Model.Bytes, SpeciesImporter.PsxBase);
-    }
+        => RoomSpeciesEditor.Import(this, donor, enemyIndex);
 
     /// <summary>
     /// Cross-room import of an <i>entangled</i> species (the Therizinosaurus) whose resource is a
@@ -169,19 +146,7 @@ public sealed class RoomFile
     /// last-entry path. Geometry only (no textures); animation correctness is a later CE gate.
     /// </summary>
     public void ImportSpecies(SpeciesDonorMulti donor, int enemyIndex)
-    {
-        if (enemyIndex < 0 || enemyIndex >= Enemies.Count)
-            throw new ArgumentOutOfRangeException(nameof(enemyIndex));
-
-        var result = SpeciesImporter.ImportRangeSet(RdtBuffer, donor.Blocks);
-        RdtBuffer = result.Rdt;
-
-        var e = Enemies[enemyIndex];
-        e.ModelPtr = result.ModelPtr;
-        e.MotionPtr = result.MotionPtr;
-        e.Category = donor.Category;
-        e.SpeciesBoneCount = EnemySkeleton.ReadBoneCount(RdtBuffer, result.ModelPtr);
-    }
+        => RoomSpeciesEditor.Import(this, donor, enemyIndex);
 
     /// <summary>
     /// <b>⚠ DORMANT — DOES NOT WORK IN-ENGINE.</b> Overlay-in-place was CE-tested and <b>crashes on room
@@ -205,41 +170,7 @@ public sealed class RoomFile
     /// CE gate (never freed memory; the same stale-data situation the shipped append-swap tolerates).</para>
     /// </summary>
     public void OverlaySpecies(SpeciesDonorMulti donor, int enemyIndex)
-    {
-        if (enemyIndex < 0 || enemyIndex >= Enemies.Count)
-            throw new ArgumentOutOfRangeException(nameof(enemyIndex));
-        var victim = Enemies[enemyIndex];
-        const uint psx = SpeciesImporter.PsxBase;
-
-        var otherHeads = new List<int>();
-        for (int i = 0; i < Enemies.Count; i++)
-        {
-            if (i == enemyIndex) continue;
-            var e = Enemies[i];
-            if (e.OriginalModelPtr == victim.OriginalModelPtr || e.OriginalMotionPtr == victim.OriginalMotionPtr)
-                throw new InvalidOperationException(
-                    "victim geometry is shared by another placement; overlay would corrupt the survivor");
-            if (e.OriginalModelPtr >= psx) otherHeads.Add((int)(e.OriginalModelPtr - psx));
-            if (e.OriginalMotionPtr >= psx) otherHeads.Add((int)(e.OriginalMotionPtr - psx));
-        }
-
-        int modelHead = (int)(victim.OriginalModelPtr - psx);
-        int motionHead = (int)(victim.OriginalMotionPtr - psx);
-        var region = SpeciesImporter.OverlayRegion(RdtBuffer, modelHead, motionHead, otherHeads)
-            ?? throw new InvalidOperationException(
-                "victim resource is not a single contiguous region (model/motion interleaved with live data); cannot overlay");
-
-        // Reuse the hole for as much of the donor as fits at a tear-free boundary; append the overflow.
-        // When the donor fits the hole this does not grow the buffer; otherwise it grows by the remainder
-        // (the caller's headroom guard then accepts/rejects the result against the engine ceiling).
-        var result = SpeciesImporter.PlaceRangeSetSplit(RdtBuffer, donor.Blocks, region.Lo, region.Hi - region.Lo);
-        RdtBuffer = result.Rdt;
-
-        victim.ModelPtr = result.ModelPtr;
-        victim.MotionPtr = result.MotionPtr;
-        victim.Category = donor.Category;
-        victim.SpeciesBoneCount = EnemySkeleton.ReadBoneCount(RdtBuffer, result.ModelPtr);
-    }
+        => RoomSpeciesEditor.Overlay(this, donor, enemyIndex);
 
     /// <summary>The texture outcome of a <see cref="ImportSpeciesTextured(SpeciesDonor,int)"/> call —
     /// surfaced so callers can log which path was taken.</summary>
@@ -254,6 +185,11 @@ public sealed class RoomFile
         /// texture is already resident in VRAM (the renderable path for same-species event injection;
         /// ADD-ENEMY-EVENT-INJECTION-CRASH-RCA.md).</summary>
         Reused,
+        /// <summary>No free VRAM region existed, so the donor texture was placed over the replaced
+        /// victim's own texture column / palette row (safe because no surviving model samples them;
+        /// the staged entry uploads after the original and wins). The generalization of the Theri
+        /// fixed-column strategy — see TEXTURE-IMPORT-VRAM.md "Outcome census".</summary>
+        ReclaimedVictim,
     }
 
     /// <summary>Result of a textured import: the <see cref="Outcome"/> and (when relocated) the
@@ -261,10 +197,6 @@ public sealed class RoomFile
     /// emits any staged texture entries — so callers import then call <see cref="Write"/> as usual.</summary>
     public sealed record TexturedImportResult(TextureImportOutcome Outcome,
                                               VramRect? TextureRect, VramRect? PaletteRect);
-
-    /// <summary>Texture + palette entries staged by a textured import, injected before the RDT by
-    /// <see cref="Write"/> (so a normal Write re-emits them — the seed pipeline needs no special path).</summary>
-    private List<PackageRepacker.NewEntry>? _textureInserts;
 
     /// <summary>
     /// Texture-aware counterpart of <see cref="ImportSpecies(SpeciesDonor,int)"/>: imports geometry,
@@ -277,54 +209,71 @@ public sealed class RoomFile
     /// </summary>
     public TexturedImportResult ImportSpeciesTextured(SpeciesDonor donor, int enemyIndex)
     {
+        var reclaim = RoomSpeciesEditor.VictimReclaimableRects(this, enemyIndex);
         ImportSpecies(donor, enemyIndex);
-        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr);
+        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr, reclaim);
+    }
+
+    /// <summary>
+    /// Budget and apply a production grounded-species import as one commit. The complete RDT + texture fit is
+    /// evaluated on a fresh parse of the room's current serialized bytes; geometry, model-code rewrites and
+    /// texture staging then happen only on that private copy. This instance adopts the final serialized room
+    /// only after the import remains textured (<see cref="TextureImportOutcome.Relocated"/> or
+    /// <see cref="TextureImportOutcome.ReclaimedVictim"/>) and reparses cleanly. Every refusal or exception
+    /// before that point leaves this room byte-identical and semantically unchanged.
+    /// </summary>
+    public bool TryImportSpeciesTexturedAtomic(
+        SpeciesDonor donor, int enemyIndex, int rdtCeiling,
+        out EnemyImportFit fit, out TexturedImportResult? texture)
+    {
+        texture = null;
+        var work = Read(Stage, Room, Write());
+        if (enemyIndex < 0 || enemyIndex >= work.Enemies.Count)
+            throw new ArgumentOutOfRangeException(nameof(enemyIndex));
+
+        var reclaim = RoomSpeciesEditor.VictimReclaimableRects(work, enemyIndex);
+        fit = EnemyImportBudget.Evaluate(
+            donor.Model, donor.Motion, work.RdtBuffer.Length, rdtCeiling,
+            work.OriginalBytes, donor.Texture, reclaim, requireTexture: true);
+        if (!fit.Fits) return false;
+
+        var staged = work.ImportSpeciesTextured(donor, enemyIndex);
+        if (staged.Outcome is not (TextureImportOutcome.Relocated or TextureImportOutcome.ReclaimedVictim)
+            || staged.Outcome != fit.TextureOutcome)
+        {
+            fit = new EnemyImportFit(false, 0, 0, work.RdtBuffer.Length,
+                ImportFitConstraint.Vram, null, null, null,
+                $"texture staging produced {staged.Outcome} after a {fit.TextureOutcome} preflight");
+            return false;
+        }
+
+        var final = work.Write();
+        var committed = Read(Stage, Room, final);
+        if (!committed.ParsedCleanly)
+            throw new InvalidOperationException("grounded import serialized to an unparseable room");
+        Adopt(committed);
+        texture = staged;
+        return true;
     }
 
     /// <summary>Multi-range (entangled species) sibling of
     /// <see cref="ImportSpeciesTextured(SpeciesDonor,int)"/>.</summary>
     public TexturedImportResult ImportSpeciesTextured(SpeciesDonorMulti donor, int enemyIndex)
     {
+        var reclaim = RoomSpeciesEditor.VictimReclaimableRects(this, enemyIndex);
         ImportSpecies(donor, enemyIndex);
-        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr);
-    }
-
-    private TexturedImportResult StageTexture(TextureBlock? texture, uint importedModelPtr)
-    {
-        if (texture is null) return new TexturedImportResult(TextureImportOutcome.GeometryOnly, null, null);
-
-        TextureBlock placed;
-        try { placed = TextureImporter.PickFreeRegion(OriginalBytes, texture); }
-        catch (InvalidOperationException) { return new TexturedImportResult(TextureImportOutcome.GeometryOnly, null, null); }
-
-        // Rewrite the imported model's baked codes (donor coords) to the relocated coords; Write() then
-        // emits the rewritten RDT and injects the relocated texture + palette entries.
-        var map = new Dictionary<ushort, ushort>(texture.TpageCodes.Count);
-        for (int i = 0; i < texture.TpageCodes.Count; i++)
-            map[texture.TpageCodes[i]] = placed.TpageCodes[i];
-        TextureImporter.RewriteModelCodes(RdtBuffer, importedModelPtr, map, placed.ClutCode);
-
-        // Append (don't replace): multiple textured imports into one room each keep their entries.
-        _textureInserts ??= new List<PackageRepacker.NewEntry>();
-        _textureInserts.Add(new(GianEntryType.Lzss2, placed.Texture.Dst, Lzss.Compress(placed.Texture.Pixels)));
-        _textureInserts.Add(new(GianEntryType.Palette, placed.Palette.Dst, placed.Palette.Pixels));
-        _structurallyEdited = true; // ensure Write() emits even if record-edit detection would skip
-        return new TexturedImportResult(TextureImportOutcome.Relocated, placed.Texture.Dst, placed.Palette.Dst);
+        return StageTexture(donor.Texture, Enemies[enemyIndex].ModelPtr, reclaim);
     }
 
     /// <summary>VRAM rects already claimed by staged texture entries (enemy imports, earlier pickup
     /// imports) — a later placement into this room must avoid them as well as the on-disk uploads.</summary>
     public IReadOnlyList<VramRect> StagedTextureRects
-        => _textureInserts?.Select(e => e.Dst).ToList() ?? (IReadOnlyList<VramRect>)Array.Empty<VramRect>();
+        => _textureStager.Rects;
 
     /// <summary>Stage one extra texture/palette package entry for <see cref="Write"/> to inject before
     /// the RDT (Lever B pickup texture travel; same channel as <see cref="StageTexture"/>).</summary>
     public void StageTextureEntry(PackageRepacker.NewEntry entry)
-    {
-        _textureInserts ??= new List<PackageRepacker.NewEntry>();
-        _textureInserts.Add(entry);
-        _structurallyEdited = true;
-    }
+        => _textureStager.Add(this, entry);
 
     /// <summary>
     /// Append a pickup ground-mesh blob at the END of the decompressed RDT and return its file-form
@@ -369,63 +318,8 @@ public sealed class RoomFile
         SpeciesDonor donor, int victimIndex,
         IReadOnlyList<(short X, short Y, short Z, short Rotation)> extraMembers,
         byte[]? groupSetupRecord = null)
-    {
-        var tex = ImportSpeciesTextured(donor, victimIndex);
-        if (extraMembers is null || extraMembers.Count == 0) return tex;
-
-        if (Script is not { ParsedCleanly: true })
-            throw new InvalidOperationException("room script did not parse cleanly; cannot inject group members");
-
-        // Member 0 carries the relocated closure pointers + AI category — every extra member reuses them
-        // (so all share ONE model/motion, the precondition for the engine to form the pack).
-        var member0 = Enemies[victimIndex];
-        uint modelPtr = member0.ModelPtr, motionPtr = member0.MotionPtr;
-        byte category = member0.Category;
-        int member0Offset = member0.FileOffset;
-
-        // BAKE member 0's import edit (model/motion/category) into the RDT bytes now: ImportSpecies only
-        // mutated the EnemyRecord object, and the Reparse below re-reads from the buffer — without this the
-        // victim would revert to the original raptor. (Insert then relocates this freshly-written pointer
-        // alongside the closure and the new records, all consistently.)
-        Script.ApplyEnemyEdits(RdtBuffer, Enemies);
-
-        // Slots: the next free large-entity indices (native swarm uses contiguous slots 0..3). One shared
-        // free kill-flag for the added members (native swarm rooms share a group kill-flag).
-        var usedSlots = new HashSet<int>(Enemies.Select(e => (int)e.Slot));
-        byte killFlag = PickFreeKillFlag();
-
-        // The blob: an OPTIONAL group-setup record (the cat-5 swarm's op58 `58 00 17 02 …`, which the engine
-        // runs to ALLOCATE the shared type-0x17 coordination effect — `op58` handler 0x429AD2: alloc 0x41681F
-        // then `byte[slot+1]=byte[record+2]`=0x17), followed by the N member records. The setup MUST precede
-        // the members: each member's spawn runs the per-member init 0x5A6B15, which scans the effect pool
-        // (`scratchpad0+0x9008`, stride 0x24) for the type-0x17 entry and links it into `entity+0x1C8`. Without
-        // it the scan finds nothing, `+0x1C8` stays 0, and the swarm AI NULL-AVs at 0x5C6ADD. (Live-RE'd in
-        // 040B 2026-06-24; docs/decisions/dc1/spawn/SWARM-0102-GROUP-SPAWN-PLAN.md.)
-        int setupLen = groupSetupRecord?.Length ?? 0;
-        var blob = new byte[setupLen + extraMembers.Count * EnemyRecord.Length];
-        groupSetupRecord?.CopyTo(blob, 0);
-        byte slot = 0;
-        for (int i = 0; i < extraMembers.Count; i++)
-        {
-            while (usedSlots.Contains(slot) && slot < 0xff) slot++;
-            usedSlots.Add(slot);
-            var (x, y, z, rot) = extraMembers[i];
-            BuildEnemyRecord(category, slot, killFlag, x, y, z, rot, modelPtr, motionPtr)
-                .CopyTo(blob, setupLen + i * EnemyRecord.Length);
-        }
-
-        // Inject the blob IMMEDIATELY BEFORE the victim's record, NOT at the subroutine tail. The SCD init
-        // task is cooperative: a handler returning non-zero YIELDS the task for the frame (dispatch loop
-        // 0x46AB0B). The setup + members must run in the SAME uninterrupted span the engine forms the pack —
-        // if even one yields before them, the already-spawned members run their AI alone and the swarm AI
-        // NULL-AVs. The enemy opcodes 0x20/0x59 both return 0 (continue), so records spliced right before the
-        // victim spawn in one run with it, ahead of st102's trailing op58/op05 (which can yield). See
-        // docs/decisions/dc1/spawn/SWARM-0102-GROUP-SPAWN-PLAN.md.
-        RdtBuffer = ScriptInjector.Insert(RdtBuffer, member0Offset, blob);
-        _structurallyEdited = true;
-        Reparse(); // surface the added members in Enemies
-        return tex;
-    }
+        => RoomEnemyInjector.ImportSpeciesGroupTextured(
+            this, donor, victimIndex, extraMembers, groupSetupRecord);
 
     /// <summary>Texture-aware counterpart of <see cref="AddEnemy"/>: inject a brand-new enemy and, if
     /// the <paramref name="donor"/> carries a texture, relocate it into this room and rewrite the new
@@ -434,10 +328,8 @@ public sealed class RoomFile
     public (EnemyRecord Enemy, TexturedImportResult Texture) AddEnemyTextured(
         SpeciesDonor donor, short x, short y, short z, short rotation, byte? slot = null, byte? killFlag = null,
         EnemyAuthoring authoring = default)
-    {
-        var added = AddEnemy(donor, x, y, z, rotation, slot, killFlag, authoring);
-        return (added, StageTexture(donor.Texture, added.ModelPtr));
-    }
+        => RoomEnemyInjector.AddEnemyTextured(
+            this, donor, x, y, z, rotation, slot, killFlag, authoring);
 
     /// <summary>
     /// Add a brand-new enemy to the room by injecting a fresh <c>0x20</c> record into its init
@@ -460,38 +352,8 @@ public sealed class RoomFile
     /// <returns>The new enemy record, surfaced in <see cref="Enemies"/> at its injected offset.</returns>
     public EnemyRecord AddEnemy(SpeciesDonor donor, short x, short y, short z, short rotation,
                                byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
-    {
-        if (Script is not { ParsedCleanly: true })
-            throw new InvalidOperationException("room script did not parse cleanly; cannot inject");
-
-        byte chosenSlot = slot ?? PickFreeSlot();
-        byte chosenKill = killFlag ?? PickFreeKillFlag();
-
-        // 1. Import model + motion (appends to the buffer end; nothing before the append moves).
-        var imp = SpeciesImporter.Import(RdtBuffer, donor.Model, donor.Motion);
-        RdtBuffer = imp.Rdt;
-
-        // 2. Choose the injection offset inside the init subroutine (subroutine 0).
-        if (!ScriptInjector.TryReadFuncTable(RdtBuffer, out _, out var starts) || starts.Count == 0)
-            throw new InvalidOperationException("room has no readable init subroutine");
-        int o = InitInsertOffset(RdtBuffer, starts);
-        if (o < 0)
-            throw new InvalidOperationException("init subroutine has no interior insertion point");
-
-        // 3. Author the record and inject it (ScriptInjector does all relocation).
-        var record = BuildEnemyRecord(donor.Category, chosenSlot, chosenKill, x, y, z, rotation,
-                                      imp.ModelPtr, imp.MotionPtr, authoring);
-        if (authoring.ActivateBehavior is byte behavior)
-        {
-            var (b3, blob) = ResolveActivation(behavior, authoring);
-            record = AppendActivationPair(record, chosenSlot, behavior, b3, blob);
-        }
-        RdtBuffer = ScriptInjector.Insert(RdtBuffer, o, record);
-
-        _structurallyEdited = true;
-        Reparse(); // refresh every record's offset and surface the new enemy
-        return Enemies.First(e => e.FileOffset == o);
-    }
+        => RoomEnemyInjector.AddEnemy(
+            this, donor, x, y, z, rotation, slot, killFlag, authoring);
 
     /// <summary>
     /// Add a brand-new enemy by injecting a fresh <c>0x20</c> record at a <b>caller-specified RDT
@@ -513,68 +375,8 @@ public sealed class RoomFile
     /// clean opcode boundary in any subroutine.</exception>
     public EnemyRecord AddEnemyAt(SpeciesDonor donor, int rdtOffset, short x, short y, short z, short rotation,
                                   byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
-        => InjectAt(donor, rdtOffset, x, y, z, rotation, slot, killFlag, authoring);
-
-    /// <summary>The shared splice core behind <see cref="AddEnemyAt"/>, <see cref="AddEnemyStanding"/> and
-    /// <see cref="AddEnemyEncounter"/>: resolve the model (reuse an already-loaded one, else import),
-    /// validate the offset is a clean opcode boundary, author the 24-byte <c>0x20</c> record and inject it
-    /// via <see cref="ScriptInjector"/>. Site SELECTION is the callers' job (see
-    /// <see cref="InjectionSiteClassifier"/>); this places at a given, validated offset.</summary>
-    private EnemyRecord InjectAt(SpeciesDonor donor, int rdtOffset, short x, short y, short z, short rotation,
-                                byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
-    {
-        if (Script is not { ParsedCleanly: true })
-            throw new InvalidOperationException("room script did not parse cleanly; cannot inject");
-
-        byte chosenSlot = slot ?? PickFreeSlot();
-        byte chosenKill = killFlag ?? PickFreeKillFlag();
-
-        // 1. Resolve the model+motion. If the room ALREADY loads this species, REUSE that loaded model:
-        //    a freshly imported copy is appended to the RDT but never loaded into a renderable node, so an
-        //    event-spawned enemy using it render-AVs (ADD-ENEMY-EVENT-INJECTION-CRASH-RCA.md). Only import
-        //    a species the room does not already load. Either path leaves rdtOffset valid — a reuse moves
-        //    nothing, and an import appends at the buffer END (at/before rdtOffset is untouched).
-        uint modelPtr, motionPtr;
-        if (LoadedModelFor(donor.Species) is { } loaded)
-            (modelPtr, motionPtr) = loaded;
-        else
-        {
-            var imp = SpeciesImporter.Import(RdtBuffer, donor.Model, donor.Motion);
-            RdtBuffer = imp.Rdt;
-            (modelPtr, motionPtr) = (imp.ModelPtr, imp.MotionPtr);
-        }
-
-        // 2. Validate the requested offset is a clean opcode boundary inside a subroutine (else the splice
-        //    would split an instruction). Insert separately enforces 4-alignment / after-table placement.
-        int sub = ScriptInjector.SubroutineAtBoundary(RdtBuffer, rdtOffset);
-        if (sub < 0)
-            throw new InvalidOperationException(
-                $"offset 0x{rdtOffset:x} is not a clean opcode boundary inside any subroutine; " +
-                "injecting there would split an instruction (pick an offset from the room's decoded script)");
-
-        // Refuse to displace a control-flow opcode (branch / loop / the 0x04 counter-gated loop-return):
-        // a record spliced there derails the SCD VM (0102 crashed at load with the auto-init offset on
-        // sub0's 0x04 — docs/reference/dc1/enemies/ENEMY-INJECTION-MODES.md "0102 load-crash RCA").
-        if (ScriptCfg.IsControlOpcode(RdtBuffer[rdtOffset]))
-            throw new InvalidOperationException(
-                $"offset 0x{rdtOffset:x} is a control-flow opcode (0x{RdtBuffer[rdtOffset]:x2}); splicing a " +
-                "record there derails the SCD VM — pick a plain opcode boundary, not a branch/loop/return");
-
-        // 3. Author the record and inject it (ScriptInjector relocates the function table, file-form
-        //    pointers and pc-relative branches around the shift).
-        var record = BuildEnemyRecord(donor.Category, chosenSlot, chosenKill, x, y, z, rotation,
-                                      modelPtr, motionPtr, authoring);
-        if (authoring.ActivateBehavior is byte behavior)
-        {
-            var (b3, blob) = ResolveActivation(behavior, authoring);
-            record = AppendActivationPair(record, chosenSlot, behavior, b3, blob);
-        }
-        RdtBuffer = ScriptInjector.Insert(RdtBuffer, rdtOffset, record);
-
-        _structurallyEdited = true;
-        Reparse();
-        return Enemies.First(e => e.FileOffset == rdtOffset);
-    }
+        => RoomEnemyInjector.AddEnemyAt(
+            this, donor, rdtOffset, x, y, z, rotation, slot, killFlag, authoring);
 
     /// <summary>
     /// The (model, motion) file-form pointers of an enemy this room ALREADY loads for
@@ -584,10 +386,7 @@ public sealed class RoomFile
     /// (docs/decisions/dc1/spawn/ADD-ENEMY-EVENT-INJECTION-CRASH-RCA.md). Matches only positively-decoded dinosaurs.
     /// </summary>
     public (uint Model, uint Motion)? LoadedModelFor(DinoSpecies species)
-    {
-        var e = Enemies.FirstOrDefault(x => x.IsRandomizableDino && x.Species == species);
-        return e is null ? null : (e.OriginalModelPtr, e.OriginalMotionPtr);
-    }
+        => RoomEnemyInjector.LoadedModelFor(this, species);
 
     /// <summary>
     /// <see cref="AddEnemyAt"/> plus the donor's texture staged into the target room (same as
@@ -596,14 +395,8 @@ public sealed class RoomFile
     public (EnemyRecord Enemy, TexturedImportResult Texture) AddEnemyAtTextured(
         SpeciesDonor donor, int rdtOffset, short x, short y, short z, short rotation,
         byte? slot = null, byte? killFlag = null, EnemyAuthoring authoring = default)
-    {
-        // When AddEnemyAt reuses an already-loaded model, the texture is already resident — no staging.
-        bool reused = LoadedModelFor(donor.Species) is not null;
-        var added = AddEnemyAt(donor, rdtOffset, x, y, z, rotation, slot, killFlag, authoring);
-        return reused
-            ? (added, new TexturedImportResult(TextureImportOutcome.Reused, null, null))
-            : (added, StageTexture(donor.Texture, added.ModelPtr));
-    }
+        => RoomEnemyInjector.AddEnemyAtTextured(
+            this, donor, rdtOffset, x, y, z, rotation, slot, killFlag, authoring);
 
     /// <summary>
     /// Add an <b>active, persistent "standing"</b> enemy — one that hunts and re-instantiates on every room
@@ -617,16 +410,8 @@ public sealed class RoomFile
     /// site — the honest failure, so a standing enemy is never silently downgraded to inert/one-shot.</exception>
     public EnemyRecord AddEnemyStanding(SpeciesDonor donor, short x, short y, short z, short rotation,
                                         byte? slot = null, byte? killFlag = null)
-    {
-        if (Script is not { ParsedCleanly: true })
-            throw new InvalidOperationException("room script did not parse cleanly; cannot inject");
-        int o = InjectionSiteClassifier.StandingSite(RdtBuffer);
-        if (o < 0)
-            throw new InvalidOperationException(
-                "room has no standing (active+persistent) injection site (no flag-gated init branch-target " +
-                "spawn block); use AddEnemyEncounter for a one-shot event spawn, or AddEnemy for an inert prop");
-        return InjectAt(donor, o, x, y, z, rotation, slot, killFlag);
-    }
+        => RoomEnemyInjector.AddEnemyStanding(
+            this, donor, x, y, z, rotation, slot, killFlag);
 
     /// <summary>
     /// Add an <b>active, one-shot "encounter"</b> enemy — one that hunts when its trigger fires but does not
@@ -640,144 +425,33 @@ public sealed class RoomFile
     /// (non-init) subroutine.</exception>
     public EnemyRecord AddEnemyEncounter(SpeciesDonor donor, short x, short y, short z, short rotation,
                                          byte? slot = null, byte? killFlag = null)
+        => RoomEnemyInjector.AddEnemyEncounter(
+            this, donor, x, y, z, rotation, slot, killFlag);
+
+    internal void ReplaceRdtBuffer(byte[] buffer) => RdtBuffer = buffer;
+
+    internal void MarkStructurallyEdited() => _structurallyEdited = true;
+
+    private void Adopt(RoomFile committed)
     {
-        if (Script is not { ParsedCleanly: true })
-            throw new InvalidOperationException("room script did not parse cleanly; cannot inject");
-        int o = InjectionSiteClassifier.EncounterSite(RdtBuffer);
-        if (o < 0)
-            throw new InvalidOperationException(
-                "room has no event (active one-shot) injection site (no non-init subroutine)");
-        return InjectAt(donor, o, x, y, z, rotation, slot, killFlag);
+        OriginalBytes = committed.OriginalBytes;
+        Package = committed.Package;
+        RdtBuffer = committed.RdtBuffer;
+        RdtCompressed = committed.RdtCompressed;
+        Script = committed.Script;
+        Items.Clear(); Items.AddRange(committed.Items);
+        Enemies.Clear(); Enemies.AddRange(committed.Enemies);
+        Doors.Clear(); Doors.AddRange(committed.Doors);
+        _structurallyEdited = false;
+        _textureStager.Clear();
     }
 
-    /// <summary>The dominance-safe injection offset inside subroutine 0: the latest 4-aligned opcode
-    /// boundary that <b>post-dominates the subroutine entry</b>, i.e. is guaranteed to execute on every
-    /// room entry (<see cref="ScriptCfg"/>; docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.17). This is the fix for the
-    /// "sometimes it spawns" gap: the old tail offset (largest interior boundary) is provably
-    /// undominated in 13 of 25 enemy rooms — a branch or an <c>0x04</c>/<c>0x10</c> exit skips it on
-    /// some entries, so the injected enemy silently fails to spawn. Falls back to the tail boundary only
-    /// if the CFG yields no interior post-dominated point (no observed corpus room). -1 if subroutine 0
-    /// has no interior opcode boundary at all.</summary>
-    private static int InitInsertOffset(ReadOnlySpan<byte> rdt, IReadOnlyList<int> starts)
-    {
-        int s0 = starts[0];
-        int e0 = starts.Count > 1 ? starts[1] : rdt.Length;
-
-        int safe = ScriptCfg.SafeInsertOffset(rdt, s0, e0);
-        if (safe > 0) return safe;
-
-        // Fallback: largest 4-aligned interior PLAIN-opcode boundary (the pre-cont.17 behaviour, minus
-        // control-flow slots — splicing before a branch / loop / the 0x04 loop-return derails the VM).
-        int best = -1, pos = s0;
-        while (pos < e0)
-        {
-            int len = DcOpcodes.Length(rdt, pos);
-            if (len <= 0 || pos + len > e0) break; // trailing data / derail
-            if (pos > s0 && (pos & 3) == 0 && !ScriptCfg.IsControlOpcode(rdt[pos])) best = pos;
-            pos += len;
-        }
-        return best;
-    }
-
-    /// <summary>Smallest large-entity slot index not already used by a placed enemy (0 when empty).</summary>
-    private byte PickFreeSlot()
-    {
-        var used = new HashSet<int>(Enemies.Select(e => (int)e.Slot));
-        byte s = 0;
-        while (used.Contains(s) && s < 0xff) s++;
-        return s;
-    }
-
-    /// <summary>An "already-killed" GetFlag(group 4) id not used by another enemy in this room, so the
-    /// new enemy is not treated as pre-killed (and killing it does not mark a sibling dead). 0 is the
-    /// corpus norm and is returned when free.</summary>
-    private byte PickFreeKillFlag()
-    {
-        var used = new HashSet<int>(Enemies.Select(e => (int)e.KillFlag));
-        byte f = 0;
-        while (used.Contains(f) && f < 0xff) f++;
-        return f;
-    }
-
-    private static byte[] BuildEnemyRecord(byte category, byte slot, byte killFlag,
-                                           short x, short y, short z, short rotation,
-                                           uint modelPtr, uint motionPtr, EnemyAuthoring authoring = default)
-    {
-        var r = new byte[DcOpcodes.EnemyLength]; // 24, zero-filled (matches the corpus template)
-        r[0] = DcOpcodes.Enemy;
-        r[EnemyRecord.SlotOffset] = slot;
-        r[EnemyRecord.CategoryOffset] = category;
-        r[EnemyRecord.AiParamOffset] = authoring.AiParam;
-        r[EnemyRecord.KillFlagOffset] = killFlag;
-        r[EnemyRecord.BirthModeOffset] = authoring.BirthMode;
-        BinaryPrimitives.WriteUInt16LittleEndian(r.AsSpan(EnemyRecord.MaxHpOffset, 2), authoring.MaxHp);
-        BinaryPrimitives.WriteInt16LittleEndian(r.AsSpan(EnemyRecord.PosXOffset, 2), x);
-        BinaryPrimitives.WriteInt16LittleEndian(r.AsSpan(EnemyRecord.PosYOffset, 2), y);
-        BinaryPrimitives.WriteInt16LittleEndian(r.AsSpan(EnemyRecord.PosZOffset, 2), z);
-        BinaryPrimitives.WriteInt16LittleEndian(r.AsSpan(EnemyRecord.RotationOffset, 2), rotation);
-        BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(EnemyRecord.ModelOffset, 4), modelPtr);
-        BinaryPrimitives.WriteUInt32LittleEndian(r.AsSpan(EnemyRecord.MotionOffset, 4), motionPtr);
-        return r;
-    }
-
-    /// <summary>
-    /// Append the script activation pair after an authored <c>0x20</c> record (STATIC-SCD-RE cont.49):
-    /// op <c>0x22</c> (<c>22 02 &lt;slot&gt; 00</c> — bind the running task's implicit entity,
-    /// <c>ctx+0xB = slot</c>) then op <c>0x3a</c> (<c>3a 00 &lt;behavior&gt; &lt;b3&gt;</c> + 8 operand
-    /// bytes — the "brain install": <c>entity+0x190 ← ptr(rec+4)</c>, <c>+0x18F = 1</c>,
-    /// <c>dword +0x3C ← (behavior&lt;&lt;8)|4</c>). This is what wakes a cat-1 placed by init (cat-2
-    /// self-activates without it). Total emitted insert = 24 + 4 + 12 = 40 bytes (4-aligned).
-    /// </summary>
-    private static byte[] AppendActivationPair(byte[] record, byte slot, byte behavior, byte b3, byte[] blob)
-    {
-        if (blob.Length != 8)
-            throw new ArgumentException($"op 0x3a operand blob must be 8 bytes, got {blob.Length}", nameof(blob));
-        var r = new byte[record.Length + 16];
-        record.CopyTo(r, 0);
-        int o = record.Length;
-        r[o] = 0x22; r[o + 1] = 0x02; r[o + 2] = slot;      // 22 02 <slot> 00
-        r[o + 4] = 0x3a; r[o + 6] = behavior; r[o + 7] = b3; // 3a 00 <behavior> <b3> <blob8>
-        blob.CopyTo(r, o + 8);
-        return r;
-    }
-
-    /// <summary>Resolve the emitted op <c>0x3a</c>'s byte[3] + 8 operand bytes from
-    /// <paramref name="authoring"/>: explicit values win; otherwise both are copied together from the
-    /// first native <c>0x3a</c> in this room (preferring one whose behavior code matches — retail
-    /// pairs b3/blob with the behavior, e.g. st10e's behavior-1 installs carry b3 0x1F/0x21 + what
-    /// look like target coords, while behavior-5 installs are all-zero); zeros when the room has none
-    /// (a retail-legal value — st102 sub6, cont.52).</summary>
-    private (byte B3, byte[] Blob) ResolveActivation(byte behavior, EnemyAuthoring authoring)
-    {
-        if (authoring.ActivateBlob is { } explicitBlob)
-            return (authoring.ActivateB3 ?? 0, explicitBlob);
-        var native = FindNative3a(behavior) ?? FindNative3a(null);
-        return (authoring.ActivateB3 ?? native?.B3 ?? 0, native?.Blob ?? new byte[8]);
-    }
-
-    /// <summary>The (byte[3], operand blob) of the first native op <c>0x3a</c> in this room's script —
-    /// filtered to <paramref name="behavior"/> when given — or null. The operands reference
-    /// script-embedded behavior data (format unmapped — cont.49), so a same-room copy keeps them valid.</summary>
-    private (byte B3, byte[] Blob)? FindNative3a(byte? behavior)
-    {
-        if (!ScriptInjector.TryReadFuncTable(RdtBuffer, out _, out var starts)) return null;
-        for (int i = 0; i < starts.Count; i++)
-        {
-            int s = starts[i], e = i + 1 < starts.Count ? starts[i + 1] : RdtBuffer.Length;
-            for (int pos = s; pos < e;)
-            {
-                int len = DcOpcodes.Length(RdtBuffer, pos);
-                if (len <= 0 || pos + len > e) break; // trailing data / derail
-                if (RdtBuffer[pos] == 0x3a && (behavior is null || RdtBuffer[pos + 2] == behavior))
-                    return (RdtBuffer[pos + 3], RdtBuffer.AsSpan(pos + 4, 8).ToArray());
-                pos += len;
-            }
-        }
-        return null;
-    }
+    internal TexturedImportResult StageTexture(
+        TextureBlock? texture, uint importedModelPtr, IReadOnlyList<VramRect>? reclaim = null)
+        => _textureStager.Stage(this, texture, importedModelPtr, reclaim);
 
     /// <summary>Re-walk the (grown) <see cref="RdtBuffer"/> and refresh the record lists / script.</summary>
-    private void Reparse()
+    internal void Reparse()
     {
         Script = RoomScript.Parse(RdtBuffer);
         Items.Clear(); Enemies.Clear(); Doors.Clear();
@@ -800,7 +474,8 @@ public sealed class RoomFile
 
         bool changed = _structurallyEdited;
         foreach (var item in Items)
-            if (!item.IsEmptySlot && (item.ItemId != item.OriginalItemId || item.NormalizeVisual)) { changed = true; break; }
+            if (!item.IsEmptySlot && (item.ItemId != item.OriginalItemId || item.NormalizeVisual
+                || item.TakeIndex != item.OriginalTakeIndex)) { changed = true; break; }
         if (!changed)
             foreach (var enemy in Enemies)
                 if (enemy.IsEdited) { changed = true; break; }
@@ -814,11 +489,9 @@ public sealed class RoomFile
         Script.ApplyEnemyEdits(edited, Enemies);
         Script.ApplyDoorEdits(edited, Doors);
 
-        byte[] payload = RdtCompressed ? Lzss.Compress(edited) : edited;
-        byte[] result = RebuildLastEntry(payload, entry);
-        if (_textureInserts is { Count: > 0 })
-            result = PackageRepacker.InsertEntriesBeforeRdt(result, _textureInserts);
-        return result;
+        byte[] payload = RoomPackageCodec.EncodeRdt(edited, RdtCompressed);
+        byte[] result = RoomPackageCodec.RebuildLastEntry(OriginalBytes, Package!, entry, payload);
+        return _textureStager.Apply(result);
     }
 
     /// <summary>
@@ -831,36 +504,8 @@ public sealed class RoomFile
     public byte[] WriteWithRdt(ReadOnlySpan<byte> editedDecompressedRdt)
     {
         if (Package?.RoomDataEntry is not { } entry) return OriginalBytes;
-        byte[] payload = RdtCompressed
-            ? Lzss.Compress(editedDecompressedRdt)
-            : editedDecompressedRdt.ToArray();
-        return RebuildLastEntry(payload, entry);
-    }
-
-    /// <summary>
-    /// Rebuild the file with the last entry's payload replaced by <paramref name="payload"/>.
-    /// The header up to (and including) the prior entries is kept verbatim; only the last
-    /// entry's size field is rewritten and its payload re-padded to the sector boundary.
-    /// </summary>
-    private byte[] RebuildLastEntry(byte[] payload, GianEntry entry)
-    {
-        int sector = GianPackage.SectorSize;
-        int padded = (payload.Length + sector - 1) & ~(sector - 1);
-
-        var result = new byte[entry.PayloadOffset + padded];
-        // Header + earlier entries (everything before this entry's payload) verbatim.
-        Array.Copy(OriginalBytes, 0, result, 0, entry.PayloadOffset);
-        Array.Copy(payload, 0, result, entry.PayloadOffset, payload.Length);
-
-        // Patch the last entry's declared size in the header table (size field at entry+4).
-        int entryIndex = Package!.Entries.Count - 1;
-        int sizeFieldOffset = entryIndex * Package.EntrySize + 4;
-        uint size = (uint)payload.Length;
-        result[sizeFieldOffset + 0] = (byte)size;
-        result[sizeFieldOffset + 1] = (byte)(size >> 8);
-        result[sizeFieldOffset + 2] = (byte)(size >> 16);
-        result[sizeFieldOffset + 3] = (byte)(size >> 24);
-        return result;
+        return RoomPackageCodec.RewriteRdt(
+            OriginalBytes, Package, entry, RdtCompressed, editedDecompressedRdt);
     }
 
     public static RoomFile ReadFromFile(int stage, int room, string path)

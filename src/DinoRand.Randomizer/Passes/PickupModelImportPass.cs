@@ -15,8 +15,10 @@ namespace DinoRand.Randomizer.Passes;
 ///
 /// <para>Runs AFTER the enemy passes: they splice script bytes (<c>ScriptInjector.Insert</c>),
 /// which would shift an already-appended mesh out from under the stored pointer. Off by default
-/// (<see cref="RandomizerConfig.ImportPickupModels"/>, CLI <c>--pickup-ground-models</c>, no GUI
-/// wiring): the in-engine render is gated on a human CE / in-game witness.</para>
+/// (<see cref="RandomizerConfig.ImportPickupModels"/>); the GUI's Advanced
+/// <c>Shuffled Key Items Model Change (Experimental/Crash Risk)</c> option and CLI
+/// <c>--pickup-ground-models</c> are explicit opt-ins. The in-engine render is gated on a human
+/// CE / in-game witness.</para>
 /// </summary>
 public sealed class PickupModelImportPass : IRandomizationPass
 {
@@ -55,6 +57,9 @@ public sealed class PickupModelImportPass : IRandomizationPass
                 {
                     it.VisualModelPtr = existing;
                     imported++;
+                    spoiler.AddRow(Spoiler.Dc1RoomNames.Describe(RoomCode(room)),
+                                   Spoiler.Dc1ItemNames.NameOf(it.ItemId),
+                                   Spoiler.Dc1RoomNames.Describe(donor.RoomCode));
                     continue;
                 }
 

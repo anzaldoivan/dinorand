@@ -217,22 +217,26 @@ public class GameFeatureSupportTests
     }
 
     [Fact]
-    public void Dc2_supports_enemies_player_model_and_voices()
+    public void Dc2_supports_items_keys_enemies_player_model_and_voices()
     {
-        // DC2's shipped features: the cross-species enemy randomizer (the file-edit TYPE swap,
+        // DC2's shipped features include the fixture-backed item/key writer and progression pass,
+        // the cross-species enemy randomizer (the file-edit TYPE swap,
         // docs/dc2/CROSS-SPECIES-RANDO-PLAN.md), the character-skin swap (PlayerModel — Dylan
         // renders as Gail/Rick via their engine-native WP graft files + the WP-gate exe patch,
         // docs/dc2/DC2-CHARACTER-SKIN-SWAP-PLAN.md; replaces the withdrawn whole-file swap of
         // docs/dc2/DC2-PLAYER-SWAP-FIRE-CRASH-RCA.md), and Voices (the 2026-07-05 folder-curation
         // cast labels in data/dc2/voice.json expose the voice UI; emission itself still waits on
-        // Dc2VoiceManifestLayout.IsDecoded). The other option groups stay fenced until their DC2
-        // record decodes land (KaQ OPEN #2/#5/#6).
+        // Dc2VoiceManifestLayout.IsDecoded). Other option groups stay fenced until their DC2
+        // contracts land.
         var dc2 = new DinoCrisis2();
+        Assert.True(dc2.Supports(GameFeature.Items));
+        Assert.True(dc2.Supports(GameFeature.KeyItems));
         Assert.True(dc2.Supports(GameFeature.Enemies));
         Assert.True(dc2.Supports(GameFeature.PlayerModel));
         Assert.True(dc2.Supports(GameFeature.Voices));
         foreach (GameFeature f in System.Enum.GetValues(typeof(GameFeature)))
-            if (f is not (GameFeature.Enemies or GameFeature.PlayerModel or GameFeature.Voices))
+            if (f is not (GameFeature.Items or GameFeature.KeyItems or GameFeature.Enemies
+                or GameFeature.PlayerModel or GameFeature.Voices))
                 Assert.False(dc2.Supports(f), $"DinoCrisis2 should not support {f} yet");
     }
 

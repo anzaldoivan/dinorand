@@ -44,7 +44,7 @@ fi
 ap_touched=0
 for f in "${staged[@]}"; do
   case "$f" in
-    data/dc1/map.json|data/dc1/items.json|data/dc1/room-data.json|data/dc1/reachability-oracle.json|scripts/gen_ap_logic.py|apworld/*)
+    data/dc1/map.json|data/dc1/items.json|data/dc1/room-data.json|data/dc1/reachability-oracle.json|data/dc1/ap-client-checks.json|scripts/gen_ap_logic.py|scripts/gen_ap_client_checks.py|apworld/*)
       ap_touched=1; break ;;
   esac
 done
@@ -96,6 +96,23 @@ done
 if [ "$docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
   python3 "$root/scripts/gen_docs_index.py" --check || {
     echo "pre-commit: docs index/frontmatter contract failed — run 'python3 scripts/gen_docs_index.py --apply' and stage docs/index.md" >&2
+    exit 1
+  }
+fi
+
+# Public release-note contract: this is intentionally separate from the docs index
+# generator because tone cannot be generated, but obvious RE leakage and malformed
+# release bullets can be rejected mechanically. CI is the non-bypassable backstop.
+public_docs_touched=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    README.md|USER-GUIDE.md|MODDING.md|CONTRIBUTING.md|CHANGELOG.md|scripts/check_docs.py)
+      public_docs_touched=1; break ;;
+  esac
+done
+if [ "$public_docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
+  PYTHONDONTWRITEBYTECODE=1 python3 "$root/scripts/check_docs.py" --check || {
+    echo "pre-commit: public documentation contract failed — rewrite release notes for players" >&2
     exit 1
   }
 fi
