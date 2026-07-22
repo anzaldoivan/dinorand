@@ -7,10 +7,12 @@ versions may include breaking changes).
 
 The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Directory.Build.props).
 
-## [Unreleased]
-
 <!-- Audience: players and release readers. Keep this section user-facing; technical evidence belongs in the
      contributor/research records, not in the release notes. -->
+
+## [Unreleased]
+
+## [0.6.0] — 2026-07-22
 
 ### Added
 
@@ -248,6 +250,7 @@ Initial feature set — everything prior to the voice randomizer.
   was.
 - Self-contained single-file release builds.
 
+[0.6.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.0
 [0.5.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.0
 [0.4.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.2
 [0.4.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.1
