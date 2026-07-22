@@ -1,0 +1,1551 @@
+{
+  "_policy": "Append-only numeric compatibility registry. Existing rows and ids are immutable; additions receive ids above the current maximum. Display renames retain the previous name in aliases.",
+  "_source": "Snapshot of the published DC1 AP logic v2 numeric namespace before the v3 correctness refactor.",
+  "version": 1,
+  "items": [
+    {
+      "key": "40S&W Bullets",
+      "name": "40S&W Bullets",
+      "id": 230752256,
+      "aliases": []
+    },
+    {
+      "key": "9mm Parabellum",
+      "name": "9mm Parabellum",
+      "id": 230752257,
+      "aliases": []
+    },
+    {
+      "key": "An. Aid",
+      "name": "An. Aid",
+      "id": 230752258,
+      "aliases": []
+    },
+    {
+      "key": "An. Darts L",
+      "name": "An. Darts L",
+      "id": 230752259,
+      "aliases": []
+    },
+    {
+      "key": "An. Darts M",
+      "name": "An. Darts M",
+      "id": 230752260,
+      "aliases": []
+    },
+    {
+      "key": "An. Darts S",
+      "name": "An. Darts S",
+      "id": 230752261,
+      "aliases": []
+    },
+    {
+      "key": "Antenna Key",
+      "name": "Antenna Key",
+      "id": 230752262,
+      "aliases": []
+    },
+    {
+      "key": "B1 Crane Card",
+      "name": "B1 Crane Card",
+      "id": 230752263,
+      "aliases": []
+    },
+    {
+      "key": "B1 Key Chip",
+      "name": "B1 Key Chip",
+      "id": 230752264,
+      "aliases": []
+    },
+    {
+      "key": "B1 Key Chip \" with number \"(3695)",
+      "name": "B1 Key Chip \" with number \"(3695)",
+      "id": 230752265,
+      "aliases": []
+    },
+    {
+      "key": "B2 Key Chip 1",
+      "name": "B2 Key Chip 1",
+      "id": 230752266,
+      "aliases": []
+    },
+    {
+      "key": "B2 Key Chip 1 \" without number \"",
+      "name": "B2 Key Chip 1 \" without number \"",
+      "id": 230752267,
+      "aliases": []
+    },
+    {
+      "key": "B2 Key Chip 2",
+      "name": "B2 Key Chip 2",
+      "id": 230752268,
+      "aliases": []
+    },
+    {
+      "key": "B2 Key Chip 2 \" with number \" (0392)",
+      "name": "B2 Key Chip 2 \" with number \" (0392)",
+      "id": 230752269,
+      "aliases": []
+    },
+    {
+      "key": "B3 Crane Card 1",
+      "name": "B3 Crane Card 1",
+      "id": 230752270,
+      "aliases": []
+    },
+    {
+      "key": "B3 Crane Card 2",
+      "name": "B3 Crane Card 2",
+      "id": 230752271,
+      "aliases": []
+    },
+    {
+      "key": "B3 Crane Card 3",
+      "name": "B3 Crane Card 3",
+      "id": 230752272,
+      "aliases": []
+    },
+    {
+      "key": "BG Area Key",
+      "name": "BG Area Key",
+      "id": 230752273,
+      "aliases": []
+    },
+    {
+      "key": "BG Room B1 Key",
+      "name": "BG Room B1 Key",
+      "id": 230752274,
+      "aliases": []
+    },
+    {
+      "key": "C. O. Area Key",
+      "name": "C. O. Area Key",
+      "id": 230752275,
+      "aliases": []
+    },
+    {
+      "key": "C. O. Pass Card",
+      "name": "C. O. Pass Card",
+      "id": 230752276,
+      "aliases": []
+    },
+    {
+      "key": "Core Parts 1",
+      "name": "Core Parts 1",
+      "id": 230752277,
+      "aliases": []
+    },
+    {
+      "key": "Core Parts 2",
+      "name": "Core Parts 2",
+      "id": 230752278,
+      "aliases": []
+    },
+    {
+      "key": "Custom part For \" Ancient Type Regina \"",
+      "name": "Custom part For \" Ancient Type Regina \"",
+      "id": 230752279,
+      "aliases": []
+    },
+    {
+      "key": "DDK Code Disc D",
+      "name": "DDK Code Disc D",
+      "id": 230752280,
+      "aliases": []
+    },
+    {
+      "key": "DDK Code Disc E",
+      "name": "DDK Code Disc E",
+      "id": 230752281,
+      "aliases": []
+    },
+    {
+      "key": "DDK Code Disc H",
+      "name": "DDK Code Disc H",
+      "id": 230752282,
+      "aliases": []
+    },
+    {
+      "key": "DDK Code Disc L",
+      "name": "DDK Code Disc L",
+      "id": 230752283,
+      "aliases": []
+    },
+    {
+      "key": "DDK Code Disc N",
+      "name": "DDK Code Disc N",
+      "id": 230752284,
+      "aliases": []
+    },
+    {
+      "key": "DDK Code Disc S",
+      "name": "DDK Code Disc S",
+      "id": 230752285,
+      "aliases": []
+    },
+    {
+      "key": "DDK Code Disc W",
+      "name": "DDK Code Disc W",
+      "id": 230752286,
+      "aliases": []
+    },
+    {
+      "key": "DDK Input Disc D",
+      "name": "DDK Input Disc D",
+      "id": 230752287,
+      "aliases": []
+    },
+    {
+      "key": "DDK Input Disc E",
+      "name": "DDK Input Disc E",
+      "id": 230752288,
+      "aliases": []
+    },
+    {
+      "key": "DDK Input Disc H",
+      "name": "DDK Input Disc H",
+      "id": 230752289,
+      "aliases": []
+    },
+    {
+      "key": "DDK Input Disc L",
+      "name": "DDK Input Disc L",
+      "id": 230752290,
+      "aliases": []
+    },
+    {
+      "key": "DDK Input Disc N",
+      "name": "DDK Input Disc N",
+      "id": 230752291,
+      "aliases": []
+    },
+    {
+      "key": "DDK Input Disc S",
+      "name": "DDK Input Disc S",
+      "id": 230752292,
+      "aliases": []
+    },
+    {
+      "key": "DDK Input Disc W",
+      "name": "DDK Input Disc W",
+      "id": 230752293,
+      "aliases": []
+    },
+    {
+      "key": "Energy Tank",
+      "name": "Energy Tank",
+      "id": 230752294,
+      "aliases": []
+    },
+    {
+      "key": "Entrance Key",
+      "name": "Entrance Key",
+      "id": 230752295,
+      "aliases": []
+    },
+    {
+      "key": "F. C. Device \" With FingerPrint \"",
+      "name": "F. C. Device \" With FingerPrint \"",
+      "id": 230752296,
+      "aliases": []
+    },
+    {
+      "key": "F. C. Device \" without FingerPrint \"",
+      "name": "F. C. Device \" without FingerPrint \"",
+      "id": 230752297,
+      "aliases": []
+    },
+    {
+      "key": "Grenade Bullets",
+      "name": "Grenade Bullets",
+      "id": 230752298,
+      "aliases": []
+    },
+    {
+      "key": "Grenade Gun",
+      "name": "Grenade Gun",
+      "id": 230752299,
+      "aliases": []
+    },
+    {
+      "key": "Grenade Gun (40mmHK)",
+      "name": "Grenade Gun (40mmHK)",
+      "id": 230752300,
+      "aliases": []
+    },
+    {
+      "key": "Grenade Gun Custom (40mmHK) \"Regina Custom\"",
+      "name": "Grenade Gun Custom (40mmHK) \"Regina Custom\"",
+      "id": 230752301,
+      "aliases": []
+    },
+    {
+      "key": "Handgun (Glock 34)",
+      "name": "Handgun (Glock 34)",
+      "id": 230752302,
+      "aliases": []
+    },
+    {
+      "key": "Handgun + Sight (Glock 34)",
+      "name": "Handgun + Sight (Glock 34)",
+      "id": 230752303,
+      "aliases": []
+    },
+    {
+      "key": "Handgun Custom (Glock 35)",
+      "name": "Handgun Custom (Glock 35)",
+      "id": 230752304,
+      "aliases": []
+    },
+    {
+      "key": "Handgun Custom + Sight (Glock 35)",
+      "name": "Handgun Custom + Sight (Glock 35)",
+      "id": 230752305,
+      "aliases": []
+    },
+    {
+      "key": "Handgun Sights (critical hit)",
+      "name": "Handgun Sights (critical hit)",
+      "id": 230752306,
+      "aliases": []
+    },
+    {
+      "key": "Handgun Slides (upgrade To Glock 35)",
+      "name": "Handgun Slides (upgrade To Glock 35)",
+      "id": 230752307,
+      "aliases": []
+    },
+    {
+      "key": "Heat Bullets",
+      "name": "Heat Bullets",
+      "id": 230752308,
+      "aliases": []
+    },
+    {
+      "key": "Hemostat",
+      "name": "Hemostat",
+      "id": 230752309,
+      "aliases": []
+    },
+    {
+      "key": "ID Card Type \" Colonel \"",
+      "name": "ID Card Type \" Colonel \"",
+      "id": 230752310,
+      "aliases": []
+    },
+    {
+      "key": "ID Card Type \" Communicator \"",
+      "name": "ID Card Type \" Communicator \"",
+      "id": 230752311,
+      "aliases": []
+    },
+    {
+      "key": "ID Card Type \" Project Superintendent \" (Dr. Kirk)",
+      "name": "ID Card Type \" Project Superintendent \" (Dr. Kirk)",
+      "id": 230752312,
+      "aliases": []
+    },
+    {
+      "key": "ID Card Type \" Researcher \"",
+      "name": "ID Card Type \" Researcher \"",
+      "id": 230752313,
+      "aliases": []
+    },
+    {
+      "key": "Initializer",
+      "name": "Initializer",
+      "id": 230752314,
+      "aliases": []
+    },
+    {
+      "key": "Intensifier",
+      "name": "Intensifier",
+      "id": 230752315,
+      "aliases": []
+    },
+    {
+      "key": "Key Card L",
+      "name": "Key Card L",
+      "id": 230752316,
+      "aliases": []
+    },
+    {
+      "key": "Key Card Lv. A",
+      "name": "Key Card Lv. A",
+      "id": 230752317,
+      "aliases": []
+    },
+    {
+      "key": "Key Card Lv. B",
+      "name": "Key Card Lv. B",
+      "id": 230752318,
+      "aliases": []
+    },
+    {
+      "key": "Key Card Lv. C",
+      "name": "Key Card Lv. C",
+      "id": 230752319,
+      "aliases": []
+    },
+    {
+      "key": "Key Card Lv. D",
+      "name": "Key Card Lv. D",
+      "id": 230752320,
+      "aliases": []
+    },
+    {
+      "key": "Key Card R",
+      "name": "Key Card R",
+      "id": 230752321,
+      "aliases": []
+    },
+    {
+      "key": "Med. Pak L",
+      "name": "Med. Pak L",
+      "id": 230752322,
+      "aliases": []
+    },
+    {
+      "key": "Med. Pak M",
+      "name": "Med. Pak M",
+      "id": 230752323,
+      "aliases": []
+    },
+    {
+      "key": "Med. Pak S",
+      "name": "Med. Pak S",
+      "id": 230752324,
+      "aliases": []
+    },
+    {
+      "key": "Multiplier",
+      "name": "Multiplier",
+      "id": 230752325,
+      "aliases": []
+    },
+    {
+      "key": "Nucleum",
+      "name": "Nucleum",
+      "id": 230752326,
+      "aliases": []
+    },
+    {
+      "key": "Panel Key 1",
+      "name": "Panel Key 1",
+      "id": 230752327,
+      "aliases": []
+    },
+    {
+      "key": "Panel Key 2",
+      "name": "Panel Key 2",
+      "id": 230752328,
+      "aliases": []
+    },
+    {
+      "key": "Planning Disc",
+      "name": "Planning Disc",
+      "id": 230752329,
+      "aliases": []
+    },
+    {
+      "key": "Plug",
+      "name": "Plug",
+      "id": 230752330,
+      "aliases": []
+    },
+    {
+      "key": "Poison Dart",
+      "name": "Poison Dart",
+      "id": 230752331,
+      "aliases": []
+    },
+    {
+      "key": "Port Card Key",
+      "name": "Port Card Key",
+      "id": 230752332,
+      "aliases": []
+    },
+    {
+      "key": "Protect P. 1-A",
+      "name": "Protect P. 1-A",
+      "id": 230752333,
+      "aliases": []
+    },
+    {
+      "key": "Protect P. 1-B",
+      "name": "Protect P. 1-B",
+      "id": 230752334,
+      "aliases": []
+    },
+    {
+      "key": "Protect P. 2-A",
+      "name": "Protect P. 2-A",
+      "id": 230752335,
+      "aliases": []
+    },
+    {
+      "key": "Protect P. 2-B",
+      "name": "Protect P. 2-B",
+      "id": 230752336,
+      "aliases": []
+    },
+    {
+      "key": "Pulse Receiver",
+      "name": "Pulse Receiver",
+      "id": 230752337,
+      "aliases": []
+    },
+    {
+      "key": "Recovery Aid",
+      "name": "Recovery Aid",
+      "id": 230752338,
+      "aliases": []
+    },
+    {
+      "key": "Researcher Memo \" with number \"(1281)",
+      "name": "Researcher Memo \" with number \"(1281)",
+      "id": 230752339,
+      "aliases": []
+    },
+    {
+      "key": "Resuscitation",
+      "name": "Resuscitation",
+      "id": 230752340,
+      "aliases": []
+    },
+    {
+      "key": "SG Bullets",
+      "name": "SG Bullets",
+      "id": 230752341,
+      "aliases": []
+    },
+    {
+      "key": "Screwdriver",
+      "name": "Screwdriver",
+      "id": 230752342,
+      "aliases": []
+    },
+    {
+      "key": "Secret Disc \" With Data \"",
+      "name": "Secret Disc \" With Data \"",
+      "id": 230752343,
+      "aliases": []
+    },
+    {
+      "key": "Shotgun \"Model PA3\" (pump-action)",
+      "name": "Shotgun \"Model PA3\" (pump-action)",
+      "id": 230752344,
+      "aliases": []
+    },
+    {
+      "key": "Shotgun + Stock \"Model PA3\"",
+      "name": "Shotgun + Stock \"Model PA3\"",
+      "id": 230752345,
+      "aliases": []
+    },
+    {
+      "key": "Shotgun Custom \"Model SPAS12\" (military shotgun)",
+      "name": "Shotgun Custom \"Model SPAS12\" (military shotgun)",
+      "id": 230752346,
+      "aliases": []
+    },
+    {
+      "key": "Shotgun Custom + Stock \"Model SPAS12\"",
+      "name": "Shotgun Custom + Stock \"Model SPAS12\"",
+      "id": 230752347,
+      "aliases": []
+    },
+    {
+      "key": "Shotgun Parts (upgrade To SPAS12)",
+      "name": "Shotgun Parts (upgrade To SPAS12)",
+      "id": 230752348,
+      "aliases": []
+    },
+    {
+      "key": "Shotgun Stock",
+      "name": "Shotgun Stock",
+      "id": 230752349,
+      "aliases": []
+    },
+    {
+      "key": "Slag Bullets",
+      "name": "Slag Bullets",
+      "id": 230752350,
+      "aliases": []
+    },
+    {
+      "key": "Small Size Key",
+      "name": "Small Size Key",
+      "id": 230752351,
+      "aliases": []
+    },
+    {
+      "key": "Stabilizer",
+      "name": "Stabilizer",
+      "id": 230752352,
+      "aliases": []
+    },
+    {
+      "key": "Startup Battery. R \" Charged \"",
+      "name": "Startup Battery. R \" Charged \"",
+      "id": 230752353,
+      "aliases": []
+    },
+    {
+      "key": "Startup Battery. R \" Large \"",
+      "name": "Startup Battery. R \" Large \"",
+      "id": 230752354,
+      "aliases": []
+    },
+    {
+      "key": "Startup Battery. R \" Uncharged \"",
+      "name": "Startup Battery. R \" Uncharged \"",
+      "id": 230752355,
+      "aliases": []
+    },
+    {
+      "key": "Startup Battery. W \" Large \"",
+      "name": "Startup Battery. W \" Large \"",
+      "id": 230752356,
+      "aliases": []
+    },
+    {
+      "key": "inf. Grenades",
+      "name": "inf. Grenades",
+      "id": 230752357,
+      "aliases": []
+    },
+    {
+      "key": "locker Room Key",
+      "name": "locker Room Key",
+      "id": 230752358,
+      "aliases": []
+    }
+  ],
+  "locations": [
+    {
+      "key": "010f:40:-5120,3584",
+      "name": "Backup Generator Room 1F (010f) - Startup Battery. R \" Charged \" @-5120,3584",
+      "id": 230817792,
+      "aliases": []
+    },
+    {
+      "key": "030b:2b:-4272,-1296",
+      "name": "Backup Generator Room B1 (030b) - Plug @-4272,-1296",
+      "id": 230817793,
+      "aliases": []
+    },
+    {
+      "key": "030b:40:-5120,3584",
+      "name": "Backup Generator Room B1 (030b) - Startup Battery. R \" Charged \" @-5120,3584",
+      "id": 230817794,
+      "aliases": []
+    },
+    {
+      "key": "0601:5a:-5120,3584",
+      "name": "Backup Generator Room B3 (0601) - Startup Battery. W \" Large \" @-5120,3584",
+      "id": 230817795,
+      "aliases": []
+    },
+    {
+      "key": "010d:20:-6144,768",
+      "name": "Backyard of the Facility (010d) - An. Aid @-6144,768",
+      "id": 230817796,
+      "aliases": []
+    },
+    {
+      "key": "030c:13:-7700,6900",
+      "name": "Carrying Out Room B1 (030c) - An. Darts M @-7700,6900",
+      "id": 230817797,
+      "aliases": []
+    },
+    {
+      "key": "030c:35:-7700,6900",
+      "name": "Carrying Out Room B1 (030c) - ID Card Type \" Communicator \" @-7700,6900",
+      "id": 230817798,
+      "aliases": []
+    },
+    {
+      "key": "0600:18:-1616,4480",
+      "name": "Carrying Out Room B3 (0600) - Grenade Bullets @-1616,4480",
+      "id": 230817799,
+      "aliases": []
+    },
+    {
+      "key": "0600:5a:-5120,3584",
+      "name": "Carrying Out Room B3 (0600) - Startup Battery. W \" Large \" @-5120,3584",
+      "id": 230817800,
+      "aliases": []
+    },
+    {
+      "key": "0608:2b:-7936,6400",
+      "name": "Central Stairway (0608) - Plug @-7936,6400",
+      "id": 230817801,
+      "aliases": []
+    },
+    {
+      "key": "0202:63:-3568,720",
+      "name": "Chief's Room (0202) - DDK Input Disc N @-3568,720",
+      "id": 230817802,
+      "aliases": []
+    },
+    {
+      "key": "0202:47:-3468,2768",
+      "name": "Chief's Room (0202) - Key Card L @-3468,2768",
+      "id": 230817803,
+      "aliases": []
+    },
+    {
+      "key": "0202:3d:-1792,1792",
+      "name": "Chief's Room (0202) - Panel Key 1 @-1792,1792",
+      "id": 230817804,
+      "aliases": []
+    },
+    {
+      "key": "0202:10:2020,-1392",
+      "name": "Chief's Room (0202) - SG Bullets @2020,-1392",
+      "id": 230817805,
+      "aliases": []
+    },
+    {
+      "key": "0205:45:-2032,1632",
+      "name": "Communication Room (0205) - Antenna Key @-2032,1632",
+      "id": 230817806,
+      "aliases": []
+    },
+    {
+      "key": "0205:11:-208,-1248",
+      "name": "Communication Room (0205) - Slag Bullets @-208,-1248",
+      "id": 230817807,
+      "aliases": []
+    },
+    {
+      "key": "0304:2b:-4700,6100",
+      "name": "Computer Room (0304) - Plug @-4700,6100",
+      "id": 230817808,
+      "aliases": []
+    },
+    {
+      "key": "0304:44:-1500,0",
+      "name": "Computer Room (0304) - Screwdriver @-1500,0",
+      "id": 230817809,
+      "aliases": []
+    },
+    {
+      "key": "0602:49:-3072,4096",
+      "name": "Control Room B3 (0602) - B3 Crane Card 1 @-3072,4096",
+      "id": 230817810,
+      "aliases": []
+    },
+    {
+      "key": "0602:4a:2608,-32",
+      "name": "Control Room B3 (0602) - B3 Crane Card 2 @2608,-32",
+      "id": 230817811,
+      "aliases": []
+    },
+    {
+      "key": "0602:2b:1856,4224",
+      "name": "Control Room B3 (0602) - Plug @1856,4224",
+      "id": 230817812,
+      "aliases": []
+    },
+    {
+      "key": "0105:16:-4096,3072",
+      "name": "Control Room Hall (0105) - 9mm Parabellum @-4096,3072",
+      "id": 230817813,
+      "aliases": []
+    },
+    {
+      "key": "0609:57:-1360,1152",
+      "name": "Disembarkation Immigration Office (0609) - B2 Key Chip 2 @-1360,1152",
+      "id": 230817814,
+      "aliases": []
+    },
+    {
+      "key": "0609:2b:5760,512",
+      "name": "Disembarkation Immigration Office (0609) - Plug @5760,512",
+      "id": 230817815,
+      "aliases": []
+    },
+    {
+      "key": "050f:1d:-1100,-2100",
+      "name": "Dr. Kirk's Library Room (050f) - Med. Pak M @-1100,-2100",
+      "id": 230817816,
+      "aliases": []
+    },
+    {
+      "key": "050f:58:-7700,6900",
+      "name": "Dr. Kirk's Library Room (050f) - Pulse Receiver @-7700,6900",
+      "id": 230817817,
+      "aliases": []
+    },
+    {
+      "key": "050e:3a:-7700,6900",
+      "name": "Dr. Kirk's Personal Lab (050e) - Key Card Lv. A @-7700,6900",
+      "id": 230817818,
+      "aliases": []
+    },
+    {
+      "key": "050e:61:-7700,6900",
+      "name": "Dr. Kirk's Personal Lab (050e) - Planning Disc @-7700,6900",
+      "id": 230817819,
+      "aliases": []
+    },
+    {
+      "key": "050e:2b:-2100,-2700",
+      "name": "Dr. Kirk's Personal Lab (050e) - Plug @-2100,-2700",
+      "id": 230817820,
+      "aliases": []
+    },
+    {
+      "key": "0113:2b:-7008,2928",
+      "name": "Elevator Hall (0113) - Plug @-7008,2928",
+      "id": 230817821,
+      "aliases": []
+    },
+    {
+      "key": "0408:43:-2576,-5568",
+      "name": "Elevator Power Room (0408) - B1 Crane Card @-2576,-5568",
+      "id": 230817822,
+      "aliases": []
+    },
+    {
+      "key": "0502:14:4480,-6656",
+      "name": "Experiment Room Hall (0502) - An. Darts L @4480,-6656",
+      "id": 230817823,
+      "aliases": []
+    },
+    {
+      "key": "0502:38:-9472,3840",
+      "name": "Experiment Room Hall (0502) - Key Card Lv. C @-9472,3840",
+      "id": 230817824,
+      "aliases": []
+    },
+    {
+      "key": "0502:21:-16384,-4352",
+      "name": "Experiment Room Hall (0502) - Recovery Aid @-16384,-4352",
+      "id": 230817825,
+      "aliases": []
+    },
+    {
+      "key": "0300:14:-8048,4560",
+      "name": "Experiment Simulation Room (0300) - An. Darts L @-8048,4560",
+      "id": 230817826,
+      "aliases": []
+    },
+    {
+      "key": "0300:0c:4512,-944",
+      "name": "Experiment Simulation Room (0300) - Shotgun Stock @4512,-944",
+      "id": 230817827,
+      "aliases": []
+    },
+    {
+      "key": "0400:20:12576,1328",
+      "name": "Front Area of Entrance (0400) - An. Aid @12576,1328",
+      "id": 230817828,
+      "aliases": []
+    },
+    {
+      "key": "0400:6a:13264,1792",
+      "name": "Front Area of Entrance (0400) - DDK Code Disc N @13264,1792",
+      "id": 230817829,
+      "aliases": []
+    },
+    {
+      "key": "0400:10:7984,1104",
+      "name": "Front Area of Entrance (0400) - SG Bullets @7984,1104",
+      "id": 230817830,
+      "aliases": []
+    },
+    {
+      "key": "0303:46:3088,-1008",
+      "name": "Gas Experiment Room (0303) - B1 Key Chip @3088,-1008",
+      "id": 230817831,
+      "aliases": []
+    },
+    {
+      "key": "0303:46:3328,-2560",
+      "name": "Gas Experiment Room (0303) - B1 Key Chip @3328,-2560",
+      "id": 230817832,
+      "aliases": []
+    },
+    {
+      "key": "0303:21:512,-2048",
+      "name": "Gas Experiment Room (0303) - Recovery Aid @512,-2048",
+      "id": 230817833,
+      "aliases": []
+    },
+    {
+      "key": "0303:2d:3088,-1008",
+      "name": "Gas Experiment Room (0303) - Small Size Key @3088,-1008",
+      "id": 230817834,
+      "aliases": []
+    },
+    {
+      "key": "0605:66:-3072,3328",
+      "name": "General Weapons Storage (0605) - DDK Input Disc W @-3072,3328",
+      "id": 230817835,
+      "aliases": []
+    },
+    {
+      "key": "0605:1b:12032,384",
+      "name": "General Weapons Storage (0605) - Hemostat @12032,384",
+      "id": 230817836,
+      "aliases": []
+    },
+    {
+      "key": "0615:66:-3072,3328",
+      "name": "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328",
+      "id": 230817837,
+      "aliases": []
+    },
+    {
+      "key": "0615:1b:12032,384",
+      "name": "General Weapons Storage (0615) - Hemostat @12032,384",
+      "id": 230817838,
+      "aliases": []
+    },
+    {
+      "key": "0203:10:4800,4100",
+      "name": "Hall 2F (0203) - SG Bullets @4800,4100",
+      "id": 230817839,
+      "aliases": []
+    },
+    {
+      "key": "0402:18:-4352,-12992",
+      "name": "Hangar (0402) - Grenade Bullets @-4352,-12992",
+      "id": 230817840,
+      "aliases": []
+    },
+    {
+      "key": "0402:18:5888,-12960",
+      "name": "Hangar (0402) - Grenade Bullets @5888,-12960",
+      "id": 230817841,
+      "aliases": []
+    },
+    {
+      "key": "0402:09:-5888,-11520",
+      "name": "Hangar (0402) - Grenade Gun (40mmHK) @-5888,-11520",
+      "id": 230817842,
+      "aliases": []
+    },
+    {
+      "key": "0612:18:-896,0",
+      "name": "Hovercraft (0612) - Grenade Bullets @-896,0",
+      "id": 230817843,
+      "aliases": []
+    },
+    {
+      "key": "0612:09:-896,0",
+      "name": "Hovercraft (0612) - Grenade Gun (40mmHK) @-896,0",
+      "id": 230817844,
+      "aliases": []
+    },
+    {
+      "key": "0612:2b:-896,0",
+      "name": "Hovercraft (0612) - Plug @-896,0",
+      "id": 230817845,
+      "aliases": []
+    },
+    {
+      "key": "0610:54:-1664,-2016",
+      "name": "Hovercraft Storage (0610) - Energy Tank @-1664,-2016",
+      "id": 230817846,
+      "aliases": []
+    },
+    {
+      "key": "0610:18:-1024,-2048",
+      "name": "Hovercraft Storage (0610) - Grenade Bullets @-1024,-2048",
+      "id": 230817847,
+      "aliases": []
+    },
+    {
+      "key": "0610:09:-1024,-2048",
+      "name": "Hovercraft Storage (0610) - Grenade Gun (40mmHK) @-1024,-2048",
+      "id": 230817848,
+      "aliases": []
+    },
+    {
+      "key": "0610:2b:-1024,-2048",
+      "name": "Hovercraft Storage (0610) - Plug @-1024,-2048",
+      "id": 230817849,
+      "aliases": []
+    },
+    {
+      "key": "0405:2b:1008,11296",
+      "name": "Large Size Elevator (0405) - Plug @1008,11296",
+      "id": 230817850,
+      "aliases": []
+    },
+    {
+      "key": "060f:68:4128,448",
+      "name": "Large Size Elevator (060f) - DDK Input Disc D @4128,448",
+      "id": 230817851,
+      "aliases": []
+    },
+    {
+      "key": "060f:2b:864,8240",
+      "name": "Large Size Elevator (060f) - Plug @864,8240",
+      "id": 230817852,
+      "aliases": []
+    },
+    {
+      "key": "060f:15:3344,1264",
+      "name": "Large Size Elevator (060f) - Poison Dart @3344,1264",
+      "id": 230817853,
+      "aliases": []
+    },
+    {
+      "key": "060f:32:288,-1920",
+      "name": "Large Size Elevator (060f) - Port Card Key @288,-1920",
+      "id": 230817854,
+      "aliases": []
+    },
+    {
+      "key": "0406:6b:-3956,-1600",
+      "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-3956,-1600",
+      "id": 230817855,
+      "aliases": []
+    },
+    {
+      "key": "0406:6b:-4352,224",
+      "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-4352,224",
+      "id": 230817856,
+      "aliases": []
+    },
+    {
+      "key": "0406:64:-3456,1280",
+      "name": "Large Size Elevator Control Room (0406) - DDK Input Disc L @-3456,1280",
+      "id": 230817857,
+      "aliases": []
+    },
+    {
+      "key": "0404:11:-4200,3200",
+      "name": "Large Size Elevator Passageway (0404) - Slag Bullets @-4200,3200",
+      "id": 230817858,
+      "aliases": []
+    },
+    {
+      "key": "0404:11:5300,3000",
+      "name": "Large Size Elevator Passageway (0404) - Slag Bullets @5300,3000",
+      "id": 230817859,
+      "aliases": []
+    },
+    {
+      "key": "0109:2f:2560,-1632",
+      "name": "Lecture Room (0109) - BG Room B1 Key @2560,-1632",
+      "id": 230817860,
+      "aliases": []
+    },
+    {
+      "key": "0108:2b:-8240,-7904",
+      "name": "Lecture Room Hallway (0108) - Plug @-8240,-7904",
+      "id": 230817861,
+      "aliases": []
+    },
+    {
+      "key": "0108:2b:-8256,-7904",
+      "name": "Lecture Room Hallway (0108) - Plug @-8256,-7904",
+      "id": 230817862,
+      "aliases": []
+    },
+    {
+      "key": "0305:5e:-6400,-4864",
+      "name": "Library Room (0305) - B1 Key Chip \" with number \"(3695) @-6400,-4864",
+      "id": 230817863,
+      "aliases": []
+    },
+    {
+      "key": "0305:0d:-2176,2032",
+      "name": "Library Room (0305) - Handgun Sights (critical hit) @-2176,2032",
+      "id": 230817864,
+      "aliases": []
+    },
+    {
+      "key": "0305:48:2304,2560",
+      "name": "Library Room (0305) - Key Card R @2304,2560",
+      "id": 230817865,
+      "aliases": []
+    },
+    {
+      "key": "0305:1d:-6864,5888",
+      "name": "Library Room (0305) - Med. Pak M @-6864,5888",
+      "id": 230817866,
+      "aliases": []
+    },
+    {
+      "key": "0100:12:-1712,-2528",
+      "name": "Locker Room (0100) - An. Darts S @-1712,-2528",
+      "id": 230817867,
+      "aliases": []
+    },
+    {
+      "key": "0100:69:-1088,2976",
+      "name": "Locker Room (0100) - DDK Code Disc H @-1088,2976",
+      "id": 230817868,
+      "aliases": []
+    },
+    {
+      "key": "0204:13:3800,2800",
+      "name": "Lounge (0204) - An. Darts M @3800,2800",
+      "id": 230817869,
+      "aliases": []
+    },
+    {
+      "key": "0204:0e:2000,-3000",
+      "name": "Lounge (0204) - Handgun Slides (upgrade To Glock 35) @2000,-3000",
+      "id": 230817870,
+      "aliases": []
+    },
+    {
+      "key": "0107:20:2384,-2208",
+      "name": "Main Entrance (0107) - An. Aid @2384,-2208",
+      "id": 230817871,
+      "aliases": []
+    },
+    {
+      "key": "0206:20:-656,-3168",
+      "name": "Main Entrance (0206) - An. Aid @-656,-3168",
+      "id": 230817872,
+      "aliases": []
+    },
+    {
+      "key": "0103:20:-2576,3008",
+      "name": "Management Office (0103) - An. Aid @-2576,3008",
+      "id": 230817873,
+      "aliases": []
+    },
+    {
+      "key": "0103:62:-512,1072",
+      "name": "Management Office (0103) - DDK Input Disc H @-512,1072",
+      "id": 230817874,
+      "aliases": []
+    },
+    {
+      "key": "0103:2e:-2576,3008",
+      "name": "Management Office (0103) - Entrance Key @-2576,3008",
+      "id": 230817875,
+      "aliases": []
+    },
+    {
+      "key": "0103:3e:-2800,992",
+      "name": "Management Office (0103) - Panel Key 2 @-2800,992",
+      "id": 230817876,
+      "aliases": []
+    },
+    {
+      "key": "0103:2b:-544,640",
+      "name": "Management Office (0103) - Plug @-544,640",
+      "id": 230817877,
+      "aliases": []
+    },
+    {
+      "key": "0103:01:2288,-2224",
+      "name": "Management Office (0103) - Shotgun \"Model PA3\" (pump-action) @2288,-2224",
+      "id": 230817878,
+      "aliases": []
+    },
+    {
+      "key": "010c:30:-2992,2720",
+      "name": "Material Storage (010c) - BG Area Key @-2992,2720",
+      "id": 230817879,
+      "aliases": []
+    },
+    {
+      "key": "010c:1d:704,2928",
+      "name": "Material Storage (010c) - Med. Pak M @704,2928",
+      "id": 230817880,
+      "aliases": []
+    },
+    {
+      "key": "040b:20:240,-2266",
+      "name": "Materials Room (040b) - An. Aid @240,-2266",
+      "id": 230817881,
+      "aliases": []
+    },
+    {
+      "key": "040b:3c:2816,-2496",
+      "name": "Materials Room (040b) - C. O. Pass Card @2816,-2496",
+      "id": 230817882,
+      "aliases": []
+    },
+    {
+      "key": "0308:34:-128,-1792",
+      "name": "Medical Room (0308) - ID Card Type \" Colonel \" @-128,-1792",
+      "id": 230817883,
+      "aliases": []
+    },
+    {
+      "key": "0308:1d:-1185,1451",
+      "name": "Medical Room (0308) - Med. Pak M @-1185,1451",
+      "id": 230817884,
+      "aliases": []
+    },
+    {
+      "key": "0308:1d:1536,-2464",
+      "name": "Medical Room (0308) - Med. Pak M @1536,-2464",
+      "id": 230817885,
+      "aliases": []
+    },
+    {
+      "key": "0308:23:-1185,1451",
+      "name": "Medical Room (0308) - Multiplier @-1185,1451",
+      "id": 230817886,
+      "aliases": []
+    },
+    {
+      "key": "0308:2b:-368,2512",
+      "name": "Medical Room (0308) - Plug @-368,2512",
+      "id": 230817887,
+      "aliases": []
+    },
+    {
+      "key": "0308:1f:-1185,1451",
+      "name": "Medical Room (0308) - Resuscitation @-1185,1451",
+      "id": 230817888,
+      "aliases": []
+    },
+    {
+      "key": "010b:36:5008,-840",
+      "name": "Office (010b) - ID Card Type \" Researcher \" @5008,-840",
+      "id": 230817889,
+      "aliases": []
+    },
+    {
+      "key": "0507:52:4352,7824",
+      "name": "Parts Storage (0507) - Core Parts 1 @4352,7824",
+      "id": 230817890,
+      "aliases": []
+    },
+    {
+      "key": "0507:53:4352,9616",
+      "name": "Parts Storage (0507) - Core Parts 2 @4352,9616",
+      "id": 230817891,
+      "aliases": []
+    },
+    {
+      "key": "0507:0f:-4352,10000",
+      "name": "Parts Storage (0507) - Grenade Gun @-4352,10000",
+      "id": 230817892,
+      "aliases": []
+    },
+    {
+      "key": "0507:2b:6144,3088",
+      "name": "Parts Storage (0507) - Plug @6144,3088",
+      "id": 230817893,
+      "aliases": []
+    },
+    {
+      "key": "0508:20:-1728,-9456",
+      "name": "Passageway (0508) - An. Aid @-1728,-9456",
+      "id": 230817894,
+      "aliases": []
+    },
+    {
+      "key": "010e:20:-9024,-7760",
+      "name": "Passageway to the Backup Generator (010e) - An. Aid @-9024,-7760",
+      "id": 230817895,
+      "aliases": []
+    },
+    {
+      "key": "0114:20:5632,3184",
+      "name": "Passageway to the Backup Generator (0114) - An. Aid @5632,3184",
+      "id": 230817896,
+      "aliases": []
+    },
+    {
+      "key": "0500:20:-7568,6672",
+      "name": "Passageway to the Experiment Area (0500) - An. Aid @-7568,6672",
+      "id": 230817897,
+      "aliases": []
+    },
+    {
+      "key": "060b:6e:2736,-6656",
+      "name": "Passageway to the Port (060b) - DDK Code Disc S @2736,-6656",
+      "id": 230817898,
+      "aliases": []
+    },
+    {
+      "key": "060b:23:-4480,5760",
+      "name": "Passageway to the Port (060b) - Multiplier @-4480,5760",
+      "id": 230817899,
+      "aliases": []
+    },
+    {
+      "key": "060a:55:-5120,3584",
+      "name": "Port (060a) - Nucleum @-5120,3584",
+      "id": 230817900,
+      "aliases": []
+    },
+    {
+      "key": "060a:21:10064,15104",
+      "name": "Port (060a) - Recovery Aid @10064,15104",
+      "id": 230817901,
+      "aliases": []
+    },
+    {
+      "key": "0613:21:10064,15104",
+      "name": "Port (0613) - Recovery Aid @10064,15104",
+      "id": 230817902,
+      "aliases": []
+    },
+    {
+      "key": "050c:5d:-3328,5616",
+      "name": "Power Freq. Room (050c) - Researcher Memo \" with number \"(1281) @-3328,5616",
+      "id": 230817903,
+      "aliases": []
+    },
+    {
+      "key": "0302:65:-1280,1152",
+      "name": "Research Meeting Room (0302) - DDK Input Disc E @-1280,1152",
+      "id": 230817904,
+      "aliases": []
+    },
+    {
+      "key": "0302:2b:2880,-3056",
+      "name": "Research Meeting Room (0302) - Plug @2880,-3056",
+      "id": 230817905,
+      "aliases": []
+    },
+    {
+      "key": "0505:2b:-1100,1800",
+      "name": "Researcher Rest Room (0505) - Plug @-1100,1800",
+      "id": 230817906,
+      "aliases": []
+    },
+    {
+      "key": "0604:2b:3024,224",
+      "name": "Rest Station (0604) - Plug @3024,224",
+      "id": 230817907,
+      "aliases": []
+    },
+    {
+      "key": "0506:56:-5696,-1232",
+      "name": "Security Pass Room (0506) - B2 Key Chip 1 @-5696,-1232",
+      "id": 230817908,
+      "aliases": []
+    },
+    {
+      "key": "0506:67:3840,2592",
+      "name": "Security Pass Room (0506) - DDK Input Disc S @3840,2592",
+      "id": 230817909,
+      "aliases": []
+    },
+    {
+      "key": "0506:3b:-6912,3328",
+      "name": "Security Pass Room (0506) - ID Card Type \" Project Superintendent \" (Dr. Kirk) @-6912,3328",
+      "id": 230817910,
+      "aliases": []
+    },
+    {
+      "key": "0506:2b:-6144,128",
+      "name": "Security Pass Room (0506) - Plug @-6144,128",
+      "id": 230817911,
+      "aliases": []
+    },
+    {
+      "key": "0607:4d:4480,640",
+      "name": "Special Weapons Storage (0607) - Initializer @4480,640",
+      "id": 230817912,
+      "aliases": []
+    },
+    {
+      "key": "0607:5b:-1792,1792",
+      "name": "Special Weapons Storage (0607) - Secret Disc \" With Data \" @-1792,1792",
+      "id": 230817913,
+      "aliases": []
+    },
+    {
+      "key": "0607:4c:4480,640",
+      "name": "Special Weapons Storage (0607) - Stabilizer @4480,640",
+      "id": 230817914,
+      "aliases": []
+    },
+    {
+      "key": "0504:6d:-1632,2304",
+      "name": "Stabilizer Design Room (0504) - DDK Code Disc W @-1632,2304",
+      "id": 230817915,
+      "aliases": []
+    },
+    {
+      "key": "0504:4e:2256,-3840",
+      "name": "Stabilizer Design Room (0504) - Protect P. 1-A @2256,-3840",
+      "id": 230817916,
+      "aliases": []
+    },
+    {
+      "key": "0504:50:-2912,3872",
+      "name": "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872",
+      "id": 230817917,
+      "aliases": []
+    },
+    {
+      "key": "0504:50:4896,-3840",
+      "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
+      "id": 230817918,
+      "aliases": []
+    },
+    {
+      "key": "0504:4f:-2912,3872",
+      "name": "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872",
+      "id": 230817919,
+      "aliases": []
+    },
+    {
+      "key": "0504:4f:4896,-3840",
+      "name": "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840",
+      "id": 230817920,
+      "aliases": []
+    },
+    {
+      "key": "0503:6f:-2800,-3088",
+      "name": "Stabilizer Experiment Room (0503) - DDK Code Disc D @-2800,-3088",
+      "id": 230817921,
+      "aliases": []
+    },
+    {
+      "key": "0503:4d:-3468,2768",
+      "name": "Stabilizer Experiment Room (0503) - Initializer @-3468,2768",
+      "id": 230817922,
+      "aliases": []
+    },
+    {
+      "key": "0503:2b:-10240,-5248",
+      "name": "Stabilizer Experiment Room (0503) - Plug @-10240,-5248",
+      "id": 230817923,
+      "aliases": []
+    },
+    {
+      "key": "0503:51:-3468,2768",
+      "name": "Stabilizer Experiment Room (0503) - Protect P. 2-B @-3468,2768",
+      "id": 230817924,
+      "aliases": []
+    },
+    {
+      "key": "0503:5b:-1792,1792",
+      "name": "Stabilizer Experiment Room (0503) - Secret Disc \" With Data \" @-1792,1792",
+      "id": 230817925,
+      "aliases": []
+    },
+    {
+      "key": "0503:0b:-10240,4480",
+      "name": "Stabilizer Experiment Room (0503) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+      "id": 230817926,
+      "aliases": []
+    },
+    {
+      "key": "0503:4c:-3468,2768",
+      "name": "Stabilizer Experiment Room (0503) - Stabilizer @-3468,2768",
+      "id": 230817927,
+      "aliases": []
+    },
+    {
+      "key": "0511:6f:-2800,-3088",
+      "name": "Stabilizer Experiment Room (0511) - DDK Code Disc D @-2800,-3088",
+      "id": 230817928,
+      "aliases": []
+    },
+    {
+      "key": "0511:2b:-10240,-5248",
+      "name": "Stabilizer Experiment Room (0511) - Plug @-10240,-5248",
+      "id": 230817929,
+      "aliases": []
+    },
+    {
+      "key": "0511:0b:-10240,4480",
+      "name": "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+      "id": 230817930,
+      "aliases": []
+    },
+    {
+      "key": "0104:6c:-528,1280",
+      "name": "Strategy Room (0104) - DDK Code Disc E @-528,1280",
+      "id": 230817931,
+      "aliases": []
+    },
+    {
+      "key": "0104:41:-2352,-272",
+      "name": "Strategy Room (0104) - F. C. Device \" without FingerPrint \" @-2352,-272",
+      "id": 230817932,
+      "aliases": []
+    },
+    {
+      "key": "0104:2b:-2880,-2032",
+      "name": "Strategy Room (0104) - Plug @-2880,-2032",
+      "id": 230817933,
+      "aliases": []
+    },
+    {
+      "key": "050a:2b:7344,4736",
+      "name": "Third Energy Area B3 (050a) - Plug @7344,4736",
+      "id": 230817934,
+      "aliases": []
+    },
+    {
+      "key": "050b:2b:6656,-3328",
+      "name": "Third Energy Control Room (050b) - Plug @6656,-3328",
+      "id": 230817935,
+      "aliases": []
+    },
+    {
+      "key": "0510:22:0,-5280",
+      "name": "Third Energy Control Room (0510) - Intensifier @0,-5280",
+      "id": 230817936,
+      "aliases": []
+    },
+    {
+      "key": "0510:39:4336,3344",
+      "name": "Third Energy Control Room (0510) - Key Card Lv. B @4336,3344",
+      "id": 230817937,
+      "aliases": []
+    },
+    {
+      "key": "0606:4b:-7680,3392",
+      "name": "Transport Passageway (0606) - B3 Crane Card 3 @-7680,3392",
+      "id": 230817938,
+      "aliases": []
+    },
+    {
+      "key": "0606:31:-7648,2880",
+      "name": "Transport Passageway (0606) - C. O. Area Key @-7648,2880",
+      "id": 230817939,
+      "aliases": []
+    },
+    {
+      "key": "0606:18:3328,-2560",
+      "name": "Transport Passageway (0606) - Grenade Bullets @3328,-2560",
+      "id": 230817940,
+      "aliases": []
+    },
+    {
+      "key": "0606:2b:6144,-2560",
+      "name": "Transport Passageway (0606) - Plug @6144,-2560",
+      "id": 230817941,
+      "aliases": []
+    },
+    {
+      "key": "0606:2b:6912,-11392",
+      "name": "Transport Passageway (0606) - Plug @6912,-11392",
+      "id": 230817942,
+      "aliases": []
+    },
+    {
+      "key": "060d:18:-2816,10368",
+      "name": "Underground Heliport (060d) - Grenade Bullets @-2816,10368",
+      "id": 230817943,
+      "aliases": []
+    },
+    {
+      "key": "060d:09:-2816,10368",
+      "name": "Underground Heliport (060d) - Grenade Gun (40mmHK) @-2816,10368",
+      "id": 230817944,
+      "aliases": []
+    },
+    {
+      "key": "060d:2b:-2816,10368",
+      "name": "Underground Heliport (060d) - Plug @-2816,10368",
+      "id": 230817945,
+      "aliases": []
+    }
+  ]
+}

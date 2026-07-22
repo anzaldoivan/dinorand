@@ -12,6 +12,8 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+### Added
+
 - **Archipelago runtime client for DC1.** Connect DinoRand to an existing Archipelago game with
   `--ap-connect <host[:port]> --ap-slot <name> --install <dir>`: pickups become checks, items from
   other players arrive in-game, and reconnecting keeps your progress. The client runs on Windows;
