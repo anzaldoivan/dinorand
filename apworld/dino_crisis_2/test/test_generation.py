@@ -55,6 +55,9 @@ class TestGeneration(DinoCrisis2TestBase):
         )
 
     def test_slot_data_closes_install_contract(self) -> None:
+        from Fill import distribute_items_restrictive
+
+        distribute_items_restrictive(self.multiworld)
         slot_data = self.world.fill_slot_data()
         self.assertEqual(slot_data["logic_version"], 2)
         self.assertEqual(slot_data["start_room"], "101")
@@ -65,4 +68,9 @@ class TestGeneration(DinoCrisis2TestBase):
             slot_data["source_ids"],
             {str(loc["apId"]): loc["sourceId"] for loc in dc2.LOCATIONS},
         )
-        self.assertEqual(len(slot_data["placements"]), len(dc2.LOCATIONS))
+        placements = slot_data["placements"]
+        self.assertEqual(len(placements), len(dc2.LOCATIONS))
+        self.assertEqual(
+            set(placements),
+            {str(loc["apId"]) for loc in dc2.LOCATIONS},
+        )
