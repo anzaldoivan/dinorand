@@ -165,6 +165,20 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
             only_check_listed=True,
         )
 
+    def test_parallel_physical_edges_keep_unique_entrance_names(self) -> None:
+        # Distinct physical doors can share endpoints while carrying different latch rules.
+        # AP requires every entrance name to be unique, so parallel edges must not be dropped or
+        # registered under the same default name.
+        entrances = [
+            entrance.name
+            for region in self.multiworld.regions
+            if region.player == self.player
+            for entrance in region.exits
+        ]
+        expected = 1 + sum(edge["from"] != edge["to"] for edge in dc1.EDGES)  # Menu -> start
+        self.assertEqual(expected, len(entrances))
+        self.assertEqual(len(entrances), len(set(entrances)))
+
     def test_shared_placement_policy_keeps_progression_out_of_ineligible_locations(self) -> None:
         from Fill import distribute_items_restrictive
         distribute_items_restrictive(self.multiworld)

@@ -65,11 +65,16 @@ class DinoCrisis1World(World):
         for edge in dc1.EDGES:
             if edge["setsLatch"] is not None:
                 latch_setters.setdefault(edge["setsLatch"], []).append(edge)
-        for e in dc1.EDGES:
+        for edge_index, e in enumerate(dc1.EDGES):
             if e["from"] == e["to"]:
                 continue  # physical same-node doors add no AP reachability and AP rejects self-connects
+            entrance_name = (
+                f"{regions[e['from']].name} -> {regions[e['to']].name} "
+                f"[edge {edge_index}]"
+            )
             entrance = regions[e["from"]].connect(
                 regions[e["to"]],
+                name=entrance_name,
                 rule=self._edge_rule(e, room_regions, latch_setters),
             )
             # A rule that calls state.can_reach_region must register the dependency, or AP's
