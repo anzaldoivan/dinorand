@@ -68,6 +68,9 @@ jobs:
       - name: Install Archipelago dependencies
         working-directory: Archipelago
         run: python ModuleUpdate.py --yes
+      - name: Install Archipelago test dependencies
+        working-directory: Archipelago
+        run: python -m pip install -r ci-requirements.txt
       - name: Drop both worlds into the Archipelago checkout
         run: |
           cp -r dinorand/apworld/dino_crisis_1 Archipelago/worlds/dino_crisis_1

@@ -57,6 +57,9 @@ public sealed class PickupModelImportPass : IRandomizationPass
                 {
                     it.VisualModelPtr = existing;
                     imported++;
+                    spoiler.AddRow(Spoiler.Dc1RoomNames.Describe(RoomCode(room)),
+                                   Spoiler.Dc1ItemNames.NameOf(it.ItemId),
+                                   Spoiler.Dc1RoomNames.Describe(donor.RoomCode));
                     continue;
                 }
 

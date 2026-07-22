@@ -353,6 +353,74 @@ public class PickupModelImportTests
         Assert.Equal(ItemRecord.GenericPanelModelPtr, ReadU32(edited2, item2.FileOffset + ItemRecord.ModelPtrOffset));
     }
 
+    [Fact]
+    public void ImportPass_SharedDonorReuse_ReportsEveryPickup()
+    {
+        const ushort tpage = 0x0007;
+        ushort clut = TextureImporter.MakeClut(864, 507);
+
+        // Donor room: one visible 0x2e pickup points at a valid one-quad mesh in the pre-script gap.
+        var donorRdt = BuildMesh(0x24, Array.Empty<byte[]>(), new[] { QuadPrim(tpage, clut, UvQuad) });
+        int donorTable = donorRdt.Length;
+        Array.Resize(ref donorRdt, donorTable + 4 + DcOpcodes.ItemLength);
+        WriteU32(donorRdt, 0x14, PsxBase + (uint)donorTable);
+        WriteU32(donorRdt, donorTable, 4);
+        int donorRec = donorTable + 4;
+        donorRdt[donorRec] = DcOpcodes.Item;
+        donorRdt[donorRec + 2] = DcOpcodes.ItemSubtype;
+        donorRdt[donorRec + ItemRecord.IdOffset] = 0x2e;
+        donorRdt[donorRec + ItemRecord.CountOffset] = 1;
+        donorRdt[donorRec + ItemRecord.DisplaySlotOffset] = 1;
+        WriteU32(donorRdt, donorRec + ItemRecord.ModelPtrOffset, PsxBase + 0x24);
+
+        var donorBytes = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(448, 0, 96, 256),
+             Lzss.Compress(PatternPixels(96, 256))),
+            (GianEntryType.Palette, new VramRect(864, 507, 16, 1), PatternPixels(16, 1)),
+            (GianEntryType.Data, default, donorRdt));
+        var donor = RoomFile.Read(1, 1, donorBytes);
+
+        // Target room: two relocated records need the same donor. The pass should append/import once,
+        // repoint both records to that shared copy, and report both pickup outcomes in the spoiler.
+        const int targetTable = 0x24;
+        var targetRdt = new byte[targetTable + 4 + 2 * DcOpcodes.ItemLength];
+        WriteU32(targetRdt, 0x14, PsxBase + targetTable);
+        WriteU32(targetRdt, targetTable, 4);
+        for (int i = 0; i < 2; i++)
+        {
+            int rec = targetTable + 4 + i * DcOpcodes.ItemLength;
+            targetRdt[rec] = DcOpcodes.Item;
+            targetRdt[rec + 2] = DcOpcodes.ItemSubtype;
+            targetRdt[rec + ItemRecord.IdOffset] = (byte)(0x16 + i);
+            targetRdt[rec + ItemRecord.CountOffset] = 1;
+            targetRdt[rec + ItemRecord.DisplaySlotOffset] = (byte)(8 + i);
+            WriteU32(targetRdt, rec + ItemRecord.ModelPtrOffset, ItemRecord.GenericPanelModelPtr);
+        }
+        var targetBytes = BuildPackage(
+            (GianEntryType.Lzss2, new VramRect(320, 0, 192, 512),
+             Lzss.Compress(PatternPixels(192, 512))),
+            (GianEntryType.Data, default, targetRdt));
+        var target = RoomFile.Read(1, 2, targetBytes);
+        foreach (var item in target.Items)
+        {
+            item.ItemId = 0x2e;
+            item.NormalizeVisual = true;
+            item.NormalizeDisplaySlot = item.DisplaySlot;
+        }
+
+        var rooms = new List<RoomFile> { donor, target };
+        var context = new RandomizationContext(
+            new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(1),
+            new RandomizerConfig { ImportPickupModels = true }, _ => { });
+
+        new PickupModelImportPass().Apply(context);
+
+        Assert.All(target.Items, item => Assert.NotEqual(ItemRecord.GenericPanelModelPtr, item.VisualModelPtr));
+        Assert.Single(target.Items.Select(item => item.VisualModelPtr).Distinct());
+        var section = Assert.Single(context.Spoiler.Sections, s => s.Title == "Pickup models imported");
+        Assert.Equal(2, section.Rows.Count);
+    }
+
     // --- real install ------------------------------------------------------------------------------
 
     private static readonly GameDefinition Game = new DinoCrisis1();
