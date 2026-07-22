@@ -47,6 +47,28 @@ public class Dc1ReachabilityOracleTests
     }
 
     [Fact]
+    public void CommittedOracle_0609HasOnlyTraversableIncomingSources_AndDdkWIsAndGated()
+    {
+        var path = FindRepoFile(Path.Combine("data", "dc1", "reachability-oracle.json"));
+        using var doc = JsonDocument.Parse(File.ReadAllBytes(path));
+        var incoming = doc.RootElement.GetProperty("edges").EnumerateArray()
+            .Where(edge => edge.GetProperty("to").GetString() == "0609")
+            .ToList();
+
+        Assert.Equal(new[] { "0604", "060b" }, incoming
+            .Select(edge => edge.GetProperty("from").GetString()!)
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(source => source)
+            .ToArray());
+        Assert.DoesNotContain(incoming, edge => edge.GetProperty("from").GetString() is "0503" or "050f" or "0607");
+
+        var ddkW = Assert.Single(incoming, edge => edge.GetProperty("from").GetString() == "0604");
+        Assert.Equal(new[] { 0x66, 0x6d }, ddkW.GetProperty("requiresItems")
+            .EnumerateArray().Select(item => item.GetInt32()).ToArray());
+        Assert.Contains(incoming, edge => edge.GetProperty("from").GetString() == "060b");
+    }
+
+    [Fact]
     public void RealInstall_Oracle_MatchesEngine_ByteIdentical()
     {
         var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");

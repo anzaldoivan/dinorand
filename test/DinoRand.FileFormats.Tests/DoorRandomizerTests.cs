@@ -268,6 +268,25 @@ public class DoorRandomizerTests
         Assert.DoesNotContain(start.Edges, e => e.Target.Code == 0x0100);
     }
 
+    [Fact]
+    public void CandidateGraph_PreservesDoorSubroutineContext()
+    {
+        var eventRoom = Room(0x0503, (0x0609, 0));
+        eventRoom.Doors[0].SubroutineIndex = 1;
+        var initRoom = Room(0x0604, (0x0609, 0));
+        var rooms = new List<RoomFile> { eventRoom, initRoom };
+        var context = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(1),
+                                                new RandomizerConfig(), _ => { });
+        var result = new SegmentedDoorConnector.Result(
+            true, Array.Empty<SegmentedDoorConnector.Pairing>(),
+            Array.Empty<SegmentedDoorConnector.FreeEnd>(), Array.Empty<string>());
+
+        var candidate = DoorRandomizer.BuildCandidateGraph(context, result);
+
+        Assert.Empty(candidate.Nodes.Single(node => node.Code == 0x0503).Edges);
+        Assert.Single(candidate.Nodes.Single(node => node.Code == 0x0604).Edges);
+    }
+
     // --- laser-fence region gate survives a shuffle (REGION-SCHEMA-PLAN.md I3) ------------------
 
     [Fact]

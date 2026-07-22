@@ -410,7 +410,7 @@ namespace DinoRand.App
                         return (res, tn);
                     });
                     InstallStatusBrush = Brushes.Green;
-                    InstallStatusText = $"✓ Seed installed correctly.{trailNote} Restore to undo.";
+                    InstallStatusText = $"✓ Seed {_appSeed} installed correctly. Restore to undo.";
                     CurrentSlice.GamePath = GamePath;
                     CurrentSlice.LastSeed = _appSeed.ToString();
                     _settings.Save();
@@ -562,7 +562,7 @@ namespace DinoRand.App
                 }
                 InstallStatusBrush = Brushes.Green;
                 InstallStatusText = rr.Restored > 0
-                    ? $"✓ Restored {rr.Restored} original room files." + (exeRestored ? " Dino2.exe restored." : "")
+                    ? $"✓ Restored original files." + (exeRestored ? " Dino2.exe restored." : "")
                     : exeRestored ? "✓ Dino2.exe restored." : "Nothing to restore.";
             }
             catch (Exception ex)

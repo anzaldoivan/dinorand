@@ -67,7 +67,8 @@ public sealed class RoomFile
     /// <summary>Room id within the stage (the XX in stNXX.dat).</summary>
     public int Room { get; }
 
-    /// <summary>Doors / area transitions parsed from the room's script segment.</summary>
+    /// <summary>All raw doors / area-transition records parsed from the room's script segment, including
+    /// event-subroutine records that the room graph deliberately does not export as ordinary transitions.</summary>
     public List<DoorRecord> Doors { get; } = new();
 
     /// <summary>Item pickups placed in the room.</summary>

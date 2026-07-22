@@ -46,7 +46,7 @@ public static class DoorPoseLayout
     public const int EntryDOffset = 0x24;
 }
 
-/// <summary>A door / area-transition placed by SCD opcode <c>0x28</c> in its subtype-0 form.</summary>
+/// <summary>A raw door / area-transition record placed by SCD opcode <c>0x28</c> in its subtype-0 form.</summary>
 /// <remarks>
 /// Doors are the sibling of the item record (subtype 4) under the same <c>0x28</c> AOT
 /// ("area-of-things") umbrella opcode (<see cref="DcOpcodes.Door"/>/<see cref="DcOpcodes.DoorSubtype"/>,
@@ -110,6 +110,21 @@ public sealed class DoorRecord
     /// self-latch SETTER</b> (<c>SetFlag(9, LockId)</c> on first traverse — the "open from the far
     /// side" shortcut); 6/7/8 = Key Card ladder; 9..0xfc = item id == type; 0xfd/fe/ff = special.</summary>
     public int DoorType { get; set; }
+
+    /// <summary>
+    /// Function-table subroutine containing this record. Subroutine 0 is the room-load init path;
+    /// nonzero entries are event subroutines. This context is retained so consumers can distinguish
+    /// room transitions from event/unresolved records without dropping raw bytes.
+    /// </summary>
+    public int SubroutineIndex { get; set; }
+
+    /// <summary>
+    /// True for the statically documented room-entry transition contract: a subtype-0 record on the
+    /// room-load init path (function-table subroutine 0). Non-init records remain raw but are event or
+    /// unresolved activation surfaces and are not ordinary graph edges. This is deliberately not a
+    /// reciprocal-edge test, so confirmed one-way init transitions remain directed edges.
+    /// </summary>
+    public bool IsTraversableRoomTransition => SubroutineIndex == 0;
 
     /// <summary>
     /// Entry pose the player arrives at in the <i>destination</i> room: position

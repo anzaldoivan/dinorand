@@ -535,6 +535,31 @@ public class RoomScriptTests
     }
 
     [Fact]
+    public void Walk_PreservesDoorSubroutineContext_ForGraphClassification()
+    {
+        const int headerLen = 0x24;
+        const int tableBytes = 8;
+        int tableBase = headerLen;
+        int s0 = tableBase + tableBytes;
+        var sub0 = DoorRec(0x06, 0x09);
+        var sub1 = DoorRec(0x06, 0x09);
+        int s1 = s0 + sub0.Length;
+        var buf = new byte[s1 + sub1.Length];
+        WriteU32(buf, 0x14, PsxBase + (uint)tableBase);
+        WriteU32(buf, tableBase, tableBytes);
+        WriteU32(buf, tableBase + 4, (uint)(s1 - tableBase));
+        sub0.CopyTo(buf, s0);
+        sub1.CopyTo(buf, s1);
+
+        var doors = RoomScript.Parse(buf).Doors;
+        Assert.Equal(2, doors.Count);
+        Assert.Equal(0, doors[0].SubroutineIndex);
+        Assert.True(doors[0].IsTraversableRoomTransition);
+        Assert.Equal(1, doors[1].SubroutineIndex);
+        Assert.False(doors[1].IsTraversableRoomTransition);
+    }
+
+    [Fact]
     public void Walk_DistinguishesDoorsFromItems_SameOpcode()
     {
         // 0x28 is shared: subtype 0 = door, subtype 4 = item. The walker must split them.

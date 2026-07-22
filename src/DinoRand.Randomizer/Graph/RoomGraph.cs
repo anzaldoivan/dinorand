@@ -51,6 +51,11 @@ public sealed class RoomGraph
             int code = ((room.Stage & 0xff) << 8) | (room.Room & 0xff);
             foreach (var door in room.Doors)
             {
+                // RoomScript preserves event/unresolved 0x28 records for lossless editing. Only the
+                // room-load init-path contract represents an ordinary room transition; do not infer
+                // traversability from reciprocity, which would erase legitimate one-way story doors.
+                if (!door.IsTraversableRoomTransition)
+                    continue;
                 var source = OwningRegion(graph, splits, room.Stage, room.Room, door.TargetCode);
                 var target = LandingRegion(graph, splits, door.TargetStage, door.TargetRoom, code);
                 source.Edges.Add(new RoomEdge(target, door));

@@ -82,7 +82,9 @@ public sealed class RoomScript
     /// them); a record's <see cref="EnemyRecord.ModelFieldOffset"/> follows its opcode.</summary>
     public IReadOnlyList<EnemyRecord> Enemies { get; }
 
-    /// <summary>Door / area-transition records (<c>0x28</c> subtype 0) found in the script.</summary>
+    /// <summary>All raw door / area-transition records (<c>0x28</c> subtype 0) found in every
+    /// function-table subroutine. Use <see cref="DoorRecord.IsTraversableRoomTransition"/> for the
+    /// graph's init-path transition contract; event records remain here for lossless consumers.</summary>
     public IReadOnlyList<DoorRecord> Doors { get; }
 
     /// <summary>Display-node pool slots occupied by op23 static-scenery records in this room (their
@@ -109,7 +111,7 @@ public sealed class RoomScript
         {
             int start = starts[i];
             int end = i + 1 < starts.Count ? starts[i + 1] : buffer.Length;
-            bool ok = WalkSubroutine(buffer, start, end, items, enemies, doors, scenerySlots);
+            bool ok = WalkSubroutine(buffer, start, end, i, items, enemies, doors, scenerySlots);
             // A derail anywhere but the last subroutine means an unknown/misaligned opcode.
             if (!ok && i != starts.Count - 1) clean = false;
         }
@@ -155,7 +157,7 @@ public sealed class RoomScript
     /// Walk <c>[start, end)</c> as an opcode stream, collecting item records. Returns false if a
     /// record has an unknown length or would run past <paramref name="end"/> (trailing data).
     /// </summary>
-    private static bool WalkSubroutine(ReadOnlySpan<byte> buffer, int start, int end,
+    private static bool WalkSubroutine(ReadOnlySpan<byte> buffer, int start, int end, int subroutineIndex,
                                        List<ItemRecord> items, List<EnemyRecord> enemies,
                                        List<DoorRecord> doors, HashSet<byte> scenerySlots)
     {
@@ -184,6 +186,7 @@ public sealed class RoomScript
                     LockId = buffer[pos + DoorRecord.LockOffset],
                     OriginalLockId = buffer[pos + DoorRecord.LockOffset],
                     DoorType = buffer[pos + DoorRecord.DoorTypeOffset],
+                    SubroutineIndex = subroutineIndex,
                     Raw = buffer.Slice(pos, len).ToArray(),
                     FileOffset = pos,
                 };

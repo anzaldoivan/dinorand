@@ -128,6 +128,7 @@ public sealed class DoorRandomizer : IRandomizationPass
                     OriginalTargetRoom = door.OriginalTargetRoom,
                     DoorType = door.DoorType,
                     LockId = door.LockId,
+                    SubroutineIndex = door.SubroutineIndex,
                     FileOffset = door.FileOffset,
                     Raw = door.Raw,
                 });
