@@ -244,6 +244,78 @@ public class ItemRandomizerTests
     }
 
     [Fact]
+    public void ShuffleMode_PreservesTuples_AndAllowsCrossHandlerLocations_AtLoungePath()
+    {
+        // The exact ordinary Lounge record is the Handgun Slides source at 0204/0x3bdfc. Its
+        // native handler takes the ownership path for 0x0e, while supply ids such as 0x1f take the
+        // inventory path. Shuffle mode deliberately preserves the existing item multiset, including
+        // cross-handler placements; the native close fix handles a failed supply pickup in that spot.
+        // The 0xff records at 0x3ba74/0x3bacc are runtime-armed slots, not shuffle locations.
+        var before = new[] { (0x0e, 1), (0x1f, 2), (0x16, 3) }.OrderBy(x => x).ToArray();
+        bool crossHandlerPlacementSeen = false;
+        bool supplyToSupplyMovementSeen = false;
+
+        for (int seed = 0; seed < 32; seed++)
+        {
+            var start = new RoomFile(StStage, StRoom);
+            start.Doors.Add(new DoorRecord { TargetStage = 2, TargetRoom = 4, DoorType = 0 });
+
+            var lounge = new RoomFile(2, 4);
+            var handgunSlides = QuadRec(0x0e, 2000, -3000, 0x3bdfc);
+            handgunSlides.TakeIndex = handgunSlides.OriginalTakeIndex = 0x8d;
+            var resuscitation = new ItemRecord
+            {
+                ItemId = 0x1f, OriginalItemId = 0x1f, Amount = 2, FileOffset = 0x3be28,
+            };
+            var nineMm = new ItemRecord
+            {
+                ItemId = 0x16, OriginalItemId = 0x16, Amount = 3, FileOffset = 0x3be54,
+            };
+            var runtimeSlot = QuadRec(0xff, -3900, 4300, 0x3ba74);
+            runtimeSlot.TakeIndex = runtimeSlot.OriginalTakeIndex = 0xce;
+            runtimeSlot.Amount = 0;
+            var secondRuntimeSlot = QuadRec(0xff, 3900, 4300, 0x3bacc);
+            secondRuntimeSlot.TakeIndex = secondRuntimeSlot.OriginalTakeIndex = 0xcf;
+            secondRuntimeSlot.Amount = 0;
+            var progressionKey = new ItemRecord
+            {
+                ItemId = 0x2b, OriginalItemId = 0x2b, Amount = 1, FileOffset = 0x3be80,
+            };
+            lounge.Items.Add(handgunSlides);
+            lounge.Items.Add(resuscitation);
+            lounge.Items.Add(nineMm);
+            lounge.Items.Add(runtimeSlot);
+            lounge.Items.Add(secondRuntimeSlot);
+            lounge.Items.Add(progressionKey);
+
+            var rooms = new[] { start, lounge };
+            var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(seed),
+                                               new RandomizerConfig { ReplaceItemPool = false }, _ => { });
+            new ItemRandomizer().Apply(ctx);
+
+            var after = new[]
+            {
+                (handgunSlides.ItemId, handgunSlides.Amount),
+                (resuscitation.ItemId, resuscitation.Amount),
+                (nineMm.ItemId, nineMm.Amount),
+            }.OrderBy(x => x).ToArray();
+            Assert.Equal(before, after);
+            Assert.Equal(0xff, runtimeSlot.ItemId);
+            Assert.Equal(0, runtimeSlot.Amount);
+            Assert.Equal(0xff, secondRuntimeSlot.ItemId);
+            Assert.Equal(0, secondRuntimeSlot.Amount);
+            Assert.Equal((0x2b, 1), (progressionKey.ItemId, progressionKey.Amount));
+            crossHandlerPlacementSeen |= handgunSlides.ItemId is 0x16 or 0x1f;
+            supplyToSupplyMovementSeen |= resuscitation.ItemId == 0x16 || nineMm.ItemId == 0x1f;
+        }
+
+        Assert.True(crossHandlerPlacementSeen,
+            "the 0204 ownership source must remain eligible to receive an inventory-consuming item");
+        Assert.True(supplyToSupplyMovementSeen,
+            "ordinary supply locations must continue to exchange complete supply tuples");
+    }
+
+    [Fact]
     public void KeyAndEmptySlots_AreNeverRerolled()
     {
         var room = StartRoom(0);

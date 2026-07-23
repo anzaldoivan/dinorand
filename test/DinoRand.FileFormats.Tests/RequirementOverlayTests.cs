@@ -116,6 +116,32 @@ public class RequirementOverlayTests
     }
 
     [Fact]
+    public void MapRequirements_AuthoredTransition_ExportsNonInitDoorWithoutExportingOtherEventDoors()
+    {
+        const string json = """
+        { "beginEnd": { "start": "0403", "end": "0409" },
+          "rooms": {
+            "0403": { "category": "Segment", "traversableTransitions": ["0409"] },
+            "0503": { "category": "Segment", "traversableTransitions": ["060d"] }
+          } }
+        """;
+        static RoomFile EventRoom(int source, int target)
+        {
+            var room = Room(source, new[] { (target, 0) }, Array.Empty<int>());
+            room.Doors[0].ActivationKind = DoorActivationKind.TaskSpawn;
+            return room;
+        }
+
+        var authored = EventRoom(0x0403, 0x0409);
+        var excluded = EventRoom(0x0503, 0x0609);
+        var graph = RoomGraph.Build(new[] { authored, excluded }, MapRequirements.Parse(json));
+
+        Assert.Same(authored.Doors[0], Assert.Single(NodeOf(graph, 0x0403).Edges).Door);
+        Assert.Empty(NodeOf(graph, 0x0503).Edges);
+        Assert.Same(excluded.Doors[0], Assert.Single(excluded.Doors));
+    }
+
+    [Fact]
     public void MapRequirements_NoRequiresFields_IsEmpty_AndLeavesGraphUntouched()
     {
         const string json = """

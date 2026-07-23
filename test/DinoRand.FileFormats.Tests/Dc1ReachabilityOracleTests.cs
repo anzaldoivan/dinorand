@@ -71,11 +71,20 @@ public class Dc1ReachabilityOracleTests
     [Fact]
     public void RealInstall_Oracle_MatchesEngine_ByteIdentical()
     {
+        bool required = Environment.GetEnvironmentVariable("DINORAND_REQUIRE_REAL_INSTALL") == "1";
         var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
-        if (string.IsNullOrEmpty(root)) return; // no game files (CI) — skip; gen_ap_logic --check guards there
+        if (string.IsNullOrEmpty(root))
+        {
+            Assert.False(required, "required DC1 oracle fixture variable DINORAND_DC1_DIR is missing");
+            return; // no game files (CI) — skip; gen_ap_logic --check guards there
+        }
 
         var refs = Game.EnumerateRooms(root);
-        if (refs.Count == 0) return;
+        if (refs.Count == 0)
+        {
+            Assert.False(required, "required DC1 oracle fixture contains no recognized rooms");
+            return;
+        }
         var rooms = refs.Select(r => RoomFile.ReadFromFile(r.Stage, r.Room, r.Path)).ToList();
         var expected = BuildOracleJson(rooms);
 

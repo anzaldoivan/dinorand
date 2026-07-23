@@ -560,6 +560,49 @@ public class RoomScriptTests
     }
 
     [Fact]
+    public void Parse_ClassifiesDoorActivationFromStaticInvokers()
+    {
+        const int headerLength = 0x24;
+        const int tableBytes = 20; // five function-table entries
+        int tableBase = headerLength;
+        int subStart = tableBase + tableBytes;
+        var sub0 = new byte[]
+        {
+            0x0f, 0x00, 0x01, 0x00, // gosub sub1
+            0x01, 0xff, 0x02, 0x00, // task-spawn sub2
+            0x05, 0x00, 0x03, 0x00, // goto-sub sub3
+        };
+        var sub1 = DoorRec(0x06, 0x09);
+        var sub2 = DoorRec(0x06, 0x09);
+        var sub3 = DoorRec(0x06, 0x09);
+        var sub4 = DoorRec(0x06, 0x09); // no statically found invoker
+        var subs = new[] { sub0, sub1, sub2, sub3, sub4 };
+        int bodyLength = subs.Sum(sub => sub.Length);
+        var rdt = new byte[subStart + bodyLength];
+        WriteU32(rdt, 0x14, PsxBase + (uint)tableBase);
+        WriteU32(rdt, tableBase, (uint)tableBytes);
+
+        int cursor = subStart;
+        for (int i = 0; i < subs.Length; i++)
+        {
+            WriteU32(rdt, tableBase + i * 4, (uint)(cursor - tableBase));
+            subs[i].CopyTo(rdt, cursor);
+            cursor += subs[i].Length;
+        }
+
+        var doors = RoomScript.Parse(rdt).Doors;
+
+        Assert.Equal(DoorActivationKind.InitGosub, doors[0].ActivationKind);
+        Assert.True(doors[0].IsTraversableRoomTransition);
+        Assert.Equal(DoorActivationKind.TaskSpawn, doors[1].ActivationKind);
+        Assert.False(doors[1].IsTraversableRoomTransition);
+        Assert.Equal(DoorActivationKind.GotoSub, doors[2].ActivationKind);
+        Assert.True(doors[2].IsTraversableRoomTransition);
+        Assert.Equal(DoorActivationKind.Unresolved, doors[3].ActivationKind);
+        Assert.False(doors[3].IsTraversableRoomTransition);
+    }
+
+    [Fact]
     public void Walk_DistinguishesDoorsFromItems_SameOpcode()
     {
         // 0x28 is shared: subtype 0 = door, subtype 4 = item. The walker must split them.

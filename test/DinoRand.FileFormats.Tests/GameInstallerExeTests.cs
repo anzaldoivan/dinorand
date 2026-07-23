@@ -1,4 +1,5 @@
 using DinoRand.FileFormats.Exe;
+using DinoRand.Randomizer;
 using DinoRand.Randomizer.Install;
 using Xunit;
 
@@ -501,6 +502,50 @@ public class GameInstallerExeTests : IDisposable
 
         GameInstaller.Restore(DataDir);
         Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Fact]
+    public void PatchExeItemPickupCancelFix_InstallsAndRestoresByteIdentically()
+    {
+        var pristine = File.ReadAllBytes(ExePath);
+        new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }
+            .CopyTo(pristine, ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa));
+        File.WriteAllBytes(ExePath, pristine);
+
+        var result = GameInstaller.PatchExeItemPickupCancelFix(DataDir, seed: "pickup-test");
+
+        Assert.True(File.Exists(result.BackupPath));
+        var patched = File.ReadAllBytes(ExePath);
+        Assert.True(ExePatcher.IsItemPickupCancelFixApplied(patched));
+        var manifest = GameInstaller.ReadManifest(DataDir);
+        Assert.Contains(manifest!.ExeRepoints!,
+            entry => entry.StartsWith("item pickup cancel/failure close", StringComparison.Ordinal));
+
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void InstallDc1_ItemPickupCloseFix_IsInstalledByDefault(bool randomizeItems)
+    {
+        int hook = ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa);
+        var pristine = File.ReadAllBytes(ExePath);
+        new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }.CopyTo(pristine, hook);
+        File.WriteAllBytes(ExePath, pristine);
+
+        string modDir = Path.Combine(_root, "mod");
+        Directory.CreateDirectory(modDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 4, 3, 2, 1 });
+
+        var result = RandomizationInstallCoordinator.InstallDc1(
+            DataDir, modDir, new Seed(123),
+            new RandomizerConfig { RandomizeItems = randomizeItems },
+            () => null, _ => { }, ex => throw ex);
+
+        Assert.NotNull(result);
+        Assert.True(ExePatcher.IsItemPickupCancelFixApplied(File.ReadAllBytes(ExePath)));
     }
 
     // ---- BGM catalog shuffle (the music randomizer; docs/dc1/BGM-SYSTEM.md §4) ----

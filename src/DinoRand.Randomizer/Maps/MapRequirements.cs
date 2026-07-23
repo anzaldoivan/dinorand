@@ -8,8 +8,9 @@ namespace DinoRand.Randomizer.Maps;
 
 /// <summary>
 /// The hand-authored progression-logic overlay parsed from <c>data/dc1/map.json</c> — the
-/// <c>requiresRoom</c> / door <c>requires</c> / item <c>requires</c> fields (schema documented in the
-/// file's <c>_derivation.requires</c>). Stamps a <see cref="Requirement"/> onto matching nodes,
+/// <c>requiresRoom</c> / door <c>requires</c> / item <c>requires</c> fields and the explicit
+/// <c>traversableTransitions</c> room-transition contract (schema documented in the file's
+/// <c>_derivation</c> metadata). Stamps a <see cref="Requirement"/> onto matching nodes,
 /// edges, and node items by code, so a new puzzle/key gate is a JSON entry rather than a code change
 /// (<c>docs/decisions/cross/GRAPH-LOGIC-PARITY-PLAN.md</c> §4.1/§5). Sibling of <see cref="DoorMap"/>, which owns the
 /// door-rando half of the same file; this class deliberately ignores those keys and vice-versa.
@@ -35,7 +36,8 @@ public sealed class MapRequirements : IRequirementOverlay
         IReadOnlyDictionary<int, string> ItemLinkRecords,       // stable record offset -> sync group id
         IReadOnlyDictionary<int, string> ItemGroups,            // stable record offset -> logical pickup id
         IReadOnlyDictionary<int, Requirement> RegionDoorGates,   // laser-fence region: VANILLA dest code -> cross rule
-        IReadOnlyDictionary<(short X, short Z), Requirement> RegionItemGates); // fence-behind pickup position -> reach rule
+        IReadOnlyDictionary<(short X, short Z), Requirement> RegionItemGates, // fence-behind pickup position -> reach rule
+        IReadOnlySet<int> TraversableTransitions);               // explicitly authored non-init destinations
 
     private readonly IReadOnlyDictionary<int, RoomReq> _rooms;
     private readonly IReadOnlyDictionary<int, RegionSplit> _nodeSplits;
@@ -53,6 +55,16 @@ public sealed class MapRequirements : IRequirementOverlay
     /// <summary>Rooms the graph must split into per-region sub-nodes (REGION-SCHEMA-PLAN.md §2), parsed
     /// from a room's <c>regions</c> object when it declares <c>"nodeSplit": true</c>.</summary>
     public IReadOnlyDictionary<int, RegionSplit> NodeSplits => _nodeSplits;
+
+    /// <summary>True when the map explicitly promotes this raw non-init record's vanilla destination
+    /// to a graph transition. The target is matched before any door-rando retargeting.</summary>
+    public bool IsAuthoredTraversableRoomTransition(int sourceCode, FileFormats.Stage.DoorRecord door)
+    {
+        if (door.IsTraversableRoomTransition) return false;
+        if (!_rooms.TryGetValue(sourceCode, out var req)) return false;
+        int vanillaTarget = door.OriginalTargetCode == 0 ? door.TargetCode : door.OriginalTargetCode;
+        return req.TraversableTransitions.Contains(vanillaTarget);
+    }
 
     public void ApplyTo(RoomGraph graph)
     {
@@ -186,6 +198,7 @@ public sealed class MapRequirements : IRequirementOverlay
         {
             var v = prop.Value;
             var requiresRoom = ParseCodeArray(v, "requiresRoom");
+            var traversableTransitions = ParseCodeArray(v, "traversableTransitions").ToHashSet();
             var doorReq = ParseRequiresMap(v, "doors", "requires", IntField);
             var doorReqRoom = ParseRequiresMap(v, "doors", "requiresRoom", CodeField);
             var itemReq = ParseRequiresMap(v, "items", "requires", IntField);
@@ -213,7 +226,8 @@ public sealed class MapRequirements : IRequirementOverlay
                 && scatterTargets.Count == 0 && scatterTargetRecords.Count == 0
                 && itemVisuals.Count == 0 && itemVisualRecords.Count == 0
                 && itemLinks.Count == 0 && itemLinkRecords.Count == 0 && itemGroups.Count == 0
-                && regionDoorGates.Count == 0 && regionItemGates.Count == 0)
+                && regionDoorGates.Count == 0 && regionItemGates.Count == 0
+                && traversableTransitions.Count == 0)
                 continue; // un-authored room — nothing to stamp
 
             rooms[ParseCode(prop.Name)] =
@@ -221,7 +235,7 @@ public sealed class MapRequirements : IRequirementOverlay
                             itemPriorityRecords, scatterTargets, scatterTargetRecords,
                             itemVisuals, itemVisualRecords, itemLinks,
                             itemLinkRecords, itemGroups,
-                            regionDoorGates, regionItemGates);
+                            regionDoorGates, regionItemGates, traversableTransitions);
         }
 
         return new MapRequirements(rooms, nodeSplits);

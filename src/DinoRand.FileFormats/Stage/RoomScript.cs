@@ -84,7 +84,7 @@ public sealed class RoomScript
 
     /// <summary>All raw door / area-transition records (<c>0x28</c> subtype 0) found in every
     /// function-table subroutine. Use <see cref="DoorRecord.IsTraversableRoomTransition"/> for the
-    /// graph's init-path transition contract; event records remain here for lossless consumers.</summary>
+    /// activation-aware graph transition contract; event records remain here for lossless consumers.</summary>
     public IReadOnlyList<DoorRecord> Doors { get; }
 
     /// <summary>Display-node pool slots occupied by op23 static-scenery records in this room (their
@@ -106,12 +106,14 @@ public sealed class RoomScript
         var enemies = new List<EnemyRecord>();
         var doors = new List<DoorRecord>();
         var scenerySlots = new HashSet<byte>();
+        var activationKinds = ClassifyDoorActivations(buffer, starts);
         bool clean = true;
         for (int i = 0; i < starts.Count; i++)
         {
             int start = starts[i];
             int end = i + 1 < starts.Count ? starts[i + 1] : buffer.Length;
-            bool ok = WalkSubroutine(buffer, start, end, i, items, enemies, doors, scenerySlots);
+            bool ok = WalkSubroutine(buffer, start, end, i, activationKinds[i], items, enemies, doors,
+                                     scenerySlots);
             // A derail anywhere but the last subroutine means an unknown/misaligned opcode.
             if (!ok && i != starts.Count - 1) clean = false;
         }
@@ -158,6 +160,7 @@ public sealed class RoomScript
     /// record has an unknown length or would run past <paramref name="end"/> (trailing data).
     /// </summary>
     private static bool WalkSubroutine(ReadOnlySpan<byte> buffer, int start, int end, int subroutineIndex,
+                                       DoorActivationKind activationKind,
                                        List<ItemRecord> items, List<EnemyRecord> enemies,
                                        List<DoorRecord> doors, HashSet<byte> scenerySlots)
     {
@@ -187,6 +190,7 @@ public sealed class RoomScript
                     OriginalLockId = buffer[pos + DoorRecord.LockOffset],
                     DoorType = buffer[pos + DoorRecord.DoorTypeOffset],
                     SubroutineIndex = subroutineIndex,
+                    ActivationKind = activationKind,
                     Raw = buffer.Slice(pos, len).ToArray(),
                     FileOffset = pos,
                 };
@@ -281,6 +285,108 @@ public sealed class RoomScript
             pos += len;
         }
         return true;
+    }
+
+    /// <summary>
+    /// Classify each function-table subroutine using the statically decoded SCD invokers. The
+    /// classification is intentionally separate from record extraction: raw records remain lossless,
+    /// while the graph can distinguish room-transition activations from event/unresolved records.
+    ///
+    /// <para>The operands and invoker meanings are repository-decoded: <c>0x0f</c> is a gosub with a
+    /// subroutine index at <c>+2</c>; <c>0x01</c> is task-spawn with a signed subroutine index at
+    /// <c>+2</c>; <c>0x05</c> is goto-sub with the same signed operand; and <c>0x28</c> subtype 3
+    /// targets a subroutine at the record's <c>length-6</c> byte. See STATIC-SCD-RE cont.50.</para>
+    /// </summary>
+    private static DoorActivationKind[] ClassifyDoorActivations(ReadOnlySpan<byte> buffer,
+                                                                 IReadOnlyList<int> starts)
+    {
+        var gosubbers = new HashSet<int>[starts.Count];
+        var taskSpawners = new HashSet<int>[starts.Count];
+        var gotoSubbers = new HashSet<int>[starts.Count];
+        var aotTargets = new HashSet<int>();
+        for (int i = 0; i < starts.Count; i++)
+        {
+            gosubbers[i] = new HashSet<int>();
+            taskSpawners[i] = new HashSet<int>();
+            gotoSubbers[i] = new HashSet<int>();
+        }
+
+        for (int caller = 0; caller < starts.Count; caller++)
+        {
+            int start = starts[caller];
+            int end = caller + 1 < starts.Count ? starts[caller + 1] : buffer.Length;
+            int pos = start;
+            while (pos < end)
+            {
+                int len = DcOpcodes.Length(buffer, pos);
+                if (len <= 0 || pos + len > end) break;
+
+                switch (buffer[pos])
+                {
+                    case 0x0f:
+                        AddTarget(gosubbers, caller, ReadU16(buffer, pos + 2), starts.Count);
+                        break;
+                    case 0x01:
+                        AddTarget(taskSpawners, caller, (short)ReadU16(buffer, pos + 2), starts.Count);
+                        break;
+                    case 0x05:
+                        AddTarget(gotoSubbers, caller, (short)ReadU16(buffer, pos + 2), starts.Count);
+                        break;
+                    case DcOpcodes.Door when buffer[pos + 2] == 3:
+                        int target = buffer[pos + len - 6];
+                        if (target >= 0 && target < starts.Count)
+                            aotTargets.Add(target);
+                        break;
+                }
+
+                pos += len;
+            }
+        }
+
+        var result = new DoorActivationKind[starts.Count];
+        for (int subroutine = 0; subroutine < starts.Count; subroutine++)
+        {
+            if (subroutine == 0)
+            {
+                result[subroutine] = DoorActivationKind.Init;
+                continue;
+            }
+
+            if (aotTargets.Contains(subroutine))
+            {
+                result[subroutine] = DoorActivationKind.AotZone;
+                continue;
+            }
+
+            if (gosubbers.Any(callers => callers.Contains(subroutine)))
+            {
+                bool fromInit = gosubbers[0].Contains(subroutine);
+                result[subroutine] = fromInit ? DoorActivationKind.InitGosub : DoorActivationKind.Gosub;
+                continue;
+            }
+
+            if (taskSpawners.Any(callers => callers.Contains(subroutine)))
+            {
+                result[subroutine] = DoorActivationKind.TaskSpawn;
+                continue;
+            }
+
+            if (gotoSubbers.Any(callers => callers.Contains(subroutine)))
+            {
+                result[subroutine] = DoorActivationKind.GotoSub;
+                continue;
+            }
+
+            result[subroutine] = DoorActivationKind.Unresolved;
+        }
+
+        return result;
+    }
+
+    private static void AddTarget(HashSet<int>[] reverse, int caller, int target, int subroutineCount)
+    {
+        if (target >= 0 && target < subroutineCount)
+            reverse[caller].Add(target);
     }
 
     /// <summary>

@@ -46,6 +46,23 @@ public static class DoorPoseLayout
     public const int EntryDOffset = 0x24;
 }
 
+/// <summary>Static activation class assigned to a raw DC1 door record from its function-table context.</summary>
+/// <remarks>
+/// The SCD walker preserves the record regardless of this class. The graph exports only classes whose
+/// repository contract describes a room-transition activation; task-spawn and unresolved event records
+/// remain raw but are not ordinary graph edges.
+/// </remarks>
+public enum DoorActivationKind
+{
+    Init,
+    AotZone,
+    InitGosub,
+    Gosub,
+    TaskSpawn,
+    GotoSub,
+    Unresolved,
+}
+
 /// <summary>A raw door / area-transition record placed by SCD opcode <c>0x28</c> in its subtype-0 form.</summary>
 /// <remarks>
 /// Doors are the sibling of the item record (subtype 4) under the same <c>0x28</c> AOT
@@ -119,12 +136,24 @@ public sealed class DoorRecord
     public int SubroutineIndex { get; set; }
 
     /// <summary>
-    /// True for the statically documented room-entry transition contract: a subtype-0 record on the
-    /// room-load init path (function-table subroutine 0). Non-init records remain raw but are event or
-    /// unresolved activation surfaces and are not ordinary graph edges. This is deliberately not a
-    /// reciprocal-edge test, so confirmed one-way init transitions remain directed edges.
+    /// Static activation class assigned by <see cref="RoomScript.Parse"/>. Manually-created records
+    /// leave this unset and retain the historical subroutine-0 default below.
     /// </summary>
-    public bool IsTraversableRoomTransition => SubroutineIndex == 0;
+    public DoorActivationKind? ActivationKind { get; set; }
+
+    /// <summary>
+    /// True for the documented ordinary room-transition activation classes. This is deliberately not
+    /// a reciprocal-edge test, so legitimate one-way story transitions remain directed edges. Raw
+    /// task-spawn and unresolved event records stay in <see cref="RoomFile.Doors"/> for lossless
+    /// consumers, but do not become ordinary graph edges.
+    /// </summary>
+    public bool IsTraversableRoomTransition => ActivationKind switch
+    {
+        null => SubroutineIndex == 0,
+        DoorActivationKind.Init or DoorActivationKind.AotZone or DoorActivationKind.InitGosub
+            or DoorActivationKind.Gosub or DoorActivationKind.GotoSub => true,
+        _ => false,
+    };
 
     /// <summary>
     /// Entry pose the player arrives at in the <i>destination</i> room: position

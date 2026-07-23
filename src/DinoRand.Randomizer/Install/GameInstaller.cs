@@ -283,6 +283,17 @@ public static class GameInstaller
     => ExePatchInstaller.PatchExeWalkerNullGuard(dataDir, seed);
 
     /// <summary>
+    /// Apply the DC1 item-pickup cancel/failure fix to <c>DINO.exe</c>. The native item action sets
+    /// a pending interaction latch before opening its dialog; the shared close routine used by the
+    /// full-inventory and No/decline paths omitted the corresponding clear. This reversible additive
+    /// hook clears that latch and preserves the original close body. It is applied automatically by
+    /// every DC1 randomized install, and is also available as an installer primitive for tests and
+    /// repair flows.
+    /// </summary>
+    public static ExePatchResult PatchExeItemPickupCancelFix(string dataDir, string? seed = null)
+    => ExePatchInstaller.PatchExeItemPickupCancelFix(dataDir, seed);
+
+    /// <summary>
     /// Enemy-sound EXE patch (docs/reference/dc1/se/ENEMY-SOUND-SYSTEM.md): make a cross-swapped room load the swapped
     /// species' enemy SE instead of its native (e.g. raptor) set. DC1 binds the dino SE set to the room id
     /// via a per-room SE manifest in <c>DINO.exe</c> (room→block directory <c>0x63A470</c>); a swap changes

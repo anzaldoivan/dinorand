@@ -19,6 +19,65 @@ mapfile -d '' -t staged < <(git diff --cached --name-only --diff-filter=ACM -z)
 
 [ "${#staged[@]}" -eq 0 ] && exit 0
 
+python=()
+require_python() {
+  [ "${#python[@]}" -gt 0 ] && return
+  if command -v python3 >/dev/null 2>&1 && python3 -c "import sys" >/dev/null 2>&1; then
+    python=(python3)
+  elif command -v py >/dev/null 2>&1 && py -3 -c "import sys" >/dev/null 2>&1; then
+    python=(py -3)
+  elif command -v python >/dev/null 2>&1 && python -c "import sys" >/dev/null 2>&1; then
+    python=(python)
+  else
+    echo "pre-commit: Python 3 is required to validate staged generated contracts" >&2
+    exit 1
+  fi
+}
+
+# The committed DC1 oracle is generated from these parser/graph sources plus map.json. A configured
+# install can prove an unchanged oracle byte-identical; otherwise an input change requires an update.
+oracle_input_touched=0
+oracle_staged=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    data/dc1/map.json|src/DinoRand.FileFormats/Stage/DcOpcodes.cs|src/DinoRand.FileFormats/Stage/RoomFile.cs|src/DinoRand.FileFormats/Stage/RoomScript.cs|src/DinoRand.FileFormats/Stage/StageObjects.cs|src/DinoRand.Randomizer/Definitions/DinoCrisis1.cs|src/DinoRand.Randomizer/Graph/*.cs|src/DinoRand.Randomizer/Logic/KeyItemPlacer.cs|src/DinoRand.Randomizer/Logic/Requirement.cs|src/DinoRand.Randomizer/Maps/MapRequirements.cs|test/DinoRand.FileFormats.Tests/Dc1ReachabilityOracleTests.cs)
+      oracle_input_touched=1 ;;
+    data/dc1/reachability-oracle.json)
+      oracle_staged=1 ;;
+  esac
+done
+oracle_install_configured=0
+if [ -n "${DINORAND_DC1_DIR:-}" ] \
+  || { [ -f "$root/.env" ] && grep -Eq '^[[:space:]]*DINORAND_DC1_DIR=' "$root/.env"; }; then
+  oracle_install_configured=1
+fi
+if [ "$oracle_input_touched" = 1 ] && ! git diff --quiet -- data/dc1/reachability-oracle.json; then
+  echo "pre-commit: data/dc1/reachability-oracle.json has unstaged changes — stage the complete oracle" >&2
+  exit 1
+fi
+if [ "$oracle_input_touched" = 1 ] && [ "$oracle_staged" = 0 ] && [ "$oracle_install_configured" = 0 ]; then
+  echo "pre-commit: DC1 graph/oracle input changed — regenerate and stage data/dc1/reachability-oracle.json" >&2
+  echo "pre-commit: DINORAND_UPDATE_ORACLE=1 dotnet test --filter Dc1ReachabilityOracleTests" >&2
+  exit 1
+fi
+if { [ "$oracle_input_touched" = 1 ] || [ "$oracle_staged" = 1 ]; } \
+  && [ "$oracle_install_configured" = 1 ]; then
+  if command -v dotnet >/dev/null 2>&1; then
+    oracle_check=(dotnet test "$root/test/DinoRand.FileFormats.Tests/DinoRand.FileFormats.Tests.csproj"
+      --no-restore --filter "FullyQualifiedName~Dc1ReachabilityOracleTests.RealInstall_Oracle_MatchesEngine_ByteIdentical")
+  elif command -v powershell.exe >/dev/null 2>&1; then
+    oracle_check=(powershell.exe -NoProfile -NonInteractive -Command
+      'dotnet test test/DinoRand.FileFormats.Tests/DinoRand.FileFormats.Tests.csproj --no-restore --filter "FullyQualifiedName~Dc1ReachabilityOracleTests.RealInstall_Oracle_MatchesEngine_ByteIdentical"')
+  else
+    echo "pre-commit: DINORAND_DC1_DIR is set but dotnet is unavailable; cannot validate the DC1 oracle" >&2
+    exit 1
+  fi
+  (cd "$root" && DINORAND_REQUIRE_REAL_INSTALL=1 DINORAND_UPDATE_ORACLE=0 "${oracle_check[@]}") || {
+    echo "pre-commit: DC1 reachability oracle does not match the current graph/install" >&2
+    exit 1
+  }
+fi
+
 # Derived-data contracts: if the room data, flag labels, map, or a generator is staged,
 # the derived layers must be in sync (CI re-checks both).
 needs_check=0
@@ -28,12 +87,13 @@ for f in "${staged[@]}"; do
       needs_check=1; break ;;
   esac
 done
-if [ "$needs_check" = 1 ] && command -v python3 >/dev/null 2>&1; then
-  python3 "$root/scripts/trigger_decode.py" --check || {
+if [ "$needs_check" = 1 ]; then
+  require_python
+  "${python[@]}" "$root/scripts/trigger_decode.py" --check || {
     echo "pre-commit: trigger-decode contract failed — run 'python3 scripts/trigger_decode.py --apply'" >&2
     exit 1
   }
-  python3 "$root/scripts/gen_item_map.py" --check || {
+  "${python[@]}" "$root/scripts/gen_item_map.py" --check || {
     echo "pre-commit: item-map contract failed — run 'python3 scripts/gen_item_map.py --apply'" >&2
     exit 1
   }
@@ -48,16 +108,17 @@ for f in "${staged[@]}"; do
       ap_touched=1; break ;;
   esac
 done
-if [ "$ap_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
-  python3 "$root/scripts/gen_ap_logic.py" --check || {
+if [ "$ap_touched" = 1 ]; then
+  require_python
+  "${python[@]}" "$root/scripts/gen_ap_logic.py" --check || {
     echo "pre-commit: archipelago logic contract failed — run 'python3 scripts/gen_ap_logic.py --apply' and stage the *_logic.json" >&2
     exit 1
   }
-  python3 "$root/apworld/dino_crisis_1/selfcheck.py" || {
+  "${python[@]}" "$root/apworld/dino_crisis_1/selfcheck.py" || {
     echo "pre-commit: DC1 apworld world wiring self-check failed" >&2
     exit 1
   }
-  python3 "$root/apworld/dino_crisis_2/selfcheck.py" || {
+  "${python[@]}" "$root/apworld/dino_crisis_2/selfcheck.py" || {
     echo "pre-commit: DC2 apworld world wiring self-check failed" >&2
     exit 1
   }
@@ -74,12 +135,13 @@ for f in "${staged[@]}"; do
       gendocs_touched=1; break ;;
   esac
 done
-if [ "$gendocs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
-  python3 "$root/scripts/gen_reachability.py" --check || {
+if [ "$gendocs_touched" = 1 ]; then
+  require_python
+  "${python[@]}" "$root/scripts/gen_reachability.py" --check || {
     echo "pre-commit: reachability docs contract failed — run 'python3 scripts/gen_reachability.py --apply'" >&2
     exit 1
   }
-  python3 "$root/scripts/gen_data_reference.py" --check || {
+  "${python[@]}" "$root/scripts/gen_data_reference.py" --check || {
     echo "pre-commit: data-reference docs contract failed — run 'python3 scripts/gen_data_reference.py --apply'" >&2
     exit 1
   }
@@ -93,8 +155,9 @@ for f in "${staged[@]}"; do
     docs/*.md|scripts/gen_docs_index.py|README.md|CONTRIBUTING.md|USER-GUIDE.md|MODDING.md) docs_touched=1; break ;;
   esac
 done
-if [ "$docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
-  python3 "$root/scripts/gen_docs_index.py" --check || {
+if [ "$docs_touched" = 1 ]; then
+  require_python
+  "${python[@]}" "$root/scripts/gen_docs_index.py" --check || {
     echo "pre-commit: docs index/frontmatter contract failed — run 'python3 scripts/gen_docs_index.py --apply' and stage docs/index.md" >&2
     exit 1
   }
@@ -110,8 +173,9 @@ for f in "${staged[@]}"; do
       public_docs_touched=1; break ;;
   esac
 done
-if [ "$public_docs_touched" = 1 ] && command -v python3 >/dev/null 2>&1; then
-  PYTHONDONTWRITEBYTECODE=1 python3 "$root/scripts/check_docs.py" --check || {
+if [ "$public_docs_touched" = 1 ]; then
+  require_python
+  PYTHONDONTWRITEBYTECODE=1 "${python[@]}" "$root/scripts/check_docs.py" --check || {
     echo "pre-commit: public documentation contract failed — rewrite release notes for players" >&2
     exit 1
   }

@@ -1533,15 +1533,6 @@
     },
     {
       "from": "0113",
-      "to": "0108",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0113",
       "to": "0309:shuttle",
       "requiresLatch": null,
       "setsLatch": null,
@@ -1624,17 +1615,6 @@
       "from": "0201",
       "to": "0205",
       "requiresLatch": 11,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "0300"
-      ]
-    },
-    {
-      "from": "0201",
-      "to": "0205",
-      "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
       "requiresItems": [],
@@ -2404,15 +2384,6 @@
     },
     {
       "from": "0500",
-      "to": "0501",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0500",
       "to": "0506",
       "requiresLatch": null,
       "setsLatch": null,
@@ -2516,15 +2487,6 @@
     {
       "from": "0503",
       "to": "0502",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0503",
-      "to": "0609",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -2830,15 +2792,6 @@
       "requiresRooms": []
     },
     {
-      "from": "050f",
-      "to": "0609",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
       "from": "0510",
       "to": "050b",
       "requiresLatch": null,
@@ -3097,15 +3050,6 @@
     },
     {
       "from": "0607",
-      "to": "0609",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0607",
       "to": "060d",
       "requiresLatch": null,
       "setsLatch": null,
@@ -3219,15 +3163,6 @@
       "requiresRooms": [
         "030b"
       ]
-    },
-    {
-      "from": "060f",
-      "to": "0405",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
     },
     {
       "from": "060f",
@@ -3397,26 +3332,6 @@
     },
     {
       "from": "0a02",
-      "to": "0104",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "0202"
-      ]
-    },
-    {
-      "from": "0a02",
-      "to": "0110",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a02",
       "to": "0a03",
       "requiresLatch": null,
       "setsLatch": null,
@@ -3472,15 +3387,6 @@
     {
       "from": "0a05",
       "to": "0106",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a05",
-      "to": "0110",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -3563,15 +3469,6 @@
     },
     {
       "from": "0a08",
-      "to": "0111",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a08",
       "to": "0a0b",
       "requiresLatch": null,
       "setsLatch": null,
@@ -3636,15 +3533,6 @@
     {
       "from": "0a0b",
       "to": "0a0a",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a13",
-      "to": "0108",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],

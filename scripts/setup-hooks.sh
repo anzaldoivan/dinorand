@@ -3,5 +3,5 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 git config core.hooksPath .githooks
-chmod +x .githooks/* scripts/*.sh 2>/dev/null || true
-echo "Hooks enabled (core.hooksPath=.githooks). Pre-commit copyright guard is active."
+chmod +x .githooks/* scripts/*.sh
+echo "Hooks enabled (core.hooksPath=.githooks). Pre-commit copyright and generated-contract guards are active."

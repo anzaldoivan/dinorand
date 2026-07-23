@@ -45,4 +45,40 @@ public sealed class RoomGraphTests
         Assert.Same(init0604.Door, incoming[0].Edge.Door);
         Assert.Same(init060b.Door, incoming[1].Edge.Door);
     }
+
+    [Fact]
+    public void Build_ExportsKnownEventTransitions_ButNotTaskOrUnresolvedDoors()
+    {
+        static (RoomFile Room, DoorRecord Door) DoorRoom(int stage, int room,
+                                                         DoorActivationKind activation)
+        {
+            var source = new RoomFile(stage, room);
+            var door = new DoorRecord
+            {
+                TargetStage = 0x06,
+                TargetRoom = 0x04,
+                ActivationKind = activation,
+            };
+            source.Doors.Add(door);
+            return (source, door);
+        }
+
+        var aot = DoorRoom(0x03, 0x09, DoorActivationKind.AotZone);
+        var gotoSub = DoorRoom(0x01, 0x13, DoorActivationKind.GotoSub);
+        var task = DoorRoom(0x05, 0x03, DoorActivationKind.TaskSpawn);
+        var unresolved = DoorRoom(0x05, 0x0f, DoorActivationKind.Unresolved);
+
+        var graph = RoomGraph.Build(new[] { aot.Room, gotoSub.Room, task.Room, unresolved.Room });
+        var incoming = graph.Nodes
+            .SelectMany(source => source.Edges.Select(edge => (From: source.Code, Edge: edge)))
+            .Where(pair => pair.Edge.Target.Code == 0x0604)
+            .OrderBy(pair => pair.From)
+            .ToList();
+
+        Assert.Equal(new[] { 0x0113, 0x0309 }, incoming.Select(pair => pair.From).ToArray());
+        Assert.Same(gotoSub.Door, incoming[0].Edge.Door);
+        Assert.Same(aot.Door, incoming[1].Edge.Door);
+        Assert.Same(task.Door, Assert.Single(task.Room.Doors));
+        Assert.Same(unresolved.Door, Assert.Single(unresolved.Room.Doors));
+    }
 }

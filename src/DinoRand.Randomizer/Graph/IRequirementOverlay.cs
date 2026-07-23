@@ -1,3 +1,4 @@
+using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Logic;
 
 namespace DinoRand.Randomizer.Graph;
@@ -20,6 +21,14 @@ public interface IRequirementOverlay
     /// gates cannot express (the 0309 shuttle). Default empty so alternate/fake overlays need not
     /// implement it.</summary>
     IReadOnlyDictionary<int, RegionSplit> NodeSplits => EmptyNodeSplits;
+
+    /// <summary>
+    /// Explicitly authored non-init room transitions. Raw SCD event records stay out of the graph by
+    /// default; a game may opt in a destination when its repository contract identifies the record as
+    /// a playable room transition (including a directed story transport). The decision is evaluated
+    /// against the door's vanilla destination so it remains stable across door randomization.
+    /// </summary>
+    bool IsAuthoredTraversableRoomTransition(int sourceCode, DoorRecord door) => false;
 
     private static readonly IReadOnlyDictionary<int, RegionSplit> EmptyNodeSplits =
         new Dictionary<int, RegionSplit>();

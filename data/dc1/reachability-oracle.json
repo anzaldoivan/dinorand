@@ -1460,15 +1460,6 @@
     },
     {
       "from": "0112",
-      "to": "010d",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0112",
       "to": "010e",
       "requiresLatch": null,
       "setsLatch": null,
@@ -1527,15 +1518,6 @@
       "to": "0108",
       "requiresLatch": null,
       "setsLatch": 6,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0113",
-      "to": "0108",
-      "requiresLatch": null,
-      "setsLatch": null,
       "requiresAnyItems": [],
       "requiresItems": [],
       "requiresRooms": []
@@ -1650,28 +1632,6 @@
       "from": "0201",
       "to": "0205",
       "requiresLatch": 11,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "0300"
-      ]
-    },
-    {
-      "from": "0201",
-      "to": "0205",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "0300"
-      ]
-    },
-    {
-      "from": "0201",
-      "to": "0205",
-      "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
       "requiresItems": [],
@@ -1842,20 +1802,6 @@
       "setsLatch": null,
       "requiresAnyItems": [],
       "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0304",
-      "to": "0300",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [
-        71,
-        72,
-        101,
-        108
-      ],
       "requiresRooms": []
     },
     {
@@ -2136,15 +2082,6 @@
     {
       "from": "0309:west",
       "to": "030d",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0309:shuttle",
-      "to": "0113",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -2615,34 +2552,7 @@
     },
     {
       "from": "0500",
-      "to": "0501",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0500",
       "to": "0506",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0500",
-      "to": "0608",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0500",
-      "to": "0608",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -2745,24 +2655,6 @@
     {
       "from": "0503",
       "to": "0502",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0503",
-      "to": "0609",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0503",
-      "to": "0609",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -3088,15 +2980,6 @@
       "requiresRooms": []
     },
     {
-      "from": "050f",
-      "to": "0609",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
       "from": "0510",
       "to": "050b",
       "requiresLatch": null,
@@ -3388,24 +3271,6 @@
     },
     {
       "from": "0607",
-      "to": "0609",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0607",
-      "to": "0609",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0607",
       "to": "060d",
       "requiresLatch": null,
       "setsLatch": null,
@@ -3424,15 +3289,6 @@
       "requiresItems": [
         58
       ],
-      "requiresRooms": []
-    },
-    {
-      "from": "0608",
-      "to": "0500",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
       "requiresRooms": []
     },
     {
@@ -3469,15 +3325,6 @@
     {
       "from": "0609",
       "to": "0604",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0609",
-      "to": "060b",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -3556,93 +3403,6 @@
       "requiresItems": [],
       "requiresRooms": [
         "030b"
-      ]
-    },
-    {
-      "from": "060f",
-      "to": "030c",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "030b"
-      ]
-    },
-    {
-      "from": "060f",
-      "to": "030c",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "030b"
-      ]
-    },
-    {
-      "from": "060f",
-      "to": "030c",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "030b"
-      ]
-    },
-    {
-      "from": "060f",
-      "to": "0405",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "060f",
-      "to": "0405",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "060f",
-      "to": "0600",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "030b",
-        "0401"
-      ]
-    },
-    {
-      "from": "060f",
-      "to": "0600",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "030b",
-        "0401"
-      ]
-    },
-    {
-      "from": "060f",
-      "to": "0600",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "030b",
-        "0401"
       ]
     },
     {
@@ -3834,26 +3594,6 @@
     },
     {
       "from": "0a02",
-      "to": "0104",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": [
-        "0202"
-      ]
-    },
-    {
-      "from": "0a02",
-      "to": "0110",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a02",
       "to": "0a03",
       "requiresLatch": null,
       "setsLatch": null,
@@ -3917,15 +3657,6 @@
     },
     {
       "from": "0a05",
-      "to": "0110",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a05",
       "to": "0a03",
       "requiresLatch": null,
       "setsLatch": null,
@@ -3936,15 +3667,6 @@
     {
       "from": "0a05",
       "to": "0b07",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a07",
-      "to": "0206",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -4009,15 +3731,6 @@
     },
     {
       "from": "0a08",
-      "to": "0111",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a08",
       "to": "0a0b",
       "requiresLatch": null,
       "setsLatch": null,
@@ -4037,15 +3750,6 @@
     {
       "from": "0a0a",
       "to": "010d",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a0a",
-      "to": "0110",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -4091,15 +3795,6 @@
     {
       "from": "0a0b",
       "to": "0a0a",
-      "requiresLatch": null,
-      "setsLatch": null,
-      "requiresAnyItems": [],
-      "requiresItems": [],
-      "requiresRooms": []
-    },
-    {
-      "from": "0a13",
-      "to": "0108",
       "requiresLatch": null,
       "setsLatch": null,
       "requiresAnyItems": [],
@@ -4241,14 +3936,9 @@
         "030c",
         "030d",
         "030e",
-        "0404",
-        "0405",
-        "0406",
-        "0407",
-        "0408",
         "060f"
       ],
-      "count": 30
+      "count": 25
     },
     {
       "name": "key-30",
@@ -4726,14 +4416,9 @@
         "030d",
         "030e",
         "0400",
-        "0404",
-        "0405",
-        "0406",
-        "0407",
-        "0408",
         "060f"
       ],
-      "count": 46
+      "count": 41
     },
     {
       "name": "all-minus-ddk-63",
@@ -5071,20 +4756,13 @@
         "0606",
         "0607",
         "0608",
-        "0609",
-        "060a",
-        "060b",
-        "060c",
         "060d",
         "060f",
-        "0610",
         "0611",
-        "0612",
-        "0613",
         "0614",
         "0615"
       ],
-      "count": 96
+      "count": 89
     },
     {
       "name": "all-minus-ddk-67",
@@ -5408,14 +5086,9 @@
         "030d",
         "030e",
         "0400",
-        "0404",
-        "0405",
-        "0406",
-        "0407",
-        "0408",
         "060f"
       ],
-      "count": 46
+      "count": 41
     },
     {
       "name": "all-minus-ddk-6a",
@@ -5753,20 +5426,13 @@
         "0606",
         "0607",
         "0608",
-        "0609",
-        "060a",
-        "060b",
-        "060c",
         "060d",
         "060f",
-        "0610",
         "0611",
-        "0612",
-        "0613",
         "0614",
         "0615"
       ],
-      "count": 96
+      "count": 89
     },
     {
       "name": "all-minus-ddk-6e",
