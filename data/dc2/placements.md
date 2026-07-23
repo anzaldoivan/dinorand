@@ -1,18 +1,17 @@
 # Dino Crisis 2 — Item / Enemy / Dino-File Placement Map (guide-sourced, PARTIAL)
 
-Per-area placement oracle distilled from the cached GameFAQs walkthrough
-([`docs/_reference-dumps/DC2-ROOMS-FAQ.md`](../../docs/_reference-dumps/DC2-ROOMS-FAQ.md), JL Lee v1.0, 29/11/2000).
+Per-area placement oracle derived from contributor research; no third-party guide text is
+reproduced here.
 
 > **Status / confidence — read first.** This is **human-playthrough, single-source** data
 > (one FAQ). It is **NOT** a byte decode. Unlike DC1's `placements.md` (which validates a
 > decoded SCD `0x4C` record), DC2 has **no** decoded per-room item/enemy record yet — the
-> in-room spawn/item/door tables live in the undecoded room blob (see
-> [`docs/reference/dc2/scd/SCRIPT-DC2.md`](../../docs/reference/dc2/scd/SCRIPT-DC2.md)). So this file cannot yet be
+> in-room spawn/item/door tables live in the undecoded room blob. So this file cannot yet be
 > cross-checked against bytes; treat every row as `single-source`.
 >
 > **Granularity gap.** Placements are keyed by the FAQ's **area names**, not by `ST*.DAT`
 > ids — the two are not yet linkable (the FAQ uses its own map-grid coordinates). See
-> [`map.json`](map.json) for the area progression and [`README.md`](README.md) for the gap.
+> the area progression notes and [`README.md`](README.md) for the gap.
 >
 > **Coverage is partial.** The FAQ brackets only *some* pickups; many items/enemies are
 > described in prose without markup and are not captured here. Enemy spawns are described

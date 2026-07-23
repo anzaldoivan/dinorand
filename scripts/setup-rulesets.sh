@@ -1,110 +1,59 @@
 #!/usr/bin/env bash
-# setup-rulesets.sh — configure GitHub repository rulesets for governance.
-# Supersedes the classic setup-branch-protection.sh (rulesets are the modern mechanism and
-# support branch-name patterns the classic API can't). Idempotent: each ruleset is looked up
-# by name and deleted before being re-created, so re-running re-asserts the same config.
-#
-# ┌─ PRECONDITIONS ─────────────────────────────────────────────────────────────┐
-# │ 1. Repo + `main` exist on the remote; active `gh` account has ADMIN.         │
-# │ 2. The `build-test-coverage` and `scan` checks have each run at least once    │
-# │    (push/PR through CI) so GitHub recognises them as status-check contexts.   │
-# │ An admin runs this by hand, once (and after changing the rules here).         │
-# └─────────────────────────────────────────────────────────────────────────────┘
-#
-# Governance applied (all rulesets: enforcement=active, repo ADMINs may bypass):
-#   main-protection        — main: PR required (1 approval, stale reviews dismissed), required
-#                            checks build-test-coverage + scan (strict/up-to-date), no force-push,
-#                            no deletion. ⇒ blocks direct pushes to main.
-#   release-branch-control — only bypassers (admins) may create `release/v*` branches (⇒ only
-#                            admins cut releases), and those branches can't be force-pushed/deleted.
-#   release-tag-protection — published `v*` tags can't be deleted or moved (releases are immutable;
-#                            creating a new tag is still allowed so release.yml can publish).
-#
-# Branch NAMING (feature/*, release/v*) is NOT a ruleset here: the metadata-restriction rules
-# (branch_name_pattern etc.) are only available to Organization repos, and this is a User repo.
-# It's enforced instead by the required CI check `branch-name` (.github/workflows/branch-naming.yml),
-# which fails any PR whose head branch isn't `feature/*` or `release/v*` — added to the required
-# checks below only AFTER that workflow is merged to main (see the commented context).
+# Merge DinoRand's verified governance requirements into existing rulesets.
+# Safe default: update only required checks already observed successful on GitHub.
 set -euo pipefail
 
+PHASE="pre-merge"
+REMOVE_OBSOLETE=false
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --phase) PHASE="${2:-}"; shift 2 ;;
+    --remove-obsolete-release-branch-ruleset) REMOVE_OBSOLETE=true; shift ;;
+    *) echo "unknown argument: $1" >&2; exit 2 ;;
+  esac
+done
+case "$PHASE" in pre-merge|post-merge) ;; *) echo "--phase must be pre-merge or post-merge" >&2; exit 2 ;; esac
+if $REMOVE_OBSOLETE && [ "$PHASE" != "post-merge" ]; then
+  echo "obsolete release-branch removal requires --phase post-merge" >&2
+  exit 2
+fi
+
 REPO="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
-echo "── Repository rulesets for $REPO ──────────────────────────────────────────────"
+RULESETS="$(gh api "repos/$REPO/rulesets")"
 
-# Repo-admin role (id 5) may bypass every ruleset, "always" (avoids self-lockout on hotfixes).
-ADMIN_BYPASS='[{"actor_id":5,"actor_type":"RepositoryRole","bypass_mode":"always"}]'
-
-apply_ruleset() {
-  local name="$1" json="$2"
-  # Delete an existing ruleset of the same name (full-replace semantics on re-run).
-  local existing
-  existing="$(gh api "repos/$REPO/rulesets" --jq ".[] | select(.name==\"$name\") | .id" 2>/dev/null || true)"
-  for id in $existing; do
-    gh api --method DELETE "repos/$REPO/rulesets/$id" >/dev/null && echo "  (replaced existing '$name' #$id)"
-  done
-  gh api --method POST "repos/$REPO/rulesets" --input - <<<"$json" >/dev/null
-  echo "  ✅ $name"
+ruleset_id() {
+  jq -er --arg name "$1" '.[] | select(.name == $name) | .id' <<<"$RULESETS"
 }
 
-apply_ruleset "main-protection" "$(cat <<JSON
-{
-  "name": "main-protection",
-  "target": "branch",
-  "enforcement": "active",
-  "bypass_actors": $ADMIN_BYPASS,
-  "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
-  "rules": [
-    { "type": "pull_request", "parameters": {
-        "required_approving_review_count": 1,
-        "dismiss_stale_reviews_on_push": true,
-        "require_code_owner_review": false,
-        "require_last_push_approval": false,
-        "required_review_thread_resolution": false } },
-    { "type": "required_status_checks", "parameters": {
-        "strict_required_status_checks_policy": true,
-        "required_status_checks": [
-          { "context": "build-test-coverage" },
-          { "context": "scan" } ] } },
-    { "type": "non_fast_forward" },
-    { "type": "deletion" }
-  ]
+round_trip() {
+  local id="$1" filter="$2" current payload
+  current="$(gh api "repos/$REPO/rulesets/$id")"
+  payload="$(jq -e "$filter | {name,target,enforcement,bypass_actors,conditions,rules}" <<<"$current")"
+  gh api --method PUT "repos/$REPO/rulesets/$id" --input - <<<"$payload" >/dev/null
 }
-JSON
-)"
 
-# NOTE: branch NAMING (feature/*, release/v*) would be a `branch_name_pattern` ruleset, but that
-# rule type is Organization-only and this is a User repo — see the header. It's enforced by the
-# `branch-name` required CI check (.github/workflows/branch-naming.yml) instead.
+# Exact job names observed successful on public runs 29975061415 and 29975239199.
+MAIN_ID="$(ruleset_id main-protection)"
+round_trip "$MAIN_ID" '
+  (.rules[] | select(.type == "required_status_checks") |
+    .parameters.required_status_checks) |=
+  (. + [
+    {"context":"branch-name"},
+    {"context":"apworld"},
+    {"context":"apworld-ap-integration"}
+  ] | unique_by([.context, (.integration_id // 0)]))'
+echo "updated main-protection without removing existing rules, bypass actors, or checks"
 
-apply_ruleset "release-branch-control" "$(cat <<JSON
-{
-  "name": "release-branch-control",
-  "target": "branch",
-  "enforcement": "active",
-  "bypass_actors": $ADMIN_BYPASS,
-  "conditions": { "ref_name": { "include": ["refs/heads/release/**"], "exclude": [] } },
-  "rules": [
-    { "type": "creation" },
-    { "type": "non_fast_forward" },
-    { "type": "deletion" }
-  ]
-}
-JSON
-)"
+if [ "$PHASE" = "post-merge" ]; then
+  TAG_ID="$(ruleset_id release-tag-protection)"
+  round_trip "$TAG_ID" '
+    if any(.rules[]; .type == "creation") then .
+    else .rules += [{"type":"creation"}] end'
+  echo "updated release-tag-protection for administrator-only tag creation"
 
-apply_ruleset "release-tag-protection" "$(cat <<JSON
-{
-  "name": "release-tag-protection",
-  "target": "tag",
-  "enforcement": "active",
-  "bypass_actors": $ADMIN_BYPASS,
-  "conditions": { "ref_name": { "include": ["refs/tags/v*"], "exclude": [] } },
-  "rules": [
-    { "type": "deletion" },
-    { "type": "non_fast_forward" }
-  ]
-}
-JSON
-)"
-
-echo
-echo "Done. Review at: https://github.com/$REPO/settings/rules"
+  if $REMOVE_OBSOLETE; then
+    BRANCH_ID="$(ruleset_id release-branch-control)"
+    gh api --method DELETE "repos/$REPO/rulesets/$BRANCH_ID" >/dev/null
+    echo "removed obsolete release-branch-control ruleset"
+  fi
+fi

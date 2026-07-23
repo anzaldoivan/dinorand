@@ -33,7 +33,7 @@ more. This guide is for players. Modders/contributors: see the repo
 
 ## Quick start (GUI)
 
-1. Download the latest release for your OS and unpack it.
+1. [Download the latest release](https://github.com/anzaldoivan/dinorand/releases/latest) for your OS and unpack it.
 2. Run **`DinoRand.Avalonia`** (`DinoRand.Avalonia.exe` on Windows).
 3. Point it at your game install folder and pick a seed (or let it roll one).
 4. Leave the defaults on for a first run — every experimental lever is off by default,

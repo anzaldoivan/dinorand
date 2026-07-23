@@ -1,16 +1,14 @@
 # Dino Crisis 1 — Item / Enemy / Room Placement Map (vanilla)
 
-Per-room placement oracle distilled from the GameFAQs walkthrough (Stinger_316, v1.0)
-saved at [`dinocrisis-gamefaq-items-enemies.md`](../../docs/dc1/reference/dinocrisis-gamefaq-items-enemies.md),
-cross-referenced to the code tables in this folder:
+Per-room placement oracle derived from contributor research and cross-referenced to the published
+code tables in this folder; no third-party guide text is reproduced here:
 
-- **Room codes** ← [`rooms.json`](rooms.json) (`SSRR`: stage `SS`, room `RR`, hex).
+- **Room codes** use `SSRR`: stage `SS`, room `RR`, hex.
 - **Item ids** ← [`items.json`](items.json) (real game ids; supply pool `0x10–0x23`, keys `0x2B–0x6F`).
 - **Enemy classes** ← [`enemies.json`](enemies.json) (ids still **provisional**; mapped by class here).
 
 > **Status / confidence.** This is **human-playthrough ground truth**, not a file decode. Its purpose
-> is to be the **validation oracle** for the SCD `0x4C` placement-record decode (see
-> [`docs/reference/dc1/_registries/STATIC-SCD-RE.md`](../../docs/reference/dc1/_registries/STATIC-SCD-RE.md), 2026-06-19): a decoded `0x4C` record's
+> is to be the **validation oracle** for the SCD `0x4C` placement-record decode: a decoded `0x4C` record's
 > `+0x1A` item id should match the item this map lists for that room. Caveats: (a) a walkthrough lists
 > items in *pickup* order and may merge adjacent rooms or omit optional/branch pickups; (b) some items
 > are **conditional** (branch choices, puzzle outcomes) — flagged inline; (c) enemy ("Dino") counts are

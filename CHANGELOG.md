@@ -253,6 +253,8 @@ Initial feature set — everything prior to the voice randomizer.
 - Self-contained single-file release builds.
 
 [0.6.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.0
+[0.5.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.2
+[0.5.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.1
 [0.5.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.0
 [0.4.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.2
 [0.4.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.4.1

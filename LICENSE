@@ -2,15 +2,6 @@ MIT License
 
 Copyright (c) 2026 anzaldoivan
 
-SCOPE NOTE (not part of the MIT grant): This license covers ONLY the original
-source code, documentation, and data authored for the DinoRand project. It does
-NOT grant any rights in "Dino Crisis," the Dino Crisis game data/assets, or the
-DINO.exe binary, all of which are the property of their respective owner (Capcom).
-DinoRand ships no game assets and requires the user to supply their own legally
-owned copy of the game. Third-party components — including third-party-sourced data such as Dino Crisis Fandom
-Wiki content (CC BY-SA 3.0) — are credited in THIRD-PARTY-NOTICES.md and remain under
-their own licenses, not this MIT grant.
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

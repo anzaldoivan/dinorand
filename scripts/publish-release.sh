@@ -42,6 +42,10 @@ publish() {
     -p:PublishSingleFile=true \
     -p:IncludeNativeLibrariesForSelfExtract=true \
     -p:EnableCompressionInSingleFile=true \
+    -p:DebugSymbols=false \
+    -p:DebugType=None \
+    ${DINORAND_RELEASE_VERSION:+-p:Version="$DINORAND_RELEASE_VERSION"} \
+    --no-restore \
     -o "$DIST_DIR/$rid"
 }
 

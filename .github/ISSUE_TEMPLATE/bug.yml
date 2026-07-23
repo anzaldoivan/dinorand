@@ -1,0 +1,78 @@
+name: DinoRand bug
+description: Report a reproducible problem in the latest DinoRand release
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use the latest release and a GOG DRM-free game. Steam/Enigma builds are unsupported.
+        Do not upload game files, executables, copyrighted-byte dumps, credentials, or private data.
+  - type: input
+    id: version
+    attributes:
+      label: DinoRand version
+      placeholder: v0.6.0
+    validations: {required: true}
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options: ["Dino Crisis 1", "Dino Crisis 2"]
+    validations: {required: true}
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Supported edition
+      options: ["GOG DRM-free", "Other / unsupported"]
+    validations: {required: true}
+  - type: dropdown
+    id: frontend
+    attributes:
+      label: Frontend
+      options: ["Avalonia GUI", "CLI", "Archipelago client"]
+    validations: {required: true}
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Windows 11, Ubuntu 24.04, macOS 15
+    validations: {required: true}
+  - type: textarea
+    id: seed_settings
+    attributes:
+      label: Seed and settings
+      description: Paste the shareable seed/settings or the authored debug block above the spoiler marker. Redact paths and private data.
+    validations: {required: true}
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Give the smallest repeatable sequence. Do not attach game files.
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes: {label: Expected behavior}
+    validations: {required: true}
+  - type: textarea
+    id: actual
+    attributes: {label: Actual behavior}
+    validations: {required: true}
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted logs
+      description: Include authored text logs only. Remove credentials, private paths/data, and copyrighted bytes.
+  - type: textarea
+    id: restore
+    attributes:
+      label: Restore outcome
+      description: State whether `--restore` succeeded and whether the original game still launches.
+    validations: {required: true}
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I am using the latest release and have not attached game files, executables, copyrighted-byte dumps, credentials, or private data.
+          required: true
