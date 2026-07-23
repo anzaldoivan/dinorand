@@ -525,6 +525,24 @@ public class GameInstallerExeTests : IDisposable
         Assert.Equal(pristine, File.ReadAllBytes(ExePath));
     }
 
+    [Fact]
+    public void InstallDc1_WithoutExecutable_StillInstallsRoomOverlay()
+    {
+        File.Delete(ExePath);
+        string modDir = Path.Combine(_root, "mod-no-exe");
+        Directory.CreateDirectory(modDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 4, 3, 2, 1 });
+
+        var result = RandomizationInstallCoordinator.InstallDc1(
+            DataDir, modDir, new Seed(123),
+            new RandomizerConfig { RandomizeItems = false, RandomizeEnemies = false },
+            () => null, _ => { }, ex => throw ex);
+
+        Assert.NotNull(result);
+        Assert.Equal(new byte[] { 4, 3, 2, 1 }, File.ReadAllBytes(Path.Combine(DataDir, "st101.dat")));
+        Assert.False(File.Exists(Path.Combine(DataDir, GameInstaller.BackupDirName, GameInstaller.ExeName)));
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

@@ -36,9 +36,14 @@ internal static class RandomizationInstallCoordinator
         Emit($"installed to {dataDir}: {installResult.Overlaid} room files overlaid, "
             + $"{installResult.BackedUp} originals backed up");
 
-        var itemPickupFix = GameInstaller.PatchExeItemPickupCancelFix(dataDir, seed.ToString());
-        foreach (var repoint in itemPickupFix.Repoints)
-            Emit($"item pickup: {repoint}");
+        // Data-only synthetic installs (and room-only tooling flows) have no executable to patch. Keep
+        // the room overlay usable there; a real GOG install still receives the automatic fix below.
+        if (File.Exists(GameInstaller.ExePath(dataDir)))
+        {
+            var itemPickupFix = GameInstaller.PatchExeItemPickupCancelFix(dataDir, seed.ToString());
+            foreach (var repoint in itemPickupFix.Repoints)
+                Emit($"item pickup: {repoint}");
+        }
 
         if (config.RandomizeEnemies && config.CrossRoomEnemySpecies)
             Emit("exotic enemies: any queued EXE patches were applied; CLOSE/relaunch + CE-verify the swaps.");
