@@ -399,6 +399,39 @@ internal static class ExePatchInstaller
         return new ExePatchResult(exePath, exeBackup, new[] { entry });
     }
 
+    internal static ExePatchResult PatchExeItemPickupCancelFix(string dataDir, string? seed = null)
+    {
+        var exePath = ResolveExeForPatch(dataDir);
+
+        var backupDir = Path.Combine(dataDir, BackupDirName);
+        Directory.CreateDirectory(backupDir);
+        var exeBackup = Path.Combine(backupDir, ExeName);
+        if (!File.Exists(exeBackup))
+            File.Copy(exePath, exeBackup); // capture the pristine exe once (for --restore)
+
+        // The fix is a small additive hook/cave. Edit the live image so it composes with other
+        // already-installed EXE patches; the one-time backup still gives Restore a pristine source.
+        byte[] bytes = File.ReadAllBytes(exePath);
+        ExePatcher.InstallItemPickupCancelFix(bytes);
+        File.WriteAllBytes(exePath, bytes);
+
+        string entry = $"item pickup cancel/failure close: 0x{ExePatcher.ItemPickupSessionCloseVa:X}->" +
+                       $"0x{ExePatcher.ItemPickupCancelCaveVa:X} clears " +
+                       $"{ExePatcher.ItemPickupPendingFlagGroup}:0x{ExePatcher.ItemPickupPendingFlagIndex:X2}";
+        const string key = "item pickup cancel/failure close";
+        var manifest = ReadManifest(dataDir) ?? new InstallManifest(seed, DateTime.UtcNow.ToString("o"),
+            Array.Empty<string>());
+        var repoints = (manifest.ExeRepoints ?? Array.Empty<string>())
+            .Where(r => !r.StartsWith(key, StringComparison.Ordinal))
+            .Append(entry)
+            .ToList();
+        manifest = manifest with { ExePatched = true, ExeRepoints = repoints };
+        File.WriteAllText(Path.Combine(backupDir, ManifestName),
+            JsonSerializer.Serialize(manifest, JsonOpts));
+
+        return new ExePatchResult(exePath, exeBackup, new[] { entry });
+    }
+
     internal static ExePatchResult PatchExeRoomEnemySe(
         string dataDir, int stage, int room, int donorStage, int donorRoom, string? seed = null)
     {

@@ -165,6 +165,40 @@ public class RoomScriptTests
     }
 
     [Fact]
+    public void ApplyEdits_AmountOnly_RoundTripsAndChangesOnlyCountWord()
+    {
+        var rdt = BuildRdt(ItemRec(0x16, 17, slot: 5, model: 0x80123456));
+        var script = RoomScript.Parse(rdt);
+        var item = Assert.Single(script.Items);
+        item.Amount = 0x1234;
+
+        var edited = (byte[])rdt.Clone();
+        script.ApplyEdits(edited, script.Items);
+
+        Assert.Equal(0x1234, Assert.Single(RoomScript.Parse(edited).Items).Amount);
+        int countOffset = item.FileOffset + ItemRecord.CountOffset;
+        for (int i = 0; i < rdt.Length; i++)
+        {
+            if (i == countOffset || i == countOffset + 1) continue;
+            Assert.Equal(rdt[i], edited[i]);
+        }
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(65536)]
+    public void ApplyEdits_InvalidAmount_FailsClosed(int amount)
+    {
+        var rdt = BuildRdt(ItemRec(0x16, 17));
+        var script = RoomScript.Parse(rdt);
+        Assert.Single(script.Items).Amount = amount;
+        var edited = (byte[])rdt.Clone();
+
+        Assert.Throws<InvalidDataException>(() => script.ApplyEdits(edited, script.Items));
+        Assert.Equal(rdt, edited);
+    }
+
+    [Fact]
     public void ApplyEdits_NormalizeVisual_WritesChosenSlotAndGenericPanel()
     {
         // A relocated key in a bespoke-mesh spot (slot 5, old model): reuse the slot, repoint the model.
@@ -269,6 +303,21 @@ public class RoomScriptTests
         Assert.Equal(0x2b, reread.Items[1].ItemId);
         Assert.Equal(17, reread.Items[0].Amount);
         Assert.Equal(room.RdtBuffer.Length, reread.RdtBuffer.Length);
+    }
+
+    [Fact]
+    public void RoomFile_ScatterItemAndAmount_RoundTripTogether()
+    {
+        var file = BuildLzssPackage(BuildRdt(ItemRec(0x16, 17)));
+        var room = RoomFile.Read(1, 0, file);
+        var item = Assert.Single(room.Items);
+        item.ItemId = 0x30;
+        item.Amount = 5;
+
+        var reread = RoomFile.Read(1, 0, room.Write());
+
+        var scattered = Assert.Single(reread.Items);
+        Assert.Equal((0x30, 5), (scattered.ItemId, scattered.Amount));
     }
 
     [Fact]
@@ -483,6 +532,74 @@ public class RoomScriptTests
         Assert.Equal(3, s.Doors[1].DoorType);
         Assert.Equal(DcOpcodes.Door, rdt[s.Doors[0].FileOffset]);
         Assert.False(s.Doors[0].IsEdited);
+    }
+
+    [Fact]
+    public void Walk_PreservesDoorSubroutineContext_ForGraphClassification()
+    {
+        const int headerLen = 0x24;
+        const int tableBytes = 8;
+        int tableBase = headerLen;
+        int s0 = tableBase + tableBytes;
+        var sub0 = DoorRec(0x06, 0x09);
+        var sub1 = DoorRec(0x06, 0x09);
+        int s1 = s0 + sub0.Length;
+        var buf = new byte[s1 + sub1.Length];
+        WriteU32(buf, 0x14, PsxBase + (uint)tableBase);
+        WriteU32(buf, tableBase, tableBytes);
+        WriteU32(buf, tableBase + 4, (uint)(s1 - tableBase));
+        sub0.CopyTo(buf, s0);
+        sub1.CopyTo(buf, s1);
+
+        var doors = RoomScript.Parse(buf).Doors;
+        Assert.Equal(2, doors.Count);
+        Assert.Equal(0, doors[0].SubroutineIndex);
+        Assert.True(doors[0].IsTraversableRoomTransition);
+        Assert.Equal(1, doors[1].SubroutineIndex);
+        Assert.False(doors[1].IsTraversableRoomTransition);
+    }
+
+    [Fact]
+    public void Parse_ClassifiesDoorActivationFromStaticInvokers()
+    {
+        const int headerLength = 0x24;
+        const int tableBytes = 20; // five function-table entries
+        int tableBase = headerLength;
+        int subStart = tableBase + tableBytes;
+        var sub0 = new byte[]
+        {
+            0x0f, 0x00, 0x01, 0x00, // gosub sub1
+            0x01, 0xff, 0x02, 0x00, // task-spawn sub2
+            0x05, 0x00, 0x03, 0x00, // goto-sub sub3
+        };
+        var sub1 = DoorRec(0x06, 0x09);
+        var sub2 = DoorRec(0x06, 0x09);
+        var sub3 = DoorRec(0x06, 0x09);
+        var sub4 = DoorRec(0x06, 0x09); // no statically found invoker
+        var subs = new[] { sub0, sub1, sub2, sub3, sub4 };
+        int bodyLength = subs.Sum(sub => sub.Length);
+        var rdt = new byte[subStart + bodyLength];
+        WriteU32(rdt, 0x14, PsxBase + (uint)tableBase);
+        WriteU32(rdt, tableBase, (uint)tableBytes);
+
+        int cursor = subStart;
+        for (int i = 0; i < subs.Length; i++)
+        {
+            WriteU32(rdt, tableBase + i * 4, (uint)(cursor - tableBase));
+            subs[i].CopyTo(rdt, cursor);
+            cursor += subs[i].Length;
+        }
+
+        var doors = RoomScript.Parse(rdt).Doors;
+
+        Assert.Equal(DoorActivationKind.InitGosub, doors[0].ActivationKind);
+        Assert.True(doors[0].IsTraversableRoomTransition);
+        Assert.Equal(DoorActivationKind.TaskSpawn, doors[1].ActivationKind);
+        Assert.False(doors[1].IsTraversableRoomTransition);
+        Assert.Equal(DoorActivationKind.GotoSub, doors[2].ActivationKind);
+        Assert.True(doors[2].IsTraversableRoomTransition);
+        Assert.Equal(DoorActivationKind.Unresolved, doors[3].ActivationKind);
+        Assert.False(doors[3].IsTraversableRoomTransition);
     }
 
     [Fact]

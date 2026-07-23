@@ -1,5 +1,6 @@
 using System.Runtime.Versioning;
 using DinoRand.ApClient;
+using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
 
@@ -17,6 +18,15 @@ public static class Dc1ApRunner
 {
     public const int DefaultPort = 38281;
     public const string DefaultOutDir = "mod_dinorand_ap";
+    internal const int LogicVersion = 3;
+
+    internal static void ValidateLogicVersion(int actual)
+    {
+        if (actual != LogicVersion)
+            throw new InvalidOperationException(
+                $"server world logic_version {actual} is obsolete; this client requires DC1 AP v3 — "
+                + "regenerate the multiworld with the matching current dino_crisis_1.apworld");
+    }
 
     /// <summary>Split "host:port" into its parts, defaulting to the AP port.</summary>
     public static (string Host, int Port) ParseHostPort(string hostPort)
@@ -62,10 +72,13 @@ public static class Dc1ApRunner
             return 1;
         }
         log($"connected: seed {conn.SeedName}, slot #{conn.Slot} '{slot}', goal room {conn.GoalRoom}");
-        if (conn.LogicVersion != 2)
+        try
         {
-            error($"error: server world logic_version {conn.LogicVersion}, this client expects 2 — "
-                + "regenerate the multiworld with the matching dino_crisis_1.apworld");
+            ValidateLogicVersion(conn.LogicVersion);
+        }
+        catch (InvalidOperationException ex)
+        {
+            error($"error: {ex.Message}");
             return 1;
         }
         // --- loop-closing install (D5): AP's fill replaces KeyItemPlacer ---
@@ -82,10 +95,24 @@ public static class Dc1ApRunner
                 ? Dc1Symbols.OtherWorldMarkerItemId
                 : checked((byte)placed);
             foreach (var rec in entry.Records)
-                patches.Add(new ApPlacementInstaller.RecordPatch(rec.Room, rec.RecOffset, itemId, (ushort)rec.Take));
+                patches.Add(new ApPlacementInstaller.RecordPatch(
+                    rec.Room,
+                    rec.RecOffset,
+                    new Dc1ItemRecordClass(
+                        checked((byte)rec.ExpectedOpcode),
+                        checked((byte)rec.ExpectedSubtype),
+                        rec.ExpectedLength),
+                    rec.VanillaItemId,
+                    rec.VanillaAmount,
+                    checked((ushort)rec.VanillaTake),
+                    itemId,
+                    1,
+                    checked((ushort)rec.Take),
+                    Visual: null));
         }
         var written = ApPlacementInstaller.WriteRooms(dataDir, outDir, patches, log);
-        var installed = GameInstaller.Install(dataDir, outDir, $"AP {conn.SeedName}");
+        var installed = GameInstaller.Install(
+            dataDir, outDir, $"AP {conn.SeedName}", written.WrittenFiles);
         log($"installed AP placement: {written.RecordsPatched} records in {written.RoomsWritten} rooms "
             + $"(backed up {installed.BackedUp}, overlaid {installed.Overlaid})");
 

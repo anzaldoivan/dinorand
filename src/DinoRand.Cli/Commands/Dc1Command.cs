@@ -138,7 +138,7 @@ internal sealed partial class CliApplication
             }
             var restore = GameInstaller.Restore(dataDir);
             Console.WriteLine(restore.Restored > 0
-                ? $"restored {restore.Restored} original room files in {dataDir}"
+                ? $"restored original files in {dataDir}"
                 : $"nothing to restore (no DinoRand backup found in {dataDir})");
             if (restore.Dc1VertexLiftReapplied)
                 Console.WriteLine("re-applied the DC1 vertex-ceiling lift to DINO.exe (ddraw.dll is lifted; "

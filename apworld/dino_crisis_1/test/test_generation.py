@@ -44,6 +44,10 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
         self.collect_all_but(["Key Card Lv. A"])
         self.assertBeatable(False)
 
+    def test_not_beatable_without_entrance_key(self) -> None:
+        self.collect_all_but(["Entrance Key"])
+        self.assertBeatable(False)
+
     def test_beatable_with_everything(self) -> None:
         self.collect_all_but([])
         self.assertBeatable(True)
@@ -55,18 +59,33 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
             self.assertTrue(all(i.advancement for i in items), f"{name} not progression")
 
     def test_all_gate_items_are_progression(self) -> None:
-        # EVERY item that gates a door in the logic contract (area keys, F.C. Device, all 14 DDK discs)
+        # EVERY item that gates a physical edge or pickup (door-type OR gates, puzzle AND gates,
+        # F.C. Device, and all 14 DDK discs)
         # must be an AP progression item — otherwise fill can leave a required key behind its own gate.
-        gate_names = {dc1.ITEM_NAMES[i] for e in dc1.EDGES for i in e["requiresItems"]}
+        gate_names = {
+            dc1.ITEM_NAMES[i]
+            for edge in dc1.EDGES
+            for i in edge["requiresItems"] + edge["requiresAnyItems"]
+        }
         self.assertTrue(gate_names, "no gate items found in the contract — distiller regression?")
         for name in sorted(gate_names):
             items = self.get_items_by_name(name)
             self.assertTrue(items, f"{name} gates an edge but is absent from the item pool")
             self.assertTrue(all(i.advancement for i in items),
                             f"{name} gates an edge but is not a progression item")
+        location_gate_names = {
+            dc1.ITEM_NAMES[item_id]
+            for location in dc1.LOCATIONS
+            for item_id in location["requiresItems"]
+        }
+        for name in sorted(location_gate_names):
+            items = self.get_items_by_name(name)
+            self.assertTrue(items, f"{name} guards a location but is absent from the item pool")
+            self.assertTrue(all(item.advancement for item in items),
+                            f"{name} guards a location but is not progression")
 
     def test_excluded_locations_hold_no_progression(self) -> None:
-        # Shared-taken-flag locations (ap-client-checks.json `excluded`, dc1_logic v2) cannot be
+        # Shared-taken-flag locations (ap-client-checks.json `excluded`, dc1_logic v3) cannot be
         # attributed individually by the runtime client — fill must keep progression out.
         from Fill import distribute_items_restrictive
         excluded = [loc["name"] for loc in dc1.LOCATIONS if loc.get("excluded")]
@@ -83,7 +102,7 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
         from Fill import distribute_items_restrictive
         distribute_items_restrictive(self.multiworld)
         slot_data = self.world.fill_slot_data()
-        self.assertEqual(2, slot_data["logic_version"])
+        self.assertEqual(3, slot_data["logic_version"])
         placements = slot_data["placements"]
         self.assertEqual(len(dc1.LOCATIONS), len(placements))
         valid_ids = set(dc1.GAME_ITEM_ID.values())
@@ -130,10 +149,45 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
 
     def test_ddk_disc_pairs_are_and_gated(self) -> None:
         # A DDK Input+Code disc door needs BOTH discs (native op58-3 AND-gate, [[ddk-disc-relocation]]).
-        # 0304->0300 (discs E) and 0604->0609 (discs W) both bite in the star model with a location present.
+        # 0304->0300 (discs E) and 0604->0609 (discs W) both bite in the physical graph.
         for room, discs in (("0300", ["DDK Input Disc E", "DDK Code Disc E"]),
                             ("0609", ["DDK Input Disc W", "DDK Code Disc W"])):
             self.assertAccessDependency([_first_location_in(room)], [discs], only_check_listed=True)
+
+    def test_physical_node_split_and_guarded_pickup_are_wired(self) -> None:
+        hall_nodes = [node for node in dc1.NODES if node["room"] == "0309"]
+        self.assertEqual({"west", "shuttle"}, {node["region"] for node in hall_nodes})
+        guarded = next(location for location in dc1.LOCATIONS
+                       if location["room"] == "0305" and location["itemId"] == 0x48)
+        self.assertAccessDependency(
+            [guarded["name"]],
+            [[dc1.ITEM_NAMES[0x46]]],
+            only_check_listed=True,
+        )
+
+    def test_parallel_physical_edges_keep_unique_entrance_names(self) -> None:
+        # Distinct physical doors can share endpoints while carrying different latch rules.
+        # AP requires every entrance name to be unique, so parallel edges must not be dropped or
+        # registered under the same default name.
+        entrances = [
+            entrance.name
+            for region in self.multiworld.regions
+            if region.player == self.player
+            for entrance in region.exits
+        ]
+        expected = 1 + sum(edge["from"] != edge["to"] for edge in dc1.EDGES)  # Menu -> start
+        self.assertEqual(expected, len(entrances))
+        self.assertEqual(len(entrances), len(set(entrances)))
+
+    def test_shared_placement_policy_keeps_progression_out_of_ineligible_locations(self) -> None:
+        from Fill import distribute_items_restrictive
+        distribute_items_restrictive(self.multiworld)
+        for location in dc1.LOCATIONS:
+            item = self.multiworld.get_location(location["name"], self.player).item
+            self.assertIsNotNone(item)
+            if item.advancement:
+                self.assertIn(dc1.GAME_ITEM_ID[item.name], location["allowedProgressionItemIds"],
+                              f"{item.name} placed at ineligible {location['name']}")
 
 
 class TestMinimalAccessibility(DinoCrisis1TestBase):

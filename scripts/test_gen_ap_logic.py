@@ -2,12 +2,158 @@
 from __future__ import annotations
 
 import json
+import copy
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_ap_logic as ap
+
+
+class Dc1LogicV3Tests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.data = ap.build_dc1()
+
+    def test_v3_progression_includes_exactly_one_entrance_key_source(self) -> None:
+        self.assertEqual(3, self.data["version"])
+        self.assertEqual("physical", self.data["topology"])
+        self.assertEqual(1, self.data["items"]["progressionItemIds"].count(0x2E))
+        self.assertIn(0x2E, self.data["items"]["completionItemIds"])
+
+    def test_goal_is_not_beatable_without_entrance_key(self) -> None:
+        progression = set(self.data["items"]["progressionItemIds"])
+        self.assertTrue(ap._goal_reachable(self.data, progression))
+        self.assertFalse(ap._goal_reachable(self.data, progression - {0x2E}))
+
+    def test_every_location_and_progression_item_has_a_registered_numeric_id(self) -> None:
+        item_ids = self.data["items"]["apIds"]
+        self.assertEqual(len(item_ids), len(set(item_ids.values())))
+        self.assertEqual(len(self.data["locations"]), len({x["apId"] for x in self.data["locations"]}))
+        for item_id in self.data["items"]["progressionItemIds"]:
+            self.assertIn(str(item_id), self.data["items"]["names"])
+            self.assertIn(self.data["items"]["names"][str(item_id)], item_ids)
+        for location in self.data["locations"]:
+            self.assertIn(str(location["itemId"]), self.data["items"]["names"])
+            self.assertIsInstance(location["apId"], int)
+
+    def test_explicit_registry_preserves_ids_across_earlier_addition_and_rename(self) -> None:
+        registry = ap.load_ap_id_registry()
+        item_names = set(self.data["items"]["names"].values())
+        locations = [{"key": x["key"], "name": x["name"]} for x in self.data["locations"]]
+        before_items, before_locations = ap._registered_ap_ids(item_names, locations, registry)
+
+        changed = copy.deepcopy(registry)
+        first_item = changed["items"][0]
+        old_item_name = first_item["name"]
+        first_item["name"] = "Renamed published item"
+        first_item["aliases"].append(old_item_name)
+        changed["items"].append({
+            "key": "synthetic-earlier-item",
+            "name": "!!! Earlier item",
+            "id": max(x["id"] for x in changed["items"]) + 1,
+            "aliases": [],
+        })
+        first_location = changed["locations"][0]
+        old_location_name = first_location["name"]
+        first_location["name"] = "Renamed published location"
+        first_location["aliases"].append(old_location_name)
+        changed["locations"].append({
+            "key": "synthetic-earlier-location",
+            "name": "!!! Earlier location",
+            "id": max(x["id"] for x in changed["locations"]) + 1,
+            "aliases": [],
+        })
+
+        renamed_items = item_names - {old_item_name} | {first_item["name"], "!!! Earlier item"}
+        renamed_locations = [
+            {"key": x["key"], "name": first_location["name"] if x["key"] == first_location["key"] else x["name"]}
+            for x in locations
+        ] + [{"key": "synthetic-earlier-location", "name": "!!! Earlier location"}]
+        after_items, after_locations = ap._registered_ap_ids(
+            renamed_items, renamed_locations, changed)
+
+        for name, ap_id in before_items.items():
+            if name != old_item_name:
+                self.assertEqual(ap_id, after_items[name])
+        self.assertEqual(before_items[old_item_name], after_items[first_item["name"]])
+        for key, ap_id in before_locations.items():
+            self.assertEqual(ap_id, after_locations[key])
+        self.assertGreater(after_items["!!! Earlier item"], max(before_items.values()))
+        self.assertGreater(after_locations["synthetic-earlier-location"], max(before_locations.values()))
+
+    def test_physical_records_and_logical_groups_are_explicit_and_complete(self) -> None:
+        checks = json.loads(ap.CLIENT_CHECKS.read_text(encoding="utf-8"))
+        physical = [f"{r['room']}:{r['rec']}"
+                    for location in checks["locations"] for r in location["records"]]
+        self.assertEqual(len(physical), len(set(physical)))
+        self.assertTrue(all(len(record["geometry"]) == 8
+                            for location in checks["locations"] for record in location["records"]))
+        self.assertEqual(
+            {location["key"] for location in self.data["locations"]},
+            {location["logicalId"] for location in checks["locations"]},
+        )
+        self.assertTrue(all(location["physicalIds"] for location in self.data["locations"]))
+
+    def test_same_id_or_position_does_not_implicitly_group(self) -> None:
+        records = [
+            {"rec_offset": "0x100", "item_id": "0x1d", "pos": [10, 20]},
+            {"rec_offset": "0x200", "item_id": "0x1d", "pos": [30, 40]},
+            {"rec_offset": "0x300", "item_id": "0x20", "pos": [10, 20]},
+            {"rec_offset": "0x400", "item_id": "0x1d", "pos": [10, 20]},
+        ]
+        grouped = ap._explicit_logical_groups("0100", records, [])
+        self.assertEqual(4, len(grouped))
+        self.assertEqual(4, len({x["logicalId"] for x in grouped}))
+
+        grouped = ap._explicit_logical_groups(
+            "0100", records,
+            [{"id": "0100:explicit", "records": ["0x100", "0x200"]}],
+        )
+        self.assertEqual(3, len(grouped))
+        self.assertEqual([0x100, 0x200], grouped[0]["recordOffsets"])
+
+    def test_physical_reachability_matches_every_engine_oracle_probe(self) -> None:
+        oracle = json.loads(ap.ORACLE.read_text(encoding="utf-8"))
+        self.assertEqual(2, oracle["version"])
+        self.assertTrue(oracle["nodes"])
+        self.assertTrue(oracle["edges"])
+        for probe in oracle["probes"]:
+            held = {int(value, 16) for value in probe["held"]}
+            self.assertEqual(set(probe["reach"]), ap._reachable_rooms(self.data, held), probe["name"])
+
+    def test_locations_carry_physical_nodes_guards_and_shared_eligibility(self) -> None:
+        nodes = {node["id"] for node in self.data["nodes"]}
+        self.assertTrue(all(location["node"] in nodes for location in self.data["locations"]))
+        represented = set(self.data["items"]["progressionItemIds"])
+        self.assertTrue(all(set(location["requiresItems"]) <= represented
+                            for location in self.data["locations"]))
+        guarded = [location for location in self.data["locations"]
+                   if location["room"] == "0305" and location["itemId"] in {0x48, 0x5E}]
+        self.assertTrue(guarded)
+        self.assertTrue(all(0x46 in location["requiresItems"] for location in guarded))
+
+        progression = set(self.data["items"]["progressionItemIds"])
+        for location in self.data["locations"]:
+            allowed = set(location["allowedProgressionItemIds"])
+            self.assertTrue(allowed <= progression)
+            if (location["priority"] == "fixed" or location.get("ending")
+                    or location.get("excluded")):
+                self.assertFalse(allowed, location["name"])
+            if location["visual"] == "interaction-only" and allowed:
+                self.assertEqual(set(self.data["items"]["hiddenProgressionItemIds"]), allowed)
+
+    def test_split_nodes_are_not_flattened(self) -> None:
+        hall = [node for node in self.data["nodes"] if node["room"] == "0309"]
+        self.assertEqual({"west", "shuttle"}, {node["region"] for node in hall})
+        self.assertEqual(2, len(hall))
+
+    def test_self_check_rejects_unknown_topology_construct(self) -> None:
+        broken = copy.deepcopy(self.data)
+        broken["edges"][0]["requiresMode"] = "xor"
+        with self.assertRaises(AssertionError):
+            ap.check_dc1(broken)
 
 
 class Dc2LogicV2Tests(unittest.TestCase):

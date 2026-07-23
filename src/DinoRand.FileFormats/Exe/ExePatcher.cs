@@ -244,6 +244,56 @@ public static class ExePatcher
     /// must not cross it. <c>[verified PE parse]</c></summary>
     public const uint TextRawEndVa = 0x00620000;
 
+    // ---- Item-pickup cancel/failure close (native item session) ----
+
+    /// <summary>Native AOT item action (table subtype 4) that stages the item id and chooses the
+    /// ownership, full-inventory, or normal pickup path. <c>[verified static disassembly]</c></summary>
+    public const uint ItemPickupActionVa = 0x0044A180;
+
+    /// <summary>Native inventory preflight branch target for a nonzero remaining quantity: mode 3
+    /// (full/failed pickup). <c>[verified static disassembly]</c></summary>
+    public const uint ItemPickupFullInventoryModeVa = 0x0044A3E1;
+
+    /// <summary>Native accept/commit site that clears the item-session latch after a successful
+    /// pickup. <c>[verified static disassembly]</c></summary>
+    public const uint ItemPickupAcceptClearVa = 0x0044A72E;
+
+    /// <summary>Native shared interaction-session close routine. Both the mode-3 failure path and
+    /// the mode-5 decline path call this routine. <c>[verified static disassembly]</c></summary>
+    public const uint ItemPickupSessionCloseVa = 0x0044ADEA;
+
+    /// <summary>Mode-5 No/decline <c>call</c> instruction into <see cref="ItemPickupSessionCloseVa"/>
+    /// (the preceding <c>push</c> is at <c>0x44BD5D</c>). The call is preserved; the shared close
+    /// routine is the patch boundary. <c>[verified]</c></summary>
+    public const uint ItemPickupDeclineCloseCallVa = 0x0044BD5E;
+
+    /// <summary>Native <c>SetFlag(group,index,value)</c> entry used by the close-cave clear.
+    /// <c>[verified]</c></summary>
+    public const uint ItemPickupPendingFlagSetterVa = 0x0040752B;
+
+    /// <summary>Group/index of the interaction item-action latch set at the top of
+    /// <see cref="ItemPickupActionVa"/>. The shared vanilla close omitted its clear.</summary>
+    public const int ItemPickupPendingFlagGroup = 1;
+    public const int ItemPickupPendingFlagIndex = 0x0B;
+
+    /// <summary>Zero-slack cave in the verified free window <c>0x61FC30..0x61FF80</c>. It is
+    /// separate from the hit-descriptor, walker, render-guard, and cutscene caves.</summary>
+    public const uint ItemPickupCancelCaveVa = 0x0061FC30;
+
+    /// <summary>True when the shared item-session close has the pending-latch clear installed.</summary>
+    public static bool IsItemPickupCancelFixApplied(ReadOnlySpan<byte> exe)
+        => Dc1ItemPickupExePatch.IsApplied(exe);
+
+    /// <summary>
+    /// Patch the shared item-session close so full-inventory failure and No/decline both clear
+    /// <c>SetFlag(1,0x0B)</c> before the existing close body runs. The hook is guarded against the
+    /// verified pristine bytes, the cave accepts only zero-slack or identical bytes, and reapplying
+    /// the patch is idempotent. The game executable itself is not read or written here; the installer
+    /// supplies an in-memory copy and owns backup/restore.
+    /// </summary>
+    public static byte[] InstallItemPickupCancelFix(Span<byte> exe)
+        => Dc1ItemPickupExePatch.Install(exe);
+
     /// <summary>Size of one descriptor record (scalar, pointer-free: pos x/y/z, <c>+0xe</c> bone idx,
     /// <c>+0x10</c> death-state, counts). <c>[verified]</c></summary>
     public const int HitDescriptorRecordSize = 0x14;

@@ -36,13 +36,13 @@ public sealed class RoomGraph
                     graph.GetOrAddRegion(room.Stage, room.Room, rd.Index, rd.Name);
                 var primary = graph.GetOrAddRegion(room.Stage, room.Room, 0, split.Regions[0].Name);
                 foreach (var item in room.Items)
-                    primary.Items.Add(new NodeItem(item));
+                    primary.Items.Add(new NodeItem(item, code));
             }
             else
             {
                 var node = graph.GetOrAdd(room.Stage, room.Room);
                 foreach (var item in room.Items)
-                    node.Items.Add(new NodeItem(item));
+                    node.Items.Add(new NodeItem(item, code));
             }
         }
 
@@ -51,6 +51,13 @@ public sealed class RoomGraph
             int code = ((room.Stage & 0xff) << 8) | (room.Room & 0xff);
             foreach (var door in room.Doors)
             {
+                // RoomScript preserves every raw 0x28 record for lossless editing. Decoded transition
+                // activations are graph edges by default; an explicitly authored overlay may add a
+                // verified non-init room transition. Do not infer traversability from reciprocity,
+                // which would erase legitimate one-way story doors.
+                if (!door.IsTraversableRoomTransition
+                    && !(requirements?.IsAuthoredTraversableRoomTransition(code, door) ?? false))
+                    continue;
                 var source = OwningRegion(graph, splits, room.Stage, room.Room, door.TargetCode);
                 var target = LandingRegion(graph, splits, door.TargetStage, door.TargetRoom, code);
                 source.Edges.Add(new RoomEdge(target, door));

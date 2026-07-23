@@ -2,6 +2,7 @@ using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Graph;
+using DinoRand.Randomizer.Logic;
 using DinoRand.Randomizer.Passes;
 using Xunit;
 
@@ -190,6 +191,37 @@ public class ItemRandomizerTests
                 Assert.Equal(CategoryOf(ids[i]) == ItemCategory.Ammo ? 2 : 6, shrunk[i]);
     }
 
+    [Theory]
+    [InlineData(4, 0, 6, 18)]
+    [InlineData(0, 4, 6, 2)]
+    public void AmmoQuantityChanges_SurviveRoomWriteRead(
+        byte quantity, byte reduction, ushort originalAmount, int expectedAmount)
+    {
+        var file = SyntheticRoom.Dc1Room(
+            new[] { new SyntheticRoom.Item(0x16, originalAmount) },
+            Array.Empty<SyntheticRoom.Door>(),
+            Array.Empty<SyntheticRoom.Enemy>());
+        var room = RoomFile.Read(StStage, StRoom, file);
+        var rooms = new[] { room };
+        var config = new RandomizerConfig
+        {
+            ReplaceItemPool = true,
+            RatioAmmo = 16,
+            RatioHealth = 0,
+            AmmoQuantity = quantity,
+            AmmoReduction = reduction,
+        };
+        var context = new RandomizationContext(
+            Game, rooms, RoomGraph.Build(rooms), new Seed(9), config, _ => { });
+
+        new ItemRandomizer().Apply(context);
+        var reread = RoomFile.Read(StStage, StRoom, room.Write());
+
+        var item = Assert.Single(reread.Items);
+        Assert.Equal(ItemCategory.Ammo, CategoryOf(item.ItemId));
+        Assert.Equal(expectedAmount, item.Amount);
+    }
+
     // --- Shuffle mode ----------------------------------------------------------------------------
 
     [Fact]
@@ -209,6 +241,78 @@ public class ItemRandomizerTests
         var after = room.Items.Select(i => i.ItemId).OrderBy(x => x).ToList();
         Assert.Equal(before, after);                                            // same multiset
         Assert.NotEqual(before, room.Items.Select(i => i.ItemId).ToList());     // order changed
+    }
+
+    [Fact]
+    public void ShuffleMode_PreservesTuples_AndAllowsCrossHandlerLocations_AtLoungePath()
+    {
+        // The exact ordinary Lounge record is the Handgun Slides source at 0204/0x3bdfc. Its
+        // native handler takes the ownership path for 0x0e, while supply ids such as 0x1f take the
+        // inventory path. Shuffle mode deliberately preserves the existing item multiset, including
+        // cross-handler placements; the native close fix handles a failed supply pickup in that spot.
+        // The 0xff records at 0x3ba74/0x3bacc are runtime-armed slots, not shuffle locations.
+        var before = new[] { (0x0e, 1), (0x1f, 2), (0x16, 3) }.OrderBy(x => x).ToArray();
+        bool crossHandlerPlacementSeen = false;
+        bool supplyToSupplyMovementSeen = false;
+
+        for (int seed = 0; seed < 32; seed++)
+        {
+            var start = new RoomFile(StStage, StRoom);
+            start.Doors.Add(new DoorRecord { TargetStage = 2, TargetRoom = 4, DoorType = 0 });
+
+            var lounge = new RoomFile(2, 4);
+            var handgunSlides = QuadRec(0x0e, 2000, -3000, 0x3bdfc);
+            handgunSlides.TakeIndex = handgunSlides.OriginalTakeIndex = 0x8d;
+            var resuscitation = new ItemRecord
+            {
+                ItemId = 0x1f, OriginalItemId = 0x1f, Amount = 2, FileOffset = 0x3be28,
+            };
+            var nineMm = new ItemRecord
+            {
+                ItemId = 0x16, OriginalItemId = 0x16, Amount = 3, FileOffset = 0x3be54,
+            };
+            var runtimeSlot = QuadRec(0xff, -3900, 4300, 0x3ba74);
+            runtimeSlot.TakeIndex = runtimeSlot.OriginalTakeIndex = 0xce;
+            runtimeSlot.Amount = 0;
+            var secondRuntimeSlot = QuadRec(0xff, 3900, 4300, 0x3bacc);
+            secondRuntimeSlot.TakeIndex = secondRuntimeSlot.OriginalTakeIndex = 0xcf;
+            secondRuntimeSlot.Amount = 0;
+            var progressionKey = new ItemRecord
+            {
+                ItemId = 0x2b, OriginalItemId = 0x2b, Amount = 1, FileOffset = 0x3be80,
+            };
+            lounge.Items.Add(handgunSlides);
+            lounge.Items.Add(resuscitation);
+            lounge.Items.Add(nineMm);
+            lounge.Items.Add(runtimeSlot);
+            lounge.Items.Add(secondRuntimeSlot);
+            lounge.Items.Add(progressionKey);
+
+            var rooms = new[] { start, lounge };
+            var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(seed),
+                                               new RandomizerConfig { ReplaceItemPool = false }, _ => { });
+            new ItemRandomizer().Apply(ctx);
+
+            var after = new[]
+            {
+                (handgunSlides.ItemId, handgunSlides.Amount),
+                (resuscitation.ItemId, resuscitation.Amount),
+                (nineMm.ItemId, nineMm.Amount),
+            }.OrderBy(x => x).ToArray();
+            Assert.Equal(before, after);
+            Assert.Equal(0xff, runtimeSlot.ItemId);
+            Assert.Equal(0, runtimeSlot.Amount);
+            Assert.Equal(0xff, secondRuntimeSlot.ItemId);
+            Assert.Equal(0, secondRuntimeSlot.Amount);
+            Assert.Equal((0x2b, 1), (progressionKey.ItemId, progressionKey.Amount));
+            crossHandlerPlacementSeen |= handgunSlides.ItemId is 0x16 or 0x1f;
+            supplyToSupplyMovementSeen |= resuscitation.ItemId == 0x16 || nineMm.ItemId == 0x1f;
+        }
+
+        Assert.True(crossHandlerPlacementSeen,
+            "the 0204 ownership source must remain eligible to receive an inventory-consuming item");
+        Assert.True(supplyToSupplyMovementSeen,
+            "ordinary supply locations must continue to exchange complete supply tuples");
     }
 
     [Fact]
@@ -483,28 +587,91 @@ public class ItemRandomizerTests
     //     consistent so a spot can't show different items per camera angle. ---
 
     [Fact]
-    public void DuplicatePickups_SameQuadSameId_AllCopiesGetSameItem()
+    public void ExplicitLogicalPickup_AllCopiesGetOneConservedItemAndAmount()
     {
-        // 30 physical pickups, each duplicated as two AOTs at one quad (same original id). Independent
-        // rerolling (the bug) makes some pair diverge; the dedup must make every pair consistent.
         var room = new RoomFile(StStage, StRoom);
-        int fo = 0;
-        for (int i = 0; i < 30; i++)
-        {
-            short x = (short)(100 + i), z = (short)(-i);
-            room.Items.Add(QuadRec(0x16, x, z, fo++));
-            room.Items.Add(QuadRec(0x16, x, z, fo++));
-        }
+        var first = QuadRec(0x16, 100, 10, 1); first.Amount = 15;
+        var copy = QuadRec(0x16, 200, 20, 2); copy.Amount = 15;
+        var health = QuadRec(0x1c, 300, 30, 3); health.Amount = 2;
+        var aid = QuadRec(0x1d, 400, 40, 4); aid.Amount = 3;
+        room.Items.AddRange(new[] { first, copy, health, aid });
         var rooms = new[] { room };
-        var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(1),
-                                           new RandomizerConfig(), _ => { });
+        var graph = RoomGraph.Build(rooms);
+        foreach (var ni in graph.Nodes.SelectMany(n => n.Items).Where(n => n.Record == first || n.Record == copy))
+            ni.LogicalId = new LogicalPickupId("explicit-two-record-pickup");
+        var before = new[] { (0x16, 15), (0x1c, 2), (0x1d, 3) }.Order().ToArray();
+        var ctx = new RandomizationContext(Game, rooms, graph, new Seed(1),
+                                           new RandomizerConfig { ReplaceItemPool = false }, _ => { });
         new ItemRandomizer().Apply(ctx);
 
-        for (int i = 0; i < 30; i++)
+        Assert.Equal((first.ItemId, first.Amount), (copy.ItemId, copy.Amount));
+        Assert.Equal(before, new[]
         {
-            Assert.Equal(room.Items[2 * i].ItemId, room.Items[2 * i + 1].ItemId);   // same item
-            Assert.Equal(room.Items[2 * i].Amount, room.Items[2 * i + 1].Amount);   // same count
+            (first.ItemId, first.Amount), (health.ItemId, health.Amount), (aid.ItemId, aid.Amount),
+        }.Order().ToArray());
+    }
+
+    [Fact]
+    public void Spoiler_ListsEveryChangedPhysicalRecordOnce_AndOmitsUnchangedRecords()
+    {
+        var room = new RoomFile(StStage, StRoom);
+        var first = QuadRec(0x16, 100, 10, 0x100); first.Amount = 15;
+        var copy = QuadRec(0x16, 200, 20, 0x200); copy.Amount = 15;
+        room.Items.AddRange(new[] { first, copy });
+        for (int i = 0; i < 10; i++)
+        {
+            var record = QuadRec(i % 2 == 0 ? 0x1c : 0x1d,
+                (short)(300 + i), (short)(30 + i), 0x300 + i);
+            record.Amount = i + 1;
+            room.Items.Add(record);
         }
+        var rooms = new[] { room };
+        var graph = RoomGraph.Build(rooms);
+        foreach (var item in graph.Nodes.SelectMany(n => n.Items)
+                     .Where(n => n.Record == first || n.Record == copy))
+            item.LogicalId = new LogicalPickupId("explicit-two-record-pickup");
+        var before = room.Items.ToDictionary(r => r.FileOffset, r => (r.ItemId, r.Amount));
+        var context = new RandomizationContext(Game, rooms, graph, new Seed(7),
+            new RandomizerConfig { ReplaceItemPool = false }, _ => { });
+
+        new ItemRandomizer().Apply(context);
+
+        var section = Assert.Single(context.Spoiler.Sections,
+            section => section.Title == "Items (DC1)");
+        Assert.Equal(new[] { "Room", "Vanilla item", "New item" }, section.Columns);
+        var changed = room.Items.Where(record =>
+            before[record.FileOffset] != (record.ItemId, record.Amount)).ToArray();
+        var unchanged = room.Items.Except(changed).ToArray();
+        Assert.NotEmpty(changed);
+        Assert.Equal(changed.Length, section.Rows.Count);
+        foreach (var record in changed)
+            Assert.Single(section.Rows, row =>
+                row[0].Contains($"record 0x{record.FileOffset:X}", StringComparison.Ordinal));
+        foreach (var record in unchanged)
+            Assert.DoesNotContain(section.Rows, row =>
+                row[0].Contains($"record 0x{record.FileOffset:X}", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void SameIdAndQuadWithoutExplicitGroup_RemainIndependentLogicalPickups()
+    {
+        var room = new RoomFile(StStage, StRoom);
+        for (int i = 0; i < 12; i++)
+        {
+            var a = QuadRec(0x16, (short)i, (short)-i, i * 2); a.Amount = i * 2 + 1;
+            var b = QuadRec(0x16, (short)i, (short)-i, i * 2 + 1); b.Amount = i * 2 + 2;
+            room.Items.Add(a); room.Items.Add(b);
+        }
+        var before = room.Items.Select(r => (r.ItemId, r.Amount)).Order().ToArray();
+        var rooms = new[] { room };
+        var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(2),
+            new RandomizerConfig { ReplaceItemPool = false }, _ => { });
+
+        new ItemRandomizer().Apply(ctx);
+
+        Assert.Equal(before, room.Items.Select(r => (r.ItemId, r.Amount)).Order().ToArray());
+        for (int i = 0; i < 12; i++)
+            Assert.NotEqual(room.Items[i * 2].Amount, room.Items[i * 2 + 1].Amount);
     }
 
     [Fact]
@@ -530,6 +697,134 @@ public class ItemRandomizerTests
 
         int differing = Enumerable.Range(0, 25).Count(i => a[i].ItemId != h[i].ItemId);
         Assert.True(differing > 0, "mixed-id records at one quad must not be collapsed into one item");
+    }
+
+    private sealed class EdgeRequirement : IRequirementOverlay
+    {
+        public IReadOnlyDictionary<int, RegionSplit> NodeSplits =>
+            new Dictionary<int, RegionSplit>();
+
+        public void ApplyTo(RoomGraph graph)
+        {
+            foreach (var edge in graph.Nodes.Where(n => n.Code == Start).SelectMany(n => n.Edges))
+                if (edge.Target.Code == 0x0200)
+                    edge.Requires = Requirement.OfItems(0x62);
+        }
+    }
+
+    [Fact]
+    public void OverlayGatedButPlayableOrdinaryLocation_IsEligible()
+    {
+        bool changed = false;
+        for (int seed = 1; seed <= 12 && !changed; seed++)
+        {
+            var start = StartRoom(0);
+            start.Items.Add(new ItemRecord
+            {
+                ItemId = 0x62, OriginalItemId = 0x62, Amount = 1, FileOffset = 1,
+            });
+            start.Items.Add(new ItemRecord
+            {
+                ItemId = 0x1c, OriginalItemId = 0x1c, Amount = 2, FileOffset = 2,
+            });
+            start.Doors.Add(new DoorRecord { TargetStage = 2, TargetRoom = 0 });
+            var gated = new RoomFile(2, 0);
+            var pickup = new ItemRecord
+            {
+                ItemId = 0x16, OriginalItemId = 0x16, Amount = 999, FileOffset = 3,
+            };
+            gated.Items.Add(pickup);
+            var rooms = new[] { start, gated };
+            var graph = RoomGraph.Build(rooms, new EdgeRequirement());
+            var ctx = new RandomizationContext(Game, rooms, graph, new Seed(seed),
+                new RandomizerConfig { ReplaceItemPool = false }, _ => { });
+
+            new ItemRandomizer().Apply(ctx);
+            changed = pickup.ItemId != 0x16 || pickup.Amount != 999;
+        }
+        Assert.True(changed, "an authored key entitlement must open an overlay-gated playable pickup");
+    }
+
+    [Fact]
+    public void ExcludedAndEndingLogicalPickups_RemainUnchanged()
+    {
+        var start = StartRoom(10);
+        var excluded = start.Items[0]; excluded.Amount = 81;
+        var endingCode = Game.EndingZoneRoomCodes.First();
+        start.Doors.Add(new DoorRecord
+        {
+            TargetStage = endingCode >> 8, TargetRoom = endingCode & 0xff,
+        });
+        var ending = new RoomFile(endingCode >> 8, endingCode & 0xff);
+        var sink = new ItemRecord { ItemId = 0x16, OriginalItemId = 0x16, Amount = 82, FileOffset = 100 };
+        ending.Items.Add(sink);
+        var rooms = new[] { start, ending };
+        var graph = RoomGraph.Build(rooms);
+        graph.Nodes.SelectMany(n => n.Items).Single(n => n.Record == excluded).Excluded = true;
+        var ctx = new RandomizationContext(Game, rooms, graph, new Seed(4), new RandomizerConfig(), _ => { });
+
+        new ItemRandomizer().Apply(ctx);
+
+        Assert.Equal((0x16, 81), (excluded.ItemId, excluded.Amount));
+        Assert.Equal((0x16, 82), (sink.ItemId, sink.Amount));
+    }
+
+    [Fact]
+    public void ReplacementMode_UsesLogicalSiteCountAndSynchronizesEveryPhysicalMember()
+    {
+        static (RoomFile Room, RoomGraph Graph, ItemRecord? Copy) World(bool withCopy)
+        {
+            var room = StartRoom(10);
+            ItemRecord? copy = null;
+            if (withCopy)
+            {
+                copy = new ItemRecord
+                {
+                    ItemId = 0x16, OriginalItemId = 0x16, Amount = 1, FileOffset = 100,
+                };
+                room.Items.Insert(1, copy);
+            }
+            var graph = RoomGraph.Build(new[] { room });
+            if (copy is not null)
+                foreach (var ni in graph.Nodes.SelectMany(n => n.Items)
+                             .Where(n => n.Record == room.Items[0] || n.Record == copy))
+                    ni.LogicalId = new LogicalPickupId("replacement-copy");
+            return (room, graph, copy);
+        }
+
+        var baseline = World(withCopy: false);
+        var grouped = World(withCopy: true);
+        var config = new RandomizerConfig { ReplaceItemPool = true };
+        new ItemRandomizer().Apply(new RandomizationContext(Game, new[] { baseline.Room }, baseline.Graph,
+            new Seed(44), config, _ => { }));
+        var log = new List<string>();
+        new ItemRandomizer().Apply(new RandomizationContext(Game, new[] { grouped.Room }, grouped.Graph,
+            new Seed(44), config, log.Add));
+
+        Assert.Equal(baseline.Room.Items.Select(r => (r.ItemId, r.Amount)),
+            grouped.Room.Items.Where(r => r != grouped.Copy).Select(r => (r.ItemId, r.Amount)));
+        Assert.Equal((grouped.Room.Items[0].ItemId, grouped.Room.Items[0].Amount),
+                     (grouped.Copy!.ItemId, grouped.Copy.Amount));
+        Assert.Contains(log, line => line.Contains("rerolled 10 logical non-key pickups"));
+    }
+
+    [Fact]
+    public void SingletonShuffle_CompatibilitySequence_IsStable()
+    {
+        var room = new RoomFile(StStage, StRoom);
+        for (int i = 0; i < 8; i++)
+            room.Items.Add(new ItemRecord
+            {
+                ItemId = 0x10 + i, OriginalItemId = 0x10 + i, Amount = 1, FileOffset = i,
+            });
+        var rooms = new[] { room };
+        var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(31415),
+            new RandomizerConfig { ReplaceItemPool = false }, _ => { });
+
+        new ItemRandomizer().Apply(ctx);
+
+        Assert.Equal(new[] { 0x15, 0x11, 0x17, 0x10, 0x12, 0x14, 0x13, 0x16 },
+                     room.Items.Select(r => r.ItemId));
     }
 
     // --- Item priorities (ITEM-RANDO-PLAN.md §7.1). A pickup marked Fixed stays exactly vanilla — a

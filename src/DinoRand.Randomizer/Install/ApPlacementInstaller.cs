@@ -13,9 +13,22 @@ public static class ApPlacementInstaller
 {
     /// <summary>One record edit: <paramref name="RecOffset"/> is the record's offset in the
     /// decompressed RDT (ap-client-checks.json coordinates == <c>ItemRecord.FileOffset</c>).</summary>
-    public sealed record RecordPatch(string Room, int RecOffset, byte ItemId, ushort TakeIndex);
+    public sealed record RecordPatch(
+        string Room,
+        int RecOffset,
+        Dc1ItemRecordClass ExpectedClass,
+        int ExpectedItemId,
+        int ExpectedAmount,
+        ushort ExpectedTakeIndex,
+        int ItemId,
+        int Amount,
+        ushort TakeIndex,
+        Dc1ItemVisualEdit? Visual);
 
-    public sealed record Result(int RoomsWritten, int RecordsPatched);
+    public sealed record Result(
+        int RoomsWritten,
+        int RecordsPatched,
+        IReadOnlyList<string> WrittenFiles);
 
     /// <summary>
     /// Patch <paramref name="patches"/> into the rooms under <paramref name="dataDir"/> and write
@@ -26,12 +39,15 @@ public static class ApPlacementInstaller
     public static Result WriteRooms(string dataDir, string outDir,
         IReadOnlyList<RecordPatch> patches, Action<string>? log = null)
     {
-        Directory.CreateDirectory(outDir);
         var byRoom = patches.GroupBy(p => p.Room.ToLowerInvariant()).ToList();
-        int records = 0;
+        var rooms = new List<RoomFile>(byRoom.Count);
         foreach (var group in byRoom)
         {
             string room = group.Key; // lowercase 4-hex, e.g. "010f"
+            if (room.Length != 4 || !int.TryParse(room,
+                    System.Globalization.NumberStyles.HexNumber,
+                    System.Globalization.CultureInfo.InvariantCulture, out _))
+                throw new InvalidDataException($"AP install: invalid room identity '{group.First().Room}'");
             int stage = Convert.ToInt32(room[..2], 16);
             int roomNo = Convert.ToInt32(room[2..], 16);
             string path = FindPristineRoom(dataDir, stage, roomNo)
@@ -40,21 +56,47 @@ public static class ApPlacementInstaller
             var rf = RoomFile.ReadFromFile(stage, roomNo, path);
             if (!rf.ParsedCleanly)
                 throw new InvalidDataException($"AP install: {Path.GetFileName(path)} did not parse cleanly");
-            foreach (var patch in group)
-            {
-                var rec = rf.Items.FirstOrDefault(i => i.FileOffset == patch.RecOffset)
-                    ?? throw new InvalidDataException(
-                        $"AP install: {room} has no item record at 0x{patch.RecOffset:x} — "
-                        + "ap-client-checks.json is stale vs this install");
-                rec.ItemId = patch.ItemId;
-                rec.TakeIndex = patch.TakeIndex;
-                records++;
-            }
-            string outPath = Path.Combine(outDir, $"st{stage:x}{roomNo:x2}.dat");
-            File.WriteAllBytes(outPath, rf.Write());
-            log?.Invoke($"  {Path.GetFileName(outPath)}: {group.Count()} record(s)");
+            rooms.Add(rf);
         }
-        return new Result(byRoom.Count, records);
+
+        var prepared = Dc1ItemEditBatch.Prepare(rooms, patches.Select(ToEdit).ToList());
+
+        // Nothing is published until every source room and physical target passes preflight.
+        Directory.CreateDirectory(outDir);
+        var written = new List<string>(prepared.Rooms.Count);
+        foreach (var room in prepared.Rooms)
+        {
+            int stage = room.RoomCode >> 8;
+            int roomNo = room.RoomCode & 0xff;
+            string fileName = $"st{stage:x}{roomNo:x2}.dat";
+            File.WriteAllBytes(Path.Combine(outDir, fileName), room.Bytes);
+            written.Add(fileName);
+            int count = patches.Count(p => string.Equals(
+                p.Room, room.RoomCode.ToString("x4"), StringComparison.OrdinalIgnoreCase));
+            log?.Invoke($"  {fileName}: {count} record(s)");
+        }
+        return new Result(written.Count, patches.Count, written);
+    }
+
+    private static Dc1ItemEdit ToEdit(RecordPatch patch)
+    {
+        int roomCode;
+        try { roomCode = Convert.ToInt32(patch.Room, 16); }
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            throw new InvalidDataException($"AP install: invalid room identity '{patch.Room}'", ex);
+        }
+        return new Dc1ItemEdit(
+            roomCode,
+            patch.RecOffset,
+            patch.ExpectedClass,
+            patch.ExpectedItemId,
+            patch.ExpectedAmount,
+            patch.ExpectedTakeIndex,
+            patch.ItemId,
+            patch.Amount,
+            patch.TakeIndex,
+            patch.Visual);
     }
 
     /// <summary>The pristine source for a room: <c>Data/.dinorand_backup</c> copy when one

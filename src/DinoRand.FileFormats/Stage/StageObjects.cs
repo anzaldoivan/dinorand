@@ -46,7 +46,24 @@ public static class DoorPoseLayout
     public const int EntryDOffset = 0x24;
 }
 
-/// <summary>A door / area-transition placed by SCD opcode <c>0x28</c> in its subtype-0 form.</summary>
+/// <summary>Static activation class assigned to a raw DC1 door record from its function-table context.</summary>
+/// <remarks>
+/// The SCD walker preserves the record regardless of this class. The graph exports only classes whose
+/// repository contract describes a room-transition activation; task-spawn and unresolved event records
+/// remain raw but are not ordinary graph edges.
+/// </remarks>
+public enum DoorActivationKind
+{
+    Init,
+    AotZone,
+    InitGosub,
+    Gosub,
+    TaskSpawn,
+    GotoSub,
+    Unresolved,
+}
+
+/// <summary>A raw door / area-transition record placed by SCD opcode <c>0x28</c> in its subtype-0 form.</summary>
 /// <remarks>
 /// Doors are the sibling of the item record (subtype 4) under the same <c>0x28</c> AOT
 /// ("area-of-things") umbrella opcode (<see cref="DcOpcodes.Door"/>/<see cref="DcOpcodes.DoorSubtype"/>,
@@ -110,6 +127,33 @@ public sealed class DoorRecord
     /// self-latch SETTER</b> (<c>SetFlag(9, LockId)</c> on first traverse — the "open from the far
     /// side" shortcut); 6/7/8 = Key Card ladder; 9..0xfc = item id == type; 0xfd/fe/ff = special.</summary>
     public int DoorType { get; set; }
+
+    /// <summary>
+    /// Function-table subroutine containing this record. Subroutine 0 is the room-load init path;
+    /// nonzero entries are event subroutines. This context is retained so consumers can distinguish
+    /// room transitions from event/unresolved records without dropping raw bytes.
+    /// </summary>
+    public int SubroutineIndex { get; set; }
+
+    /// <summary>
+    /// Static activation class assigned by <see cref="RoomScript.Parse"/>. Manually-created records
+    /// leave this unset and retain the historical subroutine-0 default below.
+    /// </summary>
+    public DoorActivationKind? ActivationKind { get; set; }
+
+    /// <summary>
+    /// True for the documented ordinary room-transition activation classes. This is deliberately not
+    /// a reciprocal-edge test, so legitimate one-way story transitions remain directed edges. Raw
+    /// task-spawn and unresolved event records stay in <see cref="RoomFile.Doors"/> for lossless
+    /// consumers, but do not become ordinary graph edges.
+    /// </summary>
+    public bool IsTraversableRoomTransition => ActivationKind switch
+    {
+        null => SubroutineIndex == 0,
+        DoorActivationKind.Init or DoorActivationKind.AotZone or DoorActivationKind.InitGosub
+            or DoorActivationKind.Gosub or DoorActivationKind.GotoSub => true,
+        _ => false,
+    };
 
     /// <summary>
     /// Entry pose the player arrives at in the <i>destination</i> room: position
@@ -250,6 +294,10 @@ public sealed class ItemRecord
     /// <summary>The id as decoded from the file, before any randomizer edit. Drives change
     /// detection (so an unedited room round-trips byte-exact) and the empty-slot check.</summary>
     public int OriginalItemId { get; set; }
+
+    /// <summary>The count word as decoded from the file, before any randomizer edit. Used for
+    /// amount-only change detection and byte-exact no-op writes.</summary>
+    public int OriginalAmount { get; set; }
 
     /// <summary>Take-index word (<see cref="TakeIndexOffset"/>) — written back only when it
     /// differs from <see cref="OriginalTakeIndex"/> (the AP client's rekey; the standalone

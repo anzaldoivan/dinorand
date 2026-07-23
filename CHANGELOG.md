@@ -12,6 +12,13 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+### Added
+
+- **Archipelago runtime client for DC1.** Connect DinoRand to an existing Archipelago game with
+  `--ap-connect <host[:port]> --ap-slot <name> --install <dir>`: pickups become checks, items from
+  other players arrive in-game, and reconnecting keeps your progress. The client runs on Windows;
+  DC2 remains generation-only.
+
 ## [0.6.0] — 2026-07-22
 
 ### Added
@@ -25,11 +32,6 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
   weapons. Enable it in Advanced options or with `--dc2-shared-weapons` (or the sub-weapons-only
   `--dc2-shared-weapons-subs-only` option); use `--restore` to undo the change. The four largest
   weapons still need broader in-game verification, and shared weapons keep their original icons.
-
-- **Archipelago runtime client for DC1.** Connect DinoRand to an existing Archipelago game with
-  `--ap-connect <host[:port]> --ap-slot <name> --install <dir>`: pickups become checks, items from
-  other players arrive in-game, and reconnecting keeps your progress. The client runs on Windows;
-  DC2 remains generation-only.
 
 - **Door Skip for DC1 (experimental, off by default).** The door-opening animation can be skipped
   with the GUI option or `--dc1-door-skip` while the destination room still loads normally. It is

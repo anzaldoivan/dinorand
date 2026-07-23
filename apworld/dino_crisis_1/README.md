@@ -1,7 +1,7 @@
 # Dino Crisis 1 — Archipelago world
 
 A Python [Archipelago](https://archipelago.gg) world that lets AP **generate** a logically-valid
-Dino Crisis 1 seed from DinoRand's authored logic. The **runtime half ships too** (contract v2):
+Dino Crisis 1 seed from DinoRand's authored physical logic. The **runtime half ships too** (logic contract v3):
 slot_data carries AP's item placement (`placements` + `item_ids`), and the DinoRand CLI's
 `--ap-connect` client patches it into the local GOG install and syncs the running game
 (pickups → checks, received items → inventory, goal → completion) — live-verified end-to-end
@@ -49,8 +49,8 @@ YAML
 python Generate.py --seed 1
 ```
 Success = `output/AP_*.zip` is written with no `FillError`/logic exception. Unzip it and read the
-spoiler to confirm the three key items (BG Area Key, C. O. Area Key, Key Card Lv. A) are placed in
-reachable spots and the Underground Heliport (060d) checks sit behind Key Card Lv. A.
+spoiler to confirm progression items are placed in physically reachable, eligible spots and the
+Underground Heliport (060d) goal remains reachable through its item and room-state gates.
 
 ## Tests
 **AP-side integration** (run from the Archipelago root, after step 2 above):

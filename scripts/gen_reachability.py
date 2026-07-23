@@ -19,11 +19,8 @@ page is the *vanilla contract* view, kept fresh by --check like every other gene
               disk when they exist (docs/ is publish-held-back, so a CI checkout has no
               docs/ tree — there --check degrades to the invariant asserts alone).
 
-Fidelity caveats rendered into the DC1 page (do not silently widen them):
-  * star topology — the distilled model frees every room that is not a gated-edge target;
-    full door connectivity lives only in the .dat door records (engine RoomGraph).
-  * progression items without a distilled pickup location (event-granted, e.g. keys granted
-    by triggers rather than item_control records) are assumed held from the start, flagged.
+The DC1 page consumes the v3 physical node/edge export generated from engine RoomGraph, including
+node splits, door-type OR gates, puzzle AND gates, room-state gates, latches, and guarded pickups.
 """
 import argparse
 import os
@@ -53,14 +50,16 @@ def _spheres(data: dict, held: set, locs_by_item: dict) -> list[dict]:
     taken: set = set()
     spheres: list[dict] = []
     while True:
-        reach = ap._reachable_rooms(data, held)
+        nodes = ap._reachable_nodes(data, held)
+        reach = {node["room"] for node in data["nodes"] if node["id"] in nodes}
         got = []
-        for iid, rooms in sorted(locs_by_item.items()):
+        for iid, locations in sorted(locs_by_item.items()):
             if iid in taken or iid in held:
                 continue
-            room = next((r for r in rooms if r in reach), None)
-            if room is not None:
-                got.append((iid, room))
+            location = next((location for location in locations
+                             if ap._location_reachable(data, location, held, nodes, reach)), None)
+            if location is not None:
+                got.append((iid, location["room"]))
         if got or not spheres or spheres[-1]["collected"]:
             spheres.append({"index": len(spheres), "rooms": len(reach),
                             "reach": reach, "collected": got})
@@ -77,17 +76,20 @@ def build_dc1_doc() -> tuple[str, dict]:
     prog = data["items"]["progressionItemIds"]
     regions = data["regions"]
 
-    locs_by_item: dict[int, list[str]] = {}
+    locs_by_item: dict[int, list[dict]] = {}
     for loc in data["locations"]:
         if loc["itemId"] in prog:
-            locs_by_item.setdefault(loc["itemId"], []).append(loc["room"])
+            locs_by_item.setdefault(loc["itemId"], []).append(loc)
     unmodeled = sorted(i for i in prog if i not in locs_by_item)
+    assert not unmodeled, f"DC1 progression entitlements without physical sources: {unmodeled}"
 
-    spheres = _spheres(data, set(unmodeled), locs_by_item)
+    spheres = _spheres(data, set(), locs_by_item)
     final_reach = spheres[-1]["reach"]
     assert data["goalRoom"] in final_reach, "DC1 vanilla goal unreachable in distilled model"
 
-    gated = [e for e in data["edges"] if e["requiresItems"] or e["requiresRooms"]]
+    gated = [e for e in data["edges"] if e["requiresAnyItems"] or e["requiresItems"]
+             or e["requiresRooms"] or e["requiresLatch"] is not None]
+    nodes = {node["id"]: node for node in data["nodes"]}
 
     def room(c: str) -> str:
         n = regions.get(c, c)
@@ -100,23 +102,13 @@ def build_dc1_doc() -> tuple[str, dict]:
         "",
         GENERATED_BANNER,
         "",
-        "Source model: the **distilled logic** the DC1 apworld runs "
-        "(`scripts/gen_ap_logic.py` over authored `data/dc1/{map,items,room-data}.json`) — "
-        "star topology plus the gated-edge overlay. It is NOT the engine door graph: "
-        "engine-truth spheres for a seed are in that seed's `SPOILER.md`.",
+        "Source model: the **v3 physical node graph** the DC1 apworld runs, distilled by "
+        "`scripts/gen_ap_logic.py` from the engine RoomGraph reachability oracle plus authored "
+        "pickup identity and policy. Per-seed committed spheres remain in `SPOILER.md`.",
         "",
         f"Start `{room(data['startRoom'])}` → goal `{room(data['goalRoom'])}`. "
         f"Progression items: {', '.join(f'`{names[i]}`' for i in prog)}.",
     ]
-    if unmodeled:
-        lines += [
-            "",
-            "> ⚠ **Event-granted keys (no distilled pickup location):** "
-            + ", ".join(f"`{names[i]}`" for i in unmodeled)
-            + " — granted by script triggers, not `item_control` records, so the distilled model "
-              "assumes them held from the start. The engine model (per-seed spoiler) tracks their "
-              "real acquisition.",
-        ]
     lines += ["", "## Sphere playthrough (vanilla layout)", "",
               "| Sphere | Rooms reachable | Progression collected in this sphere |",
               "|---|---|---|"]
@@ -124,25 +116,41 @@ def build_dc1_doc() -> tuple[str, dict]:
         got = "; ".join(f"{names[i]} @ {room(r)}" for i, r in s["collected"]) or "—"
         lines.append(f"| {s['index']} | {s['rooms']} / {len(regions)} | {got} |")
     lines += ["", f"Goal `{room(data['goalRoom'])}` reachable after {len(spheres)} sphere(s).",
-              "", "## Gated edges (the logic overlay)", "",
-              "| From | To | Needs item(s) | Needs visit |", "|---|---|---|---|"]
+              "", "## Gated physical edges", "",
+              "| From node | To node | Needs any item | Needs all items | Needs visit/state |",
+              "|---|---|---|---|---|"]
     for e in gated:
-        items = ", ".join(names[i] for i in e["requiresItems"]) or "—"
-        visits = ", ".join(room(r) for r in e["requiresRooms"]) or "—"
-        lines.append(f"| {room(e['from'])} | {room(e['to'])} | {items} | {visits} |")
+        any_items = " / ".join(names[i] for i in e["requiresAnyItems"]) or "—"
+        all_items = " + ".join(names[i] for i in e["requiresItems"]) or "—"
+        state = ", ".join(room(r) for r in e["requiresRooms"])
+        if e["requiresLatch"] is not None:
+            state = ", ".join(x for x in (state, f"story latch {e['requiresLatch']}") if x)
+        lines.append(f"| `{e['from']}` | `{e['to']}` | {any_items} | {all_items} | {state or '—'} |")
     lines += [
-        "", "## Gate-overlay graph", "",
-        "Only the gated edges are drawn — in the star model every other room is freely "
-        "reachable. A full DC1 room-connectivity diagram needs the door-record export "
-        "(future increment, DOCS-AUDIENCE-PLAN.md §5a deviations).",
-        "", "```mermaid", "graph LR",
+        "", "## Physical door graph — per stage", "",
     ]
-    for e in gated:
-        label = ", ".join(names[i] for i in e["requiresItems"])
-        label = " + ".join(x for x in [label, ("visit " + ", ".join(e["requiresRooms"])
-                                               if e["requiresRooms"] else "")] if x)
-        lines.append(f'    r{e["from"]}["{room(e["from"])}"] -->|{label}| r{e["to"]}["{room(e["to"])}"]')
-    lines += ["```", ""]
+    for stage in sorted({node["room"][0] for node in data["nodes"]}):
+        lines += [f"### Stage {stage}xx", "", "```mermaid", "graph LR"]
+        for e in data["edges"]:
+            if nodes[e["from"]]["room"][0] != stage or e["from"] == e["to"]:
+                continue
+            requirements = []
+            if e["requiresAnyItems"]:
+                requirements.append(" / ".join(names[i] for i in e["requiresAnyItems"]))
+            if e["requiresItems"]:
+                requirements.append(" + ".join(names[i] for i in e["requiresItems"]))
+            if e["requiresRooms"]:
+                requirements.append("visit " + ", ".join(e["requiresRooms"]))
+            if e["requiresLatch"] is not None:
+                requirements.append(f"story latch {e['requiresLatch']}")
+            label = " + ".join(requirements)
+            arrow = f"-->|{label}|" if label else "-->"
+            source_id = "n" + e["from"].replace(":", "_")
+            target_id = "n" + e["to"].replace(":", "_")
+            source_label = e["from"]
+            target_label = e["to"]
+            lines.append(f'    {source_id}["{source_label}"] {arrow} {target_id}["{target_label}"]')
+        lines += ["```", ""]
     return "\n".join(lines), data
 
 

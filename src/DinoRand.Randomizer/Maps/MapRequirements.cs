@@ -8,8 +8,9 @@ namespace DinoRand.Randomizer.Maps;
 
 /// <summary>
 /// The hand-authored progression-logic overlay parsed from <c>data/dc1/map.json</c> — the
-/// <c>requiresRoom</c> / door <c>requires</c> / item <c>requires</c> fields (schema documented in the
-/// file's <c>_derivation.requires</c>). Stamps a <see cref="Requirement"/> onto matching nodes,
+/// <c>requiresRoom</c> / door <c>requires</c> / item <c>requires</c> fields and the explicit
+/// <c>traversableTransitions</c> room-transition contract (schema documented in the file's
+/// <c>_derivation</c> metadata). Stamps a <see cref="Requirement"/> onto matching nodes,
 /// edges, and node items by code, so a new puzzle/key gate is a JSON entry rather than a code change
 /// (<c>docs/decisions/cross/GRAPH-LOGIC-PARITY-PLAN.md</c> §4.1/§5). Sibling of <see cref="DoorMap"/>, which owns the
 /// door-rando half of the same file; this class deliberately ignores those keys and vice-versa.
@@ -26,11 +27,17 @@ public sealed class MapRequirements : IRequirementOverlay
         IReadOnlyDictionary<int, IReadOnlyList<int>> DoorReqRoom, // dest code -> required rooms (AND)
         IReadOnlyDictionary<int, IReadOnlyList<int>> ItemReq,     // pickup item id -> required items (AND)
         IReadOnlyDictionary<(short X, short Z), ItemPriority> ItemPriorities, // pickup position -> priority
+        IReadOnlyDictionary<int, ItemPriority> ItemPriorityRecords, // stable record offset -> priority
         IReadOnlySet<(short X, short Z)> ScatterTargets,        // legal key-item scatter-target positions
+        IReadOnlySet<int> ScatterTargetRecords,                 // stable record offsets
         IReadOnlyDictionary<(short X, short Z), PickupVisual> ItemVisuals, // pickup position -> ground visual
+        IReadOnlyDictionary<int, PickupVisual> ItemVisualRecords, // stable record offset -> visual
         IReadOnlySet<int> ItemLinks,                            // relocation-twin item ids (one shared assignment)
+        IReadOnlyDictionary<int, string> ItemLinkRecords,       // stable record offset -> sync group id
+        IReadOnlyDictionary<int, string> ItemGroups,            // stable record offset -> logical pickup id
         IReadOnlyDictionary<int, Requirement> RegionDoorGates,   // laser-fence region: VANILLA dest code -> cross rule
-        IReadOnlyDictionary<(short X, short Z), Requirement> RegionItemGates); // fence-behind pickup position -> reach rule
+        IReadOnlyDictionary<(short X, short Z), Requirement> RegionItemGates, // fence-behind pickup position -> reach rule
+        IReadOnlySet<int> TraversableTransitions);               // explicitly authored non-init destinations
 
     private readonly IReadOnlyDictionary<int, RoomReq> _rooms;
     private readonly IReadOnlyDictionary<int, RegionSplit> _nodeSplits;
@@ -48,6 +55,16 @@ public sealed class MapRequirements : IRequirementOverlay
     /// <summary>Rooms the graph must split into per-region sub-nodes (REGION-SCHEMA-PLAN.md §2), parsed
     /// from a room's <c>regions</c> object when it declares <c>"nodeSplit": true</c>.</summary>
     public IReadOnlyDictionary<int, RegionSplit> NodeSplits => _nodeSplits;
+
+    /// <summary>True when the map explicitly promotes this raw non-init record's vanilla destination
+    /// to a graph transition. The target is matched before any door-rando retargeting.</summary>
+    public bool IsAuthoredTraversableRoomTransition(int sourceCode, FileFormats.Stage.DoorRecord door)
+    {
+        if (door.IsTraversableRoomTransition) return false;
+        if (!_rooms.TryGetValue(sourceCode, out var req)) return false;
+        int vanillaTarget = door.OriginalTargetCode == 0 ? door.TargetCode : door.OriginalTargetCode;
+        return req.TraversableTransitions.Contains(vanillaTarget);
+    }
 
     public void ApplyTo(RoomGraph graph)
     {
@@ -101,31 +118,50 @@ public sealed class MapRequirements : IRequirementOverlay
 
             // item priorities → stamp the pickup at a given position (the placement quad's first
             // corner) with its authored priority (docs/decisions/cross/ITEM-RANDO-PLAN.md §7.1; only Fixed today).
-            if (req.ItemPriorities.Count > 0)
+            if (req.ItemPriorities.Count > 0 || req.ItemPriorityRecords.Count > 0)
                 foreach (var ni in node.Items)
-                    if (PositionOf(ni.Record) is { } pos && req.ItemPriorities.TryGetValue(pos, out var pri))
-                        ni.Priority = pri;
+                    if (req.ItemPriorityRecords.TryGetValue(ni.Record.FileOffset, out var recordPri))
+                        ni.Priority = recordPri;
+                    else if (PositionOf(ni.Record) is { } pos && req.ItemPriorities.TryGetValue(pos, out var pri))
+                    {
+                        // Legacy/synthetic rooms may not carry production record offsets. Fall back to
+                        // position only when none of this room's explicit physical targets matched;
+                        // otherwise a coordinate collision must not inherit another record's policy.
+                        bool explicitTargetPresent = node.Items.Any(other =>
+                            req.ItemPriorityRecords.ContainsKey(other.Record.FileOffset)
+                            && PositionOf(other.Record) == pos);
+                        if (!explicitTargetPresent) ni.Priority = pri;
+                    }
 
-            // scatter targets → mark the pickup at a given position as a legal key-item scatter target
-            // (docs/decisions/dc1/items/KEY-ITEM-SCATTER-DATA-AUDIT.md; consumed only by the opt-in scatter).
-            if (req.ScatterTargets.Count > 0)
+            // scatter targets → mark stable record targets as legal key-item scatter spots. Legacy
+            // position entries remain supported for synthetic fixtures only.
+            if (req.ScatterTargets.Count > 0 || req.ScatterTargetRecords.Count > 0)
                 foreach (var ni in node.Items)
-                    if (PositionOf(ni.Record) is { } pos && req.ScatterTargets.Contains(pos))
+                    if (req.ScatterTargetRecords.Contains(ni.Record.FileOffset)
+                        || (PositionOf(ni.Record) is { } pos && req.ScatterTargets.Contains(pos)))
                         ni.IsScatterTarget = true;
 
             // ground visuals → stamp the pickup's decoded visual class (generated overlay, non-default
             // classes only; docs/decisions/dc1/items/PICKUP-GROUND-MODEL-FEASIBILITY.md).
-            if (req.ItemVisuals.Count > 0)
+            if (req.ItemVisuals.Count > 0 || req.ItemVisualRecords.Count > 0)
                 foreach (var ni in node.Items)
-                    if (PositionOf(ni.Record) is { } pos && req.ItemVisuals.TryGetValue(pos, out var vis))
+                    if (req.ItemVisualRecords.TryGetValue(ni.Record.FileOffset, out var recordVis))
+                        ni.Visual = recordVis;
+                    else if (PositionOf(ni.Record) is { } pos && req.ItemVisuals.TryGetValue(pos, out var vis))
                         ni.Visual = vis;
 
-            // item links → tag every pickup of a relocation-twin id in this room with that id's hex as
-            // its link key, so the passes mirror the group's canonical assignment across all copies.
-            if (req.ItemLinks.Count > 0)
+            // item links → tag explicit record-offset synchronization groups. Legacy id-only entries
+            // remain parseable, but generated policy never infers membership from repeated ids.
+            if (req.ItemLinks.Count > 0 || req.ItemLinkRecords.Count > 0)
                 foreach (var ni in node.Items)
-                    if (req.ItemLinks.Contains(ni.Record.OriginalItemId))
+                    if (req.ItemLinkRecords.TryGetValue(ni.Record.FileOffset, out var link))
+                        ni.Link = link;
+                    else if (req.ItemLinks.Contains(ni.Record.OriginalItemId))
                         ni.Link = ni.Record.OriginalItemId.ToString("x2");
+
+            foreach (var ni in node.Items)
+                if (req.ItemGroups.TryGetValue(ni.Record.FileOffset, out var logicalId))
+                    ni.LogicalId = new LogicalPickupId(logicalId);
         }
     }
 
@@ -162,13 +198,19 @@ public sealed class MapRequirements : IRequirementOverlay
         {
             var v = prop.Value;
             var requiresRoom = ParseCodeArray(v, "requiresRoom");
+            var traversableTransitions = ParseCodeArray(v, "traversableTransitions").ToHashSet();
             var doorReq = ParseRequiresMap(v, "doors", "requires", IntField);
             var doorReqRoom = ParseRequiresMap(v, "doors", "requiresRoom", CodeField);
             var itemReq = ParseRequiresMap(v, "items", "requires", IntField);
             var itemPriorities = ParseItemPriorities(v);
+            var itemPriorityRecords = ParseItemPriorityRecords(v);
             var scatterTargets = ParseScatterTargets(v);
+            var scatterTargetRecords = ParseRecordSet(v, "scatterTargets");
             var itemVisuals = ParseItemVisuals(v);
+            var itemVisualRecords = ParseItemVisualRecords(v);
             var itemLinks = ParseItemLinks(v);
+            var itemLinkRecords = ParseItemLinkRecords(v);
+            var itemGroups = ParseItemGroups(v);
 
             // A node-split room (REGION-SCHEMA-PLAN.md §2) models its partition as real sub-region nodes in
             // RoomGraph.Build, so it does NOT also get the flattened fence door/item gates (no double-gate).
@@ -180,14 +222,20 @@ public sealed class MapRequirements : IRequirementOverlay
             if (split is not null) nodeSplits[ParseCode(prop.Name)] = split;
 
             if (requiresRoom.Count == 0 && doorReq.Count == 0 && doorReqRoom.Count == 0
-                && itemReq.Count == 0 && itemPriorities.Count == 0 && scatterTargets.Count == 0
-                && itemVisuals.Count == 0
-                && itemLinks.Count == 0 && regionDoorGates.Count == 0 && regionItemGates.Count == 0)
+                && itemReq.Count == 0 && itemPriorities.Count == 0 && itemPriorityRecords.Count == 0
+                && scatterTargets.Count == 0 && scatterTargetRecords.Count == 0
+                && itemVisuals.Count == 0 && itemVisualRecords.Count == 0
+                && itemLinks.Count == 0 && itemLinkRecords.Count == 0 && itemGroups.Count == 0
+                && regionDoorGates.Count == 0 && regionItemGates.Count == 0
+                && traversableTransitions.Count == 0)
                 continue; // un-authored room — nothing to stamp
 
             rooms[ParseCode(prop.Name)] =
-                new RoomReq(requiresRoom, doorReq, doorReqRoom, itemReq, itemPriorities, scatterTargets,
-                            itemVisuals, itemLinks, regionDoorGates, regionItemGates);
+                new RoomReq(requiresRoom, doorReq, doorReqRoom, itemReq, itemPriorities,
+                            itemPriorityRecords, scatterTargets, scatterTargetRecords,
+                            itemVisuals, itemVisualRecords, itemLinks,
+                            itemLinkRecords, itemGroups,
+                            regionDoorGates, regionItemGates, traversableTransitions);
         }
 
         return new MapRequirements(rooms, nodeSplits);
@@ -306,6 +354,51 @@ public sealed class MapRequirements : IRequirementOverlay
         return map;
     }
 
+    private static IReadOnlyDictionary<int, ItemPriority> ParseItemPriorityRecords(JsonElement room)
+    {
+        var map = new Dictionary<int, ItemPriority>();
+        if (!room.TryGetProperty("itemPriorities", out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return map;
+        foreach (var entry in arr.EnumerateArray())
+        {
+            if (!entry.TryGetProperty("priority", out var value)
+                || !Enum.TryParse<ItemPriority>(value.GetString(), true, out var priority)
+                || priority == ItemPriority.Normal
+                || !entry.TryGetProperty("records", out var records)
+                || records.ValueKind != JsonValueKind.Array)
+                continue;
+            foreach (var record in records.EnumerateArray())
+            {
+                int offset = ParseOffset(record.GetString()!);
+                if (!map.TryAdd(offset, priority))
+                    throw new InvalidDataException($"duplicate item-priority record target 0x{offset:x}");
+            }
+        }
+        return map;
+    }
+
+    private static IReadOnlyDictionary<int, string> ParseItemGroups(JsonElement room)
+    {
+        var map = new Dictionary<int, string>();
+        if (!room.TryGetProperty("itemGroups", out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return map;
+        foreach (var group in arr.EnumerateArray())
+        {
+            if (!group.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.String
+                || !group.TryGetProperty("records", out var records)
+                || records.ValueKind != JsonValueKind.Array)
+                throw new InvalidDataException("itemGroups entries require string id and records array");
+            string logicalId = id.GetString()!;
+            foreach (var record in records.EnumerateArray())
+            {
+                int offset = ParseOffset(record.GetString()!);
+                if (!map.TryAdd(offset, logicalId))
+                    throw new InvalidDataException($"physical record 0x{offset:x} belongs to multiple item groups");
+            }
+        }
+        return map;
+    }
+
     /// <summary>Parse a room's optional <c>scatterTargets</c> array — <c>[ { "at": "X,Z" }, … ]</c> —
     /// into a set of legal key-item scatter-target positions (the placement quad's first corner, decimal
     /// <c>X,Z</c>), keyed like <c>itemPriorities</c>. Generated by <c>scripts/gen_item_map.py</c>.</summary>
@@ -317,6 +410,8 @@ public sealed class MapRequirements : IRequirementOverlay
 
         foreach (var e in arr.EnumerateArray())
         {
+            if (e.TryGetProperty("records", out var records) && records.ValueKind == JsonValueKind.Array)
+                continue;
             if (!e.TryGetProperty("at", out var at)) continue;
             var parts = at.GetString()!.Split(',');
             set.Add((short.Parse(parts[0], CultureInfo.InvariantCulture),
@@ -338,6 +433,8 @@ public sealed class MapRequirements : IRequirementOverlay
 
         foreach (var e in arr.EnumerateArray())
         {
+            if (e.TryGetProperty("records", out var records) && records.ValueKind == JsonValueKind.Array)
+                continue;
             if (!e.TryGetProperty("at", out var at) || !e.TryGetProperty("visual", out var vi)) continue;
             PickupVisual? visual = vi.GetString() switch
             {
@@ -354,6 +451,48 @@ public sealed class MapRequirements : IRequirementOverlay
         return map;
     }
 
+    private static IReadOnlySet<int> ParseRecordSet(JsonElement room, string property)
+    {
+        var set = new HashSet<int>();
+        if (!room.TryGetProperty(property, out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return set;
+        foreach (var entry in arr.EnumerateArray())
+            if (entry.TryGetProperty("records", out var records) && records.ValueKind == JsonValueKind.Array)
+                foreach (var record in records.EnumerateArray())
+                    if (!set.Add(ParseOffset(record.GetString()!)))
+                        throw new InvalidDataException($"duplicate {property} physical target {record.GetString()}");
+        return set;
+    }
+
+    private static IReadOnlyDictionary<int, PickupVisual> ParseItemVisualRecords(JsonElement room)
+    {
+        var map = new Dictionary<int, PickupVisual>();
+        if (!room.TryGetProperty("itemVisuals", out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return map;
+        foreach (var entry in arr.EnumerateArray())
+        {
+            if (!entry.TryGetProperty("visual", out var value)
+                || !entry.TryGetProperty("records", out var records)
+                || records.ValueKind != JsonValueKind.Array)
+                continue;
+            PickupVisual? visual = value.GetString() switch
+            {
+                "interaction-only" => PickupVisual.InteractionOnly,
+                "bespoke-mesh" => PickupVisual.BespokeMesh,
+                "generic-panel" => PickupVisual.GenericPanel,
+                _ => null,
+            };
+            if (visual is null) continue;
+            foreach (var record in records.EnumerateArray())
+            {
+                int offset = ParseOffset(record.GetString()!);
+                if (!map.TryAdd(offset, visual.Value))
+                    throw new InvalidDataException($"duplicate item-visual record target 0x{offset:x}");
+            }
+        }
+        return map;
+    }
+
     /// <summary>Parse a room's optional <c>itemLinks</c> array — <c>[ { "id": "46" }, … ]</c> — into a
     /// set of relocation-twin item ids (hex strings, matching the <c>items</c>-key convention). Entries
     /// without a parseable <c>id</c> are skipped.</summary>
@@ -365,11 +504,35 @@ public sealed class MapRequirements : IRequirementOverlay
 
         foreach (var e in arr.EnumerateArray())
         {
+            if (e.TryGetProperty("records", out var records) && records.ValueKind == JsonValueKind.Array)
+                continue;
             if (!e.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.String) continue;
             if (int.TryParse(id.GetString(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var v))
                 set.Add(v);
         }
         return set;
+    }
+
+    private static IReadOnlyDictionary<int, string> ParseItemLinkRecords(JsonElement room)
+    {
+        var map = new Dictionary<int, string>();
+        if (!room.TryGetProperty("itemLinks", out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return map;
+        foreach (var group in arr.EnumerateArray())
+        {
+            if (!group.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.String
+                || !group.TryGetProperty("records", out var records)
+                || records.ValueKind != JsonValueKind.Array)
+                continue; // legacy id-only entry
+            string link = id.GetString()!;
+            foreach (var record in records.EnumerateArray())
+            {
+                int offset = ParseOffset(record.GetString()!);
+                if (!map.TryAdd(offset, link))
+                    throw new InvalidDataException($"physical record 0x{offset:x} belongs to multiple item links");
+            }
+        }
+        return map;
     }
 
     private static int IntField(JsonElement e) => e.GetInt32();          // item ids (decimal/numeric)
@@ -404,4 +567,8 @@ public sealed class MapRequirements : IRequirementOverlay
 
     private static int ParseCode(string code) =>
         int.Parse(code, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+
+    private static int ParseOffset(string value) => value.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+        ? int.Parse(value.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture)
+        : int.Parse(value, CultureInfo.InvariantCulture);
 }

@@ -46,6 +46,7 @@ dc1_logic.json without needing the install.
 from __future__ import annotations
 
 import json
+import os
 import struct
 import sys
 from pathlib import Path
@@ -71,11 +72,24 @@ NATIVE_AUTOSET = {212, 138}
 
 
 def _data_dir() -> Path:
-    d = REPO / "english" / "Data"
-    if not d.is_dir():
-        raise SystemExit("gen_ap_client_checks: english/Data (DC1 install) not found — "
+    value = os.environ.get("DINORAND_DC1_DIR")
+    if not value:
+        env = REPO / ".env"
+        if env.is_file():
+            for raw in env.read_text(encoding="utf-8").splitlines():
+                if raw.strip().startswith("DINORAND_DC1_DIR="):
+                    value = raw.split("=", 1)[1].strip().strip('"').strip("'")
+                    break
+    if not value:
+        raise SystemExit("gen_ap_client_checks: DINORAND_DC1_DIR is not configured — "
                          "this generator is install-gated and never runs on CI.")
-    return d
+    if os.name == "nt" and value.startswith("/mnt/") and len(value) > 6:
+        value = f"{value[5].upper()}:/{value[7:]}"
+    root = Path(value)
+    for d in (root, root / "Data", root / "english" / "Data"):
+        if d.is_dir() and d.name.lower() == "data":
+            return d
+    raise SystemExit("gen_ap_client_checks: DINORAND_DC1_DIR has no DC1 Data folder")
 
 
 ROOM_FILE_RE = __import__("re").compile(r"^st([0-9a-c])([0-9a-f]{2})\.dat$")
@@ -131,8 +145,8 @@ def _location_records() -> list[dict]:
     files = _room_files(_data_dir())
     rdt_cache: dict[str, bytes] = {}
 
-    # Group room-data records by the distiller's location key (same collapse as load_locations).
-    recs_by_key: dict[str, list[dict]] = {}
+    # Index physical records by stable room+offset. Logical membership comes only from map.itemGroups.
+    recs_by_physical: dict[tuple[str, int], dict] = {}
     for code, room in raw["rooms"].items():
         ic = room.get("item_control")
         if not ic:
@@ -140,25 +154,31 @@ def _location_records() -> list[dict]:
         c = gal._code(code)
         for rec in ic["records"]:
             iid = gal._item_id(rec["item_id"])
-            pos = rec.get("pos") or [0, 0]
-            key = f"{c}:{iid:02x}:{int(pos[0])},{int(pos[1])}"
-            recs_by_key.setdefault(key, []).append({"room": c, "rec": rec, "iid": iid})
+            offset = int(rec["rec_offset"], 16)
+            recs_by_physical[(c, offset)] = {"room": c, "rec": rec, "iid": iid}
 
     out = []
-    for loc in gal.load_locations(items["names"]):
+    for loc in gal.load_locations(items["names"], m["itemGroups"]):
         if loc["itemId"] == gal.EMPTY_SLOT_ID or loc["room"] not in m["regions"]:
             continue  # same filter as build_dc1
         rows = []
-        for r in recs_by_key[loc["key"]]:
+        for offset in loc["recordOffsets"]:
+            r = recs_by_physical[(loc["room"], offset)]
             room = r["room"]
             if room not in rdt_cache:
                 rdt_cache[room] = _rdt(files[room])
             buf = rdt_cache[room]
             off = int(r["rec"]["rec_offset"], 16)
-            if not (buf[off] == 0x28 and buf[off + 2] == OP28_ITEM_SUBTYPE and buf[off + ID_OFF] == r["iid"]):
+            count = struct.unpack_from("<H", buf, off + 0x1E)[0]
+            if not (buf[off] == 0x28 and buf[off + 2] == OP28_ITEM_SUBTYPE
+                    and buf[off + ID_OFF] == r["iid"] and count == int(r["rec"]["count"])):
                 raise SystemExit(f"gen_ap_client_checks: {room} rec {hex(off)} does not decode as "
-                                 f"item id 0x{r['iid']:02x} — room-data is stale vs the install")
+                                 f"item id/count 0x{r['iid']:02x}/{r['rec']['count']} — "
+                                 "room-data is stale vs the install")
             rows.append({"room": room, "rec": hex(off),
+                         "opcode": buf[off], "subtype": buf[off + 2], "length": 44,
+                         "itemId": r["iid"], "amount": count,
+                         "geometry": list(struct.unpack_from("<8h", buf, off + 4)),
                          "take": struct.unpack_from("<H", buf, off + TAKE_OFF)[0]})
         out.append({"loc": loc, "records": rows})
     return out
@@ -180,11 +200,13 @@ def build() -> dict:
     reserved = all_vanilla | read_refs | written_refs | TRANSITION_RESERVED | {0}
     free = [i for i in range(1, 256) if i not in reserved]
 
-    # AP location ids — the apworld's deterministic sorted-name scheme (dino_crisis_1/data.py:
-    # _BASE_ID + 0x1_0000 + index in sorted names). Carried here so the C# client never
-    # re-derives the scheme; gen_ap_logic --check asserts the two stay in agreement.
-    ap_id = {name: 0x0DC1_0000 + 0x1_0000 + i
-             for i, name in enumerate(sorted(L["loc"]["name"] for L in locs))}
+    # AP location ids come from the explicit append-only registry; sorting or renaming can no
+    # longer renumber a published location.
+    _item_ids, location_ids = gal._registered_ap_ids(
+        set(gal.load_items()["names"].values()),
+        [L["loc"] for L in locs],
+        gal.load_ap_id_registry())
+    ap_id = {L["loc"]["name"]: location_ids[L["loc"]["key"]] for L in locs}
 
     entries = []
     for L in sorted(locs, key=lambda L: L["loc"]["name"]):
@@ -204,7 +226,11 @@ def build() -> dict:
         else:
             cls, final = "pinned-shared", None
 
-        records = [{"room": r["room"], "rec": r["rec"], "vanillaTake": r["take"],
+        records = [{"room": r["room"], "rec": r["rec"],
+                    "expectedOpcode": r["opcode"], "expectedSubtype": r["subtype"],
+                    "expectedLength": r["length"], "vanillaItemId": r["itemId"],
+                    "vanillaAmount": r["amount"], "vanillaTake": r["take"],
+                    "geometry": r["geometry"],
                     "take": final if final is not None else r["take"]}
                    for r in L["records"]]
         flags = sorted({r["take"] for r in records if r["take"]})
@@ -212,6 +238,7 @@ def build() -> dict:
             "name": name,
             "apId": ap_id[name],
             "key": L["loc"]["key"],
+            "logicalId": L["loc"]["key"],
             "room": L["loc"]["room"],
             "predicate": {"kind": "flag", "group": GROUP, "anyOf": flags},
             "records": records,
@@ -227,7 +254,7 @@ def build() -> dict:
         "_generated_by": "scripts/gen_ap_client_checks.py",
         "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + "
                    "data/dc1/room-data.json + the english/Data room corpus",
-        "version": 1,
+        "version": 2,
         "game": "dc1",
         "flagGroup": GROUP,
         "locations": entries,
@@ -239,7 +266,7 @@ def main() -> int:
     doc = build()
     text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
     if mode == "--apply":
-        OUT.write_text(text, encoding="utf-8")
+        OUT.write_text(text, encoding="utf-8", newline="\n")
         by_cls: dict[str, int] = {}
         for e in doc["locations"]:
             by_cls[e["class"]] = by_cls.get(e["class"], 0) + 1

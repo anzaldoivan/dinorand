@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Linq;
 using DinoRand.FileFormats.Exe;
 using Xunit;
@@ -220,6 +221,77 @@ public class ExePatcherTests
         var exe = NewImageWithFfHookPristine();
         exe[ExePatcher.VaToFileOffset(ExePatcher.CutsceneFfCaveVa) + 3] = 0x42; // cave not zero-slack, not our cave
         Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyCutsceneFastForward(exe));
+    }
+
+    // ---- DC1 item-pickup cancel/failure close (native 0x44ADEA) ----
+
+    private static byte[] NewImageWithItemPickupClosePristine()
+    {
+        var exe = NewImage();
+        // `push ebp; mov ebp,esp; push 0` — the first five bytes of the shared close routine.
+        new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }
+            .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa));
+        return exe;
+    }
+
+    [Fact]
+    public void ItemPickupCancelFix_ClearsPendingLatchBeforeSharedClose()
+    {
+        var exe = NewImageWithItemPickupClosePristine();
+        Assert.False(ExePatcher.IsItemPickupCancelFixApplied(exe));
+
+        ExePatcher.InstallItemPickupCancelFix(exe);
+
+        int hook = ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa);
+        Assert.Equal(0xE9, exe[hook]); // failure/decline callers still enter the shared close routine
+        int cave = ExePatcher.VaToFileOffset(ExePatcher.ItemPickupCancelCaveVa);
+        Assert.Equal(new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }, exe.Skip(cave).Take(5).ToArray());
+
+        // The cave preserves the original first `push 0`, clears SetFlag(1,0x0B), then returns to
+        // the original close body at its next instruction (0x44ADEF).
+        Assert.Equal(new byte[] { 0x6A, 0x00, 0x6A, 0x0B, 0x6A, 0x01, 0xE8 },
+            exe.Skip(cave + 5).Take(7).ToArray());
+        int clearCall = cave + 11;
+        int clearRel = BinaryPrimitives.ReadInt32LittleEndian(exe.AsSpan(clearCall + 1, 4));
+        Assert.Equal((int)ExePatcher.ItemPickupPendingFlagSetterVa,
+            (int)(ExePatcher.ItemPickupCancelCaveVa + 11 + 5u + (uint)clearRel));
+        Assert.Equal(new byte[] { 0x83, 0xC4, 0x0C, 0xE9 },
+            exe.Skip(cave + 16).Take(4).ToArray());
+        int returnRel = BinaryPrimitives.ReadInt32LittleEndian(exe.AsSpan(cave + 20, 4));
+        Assert.Equal((int)ExePatcher.ItemPickupSessionCloseVa + 5,
+            (int)(ExePatcher.ItemPickupCancelCaveVa + 19 + 5u + (uint)returnRel));
+        Assert.True(ExePatcher.IsItemPickupCancelFixApplied(exe));
+    }
+
+    [Fact]
+    public void ItemPickupCancelFix_IsIdempotentAndRejectsUnexpectedHook()
+    {
+        var exe = NewImageWithItemPickupClosePristine();
+        ExePatcher.InstallItemPickupCancelFix(exe);
+        var once = (byte[])exe.Clone();
+
+        ExePatcher.InstallItemPickupCancelFix(exe);
+        Assert.Equal(once, exe);
+
+        var wrong = NewImageWithItemPickupClosePristine();
+        wrong[ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa)] ^= 0xFF;
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.InstallItemPickupCancelFix(wrong));
+
+        var wrongCave = NewImageWithItemPickupClosePristine();
+        ExePatcher.InstallItemPickupCancelFix(wrongCave);
+        wrongCave[ExePatcher.VaToFileOffset(ExePatcher.ItemPickupCancelCaveVa)] = 0xCC;
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.InstallItemPickupCancelFix(wrongCave));
+    }
+
+    [Fact]
+    public void ItemPickupCancelFix_RejectsImageWithoutFileBackedCave()
+    {
+        int hook = ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa);
+        var truncated = new byte[hook + 5];
+        new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }.CopyTo(truncated, hook);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => ExePatcher.InstallItemPickupCancelFix(truncated));
     }
 
     [Fact]

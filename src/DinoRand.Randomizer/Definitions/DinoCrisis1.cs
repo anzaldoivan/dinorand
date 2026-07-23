@@ -226,16 +226,16 @@ public sealed class DinoCrisis1 : GameDefinition
     // engine still models them as reachable (you can stand in them), so a shuffled progression key here
     // verifies "beatable" but is an uncollectable softlock — vanilla places no required key in any of
     // them (unlike the returnable port cluster 060A/060B/0609/0615, which hold vanilla DDK discs / key
-    // chips). The key shuffle excludes these from the placement spot pool (ProgressionPass.ShuffleDoorKeys).
+    // chips). The shared key-placement policy excludes these from candidate and committed spot pools.
     public override IReadOnlySet<int> EndingZoneRoomCodes { get; } =
         new HashSet<int> { 0x0612, 0x0613, 0x060c, 0x040d };
 
     // Backyard of the Facility — the game's opening room (BFS root for progression logic).
     public override int StartRoomCode => 0x010d;
 
-    // Underground Heliport — an endgame room behind the Key Card Lv. A (0x3a) door chain
-    // (0611->060d, type 8). Empty-handed it is unreachable; with the door keys it is reachable,
-    // so it is a real progression goal under the door-graph logic (see docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.13).
+    // Underground Heliport — the established endgame reachability goal. The authoritative graph
+    // includes both physical approaches, their item/room-state requirements, and the selected start;
+    // final verification must reach this node before output can be published.
     public override int GoalRoomCode => 0x060d;
 
     // Hand-authored progression-logic overlay (puzzle gates / room-state / item-guards) from

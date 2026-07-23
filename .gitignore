@@ -31,6 +31,9 @@
 # trees remain held back by the fail-closed allowlist).
 !/data/
 /data/*
+!/data/dc1/
+/data/dc1/*
+!/data/dc1/ap-id-registry.json
 !/data/dc2/
 /data/dc2/*
 !/data/dc2/item-sources.json
