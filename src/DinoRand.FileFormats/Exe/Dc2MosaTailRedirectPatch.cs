@@ -47,7 +47,7 @@ public static class Dc2MosaTailRedirectPatch
         "50a1b86d87000fb78090100000663d00077412663d02077206663d0407760658e95a93f5ff"
         + "588a4656536a40e91793f5ff");
 
-    // The released legacy candidate shipped in v0.5.0-v0.5.2. These bytes are historical compatibility
+    // The previously released legacy candidate is retained. These bytes are historical compatibility
     // fingerprints only: they can be recognized and restored, never emitted by Apply.
     private const int LegacyHookOffset = 0x3FC80;
     private const int LegacyCaveLength = 66;

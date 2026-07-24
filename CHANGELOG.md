@@ -23,14 +23,9 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ### Fixed
 
-- **DC1 key-item shuffle now follows the C.O. Area route** (`--shuffle-keys` / GUI “Shuffle Key
-  Items”). Rest Station is no longer treated as reachable before its locked passage; the shuttle's
-  B2 stop requires prior Library progression. The Large Size Elevator's B3 stop requires Liaison
-  Elevator No.1 activation. Control Room B3 unlocks after visiting Backup Generator Room B3 instead
-  of requiring the C.O. Area Key. The C.O. Area Key now gates only the Rest Station passage, while
-  Key Card A no longer blocks the earlier General Weapons Storage route and remains required for
-  the vanilla Grenade Gun Parts in Parts Storage. Affected key-shuffle seeds may produce different
-  key locations.
+- **DC1 key-item shuffle route correction.** With `--shuffle-keys` or the GUI “Shuffle Key Items”
+  toggle, the C.O. Area route now follows the intended progression. Affected seeds may place keys
+  differently.
 
 ## [0.6.0] — 2026-07-22
 
