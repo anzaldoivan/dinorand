@@ -13,10 +13,21 @@ class ReleasePublishWorkflowTests(unittest.TestCase):
         workflow = WORKFLOW.read_text(encoding="utf-8")
         commands = re.findall(r"^\s*gh release\s+\S+.*$", workflow, re.MULTILINE)
 
-        self.assertEqual(len(commands), 3)
+        self.assertEqual(len(commands), 4)
         for command in commands:
             with self.subTest(command=command.strip()):
                 self.assertIn('--repo "$GITHUB_REPOSITORY"', command)
+
+    def test_draft_verification_uses_exact_draft_capable_tag_lookup(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+
+        self.assertNotIn('releases/tags/$RELEASE_TAG', workflow)
+        self.assertRegex(
+            workflow,
+            r'gh release view "\$RELEASE_TAG" --repo "\$GITHUB_REPOSITORY" '
+            r'--json tagName,isDraft,assets > draft-release\.json',
+        )
+        self.assertRegex(workflow, r'release\["tagName"\] != tag')
 
     def test_release_workflow_contract_runs_in_ci(self):
         ci = CI_WORKFLOW.read_text(encoding="utf-8")

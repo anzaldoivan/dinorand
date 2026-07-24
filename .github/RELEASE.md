@@ -27,7 +27,7 @@ prerelease suffix). Generated notes are never a fallback.
    and changes `draft` to false only after exact completeness verification.
 
 A failure after draft creation intentionally leaves an incomplete draft. Inspect it with
-`gh api repos/anzaldoivan/dinorand/releases/tags/vX.Y.Z`; upload only verified missing assets with
+`gh release view vX.Y.Z --repo anzaldoivan/dinorand --json tagName,isDraft,assets`; upload only verified missing assets with
 `gh release upload vX.Y.Z <files>`, repeat the exact asset-set and checksum checks from the workflow,
 then publish with `gh release edit vX.Y.Z --draft=false`. Never create or move a replacement tag.
 
