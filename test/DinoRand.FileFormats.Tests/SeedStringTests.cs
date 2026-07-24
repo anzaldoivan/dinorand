@@ -78,6 +78,46 @@ public class SeedStringTests
         }
     }
 
+    [Fact]
+    public void InstallationOnlySkips_DoNotChangeShareableSeedIdentity()
+    {
+        var seed = new Seed(987654);
+        var baseline = SeedString.Encode(seed, new RandomizerConfig());
+        var configs = new[]
+        {
+            new RandomizerConfig { Dc1DoorSkip = true },
+            new RandomizerConfig { Dc2DoorSkip = true },
+            new RandomizerConfig { Dc1FastForwardCutscenes = true },
+        };
+
+        foreach (var cfg in configs)
+        {
+            var encoded = SeedString.Encode(seed, cfg);
+            Assert.Equal(baseline, encoded);
+            Assert.True(SeedString.TryParse(encoded, out var parsedSeed, out var parsed));
+            Assert.Equal(seed.Value, parsedSeed.Value);
+            Assert.False(parsed.Dc1DoorSkip);
+            Assert.False(parsed.Dc2DoorSkip);
+            Assert.False(parsed.Dc1FastForwardCutscenes);
+        }
+    }
+
+    [Fact]
+    public void ShortenCutscenes_IsCurrentlyNonEncoded_AndParsesFalse()
+    {
+        var seed = new Seed(987654);
+        var baseline = SeedString.Encode(seed, new RandomizerConfig());
+        var encoded = SeedString.Encode(seed, new RandomizerConfig { ShortenCutscenes = true });
+
+        // This equality characterizes wire-format non-encoding only. ShortenCutscenes alters
+        // deterministic generated output, so whether it belongs in the shared seed is a pending
+        // product-contract decision; this says nothing about generated-output identity.
+        Assert.Equal(baseline, encoded);
+        Assert.True(SeedString.TryParse(encoded, out var parsedSeed, out var parsed));
+        Assert.Equal(seed.Value, parsedSeed.Value);
+        Assert.False(parsed.ShortenCutscenes);
+    }
+
     /// <summary>Byte 22 (DC2 starting weapon, DC2-STARTING-LOADOUT-PLAN.md): explicit ids and
     /// random-from-band round-trip; the byte is absent when the option is off, so pre-feature
     /// seeds (≤22 bytes) parse with the feature defaulted off.</summary>

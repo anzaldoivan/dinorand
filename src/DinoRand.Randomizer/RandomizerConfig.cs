@@ -3,8 +3,10 @@ using DinoRand.Randomizer.Definitions;
 namespace DinoRand.Randomizer;
 
 /// <summary>
-/// User-facing options. Combined with a <see cref="Seed"/>, this fully determines a
-/// run. Kept flat and serializable so configs can be shared as text.
+/// User-facing options. The shareable DINO string carries the <see cref="Seed"/> and the
+/// seed-encoded subset. To reproduce a complete run/output, all other applicable non-seed-encoded
+/// configuration—including generation, session, installation, and output settings—must be matched
+/// separately. Kept flat and serializable so configs can be shared as text.
 /// </summary>
 public sealed class RandomizerConfig
 {

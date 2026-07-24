@@ -14,7 +14,7 @@
     "turret_meaning": "ST407-unique actor-flag script (auto-confirm set-piece)",
     "boss_setpiece_spawn_types": {
       "0x03": "Tyrannosaurus(boss)",
-      "0x05": "Mosasaurus(aquatic-boss)",
+      "0x05": "Plesiosaurus (boss form)",
       "0x06": "Giganotosaurus(boss)",
       "0x09": "Triceratops(setpiece)"
     },
@@ -30,7 +30,7 @@
     ]
   },
   "_legend": {
-    "flagged": "confirmed set-piece \u2014 excluded. Auto-confirm = op-0x46 scripted actor-animation (swap-crash risk) OR op-0x58 (turret) OR a hardcoded boss/set-piece spawn (Tyranno/Mosa/Gigano/Trice) OR a human ground-truth cutscene label (ST101 intro, ST106 water-tower)",
+    "flagged": "confirmed set-piece \u2014 excluded. Auto-confirm = op-0x46 scripted actor-animation (swap-crash risk) OR op-0x58 (turret) OR a hardcoded boss/set-piece spawn (Tyranno/Plesiosaurus/Gigano/Trice) OR a human ground-truth cutscene label (ST101 intro, ST106 water-tower)",
     "uncertain": "matches the scripted-event barrier (op-0x41/0x42) only \u2014 no animation/boss/label confirmation; static opcodes cannot tell swap-breaking from safe-scripted; PLAYTEST to promote to flagged or demote to clear. NOT auto-excluded.",
     "keys": "3-char st_id (no ST prefix), matching spawn-graph.json / Dc2RoomExclusions"
   },
@@ -232,7 +232,7 @@
     },
     "205": {
       "spawns": 4,
-      "barrier": 24,
+      "barrier": 26,
       "turret": 0,
       "anim": 1,
       "boss_setpiece": [],
@@ -240,7 +240,7 @@
       "decode_clean": true,
       "evidence": [
         "scripted_anim_op_0x46 x1",
-        "event_barrier_op_0x41/0x42 x24",
+        "event_barrier_op_0x41/0x42 x26",
         "scene_op_0x29 x1"
       ],
       "reason": "op-0x46 scripted actor-animation x1 (auto; swap-crash risk)"
@@ -290,7 +290,7 @@
       "reason": "op-0x58 turret-class actor script (auto)"
     },
     "503": {
-      "spawns": 9,
+      "spawns": 10,
       "barrier": 36,
       "turret": 0,
       "anim": 0,
@@ -337,17 +337,17 @@
       "turret": 0,
       "anim": 2,
       "boss_setpiece": [
-        "Mosasaurus(aquatic-boss)"
+        "Plesiosaurus (boss form)"
       ],
       "scene_op": 1,
       "decode_clean": true,
       "evidence": [
         "scripted_anim_op_0x46 x2",
-        "boss_setpiece_spawn:Mosasaurus(aquatic-boss)",
+        "boss_setpiece_spawn:Plesiosaurus (boss form)",
         "event_barrier_op_0x41/0x42 x10",
         "scene_op_0x29 x1"
       ],
-      "reason": "op-0x46 scripted actor-animation x2 (auto; swap-crash risk); hardcoded boss/set-piece spawn Mosasaurus(aquatic-boss) (auto)"
+      "reason": "op-0x46 scripted actor-animation x2 (auto; swap-crash risk); hardcoded boss/set-piece spawn Plesiosaurus (boss form) (auto)"
     },
     "800": {
       "spawns": 2,
@@ -453,15 +453,15 @@
       "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
     },
     "003": {
-      "spawns": 15,
-      "barrier": 52,
+      "spawns": 18,
+      "barrier": 56,
       "turret": 0,
       "anim": 0,
       "boss_setpiece": [],
       "scene_op": 0,
       "decode_clean": true,
       "evidence": [
-        "event_barrier_op_0x41/0x42 x52"
+        "event_barrier_op_0x41/0x42 x56"
       ],
       "reason": "scripted-event barrier signature; needs playtest to confirm/deny"
     },
