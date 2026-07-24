@@ -20,16 +20,21 @@ Do not run any test command that can discover or use a configured real game inst
 
 Before resolving or using any install path, read the gitignored `.env`. Use only `DINORAND_DC1_DIR` and `DINORAND_DC2_DIR` from it; do not use any other `.env` setting or search for an install elsewhere. State in the approval record whether the test touches the install or uses temporary copies. `RealInstallGate` reads the configured install and its pristine backups but does not write to them; its install/restore exercise writes only to temporary test trees.
 
-Any required-mode receipt and test-results directory must be dedicated to this run and outside the repository. After approval, and only after exporting the approved paths from `.env`, the safe required-mode command is:
+Any required-mode receipt and test-results directory must be unique to this run and outside the repository. After approval, and only after exporting the approved paths from `.env`, the safe required-mode command is. The xUnit/VSTest trait-key/value OR filter selects both `[Trait("RealInstall", "DC1")]` and `[Trait("RealInstall", "DC2")]` cases:
 
 ```bash
+run_root="$(mktemp -d /tmp/dinorand-release-real-install-XXXXXX)"
+receipt_dir="$run_root/receipts"
+results_dir="$run_root/results"
+mkdir "$receipt_dir" "$results_dir"
+
 DINORAND_DC1_DIR="${DINORAND_DC1_DIR:?approved path read from .env}" \
 DINORAND_DC2_DIR="${DINORAND_DC2_DIR:?approved path read from .env}" \
 DINORAND_REQUIRE_REAL_INSTALL=1 \
-DINORAND_REAL_INSTALL_RECEIPT_DIR=/tmp/dinorand-release-real-install-receipts \
+DINORAND_REAL_INSTALL_RECEIPT_DIR="$receipt_dir" \
 dotnet test test/DinoRand.FileFormats.Tests/DinoRand.FileFormats.Tests.csproj \
-  --filter 'Trait=RealInstall' \
-  --results-directory /tmp/dinorand-release-real-install-results
+  --filter 'RealInstall=DC1|RealInstall=DC2' \
+  --results-directory "$results_dir"
 ```
 
 This command requires both approved game paths because it runs both `RealInstallGate` cases. If the user authorizes only one game, do not run this both-game command; use a separately reviewed command that selects only the approved case and its approved variable. Never broaden the scope without new approval. Do not place receipts, test results, or copied game data in the repository.
