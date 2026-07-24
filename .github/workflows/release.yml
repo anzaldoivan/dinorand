@@ -132,10 +132,10 @@ jobs:
           paths=()
           for name in "${expected[@]}"; do paths+=("release-assets/$name"); done
           gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" "${paths[@]}"
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > draft-release.json
-          python3 - "$VERSION" draft-release.json <<'PY'
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,assets > draft-release.json
+          python3 - "$RELEASE_TAG" "$VERSION" draft-release.json <<'PY'
           import json, sys
-          version, path = sys.argv[1:]
+          tag, version, path = sys.argv[1:]
           release = json.load(open(path, encoding="utf-8"))
           expected = {
               f"dinorand-v{version}-win-x64.zip",
@@ -144,7 +144,7 @@ jobs:
               "dino_crisis_1.apworld", "dino_crisis_2.apworld", "SHA256SUMS",
           }
           actual = {asset["name"] for asset in release["assets"]}
-          if not release["draft"] or actual != expected:
-              raise SystemExit(f"draft completeness check failed: draft={release['draft']} assets={sorted(actual)}")
+          if release["tagName"] != tag or not release["isDraft"] or actual != expected:
+              raise SystemExit(f"draft completeness check failed: tag={release['tagName']} draft={release['isDraft']} assets={sorted(actual)}")
           PY
           gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false
