@@ -23,16 +23,19 @@
                            Text="Overlays the generated rooms onto the game's Data folder. Your originals are backed up first and can be restored at any time." />
                 <!-- Busy indicator; collapsed while idle. Signals Generate+Install progress. -->
                 <ProgressBar Height="6" Margin="0,0,0,6" IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
                                Text="{Binding InstallStatusText}"
                                Foreground="{Binding InstallStatusBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
                     <Button Grid.Column="1" Content="▶ Play" Padding="12,6" Margin="0,0,6,0"
                             Command="{Binding PlayCommand}" IsEnabled="{Binding CanPlayNow}"
                             ToolTip.Tip="Launch the selected DINO.exe. Whatever is currently in the game's Data folder is what loads — install first to play the randomized rooms." />
-                    <Button Grid.Column="2" Content="Restore Originals" Padding="12,6" Margin="0,0,6,0"
+                    <Button Grid.Column="2" Content="Browse Files" Padding="12,6" Margin="0,0,6,0"
+                            Command="{Binding BrowseFilesCommand}"
+                            ToolTip.Tip="Open the exact per-seed spoiler file after a run, or the generated-files folder before the first install." />
+                    <Button Grid.Column="3" Content="Restore Originals" Padding="12,6" Margin="0,0,6,0"
                             Command="{Binding RestoreCommand}" IsEnabled="{Binding CanRestore}" />
-                    <Button Grid.Column="3" Content="Install to Game" Padding="14,6" FontWeight="Bold"
+                    <Button Grid.Column="4" Content="Install to Game" Padding="14,6" FontWeight="Bold"
                             Command="{Binding InstallCommand}" IsEnabled="{Binding CanInstall}" />
                 </Grid>
             </StackPanel>

@@ -8,6 +8,7 @@ using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Spoiler;
 using DinoRand.Randomizer.Voice;
 
 internal sealed partial class CliApplication
@@ -439,10 +440,11 @@ internal sealed partial class CliApplication
         bool dc2EmitSpoiler = !argv.Contains("--no-spoiler");
         var dc2Result = new Dc2RandomizerRunner(dc2Game).Run(installDir, dc2Out, dc2Seed, dc2Config,
                                                              dc2EmitSpoiler);
+        var dc2SpoilerFileName = SpoilerLogBuilder.FileNameFor(SeedString.Encode(dc2Seed, dc2Config));
         Console.WriteLine($"seed {dc2Seed} → {dc2Result.RoomCount} DC2 rooms loaded, "
             + $"{dc2Result.RoomsWritten} randomized → {Path.GetFullPath(dc2Result.OutputDir)}");
         if (dc2EmitSpoiler)
-            Console.WriteLine($"spoiler: {Path.GetFullPath(Path.Combine(dc2Result.OutputDir, DinoRand.Randomizer.Spoiler.SpoilerLogBuilder.FileName))} "
+            Console.WriteLine($"spoiler: {Path.GetFullPath(Path.Combine(dc2Result.OutputDir, dc2SpoilerFileName))} "
                 + "(debug block on top is spoiler-free; --no-spoiler to skip)");
         foreach (var line in dc2Result.Log)
             Console.WriteLine($"  {line}");

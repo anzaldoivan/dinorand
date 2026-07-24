@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 using Avalonia.Input.Platform;
 using DinoRand.App;
 using DinoRand.App.Services;
+using DinoRand.Randomizer;
 using DinoRand.Randomizer.Dc2;
+using DinoRand.Randomizer.Spoiler;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
 
 /// <summary>
 /// The Avalonia GUI view-model, exercised decoupled from the randomizer engine and any real game
-/// install. The three DI seams (<see cref="IFilePicker"/> / <see cref="IDialogs"/> / clipboard) are
+/// install. The file picker, dialogs, clipboard, file-browser, and output-directory seams are
 /// faked; every constructor-path filesystem touch is best-effort (<c>AppSettings.Load</c>) or guarded
 /// by <c>Directory.Exists</c> (the Windows default path never resolves on the CI host), so the VM
 /// constructs and its seed↔UI projection runs without touching disk or the engine. The
@@ -34,11 +36,91 @@ public class MainWindowViewModelTests
         public Task ShowErrorAsync(string title, string message) => Task.CompletedTask;
     }
 
+    private sealed class FakeFileBrowser : IFileBrowser
+    {
+        public string? OpenedPath { get; private set; }
+
+        public bool TryOpen(string filePath)
+        {
+            OpenedPath = filePath;
+            return true;
+        }
+    }
+
     // The clipboard Func is only pulled by Copy/Paste commands, never on any path under test.
     // Inject a fresh in-memory AppSettings so tests neither read nor depend on a real settings file
     // (a shared %APPDATA% file would make the starting game/seed order-dependent across tests).
     private static MainWindowViewModel NewVm() =>
         new(new FakeFilePicker(), new FakeDialogs(), () => null!, new AppSettings());
+
+    [Fact]
+    public void Browse_files_opens_the_exact_last_successful_gui_spoiler()
+    {
+        var root = Directory.CreateTempSubdirectory("dinorand-browse-").FullName;
+        try
+        {
+            var seed = new Seed(12345);
+            var config = new RandomizerConfig();
+            var seedString = SeedString.Encode(seed, config);
+            var outputDir = Path.Combine(root, "mod_dinorand");
+            var expected = Path.Combine(outputDir, SpoilerLogBuilder.FileNameFor(seedString));
+            Directory.CreateDirectory(outputDir);
+            File.WriteAllText(expected, "spoiler");
+
+            var settings = new AppSettings();
+            settings.ForGame("dc1").LastSeed = seedString;
+            var browser = new FakeFileBrowser();
+            var vm = new MainWindowViewModel(new FakeFilePicker(), new FakeDialogs(), () => null!,
+                settings, fileBrowser: browser, workingModDir: () => outputDir);
+
+            vm.BrowseFilesCommand.Execute(null);
+            Assert.Equal(expected, browser.OpenedPath);
+
+            // Editing the seed after the successful run must not make Browse Files point at a
+            // different seed's spoiler.
+            vm.SeedText = SeedString.Encode(new Seed(67890), new RandomizerConfig());
+            vm.BrowseFilesCommand.Execute(null);
+            Assert.Equal(expected, browser.OpenedPath);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Browse_files_opens_the_output_directory_when_the_spoiler_is_missing()
+    {
+        var root = Directory.CreateTempSubdirectory("dinorand-browse-missing-").FullName;
+        var outputDir = Path.Combine(root, "mod_dinorand");
+        var browser = new FakeFileBrowser();
+        try
+        {
+            var vm = new MainWindowViewModel(new FakeFilePicker(), new FakeDialogs(), () => null!,
+                new AppSettings(), fileBrowser: browser, workingModDir: () => outputDir);
+
+            vm.BrowseFilesCommand.Execute(null);
+
+            Assert.Equal(outputDir, browser.OpenedPath);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Browse_files_opens_the_output_directory_before_the_first_install()
+    {
+        var root = Directory.CreateTempSubdirectory("dinorand-browse-cold-").FullName;
+        var outputDir = Path.Combine(root, "mod_dinorand");
+        try
+        {
+            var browser = new FakeFileBrowser();
+            var vm = new MainWindowViewModel(new FakeFilePicker(), new FakeDialogs(), () => null!,
+                new AppSettings(), fileBrowser: browser, workingModDir: () => outputDir);
+
+            vm.BrowseFilesCommand.Execute(null);
+
+            Assert.Equal(outputDir, browser.OpenedPath);
+            Assert.True(Directory.Exists(outputDir));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
 
     [Fact]
     public void Constructs_with_fakes_on_dc1_with_a_shareable_seed()

@@ -33,7 +33,7 @@ internal static class CliOutput
             "           [--ammo-quantity <0..7>] [--weapon-upgrade-chance <0..1>]\r\n" +
             "           [--pre-upgraded-weapon-chance <0..1>]\r\n" +
             "           [--disable-weapons handgun,shotgun,grenade] [--install-to-data]\r\n" +
-            "           [--no-spoiler]      (skip SPOILER.md; game files identical either way)\r\n" +
+            "           [--no-spoiler]      (skip the per-seed spoiler file; game files identical either way)\r\n" +
             "  dinorand --install <gameDir> --restore\r\n" +
             "  dinorand --install <gameDir> --verify-backup   (read-only: audit .dinorand_backup for poisoned captures; works for dc1 and dc2)\r\n" +
             "  dinorand --install <gameDir> --swap-species <roomCode> [--species <name>]\r\n" +

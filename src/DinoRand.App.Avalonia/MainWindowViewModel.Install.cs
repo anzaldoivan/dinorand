@@ -20,6 +20,7 @@ using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;   // Dc2CharacterSkin
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Spoiler;
 using DinoRand.Randomizer.Voice;
 
 namespace DinoRand.App
@@ -105,7 +106,7 @@ namespace DinoRand.App
 
         // --- Install / restore -------------------------------------------------
         // (The standalone "Generate" command was removed — "Install to Game" regenerates via the same
-        //  runners and the runner still writes SPOILER.md, so no generate-only path is needed.)
+        //  runners and the runner still writes the per-seed spoiler file, so no generate-only path is needed.)
 
         private string CurrentDataDir() => ResolveDataDir(SelectedGame, GamePath);
 
@@ -268,7 +269,7 @@ namespace DinoRand.App
             try
             {
                 var gamePath = ResolveGameDir(GamePath);
-                var outPath = WorkingModDir;
+                var outPath = _workingModDir();
                 var seed = _appSeed.Seed;
                 var config = _appSeed.Config;
 
@@ -409,6 +410,7 @@ namespace DinoRand.App
                         }
                         return (res, tn);
                     });
+                    _lastSuccessfulSpoilerPath = SpoilerPathFor(outPath, seed, config);
                     InstallStatusBrush = Brushes.Green;
                     InstallStatusText = $"✓ Seed {_appSeed} installed correctly. Restore to undo.";
                     CurrentSlice.GamePath = GamePath;
@@ -505,6 +507,7 @@ namespace DinoRand.App
                 InstallStatusText =
                     "✓ Seed installed correctly."
                     + (exeNote.Length == 0 ? " Restore to undo." : $" {exeNote}. Restore to undo.");
+                _lastSuccessfulSpoilerPath = SpoilerPathFor(outPath, seed, config);
 
                 CurrentSlice.GamePath = GamePath;
                 CurrentSlice.LastSeed = _appSeed.ToString();
@@ -526,6 +529,38 @@ namespace DinoRand.App
                 _installStop = null;
                 IsBusy = false;
                 UpdateInstallButtons();
+            }
+        }
+
+        [RelayCommand]
+        private void BrowseFiles()
+        {
+            try
+            {
+                bool useSpoiler = !string.IsNullOrWhiteSpace(_lastSuccessfulSpoilerPath)
+                    && File.Exists(_lastSuccessfulSpoilerPath);
+                var path = useSpoiler ? _lastSuccessfulSpoilerPath : _workingModDir();
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    InstallStatusBrush = Brushes.Red;
+                    InstallStatusText = "Couldn't find the generated files folder.";
+                    return;
+                }
+
+                if (!useSpoiler)
+                    Directory.CreateDirectory(path);
+
+                if (_fileBrowser.TryOpen(path))
+                    return;
+
+                InstallStatusBrush = Brushes.Red;
+                InstallStatusText = "Couldn't open the generated files location.";
+            }
+            catch (Exception ex)
+            {
+                InstallStatusBrush = Brushes.Red;
+                Debug.WriteLine(ex);
+                InstallStatusText = "Couldn't open the generated files location.";
             }
         }
 
@@ -576,6 +611,9 @@ namespace DinoRand.App
                 UpdateInstallButtons();
             }
         }
+
+        private static string SpoilerPathFor(string outputDir, Seed seed, RandomizerConfig config) =>
+            Path.Combine(outputDir, SpoilerLogBuilder.FileNameFor(SeedString.Encode(seed, config)));
 
         /// <summary>Map an install/restore exception to a short, actionable line for the status label,
         /// keeping the raw exception out of the UI (it goes to the debug log only). Public + static so

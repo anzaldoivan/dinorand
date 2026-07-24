@@ -71,6 +71,20 @@ public class Dc1MapContractTests
         Assert.Equal(visitRooms.OrderBy(x => x), IntArray(d, "requiresRoom").OrderBy(x => x));
     }
 
+    private static void AssertNoAuthoredDoorRequirement(JsonElement rooms, int from, int to)
+    {
+        var room = Room(rooms, from);
+        if (!room.TryGetProperty("doors", out var doors)) return;
+        foreach (var p in doors.EnumerateObject())
+        {
+            if (!int.TryParse(p.Name, System.Globalization.NumberStyles.HexNumber, null, out var code)
+                || code != to)
+                continue;
+            Assert.Empty(IntArray(p.Value, "requires"));
+            Assert.Empty(IntArray(p.Value, "requiresRoom"));
+        }
+    }
+
     // --- (A) The 0309 shuttle-car node-split (REGION-SCHEMA-PLAN §2). The drift that shipped. ------------
 
     [Fact]
@@ -100,9 +114,47 @@ public class Dc1MapContractTests
         AssertDoorRequires(rooms, 0x0113, 0x0604, items: Array.Empty<int>(), visitRooms: new[] { 0x0506 });
         AssertDoorRequires(rooms, 0x0405, 0x060F, items: Array.Empty<int>(), visitRooms: new[] { 0x030B });
         AssertDoorRequires(rooms, 0x060F, 0x030C, items: Array.Empty<int>(), visitRooms: new[] { 0x030B });
-        // Large Elevator B3 stop also requires the heliport waypoint 0401 (030B alone is start-reachable
-        // via the B1 Room Key, leaving a phantom bypass into the whole B3 endgame). cont. placement-gates.md.
-        AssertDoorRequires(rooms, 0x060F, 0x0600, items: Array.Empty<int>(), visitRooms: new[] { 0x030B, 0x0401 });
+        // Large Elevator B3 stop also requires the heliport waypoint and Liaison Elevator No.1
+        // activation (030B alone is start-reachable via the B1 Room Key). cont. placement-gates.md.
+        AssertDoorRequires(rooms, 0x060F, 0x0600, items: Array.Empty<int>(),
+                           visitRooms: new[] { 0x030B, 0x0401, 0x040C });
+    }
+
+    [Fact]
+    public void Map_HallB1ShuttleB2Stop_RequiresHeliportAndLibrary()
+        => AssertDoorRequires(Rooms(), 0x0309, 0x050B, items: Array.Empty<int>(),
+                              visitRooms: new[] { 0x0401, 0x050F });
+
+    [Fact]
+    public void Map_HeliportPassage_HasNoAuthoredLinkToTransportPassageway()
+    {
+        var rooms = Rooms();
+        Assert.DoesNotContain(0x0606, IntArray(Room(rooms, 0x0401), "logicLinks"));
+        Assert.DoesNotContain(0x0401, IntArray(Room(rooms, 0x0606), "logicLinks"));
+    }
+
+    [Fact]
+    public void Map_RestStation_RequiresPassageway()
+        => AssertRoomRequiresRoom(Rooms(), 0x0604, "Rest Station", 0x0603);
+
+    [Fact]
+    public void Map_CarryingOutRoomToControlRoom_RequiresGeneratorVisitNotCoAreaKey()
+        => AssertDoorRequires(Rooms(), 0x0600, 0x0602, items: Array.Empty<int>(),
+                              visitRooms: new[] { 0x0601 });
+
+    [Fact]
+    public void Map_KeyCardA_DoesNotGateGeneralWeaponsStorageAndAuthorsReverseSpecialWeaponsGate()
+    {
+        var rooms = Rooms();
+        foreach (var (from, to) in new[]
+                 {
+                     (0x0602, 0x0605), (0x0602, 0x0615),
+                     (0x0606, 0x0605), (0x0606, 0x0615),
+                 })
+            AssertNoAuthoredDoorRequirement(rooms, from, to);
+
+        AssertDoorRequires(rooms, 0x0607, 0x0606, items: new[] { 0x3A },
+                           visitRooms: Array.Empty<int>());
     }
 
     // --- (C) The 7 DDK Input+Code disc PAIR gates (native op58-3 AND-gate, [[ddk-disc-relocation]]). -----
@@ -223,6 +275,10 @@ public class Dc1MapContractTests
     [Fact]
     public void Map_0305_NumberedMemo_RequiresB1KeyChip()
         => AssertItemRequires(Rooms(), 0x0305, itemId: 0x5E, requires: new[] { 0x46 });
+
+    [Fact]
+    public void Map_0507_GrenadeGunParts_RequiresKeyCardA()
+        => AssertItemRequires(Rooms(), 0x0507, itemId: 0x0F, requires: new[] { 0x3A });
 
     private static void AssertItemRequires(JsonElement rooms, int room, int itemId, int[] requires)
     {

@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using DinoRand.Randomizer;
+using DinoRand.Randomizer.Spoiler;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests.Refactor;
@@ -27,6 +29,29 @@ public sealed class CliCharacterizationTests
     }
 
     [Fact]
+    public void Synthetic_randomize_reports_the_actual_per_seed_spoiler_path()
+    {
+        string root = Directory.CreateTempSubdirectory("dinorand-cli-spoiler-").FullName;
+        try
+        {
+            string install = SyntheticInputs.CreateDc1Install(root);
+            string output = Path.Combine(root, "output");
+            var config = new RandomizerConfig { RandomizeItems = false, RandomizeEnemies = false };
+            string spoilerFileName = SpoilerLogBuilder.FileNameFor(SeedString.Encode(new Seed(123), config));
+
+            var result = Run("--install", install, "--out", output, "--seed", "123",
+                "--no-items", "--no-enemies");
+
+            Assert.Equal(0, result.ExitCode);
+            Assert.Contains($"spoiler: {Path.GetFullPath(Path.Combine(output, spoilerFileName))}", result.Stdout,
+                StringComparison.Ordinal);
+            Assert.True(File.Exists(Path.Combine(output, spoilerFileName)));
+            Assert.False(File.Exists(Path.Combine(output, SpoilerLogBuilder.LegacyFileName)));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void Synthetic_randomize_install_and_restore_record_then_exactly_replay_all_observables()
     {
         var value = CaptureScenario();
@@ -36,7 +61,10 @@ public sealed class CliCharacterizationTests
         Assert.EndsWith(Environment.NewLine, value.Randomize.Result.Stdout, StringComparison.Ordinal);
         Assert.Contains("log_dinorand.txt", value.Randomize.Inventory.Select(x => x.Path));
         Assert.Contains("map.dgml", value.Randomize.Inventory.Select(x => x.Path));
-        Assert.DoesNotContain("SPOILER.md", value.Randomize.Inventory.Select(x => x.Path));
+        Assert.DoesNotContain(value.Randomize.Inventory,
+            x => SpoilerLogBuilder.IsGeneratedFileName(Path.GetFileName(x.Path)));
+        Assert.DoesNotContain(SpoilerLogBuilder.LegacyFileName,
+            value.Randomize.Inventory.Select(x => Path.GetFileName(x.Path)));
 
         Assert.Equal(0, value.Install.Result.ExitCode);
         Assert.Equal("", value.Install.Result.Stderr);

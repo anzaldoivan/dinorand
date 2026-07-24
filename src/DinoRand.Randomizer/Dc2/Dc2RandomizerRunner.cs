@@ -36,7 +36,7 @@ public sealed class Dc2RandomizerRunner
 
     public Dc2RandomizerRunner(DinoCrisis2 game) => _game = game;
 
-    /// <param name="emitSpoiler">Write <c>SPOILER.md</c> beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
+    /// <param name="emitSpoiler">Write the per-seed spoiler file (<c>&lt;encoded-seed&gt;_spoiler.md</c>) beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
     /// Built strictly AFTER the passes have emitted every game file — turning it off changes no
     /// other output byte (regression-locked).</param>
     /// <param name="ct">Cancels the GENERATE phase only — see <see cref="RandomizerRunner.Run"/>;

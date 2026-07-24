@@ -69,6 +69,65 @@ public class Dc1ReachabilityOracleTests
     }
 
     [Fact]
+    public void CommittedOracle_CoAreaKeyOnlyGatesCarryingOutRoomToRestStation()
+    {
+        var path = FindRepoFile(Path.Combine("data", "dc1", "reachability-oracle.json"));
+        using var doc = JsonDocument.Parse(File.ReadAllBytes(path));
+        var gatedEdges = doc.RootElement.GetProperty("edges").EnumerateArray()
+            .Where(edge => edge.GetProperty("requiresAnyItems").EnumerateArray()
+                               .Concat(edge.GetProperty("requiresItems").EnumerateArray())
+                               .Any(item => item.GetInt32() == 0x31))
+            .Select(edge => (
+                From: edge.GetProperty("from").GetString()!,
+                To: edge.GetProperty("to").GetString()!))
+            .Distinct()
+            .OrderBy(edge => edge.From, StringComparer.Ordinal)
+            .ThenBy(edge => edge.To, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(new[] { (From: "0600", To: "0603") }, gatedEdges);
+    }
+
+    [Fact]
+    public void CommittedOracle_KeyCardADoesNotGateGeneralWeaponsStorageRoute()
+    {
+        var path = FindRepoFile(Path.Combine("data", "dc1", "reachability-oracle.json"));
+        using var doc = JsonDocument.Parse(File.ReadAllBytes(path));
+        var edges = doc.RootElement.GetProperty("edges").EnumerateArray().ToArray();
+
+        void AssertKeyCardA(string from, string to, bool expected)
+        {
+            var matching = edges.Where(edge => edge.GetProperty("from").GetString() == from
+                                               && edge.GetProperty("to").GetString() == to)
+                .ToArray();
+            Assert.NotEmpty(matching);
+            Assert.All(matching, edge =>
+            {
+                var requiresA = edge.GetProperty("requiresAnyItems").EnumerateArray()
+                                    .Concat(edge.GetProperty("requiresItems").EnumerateArray())
+                                    .Any(item => item.GetInt32() == 0x3A);
+                Assert.Equal(expected, requiresA);
+            });
+        }
+
+        foreach (var (from, to) in new[]
+                 {
+                     ("0602", "0605"), ("0602", "0615"),
+                     ("0605", "0602"), ("0605", "0606"),
+                     ("0615", "0602"), ("0615", "0606"),
+                     ("0606", "0605"), ("0606", "0615"),
+                 })
+            AssertKeyCardA(from, to, expected: false);
+
+        foreach (var (from, to) in new[]
+                 {
+                     ("0606", "0607"), ("0607", "0606"),
+                     ("0606", "0611"), ("0611", "0606"),
+                 })
+            AssertKeyCardA(from, to, expected: true);
+    }
+
+    [Fact]
     public void RealInstall_Oracle_MatchesEngine_ByteIdentical()
     {
         bool required = Environment.GetEnvironmentVariable("DINORAND_REQUIRE_REAL_INSTALL") == "1";

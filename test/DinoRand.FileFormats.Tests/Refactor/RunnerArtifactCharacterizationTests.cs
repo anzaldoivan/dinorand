@@ -23,9 +23,11 @@ public sealed class RunnerArtifactCharacterizationTests
             var runner = new RandomizerRunner(new DinoCrisis1());
             runner.Run(install, a, new Seed(12345), config);
             runner.Run(install, b, new Seed(12345), config);
+            var spoilerFileName = SpoilerLogBuilder.FileNameFor(
+                SeedString.Encode(new Seed(12345), config));
 
             var expected = Directory.EnumerateFiles(Path.Combine(install, "Data"), "*.dat")
-                .Select(Path.GetFileName).Concat(new[] { "log_dinorand.txt", "map.dgml", SpoilerLogBuilder.FileName })
+                .Select(Path.GetFileName).Concat(new[] { "log_dinorand.txt", "map.dgml", spoilerFileName })
                 .OrderBy(x => x, StringComparer.Ordinal).ToArray();
             Assert.Equal(expected, Names(a));
             Assert.Equal(Snapshot(a, root), Snapshot(b, root));
@@ -51,7 +53,8 @@ public sealed class RunnerArtifactCharacterizationTests
             Assert.Contains("ST104.DAT", first.WrittenFiles, StringComparer.OrdinalIgnoreCase);
             Assert.Contains(Names(a), name => name.EndsWith(".DAT", StringComparison.OrdinalIgnoreCase));
             Assert.Equal(first.WrittenFiles.Distinct(StringComparer.OrdinalIgnoreCase)
-                    .Append(SpoilerLogBuilder.FileName).OrderBy(x => x, StringComparer.Ordinal),
+                    .Append(SpoilerLogBuilder.FileNameFor(SeedString.Encode(new Seed(1001), config)))
+                    .OrderBy(x => x, StringComparer.Ordinal),
                 Names(a));
             Assert.Equal(Snapshot(a, root), Snapshot(b, root));
             Assert.Equal(first.RoomCount, second.RoomCount);

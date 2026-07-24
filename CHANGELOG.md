@@ -19,6 +19,17 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
   other players arrive in-game, and reconnecting keeps your progress. The client runs on Windows;
   DC2 remains generation-only.
 
+### Fixed
+
+- **DC1 key-item shuffle now respects the C.O. Area progression route.** Rest Station is no longer
+  treated as reachable before its locked passage, and the shuttle's B2 stop now requires prior
+  Library progression. The Large Size Elevator's B3 stop also requires Liaison Elevator No.1
+  activation, while Control Room B3 correctly unlocks after visiting Backup Generator Room B3
+  instead of requiring the C.O. Area Key. The C.O. Area Key now gates only the Rest Station passage,
+  and Key Card A no longer blocks the earlier General Weapons Storage route, while still being
+  required to collect the vanilla Grenade Gun Parts in Parts Storage; affected seeds can produce
+  different key locations.
+
 ## [0.6.0] — 2026-07-22
 
 ### Added

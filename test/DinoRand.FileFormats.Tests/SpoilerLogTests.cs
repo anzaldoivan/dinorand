@@ -15,6 +15,13 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class SpoilerLogTests
 {
+    [Fact]
+    public void FileNameFor_UsesTheCanonicalEncodedSeed()
+    {
+        Assert.Equal("DINO-AetwArn_H_8vBw_spoiler.md",
+            SpoilerLogBuilder.FileNameFor("DINO-AetwArn_H_8vBw"));
+    }
+
     // --- Collector ---------------------------------------------------------------------------
 
     [Fact]
