@@ -12,23 +12,20 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.6.1] — 2026-07-24
+
 ### Added
 
-- **Archipelago runtime client for DC1.** Connect DinoRand to an existing Archipelago game with
-  `--ap-connect <host[:port]> --ap-slot <name> --install <dir>`: pickups become checks, items from
-  other players arrive in-game, and reconnecting keeps your progress. The client runs on Windows;
-  DC2 remains generation-only.
+- **Archipelago runtime client for DC1** (`--ap-connect <host[:port]> --ap-slot <name> --install <dir>`).
+  Connect to an existing Archipelago game: pickups become checks, items from other players arrive
+  in-game, and reconnecting keeps your progress. The client runs on Windows; DC2 remains
+  generation-only.
 
 ### Fixed
 
-- **DC1 key-item shuffle now respects the C.O. Area progression route.** Rest Station is no longer
-  treated as reachable before its locked passage, and the shuttle's B2 stop now requires prior
-  Library progression. The Large Size Elevator's B3 stop also requires Liaison Elevator No.1
-  activation, while Control Room B3 correctly unlocks after visiting Backup Generator Room B3
-  instead of requiring the C.O. Area Key. The C.O. Area Key now gates only the Rest Station passage,
-  and Key Card A no longer blocks the earlier General Weapons Storage route, while still being
-  required to collect the vanilla Grenade Gun Parts in Parts Storage; affected seeds can produce
-  different key locations.
+- **DC1 key-item shuffle route correction.** With `--shuffle-keys` or the GUI “Shuffle Key Items”
+  toggle, the C.O. Area route now follows the intended progression. Affected seeds may place keys
+  differently.
 
 ## [0.6.0] — 2026-07-22
 
@@ -263,6 +260,7 @@ Initial feature set — everything prior to the voice randomizer.
   was.
 - Self-contained single-file release builds.
 
+[0.6.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.1
 [0.6.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.0
 [0.5.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.2
 [0.5.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.1
