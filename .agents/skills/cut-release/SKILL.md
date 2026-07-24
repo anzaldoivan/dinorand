@@ -89,6 +89,13 @@ This command requires both approved game paths because it runs both `RealInstall
    set -euo pipefail
    git fetch origin main
    test "$(git cat-file -t refs/tags/vX.Y.Z)" = tag
+   local_tag_object="$(git rev-parse refs/tags/vX.Y.Z)"
+   remote_tag_object="$(git ls-remote --tags origin refs/tags/vX.Y.Z | cut -f1)"
+   test -n "$remote_tag_object"
+   if [ "$local_tag_object" != "$remote_tag_object" ]; then
+     printf 'remote tag object differs from local tag object; aborting\n' >&2
+     exit 1
+   fi
    tag_commit="$(git rev-parse --verify refs/tags/vX.Y.Z^{commit})"
    git merge-base --is-ancestor "$tag_commit" origin/main
    notes_file="$(mktemp /tmp/dinorand-release-recovery-notes-XXXXXX)"
