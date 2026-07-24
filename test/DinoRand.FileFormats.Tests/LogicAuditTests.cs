@@ -176,7 +176,7 @@ public class LogicAuditTests
     }
 
     [Fact]
-    public void RealInstall_FarTooFewDoorKeysAreCritical()
+    public void RealInstall_KeyCardAIsTheOnlyCriticalDoorKey()
     {
         var rooms = LoadInstall();
         if (rooms is null) return;
@@ -185,18 +185,11 @@ public class LogicAuditTests
         var critical = LogicAudit.CriticalDoorKeys(graph, Game, KeysByRoom(rooms));
 
         // Characterization of the RAW door graph (LogicAudit builds without the map.json requires
-        // overlay — that is applied later in ProgressionPass). Vanilla locks four door keys (Entrance
-        // 0x2e, BG Area 0x30, C.O. Area 0x31, Key Card Lv A 0x3a). Today the raw graph makes NONE of
-        // them solely progression-critical — the under-gating headline in its starkest form: the goal
-        // 060d has raw type-0 FREE door records from 0503 and 0607 (their real lock is an event/native
-        // gate the static decode misses), so once room 0502 (the B2 card hub — enumerated correctly
-        // since the St502.dat case fix, cont.42) makes 0503 reachable via a Key-Card-C door, the free
-        // 0503->060d edge reaches the goal without Key Card Lv A. The 2026-07-14 re-audit (STATIC-SCD-RE
-        // cont.71 / GRAPH-LOGIC-PARITY §8q) traced those free escape doors natively: they read only the
-        // transient cutscene toggle 3:33, and the Third Energy overload sets NO SCD flag — so the endgame
-        // gate is native/CE-only and NOT offline-authorable. The overlay graph (with map.json) does lock
-        // Key Card A 0x3a via the base endgame locks, but this RAW-graph assertion stays empty.
-        Assert.Empty(critical);
+        // overlay — that is applied later in ProgressionPass). Key Card Lv A 0x3a is the sole critical
+        // raw door key because the Transport Passageway enters Special Weapons Storage through the
+        // TYPE-8 0606->0607 record. The free 0607->060d escape does not bypass that entrance gate.
+        // Other known native/event gates remain absent from this static raw-door model.
+        Assert.Equal(new[] { 0x3a }, critical);
     }
 
     [Fact(Skip = "KNOWN GAP: the four-critical-keys soundness target is NOT offline-achievable — the " +

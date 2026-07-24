@@ -17,6 +17,9 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class SpoilerRunnerTests
 {
+    private static string SpoilerPath(string outputDir, Seed seed, RandomizerConfig config) =>
+        Path.Combine(outputDir, SpoilerLogBuilder.FileNameFor(SeedString.Encode(seed, config)));
+
     [Fact]
     public void Dc1_EmittingTheSpoiler_ChangesNoOutputByte()
     {
@@ -28,8 +31,9 @@ public class SpoilerRunnerTests
         new RandomizerRunner(new DinoCrisis1()).Run(install, t.A, seed, config, emitSpoiler: false);
         new RandomizerRunner(new DinoCrisis1()).Run(install, t.B, seed, config, emitSpoiler: true);
 
-        Assert.False(File.Exists(Path.Combine(t.A, SpoilerLogBuilder.FileName)));
-        Assert.True(File.Exists(Path.Combine(t.B, SpoilerLogBuilder.FileName)));
+        Assert.False(File.Exists(SpoilerPath(t.A, seed, config)));
+        Assert.True(File.Exists(SpoilerPath(t.B, seed, config)));
+        Assert.False(File.Exists(Path.Combine(t.B, SpoilerLogBuilder.LegacyFileName)));
         AssertIdenticalExceptSpoiler(t.A, t.B);
     }
 
@@ -42,7 +46,7 @@ public class SpoilerRunnerTests
 
         using var t = new TempDirs();
         var result = new RandomizerRunner(new DinoCrisis1()).Run(install, t.A, seed, config);
-        var md = File.ReadAllText(Path.Combine(t.A, SpoilerLogBuilder.FileName));
+        var md = File.ReadAllText(SpoilerPath(t.A, seed, config));
 
         // Debug block: the DINO- string reproduces exactly this run.
         var seedString = ExtractSeedString(md);
@@ -68,8 +72,9 @@ public class SpoilerRunnerTests
             ShuffleKeyItems = false, EnsureBeatable = true,
         };
         using var t = new TempDirs();
-        new RandomizerRunner(new DinoCrisis1()).Run(install, t.A, new Seed(1), config);
-        var md = File.ReadAllText(Path.Combine(t.A, SpoilerLogBuilder.FileName));
+        var seed = new Seed(1);
+        new RandomizerRunner(new DinoCrisis1()).Run(install, t.A, seed, config);
+        var md = File.ReadAllText(SpoilerPath(t.A, seed, config));
 
         Assert.DoesNotContain("## Items (DC1)", md);
         Assert.DoesNotContain("## Enemies (DC1", md);
@@ -87,8 +92,9 @@ public class SpoilerRunnerTests
         new Dc2RandomizerRunner(new DinoCrisis2()).Run(install, t.A, seed, config, emitSpoiler: false);
         new Dc2RandomizerRunner(new DinoCrisis2()).Run(install, t.B, seed, config, emitSpoiler: true);
 
-        Assert.False(File.Exists(Path.Combine(t.A, SpoilerLogBuilder.FileName)));
-        Assert.True(File.Exists(Path.Combine(t.B, SpoilerLogBuilder.FileName)));
+        Assert.False(File.Exists(SpoilerPath(t.A, seed, config)));
+        Assert.True(File.Exists(SpoilerPath(t.B, seed, config)));
+        Assert.False(File.Exists(Path.Combine(t.B, SpoilerLogBuilder.LegacyFileName)));
         AssertIdenticalExceptSpoiler(t.A, t.B);
     }
 
@@ -97,9 +103,11 @@ public class SpoilerRunnerTests
     {
         if (Dc2Install() is not { } install) return;
         using var t = new TempDirs();
+        var seed = new Seed(1001);
+        var config = new RandomizerConfig();
         var result = new Dc2RandomizerRunner(new DinoCrisis2())
-            .Run(install, t.A, new Seed(1001), new RandomizerConfig());
-        var md = File.ReadAllText(Path.Combine(t.A, SpoilerLogBuilder.FileName));
+            .Run(install, t.A, seed, config);
+        var md = File.ReadAllText(SpoilerPath(t.A, seed, config));
 
         Assert.Contains("mode: weighted", md);
         var tally = ParseTally(result.Log);
@@ -119,8 +127,9 @@ public class SpoilerRunnerTests
             Dc2FixedSpeciesType = 0x03,
         };
         using var t = new TempDirs();
-        new Dc2RandomizerRunner(new DinoCrisis2()).Run(install, t.A, new Seed(2001), config);
-        var md = File.ReadAllText(Path.Combine(t.A, SpoilerLogBuilder.FileName));
+        var seed = new Seed(2001);
+        new Dc2RandomizerRunner(new DinoCrisis2()).Run(install, t.A, seed, config);
+        var md = File.ReadAllText(SpoilerPath(t.A, seed, config));
 
         Assert.Contains("mode: fixed: Tyrannosaurus", md);
         var rows = TableRows(md, "## Enemies (DC2 cross-species)");
@@ -162,7 +171,9 @@ public class SpoilerRunnerTests
     {
         static Dictionary<string, string> Hashes(string dir) =>
             Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories)
-                .Where(f => !Path.GetFileName(f).Equals(SpoilerLogBuilder.FileName, StringComparison.OrdinalIgnoreCase))
+                .Where(f => !SpoilerLogBuilder.IsGeneratedFileName(Path.GetFileName(f))
+                            && !Path.GetFileName(f).Equals(SpoilerLogBuilder.LegacyFileName,
+                                StringComparison.OrdinalIgnoreCase))
                 .ToDictionary(
                     f => Path.GetRelativePath(dir, f).Replace('\\', '/'),
                     f => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(f))),

@@ -6,14 +6,16 @@
 
 ## Branching & pull requests
 
-- **Branch off `main`** into a **`feature/<name>`** branch (releases use `release/vX.Y.Z`).
+- **Branch off `main`** into a **`feature/<name>`** branch.
   No direct pushes to `main` — it is protected by repository rulesets
   (see `scripts/setup-rulesets.sh`). PR branch names are checked by the `branch-name` CI job.
 - **All changes land via pull request.** Every PR needs the `build-test-coverage` and
   `no-copyrighted-files` (`scan`) checks green and **≥1 approving review**; stale approvals are
   dismissed on new pushes. (Repo admins can bypass in an emergency.)
-- Read `CLAUDE.md` and `docs/CONTRIBUTING-RE.md` for the reverse-engineering session
-  contract (append decoded symbols/findings in the same change).
+- For reverse-engineering changes, verify repository registries before relying on an address or
+  layout, cite evidence, record new symbols/findings in the owning public registry when that
+  registry is published, preserve failed approaches as contributor notes, and never commit game
+  bytes, copied disassembly, dumps, or third-party guide text.
 - **Never commit game bytes or copyrighted content.** `scripts/check-no-copyrighted-files.sh`
   runs in the pre-commit hook and CI — don't bypass it with `--no-verify`.
 
@@ -86,18 +88,21 @@ repository's durable contributor-facing policy.
 
 Releases are automated by `.github/workflows/release.yml`. To cut one:
 
-1. Pick the version `X.Y.Z` (append `-rc1` / `-beta` etc. for a prerelease).
-2. Create and push a version branch:
+1. Pick `X.Y.Z` or a SemVer prerelease such as `X.Y.Z-rc.1`. Update
+   `Directory.Build.props` and add an exact, non-empty `CHANGELOG.md` section for that version.
+2. Merge the checked release commit to protected `main` and wait for all required checks.
+3. Create the tag at that exact commit, verify it is contained in `origin/main`, and push only the
+   existing tag:
 
    ```bash
-   git switch -c release/vX.Y.Z
-   git push -u origin release/vX.Y.Z
+   git fetch origin main
+   git merge-base --is-ancestor HEAD origin/main
+   git tag -a vX.Y.Z -m "DinoRand vX.Y.Z"
+   git push origin refs/tags/vX.Y.Z
    ```
 
-3. The workflow builds self-contained single-file executables for
-   `win-x64`, `linux-x64`, and `osx-arm64` (via `scripts/publish-release.sh`), then
-   creates the GitHub Release for tag `vX.Y.Z` with a per-RID zip attached to each.
-   A `-suffix` version is marked **prerelease** automatically.
+4. The tag-push workflow independently validates the existing tag and `main` ancestry, builds and
+   attests the three RID archives and two `.apworld` files, then creates a draft with `SHA256SUMS`.
+   It publishes only after the draft asset set is complete. There is no manual or branch trigger.
 
-`workflow_dispatch` (run from the release branch) is a manual fallback if the branch
-already exists.
+Operator settings, recovery, and post-merge steps are documented in [.github/RELEASE.md](.github/RELEASE.md).

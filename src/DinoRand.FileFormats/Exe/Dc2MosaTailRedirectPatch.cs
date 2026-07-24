@@ -1,73 +1,59 @@
 namespace DinoRand.FileFormats.Exe;
 
 /// <summary>
-/// Byte-level, reversible <c>Dino2.exe</c> patch that redirects a <b>randomizer-injected E80 Mosasaurus</b>
-/// (spawn TYPE <c>0x0a</c>) away from its <b>wide-turn tail strike</b> and onto its <b>narrow bite</b> in
-/// non-native LAND rooms, so the mosa never performs the out-of-bounds move — while leaving the four native
-/// aquatic rooms (ST700/702/703/704) byte-identical. Decision record + full RE:
-/// <c>docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md</c> §9.
+/// Byte-level, reversible <c>Dino2.exe</c> patch that cancels the user-labelled tail-looking
+/// <b>missed-grab continuation</b> of a randomizer-injected E80 Mosasaurus outside its four native rooms.
+/// The legacy class, config, and CLI names remain for compatibility; the active patch does not redirect a
+/// selector or claim a bite substitution. Decision record + full RE:
+/// <c>docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md</c> §10.6.
 ///
-/// <para><b>Mechanism.</b> The E80 attack FSM is nested (K106, CE-confirmed 2026-07-13): the outer state
-/// <c>byte[esi+0x54]</c> routes to the <b>state-1 hub</b> <c>0x43fc80</c>, which dispatches a second selector
-/// <c>byte[esi+0x55]</c> — the <b>attack-pattern id</b> — through sub-tables <c>0x7211f8</c> (aim) and
-/// <c>0x721218</c> (execute). The melee strikes are patterns 0/1/2/3 (their aim-handlers = states 5/6/7/8
-/// call the executor <c>0x440160</c>); pattern <b>2</b> is the wide-turn strike (state 7 <c>0x43ff40</c>,
-/// turn cap <c>0x3c</c>) — the tail sweep — and pattern <b>0</b> the narrow front strike (state 5) — the
-/// bite.</para>
-///
-/// <para><b>The lever.</b> The hook steals the hub's 5-byte prologue <c>push esi; mov esi,[esp+8]</c>
-/// (VA 0x43fc80) and jumps to a <see cref="CaveLength"/>-byte cave in the end-of-<c>.text</c> zero slack.
-/// The cave replays the prologue (so <c>esi</c> = the actor), then — only for a TYPE-0x0a actor
-/// (<c>byte[esi+0x58]==0x0a</c>) outside the four native rooms
-/// (<c>word[[0x876DB8]+0x1090]</c> ∉ <c>{0x0700,0x0702,0x0703,0x0704}</c>) whose current pattern is 2 —
-/// rewrites <c>byte[esi+0x55]:=0</c>, so the sub-dispatch runs the bite instead of the tail. Any other
-/// actor, room, or pattern falls straight through to the unchanged hub. This changes <b>which behavior</b>
-/// the mosa runs; it touches no player-movement code.</para>
-///
-/// <para><b>Why TYPE, not the model base.</b> Every aquatic species shares model base
-/// <c>[actor+0x60]==0x640000</c>, so that is not a Mosasaurus discriminator; the spawn TYPE
-/// <c>byte[actor+0x58]</c> is (<c>0x0a</c> ↔ E80 uniquely). Dino2.exe is non-ASLR (fixed imagebase
-/// 0x400000, no <c>.reloc</c>), so the cave's absolute <c>[0x876DB8]</c> load needs no fix-up. The cave sits
-/// below the T-Rex / Inostra / grab / knockback caves in the same slack, chosen not to overlap, so all
-/// levers compose.</para>
+/// <para><b>Mechanism.</b> The hook is inside the selector-6 B-handler <c>0x440860</c>, which the pristine
+/// nested B dispatch table <c>0x721218</c> maps from selector 6. It steals the six-byte ref-5 bind/effect
+/// head at VA <c>0x440942</c>. The cave reads
+/// <c>word[[0x876DB8]+0x1090]</c>: native rooms <c>{0x0700,0x0702,0x0703,0x0704}</c> replay the displaced
+/// instructions and resume at <c>0x440948</c>; every other room enters the original cleanup at
+/// <c>0x44097f</c>, skipping only the ref-5 continuation. Successful-contact substates 3/4 are untouched.
+/// No TYPE guard or <c>actor+0x55</c> selector rewrite is needed at this handler.</para>
 ///
 /// <para><b>Safety.</b> Offsets are specific to the pristine rebirth build
 /// (<see cref="Dc2WpGatePatch.ExpectedLength"/>), so <see cref="Apply"/> refuses anything else: exact
-/// length + the original hook prologue + the cave region being free zero slack. In-memory <c>byte[]</c>
-/// only; file I/O and pristine <c>.bak</c> are the installer's concern. Restores only its own two slices so
-/// it composes with the other Dino2.exe patches.</para>
-///
-/// <para><b>Runtime caveat (NOT a unit-test claim).</b> Which pattern is the tail is a best-guess
-/// (pattern 2 = the wide-turn strike); the OOB fling was not reproduced live in the CE session (§9.1). The
-/// in-game verify must confirm the redirect actually keeps the player in-bounds in ST105 — and that a
-/// two-mosa enemy-enemy separation isn't the real cause.</para>
+/// length + the original six-byte hook sentinel + the cave region being free zero slack. In-memory
+/// <c>byte[]</c> only; file I/O and pristine <c>.bak</c> are the installer's concern. Restores only its own
+/// hook and cave slices, and recognizes the exact released legacy candidate only for restoration/migration.</para>
 /// </summary>
 public static class Dc2MosaTailRedirectPatch
 {
-    /// <summary>File offset of the E80 state-1 attack-pattern hub prologue (VA <c>0x43FC80</c>): steals
-    /// <c>push esi; mov esi,[esp+8]</c> (5 bytes) so the cave can gate the pattern selector
-    /// <c>byte[esi+0x55]</c> before the sub-dispatch.</summary>
-    public const int HookOffset = 0x3FC80;
+    /// <summary>File offset of the selector-6 missed-grab ref-5 transition (VA <c>0x440942</c>): steals
+    /// <c>mov al,[esi+0x56]; push ebx; push 0x40</c> (six bytes).</summary>
+    public const int HookOffset = 0x40942;
 
     /// <summary>File offset of the cave (VA <c>0x4E7600</c>) — end-of-<c>.text</c> zero slack, below the
     /// T-Rex / Inostra / grab / knockback caves so the levers compose.</summary>
     public const int CaveOffset = 0xE7600;
 
     /// <summary>Length of the installed cave (and the free slack required when pristine).</summary>
-    public const int CaveLength = 66;
+    public const int CaveLength = 49;
 
-    private const int HookLen = 5;
+    private const int HookLen = 6;
 
     // ---- the two reversible edits ----
-    // Hook steals the hub prologue: push esi (56) ; mov esi,[esp+8] (8B 74 24 08).
-    private static readonly byte[] HookOriginal = { 0x56, 0x8B, 0x74, 0x24, 0x08 };
-    private static readonly byte[] HookPatched = { 0xE9, 0x7B, 0x79, 0x0A, 0x00 }; // jmp 0x4E7600
+    // Hook steals: mov al,[esi+0x56] (8A 46 56) ; push ebx (53) ; push 0x40 (6A 40).
+    private static readonly byte[] HookOriginal = { 0x8A, 0x46, 0x56, 0x53, 0x6A, 0x40 };
+    private static readonly byte[] HookPatched = { 0xE9, 0xB9, 0x6C, 0x0A, 0x00, 0x90 }; // jmp 0x4E7600 ; nop
 
-    // 66-byte cave (capstone-verified). Shape: replay stolen (push esi; mov esi,[esp+8]); guard
-    // cmp byte[esi+0x58],0x0a jne done; mov eax,[0x876DB8]; movzx ecx,word[eax+0x1090];
-    // cmp cx,{0700,0702,0703,0704} je done; cmp byte[esi+0x55],2 jne done; mov byte[esi+0x55],0;
-    // done: jmp 0x43fc85 (resume the hub).
+    // 49 bytes (capstone-verified): save eax; read room; native 0700 or inclusive 0702..0704 replays
+    // the displaced six bytes and jumps to 0x440948; all other rooms jump to original cleanup 0x44097f.
     private static readonly byte[] Cave = Convert.FromHexString(
+        "50a1b86d87000fb78090100000663d00077412663d02077206663d0407760658e95a93f5ff"
+        + "588a4656536a40e91793f5ff");
+
+    // The released legacy candidate shipped in v0.5.0-v0.5.2. These bytes are historical compatibility
+    // fingerprints only: they can be recognized and restored, never emitted by Apply.
+    private const int LegacyHookOffset = 0x3FC80;
+    private const int LegacyCaveLength = 66;
+    private static readonly byte[] LegacyHookOriginal = { 0x56, 0x8B, 0x74, 0x24, 0x08 };
+    private static readonly byte[] LegacyHookPatched = { 0xE9, 0x7B, 0x79, 0x0A, 0x00 };
+    private static readonly byte[] LegacyCave = Convert.FromHexString(
         "568b742408807e580a7532a1b86d87000fb788901000006681f90007741f"
         + "6681f9020774186681f9030774116681f90407740a807e55027504c6465500e94386f5ff");
 
@@ -76,53 +62,69 @@ public static class Dc2MosaTailRedirectPatch
     private static bool Matches(ReadOnlySpan<byte> exe, int offset, ReadOnlySpan<byte> expected)
         => offset + expected.Length <= exe.Length && exe.Slice(offset, expected.Length).SequenceEqual(expected);
 
-    private static bool CaveIsFreeSlack(ReadOnlySpan<byte> exe, int offset)
+    private static bool CaveIsFreeSlack(ReadOnlySpan<byte> exe, int offset, int length)
     {
-        if (offset + CaveLength > exe.Length) return false;
-        foreach (var b in exe.Slice(offset, CaveLength))
+        if (offset + length > exe.Length) return false;
+        foreach (var b in exe.Slice(offset, length))
             if (b != 0x00) return false;
         return true;
     }
 
     /// <summary>True iff <paramref name="exe"/> is the pristine rebirth build, ready to patch: correct
-    /// length, the original hook prologue present, and the cave region free zero slack. (False once patched,
+    /// length, the original six-byte hook sentinel present, and the cave region free zero slack. (False once patched,
     /// or for any other file. Only inspects this patch's own two sites, so it stays true when the other
     /// Dino2.exe patches are already applied.)</summary>
     public static bool IsRecognizedPristine(ReadOnlySpan<byte> exe)
         => RightBuild(exe)
         && Matches(exe, HookOffset, HookOriginal)
-        && CaveIsFreeSlack(exe, CaveOffset);
+        && CaveIsFreeSlack(exe, CaveOffset, CaveLength);
 
-    /// <summary>True iff this exe already carries the tail-redirect lever, so the installer can skip it
+    /// <summary>True iff this exe already carries the missed-grab cancellation lever, so the installer can skip it
     /// idempotently.</summary>
     public static bool IsApplied(ReadOnlySpan<byte> exe)
         => RightBuild(exe)
         && Matches(exe, HookOffset, HookPatched)
         && Matches(exe, CaveOffset, Cave);
 
-    /// <summary>Apply the hook + cave in place. Throws <see cref="InvalidOperationException"/> (leaving
-    /// <paramref name="exe"/> untouched) unless <see cref="IsRecognizedPristine"/> — so an unknown build,
-    /// an already-patched file, or a wrong-length buffer is never corrupted.</summary>
+    /// <summary>True only for the exact released legacy candidate, with the current hook still pristine.
+    /// This fingerprint exists solely to permit a safe in-memory restore/migration; <see cref="Apply"/>
+    /// never emits it.</summary>
+    public static bool IsLegacyApplied(ReadOnlySpan<byte> exe)
+        => RightBuild(exe)
+        && Matches(exe, HookOffset, HookOriginal)
+        && Matches(exe, LegacyHookOffset, LegacyHookPatched)
+        && Matches(exe, CaveOffset, LegacyCave);
+
+    /// <summary>Apply the validated hook + cave in place. Throws <see cref="InvalidOperationException"/>
+    /// (leaving <paramref name="exe"/> untouched) unless <see cref="IsRecognizedPristine"/> — so an unknown
+    /// build, a legacy/partial patch, or a wrong-length buffer is never corrupted.</summary>
     public static void Apply(byte[] exe)
     {
         ArgumentNullException.ThrowIfNull(exe);
         if (!IsRecognizedPristine(exe))
             throw new InvalidOperationException(
-                "Dino2.exe is not the recognized pristine rebirth build the Mosasaurus tail-redirect lever "
+                "Dino2.exe is not the recognized pristine rebirth build the Mosasaurus missed-grab cancellation lever "
                 + "targets (wrong length, already patched, or a different version); refusing to patch.");
         HookPatched.CopyTo(exe.AsSpan(HookOffset));
         Cave.CopyTo(exe.AsSpan(CaveOffset));
     }
 
-    /// <summary>Revert the lever's own two slices (hook → original prologue, cave → zero slack), leaving
-    /// every other Dino2.exe patch intact. No-op-safe: throws only on a wrong-length buffer.</summary>
+    /// <summary>Revert the current lever's own two slices, or the exact released legacy fingerprint's two
+    /// slices, leaving every other Dino2.exe patch intact. No-op-safe: throws only on a wrong-length buffer.</summary>
     public static void Restore(byte[] exe)
     {
         ArgumentNullException.ThrowIfNull(exe);
         if (!RightBuild(exe))
             throw new InvalidOperationException("Dino2.exe wrong length; refusing to restore.");
-        if (!IsApplied(exe)) return;
-        HookOriginal.CopyTo(exe.AsSpan(HookOffset));
-        exe.AsSpan(CaveOffset, CaveLength).Clear();
+        if (IsApplied(exe))
+        {
+            HookOriginal.CopyTo(exe.AsSpan(HookOffset));
+            exe.AsSpan(CaveOffset, CaveLength).Clear();
+        }
+        else if (IsLegacyApplied(exe))
+        {
+            LegacyHookOriginal.CopyTo(exe.AsSpan(LegacyHookOffset));
+            exe.AsSpan(CaveOffset, LegacyCaveLength).Clear();
+        }
     }
 }

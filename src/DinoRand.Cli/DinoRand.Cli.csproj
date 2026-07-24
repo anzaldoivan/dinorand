@@ -3,6 +3,8 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DinoRand.Cli</RootNamespace>
     <AssemblyName>dinorand</AssemblyName>
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DinoRand.Randomizer\DinoRand.Randomizer.csproj" />

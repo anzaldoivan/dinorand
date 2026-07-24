@@ -17,6 +17,9 @@ namespace DinoRand.FileFormats.Tests;
 /// </summary>
 public class RunnerMockCorpusTests
 {
+    private static string SpoilerPath(string outputDir, Seed seed, RandomizerConfig config) =>
+        Path.Combine(outputDir, SpoilerLogBuilder.FileNameFor(SeedString.Encode(seed, config)));
+
     /// <summary>Temp DC1 install: <c>install/Data/st*.dat</c> copied from the mock corpus.</summary>
     private static string NewDc1Install(string root)
     {
@@ -49,9 +52,9 @@ public class RunnerMockCorpusTests
         {
             var install = NewDc1Install(root);
             var outDir = Path.Combine(root, "out");
+            var config = new RandomizerConfig { EnsureBeatable = false };
             var result = new RandomizerRunner(new DinoCrisis1())
-                .Run(install, outDir, new Seed(12345),
-                    new RandomizerConfig { EnsureBeatable = false });
+                .Run(install, outDir, new Seed(12345), config);
 
             Assert.Equal(12, result.RoomsWritten);
             // RoomCount = graph nodes, which includes phantom door-destination rooms outside the corpus
@@ -68,7 +71,8 @@ public class RunnerMockCorpusTests
             }
             Assert.True(File.Exists(Path.Combine(outDir, "log_dinorand.txt")));
             Assert.True(File.Exists(Path.Combine(outDir, "map.dgml")));
-            Assert.True(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.FileName)));
+            Assert.True(File.Exists(SpoilerPath(outDir, new Seed(12345), config)));
+            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.LegacyFileName)));
         }
         finally { Directory.Delete(root, recursive: true); }
     }
@@ -125,17 +129,28 @@ public class RunnerMockCorpusTests
             var install = NewDc1Install(root);
             var outDir = Directory.CreateDirectory(Path.Combine(root, "out")).FullName;
 
-            // a leftover .dat from "another seed" and a stale spoiler — both must not survive
+            // Leftovers from "another seed" must not survive, while unrelated markdown and nested
+            // files remain untouched by the root-level spoiler cleanup.
             File.WriteAllBytes(Path.Combine(outDir, "stZ99.dat"), new byte[] { 1, 2, 3 });
-            File.WriteAllText(Path.Combine(outDir, SpoilerLogBuilder.FileName), "stale");
+            File.WriteAllText(Path.Combine(outDir, SpoilerLogBuilder.FileNameFor("DINO-stale")), "stale");
+            File.WriteAllText(Path.Combine(outDir, SpoilerLogBuilder.LegacyFileName), "legacy");
+            File.WriteAllText(Path.Combine(outDir, "notes.md"), "keep");
+            var nestedSpoiler = Path.Combine(outDir, "nested", SpoilerLogBuilder.FileNameFor("DINO-nested"));
+            Directory.CreateDirectory(Path.GetDirectoryName(nestedSpoiler)!);
+            File.WriteAllText(nestedSpoiler, "keep");
 
+            var config = new RandomizerConfig { EnsureBeatable = false };
             var result = new RandomizerRunner(new DinoCrisis1())
                 .Run(install, outDir, new Seed(9),
-                    new RandomizerConfig { EnsureBeatable = false }, emitSpoiler: false);
+                    config, emitSpoiler: false);
 
             Assert.False(File.Exists(Path.Combine(outDir, "stZ99.dat")), "stale .dat survived the run");
-            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.FileName)),
-                "suppressed spoiler left a stale SPOILER.md behind");
+            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.FileNameFor("DINO-stale"))),
+                "suppressed run left a stale dynamic spoiler behind");
+            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.LegacyFileName)),
+                "suppressed run left legacy SPOILER.md behind");
+            Assert.True(File.Exists(Path.Combine(outDir, "notes.md")));
+            Assert.True(File.Exists(nestedSpoiler), "nested files must not be part of root-level cleanup");
             Assert.Contains(result.Log, l => l.Contains("[clean]"));
         }
         finally { Directory.Delete(root, recursive: true); }
@@ -181,13 +196,15 @@ public class RunnerMockCorpusTests
         {
             var install = NewDc2Install(root);
             var outDir = Path.Combine(root, "out");
+            var config = new RandomizerConfig();
             var result = new Dc2RandomizerRunner(new DinoCrisis2())
-                .Run(install, outDir, new Seed(1001), new RandomizerConfig());
+                .Run(install, outDir, new Seed(1001), config);
 
             Assert.Equal(6, result.RoomCount);
             Assert.Equal(0, result.RoomsWritten);   // no spawn-graph entries ⇒ every room skipped
             Assert.Empty(result.WrittenFiles);
-            Assert.True(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.FileName)));
+            Assert.True(File.Exists(SpoilerPath(outDir, new Seed(1001), config)));
+            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.LegacyFileName)));
             Assert.Contains(result.Log, l => l.Contains("[dc2-enemy]"));
         }
         finally { Directory.Delete(root, recursive: true); }
@@ -201,11 +218,13 @@ public class RunnerMockCorpusTests
         {
             var install = NewDc2Install(root);
             var outDir = Directory.CreateDirectory(Path.Combine(root, "out")).FullName;
-            File.WriteAllText(Path.Combine(outDir, SpoilerLogBuilder.FileName), "stale");
+            File.WriteAllText(Path.Combine(outDir, SpoilerLogBuilder.FileNameFor("DINO-stale")), "stale");
+            File.WriteAllText(Path.Combine(outDir, SpoilerLogBuilder.LegacyFileName), "legacy");
 
             new Dc2RandomizerRunner(new DinoCrisis2())
                 .Run(install, outDir, new Seed(1), new RandomizerConfig(), emitSpoiler: false);
-            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.FileName)));
+            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.FileNameFor("DINO-stale"))));
+            Assert.False(File.Exists(Path.Combine(outDir, SpoilerLogBuilder.LegacyFileName)));
         }
         finally { Directory.Delete(root, recursive: true); }
     }

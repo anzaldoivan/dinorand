@@ -46,10 +46,14 @@
 !/CONTRIBUTING.md
 !/.env.example
 !/LICENSE
+!/LEGAL.md
 !/THIRD-PARTY-NOTICES.md
+!/SECURITY.md
+!/SUPPORT.md
 !/CHANGELOG.md
 !/DinoRand.sln
 !/Directory.Build.props
+!/global.json
 
 # ── Backstop: inside the allowed trees, still exclude build output & asset bytes ─
 bin/

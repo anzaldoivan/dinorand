@@ -10,6 +10,8 @@
     <Nullable>disable</Nullable>
     <RootNamespace>DinoRand.App</RootNamespace>
     <AssemblyName>DinoRand.Avalonia</AssemblyName>
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Win32 .exe icon (same art as the WPF front-end). The window/taskbar icon is set via
          Window.Icon in MainWindow.axaml off the AvaloniaResource below. -->

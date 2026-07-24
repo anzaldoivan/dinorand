@@ -2,6 +2,7 @@ using System.Buffers.Binary;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Spoiler;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -81,13 +82,13 @@ public sealed class Dc2InstallIntegrityTests : IDisposable
         var dir = Path.Combine(_root, "out");
         Directory.CreateDirectory(dir);
         File.WriteAllBytes(Path.Combine(dir, "ST999.DAT"), new byte[] { 1 });      // stale room
-        File.WriteAllText(Path.Combine(dir, "SPOILER.md"), "keep me");             // non-.dat artifact
+        File.WriteAllText(Path.Combine(dir, SpoilerLogBuilder.LegacyFileName), "keep me"); // non-.dat artifact
 
         int removed = RunOutputDir.ClearStaleRoomFiles(dir);
 
         Assert.Equal(1, removed);
         Assert.False(File.Exists(Path.Combine(dir, "ST999.DAT")));
-        Assert.True(File.Exists(Path.Combine(dir, "SPOILER.md")));
+        Assert.True(File.Exists(Path.Combine(dir, SpoilerLogBuilder.LegacyFileName)));
     }
 
     [Fact]

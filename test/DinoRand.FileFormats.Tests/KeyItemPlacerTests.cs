@@ -5,6 +5,7 @@ using DinoRand.Randomizer.Graph;
 using DinoRand.Randomizer.Logic;
 using DinoRand.Randomizer.Maps;
 using DinoRand.Randomizer.Passes;
+using DinoRand.Randomizer.Spoiler;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -701,9 +702,9 @@ public class KeyItemPlacerTests
     /// heliport-powered elevators are the only real descent. Every other apparent descent is an
     /// intra-facility shortcut that unlocks only after the heliport route:
     ///  • the Large Size Elevator B3 stop 060F→0600 requires the heliport (reqRoom 0401);
-    ///  • the 0309 shuttle deep stops 0309→050B / 0309→0604 require Third Energy Control 050B, which is
-    ///    itself reachable only via the heliport — so the facility elevator (0107→0113, DDK-N discs) can
-    ///    reach B1 but NOT teleport into the B2/B3 hub.
+    ///  • the 0309 shuttle B2 stop requires both the heliport waypoint 0401 and prior Library room 050F;
+    ///    its B3 stop requires Third Energy Control 050B — so the facility elevator (0107→0113,
+    ///    DDK-N discs) can reach B1 but NOT teleport into the B2/B3 hub.
     /// So dropping the Entrance Key must make the goal UNREACHABLE even while every other key (incl. the
     /// DDK-N pair 0x63/0x6a) is held. Dropping only the DDK-N discs must NOT — the heliport + Large
     /// Elevator still descend — which guards against over-gating. See the entrance-key / phantom-descent findings.
@@ -741,11 +742,11 @@ public class KeyItemPlacerTests
 
         // THE INVARIANT — the Entrance Key is a hard B3 requirement. Even holding every other key (incl.
         // the DDK-N pair), the goal must be UNREACHABLE without it: the facility elevator + 0309 shuttle
-        // reach B1 but the B2/B3 deep stops require 050B, which is heliport-only. RED until the shuttle
-        // deep stops are gated.
+        // reach B1 but the B2/B3 deep stops require the heliport + Library progression. RED until the
+        // shuttle deep stops are gated.
         Assert.False(GoalReachable(Without(entranceKey)),
-            "goal must be UNREACHABLE without the Entrance Key — B3 is heliport-only; the 0309 shuttle deep " +
-            "stops (0309→050B / 0309→0604) must not teleport into the B2/B3 hub without the heliport");
+            "goal must be UNREACHABLE without the Entrance Key — the 0309 shuttle deep stops must not " +
+            "teleport into the B2/B3 hub without the heliport and Library progression");
     }
 
     [Theory]
@@ -959,7 +960,7 @@ public class KeyItemPlacerTests
     }
 
     [Fact]
-    public void RealInstall_KeyShuffle_ActuallyRelocatesAtLeastOneKey()
+    public void RealInstall_KeyShuffleWithScatter_ActuallyRelocatesAtLeastOneKey()
     {
         var vanilla = LoadInstall();
         if (vanilla is null) return;
@@ -972,11 +973,15 @@ public class KeyItemPlacerTests
             var rooms = LoadInstall()!;
             var ctx = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms, Game.Requirements),
                                                new Seed(seed),
-                                               new RandomizerConfig { ShuffleKeyItems = true }, _ => { });
+                                               new RandomizerConfig
+                                               {
+                                                   ShuffleKeyItems = true,
+                                                   ShuffleKeyItemsIntoPickups = true,
+                                               }, _ => { });
             new ProgressionPass().Apply(ctx);
             moved = !PositionsEqual(vanillaPos, DoorKeyPositions(rooms));
         }
-        Assert.True(moved, "key shuffle never changed any door-key position across 30 seeds");
+        Assert.True(moved, "key shuffle with scatter never changed a door-key position across 30 seeds");
     }
 
     private static bool PositionsEqual(Dictionary<int, List<int>> a, Dictionary<int, List<int>> b)
@@ -1376,12 +1381,148 @@ public class KeyItemPlacerTests
         AssertEdgeRequires(graph, 0x0113, 0x0309, items: new[] { 0x41 }, rooms: new[] { 0x010B });
         AssertEdgeRequires(graph, 0x0113, 0x050B, items: System.Array.Empty<int>(), rooms: new[] { 0x0506 });
         AssertEdgeRequires(graph, 0x0113, 0x0604, items: System.Array.Empty<int>(), rooms: new[] { 0x0506 });
+        AssertEdgeRequires(graph, 0x0309, 0x050B, items: System.Array.Empty<int>(),
+                           rooms: new[] { 0x0401, 0x050F });
         AssertEdgeRequires(graph, 0x0405, 0x060F, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
         AssertEdgeRequires(graph, 0x060F, 0x030C, items: System.Array.Empty<int>(), rooms: new[] { 0x030B });
-        // 060F→0600 (Large Elevator B3 stop) also requires the heliport waypoint 0401: 030B alone is
-        // reachable from the start (B1 Room Key), which left a phantom descent into the whole B3 endgame
-        // that bypassed the Entrance Key. See RealInstall_DeepFacility_RequiresARealSurfaceDescent.
-        AssertEdgeRequires(graph, 0x060F, 0x0600, items: System.Array.Empty<int>(), rooms: new[] { 0x030B, 0x0401 });
+        // 060F→0600 (Large Elevator B3 stop) requires generator power, the heliport waypoint, and
+        // Liaison Elevator No.1: 040C is the hard activation step reached through
+        // 0401→0402→0403→0409→040A→040C.
+        AssertEdgeRequires(graph, 0x060F, 0x0600, items: System.Array.Empty<int>(),
+                           rooms: new[] { 0x030B, 0x0401, 0x040C });
+    }
+
+    [Fact]
+    public void RealInstall_CoAreaKey_IsRequiredBeforePassagewayCanReachRestStation()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+        var all = new HashSet<int>(Game.KeyItemIds);
+
+        var coAreaKeyEdges = graph.Nodes
+            .SelectMany(node => node.Edges
+                .Where(edge => Game.KeyItemsForDoor(edge.Door.DoorType).Contains(0x31)
+                               || (edge.Requires.Items ?? System.Array.Empty<int>()).Contains(0x31))
+                .Select(edge => (From: node.Code, To: edge.Door.OriginalTargetCode)))
+            .Distinct()
+            .OrderBy(edge => edge.From)
+            .ThenBy(edge => edge.To)
+            .ToArray();
+        Assert.Equal(new[] { (From: 0x0600, To: 0x0603) }, coAreaKeyEdges);
+
+        var withoutCoAreaKey = new HashSet<int>(all);
+        withoutCoAreaKey.Remove(0x31);
+        var beforeCoAreaKey = KeyItemPlacer.Reachable(
+            graph, Game, Game.StartRoomCode, withoutCoAreaKey);
+
+        foreach (var reachable in new[] { 0x0601, 0x0602, 0x0605, 0x0615, 0x0606 })
+            Assert.Contains(reachable, beforeCoAreaKey);
+        foreach (var blocked in new[] { 0x0603, 0x0604 })
+            Assert.DoesNotContain(blocked, beforeCoAreaKey);
+
+        var afterCoAreaKey = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, all);
+        foreach (var reachable in new[] { 0x050F, 0x050B, 0x0603, 0x0604 })
+            Assert.Contains(reachable, afterCoAreaKey);
+    }
+
+    [Fact]
+    public void RealInstall_KeyCardADoesNotGateGeneralWeaponsStorageRoute()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        void AssertKeyCardA(int from, int to, bool expected)
+        {
+            var edges = graph.Nodes.Where(node => node.Code == from)
+                .SelectMany(node => node.Edges)
+                .Where(edge => edge.Door.OriginalTargetCode == to)
+                .ToArray();
+            Assert.NotEmpty(edges);
+            Assert.All(edges, edge =>
+            {
+                var requiresA = Game.KeyItemsForDoor(edge.Door.DoorType).Contains(0x3A)
+                                || (edge.Requires.Items ?? System.Array.Empty<int>()).Contains(0x3A);
+                Assert.Equal(expected, requiresA);
+            });
+        }
+
+        foreach (var (from, to) in new[]
+                 {
+                     (0x0602, 0x0605), (0x0602, 0x0615),
+                     (0x0605, 0x0602), (0x0605, 0x0606),
+                     (0x0615, 0x0602), (0x0615, 0x0606),
+                     (0x0606, 0x0605), (0x0606, 0x0615),
+                 })
+            AssertKeyCardA(from, to, expected: false);
+
+        foreach (var (from, to) in new[]
+                 {
+                     (0x0606, 0x0607), (0x0607, 0x0606),
+                     (0x0606, 0x0611), (0x0611, 0x0606),
+                 })
+            AssertKeyCardA(from, to, expected: true);
+    }
+
+    [Fact]
+    public void RealInstall_PartsStorageGrenadeGunParts_RequiresKeyCardA()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+
+        var pickup = Assert.Single(
+            graph.Nodes.Where(node => node.Code == 0x0507).SelectMany(node => node.Items),
+            item => item.Record.OriginalItemId == 0x0F
+                    && item.Record.FileOffset == 0x41410);
+
+        Assert.Equal(new[] { 0x3A }, pickup.Requires.Items);
+    }
+
+    [Fact]
+    public void RealInstall_VanillaOverlay_CollectsCoAreaKeyBeforeKeyCardA()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+        var result = KeyItemPlacer.Verify(
+            graph, Game, Game.StartRoomCode, Game.GoalRoomCode, KeysByRoom(rooms));
+
+        Assert.True(result.Success, string.Join("\n", result.Log));
+        Assert.NotNull(result.Spheres);
+        var coAreaSphere = Assert.Single(result.Spheres!,
+            sphere => sphere.Collected.Any(item => item.KeyItem == 0x31));
+        var keyCardASphere = Assert.Single(result.Spheres,
+            sphere => sphere.Collected.Any(item => item.KeyItem == 0x3A));
+        Assert.Contains((0x31, 0x0606), coAreaSphere.Collected);
+        Assert.Contains((0x3A, 0x050E), keyCardASphere.Collected);
+        Assert.True(coAreaSphere.Index < keyCardASphere.Index);
+    }
+
+    [Fact]
+    public void RealInstall_ReportedSeed_CoAreaKeyPlacementIsReachableWithoutItself()
+    {
+        var rooms = LoadInstall();
+        if (rooms is null) return;
+        Assert.True(SeedString.TryParse("DINO-AetwArn_H_8vBw", out var seed, out var config));
+        Assert.True(config.ShuffleKeyItems);
+
+        var graph = RoomGraph.Build(rooms, Game.Requirements);
+        new ProgressionPass().Apply(
+            new RandomizationContext(Game, rooms, graph, seed, config, _ => { }));
+
+        var coAreaKeyRooms = graph.Nodes
+            .Where(node => node.Items.Any(item => item.Record.ItemId == 0x31))
+            .Select(node => node.Code)
+            .Distinct()
+            .ToArray();
+        Assert.Equal(new[] { 0x0502 }, coAreaKeyRooms);
+
+        var held = new HashSet<int>(Game.KeyItemIds);
+        held.Remove(0x31);
+        var withoutCoAreaKey = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, held);
+        Assert.All(coAreaKeyRooms, room => Assert.Contains(room, withoutCoAreaKey));
     }
 
     /// <summary>
@@ -1434,11 +1575,11 @@ public class KeyItemPlacerTests
 
     /// <summary>
     /// The self-seal invariant (Phase 4 (ii)): across a seed sweep with the key shuffle (and DDK-disc
-    /// relocation) on, no key item is ever placed in a playable-world room that requires that same key to
-    /// reach — i.e. never past its own dominating gate. Out-of-world Operation Wipe-Out duplicates (stage
-    /// <c>0x0A</c>, unreachable even with every key) are excluded exactly as
-    /// <see cref="KeyItemPlacer.Verify"/>'s StrandedKeyItems does. Standing guard on the whole overlay,
-    /// including the re-audited elevator forge-chain + power gates.
+    /// relocation) on, every playable key entitlement has at least one copy reachable without already
+    /// holding that item id. This is entitlement-level rather than physical-record-level because DC1
+    /// carries alternate-state copies of the same key; one gated copy is harmless when another copy grants
+    /// the same held-item flag. Out-of-world Operation Wipe-Out duplicates are excluded exactly as
+    /// <see cref="KeyItemPlacer.Verify"/>'s StrandedKeyItems does.
     /// </summary>
     [Fact]
     public void RealInstall_KeyShuffle_NoKeyPlacedPastItsOwnDominatingGate()
@@ -1456,16 +1597,16 @@ public class KeyItemPlacerTests
             var all = new HashSet<int>(pos.Values.SelectMany(v => v));
             var world = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, all); // playable world
 
-            foreach (var (room, keys) in pos)
+            foreach (var key in pos.Values.SelectMany(keys => keys).Distinct())
             {
-                if (!world.Contains(room)) continue;                 // out-of-world duplicate — never required
-                foreach (var k in keys)
-                {
-                    var minusK = new HashSet<int>(all); minusK.Remove(k);
-                    Assert.True(
-                        KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, minusK).Contains(room),
-                        $"seed {seed}: key 0x{k:X2} sits in room 0x{room:X4}, which is unreachable without 0x{k:X2}");
-                }
+                var playableHomes = pos.Where(entry => world.Contains(entry.Key) && entry.Value.Contains(key))
+                    .Select(entry => entry.Key).Distinct().ToArray();
+                if (playableHomes.Length == 0) continue;
+
+                var minusKey = new HashSet<int>(all);
+                minusKey.Remove(key);
+                var withoutKey = KeyItemPlacer.Reachable(graph, Game, Game.StartRoomCode, minusKey);
+                Assert.Contains(playableHomes, withoutKey.Contains);
             }
         }
     }

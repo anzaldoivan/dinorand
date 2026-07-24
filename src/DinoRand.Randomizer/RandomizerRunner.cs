@@ -69,7 +69,7 @@ public sealed class RandomizerRunner
     /// <summary>Test seam for the mandatory post-pass verification gate.</summary>
     internal Func<RandomizationContext, KeyItemPlacer.PlacementResult>? FinalProgressionVerifier { get; init; }
 
-    /// <param name="emitSpoiler">Write <c>SPOILER.md</c> beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
+    /// <param name="emitSpoiler">Write the per-seed spoiler file (<c>&lt;encoded-seed&gt;_spoiler.md</c>) beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
     /// The spoiler is a pure projection of the passes' recorded decisions, built strictly AFTER every
     /// game file is written — turning it off changes no other output byte (regression-locked).</param>
     /// <param name="ct">Cancels the GENERATE phase only — every write here lands in

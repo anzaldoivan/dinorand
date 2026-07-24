@@ -1,101 +1,150 @@
 name: release
 
-# Fires when a version branch `version/VX.Y.Z` is CREATED (push a new branch to cut a
-# release). Common alternative: trigger on a pushed tag `v*` (on: push: tags: ['v*']).
-# `workflow_dispatch` is a manual fallback — run it from the version branch.
 on:
-  create:
-  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
 
-permissions:
-  contents: write   # needed to create the GitHub Release + upload assets
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  release:
+  validate:
     runs-on: ubuntu-latest
-    # `create` fires for tags too — gate to branch + version/V* only. Manual dispatch always runs.
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.ref_type == 'branch' && startsWith(github.event.ref, 'version/V'))
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
+      prerelease: ${{ steps.release.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
+      - name: Check out the pushed tag with full history
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          dotnet-version: 8.0.x
-
-      - name: Derive VERSION from the release branch name
-        id: ver
-        run: |
-          # On `create` the branch is in github.event.ref; on manual dispatch use the ref we ran from.
-          if [ "${{ github.event_name }}" = "create" ]; then
-            REF="${{ github.event.ref }}"
-          else
-            REF="${{ github.ref_name }}"
-          fi
-          case "$REF" in
-            version/V*) ;;
-            *) echo "Not a version/VX.Y.Z branch: $REF" >&2; exit 1 ;;
-          esac
-          VERSION="${REF#version/V}"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          # A '-' suffix (e.g. 1.2.0-rc1, 2.0.0-beta) marks a prerelease.
-          case "$VERSION" in
-            *-*) echo "prerelease=true"  >> "$GITHUB_OUTPUT" ;;
-            *)   echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
-          esac
-
-      - name: Validate curated release notes
-        run: PYTHONDONTWRITEBYTECODE=1 python3 scripts/check_docs.py --version "${{ steps.ver.outputs.version }}"
-
-      - name: Build self-contained release binaries
-        run: bash scripts/publish-release.sh win-x64 linux-x64 osx-arm64
-
-      - name: Package per-RID zips
-        id: pkg
-        run: |
-          # One zip per RID — the raw dist/<rid>/ files share names across RIDs
-          # (dinorand, DinoRand.Avalonia), which would collide as release assets.
-          VERSION="${{ steps.ver.outputs.version }}"
-          for rid in win-x64 linux-x64 osx-arm64; do
-            ( cd "dist/$rid" && zip -r "../../dinorand-v$VERSION-$rid.zip" . )
-          done
-
-      - name: Package .apworld release assets
-        run: python3 scripts/package_apworlds.py
-
-      - name: Extract release notes from CHANGELOG.md
-        id: notes
-        run: |
-          VERSION="${{ steps.ver.outputs.version }}"
-          # Pull the `## [VERSION] …` section body (up to the next `## [` heading).
-          awk -v ver="$VERSION" '
-            $0 ~ "^## \\[" ver "\\]" { grab=1; next }
-            grab && /^## \[/        { exit }
-            grab                    { print }
-          ' CHANGELOG.md > NOTES.md
-          if [ -s NOTES.md ]; then
-            echo "have_notes=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "have_notes=false" >> "$GITHUB_OUTPUT"
-            echo "No CHANGELOG.md section for v$VERSION — falling back to auto-generated notes." >&2
-          fi
-
-      - name: Create GitHub Release
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch the checked main branch
+        run: git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+      - name: Validate existing tag, version, ancestry, and curated notes
+        id: release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: >-
+          PYTHONDONTWRITEBYTECODE=1 python3 scripts/release_validate.py
+          --tag "$RELEASE_TAG" --notes-output NOTES.md --github-output "$GITHUB_OUTPUT"
+      - name: Preserve validated release notes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-metadata
+          path: NOTES.md
+          if-no-files-found: error
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the validated tag
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Use the pinned release SDK
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 8.0.423
+      - name: Locked solution restore
+        run: dotnet restore DinoRand.sln --locked-mode
+      - name: Release build
+        run: dotnet build DinoRand.sln -c Release --no-restore
+      - name: Full test suite
+        run: dotnet test DinoRand.sln -c Release --no-build --no-restore
+      - name: Build and verify all release assets
+        env:
+          VERSION: ${{ needs.validate.outputs.version }}
+        run: bash scripts/build-release-assets.sh "$VERSION"
+      - name: Upload the complete release asset set
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-assets
+          path: dist/release-assets/*
+          if-no-files-found: error
+
+  attest:
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-assets
+          path: release-assets
+      - name: Attest the complete asset set
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: release-assets/*
+
+  publish:
+    needs: [validate, build, attest]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-assets
+          path: release-assets
+      - name: Download validated notes
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-metadata
+          path: release-metadata
+      - name: Create, verify, and publish the draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.validate.outputs.tag }}
+          VERSION: ${{ needs.validate.outputs.version }}
+          PRERELEASE: ${{ needs.validate.outputs.prerelease }}
         run: |
-          VERSION="${{ steps.ver.outputs.version }}"
-          PRERELEASE=""
-          [ "${{ steps.ver.outputs.prerelease }}" = "true" ] && PRERELEASE="--prerelease"
-          # Prefer the curated CHANGELOG.md section; fall back to auto-generated notes if absent.
-          if [ "${{ steps.notes.outputs.have_notes }}" = "true" ]; then
-            NOTES="--notes-file NOTES.md"
-          else
-            NOTES="--generate-notes"
-          fi
-          gh release create "v$VERSION" ./dinorand-v"$VERSION"-*.zip ./dist/*.apworld \
-            --title "v$VERSION" \
-            --target "$GITHUB_SHA" \
-            $NOTES \
-            $PRERELEASE
+          set -euo pipefail
+          expected=(
+            "dinorand-v${VERSION}-win-x64.zip"
+            "dinorand-v${VERSION}-linux-x64.zip"
+            "dinorand-v${VERSION}-osx-arm64.zip"
+            "dino_crisis_1.apworld"
+            "dino_crisis_2.apworld"
+            "SHA256SUMS"
+          )
+          for name in "${expected[@]}"; do test -f "release-assets/$name"; done
+          test "$(find release-assets -maxdepth 1 -type f | wc -l)" -eq "${#expected[@]}"
+          (cd release-assets && sha256sum -c SHA256SUMS)
+          flags=()
+          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
+          gh release create "$RELEASE_TAG" --verify-tag --draft \
+            --title "DinoRand $RELEASE_TAG" --notes-file release-metadata/NOTES.md "${flags[@]}"
+          paths=()
+          for name in "${expected[@]}"; do paths+=("release-assets/$name"); done
+          gh release upload "$RELEASE_TAG" "${paths[@]}"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > draft-release.json
+          python3 - "$VERSION" draft-release.json <<'PY'
+          import json, sys
+          version, path = sys.argv[1:]
+          release = json.load(open(path, encoding="utf-8"))
+          expected = {
+              f"dinorand-v{version}-win-x64.zip",
+              f"dinorand-v{version}-linux-x64.zip",
+              f"dinorand-v{version}-osx-arm64.zip",
+              "dino_crisis_1.apworld", "dino_crisis_2.apworld", "SHA256SUMS",
+          }
+          actual = {asset["name"] for asset in release["assets"]}
+          if not release["draft"] or actual != expected:
+              raise SystemExit(f"draft completeness check failed: draft={release['draft']} assets={sorted(actual)}")
+          PY
+          gh release edit "$RELEASE_TAG" --draft=false

@@ -15,8 +15,8 @@ public enum Dc2MosaTailRedirectOutcome
 }
 
 /// <summary>
-/// Install-time exe step for the Mosasaurus tail-redirect lever
-/// (docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md §9): writes the hook + code cave
+/// Install-time exe step for the Mosasaurus missed-grab cancellation lever
+/// (docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md §10.6): writes the hook + code cave
 /// (<see cref="Dc2MosaTailRedirectPatch"/>) into the game's <c>Dino2.exe</c>. Mirrors
 /// <see cref="Dc2MosaGrabSuppressInstaller"/>: one-time pristine <c>.bak</c>, refuse unrecognized builds,
 /// idempotent (skips if already applied), and restores only its own two slices so the other Dino2.exe
@@ -31,8 +31,8 @@ public static class Dc2MosaTailRedirectInstaller
     /// room — water-level swaps admit E80 to the weighted donor pool, or a fixed-species pin selects it —
     /// or the user forced it on (<see cref="RandomizerConfig.Dc2RedirectMosaTail"/>). Same predicate as the
     /// grab/knockback levers. Gating on "spawnable" (not "actually placed") is sufficient because the patch
-    /// is a harmless no-op when no injected Mosasaurus exists — its cave only rewrites the pattern of a
-    /// TYPE-0x0a actor outside the four native rooms, so a seed that rolls no Mosasaurus leaves behaviour
+    /// is a harmless no-op when no injected Mosasaurus exists — the cave is reached only by the E80
+    /// selector-6 handler outside the four native rooms, so a seed that rolls no Mosasaurus leaves behaviour
     /// identical to vanilla.</summary>
     public static bool WantedFor(RandomizerConfig config)
     {
@@ -50,7 +50,7 @@ public static class Dc2MosaTailRedirectInstaller
         var dataDir = new DinoCrisis2().GetDataDir(installDir);
         if (dataDir is null)
         {
-            log?.Invoke($"[mosa-tail-to-bite] no DC2 Data folder under {installDir}; skipped");
+            log?.Invoke($"[mosa-missed-grab-cancel] no DC2 Data folder under {installDir}; skipped");
             return Dc2MosaTailRedirectOutcome.NotFound;
         }
         var gameRoot = Path.GetDirectoryName(Path.GetFullPath(
@@ -64,32 +64,41 @@ public static class Dc2MosaTailRedirectInstaller
     {
         if (!File.Exists(exePath))
         {
-            log?.Invoke($"[mosa-tail-to-bite] {Path.GetFileName(exePath)} not found at {exePath}; skipped");
+            log?.Invoke($"[mosa-missed-grab-cancel] {Path.GetFileName(exePath)} not found at {exePath}; skipped");
             return Dc2MosaTailRedirectOutcome.NotFound;
         }
         var bytes = File.ReadAllBytes(exePath);
 
         if (restore)
         {
-            if (!Dc2MosaTailRedirectPatch.IsApplied(bytes))
+            if (!Dc2MosaTailRedirectPatch.IsApplied(bytes)
+                && !Dc2MosaTailRedirectPatch.IsLegacyApplied(bytes))
             {
-                log?.Invoke("[mosa-tail-to-bite] lever not present; restore skipped");
+                log?.Invoke("[mosa-missed-grab-cancel] lever not present; restore skipped");
                 return Dc2MosaTailRedirectOutcome.Skipped;
             }
             Dc2MosaTailRedirectPatch.Restore(bytes);
             File.WriteAllBytes(exePath, bytes);
-            log?.Invoke("[mosa-tail-to-bite] hook + cave reverted to vanilla");
+            log?.Invoke("[mosa-missed-grab-cancel] hook + cave reverted to vanilla");
             return Dc2MosaTailRedirectOutcome.Restored;
         }
 
         if (Dc2MosaTailRedirectPatch.IsApplied(bytes))
         {
-            log?.Invoke("[mosa-tail-to-bite] lever already applied; skipped");
+            log?.Invoke("[mosa-missed-grab-cancel] lever already applied; skipped");
             return Dc2MosaTailRedirectOutcome.Skipped;
+        }
+
+        var legacy = Dc2MosaTailRedirectPatch.IsLegacyApplied(bytes);
+        if (legacy)
+        {
+            // This exact released fingerprint is safe to migrate in memory; partially matching inputs remain refused.
+            Dc2MosaTailRedirectPatch.Restore(bytes);
+            log?.Invoke("[mosa-missed-grab-cancel] exact released legacy candidate found; restoring its slices before migration");
         }
         if (!Dc2MosaTailRedirectPatch.IsRecognizedPristine(bytes))
         {
-            log?.Invoke("[mosa-tail-to-bite] Dino2.exe is not the recognized rebirth build; exe patch skipped "
+            log?.Invoke("[mosa-missed-grab-cancel] Dino2.exe is not the recognized rebirth build; exe patch skipped "
                 + "(room-file enemy edits still apply)");
             return Dc2MosaTailRedirectOutcome.UnrecognizedVersion;
         }
@@ -97,12 +106,17 @@ public static class Dc2MosaTailRedirectInstaller
         // Capture the pristine original exactly once (shared .bak with the other exe installers).
         var backupPath = exePath + Dc2CharacterSkinInstaller.BackupSuffix;
         if (!File.Exists(backupPath))
-            File.Copy(exePath, backupPath);
+        {
+            if (legacy)
+                File.WriteAllBytes(backupPath, bytes);
+            else
+                File.Copy(exePath, backupPath);
+        }
 
         Dc2MosaTailRedirectPatch.Apply(bytes);
         File.WriteAllBytes(exePath, bytes);
-        log?.Invoke($"[mosa-tail-to-bite] exe patched: injected Mosasaurus does the bite instead of the "
-            + $"OOB tail strike outside ST700/702/703/704 (backup: {Path.GetFileName(backupPath)})");
+        log?.Invoke($"[mosa-missed-grab-cancel] exe patched: cancels the injected Mosasaurus selector-6 "
+            + $"missed-grab continuation outside ST700/702/703/704 (backup: {Path.GetFileName(backupPath)})");
         return Dc2MosaTailRedirectOutcome.Applied;
     }
 }

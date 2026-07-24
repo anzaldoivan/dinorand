@@ -1,5 +1,9 @@
 # Third-Party Notices
 
+Release archives also contain a generated, RID-specific shipped-component inventory, package
+license files supplied by dependencies where applicable, and clearly named .NET runtime license
+and third-party-notice files. Build- and test-only dependencies are not shipped.
+
 DinoRand is modelled on and derives concepts and data shapes from the following
 project. Its license and copyright notice are reproduced here in accordance with
 its terms.

@@ -98,9 +98,12 @@ internal static class Dc1RunArtifactWriter
         File.WriteAllText(Path.Combine(outputDir, "map.dgml"), graph.ToDgml());
 
         // Spoiler log (docs/decisions/cross/SPOILER-LOG-PLAN.md): a pure projection of what the passes recorded,
-        // written strictly AFTER every game file above so emitting it cannot affect them. A stale
-        // spoiler from a previous roll is removed when suppressed (mirrors the exe-plan cleanup).
-        var spoilerPath = Path.Combine(outputDir, SpoilerLogBuilder.FileName);
+        // written strictly AFTER every game file above so emitting it cannot affect them. The encoded seed is
+        // computed once and owns the per-seed file name; stale generated names and the legacy fixed name are
+        // removed from the reused output directory for both emission modes.
+        var seedString = SeedString.Encode(seed, config);
+        var spoilerPath = Path.Combine(outputDir, SpoilerLogBuilder.FileNameFor(seedString));
+        SpoilerLogBuilder.RemoveStaleFiles(outputDir);
         if (emitSpoiler)
         {
             var outputFiles = refs.Select(r => Path.GetFileName(r.Path))
@@ -109,14 +112,12 @@ internal static class Dc1RunArtifactWriter
                 .Concat(new[] { "log_dinorand.txt", "map.dgml" })
                 .OrderBy(f => f, StringComparer.OrdinalIgnoreCase).ToList();
             var debug = new SpoilerDebugInfo(
-                SeedString.Encode(seed, config), seed.Value, context.Game.Id,
+                seedString, seed.Value, context.Game.Id,
                 SpoilerLogBuilder.AppVersion(),
                 DateTimeOffset.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'"),
                 SpoilerLogBuilder.DumpConfig(config), logLines, outputFiles);
             File.WriteAllText(spoilerPath,
                 SpoilerLogBuilder.Build(new SpoilerDocument(debug, context.Spoiler.Sections)));
         }
-        else if (File.Exists(spoilerPath))
-            File.Delete(spoilerPath);
     }
 }

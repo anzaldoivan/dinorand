@@ -15,6 +15,9 @@ related: []
 
 # DinoRand
 
+**[Download latest release](https://github.com/anzaldoivan/dinorand/releases/latest)** ·
+**[User Guide](USER-GUIDE.md)**
+
 [![CI](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml/badge.svg)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)
 [![coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/anzaldoivan/b1a330aadd5e6deb20cf6ec18c738b6a/raw/dinorand-coverage.json)](https://github.com/anzaldoivan/dinorand/actions/workflows/ci.yml)
 [![no-copyrighted-files](https://github.com/anzaldoivan/dinorand/actions/workflows/no-copyrighted-files.yml/badge.svg)](https://github.com/anzaldoivan/dinorand/actions/workflows/no-copyrighted-files.yml)
@@ -39,8 +42,7 @@ get back a randomized, still-completable playthrough — items, enemies, loadout
 
 > **Status: active.** DC1 (items, enemies, key-item logic, loadout, audio) and DC2 (enemy swaps,
 > shop, BGM, voice, starting loadout) levers are implemented and tested; door-graph randomization is
-> gated pending further RE. See **[DESIGN.md](docs/reference/cross/architecture/DESIGN.md)** for the full
-> design/decision record and **[ROADMAP.md](docs/decisions/cross/ROADMAP.md)** for the build plan and current phase.
+> gated pending further reverse engineering.
 
 ## Layout
 
@@ -53,12 +55,12 @@ test/                      unit tests (codec + parser round-trips)
 data/dc1/                  JSON game data (items, enemies, room metadata)
 ```
 
-## Build (requires the .NET 8 SDK)
+## Build (requires .NET SDK 8.0.423)
 
 If you don't have the SDK, install it user-local in WSL/Linux (no sudo):
 
 ```bash
-curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0 --install-dir "$HOME/.dotnet"
+curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version 8.0.423 --install-dir "$HOME/.dotnet"
 export DOTNET_ROOT="$HOME/.dotnet" && export PATH="$HOME/.dotnet:$PATH"   # add to ~/.bashrc to persist
 ```
 
@@ -70,7 +72,7 @@ dotnet test                                    # full unit suite (codec + parser
 dotnet run --project src/DinoRand.Cli -- --help
 # Run against your install (absolute path); output → mod_dinorand/
 # (includes SPOILER.md — bug-report debug block on top, room-by-room spoilers below a
-#  marker; --no-spoiler skips it. docs/decisions/cross/SPOILER-LOG-PLAN.md)
+#  marker; --no-spoiler skips it.)
 dotnet run --project src/DinoRand.Cli -- --install /path/to/DinoCrisis --out mod_dinorand --seed 12345
 ```
 
@@ -101,7 +103,7 @@ Outputs:
 
 `src/DinoRand.App.Avalonia` is the GUI (Avalonia 12, `net8.0`); it builds to
 **`DinoRand.Avalonia`** and runs on Windows, Linux and macOS. It is the sole GUI front-end (the
-former WPF `.App` was retired — see [AVALONIA-PORT.md](docs/decisions/cross/AVALONIA-PORT.md)). From the repo root
+former WPF `.App` was retired). From the repo root
 with the .NET 8 SDK installed:
 
 ```bash
@@ -123,6 +125,8 @@ runtime installed to launch. For a release, use `scripts/publish-release.sh` to 
 **self-contained, single-file** executables that run with **no .NET runtime installed**:
 
 ```bash
+dotnet restore src/DinoRand.Cli --locked-mode
+dotnet restore src/DinoRand.App.Avalonia --locked-mode
 scripts/publish-release.sh                 # default: win-x64 (Avalonia GUI + CLI)
 scripts/publish-release.sh linux-x64       # Avalonia GUI + CLI
 scripts/publish-release.sh win-x64 osx-arm64 linux-x64   # several RIDs at once
@@ -157,8 +161,8 @@ USER-GUIDE "Archipelago" section.
 
 Branch off `main` and open a PR — `main` is protected, and CI (`build-test-coverage`)
 runs the tests behind a coverage floor. New features need tests that hold or raise it.
-Releases are cut by pushing a `release/vX.Y.Z` branch, which auto-builds and publishes
-the binaries. Full details: **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+Releases are cut only from a protected, existing `vX.Y.Z` or SemVer prerelease tag whose checked
+commit is already in `main`. Full details: **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ## Legal
 
@@ -175,9 +179,8 @@ DinoRand deliberately targets the **DRM-free GOG build** and patches only gamepl
 circumvents any technological protection measure (cf. DMCA §1201). The Steam re-release (wrapped in
 "The Enigma Protector" DRM) is unsupported for that reason.
 
-DinoRand's own source code is released under the [MIT License](LICENSE), which covers
-**only** the project's authored code, documentation, and data — it grants no rights in
-Capcom's intellectual property. Third-party components are credited in
+DinoRand's own source code is released under the [MIT License](LICENSE). Project scope and
+non-affiliation terms are in [LEGAL.md](LEGAL.md), and third-party components are credited in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 Provided for interoperability and personal use with a game you own. This is **not legal

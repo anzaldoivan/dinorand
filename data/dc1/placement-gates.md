@@ -6,8 +6,8 @@ by `tools/scd_re/extract_logic.py`). This ledger owns the *placement* axis — t
 is a `test → 0x0e` script flag-gate (`tools/scd_re/door_catalog.py`, STATIC-SCD-RE cont.42/45,
 GRAPH-LOGIC-PARITY §8a–§8e).
 
-The raw placement census is 120 flag-gated doors, dominated by a broad scenario-phase flag (`2:4` set in
-`030B`) the dominance heuristic mis-attributes to ~20 early-map doors (both directions of `0102↔0110`,
+The raw placement census is 120 flag-gated doors, dominated by a broad scenario-phase flag historically
+attributed to `030B` that the dominance heuristic mis-attributes to ~20 early-map doors (both directions of `0102↔0110`,
 `0110↔010A`, `0101↔0111`, …). Promoting those as gates would inject false constraints, so a **conservative
 filter** keeps only trustworthy per-door **monotonic** gates:
 
@@ -15,9 +15,9 @@ filter** keeps only trustworthy per-door **monotonic** gates:
 > `skip-if-false` `test_branch` (door placed only when the flag is SET) with an **external** producer
 > room, **none** unconditional, **none** `skip-if-true` (open-by-default variant), a **single** gate
 > flag, that flag gates **≤ 3** destinations (fan-out cap — `2:4` fans out to ~13), **and** that flag is
-> **not a §8c toggled register** (`2:4/2:5/2:6` elevator, `3:33/34/57` runtime — these are set by native
-> elevator code the SCD census can't see, so a monotonic `requiresRoom` would wrongly gate them; §8c/§8d
-> deferred them, "author nothing yet").
+> **not a transient/native register** (`2:4/2:5/2:6` selection registers, `3:33/34/57` runtime — these
+> are not monotonic progression flags, and their native consumers are case-specific; §8c/§8d deferred
+> them, "author nothing yet").
 
 Run: `PYTHONPATH=tools/scd_re python3 tools/scd_re/door_catalog.py --audit` (needs the local install).
 It cross-checks the trusted set against the authored `map.json` door overlay and **asserts every trusted
@@ -42,26 +42,23 @@ lock-axis external gate `0108→0113` (type-1, flag `9:6`) lives in `map-require
 
 A native-mechanism analog to the `0400→0401` communication-room gate above (§8d): where the real unlock is
 a **native** check with **no readable SCD flag**, model it on the ROOM whose event produces the unlock —
-not on a refuted item/register. Two static native traces this session settled both mechanisms (agents,
-`DINO.exe`):
+not on a refuted item/register. The current ledger combines cont.71's facility-elevator proxy with
+cont.46's large-elevator free witness; the exact facility native predicate remains open:
 
-- **Facility elevator (`0113` → floors) — ID-card forge, native.** The `2:4/2:5/2:6` door flags are the
-  floor-select REGISTER (native panel `0x4466BC` + `st30b` writes; §8c/§8d "author nothing" **stands for
-  the register**). The real gate is the card forge: `st113` sub15's card reader tests items `0x36/0x3B/0x34`
-  but its output flags `0:55/0:56` are **read by nothing** — the check is native/CE-only. So it is modelled
-  on the forge ROOM per the decoded chain (`DC1-ELEVATOR-ID-CARD-GATE.md`).
+- **Facility elevator (`0113` → floors) — native predicate unresolved.** The decoded script side shows
+  `st113` sub15 testing card items `0x36/0x3B/0x34` and writing `0:55/0:56`, but no corpus reader for
+  those outputs is known. The generic menu handlers that write `2:4/2:5/2:6` are selection-register
+  handlers, not by themselves proof of an elevator gate. The current `requiresRoom` entries therefore
+  remain conservative forge-room proxies; the byte-true card-to-floor predicate is **[unverified]**.
 - **Big/cargo elevator (`0405↔060F↔030C/0600`) — power, native.** Gated on the generator-power producer
   room `030B` (power restored via BG Room B1 Key `0x2F`, `010D→030B`). **Erratum (2026-07-15, user-directed):**
   the B3 stop `060F→0600` needs an ADDITIONAL gate. `030B` is reachable from the start (`010D→030B` via the
   B1 Room Key `0x2F`), so `requiresRoom:[030B]` alone did NOT require the Entrance Key — leaving a **phantom
   descent**: the engine reached Carrying Out Room B3 `0600` (and the whole B3 endgame + goal `060D`) with only
   `0x2F`, no Entrance Key, no DDK discs (measured: goal reachable holding all keys minus `{2E,63,6A}`). In the
-  real game the Large Elevator's B3 stop only works after the **heliport descent** (Entrance Key → `0400` →
-  `0401` → transport, the excluded `0401↔060D` link) powers the B3 backup generator (`0601`). Since the
-  transport link is excluded from the graph and the B3-generator flag is armed inside `0600`/`0601` (circular
-  — `0:184` "Carrying Out Room B3 event" set by `0600` sub20/31; `0601` sets no readable flag), the descent is
-  modelled on the heliport waypoint `0401` (Entrance-Key-gated, the entry to the transport descent). Same shape
-  as the elevator-hall forge gates: a free-looking door gated on its producer/prerequisite ROOM.
+  real game the Large Elevator's B3 stop only works after the **heliport route** reaches Liaison Elevator
+  No.1 (`0401→0402→0403→0409→040A→040C`). The gate therefore preserves the existing generator-power
+  and heliport prerequisites and adds `040C` as the hard activation room.
 
 | Door room | Dest | Real gate | Authored | Provenance |
 |---|---|---|---|---|
@@ -70,7 +67,7 @@ not on a refuted item/register. Two static native traces this session settled bo
 | 0113 | 0604 (B3) | Kirk-card forge | ✅ `requiresRoom:[0506]` | same endgame forge |
 | 0405 | 060F | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
 | 060F | 030C | generator power | ✅ `requiresRoom:[030B]` | power @`030B` |
-| 060F | 0600 | generator power **+ heliport descent** | ✅ `requiresRoom:[030B, 0401]` | power @`030B`; B3 stop only unlocks after the heliport descent (Entrance Key → `0400` → `0401`) powers the B3 generator — closes the phantom bypass (see erratum above) |
+| 060F | 0600 | generator power **+ Liaison Elevator No.1 activation** | ✅ `requiresRoom:[030B, 0401, 040C]` | power @`030B`; heliport route `0401→0402→0403→0409→040A→040C` enables the Large Size Elevator B3 stop |
 
 Only the `0113→floor` **descent** edges are gated; the inter-floor elevator edges (`0309↔050B↔0604`) are
 left to their door-record logic — gating them **breaks the vanilla key ordering** (measured: `Verify`
@@ -99,14 +96,14 @@ to neither ledger; the earlier "Entrance Key is free / reachable another way" no
 
 | Door room | Dest | Flag | Verdict |
 |---|---|---|---|
-| 0405 | 060F | 2:6 | **FREE** — live CE capture (STATIC-SCD-RE cont.46): user rode `0405→060F→030C` and back with `2:4/2:5/2:6 == 0` the whole time, without entering 030B, and the ride set none of them. The door is **present at `2:6==0`** ⇒ skip-if-**true** (open at start), refuting the `door_catalog.py` "skip-if-false `2:6`" decode as a passability constraint and confirming §8d. `2:4/2:5/2:6` are runtime UI/cursor registers (`0x446664` menu object writes grp2 b4–7 from input) + the elevator's own state is byte `[0x677F5D]`, **not** the g2 bank — so no monotonic progression to gate on. Verdict (a) impossible; `requiresRoom=[030B]` NOT authored (would gate a free passage). |
+| 0405 | 060F | 2:6 | **FREE** — live CE capture (STATIC-SCD-RE cont.46): user rode `0405→060F→030C` and back with `2:4/2:5/2:6 == 0` the whole time, without entering 030B, and the ride set none of them. The door is **present at `2:6==0`** ⇒ skip-if-**true** (open at start), refuting the `door_catalog.py` "skip-if-false `2:6`" decode as a passability constraint and confirming §8d. `2:4/2:5/2:6` are runtime UI/cursor registers (`0x446664` menu object writes grp2 b4–7 from input); `[0x677F5D]` is generic interaction-session state, **not** the g2 bank or an established elevator-only state — so no monotonic progression gate is proven. Verdict (a) impossible; `requiresRoom=[030B]` NOT authored (would gate a free passage). |
 | 060F | 030C | 2:5/2:4 | **FREE** — same capture; both `060F→030C` and reciprocal `030C→060F` traversed at `2:x==0`, both directions, no 030B, no flag written. |
 
 These are no longer `CrossRegionFreeBridges` phantoms *to resolve* — they are confirmed genuinely-free topology (§8e), matching §8d. Left unauthored by design.
 
 ## Excluded as broad-flag noise (NOT gates)
 
-21 doors gated on flag **`2:4`** (set in `030B`, fan-out ~13) or another native-writer register: both
+21 doors gated on flag **`2:4`** (historically attributed to `030B`, fan-out ~13) or another native-writer register: both
 directions of `0102↔0110`, `0105↔0110`, `0110↔010A`, `0101↔0111`, `0108↔0111`, `0300→030C`, `0106↔0205`,
 `0501↔0502`, `0509↔050A`, `0405↔060F`, plus `0306→0304` (`0:119`, fan-out 4). A single room-init guard /
 elevator register, not a per-door lock — these doors are walkable from game start, long before `030B`.
@@ -224,14 +221,56 @@ vanilla stays beatable via the `0113` elevator). The pre-existing `0309→0306` 
 > `0400`) the engine reached the whole B2/B3 hub and the goal **without the Entrance Key** (measured: goal
 > reachable holding all keys minus `0x2e`). Real game: the shuttle only reaches the deep floors after the
 > heliport route — the giant elevator's B3 stop needs `0401` power, and the Third Energy Control Room
-> `050B` (the shuttle's B2 stop) is itself reachable only via the heliport. Same shape as the big-elevator
-> fix. **AUTHORED**: `0309→050B` requiresRoom `[0401]` (shuttle B2 stop needs the heliport) and
+> `050B` (the shuttle's B2 stop) is itself reachable only after the heliport and Library progression.
+> Same shape as the big-elevator fix. **AUTHORED**: `0309→050B` requiresRoom `[0401,050F]` (shuttle B2
+> stop needs the heliport and prior Dr. Kirk's Library access; `050F` added 2026-07-24, user-directed) and
 > `0309→0604` requiresRoom `[050B]` (shuttle B3 stop needs Third Energy Control). Post-fix the whole B2/B3
 > deep facility (incl. `050B/0604/0600/0608/0609/060D`) leaves every single-key oracle probe — it appears
 > only when the Entrance Key is held. So the Entrance Key is now a hard B3 requirement. The `0113→050B` /
 > `0113→0604` forge edges (reqRoom `0506`) need no change: `0506` is itself inside the now-gated hub.
-> Vanilla still beatable (`0401` reachable with the Entrance Key). Guard:
-> `KeyItemPlacerTests.RealInstall_DeepFacility_RequiresTheEntranceKey`.
+> The shuffled forward-fill model remains beatable. The
+> `0401→0402→0403→0409→040A→040C→0405→060F→0600→0601→0602` route now records the real first
+> descent and generator activation without a C.O.-key self-lock. The vanilla sphere model continues
+> through the free General Weapons Storage variants to `0606`; do not restore `0401↔0606`.
+> Guards: `KeyItemPlacerTests.RealInstall_DeepFacility_RequiresTheEntranceKey` and
+> `RealInstall_CoAreaKey_IsRequiredBeforePassagewayCanReachRestStation`.
+
+> **REFINEMENT (2026-07-24, user-directed) — Library-gated shuttle + Rest Station boundary.**
+> `0309→050B` now requires both `[0401,050F]`, and Rest Station `0604` has a room-level
+> `requiresRoom:[0603]` backstop so none of its alternate graph inbounds bypass the C.O.-locked
+> `0600→0603` passage. No `0401↔0606` edge is authored: Passageway to the Heliport has no physical
+> door to Transport Passageway. Exact-seed characterization for `DINO-AetwArn_H_8vBw` now places
+> `0x31` in `0502`, reachable without itself; the reported `0606→050F` row no longer reproduces.
+
+> **REFINEMENT (2026-07-24, user-directed) — Carrying Out Room bootstrap.**
+> `0600→0602` does **not** require the C.O. Area Key. It now has
+> `requiresRoom:[0601]`: entering Backup Generator Room B3 enables the Control Room B3 route.
+> This removes the direct C.O.-key self-lock.
+>
+> **REFINEMENT (2026-07-24, user-directed) — C.O. Area Key boundary.**
+> The C.O. Area Key gates only `0600→0603`. The authored `0x31` requirement on
+> `0600→060F` was erroneous and has been removed; the protected reverse Large Size Elevator gate
+> `060F→0600 requiresRoom:[030B,0401,040C]` remains intact. This correctly models returning from
+> Carrying Out Room B3 to the Large Size Elevator without using the C.O. Area Key.
+>
+> **REFINEMENT (2026-07-24, user-directed + same-build static room proof) — Key Card Lv. A boundary.**
+> Key Card A gates the Transport Passageway connections `0606↔0607` (Special Weapons Storage) and
+> `0606↔0611` (Heliport Transport Passageway), not either General Weapons Storage state. Static room
+> records prove `0602→0605/0615`, `0605/0615→0606`, and the reverse storage directions are TYPE `00`,
+> lock `00`; the four authored `requires:[0x3A]` overlays on `0602/0606→0605/0615` were erroneous and
+> are removed. The raw forward `0606→0607` and both `0606↔0611` records already encode TYPE `08`;
+> `0607→0606` receives the missing authored reverse gate. Vanilla spheres now collect the C.O. Area Key
+> in `0606` at sphere 5, Key Card A in `050E` at sphere 6, and complete all 96 rooms. Guards:
+> `Dc1ReachabilityOracleTests.CommittedOracle_KeyCardADoesNotGateGeneralWeaponsStorageRoute`,
+> `KeyItemPlacerTests.RealInstall_KeyCardADoesNotGateGeneralWeaponsStorageRoute`, and
+> `RealInstall_VanillaOverlay_CollectsCoAreaKeyBeforeKeyCardA`.
+>
+> **CLARIFICATION (2026-07-24, user-directed) — Grenade Gun Parts pickup.**
+> Parts Storage room `0507` remains reachable independently of this rule, but its vanilla GG Parts
+> pickup (decoded item `0x0F`, record `0x41410`) requires Key Card Lv. A `0x3A`. This is authored as
+> `0507.items["0f"].requires:[0x3A]`, so it gates collection of that location without adding a door or
+> room-entry requirement. Guards: `Dc1MapContractTests.Map_0507_GrenadeGunParts_RequiresKeyCardA` and
+> `KeyItemPlacerTests.RealInstall_PartsStorageGrenadeGunParts_RequiresKeyCardA`.
 
 ## `010D` An. Aid scatter-spot gate (2026-07-15, user-directed, NO code trace)
 
@@ -335,7 +374,7 @@ the `010D`/`0101`/`0104` entries above):
 | `0109` (Lecture Room) | `requiresRoom:[0101]` | "Gail cutscene" trigger site — closes the B1 Room Key phantom-reach directly. |
 | `0105→0307` door | `requiresRoom:[030B,0109]` (was `[030B]`) | Control Room Hall shutter to Medical Room Hallway — the 030B+Gail-cutscene combination. |
 | `0112→0404` door | `requiresRoom:[0106,0109]` (was `[0106]`) | The Backyard → Large Size Elevator Passageway — same combination, the other alternate path. |
-| `0400→0401` door | `requiresRoom:[0205,0109]` (was `[0205]`) | **The decisive one.** `0401` (Passageway to the Heliport) already gates the *entire* B2/B3 deep facility transitively (`0309.doors["050B"].requiresRoom=[0401]`, `.doors["0604"].requiresRoom=[050B]`) per the pre-existing Entrance-Key/heliport work — so adding `0109` here alone closes `050B`/`0604`/`0609`/`060B`/the whole deep facility back to `0101`/`0202`/the H-pair, without touching those downstream edges directly. |
+| `0400→0401` door | `requiresRoom:[0205,0109]` (was `[0205]`) | **The decisive one.** `0401` (Passageway to the Heliport) already gates the *entire* B2/B3 deep facility transitively (`0309.doors["050B"].requiresRoom=[0401,050F]`, `.doors["0604"].requiresRoom=[050B]`) per the Entrance-Key/heliport + Library work — so adding `0109` here alone closes `050B`/`0604`/`0609`/`060B`/the whole deep facility back to `0101`/`0202`/the H-pair, without touching those downstream edges directly. |
 
 **Measured effect (large):** `all-minus-ddk-62`/`-69` reach count dropped from 96 → **46** (half the map)
 — confirms the DDK H-pair is now a transitive hard requirement for the **goal room `060D` itself**

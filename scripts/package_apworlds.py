@@ -7,6 +7,7 @@ Run by the release workflow and locally for verification:
 
     python3 scripts/package_apworlds.py
 """
+import stat
 import sys
 import zipfile
 from pathlib import Path
@@ -23,9 +24,13 @@ def package(world_dir: Path) -> Path:
         if p.is_file() and p.suffix != ".pyc" and "__pycache__" not in p.parts
     )
     DIST.mkdir(exist_ok=True)
-    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         for p in files:
-            z.write(p, Path(name) / p.relative_to(world_dir))
+            archive_name = (Path(name) / p.relative_to(world_dir)).as_posix()
+            info = zipfile.ZipInfo(archive_name, (2020, 1, 1, 0, 0, 0))
+            info.external_attr = (stat.S_IFREG | 0o644) << 16
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, p.read_bytes(), compresslevel=9)
 
     # Fail the release rather than ship a zip AP can't load.
     names = zipfile.ZipFile(out).namelist()

@@ -21,6 +21,7 @@ TESTS_EXIT=0
 dotnet test \
   --settings "$SETTINGS" \
   --collect:"XPlat Code Coverage" \
+  --no-restore \
   --results-directory "$RESULTS_DIR" \
   || TESTS_EXIT=$?
 

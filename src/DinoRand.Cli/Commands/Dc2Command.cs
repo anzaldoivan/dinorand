@@ -8,6 +8,7 @@ using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Spoiler;
 using DinoRand.Randomizer.Voice;
 
 internal sealed partial class CliApplication
@@ -421,10 +422,9 @@ internal sealed partial class CliApplication
         // native aquatic rooms (ST700/702/703/704).
         dc2Config.Dc2SuppressMosaKnockback = argv.Contains("--dc2-mosa-no-knockback");
 
-        // Behavior-layer OOB fix (DC2-MOSA-GRAB-SUPPRESS-PLAN.md §9, K106): rather than gate shared movement,
-        // --dc2-mosa-tail-to-bite patches Dino2.exe so an injected E80 Mosasaurus does its narrow bite instead
-        // of the OOB-causing wide-turn tail strike in land rooms, EXCEPT the native aquatic rooms
-        // (ST700/702/703/704). Changes WHICH behavior the mosa runs; touches no player-movement code.
+        // Compatibility flag name: --dc2-mosa-tail-to-bite now cancels the user-labelled tail-looking
+        // selector-6 missed-grab continuation in non-native land rooms. Native aquatic rooms
+        // (ST700/702/703/704) replay the displaced instructions; successful-contact substates are untouched.
         dc2Config.Dc2RedirectMosaTail = argv.Contains("--dc2-mosa-tail-to-bite");
 
         // Killable injected Triceratops (RCA §7b): --dc2-triceratops-killable remaps E70's out-of-range
@@ -440,10 +440,11 @@ internal sealed partial class CliApplication
         bool dc2EmitSpoiler = !argv.Contains("--no-spoiler");
         var dc2Result = new Dc2RandomizerRunner(dc2Game).Run(installDir, dc2Out, dc2Seed, dc2Config,
                                                              dc2EmitSpoiler);
+        var dc2SpoilerFileName = SpoilerLogBuilder.FileNameFor(SeedString.Encode(dc2Seed, dc2Config));
         Console.WriteLine($"seed {dc2Seed} → {dc2Result.RoomCount} DC2 rooms loaded, "
             + $"{dc2Result.RoomsWritten} randomized → {Path.GetFullPath(dc2Result.OutputDir)}");
         if (dc2EmitSpoiler)
-            Console.WriteLine($"spoiler: {Path.GetFullPath(Path.Combine(dc2Result.OutputDir, DinoRand.Randomizer.Spoiler.SpoilerLogBuilder.FileName))} "
+            Console.WriteLine($"spoiler: {Path.GetFullPath(Path.Combine(dc2Result.OutputDir, dc2SpoilerFileName))} "
                 + "(debug block on top is spoiler-free; --no-spoiler to skip)");
         foreach (var line in dc2Result.Log)
             Console.WriteLine($"  {line}");
@@ -513,20 +514,19 @@ internal sealed partial class CliApplication
             }
         }
 
-        // Behavior-layer Mosasaurus tail-redirect exe lever (hook + code cave at the attack-pattern hub) — same
-        // in-place, .bak-protected contract. Auto-applied whenever the run can inject a Mosasaurus (water-level
-        // swaps / fixed-mosa pin), or forced on by --dc2-mosa-tail-to-bite. Harmless no-op when no Mosasaurus is
-        // actually placed.
+        // Mosasaurus missed-grab continuation cancellation exe lever — same in-place, .bak-protected contract.
+        // Auto-applied whenever the run can inject a Mosasaurus (water-level swaps / fixed-mosa pin), or forced
+        // on by the compatibility flag --dc2-mosa-tail-to-bite. Harmless no-op when no Mosasaurus is placed.
         if (Dc2MosaTailRedirectInstaller.WantedFor(dc2Config))
         {
             try
             {
                 var outcome = Dc2MosaTailRedirectInstaller.Apply(installDir, restore: false, Console.WriteLine);
-                Console.WriteLine($"mosa-tail-to-bite exe patch: {outcome}");
+                Console.WriteLine($"mosa-missed-grab-cancel exe patch: {outcome}");
             }
             catch (IOException)
             {
-                Console.Error.WriteLine("mosa-tail-to-bite exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
+                Console.Error.WriteLine("mosa-missed-grab-cancel exe patch NOT applied: Dino2.exe is locked — close the game and re-run.");
             }
         }
 

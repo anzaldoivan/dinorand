@@ -120,8 +120,7 @@ what is locked vs unresolved.
    from a quadruped from a theropod (this weakens the DC2-FEASIBILITY "obj_cnt = species
    discriminator" claim for DC2). **The EXE enemy-id table was checked and does NOT resolve
    it:** `Dino2.exe` has a filename pointer table (id↔E-file, order E00…EA0, at VA `0x71b3xx`)
-   but **zero creature-name strings**, so it maps id→*filename*, never id→*creature* (see
-   [`docs/reference/dc2/enemies/EXE-ENEMY-TABLE.md`](../../docs/reference/dc2/enemies/EXE-ENEMY-TABLE.md) and `enemies.json` →
+   but **zero creature-name strings**, so it maps id→*filename*, never id→*creature* (see `enemies.json` →
    `mapping.exe_id_table`). Resolving the 9 still needs the in-room spawn decode or a runtime
    RAM dump. See `enemies.json` → `mapping`.
 3. ~~**All numeric item ids.**~~ **RESOLVED (K75):** the full 58-entry catalog (`0x704260`)

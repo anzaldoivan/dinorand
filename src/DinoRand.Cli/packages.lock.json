@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net8.0": {
+      "Archipelago.MultiClient.Net": {
+        "type": "Transitive",
+        "resolved": "6.7.1",
+        "contentHash": "wheDMl5C0e175RvuY+E3oDY13myaa7f2pRRjOg9PgcbOJApVu3QT62mQ46jYJ0sn/X7Fu4bdVVxZ2bx0vwncBQ=="
+      },
+      "NVorbis": {
+        "type": "Transitive",
+        "resolved": "0.10.5",
+        "contentHash": "o+IptCG4Avze39HrGeztC+xIp6fOOwGVAwkoa1J++4Ji1WmZ+KIKlFl5wsgxsXqBkmdpfs/vFSUproiLKYa2bw==",
+        "dependencies": {
+          "System.Memory": "4.5.3",
+          "System.ValueTuple": "4.5.0"
+        }
+      },
+      "System.Memory": {
+        "type": "Transitive",
+        "resolved": "4.5.3",
+        "contentHash": "3oDzvc/zzetpTKWMShs1AADwZjQ/36HnsufHRPcOjyRAAMLDlu2iD33MBI2opxnezcVUtXyqDXXjoFMOU9c7SA=="
+      },
+      "System.ValueTuple": {
+        "type": "Transitive",
+        "resolved": "4.5.0",
+        "contentHash": "okurQJO6NRE/apDIP23ajJ0hpiNmJ+f0BwOlB/cSqTLQlw5upkf+5+96+iG2Jw40G1fCVCyPz/FhIABUjMR+RQ=="
+      },
+      "dinorand.apclient": {
+        "type": "Project",
+        "dependencies": {
+          "Archipelago.MultiClient.Net": "[6.7.1, )"
+        }
+      },
+      "dinorand.fileformats": {
+        "type": "Project"
+      },
+      "dinorand.randomizer": {
+        "type": "Project",
+        "dependencies": {
+          "DinoRand.ApClient": "[0.6.0, )",
+          "DinoRand.FileFormats": "[0.6.0, )",
+          "NVorbis": "[0.10.5, )"
+        }
+      }
+    },
+    "net8.0/linux-x64": {},
+    "net8.0/osx-arm64": {},
+    "net8.0/win-x64": {}
+  }
+}

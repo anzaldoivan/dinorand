@@ -28,10 +28,40 @@ public sealed record SpoilerDocument(SpoilerDebugInfo Debug, IReadOnlyList<Spoil
 /// </summary>
 public static class SpoilerLogBuilder
 {
-    /// <summary>The spoiler file's name in the output dir. Not a room <c>.dat</c> and not under a
-    /// loose-file subtree, so <c>GameInstaller.Install</c> never copies it into the game (like
-    /// <c>log_dinorand.txt</c>).</summary>
-    public const string FileName = "SPOILER.md";
+    /// <summary>The legacy fixed spoiler name removed from a reused output directory.</summary>
+    public const string LegacyFileName = "SPOILER.md";
+
+    /// <summary>Build the root-level spoiler file name for the canonical encoded seed string.</summary>
+    public static string FileNameFor(string seedString) => $"{seedString}_spoiler.md";
+
+    /// <summary>Whether <paramref name="fileName"/> matches the generated per-seed spoiler convention.</summary>
+    public static bool IsGeneratedFileName(string fileName) =>
+        fileName.StartsWith("DINO-", StringComparison.OrdinalIgnoreCase)
+        && fileName.EndsWith("_spoiler.md", StringComparison.OrdinalIgnoreCase)
+        && fileName.Length > "DINO-".Length + "_spoiler.md".Length;
+
+    /// <summary>Remove only root-level generated spoiler files and the legacy fixed name.</summary>
+    public static int RemoveStaleFiles(string outputDir)
+    {
+        if (!Directory.Exists(outputDir)) return 0;
+
+        int removed = 0;
+        foreach (var path in Directory.EnumerateFiles(outputDir, "*", SearchOption.TopDirectoryOnly))
+        {
+            var fileName = Path.GetFileName(path);
+            if (!fileName.Equals(LegacyFileName, StringComparison.OrdinalIgnoreCase)
+                && !IsGeneratedFileName(fileName))
+                continue;
+
+            try
+            {
+                File.Delete(path);
+                removed++;
+            }
+            catch (IOException) { }
+        }
+        return removed;
+    }
 
     /// <summary>The unmissable boundary between the shareable debug block and the spoilers.</summary>
     public const string SpoilerMarker = "# ⚠ SPOILERS BELOW";

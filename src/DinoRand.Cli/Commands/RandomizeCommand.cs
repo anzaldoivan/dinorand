@@ -8,6 +8,7 @@ using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Spoiler;
 using DinoRand.Randomizer.Voice;
 
 internal sealed partial class CliApplication
@@ -153,15 +154,16 @@ internal sealed partial class CliApplication
         }
 
         var runner = new RandomizerRunner(new DinoCrisis1());
-        // --no-spoiler suppresses SPOILER.md only (docs/decisions/cross/SPOILER-LOG-PLAN.md); every game file is
+        // --no-spoiler suppresses the per-seed spoiler file only (docs/decisions/cross/SPOILER-LOG-PLAN.md); every game file is
         // byte-identical either way (the spoiler is a pure post-write projection).
         bool emitSpoiler = !argv.Contains("--no-spoiler");
         var result = runner.Run(install, outDir, seed, config, emitSpoiler);
+        var spoilerFileName = SpoilerLogBuilder.FileNameFor(SeedString.Encode(seed, config));
 
         Console.WriteLine($"seed {seed} → {result.RoomsWritten} room files, {result.RoomCount} rooms");
         Console.WriteLine($"output: {Path.GetFullPath(result.OutputDir)}");
         if (emitSpoiler)
-            Console.WriteLine($"spoiler: {Path.GetFullPath(Path.Combine(result.OutputDir, DinoRand.Randomizer.Spoiler.SpoilerLogBuilder.FileName))} "
+            Console.WriteLine($"spoiler: {Path.GetFullPath(Path.Combine(result.OutputDir, spoilerFileName))} "
                 + "(debug block on top is spoiler-free; --no-spoiler to skip)");
 
         if (argv.Contains("--install-to-data"))

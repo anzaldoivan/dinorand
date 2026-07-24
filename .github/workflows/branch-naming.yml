@@ -2,7 +2,7 @@ name: branch-name
 
 # Enforces the branch-naming policy at the merge gate. GitHub's `branch_name_pattern` ruleset rule
 # is Organization-only, and this is a User repo, so naming is gated here instead: a PR into `main`
-# must come from a `feature/*` or `release/v*` branch. Make the `branch-name` job a REQUIRED status
+# must come from a `feature/*` branch. Make the `branch-name` job a REQUIRED status
 # check on main (scripts/setup-rulesets.sh) so a non-conforming PR cannot merge. This gates merges;
 # it cannot block creating a misnamed branch locally (that needs an Organization ruleset).
 on:
@@ -17,15 +17,15 @@ jobs:
     name: branch-name
     runs-on: ubuntu-latest
     steps:
-      - name: Head branch must be feature/* or release/vX.Y.Z
+      - name: Head branch must be feature/*
         env:
           HEAD_REF: ${{ github.head_ref }}
         run: |
           case "$HEAD_REF" in
-            feature/*|release/v*)
+            feature/*)
               echo "✓ '$HEAD_REF' matches the naming policy." ;;
             *)
               echo "::error::Branch '$HEAD_REF' violates the naming policy." \
-                   "PRs into main must come from 'feature/<name>' or 'release/vX.Y.Z'."
+                   "PRs into main must come from 'feature/<name>'."
               exit 1 ;;
           esac

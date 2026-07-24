@@ -299,15 +299,14 @@ public sealed class RandomizerConfig
     public bool Dc2SuppressMosaKnockback { get; set; }
 
     /// <summary>
-    /// DC2 only (off by default). Stop a randomizer-injected E80 Mosasaurus from flinging the player OUT OF
-    /// BOUNDS in land rooms by changing WHICH behavior it runs: patches Dino2.exe with a hook + code cave at
-    /// the E80 attack-pattern hub (state-1 <c>0x43fc80</c>) that, for a TYPE-0x0a actor outside the native
-    /// Mosasaurus rooms (ST700/702/703/704), redirects the wide-turn tail strike (attack-pattern
-    /// <c>byte[esi+0x55]==2</c>) to the narrow bite (pattern 0), so the mosa never performs the OOB move.
-    /// Touches no player-movement code; the four native aquatic encounters stay byte-identical. Applied in
-    /// place at install (backup-protected .bak). Distinct from the grab (<see cref="Dc2SuppressMosaGrab"/>)
-    /// and knockback (<see cref="Dc2SuppressMosaKnockback"/>) levers — the behavior-layer approach, K106.
-    /// docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md §9. CLI <c>--dc2-mosa-tail-to-bite</c>.
+    /// DC2 only (off by default). Cancel the user-labelled tail-looking continuation after an injected E80
+    /// Mosasaurus misses its selector-6 grab in non-native land rooms: patches Dino2.exe at the selector-6
+    /// B-handler's ref-5 transition so the original cleanup runs without binding that continuation. The four
+    /// native aquatic rooms (ST700/702/703/704) replay the displaced instructions byte-identically, and the
+    /// successful-contact substates remain untouched. Applied in place at install (backup-protected .bak).
+    /// The legacy property name is retained for compatibility. Distinct from the grab
+    /// (<see cref="Dc2SuppressMosaGrab"/>) and knockback (<see cref="Dc2SuppressMosaKnockback"/>) levers.
+    /// docs/decisions/dc2/enemies/DC2-MOSA-GRAB-SUPPRESS-PLAN.md §10.6. CLI <c>--dc2-mosa-tail-to-bite</c>.
     /// </summary>
     public bool Dc2RedirectMosaTail { get; set; }
 

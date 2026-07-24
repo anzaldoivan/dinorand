@@ -55,6 +55,9 @@ namespace DinoRand.App
         private readonly IFilePicker _filePicker;
         private readonly IDialogs _dialogs;
         private readonly Func<IClipboard> _clipboard;
+        private readonly IFileBrowser _fileBrowser;
+        private readonly Func<string> _workingModDir;
+        private string _lastSuccessfulSpoilerPath;
 
         private AppSeed _appSeed = AppSeed.Random();
         private readonly AppSettings _settings;
@@ -82,12 +85,17 @@ namespace DinoRand.App
         // tests pass an in-memory AppSettings so they neither read nor depend on a real settings file.
         // <paramref name="apRunner"/> / <paramref name="uiPost"/> are the AP connect tab's two seams
         // (a fake runner + a synchronous post make the connect/disconnect state machine unit-testable).
+        // <paramref name="fileBrowser"/> and <paramref name="workingModDir"/> keep Browse Files
+        // deterministic in unit tests without launching an OS file manager.
         public MainWindowViewModel(IFilePicker filePicker, IDialogs dialogs, Func<IClipboard> clipboard,
-            AppSettings settings = null, ApRunner apRunner = null, Action<Action> uiPost = null)
+            AppSettings settings = null, ApRunner apRunner = null, Action<Action> uiPost = null,
+            IFileBrowser fileBrowser = null, Func<string> workingModDir = null)
         {
             _filePicker = filePicker;
             _dialogs = dialogs;
             _clipboard = clipboard;
+            _fileBrowser = fileBrowser ?? new OsFileBrowser();
+            _workingModDir = workingModDir ?? (() => WorkingModDir);
             _settings = settings ?? AppSettings.Load();
             _apRunner = apRunner ?? Dc1ApRunner.Run;
             _uiPost = uiPost ?? (a => Dispatcher.UIThread.Post(a));
@@ -122,7 +130,10 @@ namespace DinoRand.App
             _suspend = false;
 
             if (slice.LastSeed is { } last && AppSeed.TryParse(last, out var parsed))
+            {
                 _appSeed = NormalizeSeed(parsed);
+                _lastSuccessfulSpoilerPath = SpoilerPathFor(_workingModDir(), _appSeed.Seed, _appSeed.Config);
+            }
             else
                 _appSeed = AppSeed.Random();
 
