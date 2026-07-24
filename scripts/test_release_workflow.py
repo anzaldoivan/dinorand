@@ -5,22 +5,23 @@ from pathlib import Path
 
 
 WORKFLOW = Path(__file__).parents[1] / ".github" / "workflows" / "release.yml"
+CI_WORKFLOW = Path(__file__).parents[1] / ".github" / "workflows" / "ci.yml"
 
 
 class ReleasePublishWorkflowTests(unittest.TestCase):
     def test_release_commands_declare_repository_context(self):
         workflow = WORKFLOW.read_text(encoding="utf-8")
-        commands = [
-            (match.group("name"), match.group(0))
-            for match in re.finditer(
-                r"^\s*gh release (?P<name>create|upload|edit)\b.*$", workflow, re.MULTILINE
-            )
-        ]
+        commands = re.findall(r"^\s*gh release\s+\S+.*$", workflow, re.MULTILINE)
 
-        self.assertEqual([name for name, _ in commands], ["create", "upload", "edit"])
-        for name, command in commands:
-            with self.subTest(command=name):
+        self.assertEqual(len(commands), 3)
+        for command in commands:
+            with self.subTest(command=command.strip()):
                 self.assertIn('--repo "$GITHUB_REPOSITORY"', command)
+
+    def test_release_workflow_contract_runs_in_ci(self):
+        ci = CI_WORKFLOW.read_text(encoding="utf-8")
+
+        self.assertRegex(ci, r"(?s)python3 -m unittest.*?scripts/test_release_workflow\.py")
 
 
 if __name__ == "__main__":
