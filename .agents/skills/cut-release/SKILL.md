@@ -76,6 +76,33 @@ This command requires both approved game paths because it runs both `RealInstall
 
 7. **STOP before any push.** Show the commit, tag, changelog section, and build result, then get explicit user confirmation. After confirmation only, land the release commit on `main` through the approved repository path, verify the tag commit is an ancestor of freshly fetched `origin/main`, and push `vX.Y.Z`. Pushing that tag starts validation; never push a tag before this confirmation gate.
 
+8. **Verify the tag event after the approved push.** Do not assume that a successful tag push created a run. Check the workflow state and recent runs:
+   ```bash
+   gh workflow list --all --limit 100
+   gh workflow view release.yml
+   gh run list --workflow release.yml --limit 20
+   ```
+   `--all` is required because disabled workflows are hidden by default. Confirm that `release.yml` is active and that `gh run list` contains a run for `vX.Y.Z`; then watch that run to completion with `gh run watch RUN_ID --exit-status`. Use `gh run view RUN_ID --log-failed` for a failed run. This workflow has only a `push` trigger for `v*` tags, not `workflow_dispatch`, so enabling it does not replay a tag event that was missed while it was disabled.
+
+   If `release.yml` is disabled, stop. Before enabling it or taking any tag recovery action, and again immediately before a destructive recovery if time has elapsed, validate the unchanged local annotated tag and its `main` ancestry:
+   ```bash
+   set -euo pipefail
+   git fetch origin main
+   test "$(git cat-file -t refs/tags/vX.Y.Z)" = tag
+   tag_commit="$(git rev-parse --verify refs/tags/vX.Y.Z^{commit})"
+   git merge-base --is-ancestor "$tag_commit" origin/main
+   notes_file="$(mktemp /tmp/dinorand-release-recovery-notes-XXXXXX)"
+   PYTHONDONTWRITEBYTECODE=1 python3 scripts/release_validate.py \
+     --repository . --tag vX.Y.Z --notes-output "$notes_file"
+   rm -f "$notes_file"
+   ```
+   After those checks pass, obtain explicit user approval before enabling the workflow:
+   ```bash
+   gh workflow enable release.yml
+   gh workflow view release.yml
+   ```
+   Enabling is one approval; it is not approval to alter the remote tag. Because enabling does not replay the missed tag event, get a separate, explicit user approval naming the exact tag and unchanged annotated tag object before deleting and re-pushing it. Only then may the recovery use `git push origin :refs/tags/vX.Y.Z` followed by `git push origin refs/tags/vX.Y.Z`; never recreate, move, or force-update the local tag. The delete/re-push is destructive and is not covered by the earlier push approval. Recheck `gh workflow view release.yml` and `gh run list --workflow release.yml --limit 20` afterward, then watch the newly created run.
+
 ## Gotchas
 
 - If the version changes after the build or tag is prepared, update `VersionPrefix`, the Avalonia label, the changelog heading/reference, rebuild, and recreate the local tag.
