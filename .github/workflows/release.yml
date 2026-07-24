@@ -127,11 +127,11 @@ jobs:
           (cd release-assets && sha256sum -c SHA256SUMS)
           flags=()
           if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
-          gh release create "$RELEASE_TAG" --verify-tag --draft \
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
             --title "DinoRand $RELEASE_TAG" --notes-file release-metadata/NOTES.md "${flags[@]}"
           paths=()
           for name in "${expected[@]}"; do paths+=("release-assets/$name"); done
-          gh release upload "$RELEASE_TAG" "${paths[@]}"
+          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" "${paths[@]}"
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > draft-release.json
           python3 - "$VERSION" draft-release.json <<'PY'
           import json, sys
@@ -147,4 +147,4 @@ jobs:
           if not release["draft"] or actual != expected:
               raise SystemExit(f"draft completeness check failed: draft={release['draft']} assets={sorted(actual)}")
           PY
-          gh release edit "$RELEASE_TAG" --draft=false
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false
