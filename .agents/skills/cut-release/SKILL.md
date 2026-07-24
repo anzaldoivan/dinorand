@@ -14,6 +14,26 @@ The user wants to cut a release: "release vX.Y.Z", "bump the version", "generate
 - The tag's core version must equal the single `<VersionPrefix>` in `Directory.Build.props`. For `vX.Y.Z-rc1`, use `X.Y.Z` as `VersionPrefix`.
 - `CHANGELOG.md` must contain exactly one non-empty curated heading for the full tag version: `## [X.Y.Z]` (or the full prerelease version), optionally followed by ` — YYYY-MM-DD`. Generated notes are not a fallback.
 
+## HARD GATE: approval before real-install validation
+
+Do not run any test command that can discover or use a configured real game install until the user has explicitly authorized the exact real-install scope. The approval must name each game, the exact `DINORAND_DC1_DIR` and/or `DINORAND_DC2_DIR` path, the test command, and whether the test is allowed to read the install or must use a temporary copy. If that approval is absent, do not run the command.
+
+Before resolving or using any install path, read the gitignored `.env`. Use only `DINORAND_DC1_DIR` and `DINORAND_DC2_DIR` from it; do not use any other `.env` setting or search for an install elsewhere. State in the approval record whether the test touches the install or uses temporary copies. `RealInstallGate` reads the configured install and its pristine backups but does not write to them; its install/restore exercise writes only to temporary test trees.
+
+Any required-mode receipt and test-results directory must be dedicated to this run and outside the repository. After approval, and only after exporting the approved paths from `.env`, the safe required-mode command is:
+
+```bash
+DINORAND_DC1_DIR="${DINORAND_DC1_DIR:?approved path read from .env}" \
+DINORAND_DC2_DIR="${DINORAND_DC2_DIR:?approved path read from .env}" \
+DINORAND_REQUIRE_REAL_INSTALL=1 \
+DINORAND_REAL_INSTALL_RECEIPT_DIR=/tmp/dinorand-release-real-install-receipts \
+dotnet test test/DinoRand.FileFormats.Tests/DinoRand.FileFormats.Tests.csproj \
+  --filter 'Trait=RealInstall' \
+  --results-directory /tmp/dinorand-release-real-install-results
+```
+
+This command requires both approved game paths because it runs both `RealInstallGate` cases. If the user authorizes only one game, do not run this both-game command; use a separately reviewed command that selects only the approved case and its approved variable. Never broaden the scope without new approval. Do not place receipts, test results, or copied game data in the repository.
+
 ## Steps
 
 1. **Pick the version.** Confirm with the user if ambiguous; confirm pre-1.0 jumps (0.2.0 → 4.0.0 is almost always a typo for 0.4.0).
