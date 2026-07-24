@@ -166,8 +166,9 @@ namespace DinoRand.App
             var cts = new CancellationTokenSource();
             _apStop = cts;
 
-            ApSessionTask = Task.Run(
-                    () => _apRunner(host, slot, password, gamePath, outDir, ApAppendLog, ApAppendLog, cts.Token))
+            ApSessionTask = Task.Factory.StartNew(
+                    () => _apRunner(host, slot, password, gamePath, outDir, ApAppendLog, ApAppendLog, cts.Token),
+                    CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default)
                 .ContinueWith(t => _uiPost(() =>
                 {
                     if (t.IsFaulted)

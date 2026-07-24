@@ -697,6 +697,12 @@ public class MainWindowViewModelTests
     [Fact]
     public async Task Cancelling_running_work_stops_a_live_ap_session()
     {
+        ThreadPool.GetMinThreads(out var originalMinWorkerThreads, out var originalMinCompletionThreads);
+        ThreadPool.GetMaxThreads(out var originalMaxWorkerThreads, out var originalMaxCompletionThreads);
+        using var poolReleased = new ManualResetEventSlim();
+        using var poolBlockerStarted = new ManualResetEventSlim();
+        Task? poolBlocker = null;
+
         // The confirmed-close path calls CancelRunningWork() instead of letting the process die,
         // so the session takes its normal finally-path (state save + clean disconnect).
         using var started = new ManualResetEventSlim();
@@ -713,12 +719,27 @@ public class MainWindowViewModelTests
         var install = NewFakeDc1Install();
         try
         {
+            poolBlocker = Task.Run(() =>
+            {
+                poolBlockerStarted.Set();
+                poolReleased.Wait();
+            });
+            Assert.True(poolBlockerStarted.Wait(TimeSpan.FromSeconds(5)), "the ThreadPool blocker never started");
+            Assert.True(ThreadPool.SetMinThreads(1, originalMinCompletionThreads));
+            Assert.True(ThreadPool.SetMaxThreads(1, originalMaxCompletionThreads));
+
             vm.GamePath = install;
             vm.ApSlot = "Regina";
             vm.ApToggleConnectCommand.Execute(null);
-            Assert.True(started.Wait(TimeSpan.FromSeconds(5)));
+            Assert.True(started.Wait(TimeSpan.FromSeconds(1)),
+                "the AP runner did not start while the ThreadPool was constrained");
+            Assert.True(vm.ApRunning);
 
             vm.CancelRunningWork();
+            poolReleased.Set();
+            ThreadPool.SetMaxThreads(originalMaxWorkerThreads, originalMaxCompletionThreads);
+            ThreadPool.SetMinThreads(originalMinWorkerThreads, originalMinCompletionThreads);
+            await poolBlocker;
             await vm.ApSessionTask;
 
             Assert.False(vm.ApRunning);
@@ -726,6 +747,14 @@ public class MainWindowViewModelTests
         }
         finally
         {
+            vm.CancelRunningWork();
+            poolReleased.Set();
+            ThreadPool.SetMaxThreads(originalMaxWorkerThreads, originalMaxCompletionThreads);
+            ThreadPool.SetMinThreads(originalMinWorkerThreads, originalMinCompletionThreads);
+            if (poolBlocker is not null)
+                await poolBlocker;
+            if (vm.ApSessionTask is { } session && !session.IsCompleted)
+                await session;
             try { Directory.Delete(install, recursive: true); } catch { }
         }
     }
