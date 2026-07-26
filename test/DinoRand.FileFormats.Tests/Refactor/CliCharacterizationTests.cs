@@ -68,7 +68,8 @@ public sealed class CliCharacterizationTests
 
         Assert.Equal(0, value.Install.Result.ExitCode);
         Assert.Equal("", value.Install.Result.Stderr);
-        Assert.Contains("installed to <TEMP>/install/Data:", value.Install.Result.Stdout, StringComparison.Ordinal);
+        Assert.Contains($"installed to <TEMP>{Path.DirectorySeparatorChar}install{Path.DirectorySeparatorChar}Data:",
+            value.Install.Result.Stdout, StringComparison.Ordinal);
         Assert.True(value.Install.ManifestApplied);
         Assert.Contains(".dinorand_backup/manifest.json", value.Install.Inventory.Select(x => x.Path));
 
@@ -132,6 +133,8 @@ public sealed class CliCharacterizationTests
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = Encoding.UTF8,
+            StandardErrorEncoding = Encoding.UTF8,
             UseShellExecute = false,
             CreateNoWindow = true,
         };

@@ -170,8 +170,28 @@ public class MainWindowViewModelTests
         Assert.True(advanced > 0);
         Assert.InRange(xaml.IndexOf("Content=\"Door Skip\"", StringComparison.Ordinal), 0, advanced - 1);
         Assert.InRange(xaml.IndexOf("Content=\"Disable laser fences\"", StringComparison.Ordinal), 0, advanced - 1);
+        var vm = NewVm();
+        Assert.False(vm.Dc1DoorSkip);
+        Assert.False(vm.DisableLaserFences);
         Assert.False(new RandomizerConfig().Dc1DoorSkip);
         Assert.False(new RandomizerConfig().DisableLaserFences);
+    }
+
+    [Fact]
+    public void Puzzle_and_emergency_box_options_default_on_when_entering_dc1()
+    {
+        var vm = new MainWindowViewModel(
+            new FakeFilePicker(), new FakeDialogs(), () => null!,
+            new AppSettings { SelectedGameId = "dc2" });
+
+        Assert.True(vm.Dc2RandomizePuzzles);
+        Assert.False(vm.ScramblePuzzleCodes);
+        Assert.False(vm.RandomizeBoxes);
+
+        vm.SelectedGameIndex = 0;
+
+        Assert.True(vm.ScramblePuzzleCodes);
+        Assert.True(vm.RandomizeBoxes);
     }
 
     [Fact]

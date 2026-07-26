@@ -507,8 +507,8 @@ namespace DinoRand.App
             if (!CanRandomizeVoices) IsVoicesChecked = false;
             if (!CanShuffleBgm) ShuffleBgm = false;
             if (!CanImportBgm) ImportBgm = false;
-            if (!CanRandomizeBoxes) RandomizeBoxes = false;
-            if (!CanScramblePuzzleCodes) ScramblePuzzleCodes = false;
+            RandomizeBoxes = CanRandomizeBoxes;
+            ScramblePuzzleCodes = CanScramblePuzzleCodes;
             _suspend = prevSuspend;
 
             OnPropertyChanged(nameof(CanRandomizeItems));
