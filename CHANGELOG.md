@@ -12,6 +12,37 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.6.2] — 2026-07-27
+
+### Added
+
+- **Disable laser fences for DC1 (off by default).** The GUI accessibility option keeps each
+  fence down until the story enables its keypad, after which the keypad works normally. It
+  reversibly patches the supported GOG `DINO.exe`, is undone by `--restore`, and is not part of
+  the shareable seed string.
+
+### Changed
+
+- **Door Skip for DC1 is now a primary option.** The default-off, reversible `DINO.exe` patch has
+  moved out of Advanced settings and is no longer marked experimental.
+
+- **Seed-sharing guidance now distinguishes seed-encoded and installation settings.** A `DINO-…`
+  string carries the seed and seed-encoded generation options; matching a complete run also
+  requires separately matching applicable non-seed-encoded settings. The spoiler debug block
+  continues to include the full configuration for issue reports.
+
+### Fixed
+
+- **DC1 key-item shuffle now respects the 0608 laser-fence route.** The route to 0614 remains
+  unavailable until the 0505 story event, preventing progression placement from treating that
+  path as open too early. Affected seeds may place keys differently.
+
+- **DC1 GUI defaults are restored when switching games.** Randomize Puzzles and Randomize
+  Emergency Boxes now turn on when switching from DC2 to DC1, matching the normal DC1 defaults.
+
+- **CLI output now uses UTF-8 consistently.** Unicode output and captured CLI results render
+  correctly across supported platforms.
+
 ## [0.6.1] — 2026-07-24
 
 ### Added
@@ -260,6 +291,7 @@ Initial feature set — everything prior to the voice randomizer.
   was.
 - Self-contained single-file release builds.
 
+[0.6.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.2
 [0.6.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.1
 [0.6.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.0
 [0.5.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.5.2
