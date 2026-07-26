@@ -181,9 +181,6 @@ resolved, and the legacy release workflow is confirmed disabled.
 
 ## P0 gates and known risks
 
-- **P0: `src/DinoRand.App.Avalonia/resources/dinorand.ico — owner verification required`.** Its
-  provenance/license has not been established. It must remain byte-identical and no tag or release
-  may be produced until the owner resolves it.
 - No screenshot or social preview is approved.
 - No tag or release may be created until every P0 gate is closed and the repository settings have
   been read back successfully.
