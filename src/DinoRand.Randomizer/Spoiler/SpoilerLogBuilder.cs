@@ -4,9 +4,11 @@ using System.Text;
 
 namespace DinoRand.Randomizer.Spoiler;
 
-/// <summary>The bug-report identity of one run (docs/decisions/cross/SPOILER-LOG-PLAN.md §5): everything needed
-/// to reproduce and triage a seed, with no room-level spoilers. The timestamp is caller-supplied
-/// so the builder stays pure (same document ⇒ same markdown).</summary>
+/// <summary>The bug-report identity of one run (docs/decisions/cross/SPOILER-LOG-PLAN.md §5): the shareable
+/// seed string carries the seed and seed-encoded generation settings. To reproduce a complete run/output,
+/// all other applicable non-seed-encoded configuration—including generation, session, installation, and output
+/// settings—must be matched separately. The full config dump is included for issue reports, with no room-level
+/// spoilers. The timestamp is caller-supplied so the builder stays pure (same document ⇒ same markdown).</summary>
 public sealed record SpoilerDebugInfo(
     string SeedString,
     int SeedValue,
@@ -75,7 +77,7 @@ public static class SpoilerLogBuilder
         sb.AppendLine();
         sb.AppendLine("## Debug info (no spoilers — safe to paste in a bug report)");
         sb.AppendLine();
-        sb.AppendLine($"- Seed string: `{d.SeedString}` (paste into DinoRand to reproduce this run)");
+        sb.AppendLine($"- Seed string: `{d.SeedString}` (paste into DinoRand to restore the seed-encoded generation settings; match all other applicable non-seed-encoded configuration separately)");
         sb.AppendLine($"- Seed: {d.SeedValue}");
         sb.AppendLine($"- Game: {d.GameId}");
         sb.AppendLine($"- DinoRand version: {d.AppVersion}");
@@ -84,7 +86,7 @@ public static class SpoilerLogBuilder
             sb.AppendLine($"- Changes: {string.Join("; ", doc.Sections.Select(s => $"{s.Title}: {s.Rows.Count} row(s)"))}");
         sb.AppendLine();
 
-        sb.AppendLine("### Config");
+        sb.AppendLine("### Config (full config for issue reports)");
         sb.AppendLine();
         sb.AppendLine("```");
         foreach (var line in d.ConfigDump) sb.AppendLine(line);

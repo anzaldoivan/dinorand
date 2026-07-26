@@ -3316,10 +3316,10 @@
       "requiresAnyItems": [
         58
       ],
-      "requiresItems": [
-        58
-      ],
-      "requiresRooms": []
+      "requiresItems": [],
+      "requiresRooms": [
+        "0505"
+      ]
     },
     {
       "from": "0609",

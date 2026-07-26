@@ -1,6 +1,6 @@
 {
  "_source": "Static spawn-graph (op-0x1a, edit_spawn.py) -> type_species TYPE->species. Counterpart to the live enemies-per-room.json. Generic TYPEs 0x10/0x11/0x12 take their model from a per-room MODEL_BASE global (mode-6) that static decode can't resolve -> counted as generic_model_global; see live_efiles for the runtime answer.",
- "_resolved_types": "TYPE 0x02=Velociraptor(E00), 0x03=Tyrannosaurus(E10, ST200 live-anchor), 0x05=shared-0x640000 (still ambiguous), 0x07=Oviraptor(E90? E-file E3d via 0x63d000), 0x08=Allosaurus. See type_species.py.",
+ "_resolved_types": "TYPE 0x02=Velociraptor(E00), 0x03=Tyrannosaurus(E10, ST200 live-anchor), 0x05=Plesiosaurus boss(E30, K68/K70), 0x07=Oviraptor(E90? E-file E3d via 0x63d000), 0x08=Allosaurus. See type_species.py.",
  "rooms": {
   "ST000": {
    "spawn_count": 1,
@@ -328,7 +328,7 @@
    "resolved_species": {},
    "generic_model_global": 12,
    "live_efiles": [
-    "E30 (Mosasaurus)"
+    "E30 (Plesiosaurus boss)"
    ]
   },
   "ST706": {

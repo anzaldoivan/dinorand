@@ -38,8 +38,9 @@ more. This guide is for players. Modders/contributors: see the repo
 3. Point it at your game install folder and pick a seed (or let it roll one).
 4. Leave the defaults on for a first run — every experimental lever is off by default,
    and default seeds are kept provably beatable.
-5. Generate and install, then launch the game normally. Sharing the seed (and settings)
-   with a friend reproduces the identical run.
+5. Generate and install, then launch the game normally. The DINO string carries the seed and
+   seed-encoded settings. To reproduce a complete run/output, match all other applicable
+   non-seed-encoded configuration separately—including generation, session, installation, and output settings.
 
 ## Quick start (CLI)
 
@@ -135,8 +136,9 @@ say **CE-verify** in `--help` — they are lab tools, expect rough edges.
 ## Seeds, spoilers and the playthrough log
 
 Every randomized install shows its identity on the **title screen** — "DINORAND V…" plus the
-same shareable `DINO-…` seed string the GUI displays (it encodes the seed *and* your settings,
-so anyone can re-type it from a screenshot to reproduce the run). Removed by `--restore`.
+same shareable `DINO-…` seed string the GUI displays (it carries the seed and its seed-encoded
+generation settings). To reproduce a complete run/output, match all other applicable non-seed-encoded
+configuration separately—including generation, session, installation, and output settings. Removed by `--restore`.
 
 Every run writes into the output folder:
 
@@ -155,8 +157,9 @@ Every run writes into the output folder:
 - Seeds with item/key randomization are verified beatable before they ship; if generation
   can't prove it, it rerolls or falls back rather than emitting a softlock.
 - If the game crashes on a randomized seed: run `--restore` to get back to vanilla, and
-  report the issue with the **debug block from the top of `SPOILER.md`** (it identifies the
-  seed and settings without spoiling your run).
+  report the issue with the **debug block from the top of `SPOILER.md`** (it includes the full
+  config for the report without spoiling your run; the seed string itself carries only the seed
+  and seed-encoded generation settings).
 
 ## Archipelago (experimental)
 

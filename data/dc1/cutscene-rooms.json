@@ -8,7 +8,7 @@
     "cutscene": "hand-curated cutscene rooms — always excluded from the enemy pass",
     "keys": "4-hex room code (stage<<8|room), UPPERCASE, matching room-data.json / st<id>.dat"
   },
-  "_unverified_sources": "DEMO*.TRG cutscene timelines (format undecoded, cont.33) drive the native cutscene subsystem (0x64a868) with dedicated MF_/MS_/MR_ actor models, not room enemy records — not expected to add rooms; UNVERIFIED until a TRG decode.",
+  "_unverified_sources": "RETRACTED historical inference (cont.33; corrected cont.74/79/87): DEMO*.TRG is NOT established as an in-game cutscene actor timeline, and 0x64a868 is the main game-mode table, not a TRG interpreter. TRG format and any MF_/MS_/MR_ actor binding remain [unverified]. This unresolved source does not affect this SCD-derived room classification.",
   "scripted_enemy": [
     "0200",
     "0202",

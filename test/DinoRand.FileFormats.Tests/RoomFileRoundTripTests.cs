@@ -117,6 +117,31 @@ public class RoomFileRoundTripTests
         }
     }
 
+    [Fact]
+    public void Dc1Rdt0202_Replacement_PreservesTakeIndex85()
+    {
+        var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (string.IsNullOrEmpty(root)) return;
+
+        var dataDir = FindDataDir(root);
+        var path = dataDir is null ? null : Path.Combine(dataDir, "st202.dat");
+        if (path is null || !File.Exists(path)) return;
+
+        var room = RoomFile.Read(2, 2, File.ReadAllBytes(path));
+        var item = room.Items.Single(i => i.FileOffset == 0x4ff0c);
+        Assert.Equal(0x63, item.OriginalItemId);
+        Assert.Equal((ushort)85, item.OriginalTakeIndex);
+        int replacementId = item.ItemId == 0x16 ? 0x21 : 0x16;
+        item.ItemId = replacementId;
+
+        var reread = RoomFile.Read(2, 2, room.Write());
+        var replacement = reread.Items.Single(i => i.FileOffset == 0x4ff0c);
+
+        Assert.Equal(replacementId, replacement.ItemId);
+        Assert.Equal((ushort)85, replacement.TakeIndex);
+        Assert.NotEqual(ItemRecord.EmptySlotId, replacement.ItemId);
+    }
+
     [Theory]
     [MemberData(nameof(RoomFiles))]
     public void Room_EnemySpecies_DecodesAndMatchesCategory(string path)

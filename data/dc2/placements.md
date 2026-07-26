@@ -4,10 +4,10 @@ Per-area placement oracle derived from contributor research; no third-party guid
 reproduced here.
 
 > **Status / confidence — read first.** This is **human-playthrough, single-source** data
-> (one FAQ). It is **NOT** a byte decode. Unlike DC1's `placements.md` (which validates a
-> decoded SCD `0x4C` record), DC2 has **no** decoded per-room item/enemy record yet — the
-> in-room spawn/item/door tables live in the undecoded room blob. So this file cannot yet be
-> cross-checked against bytes; treat every row as `single-source`.
+> (one FAQ). Its area-level claims are **NOT** a byte decode. DC2 now has decoded per-room
+> slot-5 spawn (`op 0x1a`), item-trigger (`op 0x31`), and door (`op 0x30`) records, but those
+> records do not map the FAQ's area labels to `ST*.DAT` ids or establish these guide placements.
+> Treat every row here as `single-source`.
 >
 > **Granularity gap.** Placements are keyed by the FAQ's **area names**, not by `ST*.DAT`
 > ids — the two are not yet linkable (the FAQ uses its own map-grid coordinates). See

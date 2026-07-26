@@ -133,6 +133,68 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
+    public void Disable_laser_fences_is_dc1_only_default_off_and_not_seed_encoded()
+    {
+        var vm = NewVm();
+        var seed = vm.SeedText;
+
+        Assert.True(vm.CanDisableLaserFences);
+        Assert.False(vm.DisableLaserFences);
+        vm.DisableLaserFences = true;
+
+        Assert.True(vm.CurrentConfig.DisableLaserFences);
+        Assert.Equal(seed, vm.SeedText);
+
+        var pasted = NewVm();
+        pasted.SeedText = seed;
+        Assert.False(pasted.DisableLaserFences);
+        Assert.False(pasted.CurrentConfig.DisableLaserFences);
+
+        vm.SelectedGameIndex = 1;
+        Assert.False(vm.CanDisableLaserFences);
+        Assert.False(vm.DisableLaserFences);
+        Assert.False(vm.CurrentConfig.DisableLaserFences);
+    }
+
+    [Fact]
+    public void Door_skip_and_laser_fences_are_primary_options_but_default_off()
+    {
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "DinoRand.sln")))
+            root = root.Parent;
+        Assert.NotNull(root);
+        string xaml = File.ReadAllText(Path.Combine(
+            root!.FullName, "src", "DinoRand.App.Avalonia", "MainWindow.axaml"));
+        int advanced = xaml.IndexOf("<Expander Header=\"Advanced options\"", StringComparison.Ordinal);
+
+        Assert.True(advanced > 0);
+        Assert.InRange(xaml.IndexOf("Content=\"Door Skip\"", StringComparison.Ordinal), 0, advanced - 1);
+        Assert.InRange(xaml.IndexOf("Content=\"Disable laser fences\"", StringComparison.Ordinal), 0, advanced - 1);
+        var vm = NewVm();
+        Assert.False(vm.Dc1DoorSkip);
+        Assert.False(vm.DisableLaserFences);
+        Assert.False(new RandomizerConfig().Dc1DoorSkip);
+        Assert.False(new RandomizerConfig().DisableLaserFences);
+    }
+
+    [Fact]
+    public void Puzzle_and_emergency_box_options_default_on_when_entering_dc1()
+    {
+        var vm = new MainWindowViewModel(
+            new FakeFilePicker(), new FakeDialogs(), () => null!,
+            new AppSettings { SelectedGameId = "dc2" });
+
+        Assert.True(vm.Dc2RandomizePuzzles);
+        Assert.False(vm.ScramblePuzzleCodes);
+        Assert.False(vm.RandomizeBoxes);
+
+        vm.SelectedGameIndex = 0;
+
+        Assert.True(vm.ScramblePuzzleCodes);
+        Assert.True(vm.RandomizeBoxes);
+    }
+
+    [Fact]
     public void Toggling_options_encodes_into_the_seed_and_round_trips_through_a_paste()
     {
         var vm = NewVm();

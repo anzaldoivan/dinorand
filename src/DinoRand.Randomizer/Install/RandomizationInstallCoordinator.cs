@@ -45,6 +45,13 @@ internal static class RandomizationInstallCoordinator
                 Emit($"item pickup: {repoint}");
         }
 
+        if (config.DisableLaserFences)
+        {
+            var laserFences = GameInstaller.PatchExeDisableLaserFences(dataDir, seed.ToString());
+            foreach (var repoint in laserFences.Repoints)
+                Emit($"laser fences: {repoint}");
+        }
+
         if (config.RandomizeEnemies && config.CrossRoomEnemySpecies)
             Emit("exotic enemies: any queued EXE patches were applied; CLOSE/relaunch + CE-verify the swaps.");
 
@@ -78,4 +85,5 @@ internal static class RandomizationInstallCoordinator
         Emit($"backup: {installResult.BackupDir}  (run with --restore to undo)");
         return new RandomizationInstallResult(installResult, events);
     }
+
 }

@@ -566,6 +566,65 @@ public class GameInstallerExeTests : IDisposable
         Assert.True(ExePatcher.IsItemPickupCancelFixApplied(File.ReadAllBytes(ExePath)));
     }
 
+    private void SeedLaserFenceOutputFixture()
+    {
+        var exe = BuildSyntheticExe();
+        new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }
+            .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa));
+        ExePatcher.WriteUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa,
+            ExePatcher.LaserFenceControllerActiveVa);
+        ExePatcher.WriteUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa + 4,
+            ExePatcher.LaserFenceControllerDownVa);
+        File.WriteAllBytes(ExePath, exe);
+    }
+
+    [Fact]
+    public void InstallDc1_DisableLaserFences_PatchesSelectedInstallExe_AndRestoreReverses()
+    {
+        SeedLaserFenceOutputFixture();
+        var pristine = File.ReadAllBytes(ExePath);
+        string modDir = Path.Combine(_root, "mod-laser-fences");
+        Directory.CreateDirectory(modDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 4, 3, 2, 1 });
+
+        var result = RandomizationInstallCoordinator.InstallDc1(
+            DataDir, modDir, new Seed(123), new RandomizerConfig { DisableLaserFences = true },
+            () => null, _ => { }, ex => throw ex);
+
+        Assert.NotNull(result);
+        Assert.True(ExePatcher.IsDisableLaserFencesApplied(File.ReadAllBytes(ExePath)));
+        Assert.False(File.Exists(Path.Combine(modDir, GameInstaller.ExeName)));
+        var backup = Path.Combine(DataDir, GameInstaller.BackupDirName, GameInstaller.ExeName);
+        Assert.True(File.Exists(backup));
+        Assert.Equal(pristine, File.ReadAllBytes(backup));
+        Assert.Contains(GameInstaller.ReadManifest(DataDir)!.ExeRepoints!,
+            entry => entry.StartsWith("disable laser fences", StringComparison.Ordinal));
+
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Fact]
+    public void InstallDc1_WithoutDisableLaserFences_LeavesLaserFencePointerUnchanged()
+    {
+        SeedLaserFenceOutputFixture();
+        var pristine = File.ReadAllBytes(ExePath);
+        string modDir = Path.Combine(_root, "mod-no-laser-fences");
+        Directory.CreateDirectory(modDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 4, 3, 2, 1 });
+
+        var result = RandomizationInstallCoordinator.InstallDc1(
+            DataDir, modDir, new Seed(123), new RandomizerConfig(),
+            () => null, _ => { }, ex => throw ex);
+
+        Assert.NotNull(result);
+        Assert.Equal(ExePatcher.LaserFenceControllerActiveVa,
+            ExePatcher.ReadUInt32AtVa(File.ReadAllBytes(ExePath), ExePatcher.LaserFenceControllerPointerVa));
+        Assert.False(File.Exists(Path.Combine(modDir, GameInstaller.ExeName)));
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
     // ---- BGM catalog shuffle (the music randomizer; docs/dc1/BGM-SYSTEM.md §4) ----
 
     private static uint BgmFlagsFor(int id) => (id % 3) switch { 0 => 0x2Au, 1 => 0x08u, _ => 0x0Au };

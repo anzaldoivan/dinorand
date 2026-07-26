@@ -121,7 +121,7 @@ def render(corpus):
         "# DinoRand documentation index",
         "",
         "Every corpus doc under `docs/` has exactly one line here, generated from its",
-        "frontmatter: `[title](path) — status · hook`. The RE session contract lives in",
+        "frontmatter: `[title](path) — status · hook`. The RE workflow lives in",
         "[CONTRIBUTING-RE.md](CONTRIBUTING-RE.md); acronyms in [glossary.md](glossary.md).",
         "Prompts (`_prompts/`) and verbatim dumps (`_reference-dumps/`) are `corpus:false`",
         "and intentionally excluded.",

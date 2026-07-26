@@ -3,8 +3,10 @@ using DinoRand.Randomizer.Definitions;
 namespace DinoRand.Randomizer;
 
 /// <summary>
-/// User-facing options. Combined with a <see cref="Seed"/>, this fully determines a
-/// run. Kept flat and serializable so configs can be shared as text.
+/// User-facing options. The shareable DINO string carries the <see cref="Seed"/> and the
+/// seed-encoded subset. To reproduce a complete run/output, all other applicable non-seed-encoded
+/// configuration—including generation, session, installation, and output settings—must be matched
+/// separately. Kept flat and serializable so configs can be shared as text.
 /// </summary>
 public sealed class RandomizerConfig
 {
@@ -528,7 +530,7 @@ public sealed class RandomizerConfig
     public bool Dc1CutsceneSafeEnemies { get; set; } = false;
 
     /// <summary>
-    /// Opt-in (default off; DC1 only). "Door skip (experimental)": patch <c>DINO.exe</c> so room-to-room
+    /// Opt-in (default off; DC1 only). Patch <c>DINO.exe</c> so room-to-room
     /// door transitions are near-instant — the leaf-swing animation is removed while the destination
     /// background/room-view commit is preserved (STATIC-SCD-RE cont.78, LIVE-CONFIRMED). Two small reversible
     /// <c>.text</c> windows via <see cref="FileFormats.Exe.ExePatcher.ApplyDoorSkip"/>; leaves the shared
@@ -548,6 +550,14 @@ public sealed class RandomizerConfig
     /// <see cref="Dc1DoorSkip"/>, NOT seed-encoded. Still "experimental" pending broad in-game witness.
     /// </summary>
     public bool Dc1FastForwardCutscenes { get; set; } = false;
+
+    /// <summary>
+    /// Opt-in (default off; DC1 only). Patch the selected install's <c>DINO.exe</c> in place, using the
+    /// reversible backup/restore transaction, so each fence stays down until its natural cutscene enables
+    /// the keypad; after that, the native active/down toggle works normally. Flags/keypads remain untouched,
+    /// and the option is not seed-encoded.
+    /// </summary>
+    public bool DisableLaserFences { get; set; } = false;
 
     /// <summary>
     /// Opt-in (default off). Allow the installer to patch <c>DINO.exe</c> (back it up first; reversed

@@ -5,9 +5,10 @@ using DinoRand.Randomizer.Spoiler;
 namespace DinoRand.App;
 
 /// <summary>
-/// A shareable run identity: the <see cref="Seed"/> plus the full
-/// <see cref="RandomizerConfig"/> packed into a short <c>DINO-{base64url}</c> string
-/// (~12 chars), BioRand-style. Anyone pasting the string back reproduces the same run.
+/// A shareable run identity: the seed and its seed-encoded generation settings from
+/// <see cref="RandomizerConfig"/> packed into a short <c>DINO-{base64url}</c> string (~12 chars),
+/// BioRand-style. To reproduce a complete run/output, all other applicable non-seed-encoded
+/// configuration—including generation, session, installation, and output settings—must be matched separately.
 /// </summary>
 /// <remarks>
 /// The wire format (byte layout, back-compat rules, the frozen DC2 canonical-species order) is

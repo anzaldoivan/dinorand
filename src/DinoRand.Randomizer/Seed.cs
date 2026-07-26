@@ -1,8 +1,11 @@
 namespace DinoRand.Randomizer;
 
 /// <summary>
-/// Reproducible randomness for a run. Every pass draws from the same seed, so a
-/// seed + config fully determines the output (shareable, like BioRand). docs/reference/cross/architecture/DESIGN.md §6.
+/// Reproducible randomness for a run. Every pass draws from the same seed. The shareable
+/// DINO string carries the seed and seed-encoded generation settings; to reproduce a complete
+/// run/output, all other applicable non-seed-encoded configuration—including generation, session,
+/// installation, and output settings—must be matched separately.
+/// docs/reference/cross/architecture/DESIGN.md §6.
 /// </summary>
 public sealed class Seed
 {

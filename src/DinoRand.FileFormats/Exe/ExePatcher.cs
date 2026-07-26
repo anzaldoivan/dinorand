@@ -965,6 +965,35 @@ public static class ExePatcher
     public static void ApplyCutsceneFastForward(Span<byte> exe)
         => Dc1TransitionExePatch.ApplyCutsceneFastForward(exe);
 
+    // ---- Disable laser fences (advanced, default-off): conditional state-0 controller ----
+
+    /// <summary>VA of the state-0 entry in the shared laser-fence apply-function table. <c>[verified]</c></summary>
+    public const uint LaserFenceControllerPointerVa = 0x0065D27C;
+
+    /// <summary>VA of the active/blocking laser-fence controller. <c>[verified]</c></summary>
+    public const uint LaserFenceControllerActiveVa = 0x004B0F5A;
+
+    /// <summary>VA of the down/passable laser-fence controller. <c>[verified]</c></summary>
+    public const uint LaserFenceControllerDownVa = 0x004B1018;
+
+    /// <summary>
+    /// Zero-slack cave for the state-0 wrapper: down while the matching keypad-enable flag is clear,
+    /// otherwise tail-call the native active controller. <c>[verified file-backed]</c>
+    /// </summary>
+    public const uint LaserFenceConditionalCaveVa = 0x0061FC50;
+
+    /// <summary>True when the conditional state-0 wrapper, lookup, and native state-1 entry are intact.</summary>
+    public static bool IsDisableLaserFencesApplied(ReadOnlySpan<byte> exe)
+        => Dc1LaserFenceExePatch.IsApplied(exe);
+
+    /// <summary>
+    /// Install the conditional state-0 controller. Inoperable fences use the native down path; once their
+    /// cutscene enables the keypad, state 0 uses the native active path and the unchanged keypad/state-1
+    /// controller can toggle the fence normally. Idempotent; accepts the legacy always-down patch for upgrade.
+    /// </summary>
+    public static void ApplyDisableLaserFences(Span<byte> exe)
+        => Dc1LaserFenceExePatch.Apply(exe);
+
     /// <summary>One slot written by a starting-inventory patch (for logging).</summary>
     public readonly record struct StartingInvWrite(string Block, int Slot, byte Id, byte Count);
 

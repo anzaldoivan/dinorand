@@ -1,9 +1,9 @@
 {
- "_comment": "DC2 (rebirth) per-room enemy SET, recovered at RUNTIME (Cheat Engine MCP bridge attached to Dino2.exe, imagebase 0x400000, no rebase). Resolves the room<->E-file link that static RE (docs/dc2/ROOM-SECTION-TABLE.md, EXE-SPAWN-SYSTEM.md) could not: DC2 has no spawn table in the room file or .data; spawns are EXE code-driven. This file is observed ground-truth, not inference.",
+ "_comment": "DC2 (rebirth) per-room enemy SET, recovered at RUNTIME (Cheat Engine MCP bridge attached to Dino2.exe, imagebase 0x400000, no rebase). Resolves the room<->E-file link that static RE (docs/dc2/ROOM-SECTION-TABLE.md, EXE-SPAWN-SYSTEM.md) could not: DC2 has no flat per-room spawn table; spawn information is carried by room-file slot-5 VM operands, including editable literal operands, while generic, wave, and nonliteral paths are not universally editable. This file is observed ground-truth, not inference.",
  "_method": "CreateFileA hook (kernel32 0x75A9E9F0) as a non-breaking logging breakpoint. On each hit, register ESI holds a STABLE pointer into the EXE's static filename table (0x71xxxx) for the file being opened (lpFileName at [esp+4] is a transient stack path and is NOT reliable). Filter hits to ESI in [0x710000,0x720000) and read the ASCII string: ST*.DAT/.DBS = room being loaded, E*.DAT/E*.TEX = that room's enemy model/texture, DOOR*.DAT = door. A room's enemy set = the E* files opened between its ST* open and the next ST* open. Enemy id = E-slot (E00..EA0); model RAM base per docs/dc2/EXE-SPAWN-SYSTEM.md.",
  "_caveat": "Model files are CACHED across rooms: a previously-loaded E* model stays resident (e.g. E00 model remained at 0x633000 after leaving ST102), so a residency snapshot is NOT a per-room set. Only the file-OPEN during a room load is authoritative, and a cached model may open only its .TEX (not .DAT) on re-entry. Some enemies are one-time scripted spawns (the ST102 pack did not reconstruct on re-entry). Coverage below is partial (session in progress); 40 of 42 combat rooms still to walk.",
  "_provenance_legend": "runtime-fileload = observed via the CreateFileA/ESI hook this session; partial = room visited but may have triggered/late spawns not yet seen.",
- "_slot_note": "ST102's jungle 'raptor' loads model base 0x633000 = the E00 slot (E00.TEX opened; live actor [+0x5C]=0x00633000). This is in tension with data/dc2/enemies.json's UNRESOLVED guess that the Velociraptor is the E30/E31/E32 triple. The rigorous datum here is the E-SLOT/base; the slot<->creature-name mapping remains open and should be reconciled against this runtime evidence.",
+   "_slot_note": "ST102's jungle raptors load model base 0x633000 = E00 (E00.TEX opened; live actors [+0x60]=0x00633000). K43 corrects the earlier [+0x5C] value-scan frame artifact: the resting species base is [+0x60]. K68 closes the name mapping consistently: E00 is Velociraptor; E30 is Plesiosaurus BOSS, E31/E32 are regular/grunt Plesiosaurus, and E80 is Mosasaurus. The legacy E30/E31/E32 raptor-triple inference is superseded.",
  "rooms": {
   "ST101": {
    "enemies": [],
@@ -41,7 +41,7 @@
    ],
    "source": "runtime-actorscan",
    "confidence": "partial",
-   "note": "Jungle / north area 2. Two E00 raptors, TRIGGER-spawned partway into the room (NOT at room-load): the room-load opened only ST105.DAT + player weapons WEP_P100/P101.DAT + DOOR00D.DAT, NO E* file (E00 model served from cache). Located the 2 live actors by scanning writable memory for base 0x633000 at [+0x5C]: actors at 0x5EA258 and 0x5EA4B8 (stride 0x260 confirmed). Spawned via a different E00-variant ctor (ctor 0x4461D0 stayed silent). Both actors share floor-Y ~ -7000 = the room's s1 floor plane."
+    "note": "Jungle / north area 2. Two E00 raptors, TRIGGER-spawned partway into the room (NOT at room-load): the room-load opened only ST105.DAT + player weapons WEP_P100/P101.DAT + DOOR00D.DAT, NO E* file (E00 model served from cache). Located the 2 live actors by scanning writable memory for base 0x633000 in the historical +4 value-scan frame; K43 corrects the resting species base to [+0x60]: actors at 0x5EA258 and 0x5EA4B8 (stride 0x260 confirmed). Spawned via a different E00-variant ctor (ctor 0x4461D0 stayed silent). Both actors share floor-Y ~ -7000 = the room's s1 floor plane."
   },
   "ST103": {
    "enemies": [
@@ -183,11 +183,11 @@
   },
   "ST704": {
    "enemies": [
-    "E30 (Mosasaurus)"
+     "E30 (Plesiosaurus boss)"
    ],
-   "source": "runtime-actor-read + user visual ID (CE, 2026-06-27, PID 8296)",
-   "confidence": "high",
-   "note": "User visually identified Mosasaurus. Live actor read: actor_base [scene_mgr+0x940]=0x5ED1D8 (stride 0x260); 11 active enemies at slots 2,3,4 all TYPE=0x13 (generic family, [actor+0x58]) sharing one runtime model base [actor+0x60]=0x5E37B0 (stage-7 relocated, not a Colosseum 0x6xxxxx base) + 1 TYPE 0x10 at slot1 (inactive). Matches static spawn-graph ST704 (12 spawns, TYPE 0x13 x11 / TYPE 0x10 x1). HP not at [actor+0x108] (read 0) -> stats likely in a separate AI struct (unpinned). E-file PINNED via resident header read: model base 0x5E3878 has tri290/quad132/obj20 = E30 (also resident at canonical 0x640010). Resolves one of the 4 long-open creatures (Pteranodon/Plesiosaurus/Mosasaurus/Triceratops)."
-  }
+    "source": "runtime-actor-read (CE, 2026-07-09; K70)",
+    "confidence": "confirmed",
+    "note": "K70 live read: exactly one enemy actor is the E30 Plesiosaurus BOSS (slot 2, TYPE 0x05, [actor+0x60]=0x00640000, resident header tri290/quad132/obj20, HP 20000/20000); player and partner are the only other live actors. The 2026-06-27 static/actor observation of 11 TYPE 0x13 entries and one TYPE 0x10 is historical and does not establish concurrent grunts: those entries are conditional/phased/marker spawns of uncertain exact role."
+   }
  }
 }

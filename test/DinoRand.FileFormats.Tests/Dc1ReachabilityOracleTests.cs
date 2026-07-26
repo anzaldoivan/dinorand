@@ -128,6 +128,21 @@ public class Dc1ReachabilityOracleTests
     }
 
     [Fact]
+    public void CommittedOracle_Direct0608To0614Requires0505AndKeyCardA()
+    {
+        var path = FindRepoFile(Path.Combine("data", "dc1", "reachability-oracle.json"));
+        using var doc = JsonDocument.Parse(File.ReadAllBytes(path));
+        var edge = Assert.Single(doc.RootElement.GetProperty("edges").EnumerateArray(), candidate =>
+            candidate.GetProperty("from").GetString() == "0608"
+            && candidate.GetProperty("to").GetString() == "0614");
+
+        Assert.Equal(new[] { 58 }, edge.GetProperty("requiresAnyItems").EnumerateArray()
+            .Select(item => item.GetInt32()).ToArray());
+        Assert.Equal(new[] { "0505" }, edge.GetProperty("requiresRooms").EnumerateArray()
+            .Select(room => room.GetString()!).ToArray());
+    }
+
+    [Fact]
     public void RealInstall_Oracle_MatchesEngine_ByteIdentical()
     {
         bool required = Environment.GetEnvironmentVariable("DINORAND_REQUIRE_REAL_INSTALL") == "1";

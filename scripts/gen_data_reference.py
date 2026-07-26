@@ -203,8 +203,10 @@ def build_dc2_doc():
                     [(code, ", ".join(v.get("enemies", [])) or "—",
                       v.get("confidence", "—")) for code, v in sorted(epr.items())])
     lines += ["", "This census is runtime-witnessed and partial by design "
-              "(`data/dc2/enemies-per-room.json` — DC2 has no spawn table in the room file); "
-              "wave-descriptor data lives in `data/dc2/wave-descriptors.json`.", ""]
+               "(`data/dc2/enemies-per-room.json` — DC2 has no flat per-room spawn table; "
+               "spawn information is carried by room-file slot-5 VM operands, including editable "
+               "literal operands; generic, wave, and nonliteral paths are not universally editable); "
+               "wave-descriptor data lives in `data/dc2/wave-descriptors.json`.", ""]
     return "\n".join(lines)
 
 
