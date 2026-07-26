@@ -351,6 +351,15 @@ public static class GameInstaller
     => ExePatchInstaller.PatchExeFastForwardCutscenes(dataDir, seedLabel);
 
     /// <summary>
+    /// Apply the DC1 advanced "disable laser fences" lever to the selected install's <c>DINO.exe</c>.
+    /// The guarded state-0 wrapper keeps an inoperable fence down, then restores the native active/down
+    /// toggle after its cutscene enables the keypad. It is backed up once with the existing EXE transaction,
+    /// recorded in the manifest, and reversed byte-identically by <see cref="Restore"/>. Not seed-dependent.
+    /// </summary>
+    public static ExePatchResult PatchExeDisableLaserFences(string dataDir, string? seedLabel = null)
+    => ExePatchInstaller.PatchExeDisableLaserFences(dataDir, seedLabel);
+
+    /// <summary>
     /// Scramble the DC1 keypad-code puzzle family (Management Office / Lounge / Computer-Room-gas safes +
     /// the Stabilizer codes) so each lock's accepted 4-digit code is seed-derived, and keep the in-game
     /// document that states the code in sync — the <b>displayed == checked</b> invariant

@@ -147,6 +147,17 @@
                               IsChecked="{Binding ScramblePuzzleCodes, Mode=TwoWay}"
                               ToolTip.Tip="Patch DINO.exe + room files at install so each keypad safe (Management Office, Lounge, Computer Room gas, Stabilizer) accepts a new seed-derived 4-digit code, and the in-game document that states the code is rewritten to match. Reversed by Restore. CLOSE the game first — codes are read at load, seen after the next launch." />
 
+                    <!-- Tested DC1 accessibility/pace patches. Visible in the primary list, default OFF,
+                         backup-protected, restored byte-identically, and not part of the seed string. -->
+                    <CheckBox Content="Door Skip" Margin="0,2"
+                              IsVisible="{Binding CanDc1DoorSkip}"
+                              ToolTip.Tip="Patch DINO.exe so room-to-room door transitions are near-instant — the door-opening animation is removed while the destination background still loads correctly. Reversed by Restore and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
+                              IsChecked="{Binding Dc1DoorSkip, Mode=TwoWay}" />
+                    <CheckBox Content="Disable laser fences" Margin="0,2"
+                              IsVisible="{Binding CanDisableLaserFences}"
+                              ToolTip.Tip="Accessibility bypass: keeps each fence down until its natural cutscene enables the keypad; after that, the keypad can turn it on and off normally. Fence flags and keypad logic are untouched. Reversed by Restore and not part of the shareable seed string."
+                              IsChecked="{Binding DisableLaserFences, Mode=TwoWay}" />
+
                     <!-- DC2 puzzle randomization (docs/decisions/dc2/DC2-PUZZLE-RANDO-PLAN.md K108/K110/K118):
                          one master toggle over the elevator codes, stungun circuits and the ST205
                          Key-Plate terminal re-key. Visible for DC2 only (drop-in for the DC1 box above). -->
@@ -524,17 +535,10 @@
                                       IsEnabled="{Binding CanShortenCutscenes}"
                                       ToolTip.Tip="Skip cutscene choreography while keeping every story flag and item grant intact (65 of 171 cutscenes qualify; the rest play normally). Experimental: not yet verified in-game, and not part of the shareable seed string."
                                       IsChecked="{Binding ShortenCutscenes, Mode=TwoWay}" />
-                            <!-- DC1 door skip (STATIC-SCD-RE cont.78, LIVE-CONFIRMED): reversible DINO.exe patch that
-                                 removes the door-transition swing while keeping the destination background commit.
-                                 Visible DC1-only option, default OFF; not part of the seed string. -->
-                            <CheckBox Content="Door Skip (Experimental)" Margin="0,2"
-                                      IsVisible="{Binding CanDc1DoorSkip}"
-                                      ToolTip.Tip="Patch DINO.exe so room-to-room door transitions are near-instant — the door-opening animation is removed while the destination background still loads correctly. Experimental; reversed by Restore, and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
-                                      IsChecked="{Binding Dc1DoorSkip, Mode=TwoWay}" />
-                            <CheckBox Content="Fast Forward Cutscenes (Experimental/Crash Risk)" Margin="0,2"
-                                      IsVisible="{Binding CanDc1FastForwardCutscenes}"
-                                      ToolTip.Tip="Patch DINO.exe so cutscenes play faster — dead-air pauses are compressed by a guarded script-VM tick multiplier while every story flag, item grant and dialogue line is preserved. EXPERIMENTAL / CRASH RISK: not yet broadly witnessed in-game. Reversed by Restore, not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
-                                      IsChecked="{Binding Dc1FastForwardCutscenes, Mode=TwoWay}" />
+                             <CheckBox Content="Fast Forward Cutscenes (Experimental/Crash Risk)" Margin="0,2"
+                                       IsVisible="{Binding CanDc1FastForwardCutscenes}"
+                                       ToolTip.Tip="Patch DINO.exe so cutscenes play faster — dead-air pauses are compressed by a guarded script-VM tick multiplier while every story flag, item grant and dialogue line is preserved. EXPERIMENTAL / CRASH RISK: not yet broadly witnessed in-game. Reversed by Restore, not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
+                                       IsChecked="{Binding Dc1FastForwardCutscenes, Mode=TwoWay}" />
                             <!-- Starting-inventory detail editor: pin the starting weapon / set explicit supply slots.
                                  Sits under its master toggle (moved here from the install panel to de-clutter it). -->
                             <Expander Header="Starting inventory (EXPERIMENTAL)" Margin="20,0,0,6"

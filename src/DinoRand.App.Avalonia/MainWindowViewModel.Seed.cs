@@ -75,6 +75,7 @@ namespace DinoRand.App
                 ShuffledKeyItemsModelChange = _appSeed.Config.ImportPickupModels;
                 ShortenCutscenes = _appSeed.Config.ShortenCutscenes;
                 Dc2DoorSkip = _appSeed.Config.Dc2DoorSkip;
+                DisableLaserFences = _appSeed.Config.DisableLaserFences;
                 RandomizeStartingInventory = _appSeed.Config.RandomizeStartingInventory;
                 Difficulty = Math.Round(_appSeed.Config.EnemyDifficulty * 31);
 
@@ -175,6 +176,7 @@ namespace DinoRand.App
                 // REbirth DoorSkip ini passthrough (DC2). Both are lost on seed paste by design.
                 ShortenCutscenes = ShortenCutscenes && CanShortenCutscenes,
                 Dc2DoorSkip = Dc2DoorSkip,
+                DisableLaserFences = DisableLaserFences && CanDisableLaserFences,
                 RandomizeStartingInventory = RandomizeStartingInventory,
                 RandomizeVoices = voicesOn,
                 IncludeCrossGameVoices = CrossGameVoices,

@@ -309,6 +309,144 @@ public class ExePatcherTests
         Assert.Equal(pristine, exe);
     }
 
+    // ---- DC1 laser-fence conditional state-0 controller ----
+
+    private static byte[] NewImageWithLaserFenceControllerPointer(uint pointer)
+    {
+        var exe = NewImage();
+        ExePatcher.WriteUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa, pointer);
+        ExePatcher.WriteUInt32AtVa(
+            exe, ExePatcher.LaserFenceControllerPointerVa + 4, ExePatcher.LaserFenceControllerDownVa);
+        return exe;
+    }
+
+    [Fact]
+    public void DisableLaserFences_UsesConditionalStateZero_AndPreservesNativeDownState()
+    {
+        const uint conditionalCaveVa = 0x0061FC50;
+        var exe = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerActiveVa);
+
+        Assert.False(ExePatcher.IsDisableLaserFencesApplied(exe));
+        ExePatcher.ApplyDisableLaserFences(exe);
+
+        Assert.Equal(conditionalCaveVa,
+            ExePatcher.ReadUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa));
+        Assert.Equal(ExePatcher.LaserFenceControllerDownVa,
+            ExePatcher.ReadUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa + 4));
+        Assert.True(ExePatcher.IsDisableLaserFencesApplied(exe));
+    }
+
+    [Fact]
+    public void DisableLaserFences_EmbedsTheAuthoredStateToKeypadEnableMap()
+    {
+        const uint conditionalCaveVa = 0x0061FC50;
+        const int lookupOffset = 66;
+        byte[] expected =
+        {
+            12, 240, 13, 241, 32, 243, 36, 244, 78, 245, 79, 246, 98, 247,
+            99, 248, 112, 249, 177, 250, 173, 251, 147, 252, 149, 253,
+        };
+        var exe = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerActiveVa);
+
+        ExePatcher.ApplyDisableLaserFences(exe);
+
+        int lookup = ExePatcher.VaToFileOffset(conditionalCaveVa) + lookupOffset;
+        Assert.Equal(expected, exe[lookup..(lookup + expected.Length)]);
+    }
+
+    [Fact]
+    public void DisableLaserFences_ConditionalControllerReadsEnable_ThenRoutesToNativeHandlers()
+    {
+        static uint Rel32Target(byte[] image, int instructionOffset, uint instructionVa)
+            => unchecked((uint)((long)instructionVa + 5
+                + BinaryPrimitives.ReadInt32LittleEndian(image.AsSpan(instructionOffset + 1, 4))));
+
+        var exe = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerActiveVa);
+        ExePatcher.ApplyDisableLaserFences(exe);
+        int cave = ExePatcher.VaToFileOffset(ExePatcher.LaserFenceConditionalCaveVa);
+
+        Assert.Equal(0x0040764Bu,
+            Rel32Target(exe, cave + 39, ExePatcher.LaserFenceConditionalCaveVa + 39));
+        Assert.Equal(ExePatcher.LaserFenceConditionalCaveVa + 56,
+            Rel32Target(exe, cave + 27, ExePatcher.LaserFenceConditionalCaveVa + 27));
+        Assert.Equal(ExePatcher.LaserFenceConditionalCaveVa + 61,
+            Rel32Target(exe, cave + 51, ExePatcher.LaserFenceConditionalCaveVa + 51));
+        Assert.Equal(ExePatcher.LaserFenceControllerActiveVa,
+            Rel32Target(exe, cave + 56, ExePatcher.LaserFenceConditionalCaveVa + 56));
+        Assert.Equal(ExePatcher.LaserFenceControllerDownVa,
+            Rel32Target(exe, cave + 61, ExePatcher.LaserFenceConditionalCaveVa + 61));
+        Assert.Equal(5, (sbyte)exe[cave + 50]); // enable set branches to the active tail-jump
+    }
+
+    [Fact]
+    public void DisableLaserFences_IsIdempotent()
+    {
+        var exe = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerActiveVa);
+        ExePatcher.ApplyDisableLaserFences(exe);
+        var once = (byte[])exe.Clone();
+
+        ExePatcher.ApplyDisableLaserFences(exe);
+
+        Assert.Equal(once, exe);
+    }
+
+    [Fact]
+    public void DisableLaserFences_UpgradesTheLegacyAlwaysDownPointer()
+    {
+        var exe = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerDownVa);
+
+        ExePatcher.ApplyDisableLaserFences(exe);
+
+        Assert.Equal(ExePatcher.LaserFenceConditionalCaveVa,
+            ExePatcher.ReadUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa));
+        Assert.True(ExePatcher.IsDisableLaserFencesApplied(exe));
+    }
+
+    [Fact]
+    public void DisableLaserFences_TouchesOnlyTheCaveAndStateZeroPointer()
+    {
+        const int caveLength = 92;
+        var exe = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerActiveVa);
+        var pristine = (byte[])exe.Clone();
+        int cave = ExePatcher.VaToFileOffset(ExePatcher.LaserFenceConditionalCaveVa);
+        int pointer = ExePatcher.VaToFileOffset(ExePatcher.LaserFenceControllerPointerVa);
+
+        ExePatcher.ApplyDisableLaserFences(exe);
+
+        Assert.Equal(pristine[..cave], exe[..cave]);
+        Assert.Equal(pristine[(cave + caveLength)..pointer], exe[(cave + caveLength)..pointer]);
+        Assert.Equal(ExePatcher.LaserFenceConditionalCaveVa,
+            ExePatcher.ReadUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa));
+        Assert.Equal(pristine[(pointer + 4)..], exe[(pointer + 4)..]);
+    }
+
+    [Fact]
+    public void DisableLaserFences_RefusesUnexpectedPointer()
+    {
+        var exe = NewImageWithLaserFenceControllerPointer(0xDEADBEEFu);
+
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDisableLaserFences(exe));
+        Assert.Equal(0xDEADBEEFu,
+            ExePatcher.ReadUInt32AtVa(exe, ExePatcher.LaserFenceControllerPointerVa));
+    }
+
+    [Fact]
+    public void DisableLaserFences_RefusesUnexpectedDownStateOrDirtyCaveWithoutWriting()
+    {
+        var wrongDown = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerActiveVa);
+        ExePatcher.WriteUInt32AtVa(
+            wrongDown, ExePatcher.LaserFenceControllerPointerVa + 4, ExePatcher.LaserFenceControllerActiveVa);
+        var wrongDownBefore = (byte[])wrongDown.Clone();
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDisableLaserFences(wrongDown));
+        Assert.Equal(wrongDownBefore, wrongDown);
+
+        var dirtyCave = NewImageWithLaserFenceControllerPointer(ExePatcher.LaserFenceControllerActiveVa);
+        dirtyCave[ExePatcher.VaToFileOffset(ExePatcher.LaserFenceConditionalCaveVa)] = 0x42;
+        var dirtyCaveBefore = (byte[])dirtyCave.Clone();
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDisableLaserFences(dirtyCave));
+        Assert.Equal(dirtyCaveBefore, dirtyCave);
+    }
+
     // ---- Surgical per-category AI-handler slot (cont.30 / Theri cat8) ----
 
     [Fact]

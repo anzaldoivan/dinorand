@@ -418,6 +418,9 @@ namespace DinoRand.App
         // Fast-forward cutscenes is a DC1-only DINO.exe patch (SCD-VM tick multiplier, cont.79 v2).
         public bool CanDc1FastForwardCutscenes => SelectedGame.Id == "dc1";
 
+        // Laser-fence bypass is a DC1-only reversible install EXE patch.
+        public bool CanDisableLaserFences => SelectedGame.Id == "dc1";
+
         // The key-item scatter (into ammo/health pickups) and the DDK Input/Code disc relocation have no
         // toggles: both ride on the key shuffle, config-built as ShuffleKeyItemsIntoPickups = ShuffleKeyItems
         // and RelocateDdkDiscs = ShuffleKeyItems, so "Shuffle Key Items" does all three key-shuffle behaviors
@@ -499,6 +502,7 @@ namespace DinoRand.App
             if (!CanShortenCutscenes) ShortenCutscenes = false;
             if (!CanDc1DoorSkip) Dc1DoorSkip = false;
             if (!CanDc1FastForwardCutscenes) Dc1FastForwardCutscenes = false;
+            if (!CanDisableLaserFences) DisableLaserFences = false;
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
             if (!CanRandomizeVoices) IsVoicesChecked = false;
             if (!CanShuffleBgm) ShuffleBgm = false;
@@ -524,6 +528,7 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanShortenCutscenes));
             OnPropertyChanged(nameof(CanDc1DoorSkip));
             OnPropertyChanged(nameof(CanDc1FastForwardCutscenes));
+            OnPropertyChanged(nameof(CanDisableLaserFences));
             OnPropertyChanged(nameof(CanRandomizeStartingInventory));
             OnPropertyChanged(nameof(CanRandomizeVoices));
             OnPropertyChanged(nameof(ShowDc1VoiceCast));
@@ -623,12 +628,16 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _shuffleBgm;
 
-        // Door skip (experimental, DC1): reversible DINO.exe patch applied at install (cont.78). Default OFF.
+        // Door skip (DC1): reversible DINO.exe patch applied at install (cont.78). Default OFF.
         [ObservableProperty] private bool _dc1DoorSkip;
 
         // Fast-forward cutscenes (experimental/crash risk, DC1): reversible DINO.exe patch applied at
         // install (cont.79 v2 guarded tick multiplier). Default OFF, not seed-encoded.
         [ObservableProperty] private bool _dc1FastForwardCutscenes;
+
+        // Disable laser fences (DC1): guarded patch is written to the selected install EXE.
+        // Default OFF and deliberately not seed-encoded.
+        [ObservableProperty] private bool _disableLaserFences;
 
         // External BGM import (DC1): overwrite Sound/BGM/ slots with tagged donor tracks from BgmPacksRoot.
         [ObservableProperty] private bool _importBgm;
@@ -743,6 +752,7 @@ namespace DinoRand.App
         }
         partial void OnShortenCutscenesChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2DoorSkipChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDisableLaserFencesChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2RandomizeStartWeaponChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2AddAndEquipStartWeaponChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2DylanStartWeaponIndexChanged(int value) => UpdateSeedFromUi();

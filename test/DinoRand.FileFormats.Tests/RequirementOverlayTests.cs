@@ -344,6 +344,16 @@ public class RequirementOverlayTests
     }
 
     [Fact]
+    public void ShippedDc1Map_Fence0608_Requires0505AndKeyCardA()
+    {
+        var overlay = MapRequirements.LoadDefault();
+        var room = Room(0x0608, new[] { (0x0614, 8) }, Array.Empty<int>());
+        var edge = NodeOf(RoomGraph.Build(new[] { room }, overlay), 0x0608).Edges.Single();
+
+        Assert.Equal(new[] { 0x0505 }, edge.Requires.RoomsVisited);
+    }
+
+    [Fact]
     public void RegionSchema_DoesNotSplitNodes_TopologyStaysAtomic()
     {
         // The doorway-keyed realization never duplicates a node: every room is still exactly one node,

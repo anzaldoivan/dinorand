@@ -437,7 +437,7 @@ namespace DinoRand.App
                         dataDir,
                         outPath,
                         seed,
-                        new RandomizerConfig(),
+                        new RandomizerConfig { DisableLaserFences = config.DisableLaserFences },
                         createStartingInventoryPlan: () => null,
                         output: _ => { },
                         overlayFailure: ex => throw ex)!.InstallResult;

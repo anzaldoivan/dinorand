@@ -1,0 +1,152 @@
+{
+  "_source": "Authored DC1 laser-fence registry from the state-driver decode in data/dc1/placement-gates.md (STATIC-SCD-RE cont.62).",
+  "_note": "Each entry is one zero-based type-4 fence controller instance. stateFlag is the polled beam state (0=active/blocking); enableFlag gates whether the keypad can operate it. requiredRooms are direct normal-flow prerequisites, not transitive claims. requiredItems and requiredActions preserve distinct item-held and pickup/action predicates. The optional guarded EXE patch uses this state-to-enable map only for state 0: enable clear routes down/passable, enable set restores active/blocking; state 1 and keypad/flag writers remain native.",
+  "fences": [
+    {
+      "id": "0102A",
+      "room": "0102",
+      "instance": 12,
+      "stateFlag": "0:12",
+      "enableFlag": "0:240",
+      "requiredRooms": ["0106", "0202", "0107"],
+      "requiredItems": [],
+      "requiredActions": [
+        { "kind": "take", "item": "0x63", "room": "0202", "flag": "7:85" }
+      ]
+    },
+    {
+      "id": "0102B",
+      "room": "0102",
+      "instance": 13,
+      "stateFlag": "0:13",
+      "enableFlag": "0:241",
+      "requiredRooms": ["0106"],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "0108",
+      "room": "0108",
+      "instance": 32,
+      "stateFlag": "0:32",
+      "enableFlag": "0:243",
+      "requiredRooms": ["0106", "0202", "0107"],
+      "requiredItems": [],
+      "requiredActions": [
+        { "kind": "take", "item": "0x63", "room": "0202", "flag": "7:85" }
+      ]
+    },
+    {
+      "id": "010A",
+      "room": "010A",
+      "instance": 36,
+      "stateFlag": "0:36",
+      "enableFlag": "0:244",
+      "requiredRooms": ["0106", "0202", "0107"],
+      "requiredItems": [],
+      "requiredActions": [
+        { "kind": "take", "item": "0x63", "room": "0202", "flag": "7:85" }
+      ]
+    },
+    {
+      "id": "0301A",
+      "room": "0301",
+      "instance": 78,
+      "stateFlag": "0:78",
+      "enableFlag": "0:245",
+      "requiredRooms": [],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "0301B",
+      "room": "0301",
+      "instance": 79,
+      "stateFlag": "0:79",
+      "enableFlag": "0:246",
+      "requiredRooms": [],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "0306A",
+      "room": "0306",
+      "instance": 98,
+      "stateFlag": "0:98",
+      "enableFlag": "0:247",
+      "requiredRooms": [],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "0306B",
+      "room": "0306",
+      "instance": 99,
+      "stateFlag": "0:99",
+      "enableFlag": "0:248",
+      "requiredRooms": [],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "030A",
+      "room": "030A",
+      "instance": 112,
+      "stateFlag": "0:112",
+      "enableFlag": "0:249",
+      "requiredRooms": ["0406"],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "030D",
+      "room": "030D",
+      "instance": 112,
+      "stateFlag": "0:112",
+      "enableFlag": "0:249",
+      "requiredRooms": ["0406"],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "0500",
+      "room": "0500",
+      "instance": 177,
+      "stateFlag": "0:177",
+      "enableFlag": "0:250",
+      "requiredRooms": [],
+      "requiredItems": [],
+      "requiredActions": []
+    },
+    {
+      "id": "0502",
+      "room": "0502",
+      "instance": 173,
+      "stateFlag": "0:173",
+      "enableFlag": "0:251",
+      "requiredRooms": ["0505", "0608"],
+      "requiredItems": ["0x38"],
+      "requiredActions": []
+    },
+    {
+      "id": "0606",
+      "room": "0606",
+      "instance": 147,
+      "stateFlag": "0:147",
+      "enableFlag": "0:252",
+      "requiredRooms": ["0505", "0608"],
+      "requiredItems": ["0x38"],
+      "requiredActions": []
+    },
+    {
+      "id": "0608",
+      "room": "0608",
+      "instance": 149,
+      "stateFlag": "0:149",
+      "enableFlag": "0:253",
+      "requiredRooms": ["0505", "0608"],
+      "requiredItems": ["0x38"],
+      "requiredActions": []
+    }
+  ]
+}

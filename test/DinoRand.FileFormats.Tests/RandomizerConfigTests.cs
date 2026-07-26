@@ -18,6 +18,10 @@ public class RandomizerConfigTests
     }
 
     [Fact]
+    public void DisableLaserFences_DefaultsOff()
+        => Assert.False(new RandomizerConfig().DisableLaserFences);
+
+    [Fact]
     public void NormalizeRatios_BothZero_BecomesDefaultAndReportsChange()
     {
         var cfg = new RandomizerConfig { RatioAmmo = 0, RatioHealth = 0 };
