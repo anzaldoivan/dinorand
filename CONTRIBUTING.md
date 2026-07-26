@@ -6,7 +6,8 @@
 
 ## Branching & pull requests
 
-- **Branch off `main`** into a **`feature/<name>`** branch.
+- **Branch off `main`** into a **`feature/<name>`** branch. Release preparation uses the dedicated
+  **`version/vX.Y.Z`** form (or the equivalent strict SemVer prerelease).
   No direct pushes to `main` — it is protected by repository rulesets
   (see `scripts/setup-rulesets.sh`). PR branch names are checked by the `branch-name` CI job.
 - **All changes land via pull request.** Every PR needs the `build-test-coverage` and
@@ -88,21 +89,28 @@ repository's durable contributor-facing policy.
 
 Releases are automated by `.github/workflows/release.yml`. To cut one:
 
-1. Pick `X.Y.Z` or a SemVer prerelease such as `X.Y.Z-rc.1`. Update
+1. Pick `X.Y.Z` or a SemVer prerelease such as `X.Y.Z-rc.1`, then create the matching PR branch:
+
+   ```bash
+   git switch -c version/vX.Y.Z
+   ```
+
+2. Update
    `Directory.Build.props` and add an exact, non-empty `CHANGELOG.md` section for that version.
-2. Merge the checked release commit to protected `main` and wait for all required checks.
-3. Create the tag at that exact commit, verify it is contained in `origin/main`, and push only the
+3. Merge the checked release commit to protected `main` and wait for all required checks.
+4. Create the tag at that exact commit, verify it is contained in `origin/main`, and push only the
    existing tag:
 
    ```bash
    git fetch origin main
    git merge-base --is-ancestor HEAD origin/main
    git tag -a vX.Y.Z -m "DinoRand vX.Y.Z"
-   git push origin refs/tags/vX.Y.Z
+   git push origin refs/tags/vX.Y.Z:refs/tags/vX.Y.Z
    ```
 
-4. The tag-push workflow independently validates the existing tag and `main` ancestry, builds and
+5. The tag-push workflow independently validates the existing tag and `main` ancestry, builds and
    attests the three RID archives and two `.apworld` files, then creates a draft with `SHA256SUMS`.
-   It publishes only after the draft asset set is complete. There is no manual or branch trigger.
+   It publishes only after the draft asset set is complete. A same-tag manual dispatch is reserved
+   for nondestructive recovery; a branch push never publishes.
 
 Operator settings, recovery, and post-merge steps are documented in [.github/RELEASE.md](.github/RELEASE.md).

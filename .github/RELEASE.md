@@ -19,38 +19,46 @@ prerelease suffix). Generated notes are never a fallback.
 ## Job boundaries
 
 1. `validate` has `contents: read`, checks full history/tag/main/version/notes, and exports only the
-   validated notes and scalar outputs.
+   validated notes, tag, version, prerelease state, and exact commit.
 2. `build` has `contents: read`, restores locked graphs, builds/tests, and packages assets.
 3. `attest` has only `contents: read`, `id-token: write`, and `attestations: write`.
-4. `publish` has only `contents: write`. It checks `SHA256SUMS`, uses `gh release create
-   --verify-tag --draft` without `--target`, uploads the exact six-asset set, reads the draft back,
-   and changes `draft` to false only after exact completeness verification.
+4. `publish` has only `contents: write` and a 30-minute job timeout. The repository-owned
+   `scripts/release_publish.py` is checked out at the run's immutable `github.workflow_sha`. A tag
+   push therefore uses the tagged control plane; a recovery dispatch from protected `main` can use a
+   subsequently corrected publisher without moving the release tag. The publisher re-resolves the
+   remote annotated tag to the validator's exact commit, creates or resumes its draft, and uploads
+   missing assets one at a time in a fixed order. Every request has a 120-second timeout and at most
+   three attempts. After an ambiguous response it reads the draft back before retrying; an exact
+   remote digest counts as success, an incomplete `starter` asset is removed, and an uploaded
+   size/digest mismatch fails closed. Publication occurs only after the exact six names, sizes,
+   uploaded states, and SHA-256 digests match.
 
-A failure after draft creation intentionally leaves an incomplete draft. Inspect it with
-`gh release view vX.Y.Z --repo anzaldoivan/dinorand --json tagName,isDraft,assets`; upload only verified missing assets with
-`gh release upload vX.Y.Z <files>`, repeat the exact asset-set and checksum checks from the workflow,
-then publish with `gh release edit vX.Y.Z --draft=false`. Never create or move a replacement tag.
+Both a tag push and `workflow_dispatch` run the same validator and publisher. A failed or cancelled
+run intentionally leaves a resumable draft. Rerun that workflow, or dispatch the exact unchanged tag
+if its original tag event was missed. Never delete/re-push the tag, upload assets ad hoc, or publish
+the draft manually.
 
 ## Pinned tools and dependencies
 
 `global.json` and `actions/setup-dotnet` both pin SDK `8.0.423`; `rollForward: disable` prevents a
-feature-band fallback. Solution and RID restores use `--locked-mode`; build/test/publish use
-`--no-restore` where supported. Executable and test roots own tracked lockfiles, and the existing AP
-client lock remains authoritative.
+feature-band fallback. All Python-using release jobs pin Python `3.12.13` through a full-SHA-pinned
+`actions/setup-python`. The publisher uses only that Python standard library and GitHub's versioned
+REST API, not the runner's mutable `gh` binary. Solution and RID restores use `--locked-mode`;
+build/test/publish use `--no-restore` where supported. Executable and test roots own tracked
+lockfiles, and the existing AP client lock remains authoritative.
 
-Every Action tag below was resolved against its official repository with `git ls-remote <official
-repository> refs/tags/<tag>` on 2026-07-23:
+The current full-SHA Action pins are:
 
 | Action | Tag | Full commit |
 |---|---|---|
-| `actions/checkout` | `v4.2.2` | `11bd71901bbe5b1630ceea73d27597364c9af683` |
-| `actions/setup-dotnet` | `v4.3.1` | `67a3573c9a986a3f9c594539f4ab511d57bb3ce9` |
-| `actions/setup-python` | `v5.6.0` | `a26af69be951a213d495a4c3e4e4022e16d87065` |
-| `actions/upload-artifact` | `v4.6.2` | `ea165f8d65b6e75b540449e92b4886f43607fa02` |
-| `actions/download-artifact` | `v4.3.0` | `d3f86a106a0bac45b974a628896c90dbdf5c8093` |
-| `schneegans/dynamic-badges-action` | `v1.7.0` | `e9a478b16159b4d31420099ba146cdc50f134483` |
-| `actions/dependency-review-action` | `v4.7.1` | `da24556b548a50705dd671f47852072ea4c105d9` |
-| `actions/attest-build-provenance` | `v2.4.0` | `e8998f949152b193b063cb0ec769d69d929409be` |
+| `actions/checkout` | `v7.0.1` | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+| `actions/setup-dotnet` | `v6.0.0` | `a98b56852c35b8e3190ac28c8c2271da59106c68` |
+| `actions/setup-python` | `v7.0.0` | `5fda3b95a4ea91299a34e894583c3862153e4b97` |
+| `actions/upload-artifact` | `v7.0.1` | `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` |
+| `actions/download-artifact` | `v8.0.1` | `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c` |
+| `schneegans/dynamic-badges-action` | `v1.9.0` | `28b0fa8bdeb46170ac397105ece0c1fe58f68910` |
+| `actions/dependency-review-action` | `v5.0.0` | `a1d282b36b6f3519aa1f3fc636f609c47dddb294` |
+| `actions/attest-build-provenance` | `v4.1.1` | `0f67c3f4856b2e3261c31976d6725780e5e4c373` |
 
 ## Notices, archives, checksums, and attestations
 
@@ -68,120 +76,34 @@ Each deterministic archive contains both executables, project `LICENSE`, `LEGAL.
 license/notices. `SHA256SUMS` covers the three RID archives and two `.apworld` files in filename
 order and is checked before upload. Build provenance attests that same asset directory.
 
-## Remote safety gate and current deviation
+## Current remote release controls
 
-The legacy remote `release.yml` must be disabled before this change merges and remain disabled until
-all post-merge checks below pass:
+The one-time public-hardening rollout is complete. The current release baseline is:
+
+- `release.yml` is active and supports both `v*` tag pushes and explicit same-tag recovery dispatch;
+- repository Actions policy requires full-SHA pins;
+- `main-protection` requires PR review and the configured status checks;
+- `release-tag-protection` protects `v*` creation, deletion, and non-fast-forward updates with the
+  configured owner bypass;
+- the obsolete release-branch ruleset has been removed; and
+- immutable releases and the approved repository security controls are enabled.
+
+A normal release cut must not disable the workflow or mutate repository settings/rulesets. Read them
+back only when diagnosing an actual mismatch:
 
 ```bash
-gh workflow disable release.yml --repo anzaldoivan/dinorand
 gh workflow view release.yml --repo anzaldoivan/dinorand
+gh api repos/anzaldoivan/dinorand/actions/permissions \
+  --jq '{allowed_actions,sha_pinning_required}'
+gh api repos/anzaldoivan/dinorand/rulesets \
+  --jq '.[] | [.id,.name,.target,.enforcement]'
+gh api repos/anzaldoivan/dinorand/immutable-releases
 ```
 
-Authentication succeeded on retry on 2026-07-24. Workflow `#309012384` was read back as
-`disabled_manually` and must remain in that state until the hardened workflow is on `main` and the
-post-merge checks below pass.
+Any future settings mutation is a separate operation: capture its exact before-state in a
+mode-0700 directory, generate the inverse from that response, and obtain explicit approval. Never
+run historical rollout/rollback commands as part of a version cut.
 
-## Repository settings and rollback
+## Legal scope
 
-Mode-0700 before/after receipts and exact rollback payloads were captured under
-`/tmp/dinorand-public-hardening-remote-20260724`. Before-state was: description
-`Randomizer for classic Dino Crisis`; topics `mod`, `randomizer`, `dino-crisis`; release workflow
-active; private vulnerability reporting, immutable releases, vulnerability alerts, automated
-security fixes, secret scanning, push protection, and CodeQL default setup disabled. Actions already
-used read-only default permissions, could not approve pull requests, allowed all Actions, and did not
-require full-SHA pinning.
-
-The approved metadata and security controls were enabled and read back. The complete `main-protection`
-ruleset was round-tripped: bypass actors and existing rules/checks were preserved, and only
-`branch-name`, `apworld`, and `apworld-ap-integration` were added. The release-branch and release-tag
-rulesets, releases, and tags remained unchanged.
-
-The protected receipt directory contains `rollback-commands.sh`, which was generated but not run.
-The durable equivalent is:
-
-```bash
-printf '%s\n' '{"description":"Randomizer for classic Dino Crisis","security_and_analysis":{"secret_scanning":{"status":"disabled"},"secret_scanning_push_protection":{"status":"disabled"}}}' | \
-  gh api --method PATCH repos/anzaldoivan/dinorand --input -
-printf '%s\n' '{"names":["mod","randomizer","dino-crisis"]}' | \
-  gh api --method PUT repos/anzaldoivan/dinorand/topics --input -
-gh api --method DELETE repos/anzaldoivan/dinorand/private-vulnerability-reporting
-gh api --method DELETE repos/anzaldoivan/dinorand/immutable-releases
-gh api --method DELETE repos/anzaldoivan/dinorand/vulnerability-alerts
-gh api --method DELETE repos/anzaldoivan/dinorand/automated-security-fixes
-printf '%s\n' '{"state":"not-configured"}' | \
-  gh api --method PATCH repos/anzaldoivan/dinorand/code-scanning/default-setup --input -
-
-gh api repos/anzaldoivan/dinorand/rulesets/18643611 > /tmp/dinorand-main-ruleset-current.json
-jq '(.rules[] | select(.type == "required_status_checks") |
-      .parameters.required_status_checks) |=
-      map(select(.context != "branch-name" and .context != "apworld" and
-                 .context != "apworld-ap-integration")) |
-    {name,target,enforcement,bypass_actors,conditions,rules}' \
-  /tmp/dinorand-main-ruleset-current.json > /tmp/dinorand-main-ruleset-rollback.json
-gh api --method PUT repos/anzaldoivan/dinorand/rulesets/18643611 \
-  --input /tmp/dinorand-main-ruleset-rollback.json
-gh workflow enable release.yml --repo anzaldoivan/dinorand
-```
-
-Before any future settings change, save its GET response mode-0700 and generate the inverse command
-from that response. Never guess an unavailable prior value.
-
-The applied public metadata and its read-back commands are:
-
-```bash
-gh api --method PATCH repos/anzaldoivan/dinorand \
-  -f description='Cross-platform Dino Crisis 1 & 2 randomizer for the GOG DRM-free releases, with deterministic seeds, reversible installs, and Archipelago support.'
-printf '%s\n' '{"names":["archipelago","avalonia","csharp","dino-crisis","dotnet","game-randomizer","gog","modding","randomizer","reverse-engineering"]}' | \
-  gh api --method PUT repos/anzaldoivan/dinorand/topics --input -
-gh api repos/anzaldoivan/dinorand --jq '{description,visibility,default_branch}'
-gh api repos/anzaldoivan/dinorand/topics --jq '.names'
-```
-
-## Required post-merge order
-
-Do not run these steps until the workflow pins and scripts above are in `main`, the icon P0 is
-resolved, and the legacy release workflow is confirmed disabled.
-
-1. Confirm every `uses:` on `main` is a full SHA, then preserve the current Actions policy while
-   enabling mandatory SHA pinning:
-
-   ```bash
-   git fetch origin main
-   git show origin/main:.github/workflows/release.yml | rg '@[0-9a-f]{40} # v'
-   gh api repos/anzaldoivan/dinorand/actions/permissions > /tmp/dinorand-actions-before.json
-   jq '.sha_pinning_required=true' /tmp/dinorand-actions-before.json | \
-     gh api --method PUT repos/anzaldoivan/dinorand/actions/permissions --input -
-   gh api repos/anzaldoivan/dinorand/actions/permissions --jq '{allowed_actions,sha_pinning_required}'
-   ```
-
-2. Confirm the three verified contexts already present on `main-protection`, then use the idempotent
-   post-merge phase to protect release-tag creation and explicitly remove the obsolete release-branch
-   ruleset:
-
-   ```bash
-   bash scripts/setup-rulesets.sh --phase post-merge
-   gh api repos/anzaldoivan/dinorand/rulesets/18643611 --jq '{bypass_actors,rules}'
-   gh api repos/anzaldoivan/dinorand/rulesets/18643614 --jq '{bypass_actors,conditions,rules}'
-   bash scripts/setup-rulesets.sh --phase post-merge --remove-obsolete-release-branch-ruleset
-   gh api repos/anzaldoivan/dinorand/rulesets --jq '.[] | [.id,.name,.target,.enforcement]'
-   ```
-
-3. Read back the approved metadata, private vulnerability reporting, immutable releases, alerts,
-   automated security fixes, secret scanning, push protection, and CodeQL default setup. These were
-   applied on 2026-07-24; do not mutate them again if the read-back already matches.
-
-4. Re-enable only the merged tag workflow and verify its trigger from `origin/main`:
-
-   ```bash
-   git show origin/main:.github/workflows/release.yml | sed -n '1,35p'
-   gh workflow enable release.yml --repo anzaldoivan/dinorand
-   gh workflow view release.yml --repo anzaldoivan/dinorand
-   ```
-
-## P0 gates and known risks
-
-- No screenshot or social preview is approved.
-- No tag or release may be created until every P0 gate is closed and the repository settings have
-  been read back successfully.
-- Practical risk-reduction only, not legal advice; a lawyer confirms before publishing.
+Practical risk-reduction only, not legal advice; a lawyer confirms before publishing.

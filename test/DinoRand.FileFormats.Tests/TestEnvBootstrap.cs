@@ -10,12 +10,29 @@ namespace DinoRand.FileFormats.Tests;
 /// missing <c>.env</c> is a no-op (CI has none → the tests fall back to <see cref="MockRooms"/>).
 ///
 /// <para><c>.env</c> is gitignored — it holds per-machine install paths, never game bytes.</para>
+///
+/// <para>Release validation sets <c>DINORAND_DISABLE_REAL_INSTALL=1</c>. In that mode this
+/// initializer removes all real-install variables from the test process and does not read
+/// <c>.env</c>, making the ordinary suite independent of the developer's machine.</para>
 /// </summary>
 internal static class TestEnvBootstrap
 {
     [ModuleInitializer]
     internal static void Load()
     {
+        if (Environment.GetEnvironmentVariable("DINORAND_DISABLE_REAL_INSTALL") == "1")
+        {
+            foreach (var key in new[]
+            {
+                "DINORAND_DC1_DIR",
+                "DINORAND_DC2_DIR",
+                "DINORAND_REQUIRE_REAL_INSTALL",
+                "DINORAND_REAL_INSTALL_RECEIPT_DIR",
+            })
+                Environment.SetEnvironmentVariable(key, null);
+            return;
+        }
+
         var root = FindRepoRoot();
         if (root is null) return;
         var envPath = Path.Combine(root, ".env");
