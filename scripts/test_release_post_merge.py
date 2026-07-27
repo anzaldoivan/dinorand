@@ -122,9 +122,10 @@ def tag_response(
     commit=MERGE_COMMIT,
     message="DinoRand v0.6.3",
     date=TAGGER_DATE,
+    object_sha=TAG_OBJECT,
 ):
     return {
-        "sha": TAG_OBJECT,
+        "sha": object_sha,
         "tag": tag,
         "message": message,
         "object": {"type": "commit", "sha": commit},
@@ -178,6 +179,7 @@ class ReleaseTaggerTests(unittest.TestCase):
             [ref_response(object_type="commit", sha=MERGE_COMMIT)],
             [ref_response(), tag_response(commit="c" * 40)],
             [ref_response(), tag_response(message="unexpected")],
+            [ref_response(), tag_response(object_sha="d" * 40)],
         )
         for responses in cases:
             with self.subTest(responses=responses):
@@ -211,6 +213,61 @@ class ReleaseTaggerTests(unittest.TestCase):
         self.assertEqual(
             [method for method, _, _ in api.calls],
             ["GET", "POST", "POST", "GET", "GET"],
+        )
+
+    def test_ambiguous_tag_response_reconciles_before_bounded_retry(self):
+        api = FakeApi(
+            [
+                release_tag.ApiError(404, "missing ref"),
+                release_tag.TransientApiError("timed out"),
+                release_tag.ApiError(404, "still missing"),
+                release_tag.ApiError(404, "missing before retry"),
+                tag_response(),
+                {},
+                ref_response(),
+                tag_response(),
+            ]
+        )
+
+        release_tag.ensure_release_tag(
+            api,
+            REPOSITORY,
+            self.spec(),
+            token="configured-pat",
+            attempts=2,
+            sleep=lambda _: None,
+        )
+
+        self.assertEqual(
+            [method for method, _, _ in api.calls],
+            ["GET", "POST", "GET", "GET", "POST", "POST", "GET", "GET"],
+        )
+
+    def test_transient_tag_failures_stop_at_the_attempt_bound(self):
+        api = FakeApi(
+            [
+                release_tag.ApiError(404, "missing ref"),
+                release_tag.TransientApiError("timed out"),
+                release_tag.ApiError(404, "still missing"),
+                release_tag.ApiError(404, "missing before retry"),
+                release_tag.TransientApiError("timed out again"),
+                release_tag.ApiError(404, "still missing"),
+            ]
+        )
+
+        with self.assertRaisesRegex(release_tag.TaggingError, "after 2 attempts"):
+            release_tag.ensure_release_tag(
+                api,
+                REPOSITORY,
+                self.spec(),
+                token="configured-pat",
+                attempts=2,
+                sleep=lambda _: None,
+            )
+
+        self.assertEqual(
+            [method for method, _, _ in api.calls],
+            ["GET", "POST", "GET", "GET", "POST", "GET"],
         )
 
     def test_missing_pat_fails_before_any_api_request(self):

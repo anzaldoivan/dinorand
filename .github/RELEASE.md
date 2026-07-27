@@ -2,41 +2,57 @@
 
 ## Decision
 
-Branch creation is not a release authority: a branch can be pushed before review, may not be in
-`main`, and the old workflow could synthesize a tag through `gh release create --target`. DinoRand
-therefore publishes only after an existing tag is pushed. The accepted grammar is:
+Branch creation is not a release authority: a branch can be pushed before review and may not be in
+`main`. `feature/*` names remain unrestricted and never authorize tagging. A release cut uses a
+same-repository PR whose head exactly matches `version/vMAJOR.MINOR.PATCH[-PRERELEASE]`. When and
+only when that PR merges into `main`, `post-merge-release-tag.yml` creates one annotated tag at the
+exact merge commit. DinoRand publishes only after that PAT-created tag push. The accepted tag
+grammar is:
 
 - stable: `vMAJOR.MINOR.PATCH`;
 - prerelease: `vMAJOR.MINOR.PATCH-IDENTIFIER[.IDENTIFIER...]`;
 - numeric identifiers and core numbers have no leading zeroes; identifiers use ASCII letters,
   digits, and hyphens; build metadata (`+...`) is rejected.
 
-The tag resolves to a commit, that commit must be an ancestor of freshly fetched `origin/main`, its
-core version must equal the single `VersionPrefix` in `Directory.Build.props`, and
-`CHANGELOG.md` must have one exact, non-empty curated section for the full version (including a
-prerelease suffix). Generated notes are never a fallback.
+The post-merge workflow checks out the PR's pre-merge base SHA as trusted control code and checks out
+the exact merge commit separately as data. It never executes candidate scripts. The trusted
+validator requires that commit to be the candidate `HEAD` and an ancestor of freshly fetched
+`origin/main`, requires its core version to equal the single `VersionPrefix` in
+`Directory.Build.props`, and requires `CHANGELOG.md` to have one exact, non-empty curated section
+for the full version. Generated notes are never a fallback.
+
+The repository-owned tagger uses GitHub's annotated-tag-object then tag-reference REST sequence. It
+sets the target to the exact merge SHA, the message to `DinoRand vVERSION`, fixed repository-owned
+tagger identity, and the PR merge time. It reconciles ambiguous responses before bounded retries.
+An existing exact annotated tag is success; a lightweight tag or any target/metadata mismatch fails
+closed. `RELEASE_TAG_TOKEN` must be an owner fine-grained PAT limited to this repository with
+`Contents: read/write`; its owner retains administrator status for the protected `v*` creation
+bypass. The PAT is required so its tag push starts `release.yml`; the normal `GITHUB_TOKEN` does
+not provide that event chaining.
 
 ## Job boundaries
 
-1. `validate` has `contents: read`, checks full history/tag/main/version/notes, and exports only the
-   validated notes, tag, version, prerelease state, and exact commit.
-2. `build` has `contents: read`, restores locked graphs, builds/tests, and packages assets.
-3. `attest` has only `contents: read`, `id-token: write`, and `attestations: write`.
-4. `publish` has only `contents: write` and a 30-minute job timeout. The repository-owned
+1. `post-merge-release-tag` has only `contents: read` through the workflow token. It runs only for a
+   merged, same-repository `version/*` PR targeting `main`; trusted code validates the strict branch
+   grammar and candidate inputs before the separate PAT creates or reconciles the tag.
+2. Release `validate` has `contents: read`, checks full history/tag/main/version/notes, and exports
+   only the validated notes, tag, version, prerelease state, and exact commit.
+3. `build` has `contents: read`, restores locked graphs, builds/tests, and packages assets.
+4. `attest` has only `contents: read`, `id-token: write`, and `attestations: write`.
+5. `publish` has only `contents: write` and a 30-minute job timeout. The repository-owned
    `scripts/release_publish.py` is checked out at the run's immutable `github.workflow_sha`. A tag
-   push therefore uses the tagged control plane; a recovery dispatch from protected `main` can use a
-   subsequently corrected publisher without moving the release tag. The publisher re-resolves the
-   remote annotated tag to the validator's exact commit, creates or resumes its draft, and uploads
-   missing assets one at a time in a fixed order. Every request has a 120-second timeout and at most
-   three attempts. After an ambiguous response it reads the draft back before retrying; an exact
-   remote digest counts as success, an incomplete `starter` asset is removed, and an uploaded
-   size/digest mismatch fails closed. Publication occurs only after the exact six names, sizes,
-   uploaded states, and SHA-256 digests match.
+   push therefore uses the tagged control plane. The publisher re-resolves the remote annotated tag
+   to the validator's exact commit, creates or resumes its draft, and uploads missing assets one at
+   a time in a fixed order. Every request has a 120-second timeout and at most three attempts. After
+   an ambiguous response it reads the draft back before retrying; an exact remote digest counts as
+   success, an incomplete `starter` asset is removed, and an uploaded size/digest mismatch fails
+   closed. Publication occurs only after the exact six names, sizes, uploaded states, and SHA-256
+   digests match.
 
 Both a tag push and `workflow_dispatch` run the same validator and publisher. A failed or cancelled
-run intentionally leaves a resumable draft. Rerun that workflow, or dispatch the exact unchanged tag
-if its original tag event was missed. Never delete/re-push the tag, upload assets ad hoc, or publish
-the draft manually.
+run intentionally leaves a resumable draft and is rerun unchanged. Dispatch the exact unchanged tag
+only if its original tag event produced no run. Never delete/re-push the tag, upload assets ad hoc,
+or publish the draft manually.
 
 ## Pinned tools and dependencies
 
@@ -81,6 +97,9 @@ order and is checked before upload. Build provenance attests that same asset dir
 The one-time public-hardening rollout is complete. The current release baseline is:
 
 - `release.yml` is active and supports both `v*` tag pushes and explicit same-tag recovery dispatch;
+- `post-merge-release-tag.yml` automatically tags eligible merged version PRs;
+- before the first version PR merge, `RELEASE_TAG_TOKEN` must be configured with repository-only
+  `Contents: read/write` access and an administrator owner;
 - repository Actions policy requires full-SHA pins;
 - `main-protection` requires PR review and the configured status checks;
 - `release-tag-protection` protects `v*` creation, deletion, and non-fast-forward updates with the

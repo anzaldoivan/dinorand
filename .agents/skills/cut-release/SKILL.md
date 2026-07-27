@@ -1,6 +1,6 @@
 ---
 name: cut-release
-description: Cut a DinoRand version release — prepare and validate the release inputs, land them through a version-branch PR, tag the exact merged commit, and verify the idempotent release workflow. Use when the user asks to cut/tag/ship a release, bump the version, or generate a release build.
+description: Cut a DinoRand version release — prepare and validate the release inputs, land them through a version-branch PR, verify automatic tagging of the exact merge commit, and watch the idempotent release workflow. Use when the user asks to cut/tag/ship a release, bump the version, or generate a release build.
 ---
 
 ## When to use
@@ -10,12 +10,15 @@ The user wants to cut a release: "release vX.Y.Z", "bump the version", "generate
 ## The contract
 
 - A release change lands through a strict `version/vMAJOR.MINOR.PATCH` or
-  `version/vMAJOR.MINOR.PATCH-PRERELEASE` pull request. Never use `feature/release-*`,
-  `release/*`, or a direct push to `main`, even when the owner can bypass the ruleset.
-- Create the annotated tag only after the PR is merged. Point it at the exact verified PR merge
-  commit, not at the pre-merge version-branch commit and not implicitly at the current checkout.
+  `version/vMAJOR.MINOR.PATCH-PRERELEASE` pull request. `feature/*` remains unrestricted feature
+  naming; do not use it for an actual release cut. Never use `release/*` or a direct push to `main`,
+  even when the owner can bypass the ruleset.
+- The post-merge release-tag workflow creates the annotated tag only after an eligible PR merges.
+  It validates the exact merge commit with trusted pre-merge control code, then uses the
+  repository-scoped `RELEASE_TAG_TOKEN`; do not create or push a release tag manually.
 - `.github/workflows/release.yml` normally runs when a tag matching `v*` is pushed. Its
-  `workflow_dispatch` input can safely replay the same existing tag without deleting or moving it.
+  `workflow_dispatch` input is only for recovery when the exact tag exists but its push event
+  produced no run.
 - The validator requires strict `vMAJOR.MINOR.PATCH` or
   `vMAJOR.MINOR.PATCH-PRERELEASE` syntax.
 - The tag must already exist, be annotated, resolve to the validator's exact commit, and point to a
@@ -25,6 +28,9 @@ The user wants to cut a release: "release vX.Y.Z", "bump the version", "generate
 - The publisher is idempotent. It creates or resumes the exact draft, uploads missing assets in a
   fixed order with bounded retries/timeouts, verifies remote size and SHA-256, and publishes only
   the exact six-asset set. Rerun it; never repair a release with ad-hoc uploads.
+- Before merging the first version PR, confirm the `RELEASE_TAG_TOKEN` repository secret contains
+  an owner fine-grained PAT limited to this repository with `Contents: read/write`. The token owner
+  must retain administrator status so the existing protected-tag creation bypass applies.
 
 ## HARD GATE: approval before real-install validation
 
@@ -127,48 +133,34 @@ This command requires both approved game paths because it runs both `RealInstall
    If the owner must use an admin merge because independent review is impossible, stop and obtain
    explicit approval for that bypass; do not infer it from release approval.
 
-6. **Prove the PR merged, then create the local tag.** Read the PR back and require `MERGED`,
-   base `main`, the recorded `RELEASE_HEAD`, and a non-null merge commit. Fetch `main`, require the
-   merge commit to be its ancestor, and ensure the tag is still absent remotely.
+6. **Prove the PR merged, then watch automatic tagging.** Read the PR back and require `MERGED`,
+   base `main`, the exact `version/vX.Y.Z` head, the recorded `RELEASE_HEAD`, and a non-null merge
+   commit. Fetch `main` and require the merge commit to be its ancestor.
 
    ```bash
    gh pr view PR_NUMBER \
      --json state,baseRefName,headRefName,headRefOid,mergeCommit,mergedAt
    git fetch origin main --tags
    git merge-base --is-ancestor MERGE_COMMIT origin/main
-   git ls-remote --tags origin refs/tags/vX.Y.Z
+   gh run list --workflow post-merge-release-tag.yml --event pull_request_target \
+     --commit MERGE_COMMIT --limit 20 \
+     --json databaseId,headBranch,headSha,status,conclusion,url
+   gh run watch TAG_RUN_ID --exit-status
    ```
 
-   Create the annotated tag only after the PR is merged:
+   Require the run for `PR_NUMBER` to succeed. Then read the protected tag reference and its
+   annotated object through the API. Require reference type `tag`, tag name `vX.Y.Z`, message
+   `DinoRand vX.Y.Z`, target type `commit`, and target `MERGE_COMMIT`. The tagger date must equal
+   the PR's `mergedAt` timestamp and the tagger must be the repository-owned release automation.
 
    ```bash
-   git tag -a vX.Y.Z MERGE_COMMIT -m "DinoRand vX.Y.Z"
-   test "$(git cat-file -t refs/tags/vX.Y.Z)" = tag
-   test "$(git rev-parse refs/tags/vX.Y.Z^{commit})" = "MERGE_COMMIT"
-   notes_file="$(mktemp /tmp/dinorand-release-notes-XXXXXX)"
-   PYTHONDONTWRITEBYTECODE=1 python3 scripts/release_validate.py \
-     --repository . --tag vX.Y.Z --notes-output "$notes_file"
+   TAG_OBJECT_SHA="$(gh api repos/anzaldoivan/dinorand/git/ref/tags/vX.Y.Z --jq '.object.sha')"
+   gh api "repos/anzaldoivan/dinorand/git/tags/$TAG_OBJECT_SHA" \
+     --jq '{tag,message,object,tagger}'
    ```
 
-7. **STOP before the tag push.** Show the exact annotated tag object, dereferenced commit, validated
-   notes, remote-tag absence, and active workflow state:
-
-   ```bash
-   git rev-parse refs/tags/vX.Y.Z
-   git rev-parse refs/tags/vX.Y.Z^{commit}
-   cat "$notes_file"
-   gh workflow list --all --limit 100
-   gh workflow view release.yml
-   ```
-
-   Obtain explicit approval naming that tag object before pushing. Use the explicit refspec; a plain
-   `git push` does not push the tag:
-
-   ```bash
-   git push origin refs/tags/vX.Y.Z:refs/tags/vX.Y.Z
-   ```
-
-8. **Require and watch the exact tag run.** Do not infer success from the tag push.
+7. **Require and watch the exact tag-triggered release run.** The PAT-created tag push starts
+   `release.yml`; do not infer release success merely from the tagging run.
 
    ```bash
    gh run list --workflow release.yml --limit 20 \
@@ -180,7 +172,7 @@ This command requires both approved game paths because it runs both `RealInstall
    Require `headBranch=vX.Y.Z`, the validated merge commit as `headSha`, and all four jobs
    (`validate`, `build`, `attest`, `publish`) successful.
 
-9. **Use only idempotent recovery.**
+8. **Use only idempotent recovery.**
 
    - If a run exists but failed or was cancelled because of a transient service/runner failure,
      inspect it with `gh run view RUN_ID --log-failed`, then rerun the unchanged tag workflow:
@@ -193,43 +185,34 @@ This command requires both approved game paths because it runs both `RealInstall
      The publisher resumes the same draft, reconciles ambiguous requests, uploads only missing
      assets, and verifies every remote digest before publication.
 
-   - If the release-control workflow or publisher itself is defective, fix it through a new
-     protected `main` PR. Do not rerun the old workflow commit. After the fix merges, dispatch from
-     `main`; the publish job executes that dispatch's immutable `github.workflow_sha`, while
-     validation and asset building still use the unchanged release tag:
-
-     ```bash
-     gh workflow run release.yml --ref main -f tag=vX.Y.Z
-     ```
-
-   - If the tag push produced no run because the workflow was disabled, validate that the local and
-     remote annotated tag objects are identical and still point into `origin/main`. After explicit
-     approval, enable the workflow and dispatch the same immutable tag:
+   - Only if the exact remote tag exists but its tag push produced no `release.yml` run, validate
+     the remote annotated object again. After explicit approval, enable the workflow if necessary
+     and dispatch that same immutable tag from protected `main`:
 
      ```bash
      gh workflow enable release.yml
      gh workflow run release.yml --ref main -f tag=vX.Y.Z
      ```
 
-   Never delete, recreate, move, or force-update a release tag. Never use ad-hoc
-   `gh release upload` or publish a draft manually; rerun or dispatch the repository-owned
-   deterministic publisher. If the tagged product inputs or built source are wrong, fail closed and
-   cut a new version; a control-plane recovery must not change tagged release content.
+   Never use dispatch to replace an existing failed tag-triggered run. If the release control or
+   tagged product is defective, fix the repository through a protected `main` PR and cut a new
+   version. Never delete, recreate, move, or force-update a release tag, use ad-hoc
+   `gh release upload`, or publish a draft manually.
 
-10. **Read back the published release.** Require `isDraft=false`, the expected prerelease state,
-    the exact six asset names, uploaded states, sizes, and `sha256:` digests:
+9. **Read back the published release.** Require `isDraft=false`, the expected prerelease state,
+   the exact six asset names, uploaded states, sizes, and `sha256:` digests:
 
-    ```bash
-    gh release view vX.Y.Z --repo anzaldoivan/dinorand \
-      --json tagName,isDraft,isPrerelease,publishedAt,url,assets
-    gh api repos/anzaldoivan/dinorand/releases/tags/vX.Y.Z \
-      --jq '{tag_name,draft,prerelease,published_at,assets:[.assets[]|{name,size,state,digest}]}'
-    ```
+   ```bash
+   gh release view vX.Y.Z --repo anzaldoivan/dinorand \
+     --json tagName,isDraft,isPrerelease,publishedAt,url,assets
+   gh api repos/anzaldoivan/dinorand/releases/tags/vX.Y.Z \
+     --jq '{tag_name,draft,prerelease,published_at,assets:[.assets[]|{name,size,state,digest}]}'
+   ```
 
 ## Gotchas
 
 - A version or release-input change after the local build requires another build and PR update.
   Because tagging happens after merge, no tag recreation is part of the normal flow.
-- A workflow rerun or manual dispatch is safe only for the exact unchanged remote annotated tag.
-  The validator and publisher both recheck its commit.
+- A workflow rerun is safe for the unchanged tag. Manual same-tag dispatch is reserved for a
+  missed tag event and remains safe only after the remote annotated object is revalidated.
 - `scripts/build-release-assets.sh X.Y.Z` is the CI packaging path; it produces all release RIDs and the complete asset set. The local check above intentionally builds the Windows RID first.

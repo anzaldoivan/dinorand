@@ -217,6 +217,10 @@ def reconcile_existing(api, repository: str, spec: TagSpec) -> bool:
     if not FULL_SHA.fullmatch(object_sha):
         raise TaggingError("annotated tag reference has an invalid object SHA")
     tag_object = api.request("GET", f"{tags_path}/{object_sha}")
+    if tag_object.get("sha") != object_sha:
+        raise TaggingError(
+            "annotated tag object response does not match its reference"
+        )
     _validate_tag_object(tag_object, spec)
     return True
 
