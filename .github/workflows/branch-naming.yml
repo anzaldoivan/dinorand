@@ -1,10 +1,11 @@
 name: branch-name
 
 # Enforces the branch-naming policy at the merge gate. GitHub's `branch_name_pattern` ruleset rule
-# is Organization-only, and this is a User repo, so naming is gated here instead: a PR into `main`
-# must come from a `feature/*` branch. Make the `branch-name` job a REQUIRED status
-# check on main (scripts/setup-rulesets.sh) so a non-conforming PR cannot merge. This gates merges;
-# it cannot block creating a misnamed branch locally (that needs an Organization ruleset).
+# is Organization-only, and this is a User repo, so naming is gated here instead. Human-authored
+# work uses `feature/*`; release preparation uses a strict SemVer `version/v*` branch; and
+# Dependabot-authored PRs may use its generated `dependabot/*` namespace. Make the `branch-name` job
+# a REQUIRED status check on main (scripts/setup-rulesets.sh) so a non-conforming PR cannot merge.
+# This gates merges; it cannot block creating a misnamed branch locally.
 on:
   pull_request:
     branches: [main]
@@ -17,15 +18,33 @@ jobs:
     name: branch-name
     runs-on: ubuntu-latest
     steps:
-      - name: Head branch must be feature/*
+      - name: Enforce the PR branch namespace
         env:
           HEAD_REF: ${{ github.head_ref }}
+          HEAD_LOGIN: ${{ github.event.pull_request.user.login }}
         run: |
+          version_pattern='^version/v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[A-Za-z-][0-9A-Za-z-]*))*)?$'
           case "$HEAD_REF" in
+            version/*)
+              if [[ "$HEAD_REF" =~ $version_pattern ]]; then
+                echo "✓ '$HEAD_REF' is a valid release version branch."
+              else
+                echo "::error::Branch '$HEAD_REF' is not a valid release version branch." \
+                     "Use 'version/vMAJOR.MINOR.PATCH' or a valid SemVer prerelease."
+                exit 1
+              fi ;;
             feature/*)
               echo "✓ '$HEAD_REF' matches the naming policy." ;;
+            dependabot/*)
+              if [ "$HEAD_LOGIN" = "dependabot[bot]" ]; then
+                echo "✓ '$HEAD_REF' is owned by Dependabot."
+              else
+                echo "::error::Branch '$HEAD_REF' uses the reserved Dependabot namespace" \
+                     "but the PR author is '$HEAD_LOGIN'."
+                exit 1
+              fi ;;
             *)
               echo "::error::Branch '$HEAD_REF' violates the naming policy." \
-                   "PRs into main must come from 'feature/<name>'."
+                   "Use 'feature/<name>' or 'version/vMAJOR.MINOR.PATCH'."
               exit 1 ;;
           esac

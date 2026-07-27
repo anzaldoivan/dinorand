@@ -4,32 +4,45 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing annotated release tag to validate and publish
+        required: true
+        type: string
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     outputs:
       tag: ${{ steps.release.outputs.tag }}
       version: ${{ steps.release.outputs.version }}
       prerelease: ${{ steps.release.outputs.prerelease }}
+      commit: ${{ steps.release.outputs.commit }}
     steps:
       - name: Check out the pushed tag with full history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.tag || github.ref_name }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Use the pinned release Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12.13"
       - name: Fetch the checked main branch
         run: git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
       - name: Validate existing tag, version, ancestry, and curated notes
         id: release
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: >-
           PYTHONDONTWRITEBYTECODE=1 python3 scripts/release_validate.py
           --tag "$RELEASE_TAG" --notes-output NOTES.md --github-output "$GITHUB_OUTPUT"
@@ -43,14 +56,22 @@ jobs:
   build:
     needs: validate
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DINORAND_DISABLE_REAL_INSTALL: "1"
     permissions:
       contents: read
     steps:
       - name: Check out the validated tag
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ needs.validate.outputs.tag }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Use the pinned release Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12.13"
       - name: Use the pinned release SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
@@ -75,6 +96,7 @@ jobs:
   attest:
     needs: [validate, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       id-token: write
@@ -93,9 +115,19 @@ jobs:
   publish:
     needs: [validate, build, attest]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
     steps:
+      - name: Check out the immutable release control commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - name: Use the pinned release Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12.13"
       - name: Download release assets
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -106,45 +138,23 @@ jobs:
         with:
           name: release-metadata
           path: release-metadata
-      - name: Create, verify, and publish the draft
+      - name: Create or resume, verify, and publish
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.validate.outputs.tag }}
           VERSION: ${{ needs.validate.outputs.version }}
           PRERELEASE: ${{ needs.validate.outputs.prerelease }}
-        run: |
-          set -euo pipefail
-          expected=(
-            "dinorand-v${VERSION}-win-x64.zip"
-            "dinorand-v${VERSION}-linux-x64.zip"
-            "dinorand-v${VERSION}-osx-arm64.zip"
-            "dino_crisis_1.apworld"
-            "dino_crisis_2.apworld"
-            "SHA256SUMS"
-          )
-          for name in "${expected[@]}"; do test -f "release-assets/$name"; done
-          test "$(find release-assets -maxdepth 1 -type f | wc -l)" -eq "${#expected[@]}"
-          (cd release-assets && sha256sum -c SHA256SUMS)
-          flags=()
-          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
-          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
-            --title "DinoRand $RELEASE_TAG" --notes-file release-metadata/NOTES.md "${flags[@]}"
-          paths=()
-          for name in "${expected[@]}"; do paths+=("release-assets/$name"); done
-          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" "${paths[@]}"
-          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,assets > draft-release.json
-          python3 - "$RELEASE_TAG" "$VERSION" draft-release.json <<'PY'
-          import json, sys
-          tag, version, path = sys.argv[1:]
-          release = json.load(open(path, encoding="utf-8"))
-          expected = {
-              f"dinorand-v{version}-win-x64.zip",
-              f"dinorand-v{version}-linux-x64.zip",
-              f"dinorand-v{version}-osx-arm64.zip",
-              "dino_crisis_1.apworld", "dino_crisis_2.apworld", "SHA256SUMS",
-          }
-          actual = {asset["name"] for asset in release["assets"]}
-          if release["tagName"] != tag or not release["isDraft"] or actual != expected:
-              raise SystemExit(f"draft completeness check failed: tag={release['tagName']} draft={release['isDraft']} assets={sorted(actual)}")
-          PY
-          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+          EXPECTED_COMMIT: ${{ needs.validate.outputs.commit }}
+        run: >-
+          PYTHONDONTWRITEBYTECODE=1 python3 scripts/release_publish.py
+          --repository "$GITHUB_REPOSITORY"
+          --tag "$RELEASE_TAG"
+          --version "$VERSION"
+          --expected-commit "$EXPECTED_COMMIT"
+          --prerelease "$PRERELEASE"
+          --assets-dir release-assets
+          --notes-file release-metadata/NOTES.md
+          --attempts 3
+          --request-timeout 120
+          --upload-timeout 120
+          --retry-delay 2
