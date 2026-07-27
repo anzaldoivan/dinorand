@@ -71,7 +71,7 @@ internal static class RandomizationInstallCoordinator
             var doorSkip = GameInstaller.PatchExeDoorSkip(dataDir, seed.ToString());
             foreach (var repoint in doorSkip.Repoints)
                 Emit($"door skip: {repoint}");
-            Emit("door skip: EXPERIMENTAL — door transitions are near-instant on the next launch. CLOSE the game first.");
+            Emit("door skip: EXPERIMENTAL — newly mapped door transitions advance on button press on the next launch. CLOSE the game first.");
         }
 
         if (config.Dc1FastForwardCutscenes)

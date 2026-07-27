@@ -20,6 +20,8 @@ public sealed class CliCharacterizationTests
         Assert.Equal(0, value.Help.ExitCode);
         Assert.Contains("DinoRand", value.Help.Stdout);
         Assert.Contains("--install", value.Help.Stdout);
+        Assert.Contains("--dc1-door-skip", value.Help.Stdout);
+        Assert.Contains("button press", value.Help.Stdout, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("", value.Help.Stderr);
         Assert.NotEqual(0, value.Invalid.ExitCode);
         Assert.Contains("error", value.Invalid.Stderr, StringComparison.OrdinalIgnoreCase);

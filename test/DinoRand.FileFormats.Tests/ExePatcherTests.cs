@@ -107,44 +107,49 @@ public class ExePatcherTests
         Assert.Throws<ArgumentOutOfRangeException>(() => ExePatcher.ReadUInt32(small, 2));
     }
 
-    // ---- Door skip (cont.78): reversible two-window patch ----
+    // ---- Door skip (cont.78): reversible button-press hook + code cave ----
 
-    /// <summary>Seed the two door-skip sites with their pristine bytes (skip-swing prologue + `cmp edx,0x3c`).</summary>
-    private static byte[] NewImageWithDoorSitesPristine()
+    /// <summary>Seed the door-skip hook with its pristine 14-byte transition prologue; the cave stays zero-slack.</summary>
+    private static byte[] NewImageWithDoorHookPristine()
     {
         var exe = NewImage();
         byte[] swing = { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F };
-        int a = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipSwingVa);
+        int a = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa);
         swing.CopyTo(exe, a);
-        int g = ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa);
-        exe[g] = 0x83; exe[g + 1] = 0xFA; exe[g + 2] = ExePatcher.DoorHoldPristine; // cmp edx, 0x3c
         return exe;
     }
 
     [Fact]
-    public void ApplyDoorSkip_PatchesBothWindows_AndIsDetected()
+    public void ApplyDoorSkip_PatchesHookAndCave_AndIsDetected()
     {
-        var exe = NewImageWithDoorSitesPristine();
+        var exe = NewImageWithDoorHookPristine();
         Assert.False(ExePatcher.IsDoorSkipApplied(exe));
 
         ExePatcher.ApplyDoorSkip(exe);
 
-        // A: skip-swing prologue rewritten to `mov eax,[ebp+8]; mov word[eax+2],1; jmp 0x47149a`.
-        int a = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipSwingVa);
-        byte[] expected = { 0x8B, 0x45, 0x08, 0x66, 0xC7, 0x40, 0x02, 0x01, 0x00, 0xE9, 0x6A, 0x03, 0x00, 0x00 };
-        Assert.Equal(expected, exe.Skip(a).Take(expected.Length).ToArray());
-        // B: the 60-frame hold immediate is lowered; the `cmp edx` opcode is untouched.
-        int g = ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa);
-        Assert.Equal(0x83, exe[g]);
-        Assert.Equal(0xFA, exe[g + 1]);
-        Assert.Equal(ExePatcher.DoorHoldPatched, exe[g + 2]);
+        int h = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa);
+        int rel = unchecked((int)(ExePatcher.DoorSkipCaveVa - (ExePatcher.DoorSkipHookVa + 5)));
+        byte[] expectedHook = { 0xE9, (byte)rel, (byte)(rel >> 8), (byte)(rel >> 16), (byte)(rel >> 24),
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+        Assert.Equal(expectedHook, exe.Skip(h).Take(expectedHook.Length).ToArray());
+
+        int c = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipCaveVa);
+        byte[] expectedCave =
+        {
+            0x66, 0x83, 0x3D, 0x40, 0x3C, 0x6D, 0x00, 0x00, 0x75, 0x13,
+            0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F,
+            0xE9, 0x67, 0x14, 0xE5, 0xFF,
+            0x8B, 0x45, 0x08, 0x66, 0xC7, 0x40, 0x02, 0x01, 0x00, 0xC6, 0x40, 0x0F, 0x3D,
+            0xE9, 0xBF, 0x17, 0xE5, 0xFF,
+        };
+        Assert.Equal(expectedCave, exe.Skip(c).Take(expectedCave.Length).ToArray());
         Assert.True(ExePatcher.IsDoorSkipApplied(exe));
     }
 
     [Fact]
     public void ApplyDoorSkip_IsIdempotent()
     {
-        var exe = NewImageWithDoorSitesPristine();
+        var exe = NewImageWithDoorHookPristine();
         ExePatcher.ApplyDoorSkip(exe);
         var once = (byte[])exe.Clone();
         ExePatcher.ApplyDoorSkip(exe); // second apply must be a no-op, not a throw
@@ -152,19 +157,29 @@ public class ExePatcherTests
     }
 
     [Fact]
-    public void ApplyDoorSkip_RefusesUnexpectedSwingBytes()
+    public void ApplyDoorSkip_RefusesUnexpectedHookBytes()
     {
-        var exe = NewImageWithDoorSitesPristine();
-        exe[ExePatcher.VaToFileOffset(ExePatcher.DoorSkipSwingVa)] ^= 0xFF; // corrupt the window
+        var exe = NewImageWithDoorHookPristine();
+        exe[ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa)] ^= 0xFF; // corrupt the window
         Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDoorSkip(exe));
     }
 
     [Fact]
-    public void ApplyDoorSkip_RefusesWrongHoldGuard()
+    public void ApplyDoorSkip_RefusesUnexpectedCaveBytes()
     {
-        var exe = NewImageWithDoorSitesPristine();
-        exe[ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa)] = 0x90; // not `cmp edx,imm8`
+        var exe = NewImageWithDoorHookPristine();
+        exe[ExePatcher.VaToFileOffset(ExePatcher.DoorSkipCaveVa) + 1] = 0x90;
         Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDoorSkip(exe));
+    }
+
+    [Fact]
+    public void ApplyDoorSkip_DoesNotEditFormerGlobalHoldSite()
+    {
+        var exe = NewImageWithDoorHookPristine();
+        int hold = ExePatcher.VaToFileOffset(0x00471631);
+        exe[hold] = 0x83; exe[hold + 1] = 0xFA; exe[hold + 2] = 0x3C;
+        ExePatcher.ApplyDoorSkip(exe);
+        Assert.Equal(new byte[] { 0x83, 0xFA, 0x3C }, exe.Skip(hold).Take(3).ToArray());
     }
 
     // ---- Fast-forward cutscenes (cont.79 v2): reversible hook + code cave ----

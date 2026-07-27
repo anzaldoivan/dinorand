@@ -530,12 +530,12 @@ public sealed class RandomizerConfig
     public bool Dc1CutsceneSafeEnemies { get; set; } = false;
 
     /// <summary>
-    /// Opt-in (default off; DC1 only). Patch <c>DINO.exe</c> so room-to-room
-    /// door transitions are near-instant — the leaf-swing animation is removed while the destination
-    /// background/room-view commit is preserved (STATIC-SCD-RE cont.78, LIVE-CONFIRMED). Two small reversible
-    /// <c>.text</c> windows via <see cref="FileFormats.Exe.ExePatcher.ApplyDoorSkip"/>; leaves the shared
-    /// keyframe stepper untouched (no enemy/cutscene timing impact). Applied at install time from a pristine
-    /// backup and reversed by <c>--restore</c>. Like <see cref="Dc1CutsceneSafeEnemies"/>, NOT seed-encoded.
+    /// Opt-in (default off; DC1 only). Patch <c>DINO.exe</c> so a newly mapped room-to-room door transition
+    /// advances on the button press while existing transitions replay their original 14-byte prologue.
+    /// The destination background/room-view commit is preserved (STATIC-SCD-RE cont.78). A guarded reversible
+    /// <c>.text</c> hook + code cave via <see cref="FileFormats.Exe.ExePatcher.ApplyDoorSkip"/> leaves the
+    /// shared keyframe stepper and global hold site untouched. Applied at install time from a pristine backup
+    /// and reversed by <c>--restore</c>. Like <see cref="Dc1CutsceneSafeEnemies"/>, NOT seed-encoded.
     /// </summary>
     public bool Dc1DoorSkip { get; set; } = false;
 

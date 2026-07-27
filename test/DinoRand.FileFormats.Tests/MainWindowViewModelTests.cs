@@ -168,7 +168,8 @@ public class MainWindowViewModelTests
         int advanced = xaml.IndexOf("<Expander Header=\"Advanced options\"", StringComparison.Ordinal);
 
         Assert.True(advanced > 0);
-        Assert.InRange(xaml.IndexOf("Content=\"Door Skip\"", StringComparison.Ordinal), 0, advanced - 1);
+        Assert.InRange(xaml.IndexOf("Content=\"Door Skip (Button Press)\"", StringComparison.Ordinal), 0, advanced - 1);
+        Assert.Contains("newly mapped door transition", xaml, StringComparison.Ordinal);
         Assert.InRange(xaml.IndexOf("Content=\"Disable laser fences\"", StringComparison.Ordinal), 0, advanced - 1);
         var vm = NewVm();
         Assert.False(vm.Dc1DoorSkip);

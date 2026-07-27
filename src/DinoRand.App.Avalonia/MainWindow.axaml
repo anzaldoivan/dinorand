@@ -149,9 +149,9 @@
 
                     <!-- Tested DC1 accessibility/pace patches. Visible in the primary list, default OFF,
                          backup-protected, restored byte-identically, and not part of the seed string. -->
-                    <CheckBox Content="Door Skip" Margin="0,2"
+                    <CheckBox Content="Door Skip (Button Press)" Margin="0,2"
                               IsVisible="{Binding CanDc1DoorSkip}"
-                              ToolTip.Tip="Patch DINO.exe so room-to-room door transitions are near-instant — the door-opening animation is removed while the destination background still loads correctly. Reversed by Restore and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
+                              ToolTip.Tip="Patch DINO.exe so a newly mapped door transition advances on the button press while existing transitions keep their original prologue and the destination background still loads correctly. Reversed by Restore and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
                               IsChecked="{Binding Dc1DoorSkip, Mode=TwoWay}" />
                     <CheckBox Content="Disable laser fences" Margin="0,2"
                               IsVisible="{Binding CanDisableLaserFences}"
