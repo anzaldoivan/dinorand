@@ -147,11 +147,11 @@
                               IsChecked="{Binding ScramblePuzzleCodes, Mode=TwoWay}"
                               ToolTip.Tip="Patch DINO.exe + room files at install so each keypad safe (Management Office, Lounge, Computer Room gas, Stabilizer) accepts a new seed-derived 4-digit code, and the in-game document that states the code is rewritten to match. Reversed by Restore. CLOSE the game first — codes are read at load, seen after the next launch." />
 
-                    <!-- Tested DC1 accessibility/pace patches. Visible in the primary list, default OFF,
+                    <!-- Tested DC1 accessibility/pace patches. Visible in the primary list; door skip is default ON,
                          backup-protected, restored byte-identically, and not part of the seed string. -->
                     <CheckBox Content="Door Skip (Button Press)" Margin="0,2"
                               IsVisible="{Binding CanDc1DoorSkip}"
-                              ToolTip.Tip="Patch DINO.exe so a newly mapped door transition advances on the button press while existing transitions keep their original prologue and the destination background still loads correctly. Reversed by Restore and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
+                              ToolTip.Tip="On by default: patch DINO.exe so a newly mapped door transition advances on the button press while existing transitions keep their original prologue and the destination background still loads correctly. Turn it off for a room-only install. Reversed by Restore and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
                               IsChecked="{Binding Dc1DoorSkip, Mode=TwoWay}" />
                     <CheckBox Content="Disable laser fences" Margin="0,2"
                               IsVisible="{Binding CanDisableLaserFences}"

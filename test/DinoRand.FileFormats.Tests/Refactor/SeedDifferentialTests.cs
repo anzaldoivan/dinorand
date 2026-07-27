@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using DinoRand.FileFormats.Exe;
 using DinoRand.FileFormats.Compression;
 using DinoRand.FileFormats.Stage;
 using DinoRand.FileFormats.Stage.Dc2;
@@ -354,9 +355,10 @@ public sealed class SeedDifferentialTests
 
 internal static class SyntheticInputs
 {
-    public static string CreateDc1Install(string root)
+    public static string CreateDc1Install(string root, bool includeExe = false)
     {
-        string data = Directory.CreateDirectory(Path.Combine(root, "install", "Data")).FullName;
+        string install = Directory.CreateDirectory(Path.Combine(root, "install")).FullName;
+        string data = Directory.CreateDirectory(Path.Combine(install, "Data")).FullName;
         foreach (string path in Directory.EnumerateFiles(MockRooms.Dc1DataDir(), "*.dat"))
             File.Copy(path, Path.Combine(data, Path.GetFileName(path)));
         // Runner fixtures must model the production start/goal contract now that final progression
@@ -370,7 +372,16 @@ internal static class SyntheticInputs
             Array.Empty<SyntheticRoom.Item>(),
             new[] { new SyntheticRoom.Door(1, 0x0d, 0, 0) },
             Array.Empty<SyntheticRoom.Enemy>()));
-        return Path.Combine(root, "install");
+        if (includeExe)
+        {
+            var exe = new byte[ExePatcher.FileBackedRvaHi];
+            new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }
+                .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa));
+            new byte[] { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F }
+                .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa));
+            File.WriteAllBytes(Path.Combine(install, "DINO.exe"), exe);
+        }
+        return install;
     }
 
     public static string CreateDc2Install(string root, RandomizerConfig config)

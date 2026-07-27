@@ -36,6 +36,10 @@ public class GameInstallerExeTests : IDisposable
     private static byte[] BuildSyntheticExe()
     {
         var exe = new byte[ExePatcher.FileBackedRvaHi];
+        new byte[] { 0x55, 0x8B, 0xEC, 0x6A, 0x00 }
+            .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa));
+        new byte[] { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F }
+            .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa));
         ExePatcher.WriteUInt32AtVa(exe, ExePatcher.SetupFnFieldVa(1), ExePatcher.SetupFnBasicRaptor);
         ExePatcher.WriteUInt32AtVa(exe, ExePatcher.SetupFnFieldVa(2), ExePatcher.SetupFnStage2);
         for (int r = 0; r < ExePatcher.HitDescriptorTotalRecords; r++)
@@ -541,6 +545,42 @@ public class GameInstallerExeTests : IDisposable
         Assert.NotNull(result);
         Assert.Equal(new byte[] { 4, 3, 2, 1 }, File.ReadAllBytes(Path.Combine(DataDir, "st101.dat")));
         Assert.False(File.Exists(Path.Combine(DataDir, GameInstaller.BackupDirName, GameInstaller.ExeName)));
+    }
+
+    [Fact]
+    public void InstallDc1_DoorSkipDefaultsOn_AndRestoreReverses()
+    {
+        var pristine = File.ReadAllBytes(ExePath);
+        string modDir = Path.Combine(_root, "mod-door-skip");
+        Directory.CreateDirectory(modDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 4, 3, 2, 1 });
+
+        var result = RandomizationInstallCoordinator.InstallDc1(
+            DataDir, modDir, new Seed(123),
+            new RandomizerConfig { RandomizeItems = false, RandomizeEnemies = false },
+            () => null, _ => { }, ex => throw ex);
+
+        Assert.NotNull(result);
+        Assert.True(ExePatcher.IsDoorSkipApplied(File.ReadAllBytes(ExePath)));
+
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Fact]
+    public void InstallDc1_NoDoorSkipLeavesDoorHookUnchanged()
+    {
+        string modDir = Path.Combine(_root, "mod-no-door-skip");
+        Directory.CreateDirectory(modDir);
+        File.WriteAllBytes(Path.Combine(modDir, "st101.dat"), new byte[] { 4, 3, 2, 1 });
+
+        var result = RandomizationInstallCoordinator.InstallDc1(
+            DataDir, modDir, new Seed(123),
+            new RandomizerConfig { RandomizeItems = false, RandomizeEnemies = false, Dc1DoorSkip = false },
+            () => null, _ => { }, ex => throw ex);
+
+        Assert.NotNull(result);
+        Assert.False(ExePatcher.IsDoorSkipApplied(File.ReadAllBytes(ExePath)));
     }
 
     [Theory]

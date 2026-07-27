@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using DinoRand.FileFormats.Exe;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Spoiler;
 using Xunit;
@@ -20,7 +21,7 @@ public sealed class CliCharacterizationTests
         Assert.Equal(0, value.Help.ExitCode);
         Assert.Contains("DinoRand", value.Help.Stdout);
         Assert.Contains("--install", value.Help.Stdout);
-        Assert.Contains("--dc1-door-skip", value.Help.Stdout);
+        Assert.Contains("--no-dc1-door-skip", value.Help.Stdout);
         Assert.Contains("button press", value.Help.Stdout, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("", value.Help.Stderr);
         Assert.NotEqual(0, value.Invalid.ExitCode);
@@ -28,6 +29,47 @@ public sealed class CliCharacterizationTests
         Assert.Equal("", value.Invalid.Stdout);
         Assert.Equal(value, CaptureTextInvocations());
         RecordOrCompare("cli-text", value, nameof(Help_and_invalid_invocations_pin_exit_stdout_and_stderr));
+    }
+
+    [Fact]
+    public void Dc1_install_defaults_to_door_skip_and_restore_returns_original_exe()
+    {
+        string root = Directory.CreateTempSubdirectory("dinorand-cli-door-skip-").FullName;
+        try
+        {
+            string install = SyntheticInputs.CreateDc1Install(root, includeExe: true);
+            string exe = Path.Combine(install, "DINO.exe");
+            var pristine = File.ReadAllBytes(exe);
+
+            var installResult = Run("--install", install, "--out", Path.Combine(root, "output"), "--seed", "123",
+                "--no-items", "--no-enemies", "--no-spoiler", "--install-to-data");
+
+            Assert.Equal(0, installResult.ExitCode);
+            Assert.True(ExePatcher.IsDoorSkipApplied(File.ReadAllBytes(exe)));
+
+            var restoreResult = Run("--install", install, "--restore");
+            Assert.Equal(0, restoreResult.ExitCode);
+            Assert.Equal(pristine, File.ReadAllBytes(exe));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Dc1_install_no_door_skip_leaves_exe_pristine()
+    {
+        string root = Directory.CreateTempSubdirectory("dinorand-cli-no-door-skip-").FullName;
+        try
+        {
+            string install = SyntheticInputs.CreateDc1Install(root, includeExe: true);
+            string exe = Path.Combine(install, "DINO.exe");
+
+            var result = Run("--install", install, "--out", Path.Combine(root, "output"), "--seed", "123",
+                "--no-items", "--no-enemies", "--no-spoiler", "--install-to-data", "--no-dc1-door-skip");
+
+            Assert.Equal(0, result.ExitCode);
+            Assert.False(ExePatcher.IsDoorSkipApplied(File.ReadAllBytes(exe)));
+        }
+        finally { Directory.Delete(root, recursive: true); }
     }
 
     [Fact]

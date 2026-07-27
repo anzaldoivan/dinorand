@@ -66,7 +66,7 @@ internal static class RandomizationInstallCoordinator
                 + "(a removed start weapon is placed in the early world by the item pass).");
         }
 
-        if (config.Dc1DoorSkip)
+        if (config.Dc1DoorSkip && File.Exists(GameInstaller.ExePath(dataDir)))
         {
             var doorSkip = GameInstaller.PatchExeDoorSkip(dataDir, seed.ToString());
             foreach (var repoint in doorSkip.Repoints)

@@ -437,7 +437,7 @@ namespace DinoRand.App
                         dataDir,
                         outPath,
                         seed,
-                        new RandomizerConfig { DisableLaserFences = config.DisableLaserFences },
+                        new RandomizerConfig { DisableLaserFences = config.DisableLaserFences, Dc1DoorSkip = false },
                         createStartingInventoryPlan: () => null,
                         output: _ => { },
                         overlayFailure: ex => throw ex)!.InstallResult;
@@ -481,7 +481,7 @@ namespace DinoRand.App
                         catch (IOException) { xn = (xn.Length == 0 ? "" : xn + ". ") + "puzzle codes NOT scrambled — DINO.exe is locked; close the game and re-install"; xf = true; }
                         catch (Exception pex) { xn = (xn.Length == 0 ? "" : xn + ". ") + $"puzzle codes NOT scrambled — {pex.Message}"; xf = true; }
 
-                    if (dc1DoorSkip)
+                    if (dc1DoorSkip && File.Exists(GameInstaller.ExePath(dataDir)))
                         try
                         {
                             GameInstaller.PatchExeDoorSkip(dataDir, seed.ToString());

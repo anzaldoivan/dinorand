@@ -96,7 +96,7 @@ public class SeedStringTests
             Assert.Equal(baseline, encoded);
             Assert.True(SeedString.TryParse(encoded, out var parsedSeed, out var parsed));
             Assert.Equal(seed.Value, parsedSeed.Value);
-            Assert.False(parsed.Dc1DoorSkip);
+            Assert.True(parsed.Dc1DoorSkip);
             Assert.False(parsed.Dc2DoorSkip);
             Assert.False(parsed.Dc1FastForwardCutscenes);
         }
