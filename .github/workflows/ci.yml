@@ -23,7 +23,8 @@ jobs:
       - name: Release hardening contracts
         run: >-
           PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=scripts python3 -m unittest
-          scripts/test_release_validate.py scripts/test_release_publish.py
+          scripts/test_release_validate.py scripts/test_release_post_merge.py
+          scripts/test_release_publish.py
           scripts/test_check_docs.py
           scripts/test_release_notices.py scripts/test_package_release.py
           scripts/test_release_workflow.py scripts/test_branch_naming_workflow.py

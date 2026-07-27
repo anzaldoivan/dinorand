@@ -35,10 +35,16 @@ def run_check(head_ref: str, head_login: str):
 
 
 class BranchNamingWorkflowTests(unittest.TestCase):
-    def test_ordinary_feature_branch_is_allowed_for_a_human_author(self):
-        result = run_check("feature/enemy-randomizer", "maintainer")
+    def test_every_feature_branch_is_allowed_for_a_human_author(self):
+        for head_ref in (
+            "feature/enemy-randomizer",
+            "feature/release-scripts",
+            "feature/release-v0.6.1",
+        ):
+            with self.subTest(head_ref=head_ref):
+                result = run_check(head_ref, "maintainer")
 
-        self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_stable_version_branch_is_allowed(self):
         result = run_check("version/v0.6.1", "maintainer")
@@ -67,11 +73,9 @@ class BranchNamingWorkflowTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
 
     def test_obsolete_release_branch_names_are_rejected(self):
-        for head_ref in ("release/v0.6.1", "feature/release-v0.6.1"):
-            with self.subTest(head_ref=head_ref):
-                result = run_check(head_ref, "maintainer")
+        result = run_check("release/v0.6.1", "maintainer")
 
-                self.assertNotEqual(result.returncode, 0)
+        self.assertNotEqual(result.returncode, 0)
 
     def test_malformed_version_branch_names_are_rejected(self):
         for head_ref in (
@@ -89,6 +93,11 @@ class BranchNamingWorkflowTests(unittest.TestCase):
         policy = CONTRIBUTING.read_text(encoding="utf-8")
 
         self.assertIn("`version/vX.Y.Z`", policy)
+
+    def test_branch_gate_never_creates_a_tag_or_release(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+
+        self.assertNotRegex(workflow, r"\bgit\s+tag\b|refs/tags/|gh\s+release\s+create")
 
 
 if __name__ == "__main__":

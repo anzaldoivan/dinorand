@@ -82,11 +82,10 @@ class ReleasePublishWorkflowTests(unittest.TestCase):
 
         self.assertIn("version/vX.Y.Z", skill)
         self.assertNotIn("feature/release-vX.Y.Z", skill)
-        self.assertIn("Create the annotated tag only after the PR is merged", skill)
-        self.assertIn(
-            "git push origin refs/tags/vX.Y.Z:refs/tags/vX.Y.Z",
-            skill,
-        )
+        self.assertIn("post-merge release-tag workflow", skill)
+        self.assertIn("RELEASE_TAG_TOKEN", skill)
+        self.assertNotIn("git tag -a", skill)
+        self.assertNotIn("git push origin refs/tags/", skill)
         self.assertIn(
             "gh workflow run release.yml --ref main -f tag=vX.Y.Z",
             skill,
@@ -108,7 +107,8 @@ class ReleasePublishWorkflowTests(unittest.TestCase):
 
         self.assertRegex(
             ci,
-            r"(?s)python3 -m unittest.*?scripts/test_release_publish\.py.*?"
+            r"(?s)python3 -m unittest.*?scripts/test_release_post_merge\.py.*?"
+            r"scripts/test_release_publish\.py.*?"
             r"scripts/test_release_workflow\.py",
         )
 

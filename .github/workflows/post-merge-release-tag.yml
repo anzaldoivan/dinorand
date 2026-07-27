@@ -1,0 +1,75 @@
+name: post-merge-release-tag
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+
+concurrency:
+  group: release-tag-${{ github.event.pull_request.merge_commit_sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  tag-release:
+    name: tag-release
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'version/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the trusted pre-merge release controls
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: control
+          persist-credentials: false
+
+      - name: Check out the exact merge candidate as data
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Use the pinned release Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12.13"
+
+      - name: Fetch current main for ancestry validation
+        run: >-
+          git -C candidate fetch --no-tags origin
+          +refs/heads/main:refs/remotes/origin/main
+
+      - name: Validate the merged release candidate with trusted code
+        id: release
+        env:
+          MERGE_COMMIT: ${{ github.event.pull_request.merge_commit_sha }}
+        run: >-
+          PYTHONDONTWRITEBYTECODE=1 python3 control/scripts/release_post_merge.py
+          --event "$GITHUB_EVENT_PATH"
+          --repository candidate
+          --merge-commit "$MERGE_COMMIT"
+          --github-output "$GITHUB_OUTPUT"
+
+      - name: Create or reconcile the exact annotated release tag
+        env:
+          RELEASE_TAG_TOKEN: ${{ secrets.RELEASE_TAG_TOKEN }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          MERGE_COMMIT: ${{ steps.release.outputs.commit }}
+          TAGGER_DATE: ${{ github.event.pull_request.merged_at }}
+        run: >-
+          PYTHONDONTWRITEBYTECODE=1 python3 control/scripts/release_tag.py
+          --repository "$GITHUB_REPOSITORY"
+          --tag "$RELEASE_TAG"
+          --commit "$MERGE_COMMIT"
+          --tagger-date "$TAGGER_DATE"
+          --attempts 3
+          --request-timeout 30
+          --retry-delay 2

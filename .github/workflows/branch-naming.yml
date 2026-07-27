@@ -33,10 +33,6 @@ jobs:
                      "Use 'version/vMAJOR.MINOR.PATCH' or a valid SemVer prerelease."
                 exit 1
               fi ;;
-            feature/release-*)
-              echo "::error::Branch '$HEAD_REF' uses the obsolete release spelling." \
-                   "Release PRs must use 'version/vMAJOR.MINOR.PATCH'."
-              exit 1 ;;
             feature/*)
               echo "✓ '$HEAD_REF' matches the naming policy." ;;
             dependabot/*)
