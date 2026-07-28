@@ -1,5 +1,3 @@
-using Archipelago.MultiClient.Net;
-using Archipelago.MultiClient.Net.Enums;
 using Newtonsoft.Json.Linq;
 
 namespace DinoRand.ApClient;
@@ -18,7 +16,7 @@ public sealed record ApConnection(
     IReadOnlySet<long> CheckedLocations);
 
 /// <summary>
-/// Thin wrapper over <c>Archipelago.MultiClient.Net</c> (AP-CLIENT-PLAN.md §1): game
+/// Thin wrapper over the AP protocol client (AP-CLIENT-PLAN.md §1): game
 /// "Dino Crisis 1", items_handling 0b111. Protocol behavior is the library's contract — this
 /// class only adapts it to the game-id domain the rest of the client speaks.
 /// </summary>
@@ -28,8 +26,13 @@ public sealed class ApSession : IDisposable
     /// <summary>slot_data placement value for "another world's item" (apworld OTHER_WORLD_MARKER).</summary>
     public const int OtherWorldMarker = -1;
 
-    private ArchipelagoSession? _session;
+    private readonly IApProtocolSessionFactory _factory;
+    private IApProtocolSession? _session;
     private ApConnection? _connection;
+
+    public ApSession() : this(new ArchipelagoProtocolSessionFactory()) { }
+
+    internal ApSession(IApProtocolSessionFactory factory) => _factory = factory;
 
     public ApConnection Connection => _connection
         ?? throw new InvalidOperationException("not connected");
@@ -37,30 +40,23 @@ public sealed class ApSession : IDisposable
     /// <summary>Connect + login; throws with the server's errors on refusal.</summary>
     public ApConnection Connect(string host, int port, string slotName, string? password)
     {
-        var session = ArchipelagoSessionFactory.CreateSession(host, port);
-        var result = session.TryConnectAndLogin(
-            GameName, slotName, ItemsHandlingFlags.AllItems, password: password);
-        if (result is not LoginSuccessful ok)
-        {
-            var errors = result is LoginFailure fail ? string.Join("; ", fail.Errors) : result.ToString();
-            throw new InvalidOperationException($"AP login failed: {errors}");
-        }
+        var session = _factory.CreateSession(host, port);
+        var result = session.TryConnectAndLogin(GameName, slotName, password);
+        if (!result.Success)
+            throw new InvalidOperationException($"AP login failed: {result.Error}");
 
-        var slotData = ok.SlotData;
-        int logicVersion = Convert.ToInt32(slotData["logic_version"]);
-        string goalRoom = Convert.ToString(slotData["goal_room"]) ?? "060d";
-        var placements = ParseIntMap(slotData, "placements");
-        var itemIds = ParseIntMap(slotData, "item_ids");
+        var snapshot = result.Snapshot
+            ?? throw new InvalidOperationException("AP login succeeded without a session snapshot");
 
         _session = session;
         _connection = new ApConnection(
-            session.RoomState.Seed,
-            ok.Slot,
-            logicVersion,
-            goalRoom,
-            placements,
-            itemIds,
-            session.Locations.AllLocationsChecked.ToHashSet());
+            snapshot.SeedName,
+            snapshot.Slot,
+            snapshot.LogicVersion,
+            snapshot.GoalRoom ?? "060d",
+            snapshot.Placements,
+            snapshot.ItemIdToGameId,
+            snapshot.CheckedLocations);
         return _connection;
     }
 
@@ -81,7 +77,7 @@ public sealed class ApSession : IDisposable
         var s = _session ?? throw new InvalidOperationException("not connected");
         int ownSlot = Connection.Slot;
         var result = new List<ReceivedGameItem>();
-        var all = s.Items.AllItemsReceived;
+        var all = s.AllItemsReceived;
         for (int i = 0; i < all.Count; i++)
         {
             var item = all[i];
@@ -96,16 +92,15 @@ public sealed class ApSession : IDisposable
         var ids = locationIds.ToArray();
         if (ids.Length == 0) return;
         (_session ?? throw new InvalidOperationException("not connected"))
-            .Locations.CompleteLocationChecks(ids);
+            .CompleteLocationChecks(ids);
     }
 
     public void SetGoalAchieved() =>
-        (_session ?? throw new InvalidOperationException("not connected"))
-            .SetGoalAchieved();
+        (_session ?? throw new InvalidOperationException("not connected")).SetGoalAchieved();
 
     public void Disconnect()
     {
-        try { _session?.Socket.DisconnectAsync().Wait(TimeSpan.FromSeconds(3)); }
+        try { _session?.Disconnect(TimeSpan.FromSeconds(3)); }
         catch { /* socket already gone — nothing to clean */ }
         _session = null;
         _connection = null;

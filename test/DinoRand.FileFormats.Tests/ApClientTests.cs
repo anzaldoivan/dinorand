@@ -353,6 +353,147 @@ public class ApClientTests
         Assert.Throws<InvalidOperationException>(() => ApSession.ParseIntMap(slotData, "placements"));
     }
 
+    // ---- AP session seam ------------------------------------------------------------------
+
+    [Fact]
+    public void ApSession_ConnectsSnapshotAndFiltersUnknownItemsInServerOrder()
+    {
+        var factory = new FakeApProtocolSessionFactory(new ApLoginResult(
+            true,
+            null,
+            new ApLoginSnapshot(
+                "SEED", 7, 4, "060d",
+                new Dictionary<long, int> { [100] = 0x30 },
+                new Dictionary<long, int> { [10] = 0x18, [20] = 0x1D },
+                new HashSet<long> { 100 })));
+        factory.Session.Items.Add(new ApReceivedItem(10, 7));
+        factory.Session.Items.Add(new ApReceivedItem(999, 7));
+        factory.Session.Items.Add(new ApReceivedItem(20, 3));
+
+        using var session = new ApSession(factory);
+        var connection = session.Connect("localhost", 38281, "Regina", "secret");
+
+        Assert.Equal("localhost", factory.Host);
+        Assert.Equal(38281, factory.Port);
+        Assert.Equal((ApSession.GameName, "Regina", "secret"),
+            (factory.Session.GameName, factory.Session.SlotName, factory.Session.Password));
+        Assert.Equal("SEED", connection.SeedName);
+        Assert.Equal(7, connection.Slot);
+        Assert.Equal(4, connection.LogicVersion);
+        Assert.Equal("060d", connection.GoalRoom);
+        Assert.Equal(new HashSet<long> { 100 }, connection.CheckedLocations);
+        Assert.Equal(new[]
+        {
+            new ReceivedGameItem(0, 0x18, true),
+            new ReceivedGameItem(2, 0x1D, false),
+        }, session.ReceivedItems());
+    }
+
+    [Fact]
+    public void ApSession_LoginFailurePreservesFailureMessage()
+    {
+        var factory = new FakeApProtocolSessionFactory(new ApLoginResult(false, "bad slot; denied", null));
+        using var session = new ApSession(factory);
+
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => session.Connect("host", 1, "slot", null));
+
+        Assert.Equal("AP login failed: bad slot; denied", ex.Message);
+        Assert.Throws<InvalidOperationException>(() => session.Connection);
+    }
+
+    [Fact]
+    public void ApSession_SendsOnlyNonemptyChecksAndReportsGoal()
+    {
+        var factory = new FakeApProtocolSessionFactory(SuccessfulSnapshot());
+        using var session = new ApSession(factory);
+        var connection = session.Connect("host", 1, "slot", null);
+
+        Assert.Equal("060d", connection.GoalRoom);
+        session.SendChecks(Array.Empty<long>());
+        session.SendChecks(new long[] { 10, 20 });
+        session.SetGoalAchieved();
+
+        Assert.Equal(new[] { new long[] { 10, 20 } }, factory.Session.SentChecks);
+        Assert.Equal(1, factory.Session.GoalCalls);
+    }
+
+    [Fact]
+    public void ApSession_DisposeClearsStateWhenDisconnectSucceedsOrFails()
+    {
+        foreach (bool throws in new[] { false, true })
+        {
+            var factory = new FakeApProtocolSessionFactory(SuccessfulSnapshot())
+            { Session = { DisconnectThrows = throws } };
+            var session = new ApSession(factory);
+            session.Connect("host", 1, "slot", null);
+
+            session.Dispose();
+
+            Assert.True(factory.Session.Disconnected);
+            Assert.Equal(TimeSpan.FromSeconds(3), factory.Session.DisconnectTimeout);
+            Assert.Throws<InvalidOperationException>(() => session.Connection);
+            Assert.Throws<InvalidOperationException>(() => session.ReceivedItems());
+        }
+    }
+
+    private static ApLoginSnapshot SuccessfulSnapshot() => new(
+        "SEED", 1, 4, null,
+        new Dictionary<long, int>(),
+        new Dictionary<long, int>(),
+        new HashSet<long>());
+
+    private sealed class FakeApProtocolSessionFactory : IApProtocolSessionFactory
+    {
+        public FakeApProtocolSessionFactory(ApLoginResult result) => Session = new(result);
+        public FakeApProtocolSessionFactory(ApLoginSnapshot snapshot)
+            : this(new ApLoginResult(true, null, snapshot)) { }
+        public FakeApProtocolSession Session { get; }
+        public string? Host { get; private set; }
+        public int Port { get; private set; }
+
+        public IApProtocolSession CreateSession(string host, int port)
+        {
+            Host = host;
+            Port = port;
+            return Session;
+        }
+    }
+
+    private sealed class FakeApProtocolSession : IApProtocolSession
+    {
+        private readonly ApLoginResult _result;
+
+        public FakeApProtocolSession(ApLoginResult result) => _result = result;
+        public string? GameName { get; private set; }
+        public string? SlotName { get; private set; }
+        public string? Password { get; private set; }
+        public List<ApReceivedItem> Items { get; } = new();
+        public List<long[]> SentChecks { get; } = new();
+        public int GoalCalls { get; private set; }
+        public bool DisconnectThrows { get; set; }
+        public bool Disconnected { get; private set; }
+        public TimeSpan DisconnectTimeout { get; private set; }
+        public IReadOnlyList<ApReceivedItem> AllItemsReceived => Items;
+
+        public ApLoginResult TryConnectAndLogin(string gameName, string slotName, string? password)
+        {
+            GameName = gameName;
+            SlotName = slotName;
+            Password = password;
+            return _result;
+        }
+
+        public void CompleteLocationChecks(IReadOnlyList<long> locationIds) => SentChecks.Add(locationIds.ToArray());
+        public void SetGoalAchieved() => GoalCalls++;
+        public void Disconnect(TimeSpan timeout)
+        {
+            DisconnectTimeout = timeout;
+            Disconnected = true;
+            if (DisconnectThrows) throw new InvalidOperationException("socket failed");
+        }
+    }
+
     // ---- crash-safe state file (GUI-SHUTDOWN-AND-CANCEL-PLAN.md S5) --------------------------
     // A torn state file fails LoadOrNew's parse and resets AppliedThrough to -1, which re-grants
     // already-delivered consumables. So the write must swap atomically, never truncate in place.
