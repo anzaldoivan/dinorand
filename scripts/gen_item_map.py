@@ -25,6 +25,7 @@ import sys, os, json
 _ROOT = os.path.join(os.path.dirname(__file__), "..", "data", "dc1")
 ROOMDATA_FP = os.path.join(_ROOT, "room-data.json")
 MAP_FP = os.path.join(_ROOT, "map.json")
+SUPPRESSED_PICKUPS_FP = os.path.join(_ROOT, "suppressed-pickups.json")
 
 # Key items 0x2b..0x6f gate doors by possession and are owned by KeyItemPlacer (never id-rerolled by
 # the item pass), so their gate is progression-relevant. Ids outside the range (consumables/ammo and
@@ -77,6 +78,18 @@ _CONSERVATIVE_PIN_GROUPS = {
 }
 
 
+def load_suppressed_pickups():
+    with open(SUPPRESSED_PICKUPS_FP, encoding="utf-8") as f:
+        doc = json.load(f)
+    if doc.get("version") != 1 or not isinstance(doc.get("pickups"), list):
+        raise ValueError("suppressed-pickups.json must use version 1 with a pickups array")
+    out = {}
+    for entry in doc["pickups"]:
+        room, offset = entry["physicalId"].lower().split(":", 1)
+        out.setdefault(room, set()).add(int(offset, 16))
+    return out
+
+
 def _room_groups(groups, room):
     return groups.get(room.upper(), [])
 
@@ -89,7 +102,7 @@ def is_key_item(iid):
     return iid != "0xff" and KEY_LO <= int(iid, 16) <= KEY_HI
 
 
-def hazard_reasons(rec, sync_offsets):
+def hazard_reasons(rec, sync_offsets, suppressed_offsets=frozenset()):
     """Return the list of hazard reasons that pin this item record Fixed (empty = shuffleable).
 
     The only relaxation vs. the original blanket policy is the flag gate: a NON-key item gated by a
@@ -115,16 +128,18 @@ def hazard_reasons(rec, sync_offsets):
         reasons.append("unresolved-trigger")
     if int(rec.get("rec_offset", "-1"), 16) in sync_offsets:
         reasons.append("relocation-twin")
+    if int(rec.get("rec_offset", "-1"), 16) in suppressed_offsets:
+        reasons.append("policy-suppressed")
     return reasons
 
 
-def room_pins(records, sync_offsets=frozenset(), conservative_groups=()):
+def room_pins(records, sync_offsets=frozenset(), conservative_groups=(), suppressed_offsets=frozenset()):
     """Compute the itemPriorities entries for one room's item_control records.
     Stable record targets are merged by position for readability without spreading policy to
     non-target records. conservative_groups is the one explicit 030C over-pin exception."""
     by_pos = {}
     for r in records:
-        reasons = hazard_reasons(r, sync_offsets)
+        reasons = hazard_reasons(r, sync_offsets, suppressed_offsets)
         if not reasons:
             continue
         pos = r.get("pos")
@@ -169,19 +184,21 @@ def _is_consumable(iid):
     return _AMMO_LO <= v <= _AMMO_HI or _HEALTH_LO <= v <= _HEALTH_HI
 
 
-def is_scatter_target(rec, sync_offsets):
+def is_scatter_target(rec, sync_offsets, suppressed_offsets=frozenset()):
     """True iff this record is a legal key-item scatter target: an ammo/health pickup that is static
     (placed at load / by an always-present enter-zone), appears UNCONDITIONALLY (no test_branch or
     branch_only gate), and is not a relocation twin."""
     iid = rec.get("item_id")
-    if not _is_consumable(iid) or int(rec.get("rec_offset", "-1"), 16) in sync_offsets:
+    if (not _is_consumable(iid)
+            or int(rec.get("rec_offset", "-1"), 16) in sync_offsets
+            or int(rec.get("rec_offset", "-1"), 16) in suppressed_offsets):
         return False
     if (rec.get("trigger") or {}).get("kind") not in _STATIC_TRIGGER_KINDS:
         return False
     return (rec.get("gate") or {}).get("type") == "unconditional"
 
 
-def room_scatter(records, sync_offsets=frozenset()):
+def room_scatter(records, sync_offsets=frozenset(), suppressed_offsets=frozenset()):
     """Compute record-targeted `scatterTargets` entries, one per
     legal scatter target, sorted by position for a stable diff. A position occupied by MORE THAN ONE
     record remains excluded by the established conservative scatter policy."""
@@ -192,7 +209,7 @@ def room_scatter(records, sync_offsets=frozenset()):
             pos_counts[(int(pos[0]), int(pos[1]))] = pos_counts.get((int(pos[0]), int(pos[1])), 0) + 1
     out = {}
     for r in records:
-        if not is_scatter_target(r, sync_offsets):
+        if not is_scatter_target(r, sync_offsets, suppressed_offsets):
             continue
         pos = r.get("pos")
         if not pos or len(pos) != 2:
@@ -209,12 +226,14 @@ def room_scatter(records, sync_offsets=frozenset()):
 def compute(doc):
     """room_id -> itemPriorities list, for every item_control room with >=1 pin."""
     out = {}
+    suppressed = load_suppressed_pickups()
     for rid, room in doc["rooms"].items():
         ic = room.get("item_control")
         if not ic:
             continue
         pins = room_pins(ic.get("records", []), _member_offsets(_EXPLICIT_SYNC_GROUPS, rid),
-                         _CONSERVATIVE_PIN_GROUPS.get(rid.upper(), ()))
+                         _CONSERVATIVE_PIN_GROUPS.get(rid.upper(), ()),
+                         suppressed.get(rid.lower(), ()))
         if pins:
             out[rid] = pins
     return out
@@ -274,11 +293,13 @@ _SCATTER_EXCLUDED = {
 def compute_scatter(doc):
     """room_id -> scatterTargets list, for every item_control room with >=1 legal scatter target."""
     out = {}
+    suppressed = load_suppressed_pickups()
     for rid, room in doc["rooms"].items():
         ic = room.get("item_control")
         if not ic:
             continue
-        st = room_scatter(ic.get("records", []), _member_offsets(_EXPLICIT_SYNC_GROUPS, rid))
+        st = room_scatter(ic.get("records", []), _member_offsets(_EXPLICIT_SYNC_GROUPS, rid),
+                          suppressed.get(rid.lower(), ()))
         excluded = _SCATTER_EXCLUDED.get(rid, set())
         st = [e for e in st if e["at"] not in excluded]
         if st:
@@ -356,13 +377,14 @@ def compute_visuals(doc):
 # A gen-computed itemPriorities entry leads its `_why` with a hazard-reason token (see hazard_reasons);
 # a hand-authored pin uses free-form prose the generator never produces. This lets regenerate_map keep
 # hand-authored pins instead of clobbering them, and integrity_violations skip them in the SPURIOUS check.
-_GEN_PIN_REASONS = ("flag-gated", "relocation-twin", "runtime-armed", "unresolved-trigger")
+_GEN_PIN_REASONS = ("flag-gated", "relocation-twin", "runtime-armed", "unresolved-trigger", "policy-suppressed")
 
 _ITEM_POLICY_DERIVATION = (
     "Physical-pickup placement policy generated by scripts/gen_item_map.py from room-data.json. "
     "Entries carry stable `records` offsets; `at` is a readable geometry alias and is used only as "
     "a legacy/synthetic fallback when no explicit record target matches. Fixed records never enter "
-    "ordinary or progression placement. `itemGroups` defines player-visible logical pickups and "
+    "ordinary or progression placement. data/dc1/suppressed-pickups.json adds deliberate physical-record "
+    "suppressions. `itemGroups` defines player-visible logical pickups and "
     "`itemLinks` defines script-state synchronization groups; neither is inferred from equal ids or "
     "coordinates. The conservative 030C coordinate collision intentionally pins both records."
 )

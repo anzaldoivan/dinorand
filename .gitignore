@@ -34,6 +34,7 @@
 !/data/dc1/
 /data/dc1/*
 !/data/dc1/ap-id-registry.json
+!/data/dc1/suppressed-pickups.json
 !/data/dc1/laser-fences.json
 !/data/dc2/
 /data/dc2/*

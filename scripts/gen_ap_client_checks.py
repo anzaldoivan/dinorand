@@ -158,7 +158,9 @@ def _location_records() -> list[dict]:
             recs_by_physical[(c, offset)] = {"room": c, "rec": rec, "iid": iid}
 
     out = []
-    for loc in gal.load_locations(items["names"], m["itemGroups"]):
+    # Keep suppressed records in the allocation census so removing one location does not renumber
+    # unrelated rekeys; the final emitted checks are filtered below.
+    for loc in gal.load_locations(items["names"], m["itemGroups"], suppressed_physical_ids=set()):
         if loc["itemId"] == gal.EMPTY_SLOT_ID or loc["room"] not in m["regions"]:
             continue  # same filter as build_dc1
         rows = []
@@ -187,6 +189,7 @@ def _location_records() -> list[dict]:
 def build() -> dict:
     read_refs, written_refs = _script_refs()
     locs = _location_records()
+    suppressed = gal.load_suppressed_physical_ids()
 
     takes_of = {L["loc"]["name"]: sorted({r["take"] for r in L["records"]}) for L in locs}
     # index -> location names using it (nonzero only)
@@ -244,6 +247,8 @@ def build() -> dict:
             "records": records,
             "class": cls,
         }
+        if any(physical_id in suppressed for physical_id in L["loc"]["physicalIds"]):
+            continue
         if cls in ("poisoned", "pinned-shared"):
             entry["excluded"] = True
             if shared:
@@ -253,7 +258,7 @@ def build() -> dict:
     return {
         "_generated_by": "scripts/gen_ap_client_checks.py",
         "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + "
-                   "data/dc1/room-data.json + the english/Data room corpus",
+                   "data/dc1/{room-data,suppressed-pickups}.json + the english/Data room corpus",
         "version": 2,
         "game": "dc1",
         "flagGroup": GROUP,

@@ -1,6 +1,6 @@
 {
   "_generated_by": "scripts/gen_ap_logic.py",
-  "_source": "data/dc1/{map,items,room-data,reachability-oracle}.json + ap-client-checks.json",
+  "_source": "data/dc1/{map,items,room-data,reachability-oracle,suppressed-pickups}.json + ap-client-checks.json",
   "version": 3,
   "topology": "physical",
   "startRoom": "010d",
@@ -5414,62 +5414,6 @@
       ],
       "node": "0302",
       "apId": 230817904,
-      "placementClass": "progression",
-      "allowedProgressionItemIds": [
-        46,
-        47,
-        48,
-        49,
-        56,
-        57,
-        58,
-        65,
-        70,
-        71,
-        72,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111
-      ]
-    },
-    {
-      "key": "0303:21:512,-2048",
-      "name": "Gas Experiment Room (0303) - Recovery Aid @512,-2048",
-      "room": "0303",
-      "itemId": 33,
-      "itemName": "Recovery Aid",
-      "pos": [
-        512,
-        -2048
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 33
-      },
-      "source": "static",
-      "visual": "generic-panel",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0303:0x4fa68"
-      ],
-      "recordOffsets": [
-        326248
-      ],
-      "node": "0303",
-      "apId": 230817833,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
         46,

@@ -39,6 +39,7 @@ EMPTY_SLOT_ID = 0xFF  # DC1 empty item slot sentinel
 # world cannot consume.
 ORACLE = DC1 / "reachability-oracle.json"  # engine-truth golden snapshot (Dc1ReachabilityOracleTests)
 AP_ID_REGISTRY = DC1 / "ap-id-registry.json"
+SUPPRESSED_PICKUPS = DC1 / "suppressed-pickups.json"
 
 
 def _dc1_node_split_rooms() -> set[str]:
@@ -110,6 +111,16 @@ def load_ap_id_registry() -> dict:
     if registry.get("version") != 1:
         raise SystemExit(f"gen_ap_logic: unsupported AP id registry version {registry.get('version')}")
     return registry
+
+
+def load_suppressed_physical_ids() -> set[str]:
+    """Load deliberate physical pickup suppressions without changing AP id history."""
+    if not SUPPRESSED_PICKUPS.exists():
+        raise SystemExit(f"gen_ap_logic: {SUPPRESSED_PICKUPS.relative_to(REPO)} missing")
+    policy = json.loads(SUPPRESSED_PICKUPS.read_text(encoding="utf-8"))
+    if policy.get("version") != 1 or not isinstance(policy.get("pickups"), list):
+        raise SystemExit("gen_ap_logic: suppressed-pickups.json must use version 1 with a pickups array")
+    return {entry["physicalId"].lower() for entry in policy["pickups"]}
 
 
 def _registered_ap_ids(item_names: set[str], locations: list[dict], registry: dict
@@ -273,7 +284,8 @@ def _explicit_logical_groups(room: str, records: list[dict], groups: list[dict])
 
 def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]] | None = None,
                    fixed_records: dict[str, set[int]] | None = None,
-                   item_requirements: dict[str, dict[int, dict]] | None = None) -> list[dict]:
+                   item_requirements: dict[str, dict[int, dict]] | None = None,
+                   suppressed_physical_ids: set[str] | None = None) -> list[dict]:
     """ALL decoded pickup rows, each tagged `source` — nothing is silently dropped here;
     build_dc1 filters what the AP contract can actually place."""
     raw = json.loads((DC1 / "room-data.json").read_text(encoding="utf-8"))
@@ -283,6 +295,8 @@ def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]
     item_groups = item_groups or {}
     fixed_records = fixed_records or {}
     item_requirements = item_requirements or {}
+    suppressed_physical_ids = (load_suppressed_physical_ids()
+                               if suppressed_physical_ids is None else suppressed_physical_ids)
     for code, room in rooms.items():
         ic = room.get("item_control")
         if not ic:
@@ -294,6 +308,9 @@ def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]
             pos = rec.get("pos") or [0, 0]
             x, y = int(pos[0]), int(pos[1])
             key = group["logicalId"]
+            if any(f"{c}:0x{offset:x}" in suppressed_physical_ids
+                   for offset in group["recordOffsets"]):
+                continue
             iname = item_names.get(iid, _clean(rec.get("item_name", f"0x{iid:02x}")))
             requirements = item_requirements.get(c, {}).get(iid, {})
             visual_rank = {"generic-panel": 0, "bespoke-mesh": 1, "interaction-only": 2}
@@ -451,7 +468,7 @@ def build_dc1() -> dict:
     }
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
-        "_source": "data/dc1/{map,items,room-data,reachability-oracle}.json + ap-client-checks.json",
+        "_source": "data/dc1/{map,items,room-data,reachability-oracle,suppressed-pickups}.json + ap-client-checks.json",
         "version": 3,
         "topology": "physical",
         "startRoom": m["startRoom"],
