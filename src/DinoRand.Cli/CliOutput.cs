@@ -20,7 +20,7 @@ internal static class CliOutput
             "Usage:\r\n" +
             "  dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]\r\n" +
             "           [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items]\r\n" +
-            "           [--dc1-cutscene-safe] [--dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--pickup-ground-models] [--no-pickup-ground-models]   (dc1)\r\n" +
+            "           [--dc1-cutscene-safe] [--no-dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--pickup-ground-models] [--no-pickup-ground-models]   (dc1)\r\n" +
             "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
             "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
             "           [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)\r\n" +
@@ -83,10 +83,10 @@ internal static class CliOutput
             "    enemy slot and drives it through authored waypoints, STATIC-SCD-RE cont.49/59) are\r\n" +
             "    excluded from the in-room permute and from foreign-species imports, and get a seeded\r\n" +
             "    palette tint instead (the cont.51/57 \"Blue Raptor\" lever). Off = byte-identical.\r\n" +
-            "  - --dc1-door-skip (dc1, off; EXPERIMENTAL) PATCHES DINO.exe: removes the door-transition\r\n" +
-            "    swing so room-to-room transitions are near-instant, keeping the destination background\r\n" +
-            "    (STATIC-SCD-RE cont.78). Two reversible .text windows, not seed-encoded, reversed by\r\n" +
-            "    --restore; leaves the shared animation stepper untouched. CLOSE the game first.\r\n" +
+            "  - DC1 door skip (on by default; --no-dc1-door-skip opts out; EXPERIMENTAL) PATCHES DINO.exe: a newly mapped door transition\r\n" +
+            "    advances on the button press while existing transitions replay normally and the destination\r\n" +
+            "    background stays intact (STATIC-SCD-RE cont.78). One reversible .text hook + cave, not\r\n" +
+            "    seed-encoded, reversed by --restore. CLOSE the game first.\r\n" +
             "  - --dc1-fast-forward-cutscenes (dc1, off; EXPERIMENTAL / CRASH RISK) PATCHES DINO.exe:\r\n" +
             "    compresses cutscene dead air via a guarded SCD-VM tick multiplier (STATIC-SCD-RE cont.79\r\n" +
             "    v2) — story flags/item grants still commit and dialogue pacing is preserved. One reversible\r\n" +

@@ -500,7 +500,7 @@ namespace DinoRand.App
             // GUI default: Insert upgraded weapons starts ON (item-pool block; DC1-only visible, harmless for DC2).
             PreUpgradedWeapons = true;
             if (!CanShortenCutscenes) ShortenCutscenes = false;
-            if (!CanDc1DoorSkip) Dc1DoorSkip = false;
+            Dc1DoorSkip = CanDc1DoorSkip;
             if (!CanDc1FastForwardCutscenes) Dc1FastForwardCutscenes = false;
             if (!CanDisableLaserFences) DisableLaserFences = false;
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
@@ -628,8 +628,9 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _shuffleBgm;
 
-        // Door skip (DC1): reversible DINO.exe patch applied at install (cont.78). Default OFF.
-        [ObservableProperty] private bool _dc1DoorSkip;
+        // Door skip (DC1): reversible DINO.exe patch applied at install (cont.78). Default ON;
+        // selecting DC2 forces it off because the lever is DC1-only.
+        [ObservableProperty] private bool _dc1DoorSkip = true;
 
         // Fast-forward cutscenes (experimental/crash risk, DC1): reversible DINO.exe patch applied at
         // install (cont.79 v2 guarded tick multiplier). Default OFF, not seed-encoded.

@@ -521,8 +521,8 @@ internal static class ExePatchInstaller
         ExePatcher.ApplyDoorSkip(bytes); // idempotent + guarded against an unexpected build
         File.WriteAllBytes(exePath, bytes);
 
-        string entry = $"door skip (experimental): state-1 leaf-sweep skipped @0x{ExePatcher.DoorSkipSwingVa:X}, " +
-                       $"bg hold {ExePatcher.DoorHoldPristine}->{ExePatcher.DoorHoldPatched} frames @0x{ExePatcher.DoorHoldGateVa:X}";
+        string entry = $"door skip (button press): guarded new-edge hook @0x{ExePatcher.DoorSkipHookVa:X}, " +
+                       $"code cave @0x{ExePatcher.DoorSkipCaveVa:X}";
         const string key = "door skip";
         var manifest = ReadManifest(dataDir) ?? new InstallManifest(seedLabel, DateTime.UtcNow.ToString("o"),
             Array.Empty<string>());

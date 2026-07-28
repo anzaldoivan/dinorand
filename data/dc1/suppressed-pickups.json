@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "pickups": [
+    {
+      "physicalId": "0303:0x4fa68",
+      "reason": "PC-only unconditional Recovery Aid; native take index 179 is shared with Panel Key 2 in 0103"
+    }
+  ]
+}

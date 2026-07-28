@@ -157,7 +157,7 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void Door_skip_and_laser_fences_are_primary_options_but_default_off()
+    public void Door_skip_and_laser_fences_are_primary_options_but_door_skip_defaults_on()
     {
         var root = new DirectoryInfo(AppContext.BaseDirectory);
         while (root != null && !File.Exists(Path.Combine(root.FullName, "DinoRand.sln")))
@@ -168,13 +168,26 @@ public class MainWindowViewModelTests
         int advanced = xaml.IndexOf("<Expander Header=\"Advanced options\"", StringComparison.Ordinal);
 
         Assert.True(advanced > 0);
-        Assert.InRange(xaml.IndexOf("Content=\"Door Skip\"", StringComparison.Ordinal), 0, advanced - 1);
+        Assert.InRange(xaml.IndexOf("Content=\"Door Skip (Button Press)\"", StringComparison.Ordinal), 0, advanced - 1);
+        Assert.Contains("newly mapped door transition", xaml, StringComparison.Ordinal);
         Assert.InRange(xaml.IndexOf("Content=\"Disable laser fences\"", StringComparison.Ordinal), 0, advanced - 1);
         var vm = NewVm();
-        Assert.False(vm.Dc1DoorSkip);
+        Assert.True(vm.Dc1DoorSkip);
         Assert.False(vm.DisableLaserFences);
-        Assert.False(new RandomizerConfig().Dc1DoorSkip);
+        Assert.True(new RandomizerConfig().Dc1DoorSkip);
         Assert.False(new RandomizerConfig().DisableLaserFences);
+
+        var seed = vm.SeedText;
+        vm.Dc1DoorSkip = false;
+        Assert.Equal(seed, vm.SeedText);
+        var pasted = NewVm();
+        pasted.SeedText = seed;
+        Assert.True(pasted.Dc1DoorSkip);
+
+        vm.SelectedGameIndex = 1;
+        Assert.False(vm.Dc1DoorSkip);
+        vm.SelectedGameIndex = 0;
+        Assert.True(vm.Dc1DoorSkip);
     }
 
     [Fact]

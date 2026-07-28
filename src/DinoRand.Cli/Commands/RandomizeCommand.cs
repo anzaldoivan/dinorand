@@ -39,7 +39,7 @@ internal sealed partial class CliApplication
             // flagged tier, STATIC-SCD-RE cont.49/59) refuse permutes/species imports and get the palette-tint
             // fallback instead. Off = byte-identical. Not seed-encoded.
             Dc1CutsceneSafeEnemies = argv.Contains("--dc1-cutscene-safe"),
-            Dc1DoorSkip = argv.Contains("--dc1-door-skip"),
+            Dc1DoorSkip = !argv.Contains("--no-dc1-door-skip"),
             Dc1FastForwardCutscenes = argv.Contains("--dc1-fast-forward-cutscenes"),
             ShuffleKeyItems = argv.Contains("--shuffle-keys"),
             // DC1: key-item scatter (a door key may also land in a static ammo/health pickup, not only another

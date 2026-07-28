@@ -60,12 +60,21 @@ internal static class Dc1RunArtifactWriter
             if (!fresh.Contains(Path.GetFileName(existing)))
                 File.Delete(existing);
 
-        foreach (var (rref, room) in refs.Zip(rooms))
+        var roomOutputs = refs.Zip(rooms)
+            .Select(pair =>
+            {
+                var bytes = context.TryGetRoomOutput(pair.Second, out var overridden)
+                    ? overridden
+                    : pair.Second.Write();
+                return (pair.First, pair.Second,
+                    Bytes: Dc1NativeRecoveryAidSuppression.ApplyGenerated(
+                        pair.Second.Stage << 8 | pair.Second.Room, pair.Second.OriginalBytes, bytes));
+            })
+            .ToList();
+
+        foreach (var (rref, _, bytes) in roomOutputs)
         {
             ct.ThrowIfCancellationRequested();   // mod-dir writes only — safe to abort mid-way
-            // A pass may supply final bytes (a post-serialization transform like a texture import); otherwise
-            // emit the RoomFile as edited in place.
-            var bytes = context.TryGetRoomOutput(room, out var overridden) ? overridden : room.Write();
             File.WriteAllBytes(Path.Combine(outputDir, Path.GetFileName(rref.Path)), bytes);
         }
 

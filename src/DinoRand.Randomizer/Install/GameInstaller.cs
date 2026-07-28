@@ -328,9 +328,9 @@ public static class GameInstaller
     => ExePatchInstaller.PatchExeShuffleBgm(dataDir, seed, seedLabel);
 
     /// <summary>
-    /// Apply the DC1 "door skip (experimental)" lever to <c>DINO.exe</c>: remove the door-transition swing so
-    /// room-to-room transitions are near-instant, while keeping the destination background/room-view commit
-    /// intact (cont.78, LIVE-CONFIRMED). Two small reversible <c>.text</c> windows via
+    /// Apply the DC1 "door skip (button press)" lever to <c>DINO.exe</c>: accelerate a newly mapped door
+    /// transition on its button press while keeping existing transition bytes and the destination background/room-view commit
+    /// intact (cont.78). A guarded reversible <c>.text</c> hook + code cave via
     /// <see cref="ExePatcher.ApplyDoorSkip"/>; idempotent and additive (composes with any other exe patch,
     /// leaves the shared animation stepper untouched). Backs up the pristine exe once, records the patch in
     /// the manifest, and is reversed byte-identically by <see cref="Restore"/>. Not seed-dependent.

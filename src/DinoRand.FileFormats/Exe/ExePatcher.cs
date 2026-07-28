@@ -860,37 +860,23 @@ public static class ExePatcher
     public static void WriteUInt8AtVa(Span<byte> exe, uint va, byte value)
         => Dc1InventoryExePatch.WriteUInt8AtVa(exe, va, value);
 
-    // ---- Door skip (Experimental): remove the door-transition swing, keep the room load ----
-    // cont.78 (LIVE-CONFIRMED 2026-07-18): the mode-6 door transition's state-1 (0x4710b7) is three
-    // interleaved sub-machines on the door struct. Two reversible windows make transitions instant while
-    // keeping the destination background correct (which a full state-1 skip breaks):
-    //   A. state-1 sub-state 0 (0x471122) normally calls the per-door-type leaf-sweep handler (~80 frames).
-    //      Replace it with `mov eax,[ebp+8]; mov word[eax+2],1; jmp 0x47149a` — advance past the sweep to
-    //      sub-state 1 while still falling through the tail, so the background/room-view machine (0x4715c1,
-    //      reached via the tail) still runs and commits the new room.
-    //   B. that background machine holds `byte[struct+0xf] > 0x3c` (60 frames); drop the 0x3c imm8 (of
-    //      `cmp edx,0x3c` @ 0x471631) to 4 so it isn't the new floor once the swing is gone.
-    // Leaves the shared keyframe stepper 0x45E227 untouched → no effect on enemy/cutscene timing.
+    // ---- Door skip (Experimental): accelerate only a newly mapped edge ----
+    // cont.78: the hook inspects the mapped-new-edge word at 0x6D3C40. Existing transitions replay
+    // the displaced 14 bytes and continue at 0x471130; a new edge advances the transition struct and
+    // jumps to 0x47149A. The code cave starts immediately after the occupied laser-fence cave, at 0x61FCAC,
+    // and ends before the cutscene cave. The former global hold site at 0x471631 is deliberately untouched.
 
-    /// <summary>VA of state-1 sub-state 0 (the leaf-sweep dispatch) — the skip-swing window. <c>[verified]</c></summary>
-    public const uint DoorSkipSwingVa = 0x00471122;
+    /// <summary>VA of the state-1 sub-state-0 hook. <c>[verified]</c></summary>
+    public const uint DoorSkipHookVa = 0x00471122;
 
-    /// <summary>VA of the background machine's 60-frame hold gate `cmp edx,0x3c`. <c>[verified]</c></summary>
-    public const uint DoorHoldGateVa = 0x00471631;
+    /// <summary>Compatibility alias for the former skip-swing site name.</summary>
+    public const uint DoorSkipSwingVa = DoorSkipHookVa;
 
-    /// <summary>Pristine hold threshold (frames) at <see cref="DoorHoldGateVa"/><c>+2</c>.</summary>
-    public const byte DoorHoldPristine = 0x3C;
+    /// <summary>VA of the guarded door-skip code cave in verified zero-slack. <c>[verified]</c></summary>
+    public const uint DoorSkipCaveVa = 0x0061FCAC;
 
-    /// <summary>Live-tuned hold threshold (frames) written by the door-skip patch.</summary>
-    public const byte DoorHoldPatched = 0x04;
-
-    internal static readonly byte[] DoorSkipSwingPristine =
-        { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F };
-
-    internal static readonly byte[] DoorSkipSwingCode =
-        { 0x8B, 0x45, 0x08, 0x66, 0xC7, 0x40, 0x02, 0x01, 0x00, 0xE9, 0x6A, 0x03, 0x00, 0x00 };
-
-    internal static readonly byte[] DoorHoldGateSig = { 0x83, 0xFA }; // `cmp edx, imm8`
+    /// <summary>Runtime-only word indicating that the mapped edge is new.</summary>
+    public const uint DoorSkipMappedEdgeVa = 0x006D3C40;
 
     /// <summary>True when the door-skip patch is already applied (idempotency check).</summary>
     public static bool IsDoorSkipApplied(ReadOnlySpan<byte> exe)
@@ -898,10 +884,10 @@ public static class ExePatcher
 
     /// <summary>
     /// Apply the reversible "door skip" lever to <paramref name="exe"/> in place. Idempotent: a no-op if
-    /// already applied. Refuses (throws <see cref="InvalidOperationException"/>) if the skip-swing window is
-    /// neither pristine nor already patched, or if the hold-gate guard bytes don't match — so it can never
-    /// corrupt an unexpected build. Both sites are file-backed <c>.text</c> (guarded by
-    /// <see cref="VaToFileOffset"/>).
+    /// already applied. Refuses (throws <see cref="InvalidOperationException"/>) if the hook is neither
+    /// pristine nor already patched, or if the cave is occupied by unexpected bytes — so it can never
+    /// corrupt an unexpected build. The hook and cave are file-backed <c>.text</c> (guarded by
+    /// <see cref="VaToFileOffset"/>); no runtime-only state or global hold site is written.
     /// </summary>
     public static void ApplyDoorSkip(Span<byte> exe)
         => Dc1TransitionExePatch.ApplyDoorSkip(exe);

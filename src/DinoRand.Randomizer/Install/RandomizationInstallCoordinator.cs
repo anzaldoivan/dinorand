@@ -66,12 +66,12 @@ internal static class RandomizationInstallCoordinator
                 + "(a removed start weapon is placed in the early world by the item pass).");
         }
 
-        if (config.Dc1DoorSkip)
+        if (config.Dc1DoorSkip && File.Exists(GameInstaller.ExePath(dataDir)))
         {
             var doorSkip = GameInstaller.PatchExeDoorSkip(dataDir, seed.ToString());
             foreach (var repoint in doorSkip.Repoints)
                 Emit($"door skip: {repoint}");
-            Emit("door skip: EXPERIMENTAL — door transitions are near-instant on the next launch. CLOSE the game first.");
+            Emit("door skip: EXPERIMENTAL — newly mapped door transitions advance on button press on the next launch. CLOSE the game first.");
         }
 
         if (config.Dc1FastForwardCutscenes)

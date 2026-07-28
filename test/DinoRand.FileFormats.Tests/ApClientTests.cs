@@ -26,11 +26,11 @@ public class ApClientTests
     // ---- embedded checks contract -------------------------------------------------------
 
     [Fact]
-    public void EmbeddedChecks_Load_154Locations_UniqueApIds_UniqueNonExcludedFlags()
+    public void EmbeddedChecks_Load_153Locations_UniqueApIds_UniqueNonExcludedFlags()
     {
         var checks = Dc1ClientChecks.LoadEmbedded();
-        Assert.Equal(154, checks.Locations.Count);
-        Assert.Equal(154, checks.Locations.Select(l => l.ApId).Distinct().Count());
+        Assert.Equal(153, checks.Locations.Count);
+        Assert.Equal(153, checks.Locations.Select(l => l.ApId).Distinct().Count());
 
         var seen = new Dictionary<int, string>();
         foreach (var loc in checks.Locations.Where(l => !l.Excluded))

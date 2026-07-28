@@ -1,6 +1,6 @@
 {
  "_generated_by": "scripts/gen_ap_client_checks.py",
- "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + data/dc1/room-data.json + the english/Data room corpus",
+ "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + data/dc1/{room-data,suppressed-pickups}.json + the english/Data room corpus",
  "version": 2,
  "game": "dc1",
  "flagGroup": 7,
@@ -1588,44 +1588,6 @@
       -3584
      ],
      "take": 19
-    }
-   ],
-   "class": "rekeyed"
-  },
-  {
-   "name": "Gas Experiment Room (0303) - Recovery Aid @512,-2048",
-   "apId": 230817833,
-   "key": "0303:21:512,-2048",
-   "logicalId": "0303:21:512,-2048",
-   "room": "0303",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     23
-    ]
-   },
-   "records": [
-    {
-     "room": "0303",
-     "rec": "0x4fa68",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 33,
-     "vanillaAmount": 1,
-     "vanillaTake": 179,
-     "geometry": [
-      512,
-      -2048,
-      2048,
-      -2048,
-      2048,
-      -3584,
-      512,
-      -3584
-     ],
-     "take": 23
     }
    ],
    "class": "rekeyed"
