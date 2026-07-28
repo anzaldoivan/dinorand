@@ -85,11 +85,11 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
                             f"{name} guards a location but is not progression")
 
     def test_excluded_locations_hold_no_progression(self) -> None:
-        # Shared-taken-flag locations (ap-client-checks.json `excluded`, dc1_logic v3) cannot be
+        # Shared-taken-flag locations (ap-client-checks.json `excluded`, dc1_logic v4) cannot be
         # attributed individually by the runtime client — fill must keep progression out.
         from Fill import distribute_items_restrictive
         excluded = [loc["name"] for loc in dc1.LOCATIONS if loc.get("excluded")]
-        self.assertEqual(12, len(excluded), "excluded tail drifted — regenerate the contract")
+        self.assertEqual(6, len(excluded), "excluded tail drifted — regenerate the contract")
         distribute_items_restrictive(self.multiworld)
         for name in excluded:
             item = self.multiworld.get_location(name, self.player).item
@@ -102,7 +102,7 @@ class TestDefaultGeneration(DinoCrisis1TestBase):
         from Fill import distribute_items_restrictive
         distribute_items_restrictive(self.multiworld)
         slot_data = self.world.fill_slot_data()
-        self.assertEqual(3, slot_data["logic_version"])
+        self.assertEqual(4, slot_data["logic_version"])
         placements = slot_data["placements"]
         self.assertEqual(len(dc1.LOCATIONS), len(placements))
         valid_ids = set(dc1.GAME_ITEM_ID.values())

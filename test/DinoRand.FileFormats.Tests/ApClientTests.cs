@@ -19,18 +19,29 @@ public class ApClientTests
     {
         var ex = Assert.Throws<InvalidOperationException>(() => Dc1ApRunner.ValidateLogicVersion(2));
         Assert.Contains("regenerate", ex.Message, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("v3", ex.Message, StringComparison.OrdinalIgnoreCase);
-        Dc1ApRunner.ValidateLogicVersion(3);
+        Assert.Contains("v4", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Throws<InvalidOperationException>(() => Dc1ApRunner.ValidateLogicVersion(3));
+        Dc1ApRunner.ValidateLogicVersion(4);
+    }
+
+    [Fact]
+    public void Dc1Checks_RejectsV3_AndAcceptsV4()
+    {
+        static MemoryStream Contract(int version) => new(
+            System.Text.Encoding.UTF8.GetBytes($"{{\"version\":{version},\"flagGroup\":7,\"locations\":[]}}"));
+
+        Assert.Throws<InvalidOperationException>(() => Dc1ClientChecks.Load(Contract(3)));
+        Assert.Empty(Dc1ClientChecks.Load(Contract(4)).Locations);
     }
 
     // ---- embedded checks contract -------------------------------------------------------
 
     [Fact]
-    public void EmbeddedChecks_Load_153Locations_UniqueApIds_UniqueNonExcludedFlags()
+    public void EmbeddedChecks_Load_137Locations_UniqueApIds_UniqueNonExcludedFlags()
     {
         var checks = Dc1ClientChecks.LoadEmbedded();
-        Assert.Equal(153, checks.Locations.Count);
-        Assert.Equal(153, checks.Locations.Select(l => l.ApId).Distinct().Count());
+        Assert.Equal(137, checks.Locations.Count);
+        Assert.Equal(137, checks.Locations.Select(l => l.ApId).Distinct().Count());
 
         var seen = new Dictionary<int, string>();
         foreach (var loc in checks.Locations.Where(l => !l.Excluded))
@@ -52,7 +63,7 @@ public class ApClientTests
     {
         var checks = Dc1ClientChecks.LoadEmbedded();
         var excluded = checks.Locations.Where(l => l.Excluded).ToList();
-        Assert.Equal(12, excluded.Count);
+        Assert.Equal(6, excluded.Count);
         Assert.All(excluded, l => Assert.True(l.Class is "pinned-shared" or "poisoned", l.Class));
     }
 

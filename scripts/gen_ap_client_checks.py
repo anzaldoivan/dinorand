@@ -145,7 +145,8 @@ def _location_records() -> list[dict]:
     files = _room_files(_data_dir())
     rdt_cache: dict[str, bytes] = {}
 
-    # Index physical records by stable room+offset. Logical membership comes only from map.itemGroups.
+    # Index physical records by stable room+offset. Logical membership comes from itemGroups,
+    # synchronization itemLinks, and the AP-only cross-room policy.
     recs_by_physical: dict[tuple[str, int], dict] = {}
     for code, room in raw["rooms"].items():
         ic = room.get("item_control")
@@ -160,12 +161,16 @@ def _location_records() -> list[dict]:
     out = []
     # Keep suppressed records in the allocation census so removing one location does not renumber
     # unrelated rekeys; the final emitted checks are filtered below.
-    for loc in gal.load_locations(items["names"], m["itemGroups"], suppressed_physical_ids=set()):
+    locations, _unavailable = gal.apply_ap_location_policy(
+        gal.load_locations(items["names"], m["itemGroups"],
+                           suppressed_physical_ids=set(), item_links=m["itemLinks"])
+    )
+    for loc in locations:
         if loc["itemId"] == gal.EMPTY_SLOT_ID or loc["room"] not in m["regions"]:
             continue  # same filter as build_dc1
         rows = []
-        for offset in loc["recordOffsets"]:
-            r = recs_by_physical[(loc["room"], offset)]
+        for target in loc["physicalRecords"]:
+            r = recs_by_physical[(target["room"], target["offset"])]
             room = r["room"]
             if room not in rdt_cache:
                 rdt_cache[room] = _rdt(files[room])
@@ -258,8 +263,9 @@ def build() -> dict:
     return {
         "_generated_by": "scripts/gen_ap_client_checks.py",
         "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + "
-                   "data/dc1/{room-data,suppressed-pickups}.json + the english/Data room corpus",
-        "version": 2,
+                   "data/dc1/{room-data,map,suppressed-pickups,ap-location-policy}.json + "
+                   "the english/Data room corpus",
+        "version": 4,
         "game": "dc1",
         "flagGroup": GROUP,
         "locations": entries,

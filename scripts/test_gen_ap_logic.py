@@ -11,13 +11,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_ap_logic as ap
 
 
-class Dc1LogicV3Tests(unittest.TestCase):
+class Dc1LogicV4Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.data = ap.build_dc1()
 
-    def test_v3_progression_includes_exactly_one_entrance_key_source(self) -> None:
-        self.assertEqual(3, self.data["version"])
+    def test_v4_progression_includes_exactly_one_entrance_key_source(self) -> None:
+        self.assertEqual(4, self.data["version"])
         self.assertEqual("physical", self.data["topology"])
         self.assertEqual(1, self.data["items"]["progressionItemIds"].count(0x2E))
         self.assertIn(0x2E, self.data["items"]["completionItemIds"])
@@ -37,6 +37,77 @@ class Dc1LogicV3Tests(unittest.TestCase):
         for location in self.data["locations"]:
             self.assertIn(str(location["itemId"]), self.data["items"]["names"])
             self.assertIsInstance(location["apId"], int)
+
+    def test_active_ids_are_unique_and_tombstones_are_not_active(self) -> None:
+        active = [location["apId"] for location in self.data["locations"]]
+        retired = [row["id"] for row in self.data["tombstones"]]
+        self.assertEqual(len(active), len(set(active)))
+        self.assertTrue(set(active).isdisjoint(retired))
+        self.assertEqual(len(retired), len(set(retired)))
+        self.assertTrue(all(row["status"] == "tombstone" for row in self.data["tombstones"]))
+
+    def test_ap_policy_membership_and_unavailable_keys(self) -> None:
+        by_physical = {
+            physical: location
+            for location in self.data["locations"]
+            for physical in location["physicalIds"]
+        }
+        for members in (
+            {"0503:0x4d168", "0511:0x5722c"},
+            {"0503:0x4d194", "0511:0x57258"},
+            {"0503:0x4d4fc", "0511:0x575c0"},
+            {"0605:0x5c0b0", "0615:0x21c90"},
+            {"0605:0x5c0dc", "0615:0x21cbc"},
+        ):
+            self.assertEqual(1, len({by_physical[member]["logicalId"] for member in members}))
+
+        active_keys = {location["key"] for location in self.data["locations"]}
+        retired_keys = {row["key"] for row in self.data["tombstones"]}
+        self.assertTrue({
+            "0204:0e:2000,-3000",
+            "060f:68:4128,448",
+            "060f:2b:864,8240",
+            "060f:15:3344,1264",
+            "060f:32:288,-1920",
+        } <= retired_keys)
+        self.assertFalse(active_keys & retired_keys)
+
+    def test_variant_aliases_use_or_reachability_without_item_requirements(self) -> None:
+        for rooms in (("0503", "0511"), ("0605", "0615")):
+            location = next(
+                location for location in self.data["locations"]
+                if set(location["accessNodes"]) == set(rooms)
+            )
+            self.assertEqual([], location["requiresItems"])
+            self.assertEqual(set(rooms), set(location["accessNodes"]))
+
+    def test_every_item_link_group_is_one_check_and_patches_all_members(self) -> None:
+        authored = json.loads((ap.DC1 / "map.json").read_text(encoding="utf-8"))
+        locations = self.data["locations"]
+        for room, definition in authored["rooms"].items():
+            room = f"{int(room, 16):04x}"
+            for link in definition.get("itemLinks", []):
+                members = {f"{room}:0x{int(offset, 16):x}" for offset in link["records"]}
+                matches = [location for location in locations
+                           if members <= set(location["physicalIds"])]
+                self.assertEqual(1, len(matches), link["id"])
+                self.assertEqual(members, members & set(matches[0]["physicalIds"]))
+
+        expected = {
+            "0503:0x4d168", "0511:0x5722c", "0503:0x4d194", "0511:0x57258",
+            "0503:0x4d4fc", "0511:0x575c0", "0605:0x5c0b0", "0615:0x21c90",
+            "0605:0x5c0dc", "0615:0x21cbc",
+        }
+        by_physical = {
+            physical: location
+            for location in locations
+            for physical in location["physicalIds"]
+        }
+        for physical in expected:
+            self.assertIn(physical, by_physical)
+        for location in locations:
+            if expected & set(location["physicalIds"]):
+                self.assertTrue(expected & set(location["physicalIds"]) <= set(location["physicalIds"]))
 
     def test_explicit_registry_preserves_ids_across_earlier_addition_and_rename(self) -> None:
         registry = ap.load_ap_id_registry()

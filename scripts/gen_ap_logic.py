@@ -40,6 +40,7 @@ EMPTY_SLOT_ID = 0xFF  # DC1 empty item slot sentinel
 ORACLE = DC1 / "reachability-oracle.json"  # engine-truth golden snapshot (Dc1ReachabilityOracleTests)
 AP_ID_REGISTRY = DC1 / "ap-id-registry.json"
 SUPPRESSED_PICKUPS = DC1 / "suppressed-pickups.json"
+AP_LOCATION_POLICY = DC1 / "ap-location-policy.json"
 
 
 def _dc1_node_split_rooms() -> set[str]:
@@ -113,6 +114,24 @@ def load_ap_id_registry() -> dict:
     return registry
 
 
+def load_ap_location_policy() -> dict:
+    if not AP_LOCATION_POLICY.exists():
+        raise SystemExit(f"gen_ap_logic: {AP_LOCATION_POLICY.relative_to(REPO)} missing")
+    policy = json.loads(AP_LOCATION_POLICY.read_text(encoding="utf-8"))
+    if policy.get("version") != 1 or not isinstance(policy.get("groups"), list):
+        raise SystemExit("gen_ap_logic: ap-location-policy.json must use version 1 with groups")
+    return policy
+
+
+def _dc1_tombstones(registry: dict) -> list[dict]:
+    keys = set(load_ap_location_policy().get("tombstoneKeys", []))
+    rows = [row for row in registry["locations"] if row["key"] in keys]
+    if {row["key"] for row in rows} != keys:
+        missing = sorted(keys - {row["key"] for row in rows})
+        raise SystemExit(f"gen_ap_logic: AP tombstone keys missing from registry: {missing}")
+    return [{**row, "status": "tombstone"} for row in rows]
+
+
 def load_suppressed_physical_ids() -> set[str]:
     """Load deliberate physical pickup suppressions without changing AP id history."""
     if not SUPPRESSED_PICKUPS.exists():
@@ -127,12 +146,13 @@ def _registered_ap_ids(item_names: set[str], locations: list[dict], registry: di
                        ) -> tuple[dict[str, int], dict[str, int]]:
     """Resolve current catalog rows through the explicit registry without sorting/re-numbering."""
     item_rows = registry["items"]
-    location_rows = registry["locations"]
-    all_rows = [*item_rows, *location_rows]
+    location_rows = [row for row in registry["locations"]
+                     if row["key"] not in set(load_ap_location_policy().get("tombstoneKeys", []))]
+    all_rows = [*item_rows, *registry["locations"], *registry.get("tombstones", [])]
     ids = [row["id"] for row in all_rows]
     if len(ids) != len(set(ids)):
         raise SystemExit("gen_ap_logic: AP id registry contains duplicate numeric ids")
-    for kind, rows in (("item", item_rows), ("location", location_rows)):
+    for kind, rows in (("item", item_rows), ("location", [*location_rows, *registry.get("tombstones", [])])):
         keys = [row["key"] for row in rows]
         if len(keys) != len(set(keys)):
             raise SystemExit(f"gen_ap_logic: AP id registry contains duplicate {kind} keys")
@@ -161,12 +181,14 @@ def load_map() -> dict:
     regions: dict[str, str] = {}
     edges: list[dict] = []
     item_groups: dict[str, list[dict]] = {}
+    item_links: dict[str, list[dict]] = {}
     fixed_records: dict[str, set[int]] = {}
     item_requirements: dict[str, dict[int, dict]] = {}
     for code, room in raw["rooms"].items():
         c = _code(code)
         regions[c] = room.get("name", c)
         item_groups[c] = room.get("itemGroups") or []
+        item_links[c] = room.get("itemLinks") or []
         fixed_records[c] = {
             int(offset, 16)
             for entry in (room.get("itemPriorities") or [])
@@ -224,8 +246,8 @@ def load_map() -> dict:
     regions.setdefault(start, start)
     regions.setdefault(end, end)
     return {"regions": regions, "edges": edges, "startRoom": start, "goalRoom": end,
-            "itemGroups": item_groups, "fixedRecords": fixed_records,
-            "itemRequirements": item_requirements}
+             "itemGroups": item_groups, "fixedRecords": fixed_records,
+             "itemLinks": item_links, "itemRequirements": item_requirements}
 
 
 def _source(rec) -> str:
@@ -239,12 +261,25 @@ def _source(rec) -> str:
     return "static" if kind in ("init", "init_gosub", "aot_zone") else "event-granted"
 
 
-def _explicit_logical_groups(room: str, records: list[dict], groups: list[dict]) -> list[dict]:
-    """Return ordered physical membership using only explicit record-offset groups."""
+def _explicit_logical_groups(room: str, records: list[dict], groups: list[dict],
+                             links: list[dict] | None = None) -> list[dict]:
+    """Return ordered physical membership using itemGroups and synchronization itemLinks."""
     by_offset = {int(rec["rec_offset"], 16): rec for rec in records}
-    membership: dict[int, str] = {}
-    members_by_id: dict[str, list[int]] = {}
-    for group in groups:
+    all_groups = [*groups, *(links or [])]
+    parent = {offset: offset for offset in by_offset}
+
+    def find(offset: int) -> int:
+        while parent[offset] != offset:
+            parent[offset] = parent[parent[offset]]
+            offset = parent[offset]
+        return offset
+
+    def union(left: int, right: int) -> None:
+        left, right = find(left), find(right)
+        if left != right:
+            parent[right] = left
+
+    for group in all_groups:
         logical_id = group["id"]
         offsets = [int(value, 16) for value in group["records"]]
         if len(offsets) < 2:
@@ -252,31 +287,42 @@ def _explicit_logical_groups(room: str, records: list[dict], groups: list[dict])
         for offset in offsets:
             if offset not in by_offset:
                 raise SystemExit(f"gen_ap_logic: {room} group {logical_id} missing record {offset:#x}")
-            if offset in membership:
-                raise SystemExit(f"gen_ap_logic: {room} record {offset:#x} belongs to multiple groups")
-            membership[offset] = logical_id
-        members_by_id[logical_id] = offsets
+        for offset in offsets[1:]:
+            union(offsets[0], offset)
+
+    group_ids: dict[int, list[str]] = {}
+    for group in groups:
+        offsets = [int(value, 16) for value in group["records"]]
+        group_ids.setdefault(find(offsets[0]), []).append(group["id"])
+    link_ids: dict[int, list[str]] = {}
+    for link in links or []:
+        offsets = [int(value, 16) for value in link["records"]]
+        link_ids.setdefault(find(offsets[0]), []).append(link["id"])
 
     bases = []
+    base_by_offset: dict[int, str] = {}
     for rec in records:
         iid = _item_id(rec["item_id"])
         pos = rec.get("pos") or [0, 0]
-        bases.append(f"{room}:{iid:02x}:{int(pos[0])},{int(pos[1])}")
+        base = f"{room}:{iid:02x}:{int(pos[0])},{int(pos[1])}"
+        bases.append(base)
+        base_by_offset[int(rec["rec_offset"], 16)] = base
     base_counts = {base: bases.count(base) for base in set(bases)}
 
-    emitted: set[str] = set()
+    emitted: set[int] = set()
     result = []
     for rec, base in zip(records, bases):
         offset = int(rec["rec_offset"], 16)
-        logical_id = membership.get(offset)
-        if logical_id is not None:
-            if logical_id in emitted:
+        root = find(offset)
+        if root in group_ids or root in link_ids:
+            logical_id = (group_ids.get(root) or [base_by_offset[offset]])[0]
+            if root in emitted:
                 continue
-            offsets = members_by_id[logical_id]
+            offsets = [int(item["rec_offset"], 16) for item in records if find(int(item["rec_offset"], 16)) == root]
         else:
             logical_id = base if base_counts[base] == 1 else f"{base}:rec@{offset:x}"
             offsets = [offset]
-        emitted.add(logical_id)
+        emitted.add(root)
         result.append({"logicalId": logical_id, "recordOffsets": offsets,
                        "records": [by_offset[x] for x in offsets]})
     return result
@@ -285,7 +331,8 @@ def _explicit_logical_groups(room: str, records: list[dict], groups: list[dict])
 def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]] | None = None,
                    fixed_records: dict[str, set[int]] | None = None,
                    item_requirements: dict[str, dict[int, dict]] | None = None,
-                   suppressed_physical_ids: set[str] | None = None) -> list[dict]:
+                   suppressed_physical_ids: set[str] | None = None,
+                   item_links: dict[str, list[dict]] | None = None) -> list[dict]:
     """ALL decoded pickup rows, each tagged `source` — nothing is silently dropped here;
     build_dc1 filters what the AP contract can actually place."""
     raw = json.loads((DC1 / "room-data.json").read_text(encoding="utf-8"))
@@ -295,6 +342,7 @@ def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]
     item_groups = item_groups or {}
     fixed_records = fixed_records or {}
     item_requirements = item_requirements or {}
+    item_links = item_links or {}
     suppressed_physical_ids = (load_suppressed_physical_ids()
                                if suppressed_physical_ids is None else suppressed_physical_ids)
     for code, room in rooms.items():
@@ -302,7 +350,8 @@ def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]
         if not ic:
             continue
         c = _code(code)
-        for group in _explicit_logical_groups(c, ic["records"], item_groups.get(c, [])):
+        for group in _explicit_logical_groups(c, ic["records"], item_groups.get(c, []),
+                                              item_links.get(c, [])):
             rec = group["records"][0]
             iid = _item_id(rec["item_id"])
             pos = rec.get("pos") or [0, 0]
@@ -318,6 +367,7 @@ def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]
                          key=lambda value: visual_rank.get(value, 99))
             loc = {
                 "key": key,
+                "logicalId": key,
                 "name": f"{room_name.get(c, c)} ({c}) - {iname} @{x},{y}",
                 "room": c,
                 "itemId": iid,
@@ -336,12 +386,50 @@ def load_locations(item_names: dict[int, str], item_groups: dict[str, list[dict]
                 "requiresRooms": requirements.get("requiresRooms", []),
                 "physicalIds": [f"{c}:0x{offset:x}" for offset in group["recordOffsets"]],
                 "recordOffsets": group["recordOffsets"],
+                "physicalRecords": [{"room": c, "offset": offset}
+                                    for offset in group["recordOffsets"]],
             }
             fl = (rec.get("gate") or {}).get("flag")
             if fl:
                 loc["gateFlag"] = f"{fl['group']}:{fl['index']}"
             locs.append(loc)
     return locs
+
+
+def apply_ap_location_policy(locations: list[dict]) -> tuple[list[dict], list[str]]:
+    """Apply AP-only alias/unavailable policy without changing normal item placement data."""
+    policy = load_ap_location_policy()
+    unavailable = {value.lower() for value in policy.get("unavailable", [])}
+    active = [location for location in locations
+              if not unavailable.intersection(location["physicalIds"])]
+    by_physical = {
+        physical: location
+        for location in active
+        for physical in location["physicalIds"]
+    }
+    used: set[str] = set()
+    for group in policy["groups"]:
+        members = [value.lower() for value in group["members"]]
+        canonical = group["canonical"].lower()
+        if canonical not in members or any(value not in by_physical for value in members):
+            raise SystemExit(f"gen_ap_logic: incomplete AP location group {group['id']}")
+        source = {id(by_physical[value]): by_physical[value] for value in members}
+        if any(identity in used for identity in source):
+            raise SystemExit(f"gen_ap_logic: overlapping AP location group {group['id']}")
+        used.update(source)
+        primary = by_physical[canonical]
+        merged = dict(primary)
+        merged["physicalIds"] = [physical for location in source.values()
+                                  for physical in location["physicalIds"]]
+        merged["physicalRecords"] = [record for location in source.values()
+                                      for record in location["physicalRecords"]]
+        merged["recordOffsets"] = [record["offset"] for record in merged["physicalRecords"]]
+        merged["aliases"] = [location["name"] for location in source.values()
+                              if location is not primary]
+        merged["accessRooms"] = sorted({location["room"] for location in source.values()})
+        active = [location for location in active if location not in source.values()]
+        active.append(merged)
+    return active, sorted(unavailable)
 
 
 CLIENT_CHECKS = DC1 / "ap-client-checks.json"
@@ -365,7 +453,9 @@ def build_dc1() -> dict:
     m = load_map()
     oracle = json.loads(ORACLE.read_text(encoding="utf-8"))
     all_locs = load_locations(items["names"], m["itemGroups"], m["fixedRecords"],
-                              m["itemRequirements"])
+                              m["itemRequirements"], item_links=m["itemLinks"])
+    policy_source_locs = all_locs
+    all_locs, unavailable = apply_ap_location_policy(all_locs)
     # AP contract: only real-id pickups in rooms on the door graph are placeable checks.
     # Runtime-armed 0xff slots (no id to place against) and alt-room copies outside the
     # graph stay visible in DATA-REFERENCE.md via load_locations' `source` tag.
@@ -401,7 +491,15 @@ def build_dc1() -> dict:
         primary = next((node for node in nodes if node["primary"]), None)
         if primary is None:
             raise SystemExit(f"gen_ap_logic: location {location['name']} has no physical primary node")
+        access_rooms = location.get("accessRooms", [location["room"]])
+        access_nodes = []
+        for room in access_rooms:
+            room_primary = next((node for node in nodes_by_room.get(room, []) if node["primary"]), None)
+            if room_primary is None:
+                raise SystemExit(f"gen_ap_logic: location {location['name']} has no AP access node for {room}")
+            access_nodes.append(room_primary["id"])
         location["node"] = primary["id"]
+        location["accessNodes"] = access_nodes
         if location["room"] in protected_rooms:
             location["protected"] = True
         if location["room"] in ending_rooms:
@@ -466,10 +564,13 @@ def build_dc1() -> dict:
         for row in item_rows
         for alias in row.get("aliases", [])
     }
+    unavailable_item_ids = sorted({location["itemId"] for location in policy_source_locs
+                                   if any(physical in unavailable for physical in location["physicalIds"])
+                                   and location["itemId"] in progression})
     return {
         "_generated_by": "scripts/gen_ap_logic.py",
-        "_source": "data/dc1/{map,items,room-data,reachability-oracle,suppressed-pickups}.json + ap-client-checks.json",
-        "version": 3,
+        "_source": "data/dc1/{map,items,room-data,reachability-oracle,suppressed-pickups,ap-location-policy}.json + ap-client-checks.json",
+        "version": 4,
         "topology": "physical",
         "startRoom": m["startRoom"],
         "goalRoom": m["goalRoom"],
@@ -479,6 +580,8 @@ def build_dc1() -> dict:
         "nodes": oracle["nodes"],
         "edges": physical_edges,
         "locations": locs,
+        "tombstones": _dc1_tombstones(registry),
+        "unavailableProgressionItemIds": unavailable_item_ids,
         "items": {
             "names": {str(i): n for i, n in sorted(items["names"].items())},
             "keyItemIds": items["keyItemIds"],
@@ -895,8 +998,8 @@ def _reachable_rooms(data: dict, held: set[int]) -> set[str]:
 
 def _location_reachable(data: dict, location: dict, held: set[int],
                         reach_nodes: set[str], reach_rooms: set[str]) -> bool:
-    node = location.get("node", location["room"])
-    return (node in reach_nodes
+    nodes = location.get("accessNodes", [location.get("node", location["room"])])
+    return (any(node in reach_nodes for node in nodes)
             and all(item in held for item in location.get("requiresItems", []))
             and all(room in reach_rooms for room in location.get("requiresRooms", [])))
 
@@ -966,7 +1069,7 @@ def _check_common(data: dict) -> dict:
     assert len(keys) == len(set(keys)), "duplicate location keys"
     disp = [loc["name"] for loc in data["locations"]]
     assert len(disp) == len(set(disp)), "duplicate location display names"
-    if data.get("version") == 3:
+    if "apIds" in data["items"]:
         location_ids = [loc["apId"] for loc in data["locations"]]
         assert len(location_ids) == len(set(location_ids)), "duplicate AP location ids"
         item_ids = list(data["items"]["apIds"].values())
@@ -1026,7 +1129,7 @@ def check_dc2(data: dict) -> None:
 def check_dc1(data: dict) -> None:
     _assert_dc1_parity(require_oracle=True)  # + oracle golden snapshot still agrees with the source
     names = _check_common(data)
-    assert data["version"] == 3 and data["topology"] == "physical", (
+    assert data["version"] == 4 and data["topology"] == "physical", (
         data["version"], data.get("topology"))
     assert data["startRoom"] == "010d", data["startRoom"]
     assert data["goalRoom"] == "060d", data["goalRoom"]
@@ -1048,14 +1151,15 @@ def check_dc1(data: dict) -> None:
             assert f not in flag_users, f"flag 7:{f} shared by '{flag_users[f]}' and '{loc['name']}'"
             assert 0 < f < 256, f
             flag_users[f] = loc["name"]
-    assert excluded == 12, f"excluded location membership drifted: {excluded}"
+    assert excluded <= len(data["locations"]), excluded
     node_ids = {node["id"] for node in data["nodes"]}
     assert data["startNode"] in node_ids and data["goalNode"] in node_ids
     assert {node["room"] for node in data["nodes"] if node["region"] is not None} == {"0309"}
     edge_fields = {"from", "to", "requiresLatch", "setsLatch",
                    "requiresAnyItems", "requiresItems", "requiresRooms"}
     assert all(set(edge) == edge_fields for edge in data["edges"]), "unknown physical edge construct"
-    assert all(location["node"] in node_ids for location in data["locations"])
+    assert all(set(location.get("accessNodes", [location["node"]])) <= node_ids
+               for location in data["locations"])
     # A known key gate: some door from room 0112 to 0114 requires the BG Area key (0x30).
     gate = [e for e in data["edges"] if e["from"] == "0112" and e["to"] == "0114"]
     assert gate and 0x30 in (gate[0]["requiresAnyItems"] + gate[0]["requiresItems"]), gate

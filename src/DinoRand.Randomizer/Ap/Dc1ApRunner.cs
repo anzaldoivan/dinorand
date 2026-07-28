@@ -18,13 +18,13 @@ public static class Dc1ApRunner
 {
     public const int DefaultPort = 38281;
     public const string DefaultOutDir = "mod_dinorand_ap";
-    internal const int LogicVersion = 3;
+    internal const int LogicVersion = 4;
 
     internal static void ValidateLogicVersion(int actual)
     {
         if (actual != LogicVersion)
             throw new InvalidOperationException(
-                $"server world logic_version {actual} is obsolete; this client requires DC1 AP v3 — "
+                $"server world logic_version {actual} is obsolete; this client requires DC1 AP v4 — "
                 + "regenerate the multiworld with the matching current dino_crisis_1.apworld");
     }
 

@@ -80,7 +80,8 @@ def build_dc1_doc() -> tuple[str, dict]:
     for loc in data["locations"]:
         if loc["itemId"] in prog:
             locs_by_item.setdefault(loc["itemId"], []).append(loc)
-    unmodeled = sorted(i for i in prog if i not in locs_by_item)
+    unavailable = set(data.get("unavailableProgressionItemIds", []))
+    unmodeled = sorted(i for i in prog if i not in locs_by_item and i not in unavailable)
     assert not unmodeled, f"DC1 progression entitlements without physical sources: {unmodeled}"
 
     spheres = _spheres(data, set(), locs_by_item)
