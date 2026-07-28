@@ -6,7 +6,9 @@ public static class Dc1NativeRecoveryAidSuppression
     public const int RoomCode = 0x0303;
     public const int RecordOffset = 0x4FA68;
 
-    private static readonly byte[] ExpectedRecord = BuildExpectedRecord();
+    // Complete 44-byte record from the supported GOG DC1 source room, including reserved bytes.
+    private static readonly byte[] ExpectedRecord = Convert.FromHexString(
+        "28020400000200F8000800F8000800F2000200F2040200010000000021000100B30015000000188000000000");
     private static readonly byte[] NoOpRecord = new byte[ItemRecord.Length];
 
     /// <summary>Returns generated room bytes with only the validated Recovery Aid record replaced by 44 no-ops.</summary>
@@ -32,23 +34,35 @@ public static class Dc1NativeRecoveryAidSuppression
         return room.WriteWithRdt(edited);
     }
 
-    private static byte[] BuildExpectedRecord()
+    /// <summary>Applies the native transform only when the pristine source is the recognized GOG room.
+    /// Unrecognized fixtures pass through; a changed output for a recognized source is refused.</summary>
+    public static byte[] ApplyGenerated(int roomCode, ReadOnlySpan<byte> sourceBytes,
+                                        ReadOnlySpan<byte> outputBytes)
     {
-        var record = new byte[ItemRecord.Length];
-        record[0] = DcOpcodes.Item;
-        record[2] = DcOpcodes.ItemSubtype;
-        record[4] = 0x00; record[5] = 0x02; // X = 512
-        record[8] = 0x00; record[9] = 0xF8; // Z = -2048
-        record[ItemRecord.IdOffset] = 0x21;
-        record[ItemRecord.CountOffset] = 1;
-        record[ItemRecord.TakeIndexOffset] = 179;
-        record[ItemRecord.DisplaySlotOffset] = 0x15;
-        record[ItemRecord.ModelPtrOffset] = 0x00;
-        record[ItemRecord.ModelPtrOffset + 1] = 0x00;
-        record[ItemRecord.ModelPtrOffset + 2] = 0x18;
-        record[ItemRecord.ModelPtrOffset + 3] = 0x80;
-        return record;
+        if (roomCode != RoomCode) return outputBytes.ToArray();
+
+        var source = RoomFile.Read(roomCode >> 8, roomCode & 0xff, sourceBytes);
+        if (!HasRecord(source) || !source.RdtBuffer.AsSpan(RecordOffset, ItemRecord.Length)
+                .SequenceEqual(ExpectedRecord))
+            return outputBytes.ToArray();
+
+        var output = RoomFile.Read(roomCode >> 8, roomCode & 0xff, outputBytes);
+        if (!HasRecord(output))
+            throw Refuse("generated room 0303 Recovery Aid record is truncated");
+
+        var actual = output.RdtBuffer.AsSpan(RecordOffset, ItemRecord.Length);
+        if (actual.SequenceEqual(NoOpRecord))
+            return outputBytes.ToArray();
+        if (!actual.SequenceEqual(ExpectedRecord))
+            throw Refuse("generated room 0303 Recovery Aid record signature mismatch at 0x4FA68");
+
+        var edited = output.RdtBuffer.ToArray();
+        edited.AsSpan(RecordOffset, ItemRecord.Length).Clear();
+        return output.WriteWithRdt(edited);
     }
+
+    private static bool HasRecord(RoomFile room)
+        => room.ParsedCleanly && RecordOffset <= room.RdtBuffer.Length - ItemRecord.Length;
 
     private static InvalidDataException Refuse(string reason)
         => new($"DC1 native Recovery Aid suppression refused: {reason}.");

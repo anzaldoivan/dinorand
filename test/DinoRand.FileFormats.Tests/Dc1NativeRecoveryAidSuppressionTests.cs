@@ -58,6 +58,61 @@ public sealed class Dc1NativeRecoveryAidSuppressionTests
     }
 
     [Fact]
+    public void GeneratedOutput_RejectsRecordDifferingOnlyInOtherwiseUnusedByte()
+    {
+        var source = SourceRoom();
+        var outputRoom = RoomFile.Read(3, 3, source);
+        outputRoom.RdtBuffer[RecoveryAidOffset + 1] = 0x7f;
+        var output = outputRoom.WriteWithRdt(outputRoom.RdtBuffer);
+
+        Assert.Throws<InvalidDataException>(() =>
+            Dc1NativeRecoveryAidSuppression.ApplyGenerated(RoomCode, source, output));
+    }
+
+    [Fact]
+    public void GeneratedFixtureWithoutExactSourceRecord_PassesThrough()
+    {
+        var fixtureRoom = RoomFile.Read(3, 3, SourceRoom());
+        fixtureRoom.RdtBuffer[RecoveryAidOffset + 1] = 0x7f;
+        var fixture = fixtureRoom.WriteWithRdt(fixtureRoom.RdtBuffer);
+
+        Assert.Equal(fixture,
+            Dc1NativeRecoveryAidSuppression.ApplyGenerated(RoomCode, fixture, fixture));
+    }
+
+    [Fact]
+    public void StandaloneGeneratedMismatch_IsRefusedBeforePublish()
+    {
+        using var temp = new TempDirectory();
+        var source = SourceRoom();
+        var room = RoomFile.Read(3, 3, source);
+        var changed = RoomFile.Read(3, 3, source);
+        changed.RdtBuffer[RecoveryAidOffset + 1] = 0x7f;
+        var context = new RandomizationContext(new DinoCrisis1(), new[] { room },
+            RoomGraph.Build(new[] { room }), new Seed(1), new RandomizerConfig(), _ => { });
+        context.SetRoomOutput(room, changed.WriteWithRdt(changed.RdtBuffer));
+
+        Assert.Throws<InvalidDataException>(() => Dc1RunArtifactWriter.Write(temp.Path,
+            new[] { new RoomFileRef(3, 3, "st33.dat") }, new[] { room }, RoomGraph.Build(new[] { room }),
+            context, new Seed(1), new RandomizerConfig(), Array.Empty<string>(), false, CancellationToken.None));
+        Assert.False(File.Exists(Path.Combine(temp.Path, "st33.dat")));
+    }
+
+    [Fact]
+    public void RealGogSource_CompleteRecoveryAidRecordIsSuppressed()
+    {
+        var install = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (install is null || new DinoCrisis1().GetDataDir(install) is not { } dataDir) return;
+
+        var source = File.ReadAllBytes(Path.Combine(dataDir, "st303.dat"));
+        var output = Dc1NativeRecoveryAidSuppression.ApplyGenerated(RoomCode, source, source);
+        var room = RoomFile.Read(3, 3, output);
+
+        Assert.Equal(new byte[ItemRecord.Length],
+            room.RdtBuffer[RecoveryAidOffset..(RecoveryAidOffset + ItemRecord.Length)]);
+    }
+
+    [Fact]
     public void StandaloneGeneratedRoomOutput_SuppressesRecoveryAid()
     {
         using var temp = new TempDirectory();
@@ -112,8 +167,8 @@ public sealed class Dc1NativeRecoveryAidSuppressionTests
             (GianEntryType.Data, rdt));
     }
 
-    private static byte[] RecoveryAidRecord() => ItemRecordBytes(0x21, 1, 179, 512, -2048, 0x15,
-        ItemRecord.GenericPanelModelPtr);
+    private static byte[] RecoveryAidRecord() => Convert.FromHexString(
+        "28020400000200F8000800F8000800F2000200F2040200010000000021000100B30015000000188000000000");
 
     private static byte[] PanelKey2Record() => ItemRecordBytes(0x3e, 1, 179, 0, 0, ItemRecord.NoDisplaySlot, 0);
 

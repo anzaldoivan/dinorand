@@ -62,10 +62,12 @@ public static class ApPlacementInstaller
         var prepared = Dc1ItemEditBatch.Prepare(rooms, patches.Select(ToEdit).ToList());
 
         // Nothing is published until every source room, physical target, and native room transform passes preflight.
+        var sourceByRoom = rooms.ToDictionary(room => room.Stage << 8 | room.Room);
         var publishable = prepared.Rooms
             .Select(room => room with
             {
-                Bytes = Dc1NativeRecoveryAidSuppression.Apply(room.RoomCode, room.Bytes)
+                Bytes = Dc1NativeRecoveryAidSuppression.ApplyGenerated(
+                    room.RoomCode, sourceByRoom[room.RoomCode].OriginalBytes, room.Bytes)
             })
             .ToList();
         Directory.CreateDirectory(outDir);

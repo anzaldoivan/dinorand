@@ -67,8 +67,8 @@ internal static class Dc1RunArtifactWriter
                     ? overridden
                     : pair.Second.Write();
                 return (pair.First, pair.Second,
-                    Bytes: Dc1NativeRecoveryAidSuppression.Apply(
-                        pair.Second.Stage << 8 | pair.Second.Room, bytes));
+                    Bytes: Dc1NativeRecoveryAidSuppression.ApplyGenerated(
+                        pair.Second.Stage << 8 | pair.Second.Room, pair.Second.OriginalBytes, bytes));
             })
             .ToList();
 
