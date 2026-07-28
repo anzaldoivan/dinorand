@@ -12,6 +12,21 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.6.3] — 2026-07-29
+
+### Changed
+
+- **Door Skip for DC1 is now on by default.** Newly mapped door transitions advance on the
+  button press while existing transitions retain their normal sequence. Disable it for a
+  room-only install with the GUI toggle or `--no-dc1-door-skip`; `--restore` still reverses the
+  executable patch.
+
+### Fixed
+
+- **DC1 generation no longer uses the conflicting Gas Experiment Room Recovery Aid.** The pickup
+  shared collection state with Panel Key 2, so generated rooms and Archipelago placements now
+  suppress it to prevent the two pickups from interfering.
+
 ## [0.6.2] — 2026-07-27
 
 ### Added
@@ -291,6 +306,7 @@ Initial feature set — everything prior to the voice randomizer.
   was.
 - Self-contained single-file release builds.
 
+[0.6.3]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.3
 [0.6.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.2
 [0.6.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.1
 [0.6.0]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.0
