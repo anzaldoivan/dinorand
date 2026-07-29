@@ -33,14 +33,39 @@ new_repo install-proves-unchanged
 mkdir -p "$repo/fake-bin" "$repo/install"
 cat > "$repo/fake-bin/dotnet" <<'EOF'
 #!/usr/bin/env bash
-printf '%s\n' "$*" >> "$HOOK_DOTNET_LOG"
+printf 'receipt=%s args=%s\n' "${DINORAND_REAL_INSTALL_RECEIPT_DIR:-}" "$*" >> "$HOOK_DOTNET_LOG"
 exit 0
 EOF
 chmod +x "$repo/fake-bin/dotnet"
 stage_file src/DinoRand.Randomizer/Graph/RoomGraph.cs
+stage_file src/DinoRand.Randomizer/Install/GameInstaller.cs
 (cd "$repo" && DINORAND_DC1_DIR="$repo/install" HOOK_DOTNET_LOG="$repo/dotnet.log" \
   PATH="$repo/fake-bin:/usr/bin:/bin" bash .githooks/pre-commit)
 grep -q "RealInstall_Oracle_MatchesEngine_ByteIdentical" "$repo/dotnet.log"
+grep -q -- "RealInstall=DC1" "$repo/dotnet.log"
+
+new_repo real-install-dc2-selection
+mkdir -p "$repo/fake-bin" "$repo/install"
+printf 'DINORAND_DC2_DIR=%s\n' "$repo/install" > "$repo/.env"
+cat > "$repo/fake-bin/dotnet" <<'EOF'
+#!/usr/bin/env bash
+printf 'receipt=%s args=%s\n' "${DINORAND_REAL_INSTALL_RECEIPT_DIR:-}" "$*" >> "$HOOK_DOTNET_LOG"
+exit 0
+EOF
+chmod +x "$repo/fake-bin/dotnet"
+stage_file src/DinoRand.FileFormats/Stage/PackageRepacker.cs
+(cd "$repo" && HOOK_DOTNET_LOG="$repo/dotnet.log" \
+  PATH="$repo/fake-bin:/usr/bin:/bin" bash .githooks/pre-commit)
+grep -q -- "RealInstall=DC2" "$repo/dotnet.log"
+if grep -q -- "RealInstall=DC1" "$repo/dotnet.log"; then
+  echo "unexpected DC1 real-install case" >&2
+  exit 1
+fi
+receipt="$(cut -d= -f2- "$repo/dotnet.log" | cut -d' ' -f1)"
+if [ -n "$receipt" ] && [ -e "$receipt" ]; then
+  echo "real-install receipt directory was not cleaned up" >&2
+  exit 1
+fi
 
 new_repo py-launcher
 mkdir -p "$repo/fake-bin"

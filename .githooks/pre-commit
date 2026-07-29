@@ -35,7 +35,7 @@ require_python() {
 }
 
 # The committed DC1 oracle is generated from these parser/graph sources plus map.json. A configured
-# install can prove an unchanged oracle byte-identical; otherwise an input change requires an update.
+# install can prove an unchanged oracle byte-identical; this check reads the source only and never writes it.
 oracle_input_touched=0
 oracle_staged=0
 for f in "${staged[@]}"; do
@@ -74,6 +74,86 @@ if { [ "$oracle_input_touched" = 1 ] || [ "$oracle_staged" = 1 ]; } \
   fi
   (cd "$root" && DINORAND_REQUIRE_REAL_INSTALL=1 DINORAND_UPDATE_ORACLE=0 "${oracle_check[@]}") || {
     echo "pre-commit: DC1 reachability oracle does not match the current graph/install" >&2
+    exit 1
+  }
+fi
+
+# Parser/writer/installer changes get the required read-only source check plus a temp-copy mutation
+# exercise, but only for games whose install variable is configured. Keep this list narrow: these are
+# the implementation and direct contract tests used by Refactor/RealInstallGate.
+real_install_dc1_touched=0
+real_install_dc2_touched=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    src/DinoRand.Randomizer/Install/GameInstaller.cs|test/DinoRand.FileFormats.Tests/GameInstaller*.cs|test/DinoRand.FileFormats.Tests/Refactor/RealInstallGate.cs)
+      real_install_dc1_touched=1
+      real_install_dc2_touched=1 ;;
+    src/DinoRand.FileFormats/Stage/RoomFile.cs|src/DinoRand.FileFormats/Stage/RoomScript.cs|test/DinoRand.FileFormats.Tests/RoomFile*.cs)
+      real_install_dc1_touched=1 ;;
+    src/DinoRand.FileFormats/Stage/Dc2/Dc2RoomFile.cs|test/DinoRand.FileFormats.Tests/Dc2RoomFileTests.cs|test/DinoRand.FileFormats.Tests/Dc2RoomRoundTripTests.cs|src/DinoRand.FileFormats/Stage/PackageRepacker.cs|test/DinoRand.FileFormats.Tests/PackageRepacker*.cs)
+      real_install_dc2_touched=1 ;;
+  esac
+done
+
+real_install_configured() {
+  local variable="$1"
+  [ -n "${!variable:-}" ] \
+    || { [ -f "$root/.env" ] && grep -Eq "^[[:space:]]*${variable}=" "$root/.env"; }
+}
+
+real_install_games=()
+if [ "$real_install_dc1_touched" = 1 ] && real_install_configured DINORAND_DC1_DIR; then
+  real_install_games+=(DC1)
+fi
+if [ "$real_install_dc2_touched" = 1 ] && real_install_configured DINORAND_DC2_DIR; then
+  real_install_games+=(DC2)
+fi
+
+run_real_install_validation() (
+  real_install_root="$(mktemp -d /tmp/dinorand-pre-commit-real-install-XXXXXX)" || {
+    echo "pre-commit: could not create the real-install temp directory under /tmp" >&2
+    exit 1
+  }
+  trap 'rm -rf -- "$real_install_root"' EXIT
+  case "$real_install_root" in
+    "$root"|"$root"/*)
+      echo "pre-commit: refused a real-install temp directory inside the repository" >&2
+      exit 1
+      ;;
+  esac
+  receipt_dir="$real_install_root/receipts"
+  results_dir="$real_install_root/results"
+  mkdir "$receipt_dir" "$results_dir"
+
+  real_install_filter=""
+  for game in "${real_install_games[@]}"; do
+    [ -z "$real_install_filter" ] || real_install_filter+='|'
+    real_install_filter+="RealInstall=$game"
+  done
+  if command -v dotnet >/dev/null 2>&1; then
+    (cd "$root" && \
+      DINORAND_REQUIRE_REAL_INSTALL=1 \
+      DINORAND_REAL_INSTALL_RECEIPT_DIR="$receipt_dir" \
+      dotnet test "$root/test/DinoRand.FileFormats.Tests/DinoRand.FileFormats.Tests.csproj" \
+        --no-restore --filter "$real_install_filter" --results-directory "$results_dir")
+  elif command -v powershell.exe >/dev/null 2>&1; then
+    (cd "$root" && \
+      DINORAND_REQUIRE_REAL_INSTALL=1 \
+      DINORAND_REAL_INSTALL_RECEIPT_DIR="$receipt_dir" \
+      DINORAND_REAL_INSTALL_FILTER="$real_install_filter" \
+      DINORAND_REAL_INSTALL_RESULTS_DIR="$results_dir" \
+      powershell.exe -NoProfile -NonInteractive -Command \
+        'dotnet test test/DinoRand.FileFormats.Tests/DinoRand.FileFormats.Tests.csproj --no-restore --filter "$env:DINORAND_REAL_INSTALL_FILTER" --results-directory "$env:DINORAND_REAL_INSTALL_RESULTS_DIR"')
+  else
+    echo "pre-commit: relevant parser/writer change has a configured install, but dotnet and powershell.exe are unavailable" >&2
+    exit 1
+  fi
+)
+
+if [ "${#real_install_games[@]}" -gt 0 ]; then
+  run_real_install_validation || {
+    printf 'pre-commit: RealInstallGate failed for %s; original installs are read-only and temp-copy receipts/results were cleaned up\n' \
+      "${real_install_games[*]}" >&2
     exit 1
   }
 fi
