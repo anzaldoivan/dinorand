@@ -43,7 +43,11 @@ public sealed class ApSession : IDisposable
         var session = _factory.CreateSession(host, port);
         var result = session.TryConnectAndLogin(GameName, slotName, password);
         if (!result.Success)
+        {
+            try { session.Disconnect(TimeSpan.FromSeconds(3)); }
+            catch { /* socket already gone — nothing to clean */ }
             throw new InvalidOperationException($"AP login failed: {result.Error}");
+        }
 
         var snapshot = result.Snapshot
             ?? throw new InvalidOperationException("AP login succeeded without a session snapshot");

@@ -399,6 +399,7 @@ public class ApClientTests
             () => session.Connect("host", 1, "slot", null));
 
         Assert.Equal("AP login failed: bad slot; denied", ex.Message);
+        Assert.True(factory.Session.Disconnected);
         Assert.Throws<InvalidOperationException>(() => session.Connection);
     }
 
