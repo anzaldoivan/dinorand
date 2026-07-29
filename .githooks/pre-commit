@@ -98,6 +98,7 @@ for f in "${staged[@]}"; do
     src/DinoRand.FileFormats/Stage/Dc1NativeRecoveryAidSuppression.cs|src/DinoRand.FileFormats/Stage/Dc2/*.cs|\
     src/DinoRand.Randomizer/Definitions/GameDefinition.cs|src/DinoRand.Randomizer/Definitions/DinoCrisis1.cs|\
     src/DinoRand.Randomizer/Definitions/DinoCrisis2.cs|src/DinoRand.Randomizer/RandomizerRunner.cs|\
+    src/DinoRand.Randomizer/RunOutputDir.cs|\
     src/DinoRand.Randomizer/Output/Dc1RunArtifactWriter.cs|src/DinoRand.Randomizer/Dc2/Dc2RandomizerRunner.cs|\
     src/DinoRand.Randomizer/Dc2/Dc2OutputSink.cs|src/DinoRand.Randomizer/Dc2/Dc2RoomEmitGuard.cs|\
     src/DinoRand.Randomizer/Output/Dc2RunArtifactWriter.cs|\
