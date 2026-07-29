@@ -509,7 +509,12 @@ internal static class ExePatchInstaller
 
     internal static ExePatchResult PatchExeDoorSkip(string dataDir, DoorSkipMode mode = DoorSkipMode.OnPress, string? seedLabel = null)
     {
+        if (mode is not DoorSkipMode.OnPress and not DoorSkipMode.Auto)
+            throw new ArgumentOutOfRangeException(nameof(mode), mode, "unsupported DC1 door-skip mode");
+
         var exePath = ResolveExeForPatch(dataDir);
+        byte[] bytes = File.ReadAllBytes(exePath);
+        ExePatcher.ApplyDoorSkip(bytes, mode); // validate and patch before creating backup or writing
 
         var backupDir = Path.Combine(dataDir, BackupDirName);
         Directory.CreateDirectory(backupDir);
@@ -517,13 +522,11 @@ internal static class ExePatchInstaller
         if (!File.Exists(exeBackup))
             File.Copy(exePath, exeBackup); // capture the pristine exe once (for --restore)
 
-        byte[] bytes = File.ReadAllBytes(exePath);
-        ExePatcher.ApplyDoorSkip(bytes, mode); // idempotent + guarded against an unexpected build
         File.WriteAllBytes(exePath, bytes);
 
         string entry = mode == DoorSkipMode.Auto
-            ? $"door skip (auto): unconditional state-1 leaf-sweep @0x{ExePatcher.DoorSkipHookVa:X}, hold gate @0x{ExePatcher.DoorHoldGateVa:X} = 0x{ExePatcher.DoorHoldPatched:X2}"
-            : $"door skip (on-press): guarded new-edge hook @0x{ExePatcher.DoorSkipHookVa:X}, code cave @0x{ExePatcher.DoorSkipCaveVa:X}";
+            ? $"door skip (auto): all door transitions skip automatically; leaf sweep @0x{ExePatcher.DoorSkipHookVa:X}, hold gate @0x{ExePatcher.DoorHoldGateVa:X} = 0x{ExePatcher.DoorHoldPatched:X2}"
+            : $"door skip (on-press): newly mapped transitions advance on button press; guarded hook @0x{ExePatcher.DoorSkipHookVa:X}, code cave @0x{ExePatcher.DoorSkipCaveVa:X}";
         const string key = "door skip";
         var manifest = ReadManifest(dataDir) ?? new InstallManifest(seedLabel, DateTime.UtcNow.ToString("o"),
             Array.Empty<string>());

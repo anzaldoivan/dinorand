@@ -172,7 +172,11 @@ public class MainWindowViewModelTests
         Assert.InRange(xaml.IndexOf("Text=\"Door Skip:\"", StringComparison.Ordinal), 0, advanced - 1);
         Assert.Contains("OnPress", xaml, StringComparison.Ordinal);
         Assert.Contains("Auto", xaml, StringComparison.Ordinal);
-        Assert.Contains("OnPress patches", xaml, StringComparison.Ordinal);
+        Assert.Contains("OnPress advances newly mapped transitions on a button press", xaml, StringComparison.Ordinal);
+        Assert.Contains("Auto: all door transitions skip automatically", xaml, StringComparison.Ordinal);
+        string install = File.ReadAllText(Path.Combine(root!.FullName, "src", "DinoRand.App.Avalonia", "MainWindowViewModel.Install.cs"));
+        Assert.Contains("door skip applied (Auto: all door transitions skip automatically", install, StringComparison.Ordinal);
+        Assert.Contains("door skip applied (OnPress: newly mapped door transitions advance", install, StringComparison.Ordinal);
         Assert.InRange(xaml.IndexOf("Content=\"Disable laser fences\"", StringComparison.Ordinal), 0, advanced - 1);
         var vm = NewVm();
         Assert.True(vm.Dc1DoorSkip);

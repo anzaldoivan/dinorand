@@ -568,6 +568,10 @@ public class GameInstallerExeTests : IDisposable
 
         Assert.NotNull(result);
         Assert.True(ExePatcher.IsDoorSkipApplied(File.ReadAllBytes(ExePath)));
+        Assert.Contains(GameInstaller.ReadManifest(DataDir)!.ExeRepoints!,
+            entry => entry.Contains("door skip (on-press)", StringComparison.Ordinal)
+                && entry.Contains("newly mapped transitions advance on button press", StringComparison.Ordinal)
+                && !entry.Contains("all door transitions", StringComparison.Ordinal));
 
         GameInstaller.Restore(DataDir);
         Assert.Equal(pristine, File.ReadAllBytes(ExePath));
@@ -584,10 +588,38 @@ public class GameInstallerExeTests : IDisposable
         Assert.True(ExePatcher.IsDoorSkipApplied(patched, DoorSkipMode.Auto));
         Assert.False(ExePatcher.IsDoorSkipApplied(patched, DoorSkipMode.OnPress));
         Assert.Contains(GameInstaller.ReadManifest(DataDir)!.ExeRepoints!,
-            entry => entry.Contains("door skip (auto)", StringComparison.Ordinal));
+            entry => entry.Contains("door skip (auto)", StringComparison.Ordinal)
+                && entry.Contains("all door transitions skip automatically", StringComparison.Ordinal)
+                && !entry.Contains("newly mapped", StringComparison.Ordinal));
 
         GameInstaller.Restore(DataDir);
         Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PatchExeDoorSkip_RejectsUnexpectedOrCrossModeWithoutBackupOrWrite(bool crossMode)
+    {
+        if (crossMode)
+        {
+            var onPress = File.ReadAllBytes(ExePath);
+            ExePatcher.ApplyDoorSkip(onPress, DoorSkipMode.OnPress);
+            File.WriteAllBytes(ExePath, onPress);
+        }
+        else
+        {
+            var unexpected = File.ReadAllBytes(ExePath);
+            unexpected[ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa)] ^= 0xFF;
+            File.WriteAllBytes(ExePath, unexpected);
+        }
+
+        var before = File.ReadAllBytes(ExePath);
+        var mode = crossMode ? DoorSkipMode.Auto : DoorSkipMode.OnPress;
+
+        Assert.Throws<InvalidOperationException>(() => GameInstaller.PatchExeDoorSkip(DataDir, mode));
+        Assert.False(File.Exists(Path.Combine(DataDir, GameInstaller.BackupDirName, GameInstaller.ExeName)));
+        Assert.Equal(before, File.ReadAllBytes(ExePath));
     }
 
     [Fact]

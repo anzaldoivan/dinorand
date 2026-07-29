@@ -47,40 +47,59 @@ internal static class Dc1TransitionExePatch
 
     internal static bool IsDoorSkipApplied(ReadOnlySpan<byte> exe, DoorSkipMode mode)
     {
+        ValidateMode(mode);
         var hook = Slice(exe, VaToFileOffset(DoorSkipHookVa), DoorSkipHookLength);
-        return mode switch
-        {
-            DoorSkipMode.OnPress => hook.SequenceEqual(DoorSkipHookPatched())
-                && Slice(exe, VaToFileOffset(DoorSkipCaveVa), DoorSkipCave().Length).SequenceEqual(DoorSkipCave()),
-            DoorSkipMode.Auto => hook.SequenceEqual(DoorSkipAutoHook)
-                && Slice(exe, VaToFileOffset(DoorHoldGateVa), 3).SequenceEqual(new byte[] { 0x83, 0xFA, DoorHoldPatched }),
-            _ => throw new ArgumentOutOfRangeException(nameof(mode)),
-        };
+        if (mode == DoorSkipMode.OnPress)
+            return hook.SequenceEqual(DoorSkipHookPatched())
+                && Slice(exe, VaToFileOffset(DoorSkipCaveVa), DoorSkipCave().Length).SequenceEqual(DoorSkipCave());
+
+        return hook.SequenceEqual(DoorSkipAutoHook)
+            && Slice(exe, VaToFileOffset(DoorHoldGateVa), 3).SequenceEqual(new byte[] { 0x83, 0xFA, DoorHoldPatched });
     }
 
     internal static void ApplyDoorSkip(Span<byte> exe, DoorSkipMode mode)
     {
+        ValidateMode(mode);
+        if (mode == DoorSkipMode.Auto)
+        {
+            ApplyAuto(exe);
+            return;
+        }
+
+        ApplyOnPress(exe);
+    }
+
+    private static void ApplyAuto(Span<byte> exe)
+    {
+        var hook = Slice(exe, VaToFileOffset(DoorSkipHookVa), DoorSkipHookLength);
+        bool pristine = hook.SequenceEqual(DoorSkipHookPristine);
+        bool patched = hook.SequenceEqual(DoorSkipAutoHook);
+        if (!pristine && !patched)
+            throw new InvalidOperationException(
+                $"door-skip hook @0x{DoorSkipHookVa:X} is neither pristine nor already Auto; refusing to overwrite another door-skip mode.");
+
+        var gate = Slice(exe, VaToFileOffset(DoorHoldGateVa), 3);
+        bool gatePristine = gate.SequenceEqual(new byte[] { 0x83, 0xFA, DoorHoldPristine });
+        bool gatePatched = gate.SequenceEqual(new byte[] { 0x83, 0xFA, DoorHoldPatched });
+        if ((!pristine && !gatePatched) || (pristine && !gatePristine))
+            throw new InvalidOperationException(
+                $"door-skip Auto hold gate @0x{DoorHoldGateVa:X} is neither pristine nor already patched; refusing.");
+        if (patched)
+            return;
+
+        DoorSkipAutoHook.CopyTo(hook);
+        gate[2] = DoorHoldPatched;
+    }
+
+    private static void ApplyOnPress(Span<byte> exe)
+    {
         var hook = Slice(exe, VaToFileOffset(DoorSkipHookVa), DoorSkipHookLength);
         var patchedHook = DoorSkipHookPatched();
         bool pristine = hook.SequenceEqual(DoorSkipHookPristine);
-        bool patched = hook.SequenceEqual(mode == DoorSkipMode.OnPress ? patchedHook : DoorSkipAutoHook);
+        bool patched = hook.SequenceEqual(patchedHook);
         if (!pristine && !patched)
-            throw new InvalidOperationException($"door-skip hook @0x{DoorSkipHookVa:X} is not pristine or already {mode}; refusing to overwrite another door-skip mode.");
-
-        if (mode == DoorSkipMode.Auto)
-        {
-            var gate = Slice(exe, VaToFileOffset(DoorHoldGateVa), 3);
-            bool gatePristine = gate.SequenceEqual(new byte[] { 0x83, 0xFA, DoorHoldPristine });
-            bool gatePatched = gate.SequenceEqual(new byte[] { 0x83, 0xFA, DoorHoldPatched });
-            if ((!pristine && !gatePatched) || (pristine && !gatePristine))
-                throw new InvalidOperationException($"door-skip auto hold gate @0x{DoorHoldGateVa:X} is not pristine or already patched; refusing.");
-            if (patched)
-                return;
-
-            DoorSkipAutoHook.CopyTo(hook);
-            gate[2] = DoorHoldPatched;
-            return;
-        }
+            throw new InvalidOperationException(
+                $"door-skip hook @0x{DoorSkipHookVa:X} is neither pristine nor already patched; refusing to overwrite an unexpected build.");
 
         var cave = DoorSkipCave();
         uint caveEnd = DoorSkipCaveVa + (uint)cave.Length;
@@ -97,6 +116,12 @@ internal static class Dc1TransitionExePatch
 
         cave.CopyTo(caveTarget);
         patchedHook.CopyTo(hook);
+    }
+
+    private static void ValidateMode(DoorSkipMode mode)
+    {
+        if (mode is not DoorSkipMode.OnPress and not DoorSkipMode.Auto)
+            throw new ArgumentOutOfRangeException(nameof(mode), mode, "unsupported DC1 door-skip mode");
     }
 
     internal static bool IsCutsceneFastForwardApplied(ReadOnlySpan<byte> exe)

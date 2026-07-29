@@ -487,8 +487,8 @@ namespace DinoRand.App
                         {
                             GameInstaller.PatchExeDoorSkip(dataDir, dc1DoorSkipMode, seed.ToString());
                             xn = (xn.Length == 0 ? "" : xn + ". ") + (dc1DoorSkipMode == DoorSkipMode.Auto
-                                ? "door skip applied (Auto: newly mapped transitions advance automatically on the next launch)"
-                                : "door skip applied (OnPress: newly mapped transitions advance on button press on the next launch)");
+                                ? "door skip applied (Auto: all door transitions skip automatically on the next launch)"
+                                : "door skip applied (OnPress: newly mapped door transitions advance on button press on the next launch)");
                         }
                         catch (IOException) { xn = (xn.Length == 0 ? "" : xn + ". ") + "door skip NOT applied — DINO.exe is locked; close the game and re-install"; xf = true; }
                         catch (Exception dex) { xn = (xn.Length == 0 ? "" : xn + ". ") + $"door skip NOT applied — {dex.Message}"; xf = true; }

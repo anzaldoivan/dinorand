@@ -629,8 +629,8 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _shuffleBgm;
 
-        // Door skip (DC1): reversible DINO.exe patch applied at install (cont.78). The mode is
-        // session-only and selecting DC2 resets it to the safe default.
+        // Door skip (DC1): reversible DINO.exe patch applied at install (cont.78). Default ON;
+        // mode is session-only and selecting a game resets it to the safe default.
         [ObservableProperty] private bool _dc1DoorSkip = true;
         public IReadOnlyList<DoorSkipMode> Dc1DoorSkipModes { get; } =
             new[] { DoorSkipMode.OnPress, DoorSkipMode.Auto };

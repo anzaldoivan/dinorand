@@ -329,8 +329,8 @@ public static class GameInstaller
 
     /// <summary>
     /// Apply the DC1 door-skip lever to <c>DINO.exe</c> in the selected mode. <see cref="DoorSkipMode.OnPress"/>
-    /// uses the guarded mapped-edge hook; <see cref="DoorSkipMode.Auto"/> restores the unconditional state-1
-    /// sweep skip and short hold. Both are additive, backup-protected, idempotent, not seed-dependent, and
+    /// advances newly mapped transitions on a button press; <see cref="DoorSkipMode.Auto"/> skips all door
+    /// transitions automatically. Both are additive, backup-protected, idempotent, not seed-dependent, and
     /// reversed byte-identically by <see cref="Restore"/>.
     /// </summary>
     public static ExePatchResult PatchExeDoorSkip(string dataDir, string? seedLabel = null)

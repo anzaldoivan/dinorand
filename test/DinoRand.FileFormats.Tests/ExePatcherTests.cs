@@ -225,6 +225,16 @@ public class ExePatcherTests
         Assert.Equal(before, exe);
     }
 
+    [Fact]
+    public void ApplyDoorSkip_RejectsInvalidModeBeforeWriting()
+    {
+        var exe = NewImageWithDoorHookPristine();
+        var before = (byte[])exe.Clone();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => ExePatcher.ApplyDoorSkip(exe, (DoorSkipMode)99));
+        Assert.Equal(before, exe);
+    }
+
     // ---- Fast-forward cutscenes (cont.79 v2): reversible hook + code cave ----
 
     /// <summary>Seed the hook site with the pristine `call 0x46AA41` (E8 AB B5 FF FF); the cave stays zero-slack.</summary>

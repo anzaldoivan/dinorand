@@ -860,11 +860,9 @@ public static class ExePatcher
     public static void WriteUInt8AtVa(Span<byte> exe, uint va, byte value)
         => Dc1InventoryExePatch.WriteUInt8AtVa(exe, va, value);
 
-    // ---- Door skip (Experimental): accelerate only a newly mapped edge ----
-    // cont.78: the hook inspects the mapped-new-edge word at 0x6D3C40. Existing transitions replay
-    // the displaced 14 bytes and continue at 0x471130; a new edge advances the transition struct and
-    // jumps to 0x47149A. The code cave starts immediately after the occupied laser-fence cave, at 0x61FCAC,
-    // and ends before the cutscene cave. The former global hold site at 0x471631 is deliberately untouched.
+    // ---- Door skip (Experimental): guarded button-press or historic automatic mode ----
+    // OnPress inspects the mapped-new-edge word at 0x6D3C40 and uses the code cave at 0x61FCAC.
+    // Auto uses the historic direct replacement at 0x471122 plus the hold threshold at 0x471631.
 
     /// <summary>VA of the state-1 sub-state-0 hook. <c>[verified]</c></summary>
     public const uint DoorSkipHookVa = 0x00471122;
@@ -878,13 +876,13 @@ public static class ExePatcher
     /// <summary>Runtime-only word indicating that the mapped edge is new.</summary>
     public const uint DoorSkipMappedEdgeVa = 0x006D3C40;
 
-    /// <summary>VA of the background machine's 60-frame hold gate <c>cmp edx,0x3c</c>. <c>[verified]</c></summary>
+    /// <summary>VA of the door background machine's 60-frame hold gate.</summary>
     public const uint DoorHoldGateVa = 0x00471631;
 
-    /// <summary>Pristine hold threshold (frames) at <see cref="DoorHoldGateVa"/>+2.</summary>
+    /// <summary>Pristine hold threshold at <see cref="DoorHoldGateVa"/>+2.</summary>
     public const byte DoorHoldPristine = 0x3C;
 
-    /// <summary>Auto mode hold threshold (frames) at <see cref="DoorHoldGateVa"/>+2.</summary>
+    /// <summary>Auto-mode hold threshold at <see cref="DoorHoldGateVa"/>+2.</summary>
     public const byte DoorHoldPatched = 0x04;
 
     /// <summary>True when the door-skip patch is already applied (idempotency check).</summary>
@@ -896,11 +894,11 @@ public static class ExePatcher
         => Dc1TransitionExePatch.IsDoorSkipApplied(exe, mode);
 
     /// <summary>
-    /// Apply the reversible "door skip" lever to <paramref name="exe"/> in place. Idempotent: a no-op if
-    /// already applied. Refuses (throws <see cref="InvalidOperationException"/>) if the hook is neither
-    /// pristine nor already patched, or if the cave is occupied by unexpected bytes — so it can never
-    /// corrupt an unexpected build. The hook and cave are file-backed <c>.text</c> (guarded by
-    /// <see cref="VaToFileOffset"/>); no runtime-only state or global hold site is written.
+    /// Apply the reversible selected "door skip" mode to <paramref name="exe"/> in place. Idempotent: a
+    /// no-op if already applied. Refuses (throws <see cref="InvalidOperationException"/>) if the mode's
+    /// hook is neither pristine nor already patched, or if the OnPress cave / Auto hold gate is unexpected,
+    /// so it can never corrupt an unexpected build. All touched addresses are file-backed and guarded by
+    /// <see cref="VaToFileOffset"/>; no runtime-only state is written.
     /// </summary>
     public static void ApplyDoorSkip(Span<byte> exe)
         => ApplyDoorSkip(exe, DoorSkipMode.OnPress);
