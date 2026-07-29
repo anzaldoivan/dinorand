@@ -361,7 +361,7 @@ public static class GameInstaller
 
     /// <summary>
     /// Scramble the DC1 keypad-code puzzle family (Management Office / Lounge / Computer-Room-gas safes +
-    /// the Stabilizer codes) so each lock's accepted 4-digit code is seed-derived, and keep the in-game
+    /// the Stabilizer codes) so each eligible lock's accepted 4-digit code is seed-derived, and keep the in-game
     /// document that states the code in sync — the <b>displayed == checked</b> invariant
     /// (<see cref="Dc1PuzzleCodeSync"/>, docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md §17–18).
     ///

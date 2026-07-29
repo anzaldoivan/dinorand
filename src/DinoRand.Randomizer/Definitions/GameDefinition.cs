@@ -13,7 +13,7 @@ public enum GameFeature
     Items, Enemies, Doors, KeyItems, StartingInventory, Voices, Bgm, EmergencyBoxes,
 
     /// <summary>DC1: scramble the shared keypad-code puzzle family (Management Office / Lounge /
-    /// Computer-Room-gas safes + Stabilizer codes) so each accepted 4-digit code is seed-derived, keeping the
+    /// Computer-Room-gas safes + eligible Stabilizer codes) so each accepted 4-digit code is seed-derived, keeping the
     /// in-game document that states the code in sync (<see cref="Install.GameInstaller.PatchExeSyncPuzzleCodes"/>,
     /// docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md §17). DC2 does not opt in.</summary>
     PuzzleCodes,

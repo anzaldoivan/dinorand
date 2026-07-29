@@ -156,11 +156,13 @@ public class GameInstallerExeTests : IDisposable
         var res = GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 777, seedLabel: "777");
         Assert.Equal(6, res.Repoints.Count);
 
-        // Each exe row now decodes to the seed-derived code (both region halves).
+        // Each exe row now decodes to its seed-derived code, except the stock-locked row (both region halves).
         var exe = File.ReadAllBytes(ExePath);
         foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
         {
-            int[] want = DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row);
+            int[] want = lk.Randomize
+                ? DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row)
+                : lk.OriginalDigits;
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: false));
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: true));
         }
@@ -247,11 +249,13 @@ public class GameInstallerExeTests : IDisposable
         var res = GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 777);
         Assert.Contains(res.Repoints, r => r.Contains("ddraw.dll", StringComparison.Ordinal));
 
-        // exe rows hold the seed codes (both halves), and the DLL carries the text patch.
+        // exe rows hold the seed codes (both halves), except the stock-locked row; the DLL carries the text patch.
         var exe = File.ReadAllBytes(ExePath);
         foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
         {
-            int[] want = DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row);
+            int[] want = lk.Randomize
+                ? DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row)
+                : lk.OriginalDigits;
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: false));
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: true));
         }

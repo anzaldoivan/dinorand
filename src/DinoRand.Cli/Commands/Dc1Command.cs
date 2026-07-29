@@ -98,7 +98,7 @@ internal sealed partial class CliApplication
             return ShuffleBgm(install, GetOpt("--seed"));
 
         // Puzzle-code randomizer (docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md §17): scramble the shared keypad-code
-        // family (Mgmt Office / Lounge / Computer-Room-gas safes + Stabilizer codes) from --seed, and rewrite the
+        // family (Mgmt Office / Lounge / Computer-Room-gas safes + eligible Stabilizer codes) from --seed, and rewrite the
         // in-game documents that state the code so displayed == checked. EXE table + st100/st200/st302 edits; read
         // at load, so the game must be CLOSED and relaunched. Same backup/--restore contract.
         if (argv.Contains("--scramble-puzzle-codes"))
@@ -1762,7 +1762,7 @@ internal sealed partial class CliApplication
         Console.WriteLine($"backup  : {res.BackupPath}");
         Console.WriteLine($"seed    : {seed}");
         foreach (var r in res.Repoints) Console.WriteLine($"code    : {r}");
-        Console.WriteLine("effect  : each keypad safe now accepts a new seed-derived code; the document that states "
+        Console.WriteLine("effect  : each eligible keypad safe now accepts a new seed-derived code; the document that states "
             + "the code (where one exists) is rewritten to match.");
         Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
         Console.WriteLine("verify  : CLOSE then RELAUNCH the game (codes are read at load) and try a safe.");
