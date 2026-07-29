@@ -104,7 +104,8 @@ for f in "${staged[@]}"; do
     test/DinoRand.FileFormats.Tests/*InstallerTests.cs|test/DinoRand.FileFormats.Tests/GameInstaller*.cs|\
     test/DinoRand.FileFormats.Tests/ExeProtectionTests.cs|test/DinoRand.FileFormats.Tests/ExePatcherTests.cs|\
     test/DinoRand.FileFormats.Tests/GianPackageTests.cs|test/DinoRand.FileFormats.Tests/PackageRepackerTests.cs|\
-    test/DinoRand.FileFormats.Tests/LzssTests.cs|test/DinoRand.FileFormats.Tests/RoomFileRoundTripTests.cs|\
+    src/DinoRand.FileFormats/Compression/Lzss.cs|test/DinoRand.FileFormats.Tests/LzssTests.cs|\
+    test/DinoRand.FileFormats.Tests/RoomFileRoundTripTests.cs|\
     test/DinoRand.FileFormats.Tests/RoomScriptTests.cs|test/DinoRand.FileFormats.Tests/EnemySpeciesTableTests.cs|\
     test/DinoRand.FileFormats.Tests/DoorEntryPosesTests.cs|test/DinoRand.FileFormats.Tests/TextureImportTests.cs|\
     test/DinoRand.FileFormats.Tests/Dc1NativeRecoveryAidSuppressionTests.cs|\

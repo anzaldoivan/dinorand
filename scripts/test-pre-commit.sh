@@ -157,6 +157,19 @@ done
 grep -q 'Dc2RoomFileTests' "$repo/dotnet.log"
 grep -q 'RunnerArtifactCharacterizationTests' "$repo/dotnet.log"
 
+new_repo real-install-lzss
+mkdir -p "$repo/fake-bin"
+cat > "$repo/fake-bin/dotnet" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$HOOK_DOTNET_LOG"
+exit 0
+EOF
+chmod +x "$repo/fake-bin/dotnet"
+stage_file src/DinoRand.FileFormats/Compression/Lzss.cs
+(cd "$repo" && DINORAND_DC1_DIR=/configured/dc1 HOOK_DOTNET_LOG="$repo/dotnet.log" \
+  PATH="$repo/fake-bin:/usr/bin:/bin" bash .githooks/pre-commit)
+grep -q 'RealInstall=DC1' "$repo/dotnet.log"
+
 new_repo real-install-title-data-boundary
 mkdir -p "$repo/fake-bin"
 cat > "$repo/fake-bin/dotnet" <<'EOF'
