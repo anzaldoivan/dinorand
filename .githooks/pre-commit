@@ -116,6 +116,7 @@ for f in "${staged[@]}"; do
     test/DinoRand.FileFormats.Tests/Refactor/InstallCharacterizationTests.cs|\
     test/DinoRand.FileFormats.Tests/Refactor/FileFormatCharacterizationTests.cs|\
     test/DinoRand.FileFormats.Tests/Refactor/RunnerArtifactCharacterizationTests.cs|\
+    test/DinoRand.FileFormats.Tests/Refactor/SeedDifferentialTests.cs|\
     test/DinoRand.FileFormats.Tests/Refactor/RealInstallGate.cs)
       real_install_input_touched=1 ;;
   esac
