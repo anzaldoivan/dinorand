@@ -507,7 +507,7 @@ internal static class ExePatchInstaller
         return new ExePatchResult(exePath, exeBackup, new[] { entry });
     }
 
-    internal static ExePatchResult PatchExeDoorSkip(string dataDir, string? seedLabel = null)
+    internal static ExePatchResult PatchExeDoorSkip(string dataDir, DoorSkipMode mode = DoorSkipMode.OnPress, string? seedLabel = null)
     {
         var exePath = ResolveExeForPatch(dataDir);
 
@@ -518,11 +518,12 @@ internal static class ExePatchInstaller
             File.Copy(exePath, exeBackup); // capture the pristine exe once (for --restore)
 
         byte[] bytes = File.ReadAllBytes(exePath);
-        ExePatcher.ApplyDoorSkip(bytes); // idempotent + guarded against an unexpected build
+        ExePatcher.ApplyDoorSkip(bytes, mode); // idempotent + guarded against an unexpected build
         File.WriteAllBytes(exePath, bytes);
 
-        string entry = $"door skip (button press): guarded new-edge hook @0x{ExePatcher.DoorSkipHookVa:X}, " +
-                       $"code cave @0x{ExePatcher.DoorSkipCaveVa:X}";
+        string entry = mode == DoorSkipMode.Auto
+            ? $"door skip (auto): unconditional state-1 leaf-sweep @0x{ExePatcher.DoorSkipHookVa:X}, hold gate @0x{ExePatcher.DoorHoldGateVa:X} = 0x{ExePatcher.DoorHoldPatched:X2}"
+            : $"door skip (on-press): guarded new-edge hook @0x{ExePatcher.DoorSkipHookVa:X}, code cave @0x{ExePatcher.DoorSkipCaveVa:X}";
         const string key = "door skip";
         var manifest = ReadManifest(dataDir) ?? new InstallManifest(seedLabel, DateTime.UtcNow.ToString("o"),
             Array.Empty<string>());

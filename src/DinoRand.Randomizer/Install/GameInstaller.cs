@@ -328,15 +328,17 @@ public static class GameInstaller
     => ExePatchInstaller.PatchExeShuffleBgm(dataDir, seed, seedLabel);
 
     /// <summary>
-    /// Apply the DC1 "door skip (button press)" lever to <c>DINO.exe</c>: accelerate a newly mapped door
-    /// transition on its button press while keeping existing transition bytes and the destination background/room-view commit
-    /// intact (cont.78). A guarded reversible <c>.text</c> hook + code cave via
-    /// <see cref="ExePatcher.ApplyDoorSkip"/>; idempotent and additive (composes with any other exe patch,
-    /// leaves the shared animation stepper untouched). Backs up the pristine exe once, records the patch in
-    /// the manifest, and is reversed byte-identically by <see cref="Restore"/>. Not seed-dependent.
+    /// Apply the DC1 door-skip lever to <c>DINO.exe</c> in the selected mode. <see cref="DoorSkipMode.OnPress"/>
+    /// uses the guarded mapped-edge hook; <see cref="DoorSkipMode.Auto"/> restores the unconditional state-1
+    /// sweep skip and short hold. Both are additive, backup-protected, idempotent, not seed-dependent, and
+    /// reversed byte-identically by <see cref="Restore"/>.
     /// </summary>
     public static ExePatchResult PatchExeDoorSkip(string dataDir, string? seedLabel = null)
-    => ExePatchInstaller.PatchExeDoorSkip(dataDir, seedLabel);
+    => PatchExeDoorSkip(dataDir, DoorSkipMode.OnPress, seedLabel);
+
+    /// <summary>Apply the selected DC1 door-skip mode with the existing backup/restore contract.</summary>
+    public static ExePatchResult PatchExeDoorSkip(string dataDir, DoorSkipMode mode, string? seedLabel = null)
+    => ExePatchInstaller.PatchExeDoorSkip(dataDir, mode, seedLabel);
 
     /// <summary>
     /// Apply the DC1 "fast-forward cutscenes (experimental / crash risk)" lever to <c>DINO.exe</c>: repoint the

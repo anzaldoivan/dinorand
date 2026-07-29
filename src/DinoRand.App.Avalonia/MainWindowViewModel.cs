@@ -501,6 +501,7 @@ namespace DinoRand.App
             PreUpgradedWeapons = true;
             if (!CanShortenCutscenes) ShortenCutscenes = false;
             Dc1DoorSkip = CanDc1DoorSkip;
+            Dc1DoorSkipMode = DoorSkipMode.OnPress;
             if (!CanDc1FastForwardCutscenes) Dc1FastForwardCutscenes = false;
             if (!CanDisableLaserFences) DisableLaserFences = false;
             if (!CanRandomizeStartingInventory) RandomizeStartingInventory = false;
@@ -628,9 +629,12 @@ namespace DinoRand.App
 
         [ObservableProperty] private bool _shuffleBgm;
 
-        // Door skip (DC1): reversible DINO.exe patch applied at install (cont.78). Default ON;
-        // selecting DC2 forces it off because the lever is DC1-only.
+        // Door skip (DC1): reversible DINO.exe patch applied at install (cont.78). The mode is
+        // session-only and selecting DC2 resets it to the safe default.
         [ObservableProperty] private bool _dc1DoorSkip = true;
+        public IReadOnlyList<DoorSkipMode> Dc1DoorSkipModes { get; } =
+            new[] { DoorSkipMode.OnPress, DoorSkipMode.Auto };
+        [ObservableProperty] private DoorSkipMode _dc1DoorSkipMode = DoorSkipMode.OnPress;
 
         // Fast-forward cutscenes (experimental/crash risk, DC1): reversible DINO.exe patch applied at
         // install (cont.79 v2 guarded tick multiplier). Default OFF, not seed-encoded.

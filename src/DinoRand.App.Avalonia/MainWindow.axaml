@@ -149,10 +149,14 @@
 
                     <!-- Tested DC1 accessibility/pace patches. Visible in the primary list; door skip is default ON,
                          backup-protected, restored byte-identically, and not part of the seed string. -->
-                    <CheckBox Content="Door Skip (Button Press)" Margin="0,2"
-                              IsVisible="{Binding CanDc1DoorSkip}"
-                              ToolTip.Tip="On by default: patch DINO.exe so a newly mapped door transition advances on the button press while existing transitions keep their original prologue and the destination background still loads correctly. Turn it off for a room-only install. Reversed by Restore and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
-                              IsChecked="{Binding Dc1DoorSkip, Mode=TwoWay}" />
+                     <StackPanel Orientation="Horizontal" Margin="0,2"
+                                 IsVisible="{Binding CanDc1DoorSkip}"
+                                 ToolTip.Tip="Session-only DC1 door behavior; not part of the shareable seed string. OnPress patches a guarded mapped-input edge and leaves the former hold site untouched. Auto restores the unconditional state-1 sweep skip and short hold. Both are reversed by Restore. CLOSE the game first — the change is seen after the next launch.">
+                         <TextBlock Text="Door Skip:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                         <ComboBox ItemsSource="{Binding Dc1DoorSkipModes}"
+                                   SelectedItem="{Binding Dc1DoorSkipMode, Mode=TwoWay}"
+                                   MinWidth="90" />
+                     </StackPanel>
                     <CheckBox Content="Disable laser fences" Margin="0,2"
                               IsVisible="{Binding CanDisableLaserFences}"
                               ToolTip.Tip="Accessibility bypass: keeps each fence down until its natural cutscene enables the keypad; after that, the keypad can turn it on and off normally. Fence flags and keypad logic are untouched. Reversed by Restore and not part of the shareable seed string."

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia.Input.Platform;
 using DinoRand.App;
 using DinoRand.App.Services;
+using DinoRand.FileFormats.Exe;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Spoiler;
@@ -168,8 +169,10 @@ public class MainWindowViewModelTests
         int advanced = xaml.IndexOf("<Expander Header=\"Advanced options\"", StringComparison.Ordinal);
 
         Assert.True(advanced > 0);
-        Assert.InRange(xaml.IndexOf("Content=\"Door Skip (Button Press)\"", StringComparison.Ordinal), 0, advanced - 1);
-        Assert.Contains("newly mapped door transition", xaml, StringComparison.Ordinal);
+        Assert.InRange(xaml.IndexOf("Text=\"Door Skip:\"", StringComparison.Ordinal), 0, advanced - 1);
+        Assert.Contains("OnPress", xaml, StringComparison.Ordinal);
+        Assert.Contains("Auto", xaml, StringComparison.Ordinal);
+        Assert.Contains("OnPress patches", xaml, StringComparison.Ordinal);
         Assert.InRange(xaml.IndexOf("Content=\"Disable laser fences\"", StringComparison.Ordinal), 0, advanced - 1);
         var vm = NewVm();
         Assert.True(vm.Dc1DoorSkip);
@@ -188,6 +191,23 @@ public class MainWindowViewModelTests
         Assert.False(vm.Dc1DoorSkip);
         vm.SelectedGameIndex = 0;
         Assert.True(vm.Dc1DoorSkip);
+    }
+
+    [Fact]
+    public void Door_skip_mode_selector_is_session_only_and_resets_per_game()
+    {
+        var vm = NewVm();
+        Assert.Equal(new[] { DoorSkipMode.OnPress, DoorSkipMode.Auto }, vm.Dc1DoorSkipModes);
+        Assert.Equal(DoorSkipMode.OnPress, vm.Dc1DoorSkipMode);
+        var seed = vm.SeedText;
+
+        vm.Dc1DoorSkipMode = DoorSkipMode.Auto;
+        Assert.Equal(seed, vm.SeedText);
+
+        vm.SelectedGameIndex = 1;
+        Assert.False(vm.CanDc1DoorSkip);
+        vm.SelectedGameIndex = 0;
+        Assert.Equal(DoorSkipMode.OnPress, vm.Dc1DoorSkipMode);
     }
 
     [Fact]

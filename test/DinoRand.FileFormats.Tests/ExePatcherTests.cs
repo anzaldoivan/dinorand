@@ -116,6 +116,8 @@ public class ExePatcherTests
         byte[] swing = { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F };
         int a = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa);
         swing.CopyTo(exe, a);
+        new byte[] { 0x83, 0xFA, ExePatcher.DoorHoldPristine }
+            .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa));
         return exe;
     }
 
@@ -180,6 +182,47 @@ public class ExePatcherTests
         exe[hold] = 0x83; exe[hold + 1] = 0xFA; exe[hold + 2] = 0x3C;
         ExePatcher.ApplyDoorSkip(exe);
         Assert.Equal(new byte[] { 0x83, 0xFA, 0x3C }, exe.Skip(hold).Take(3).ToArray());
+    }
+
+    [Fact]
+    public void ApplyDoorSkip_Auto_PatchesFormerBehavior_AndIsDetected()
+    {
+        var exe = NewImageWithDoorHookPristine();
+
+        ExePatcher.ApplyDoorSkip(exe, DoorSkipMode.Auto);
+
+        int hook = ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa);
+        Assert.Equal(new byte[] { 0x8B, 0x45, 0x08, 0x66, 0xC7, 0x40, 0x02, 0x01, 0x00,
+            0xE9, 0x6A, 0x03, 0x00, 0x00 }, exe.Skip(hook).Take(14).ToArray());
+        Assert.Equal(ExePatcher.DoorHoldPatched,
+            exe[ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa) + 2]);
+        Assert.True(ExePatcher.IsDoorSkipApplied(exe, DoorSkipMode.Auto));
+        Assert.False(ExePatcher.IsDoorSkipApplied(exe, DoorSkipMode.OnPress));
+    }
+
+    [Fact]
+    public void ApplyDoorSkip_Auto_IsIdempotent()
+    {
+        var exe = NewImageWithDoorHookPristine();
+        ExePatcher.ApplyDoorSkip(exe, DoorSkipMode.Auto);
+        var once = (byte[])exe.Clone();
+
+        ExePatcher.ApplyDoorSkip(exe, DoorSkipMode.Auto);
+
+        Assert.Equal(once, exe);
+    }
+
+    [Theory]
+    [InlineData(DoorSkipMode.OnPress, DoorSkipMode.Auto)]
+    [InlineData(DoorSkipMode.Auto, DoorSkipMode.OnPress)]
+    public void ApplyDoorSkip_RejectsSwitchingModes(DoorSkipMode first, DoorSkipMode second)
+    {
+        var exe = NewImageWithDoorHookPristine();
+        ExePatcher.ApplyDoorSkip(exe, first);
+        var before = (byte[])exe.Clone();
+
+        Assert.Throws<InvalidOperationException>(() => ExePatcher.ApplyDoorSkip(exe, second));
+        Assert.Equal(before, exe);
     }
 
     // ---- Fast-forward cutscenes (cont.79 v2): reversible hook + code cave ----

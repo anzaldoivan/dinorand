@@ -40,6 +40,8 @@ public class GameInstallerExeTests : IDisposable
             .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa));
         new byte[] { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F }
             .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa));
+        new byte[] { 0x83, 0xFA, ExePatcher.DoorHoldPristine }
+            .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa));
         ExePatcher.WriteUInt32AtVa(exe, ExePatcher.SetupFnFieldVa(1), ExePatcher.SetupFnBasicRaptor);
         ExePatcher.WriteUInt32AtVa(exe, ExePatcher.SetupFnFieldVa(2), ExePatcher.SetupFnStage2);
         for (int r = 0; r < ExePatcher.HitDescriptorTotalRecords; r++)
@@ -566,6 +568,23 @@ public class GameInstallerExeTests : IDisposable
 
         Assert.NotNull(result);
         Assert.True(ExePatcher.IsDoorSkipApplied(File.ReadAllBytes(ExePath)));
+
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Fact]
+    public void PatchExeDoorSkip_Auto_SelectsAutoMode_AndManifestSaysSo()
+    {
+        var pristine = File.ReadAllBytes(ExePath);
+
+        GameInstaller.PatchExeDoorSkip(DataDir, DoorSkipMode.Auto, "auto-test");
+
+        var patched = File.ReadAllBytes(ExePath);
+        Assert.True(ExePatcher.IsDoorSkipApplied(patched, DoorSkipMode.Auto));
+        Assert.False(ExePatcher.IsDoorSkipApplied(patched, DoorSkipMode.OnPress));
+        Assert.Contains(GameInstaller.ReadManifest(DataDir)!.ExeRepoints!,
+            entry => entry.Contains("door skip (auto)", StringComparison.Ordinal));
 
         GameInstaller.Restore(DataDir);
         Assert.Equal(pristine, File.ReadAllBytes(ExePath));

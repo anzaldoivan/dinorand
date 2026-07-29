@@ -878,9 +878,22 @@ public static class ExePatcher
     /// <summary>Runtime-only word indicating that the mapped edge is new.</summary>
     public const uint DoorSkipMappedEdgeVa = 0x006D3C40;
 
+    /// <summary>VA of the background machine's 60-frame hold gate <c>cmp edx,0x3c</c>. <c>[verified]</c></summary>
+    public const uint DoorHoldGateVa = 0x00471631;
+
+    /// <summary>Pristine hold threshold (frames) at <see cref="DoorHoldGateVa"/>+2.</summary>
+    public const byte DoorHoldPristine = 0x3C;
+
+    /// <summary>Auto mode hold threshold (frames) at <see cref="DoorHoldGateVa"/>+2.</summary>
+    public const byte DoorHoldPatched = 0x04;
+
     /// <summary>True when the door-skip patch is already applied (idempotency check).</summary>
     public static bool IsDoorSkipApplied(ReadOnlySpan<byte> exe)
-        => Dc1TransitionExePatch.IsDoorSkipApplied(exe);
+        => IsDoorSkipApplied(exe, DoorSkipMode.OnPress);
+
+    /// <summary>True when the requested door-skip mode is already applied.</summary>
+    public static bool IsDoorSkipApplied(ReadOnlySpan<byte> exe, DoorSkipMode mode)
+        => Dc1TransitionExePatch.IsDoorSkipApplied(exe, mode);
 
     /// <summary>
     /// Apply the reversible "door skip" lever to <paramref name="exe"/> in place. Idempotent: a no-op if
@@ -890,7 +903,11 @@ public static class ExePatcher
     /// <see cref="VaToFileOffset"/>); no runtime-only state or global hold site is written.
     /// </summary>
     public static void ApplyDoorSkip(Span<byte> exe)
-        => Dc1TransitionExePatch.ApplyDoorSkip(exe);
+        => ApplyDoorSkip(exe, DoorSkipMode.OnPress);
+
+    /// <summary>Apply the requested reversible DC1 door-skip mode.</summary>
+    public static void ApplyDoorSkip(Span<byte> exe, DoorSkipMode mode)
+        => Dc1TransitionExePatch.ApplyDoorSkip(exe, mode);
 
     // ---- Fast-forward cutscenes (Experimental / crash risk): guarded SCD-VM tick multiplier ----
     // cont.79 v2 (STATIC-SCD-RE): DC1 cutscene choreography is script-authored inside the flag(2,2)
