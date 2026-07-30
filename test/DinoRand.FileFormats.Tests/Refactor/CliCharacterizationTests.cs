@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DinoRand.FileFormats.Exe;
+using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Spoiler;
 using Xunit;
@@ -91,6 +92,32 @@ public sealed class CliCharacterizationTests
                 StringComparison.Ordinal);
             Assert.True(File.Exists(Path.Combine(output, spoilerFileName)));
             Assert.False(File.Exists(Path.Combine(output, SpoilerLogBuilder.LegacyFileName)));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Swap_species_without_species_uses_an_enabled_plan()
+    {
+        string root = Directory.CreateTempSubdirectory("dinorand-cli-swap-default-").FullName;
+        try
+        {
+            string install = SyntheticInputs.CreateDc1Install(root);
+            string donorPath = Path.Combine(install, "Data", "st104.dat");
+            var donorRoom = RoomFile.ReadFromFile(1, 4, donorPath);
+            var donor = donorRoom.Enemies.Single(e => e.Species == DinoSpecies.RaptorHeavy);
+            // The synthetic fixture has no motion resource; reuse the model so the CLI reaches preflight.
+            donor.MotionPtr = donor.ModelPtr;
+            File.WriteAllBytes(donorPath, donorRoom.Write());
+            var rereadDonor = RoomFile.ReadFromFile(1, 4, donorPath);
+            Assert.Equal(donor.OriginalModelPtr, rereadDonor.Enemies.Single().OriginalMotionPtr);
+
+            var result = Run("--install", install, "--swap-species", "103");
+
+            Assert.Equal(1, result.ExitCode);
+            Assert.Contains("ST103+RaptorHeavy refused", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("texture/VRAM refusal", result.Stderr, StringComparison.Ordinal);
+            Assert.DoesNotContain("is disabled", result.Stderr, StringComparison.OrdinalIgnoreCase);
         }
         finally { Directory.Delete(root, recursive: true); }
     }
