@@ -57,6 +57,27 @@ public sealed class Dc1RaptorVisualVariantTests
     }
 
     [Fact]
+    public void Authoring_Pteranodon_IsUnsupportedAndNonMutating()
+    {
+        var enemy = new EnemyRecord
+        {
+            Opcode = DcOpcodes.Enemy,
+            Category = 7,
+            SpeciesBoneCount = 18,
+            MaxHp = 777,
+            AiParam = 3,
+            BirthMode = 2,
+        };
+        var before = (enemy.MaxHp, enemy.AiParam, enemy.BirthMode);
+
+        var result = Dc1RaptorVisualVariantEditor.TryAuthor(
+            enemy, new Dc1RaptorVisualVariantAuthoring(2222, 0, 1));
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
+        Assert.Equal(before, (enemy.MaxHp, enemy.AiParam, enemy.BirthMode));
+    }
+
+    [Fact]
     public void Authoring_Enemy20_ChangesOnlyProvenSafeFields()
     {
         var enemy = new EnemyRecord

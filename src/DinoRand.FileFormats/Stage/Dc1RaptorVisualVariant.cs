@@ -108,6 +108,9 @@ public static class Dc1RaptorVisualVariantEditor
         EnemyRecord enemy, Dc1RaptorVisualVariantAuthoring authoring)
     {
         ArgumentNullException.ThrowIfNull(enemy);
+        if (enemy.Species != DinoSpecies.RaptorHeavy || enemy.Category != 2)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported,
+                "target is not a RaptorHeavy record");
         if (authoring.IsEmpty)
             return new(Dc1RaptorVisualVariantOutcome.Applied, "no authored fields");
         if (enemy.Opcode != DcOpcodes.Enemy)
