@@ -7,6 +7,11 @@ namespace DinoRand.FileFormats.Tests;
 
 public sealed class Dc1RaptorVisualVariantTests
 {
+    public static IEnumerable<object[]> NonRaptorHeavySpecies() =>
+        Enum.GetValues<DinoSpecies>()
+            .Where(species => species != DinoSpecies.RaptorHeavy)
+            .Select(species => new object[] { species });
+
     private static Dc1RaptorVisualVariantEvidence BlueEvidence() => new(
         "blue",
         "RaptorHeavy",
@@ -77,6 +82,22 @@ public sealed class Dc1RaptorVisualVariantTests
         Assert.Equal(before, (enemy.MaxHp, enemy.AiParam, enemy.BirthMode));
     }
 
+    [Theory]
+    [MemberData(nameof(NonRaptorHeavySpecies))]
+    public void Authoring_EveryNonRaptorHeavySpecies_IsRejectedAndNonMutating(DinoSpecies species)
+    {
+        var enemy = EnemyFor(species);
+        var before = Snapshot(enemy);
+        var beforeRaw = enemy.Raw.ToArray();
+
+        var result = Dc1RaptorVisualVariantEditor.TryAuthor(
+            enemy, new Dc1RaptorVisualVariantAuthoring(2222, 0, 1));
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
+        Assert.Equal(before, Snapshot(enemy));
+        Assert.Equal(beforeRaw, enemy.Raw);
+    }
+
     [Fact]
     public void Authoring_Enemy20_ChangesOnlyProvenSafeFields()
     {
@@ -141,6 +162,29 @@ public sealed class Dc1RaptorVisualVariantTests
         Assert.All(target[2048..(2048 + 512)], b => Assert.Equal(0x11, b));
     }
 
+    [Theory]
+    [MemberData(nameof(NonRaptorHeavySpecies))]
+    public void PaletteApply_EveryNonRaptorHeavySpecies_IsRejectedAndNonMutating(DinoSpecies species)
+    {
+        var target = PackageWithPalette(0x11);
+        var donor = PackageWithPalette(0x99);
+        var beforeTarget = target.ToArray();
+        var beforeDonor = donor.ToArray();
+        var enemy = EnemyFor(species);
+        var before = Snapshot(enemy);
+        var beforeRaw = enemy.Raw.ToArray();
+
+        var result = Dc1RaptorVisualVariantEditor.TryApplyPalette(
+            target, donor, enemy, BlueEvidence());
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
+        Assert.Null(result.PatchedBytes);
+        Assert.Equal(beforeTarget, target);
+        Assert.Equal(beforeDonor, donor);
+        Assert.Equal(before, Snapshot(enemy));
+        Assert.Equal(beforeRaw, enemy.Raw);
+    }
+
     private static byte[] PackageWithPalette(byte fill)
     {
         var bytes = new byte[4096];
@@ -155,6 +199,95 @@ public sealed class Dc1RaptorVisualVariantTests
         bytes.AsSpan(2048, 512).Fill(fill);
         return bytes;
     }
+
+    private static EnemyRecord EnemyFor(DinoSpecies species)
+    {
+        var (category, bones) = species switch
+        {
+            DinoSpecies.Velociraptor => (1, 15),
+            DinoSpecies.Tyrannosaurus => (3, 20),
+            DinoSpecies.Swarm => (5, 7),
+            DinoSpecies.Pteranodon => (7, 18),
+            DinoSpecies.Therizinosaurus => (8, 22),
+            DinoSpecies.Unknown => (0, 0),
+            _ => throw new ArgumentOutOfRangeException(nameof(species), species, null),
+        };
+
+        return new EnemyRecord
+        {
+            Opcode = DcOpcodes.Enemy,
+            InstanceIndex = 0x12,
+            Slot = 0x34,
+            PosX = -101,
+            PosY = 202,
+            PosZ = -303,
+            Rotation = 404,
+            Category = (byte)category,
+            KillFlag = 0x56,
+            ModelPtr = 0x80101234,
+            MotionPtr = 0x80105678,
+            OriginalModelPtr = 0x80102222,
+            OriginalMotionPtr = 0x80106666,
+            MaxHp = 777,
+            AiParam = 3,
+            OriginalAiParam = 4,
+            BirthMode = 2,
+            OriginalBirthMode = 5,
+            OriginalMaxHp = 888,
+            SpeciesBoneCount = bones,
+            IsNpcSceneActor = true,
+            Raw = new byte[] { 1, 2, 3, 4 },
+            FileOffset = 0x1234,
+        };
+    }
+
+    private static EnemyState Snapshot(EnemyRecord enemy) => new(
+        enemy.Opcode,
+        enemy.InstanceIndex,
+        enemy.Slot,
+        enemy.PosX,
+        enemy.PosY,
+        enemy.PosZ,
+        enemy.Rotation,
+        enemy.Category,
+        enemy.KillFlag,
+        enemy.ModelPtr,
+        enemy.MotionPtr,
+        enemy.OriginalModelPtr,
+        enemy.OriginalMotionPtr,
+        enemy.MaxHp,
+        enemy.AiParam,
+        enemy.OriginalAiParam,
+        enemy.BirthMode,
+        enemy.OriginalBirthMode,
+        enemy.OriginalMaxHp,
+        enemy.SpeciesBoneCount,
+        enemy.IsNpcSceneActor,
+        enemy.FileOffset);
+
+    private readonly record struct EnemyState(
+        byte Opcode,
+        byte InstanceIndex,
+        byte Slot,
+        short PosX,
+        short PosY,
+        short PosZ,
+        short Rotation,
+        byte Category,
+        byte KillFlag,
+        uint ModelPtr,
+        uint MotionPtr,
+        uint OriginalModelPtr,
+        uint OriginalMotionPtr,
+        ushort MaxHp,
+        byte AiParam,
+        byte OriginalAiParam,
+        byte BirthMode,
+        byte OriginalBirthMode,
+        ushort OriginalMaxHp,
+        int SpeciesBoneCount,
+        bool IsNpcSceneActor,
+        int FileOffset);
 
     [Fact]
     public void RngStream_IsStableAndSeparateFromOtherEnemyStreams()
