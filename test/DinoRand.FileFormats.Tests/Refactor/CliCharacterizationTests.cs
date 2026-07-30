@@ -141,7 +141,7 @@ public sealed class CliCharacterizationTests
             Assert.Contains("damage behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("death behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("kill-flag behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("re-entry behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("end-to-end runtime-witness gate", result.Stderr, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("free-slot/open-arena eligibility", result.Stderr, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("birth handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("0x599CDC", result.Stderr, StringComparison.Ordinal);

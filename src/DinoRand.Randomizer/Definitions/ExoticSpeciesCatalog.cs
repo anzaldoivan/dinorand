@@ -78,7 +78,7 @@ public static class ExoticSpeciesCatalog
             Enabled: false,
             Blocker: "cat-7 dispatch handler proven at 0x5998F0; model/motion state and texture import evidence are " +
                      "proven; mandatory remaining gates: texture behavior, SE behavior, damage behavior, death " +
-                     "behavior, kill-flag behavior, re-entry behavior, and verified free-slot/open-arena eligibility",
+                     "behavior, kill-flag behavior, end-to-end runtime-witness gate, and verified free-slot/open-arena eligibility",
             FreeStages: Array.Empty<int>()),
         // GATED — cat5 handler LOCATED + live-verified (0x5C8116; stage-1 cat5 slot is free), but the compy is a
         // coordinated-GROUP entity: a single-victim cross-import spawns one, leaves the group-coordination block

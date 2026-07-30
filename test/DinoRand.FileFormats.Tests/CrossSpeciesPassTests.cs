@@ -74,7 +74,7 @@ public class CrossSpeciesPassTests
         Assert.Contains("damage behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("death behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("kill-flag behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("re-entry behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("end-to-end runtime-witness gate", def.Blocker, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("free-slot/open-arena eligibility", def.Blocker, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("birth handler", def.Blocker, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("0x599CDC", def.Blocker);

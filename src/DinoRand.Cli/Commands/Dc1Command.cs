@@ -766,7 +766,7 @@ internal sealed partial class CliApplication
         {
             Console.Error.WriteLine("error: Pteranodon remains gated — cat-7 dispatch handler proven at 0x5998F0; " +
                 "model/motion state and texture import evidence are proven; mandatory remaining gates: texture " +
-                "behavior, SE behavior, damage behavior, death behavior, kill-flag behavior, re-entry behavior, " +
+                "behavior, SE behavior, damage behavior, death behavior, kill-flag behavior, end-to-end runtime-witness gate, " +
                 "and verified free-slot/open-arena eligibility");
             return 1;
         }
