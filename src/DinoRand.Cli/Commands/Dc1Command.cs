@@ -26,7 +26,7 @@ internal sealed partial class CliApplication
             // --max-donor <bytes>: DEBUG/test override — force the Theri clip-strip to this donor budget even when
             // the room would fit unstripped (used to reproduce 0102's exact strip in a native-Theri room, e.g. st612).
             int? maxDonorOverride = GetOpt("--max-donor") is { } md && int.TryParse(md, out int mdv) ? mdv : null;
-            return SwapSpecies(install, swapRoom, GetOpt("--species") ?? "raptorheavy", maxDonorOverride);
+            return SwapSpecies(install, swapRoom, GetOpt("--species") ?? "largeground", maxDonorOverride);
         }
 
         // Targeted single-room ADD-enemy (inject a brand-new 0x20 record into a room that has none —
@@ -163,7 +163,7 @@ internal sealed partial class CliApplication
         if (!TryParseSpecies(speciesName, out var species))
         {
             Console.Error.WriteLine($"error: unknown species '{speciesName}' " +
-                "(raptorheavy | therizinosaurus)");
+                "(largeground | raptorheavy | pteranodon | tyrannosaurus | swarm | velociraptor | therizinosaurus)");
             return 1;
         }
 
