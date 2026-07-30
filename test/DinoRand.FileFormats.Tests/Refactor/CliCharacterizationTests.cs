@@ -132,15 +132,21 @@ public sealed class CliCharacterizationTests
             var result = Run("--install", install, "--swap-species", "103", "--species", "pteranodon");
 
             Assert.Equal(1, result.ExitCode);
-            Assert.Contains("cat-7 birth handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("0x599CDC", result.Stderr, StringComparison.Ordinal);
-            Assert.Contains("0x599D92", result.Stderr, StringComparison.Ordinal);
-            Assert.Contains("per-stage dispatch", result.Stderr, StringComparison.Ordinal);
-            Assert.Contains("room eligibility", result.Stderr, StringComparison.Ordinal);
-            Assert.Contains("enemy SE", result.Stderr, StringComparison.Ordinal);
-            Assert.Contains("death behavior", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("cat-7 dispatch handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("0x5998F0", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("model/motion state and texture import evidence are proven", result.Stderr,
+                StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("texture behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("SE behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("damage behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("death behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("kill-flag behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("re-entry behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("free-slot/open-arena eligibility", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("birth handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("0x599CDC", result.Stderr, StringComparison.Ordinal);
+            Assert.DoesNotContain("0x599D92", result.Stderr, StringComparison.Ordinal);
             Assert.DoesNotContain("handler not located", result.Stderr, StringComparison.OrdinalIgnoreCase);
-            Assert.DoesNotContain("texture", result.Stderr, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("flyer AI handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
         }
         finally { Directory.Delete(root, recursive: true); }

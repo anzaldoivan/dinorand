@@ -72,11 +72,13 @@ public static class ExoticSpeciesCatalog
             Enabled: false, Blocker: "renders invisible in 0102 (engine draw-gate, RE paused)",
             FreeStages: new[] { 1 }),
 
-        // GATED — the cat7 birth handler is proven, but the runtime witness for placement is not.
+        // GATED — the cat7 dispatch handler and model/motion + texture import are proven, but the runtime
+        // behavior and placement eligibility gates are not.
         new ExoticSpeciesDef(DinoSpecies.Pteranodon, PlacementKind.CatFlyerOrSwarm, Category: 7,
             Enabled: false,
-            Blocker: "cat7 birth handler proven at 0x599CDC (guard 0x599D92); mandatory runtime witness still " +
-                     "needed for per-stage dispatch, room eligibility, enemy SE, and death behavior",
+            Blocker: "cat-7 dispatch handler proven at 0x5998F0; model/motion state and texture import evidence are " +
+                     "proven; mandatory remaining gates: texture behavior, SE behavior, damage behavior, death " +
+                     "behavior, kill-flag behavior, re-entry behavior, and verified free-slot/open-arena eligibility",
             FreeStages: Array.Empty<int>()),
         // GATED — cat5 handler LOCATED + live-verified (0x5C8116; stage-1 cat5 slot is free), but the compy is a
         // coordinated-GROUP entity: a single-victim cross-import spawns one, leaves the group-coordination block

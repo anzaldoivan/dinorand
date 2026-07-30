@@ -764,9 +764,10 @@ internal sealed partial class CliApplication
         }
         if (species == DinoSpecies.Pteranodon)
         {
-            Console.Error.WriteLine("error: Pteranodon remains gated — cat-7 birth handler is known at 0x599CDC " +
-                "(guard 0x599D92); verified remaining blockers are runtime witness for per-stage dispatch, " +
-                "room eligibility, enemy SE, and death behavior");
+            Console.Error.WriteLine("error: Pteranodon remains gated — cat-7 dispatch handler proven at 0x5998F0; " +
+                "model/motion state and texture import evidence are proven; mandatory remaining gates: texture " +
+                "behavior, SE behavior, damage behavior, death behavior, kill-flag behavior, re-entry behavior, " +
+                "and verified free-slot/open-arena eligibility");
             return 1;
         }
 

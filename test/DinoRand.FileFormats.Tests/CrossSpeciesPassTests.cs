@@ -58,19 +58,27 @@ public class CrossSpeciesPassTests
     }
 
     [Fact]
-    public void Catalog_Pteranodon_RecordsProvenBirthHandler_ButRequiresRuntimeWitness()
+    public void Catalog_Pteranodon_RecordsDispatchEvidence_ButRetainsRuntimeGates()
     {
         var def = ExoticSpeciesCatalog.For(DinoSpecies.Pteranodon)!;
 
         Assert.False(def.Enabled);
         Assert.Empty(def.FreeStages);
         Assert.False(def.AllowsStage(1));
-        Assert.Contains("0x599CDC", def.Blocker);
-        Assert.Contains("0x599D92", def.Blocker);
-        Assert.Contains("runtime witness", def.Blocker, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("room eligibility", def.Blocker, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("SE", def.Blocker);
-        Assert.Contains("death", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("cat-7 dispatch handler", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("0x5998F0", def.Blocker);
+        Assert.Contains("model/motion state and texture import evidence are proven", def.Blocker,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("texture behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("SE behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("damage behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("death behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("kill-flag behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("re-entry behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("free-slot/open-arena eligibility", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("birth handler", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("0x599CDC", def.Blocker);
+        Assert.DoesNotContain("0x599D92", def.Blocker);
     }
 
     [Fact]
