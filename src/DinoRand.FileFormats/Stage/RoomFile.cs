@@ -431,6 +431,14 @@ public sealed class RoomFile
 
     internal void ReplaceRdtBuffer(byte[] buffer) => RdtBuffer = buffer;
 
+    internal void AdoptSerialized(ReadOnlySpan<byte> bytes)
+    {
+        var committed = Read(Stage, Room, bytes);
+        if (!committed.ParsedCleanly)
+            throw new InvalidOperationException("serialized room did not parse cleanly");
+        Adopt(committed);
+    }
+
     internal void MarkStructurallyEdited() => _structurallyEdited = true;
 
     private void Adopt(RoomFile committed)

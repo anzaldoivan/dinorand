@@ -8,6 +8,7 @@ using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Passes;
 using DinoRand.Randomizer.Voice;
 
 internal sealed partial class CliApplication
@@ -148,604 +149,8 @@ internal sealed partial class CliApplication
 
         return null;
     }
-
-    static int SwapTherizinosaurus(string installDir, string dataDir, int code, int stage, int room,
-                                   RoomFileRef targetRef, IReadOnlyList<RoomFileRef> refs, int? maxDonorOverride = null)
-    {
-        // The Theri's VRAM identity (data/dc1/enemy-textures.json cat8): X=640 texture column, palette row 511.
-        ushort[] tpages = { 0x8a, 0x9a };
-        const ushort clut = 0x7ff0;
-
-        // The surgical EXE patch needs the target stage's installed AI-record VA, with cat8 verified free.
-        // Stage 1 (cat8 NULL) and stage 2 (cat8 stub) are confirmed; stage 6 hosts cat8 natively (no patch).
-        uint? recordVa = stage switch
-        {
-            1 => ExePatcher.Stage1AiRecordVa,
-            2 => ExePatcher.Stage2AiRecordVa,
-            _ => null,
-        };
-        if (recordVa is null && stage != 6)
-        {
-            Console.Error.WriteLine($"error: Theri swap supports stage 1 and 2 (cat8 AI-record located + verified "
-                + $"free), or stage 6 (cat8 native, no patch); got ST{code:X3}.");
-            return 1;
-        }
-
-        // Donor: a stage-6 Theri room, preferring the catalog donor st603. Needs BOTH a closure-extractable
-        // cat8 geometry record AND the Theri texture uploaded at (640,0)+(768,511).
-        SpeciesDonorMulti? donor = null;
-        byte[]? donorFile = null;
-        byte[]? donorRdt = null;          // kept so an over-ceiling room can re-extract a clip-stripped donor
-        EnemyRecord? donorRec = null;
-        string? donorName = null;
-        foreach (var rref in refs.OrderByDescending(r => r.Stage == 6 && r.Room == 0x03))
-        {
-            RoomFile rf;
-            try { rf = RoomFile.ReadFromFile(rref.Stage, rref.Room, rref.Path); }
-            catch { continue; }
-            var rec = rf.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == DinoSpecies.Therizinosaurus);
-            if (rec is null) continue;
-            try
-            {
-                var d = SpeciesImporter.ExtractDonorClosure(rf.RdtBuffer, rec);
-                var bytes = File.ReadAllBytes(rref.Path);
-                _ = TextureImporter.ExtractSpeciesTexture(bytes, tpages, clut); // donor must upload the Theri skin
-                donor = d; donorFile = bytes; donorRdt = rf.RdtBuffer; donorRec = rec; donorName = Path.GetFileName(rref.Path);
-                break;
-            }
-            catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException) { }
-        }
-        if (donor is null || donorFile is null || donorRdt is null || donorRec is null)
-        {
-            Console.Error.WriteLine("error: no closure-extractable Therizinosaurus donor with a (640,0) texture found in the install");
-            return 1;
-        }
-
-        // Back up pristine + read the target from the pristine copy (re-runnable / non-compounding).
-        var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
-
-        var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
-        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
-        if (victim is null)
-        {
-            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable enemy to replace.");
-            return 1;
-        }
-        int idx = target.Enemies.IndexOf(victim);
-        var was = victim.Species;
-
-        // 1. Geometry (multi-range closure import; appends the donor, growing the RDT). Track B: the effective
-        //    append ceiling is the RESIDENT-POOL FLOOR (RDT 0x5D000), NOT the looser work-struct 0x60000 — a grown
-        //    RDT past 0x5D000 overwrites the heap-resident persistent door/prop models, which is defect A (0102
-        //    entry render AV) and, per the live convergent hypothesis (THERI-0102-PLAYABLE-FIX-PLAN "LIVE SESSION"),
-        //    also defect B (the same overrun corrupts the shared death/anim object). So we AUTO clip-strip the donor
-        //    to fit ≤ the floor (region-reuse overlay/split stays DEAD — CE-proven, THERI-RDT-MEMORY-LIBERATION-PLAN).
-        //    Refuse only if the max eligible strip (MaxClipStripDropCount) still can't clear the floor.
-        int vanillaLen = target.RdtBuffer.Length;
-        int maxDonor = SpeciesImporter.ResidentPoolFloor - ((vanillaLen + 3) & ~3);
-        if (maxDonorOverride is { } mdo && mdo < maxDonor)
-        {
-            maxDonor = mdo;   // --max-donor: tighter budget for RE (forces a deeper strip).
-            Console.WriteLine($"[--max-donor] forcing donor budget {maxDonor} B (RE override, below the resident-pool floor).");
-        }
-        int[] TheriProtectedClips = { 1, 12, 13, 15, 19, 48 };   // live st605 used set + likely-death (see plan)
-
-        // One reusable fit check (EnemyImportBudget) decides the RDT budget + clip-strip — replacing the inline
-        // maxDonor/strip/refusal logic. The Theri stages its texture via the fixed-column overwrite/append path
-        // below (step 2), NOT VRAM relocation, so the helper's VRAM half is skipped (null texture); this is the
-        // RDT-budget half only. Behaviour is byte-identical: the prepared block set imports through ImportSpecies.
-        var fit = EnemyImportBudget.Evaluate(donorRdt, donorRec.OriginalModelPtr, donorRec.OriginalMotionPtr,
-                                             vanillaLen, maxDonor, SpeciesImporter.MaxClipStripDropCount,
-                                             TheriProtectedClips, ReadOnlySpan<byte>.Empty, donorTexture: null,
-                                             out var geoBlocks);
-        if (!fit.Fits)
-        {
-            if (fit.Limiting == ImportFitConstraint.ClipStripBudget)
-                // Quality-bounded eligibility: needs more than the conservative pre-capture drop budget, so we
-                // never ship a visibly stripped Theri. Raised after the live used-clip capture.
-                Console.Error.WriteLine($"error: ST{code:X3}+Theri needs {fit.DroppedClips} clips dropped ({fit.DroppedBytes} B) "
-                    + $"to fit under the resident-pool floor, over the quality-bounded limit of "
-                    + $"{SpeciesImporter.MaxClipStripDropCount}. Pick a smaller room, or raise the limit after the "
-                    + "live used-clip capture. Nothing was written.");
-            else
-            {
-                // RdtBudget: the max eligible strip cannot bring the grown RDT ≤ the resident-pool floor → Track B
-                // can't enable this room. Refuse; ship nothing.
-                Console.Error.WriteLine($"error: ST{code:X3} is too big for the Theri even after clip-strip: {fit.Reason}");
-                Console.Error.WriteLine("hint : nothing was written.");
-            }
-            return 1;
-        }
-        int droppedClips = fit.DroppedClips, droppedBytes = fit.DroppedBytes;
-        var geoDonor = donor with { Blocks = geoBlocks! };
-        target.ImportSpecies(geoDonor, idx);
-
-        // Final headroom assert — the (possibly stripped) append must land ≤ the resident-pool floor (the effective
-        // ceiling for a pool-sharing species); never ship over it. EngineRoomRdtCeiling remains the hard upper bound.
-        if (target.RdtBuffer.Length > SpeciesImporter.ResidentPoolFloor)
-        {
-            int over = target.RdtBuffer.Length - SpeciesImporter.ResidentPoolFloor;
-            Console.Error.WriteLine($"error: ST{code:X3}+Theri RDT = {target.RdtBuffer.Length} B exceeds the resident-pool "
-                + $"floor {SpeciesImporter.ResidentPoolFloor} B by {over} B. Nothing was written.");
-            return 1;
-        }
-
-        byte[] geo = target.Write();
-
-        // 2. Texture: overwrite in place if the room already uploads the Theri's column (e.g. 0203), else ADD it
-        //    as new VRAM entries (small rooms). Texture lives in VRAM, so the append does not affect the RDT ceiling.
-        byte[] final;
-        try
-        {
-            // Per-resource import: overwrite whichever of {texture page, palette} the room already uploads,
-            // append whichever it lacks (handles 0102's palette-present / texture-absent layout).
-            final = TextureImporter.ImportSpeciesTexture(geo, donorFile, tpages, clut);
-        }
-        catch (InvalidOperationException ex)
-        {
-            Console.Error.WriteLine($"error: texture import failed: {ex.Message}");
-            return 1;
-        }
-        File.WriteAllBytes(targetRef.Path, final);
-
-        // 3. Surgical EXE patch: write the target stage's cat8 slot = the Theri handler so the spawn dispatches
-        //    to a real AI handler. Stage 6 hosts cat8 natively, so it needs no patch.
-        ExePatchResult? exeRes = null;
-        string? reactionNote = null;
-        string? soundNote = null;
-        if (recordVa is { } rva)
-        {
-            try
-            {
-                exeRes = GameInstaller.PatchExeCatSlot(dataDir, rva, 8, ExePatcher.TheriCat8HandlerVa);
-            }
-            catch (IOException ex)
-            {
-                Console.Error.WriteLine($"error: could not write {GameInstaller.ExeName}: {ex.Message}");
-                Console.Error.WriteLine("hint : the room file was written, but the EXE is locked — CLOSE the game and re-run (the .dat step is idempotent), or run --exe-patch separately.");
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"error: exe patch failed: {ex.Message}");
-                return 1;
-            }
-
-            // 3b. Defect-B fix (live-verified 2026-06-22): cave the cat8 hit-REACTION descriptor stream from the
-            //     normal-Theri donor (st603 RDT 0x3C0E0) and repoint the idx4/5 reaction tables, so the appended
-            //     Theri can be attacked/shot/killed without the walker AV at 0x41685B (the descriptor the engine
-            //     reads at the EXE-baked offset is appended garbage in the imported room). Cat8-exclusive; uses the
-            //     FULL un-stripped donorRdt. Best-effort: geometry/texture/slot are already written and this re-runs
-            //     cleanly, so a failure warns (attack stays crashy) rather than aborting. Supersedes the refuted
-            //     Architecture-A descriptor-table redirect (GameInstaller.PatchExeCat8HitDescriptors et al., left
-            //     unreferenced). See docs/decisions/dc1/theri/THERI-0102-PLAYABLE-FIX-PLAN.md "Deviations".
-            try
-            {
-                var rr = GameInstaller.PatchExeCat8HitReaction(dataDir, donorRdt);
-                reactionNote = rr.Repoints.FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"warn : cat8 hit-reaction patch failed ({ex.Message}); the Theri spawns + "
-                    + "animates but will CRASH when it attacks / is shot. Re-run after closing the game.");
-            }
-
-            // 3c. Enemy-sound fix (docs/reference/dc1/se/ENEMY-SOUND-SYSTEM.md): DC1 binds the loaded dino SE set to the room
-            //     id via a per-room SE manifest in DINO.exe, so a swapped room keeps playing its native (raptor)
-            //     samples — every swapped enemy plays VELOCIRAPTOR sounds. Copy a native Theri room's (st605)
-            //     dino SE sub-block over this room's so it loads the Theri (se\dino\j_*) set at the ids the cat8
-            //     AI emits. Best-effort, like the reaction patch: a failure leaves wrong sound, not a broken swap.
-            try
-            {
-                var se = GameInstaller.PatchExeRoomEnemySe(dataDir, stage, room, donorStage: 6, donorRoom: 5);
-                soundNote = se.Repoints.FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"warn : enemy-sound patch failed ({ex.Message}); the Theri will play "
-                    + "raptor sounds (cosmetic). Re-run after closing the game.");
-            }
-        }
-
-        string placement = droppedClips > 0
-            ? $"append+clip-strip: dropped {droppedClips} clips, {droppedBytes} B"
-            : "append";
-        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {was} -> Therizinosaurus  (cat8; multi-range geometry [{placement}] + texture)");
-        Console.WriteLine($"donor   : {donorName} (geometry closure + (640,0) texture / (768,511) palette)");
-        Console.WriteLine($"wrote   : {targetRef.Path}");
-        if (exeRes is { } er)
-        {
-            Console.WriteLine($"exe     : {er.ExePath}");
-            foreach (var r in er.Repoints) Console.WriteLine($"exe slot: {r}");
-            if (reactionNote is not null) Console.WriteLine($"exe rxn : {reactionNote}");
-            if (soundNote is not null) Console.WriteLine($"exe snd : {soundNote}");
-        }
-        else
-            Console.WriteLine($"exe     : (none — stage {stage} hosts cat8 natively)");
-        Console.WriteLine($"backup  : {backupPath}");
-        Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
-        Console.WriteLine($"verify  : CLOSE then relaunch; enter ST{code:X3} and confirm the Theri spawns, animates and is killable (CE gate).");
-        return 0;
-    }
-
-    // Replace a room's raptor with a Tyrannosaurus (cat3 20-bone boss rig): closure geometry import + its
-    // (640,0) texture carried in + a surgical EXE cat3 patch (stage 1's installed AI-record has a NULL cat3
-    // slot, so an imported T-Rex would dispatch a null handler). One reversible command
-    // (docs/decisions/dc1/models/TREX-INTO-0102-FEASIBILITY.md). Stage 1 (cat3 NULL, patched) or stage 6 (cat3 native, no patch).
-    static int SwapTyrannosaurus(string installDir, string dataDir, int code, int stage, int room,
-                                 RoomFileRef targetRef, IReadOnlyList<RoomFileRef> refs)
-    {
-        // The T-Rex boss rig's VRAM identity (data/dc1/enemy-textures.json cat3): X=640 column, palette row 510.
-        ushort[] tpages = { 0x8a, 0x9a };
-        const ushort clut = 0x7fb0;
-
-        // The surgical EXE patch needs the target stage's installed AI-record VA, with cat3 verified free.
-        // Stage 1's cat3 slot is NULL (verified from DINO.exe); stage 6 hosts cat3 natively (no patch).
-        uint? recordVa = stage switch
-        {
-            1 => ExePatcher.Stage1AiRecordVa,
-            _ => null,
-        };
-        if (recordVa is null && stage != 6)
-        {
-            Console.Error.WriteLine($"error: Tyrannosaurus swap supports stage 1 (cat3 AI-record located + "
-                + $"verified NULL) or stage 6 (cat3 native, no patch); got ST{code:X3}.");
-            return 1;
-        }
-
-        // Donor: a T-Rex room, preferring the catalog donor st60a (a single 0x20 cat-3 entity). Needs BOTH a
-        // closure-extractable cat3/20-bone geometry record AND the T-Rex texture uploaded at (640,0)+(768,510).
-        SpeciesDonorMulti? donor = null;
-        byte[]? donorFile = null;
-        string? donorName = null;
-        foreach (var rref in refs.OrderByDescending(r => r.Stage == 6 && r.Room == 0x0a))
-        {
-            RoomFile rf;
-            try { rf = RoomFile.ReadFromFile(rref.Stage, rref.Room, rref.Path); }
-            catch { continue; }
-            var rec = rf.Enemies.FirstOrDefault(e => e.Category == 3 && e.SpeciesBoneCount == 20);
-            if (rec is null) continue;
-            try
-            {
-                var d = SpeciesImporter.ExtractDonorClosure(rf.RdtBuffer, rec);
-                var bytes = File.ReadAllBytes(rref.Path);
-                _ = TextureImporter.ExtractSpeciesTexture(bytes, tpages, clut); // donor must upload the T-Rex skin
-                donor = d; donorFile = bytes; donorName = Path.GetFileName(rref.Path);
-                break;
-            }
-            catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException) { }
-        }
-        if (donor is null || donorFile is null)
-        {
-            Console.Error.WriteLine("error: no closure-extractable Tyrannosaurus donor with a (640,0) texture found in the install");
-            return 1;
-        }
-
-        // Back up pristine + read the target from the pristine copy (re-runnable / non-compounding).
-        var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
-
-        var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
-        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
-        if (victim is null)
-        {
-            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable enemy to replace.");
-            return 1;
-        }
-        int idx = target.Enemies.IndexOf(victim);
-        var was = victim.Species;
-
-        // 1. Geometry (multi-range closure import; the T-Rex boss closure is a single clean range). The append
-        //    grows the RDT; refuse if it would overflow the engine room buffer (0x60000) — that overrun crashes
-        //    the model-setup walk (docs/decisions/dc1/theri/THERI-0203-SWAP-PLAN.md). 0102 fits with ~40 KB to spare.
-        int appendLen = ((target.RdtBuffer.Length + 3) & ~3) + donor.Blocks.Bytes.Length;
-        if (appendLen > SpeciesImporter.EngineRoomRdtCeiling)
-        {
-            int over = appendLen - SpeciesImporter.EngineRoomRdtCeiling;
-            Console.Error.WriteLine($"error: ST{code:X3}+T-Rex RDT = {appendLen} B exceeds the engine ceiling "
-                + $"{SpeciesImporter.EngineRoomRdtCeiling} B by {over} B — it would overflow and crash in-game. "
-                + "Pick a smaller room. Nothing was written.");
-            return 1;
-        }
-        target.ImportSpecies(donor, idx);
-        byte[] geo = target.Write();
-
-        // 2. Texture: 0102 does not upload the X=640 column, so ADD it as new VRAM entries (texture lives in
-        //    VRAM, so it does not affect the RDT ceiling). Overwrite in place if the room already has it.
-        bool hasSlot = TextureImporter.HasSpeciesTextureSlot(geo, tpages, clut);
-        byte[] final;
-        try
-        {
-            final = hasSlot
-                ? TextureImporter.OverwriteSpeciesTextureInPlace(geo, donorFile, tpages, clut)
-                : TextureImporter.AppendSpeciesTexture(geo, donorFile, tpages, clut);
-        }
-        catch (InvalidOperationException ex)
-        {
-            Console.Error.WriteLine($"error: texture import failed: {ex.Message}");
-            return 1;
-        }
-        File.WriteAllBytes(targetRef.Path, final);
-
-        // 3. Surgical EXE patch: write the target stage's cat3 slot = the T-Rex boss handler so the spawn
-        //    dispatches to a real AI handler. Stage 6 hosts cat3 natively, so it needs no patch.
-        ExePatchResult? exeRes = null;
-        if (recordVa is { } rva)
-        {
-            try
-            {
-                exeRes = GameInstaller.PatchExeCatSlot(dataDir, rva, 3, ExePatcher.TrexCat3HandlerVa);
-            }
-            catch (IOException ex)
-            {
-                Console.Error.WriteLine($"error: could not write {GameInstaller.ExeName}: {ex.Message}");
-                Console.Error.WriteLine("hint : the room file was written, but the EXE is locked — CLOSE the game and re-run (the .dat step is idempotent), or run --exe-patch separately.");
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"error: exe patch failed: {ex.Message}");
-                return 1;
-            }
-        }
-
-        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {was} -> Tyrannosaurus  (cat3 boss rig; multi-range geometry [append] + texture [{(hasSlot ? "overwrote" : "added X=640")}])");
-        Console.WriteLine($"donor   : {donorName} (geometry closure {donor.Blocks.Bytes.Length} B + (640,0) texture / (768,510) palette)");
-        Console.WriteLine($"wrote   : {targetRef.Path}  (RDT {target.RdtBuffer.Length} B / ceiling {SpeciesImporter.EngineRoomRdtCeiling} B)");
-        if (exeRes is { } er)
-        {
-            Console.WriteLine($"exe     : {er.ExePath}");
-            foreach (var r in er.Repoints) Console.WriteLine($"exe slot: {r}");
-        }
-        else
-            Console.WriteLine($"exe     : (none — stage {stage} hosts cat3 natively)");
-        Console.WriteLine($"backup  : {backupPath}");
-        Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
-        Console.WriteLine($"verify  : CLOSE then relaunch; enter ST{code:X3} and confirm the T-Rex spawns, animates and is killable (CE gate).");
-        return 0;
-    }
-
-    // Replace a room's raptor with a Swarm (cat5 7-bone small-dino / compy): geometry import + its texture
-    // RELOCATED into a free VRAM region + a surgical EXE cat5 patch + the universal walker null-guard + a
-    // per-room enemy-SE retarget. One reversible command. The swarm shares the raptor's EXACT VRAM — tpage
-    // 0x8b @ (704,0) and CLUT 0x7ff0 @ (768,511) — with a smaller 64x128 rect, so a fixed-column overwrite
-    // (the Theri/T-Rex path) would mismatch / clobber the raptor and the swarm would wear the raptor skin;
-    // the RELOCATE import (RoomFile.ImportSpeciesTextured → free column + free palette row + RewriteModelCodes)
-    // gives it its own skin in fresh VRAM. Stage 1/2 (cat5 verified free, patched) or stage 3 (cat5 native,
-    // no patch). (docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md; swarm cat5 handler 0x5C8116 in EXE-SYMBOLS.md.)
-    static int SwapSwarm(string installDir, string dataDir, int code, int stage, int room,
-                         RoomFileRef targetRef, IReadOnlyList<RoomFileRef> refs)
-    {
-        // The surgical EXE patch needs the target stage's installed AI-record VA, with cat5 verified free.
-        // Stage 1 & 2's cat5 slots are NULL (verified from DINO.exe); stage 3 hosts cat5 natively (no patch).
-        uint? recordVa = stage switch
-        {
-            1 => ExePatcher.Stage1AiRecordVa,
-            2 => ExePatcher.Stage2AiRecordVa,
-            _ => null,
-        };
-        if (recordVa is null && stage != 3)
-        {
-            Console.Error.WriteLine($"error: swarm swap supports stage 1 or 2 (cat5 AI-record located + verified "
-                + $"free) or stage 3 (cat5 native, no patch); got ST{code:X3}.");
-            return 1;
-        }
-
-        // Donor: a swarm room, preferring st307 (stage 3 room 7 — 4 cat5 instances sharing one model). Needs a
-        // clean cat5/7-bone geometry record AND its texture present (tpage 0x8b @ (704,0) + CLUT 0x7ff0 @ (768,511)).
-        SpeciesDonor? donor = null;
-        string? donorName = null;
-        int donorStage = 3, donorRoom = 7;
-        foreach (var rref in refs.OrderByDescending(r => r.Stage == 3 && r.Room == 0x07))
-        {
-            RoomFile rf;
-            try { rf = RoomFile.ReadFromFile(rref.Stage, rref.Room, rref.Path); }
-            catch { continue; }
-            var rec = rf.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == DinoSpecies.Swarm);
-            if (rec is null) continue;
-            try
-            {
-                donor = SpeciesImporter.ExtractDonor(rf.RdtBuffer, rec, Heads(rf))
-                    with { Texture = SpeciesImporter.TryExtractTexture(rf.OriginalBytes, rf.RdtBuffer, rec.OriginalModelPtr) };
-                donorName = Path.GetFileName(rref.Path);
-                donorStage = rref.Stage; donorRoom = rref.Room;
-                break;
-            }
-            catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException) { }
-        }
-        if (donor is null)
-        {
-            Console.Error.WriteLine("error: no clean cat5 swarm donor found in the install");
-            return 1;
-        }
-        if (donor.Texture is null)
-        {
-            Console.Error.WriteLine("error: swarm donor texture (tpage 0x8b / CLUT 0x7ff0) could not be resolved; "
-                + "the swarm would wear the wrong skin. Nothing was written.");
-            return 1;
-        }
-
-        // Back up pristine + read the target from the pristine copy (re-runnable / non-compounding).
-        var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
-
-        var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
-        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
-        if (victim is null)
-        {
-            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable enemy to replace.");
-            return 1;
-        }
-        int idx = target.Enemies.IndexOf(victim);
-        var was = victim.Species;
-
-        // 0. The swarm is a COORDINATED GROUP: a lone import NULL-AVs in the swarm AI because the engine never
-        //    forms the pack (docs/decisions/dc1/spawn/SWARM-0102-GROUP-SPAWN-PLAN.md). Native rooms place 4 like-model cat-5
-        //    members; we mirror that — member 0 over the victim, +3 members sharing the one closure. The 3 extra
-        //    members need valid floor coords in the target room: a door's entry pose INTO this room is a
-        //    guaranteed floor point (where the engine safely places the player), clustered to keep them on floor.
-        var groupBase = FindRoomFloorBase(refs, code);
-        var extraMembers = SwarmGroupOffsets(groupBase);
-        // The native swarm's op58 record: the engine runs it to ALLOCATE the shared type-0x17 coordination effect
-        // that every member's +0x1C8 links to (op58 handler 0x429AD2 → byte[slot+1]=byte[record+2]=0x17;
-        // live-RE'd in 040B 2026-06-24). Prepended before the member records so the effect exists when they spawn.
-        byte[] swarmCoordinationRecord = { 0x58, 0x00, 0x17, 0x02, 0x00, 0x00, 0x00, 0x00 };
-
-        // 1. Geometry + texture: import the small swarm geometry over the victim and RELOCATE the donor texture to
-        //    a free VRAM column + palette row (so the swarm samples its OWN texels, not the raptor's shared (704,0)
-        //    column / (768,511) palette). Texture lives in VRAM, off the RDT ceiling. Refuse if no free VRAM region
-        //    (geometry-only would render mis-coloured = the "raptor skin" trap). Member 0 over the victim + the
-        //    3 group members are placed in one operation (they share the single imported closure).
-        var tex = target.ImportSpeciesGroupTextured(donor, idx, extraMembers, swarmCoordinationRecord);
-        if (tex.Outcome != RoomFile.TextureImportOutcome.Relocated)
-        {
-            Console.Error.WriteLine($"error: ST{code:X3} has no free VRAM region for the swarm texture; it would "
-                + "wear the raptor skin. Pick a room with free VRAM. Nothing was written.");
-            return 1;
-        }
-        if (target.RdtBuffer.Length > SpeciesImporter.ResidentPoolFloor)
-        {
-            Console.Error.WriteLine($"error: ST{code:X3}+swarm RDT = {target.RdtBuffer.Length} B exceeds the "
-                + $"resident-pool floor {SpeciesImporter.ResidentPoolFloor} B. Nothing was written.");
-            return 1;
-        }
-        File.WriteAllBytes(targetRef.Path, target.Write());
-
-        // 2. Surgical EXE patches (stage 1/2 only; stage 3 hosts cat5 natively):
-        //    (a) cat5 slot = the swarm handler so the spawn dispatches to a real AI handler;
-        //    (b) the universal walker null-guard (cross-import hit/death reaction crash-safety);
-        //    (c) per-room enemy-SE retarget so the swarm plays its own (compy) sounds, not raptor sounds.
-        ExePatchResult? exeRes = null;
-        string? guardNote = null, soundNote = null, effectNote = null;
-        // Stage-1/2 effect-dispatch table (loaded into [0x6D3CC4]); its type-0x17 slot is garbage in a non-swarm
-        // stage, so the per-frame driver wild-calls when it processes the swarm coordination effect (crash dump
-        // 22032). Patch in the real handler, just like the cat5 AI slot.
-        uint? effectTableVa = stage switch
-        {
-            1 => ExePatcher.Stage1EffectTableVa,
-            2 => ExePatcher.Stage2EffectTableVa,
-            _ => null,
-        };
-        if (recordVa is { } rva)
-        {
-            try
-            {
-                exeRes = GameInstaller.PatchExeCatSlot(dataDir, rva, 5, ExePatcher.SwarmCat5HandlerVa);
-            }
-            catch (IOException ex)
-            {
-                Console.Error.WriteLine($"error: could not write {GameInstaller.ExeName}: {ex.Message}");
-                Console.Error.WriteLine("hint : the room file was written, but the EXE is locked — CLOSE the game and re-run (the .dat step is idempotent).");
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"error: exe patch failed: {ex.Message}");
-                return 1;
-            }
-
-            // Swarm coordination-effect handler: install the type-0x17 effect handler into this stage's effect
-            // table so the per-frame driver dispatches the swarm's coordination effect instead of wild-calling.
-            if (effectTableVa is { } etv)
-            {
-                try
-                {
-                    effectNote = GameInstaller.PatchExeCatSlot(dataDir, etv, ExePatcher.SwarmEffectType,
-                        ExePatcher.SwarmEffectHandlerVa).Repoints.FirstOrDefault();
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"warn : swarm effect-handler patch failed ({ex.Message}); the swarm "
-                        + "will CRASH on entry (effect dispatch). Re-run after closing the game.");
-                }
-            }
-
-            // Universal walker null-guard: cross-import hit/death reactions can feed the shared +0x34 walker
-            // 0x416845 a garbage walk count (AV 0x41685B). Benign for valid callers. Best-effort.
-            try { guardNote = GameInstaller.PatchExeWalkerNullGuard(dataDir).Repoints.FirstOrDefault(); }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"warn : walker null-guard failed ({ex.Message}); the swarm spawns + "
-                    + "animates but may CRASH when hit/killed. Re-run after closing the game.");
-            }
-
-            // Enemy-sound: bind st<code> to the swarm donor's (compy) SE sub-block so it stops playing raptor SE.
-            try { soundNote = GameInstaller.PatchExeRoomEnemySe(dataDir, stage, room, donorStage, donorRoom).Repoints.FirstOrDefault(); }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"warn : enemy-sound patch failed ({ex.Message}); the swarm will play "
-                    + "raptor sounds (cosmetic). Re-run after closing the game.");
-            }
-        }
-
-        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {was} -> Swarm  (cat5; geometry import + texture relocated to {tex.TextureRect}, palette {tex.PaletteRect})");
-        Console.WriteLine($"group   : {1 + extraMembers.Count} cat5 members sharing one model closure (member0 over the victim; "
-            + $"{extraMembers.Count} added near {groupBase} so the engine forms the pack)");
-        Console.WriteLine($"donor   : {donorName} (geometry + (704,0) texture / (768,511) palette)");
-        Console.WriteLine($"wrote   : {targetRef.Path}  (RDT {target.RdtBuffer.Length} B / floor {SpeciesImporter.ResidentPoolFloor} B)");
-        if (exeRes is { } er)
-        {
-            Console.WriteLine($"exe     : {er.ExePath}");
-            foreach (var r in er.Repoints) Console.WriteLine($"exe slot: {r}");
-            if (effectNote is not null) Console.WriteLine($"exe eff : {effectNote}");
-            if (guardNote is not null) Console.WriteLine($"exe grd : {guardNote}");
-            if (soundNote is not null) Console.WriteLine($"exe snd : {soundNote}");
-        }
-        else
-            Console.WriteLine($"exe     : (none — stage {stage} hosts cat5 natively)");
-        Console.WriteLine($"backup  : {backupPath}");
-        Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
-        Console.WriteLine($"verify  : LAB TOOL — the swarm spawns (4 members), links its coordination effect, renders and");
-        Console.WriteLine($"          animates for a few seconds, then CRASHES (a behavior SCD task desyncs into the relocated");
-        Console.WriteLine($"          heap closure — docs/decisions/dc1/spawn/SWARM-0102-GROUP-SPAWN-PLAN.md). NOT shippable; --restore to revert.");
-        return 0;
-
-        static IEnumerable<int> Heads(RoomFile rf)
-        {
-            foreach (var e in rf.Enemies)
-            {
-                if (e.OriginalModelPtr >= SpeciesImporter.PsxBase)
-                    yield return (int)(e.OriginalModelPtr - SpeciesImporter.PsxBase);
-                if (e.OriginalMotionPtr >= SpeciesImporter.PsxBase)
-                    yield return (int)(e.OriginalMotionPtr - SpeciesImporter.PsxBase);
-            }
-        }
-    }
-
-    // A guaranteed-valid floor point in the target room: the entry pose of any door anywhere that leads INTO
-    // it (where the engine safely places an arriving player — real floor, not a wall). Same source SetDoor uses
-    // for an arrival pose. Falls back to (0,0,0) if no inbound door is found (caller still clusters around it).
-    static (short X, short Y, short Z) FindRoomFloorBase(IReadOnlyList<RoomFileRef> refs, int roomCode)
-    {
-        foreach (var rref in refs)
-        {
-            RoomFile rf;
-            try { rf = RoomFile.ReadFromFile(rref.Stage, rref.Room, rref.Path); }
-            catch { continue; }
-            var door = rf.Doors.FirstOrDefault(
-                d => ((d.OriginalTargetStage << 8) | d.OriginalTargetRoom) == roomCode);
-            if (door is not null)
-                return (door.OriginalEntryX, door.OriginalEntryY, door.OriginalEntryZ);
-        }
-        return (0, 0, 0);
-    }
-
-    // The 3 extra swarm members (member 0 is the imported victim). A tight cluster around a known-good floor
-    // point keeps them on valid floor (room geometry is unknown here); the swarm AI disperses them into the
-    // pack on spawn. Native swarms spread ~1200 units; we stay tighter (±~400) to avoid clipping into walls
-    // near the door, accepting a CE/visual refinement of the coords if the live test shows a bad spot.
-    static IReadOnlyList<(short X, short Y, short Z, short Rotation)> SwarmGroupOffsets((short X, short Y, short Z) b)
-    {
-        const short d = 400;
-        return new (short, short, short, short)[]
-        {
-            ((short)(b.X + d), b.Y, b.Z,             0),
-            (b.X,              b.Y, (short)(b.Z + d), 0),
-            ((short)(b.X + d), b.Y, (short)(b.Z + d), 0),
-        };
-    }
-
-    // Import one foreign species over the first randomizable raptor in a single room, writing the
-    // edited room file directly into the game's Data folder (backed up first to .dinorand_backup so
-    // --restore undoes it). For an isolated in-game test of the cross-room importer.
+    // Import one foreign species over the first randomizable raptor in a single room through the shared
+    // plan/preflight/apply pipeline.
     static int SwapSpecies(string installDir, string roomArg, string speciesName, int? maxDonorOverride = null)
     {
         var game = new DinoCrisis1();
@@ -775,88 +180,57 @@ internal sealed partial class CliApplication
             return 1;
         }
 
-        // The Therizinosaurus (cat8) is an entangled multi-range donor AND needs its texture carried +
-        // a surgical EXE cat8 patch — its own path (docs/decisions/dc1/theri/THERI-0203-SWAP-PLAN.md).
-        if (species == DinoSpecies.Therizinosaurus)
-            return SwapTherizinosaurus(installDir, dataDir, code, stage, room, targetRef, refs, maxDonorOverride);
-
-        // The Tyrannosaurus (cat3 boss rig) is set-piece-excluded from the generic donor search
-        // (EnemyRecord.IsRandomizableDino), so it has its own path: closure geometry from a T-Rex room +
-        // its (640,0) texture carried in + a surgical EXE cat3 patch (docs/decisions/dc1/models/TREX-INTO-0102-FEASIBILITY.md).
-        if (species == DinoSpecies.Tyrannosaurus)
-            return SwapTyrannosaurus(installDir, dataDir, code, stage, room, targetRef, refs);
-
-        // The Swarm (cat5) is a cross-category import: like the Theri/T-Rex it needs a surgical EXE cat5 patch
-        // (stages 1/2 have a NULL cat5 slot) + the walker null-guard + an enemy-SE retarget, and its texture must
-        // be RELOCATED (it shares the raptor's exact VRAM column/row), so it has its own path.
-        if (species == DinoSpecies.Swarm)
-            return SwapSwarm(installDir, dataDir, code, stage, room, targetRef, refs);
-
-        // Find a clean donor for the requested species anywhere in the game (carrying its texture).
-        SpeciesDonor? donor = null;
-        foreach (var rref in refs)
-        {
-            var rf = RoomFile.ReadFromFile(rref.Stage, rref.Room, rref.Path);
-            var rec = rf.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == species);
-            if (rec is null) continue;
-            try
-            {
-                donor = SpeciesImporter.ExtractDonor(rf.RdtBuffer, rec, Heads(rf))
-                    with { Texture = SpeciesImporter.TryExtractTexture(rf.OriginalBytes, rf.RdtBuffer, rec.OriginalModelPtr) };
-                break;
-            }
-            catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException) { }
-        }
-        if (donor is null)
-        {
-            Console.Error.WriteLine($"error: no clean donor for {species} found in the install");
-            return 1;
-        }
-
-        // Back up the pristine original (once) to the shared backup folder. Always edit FROM the pristine
-        // copy so re-running with a different species starts clean (no compounding imports).
-        var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
-
-        var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
-        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
+        var rooms = refs.Select(r => RoomFile.ReadFromFile(r.Stage, r.Room, r.Path)).ToList();
+        var target = rooms.Single(r => r.Stage == stage && r.Room == room);
+        var backupPath = Path.Combine(dataDir, GameInstaller.BackupDirName, Path.GetFileName(targetRef.Path));
+        if (File.Exists(backupPath))
+            target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
+        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
         if (victim is null)
         {
-            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable enemy to replace " +
-                "(its raptors may be event-spawned, not in the init script)");
+            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable raptor to replace");
             return 1;
         }
-        int idx = target.Enemies.IndexOf(victim);
-        var was = victim.Species;
-
-        var result = target.ImportSpeciesTextured(donor, idx);
-        File.WriteAllBytes(targetRef.Path, target.Write());
-
-        string texNote = result.Outcome switch
+        var importer = new CrossSpeciesImporter(rooms, maxDonorOverride);
+        var plan = importer.Plan(target, target.Enemies.IndexOf(victim), species);
+        if (plan is null)
         {
-            RoomFile.TextureImportOutcome.Relocated =>
-                $"texture relocated to {result.TextureRect}, palette {result.PaletteRect}",
-            RoomFile.TextureImportOutcome.ReclaimedVictim =>
-                $"texture placed over the victim's own column {result.TextureRect}, palette {result.PaletteRect} (VRAM was full; victim slot reclaimed)",
-            _ => donor.Texture is null
-                ? "geometry only — donor texture unresolved (may be mis-coloured)"
-                : "geometry only — no free VRAM region in target (may be mis-coloured)",
-        };
-        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {was} -> {species}  (RDT grew, model+motion imported; {texNote})");
+            var def = ExoticSpeciesCatalog.For(species);
+            Console.Error.WriteLine(def is { Enabled: false }
+                ? $"error: {species} is disabled — {def.Blocker}"
+                : $"error: {species} cannot be planned for ST{code:X3} (no verified donor or stage support)");
+            return 1;
+        }
+        var preflight = importer.Preflight(plan);
+        if (!preflight.Success)
+        {
+            Console.Error.WriteLine($"error: ST{code:X3}+{species} refused — {preflight.Note}");
+            Console.Error.WriteLine("hint : nothing was written.");
+            return 1;
+        }
+        var applied = importer.Apply(plan, preflight);
+
+        var staging = Directory.CreateTempSubdirectory("dinorand-cross-species-");
+        InstallResult installed;
+        try
+        {
+            var stagedRoom = Path.Combine(staging.FullName, Path.GetFileName(targetRef.Path));
+            File.WriteAllBytes(stagedRoom, applied.RoomBytes);
+            if (applied.Requests.Count > 0)
+                new ExePatchPlan(ExePatchPlan.CurrentVersion, applied.Requests).Write(staging.FullName);
+            installed = GameInstaller.Install(dataDir, staging.FullName,
+                onlyFiles: new[] { Path.GetFileName(targetRef.Path) });
+        }
+        finally
+        {
+            staging.Delete(true);
+        }
+
+        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: Velociraptor -> {species} ({applied.Note})");
         Console.WriteLine($"wrote   : {targetRef.Path}");
-        Console.WriteLine($"backup  : {backupPath}");
+        Console.WriteLine($"backup  : {installed.BackupDir}");
         Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
         return 0;
-
-        static IEnumerable<int> Heads(RoomFile rf)
-        {
-            foreach (var e in rf.Enemies)
-            {
-                if (e.OriginalModelPtr >= SpeciesImporter.PsxBase)
-                    yield return (int)(e.OriginalModelPtr - SpeciesImporter.PsxBase);
-                if (e.OriginalMotionPtr >= SpeciesImporter.PsxBase)
-                    yield return (int)(e.OriginalMotionPtr - SpeciesImporter.PsxBase);
-            }
-        }
     }
 
     // Inject a brand-new enemy into a room that has none, writing the edited file straight into Data
