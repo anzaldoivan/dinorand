@@ -44,6 +44,9 @@
 # Top-level project files
 !/.gitignore
 !/README.md
+!/SPEC.md
+!/ROADMAP.md
+!/TASKS.md
 !/USER-GUIDE.md
 !/MODDING.md
 !/CONTRIBUTING.md
