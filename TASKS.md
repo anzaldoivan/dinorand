@@ -2,22 +2,17 @@
 
 This is an initiative index only. It is not a task ledger, and it deliberately
 does not invent task IDs.
-Campaign task ledgers are owner-local under
-`docs/_prompts/orchestration`.
-That local-only authority is available only in the primary/local checkout or
-through a materialized task packet.
-See the [roadmap](ROADMAP.md) and its local-only authorities for status.
+Campaign task ledgers and detailed authorities remain owner-local. See the
+[roadmap](ROADMAP.md) for public sequencing.
 
 ## NOW
 
-- Orchestration rollout — follow the [active roadmap item](ROADMAP.md#work-sequence).
-- DC2 T1 read-only `ST*.DAT` filename-table audit pilot — no install writes.
+- Orchestration rollout — role alignment and pilot retrospective.
 
 ## NEXT
 
-- Decide the scope and policy owner for the next DC2 item.
-- Record that decision in `docs/reference/dc2/ROADMAP.md` before changing this
-  index.
+- DC2 next item — follow the existing owner scope and policy decision; no
+  implementation is active.
 
 ## BLOCKED
 
@@ -27,7 +22,3 @@ See the [roadmap](ROADMAP.md) and its local-only authorities for status.
 - DC2 generic TYPE 0x10/audio/voice — deferred pending scope and validation.
 
 The [root specification](SPEC.md) supplies the acceptance and safety boundary.
-The local-only authorities `docs/reference/RE-PROGRESS.md` and
-`docs/reference/ROADMAP-HISTORY.md` supply the detailed current context; those
-records outrank this index and are available only in the primary/local checkout
-or through a materialized task packet.
