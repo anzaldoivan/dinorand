@@ -149,6 +149,26 @@ public sealed class RoomFile
     public void ImportSpecies(SpeciesDonorMulti donor, int enemyIndex)
         => RoomSpeciesEditor.Import(this, donor, enemyIndex);
 
+    internal void AdoptSerialized(ReadOnlySpan<byte> bytes)
+    {
+        var committed = Read(Stage, Room, bytes);
+        if (!committed.ParsedCleanly)
+            throw new InvalidOperationException("serialized room did not parse cleanly");
+        OriginalBytes = committed.OriginalBytes;
+        Package = committed.Package;
+        RdtBuffer = committed.RdtBuffer;
+        RdtCompressed = committed.RdtCompressed;
+        Script = committed.Script;
+        Items.Clear();
+        Items.AddRange(committed.Items);
+        Enemies.Clear();
+        Enemies.AddRange(committed.Enemies);
+        Doors.Clear();
+        Doors.AddRange(committed.Doors);
+        _structurallyEdited = false;
+        _textureStager.Clear();
+    }
+
     /// <summary>
     /// <b>⚠ DORMANT — DOES NOT WORK IN-ENGINE.</b> Overlay-in-place was CE-tested and <b>crashes on room
     /// load</b>: the room references the swapped-out enemy's RDT region by the original species' byte layout,

@@ -185,10 +185,10 @@ internal static class CliOutput
             "    no relaunch is needed; it writes via the same backup contract, so --restore undoes it. This is\r\n" +
             "    the listen-test BEFORE the production voice pass is ungated (it bypasses the hard gate on purpose).\r\n" +
             "  - Door randomization is Phase 3 and not yet enabled.\r\n" +
-            "  - --swap-species imports a foreign species (default largeground; also\r\n" +
-            "    raptorheavy|pteranodon|tyrannosaurus|swarm) over the first raptor in one\r\n" +
+            "  - --swap-species imports a foreign species (default raptorheavy; also\r\n" +
+            "    therizinosaurus|largeground|tyrannosaurus|swarm|velociraptor) over the first raptor in one\r\n" +
             "    room, writing it into Data with a backup (undo with --restore). For\r\n" +
-            "    in-game testing of the cross-room importer; geometry only (may be mis-coloured).\r\n" +
+            "    in-game testing of the cross-room importer; Pteranodon remains disabled.\r\n" +
             "  - --add-enemy INJECTS a new enemy (default raptorheavy) into a room's init\r\n" +
             "    script — for rooms that ship with no placed enemy. --at x,y,z[,rot] sets the\r\n" +
             "    spawn (signed 16-bit; Y is height, 0 = floor); without it the position falls\r\n" +

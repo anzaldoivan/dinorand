@@ -78,6 +78,31 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
             var victim = room.Enemies.First(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
             int idx = room.Enemies.IndexOf(victim);
 
+            if (importer is IPlannedCrossSpeciesImporter planned)
+            {
+                var plan = planned.Plan(room, idx, p.Species);
+                if (plan is null)
+                {
+                    skipped++;
+                    context.Log($"[cross-species] {room} {p.Species}: skipped — plan refused");
+                    continue;
+                }
+                var preflight = planned.Preflight(plan);
+                if (!preflight.Success)
+                {
+                    skipped++;
+                    context.Log($"[cross-species] {room} {p.Species}: skipped — {preflight.Note}");
+                    continue;
+                }
+                var applied = planned.Apply(plan, preflight);
+                if (!room.Write().AsSpan().SequenceEqual(applied.RoomBytes))
+                    context.SetRoomOutput(room, applied.RoomBytes);
+                context.ExePatchRequests.AddRange(applied.Requests);
+                placed++;
+                context.Log($"[cross-species] {room} slot{victim.Slot}: Velociraptor -> {p.Species} ({applied.Note})");
+                continue;
+            }
+
             if (!importer.TryImport(context, room, idx, def, out var patches, out var note))
             {
                 skipped++;

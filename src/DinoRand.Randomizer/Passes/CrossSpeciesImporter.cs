@@ -23,13 +23,54 @@ public interface ICrossSpeciesImporter
                    out IReadOnlyList<ExePatchRequest> patches, out string note);
 }
 
+public interface IPlannedCrossSpeciesImporter
+{
+    CrossSpeciesImportPlan? Plan(RoomFile room, int victimIdx, DinoSpecies species);
+    CrossSpeciesPreflight Preflight(CrossSpeciesImportPlan plan);
+    CrossSpeciesImportResult Apply(CrossSpeciesImportPlan plan, CrossSpeciesPreflight preflight);
+}
+
+public sealed class CrossSpeciesImportPlan
+{
+    internal CrossSpeciesImportPlan(RoomFile room, int victimIdx, ExoticSpeciesDef definition,
+                                    SpeciesDonor? grounded, CrossSpeciesImporter.TheriDonor? theri)
+    {
+        Room = room;
+        VictimIndex = victimIdx;
+        Definition = definition;
+        Grounded = grounded;
+        Theri = theri;
+    }
+
+    public RoomFile Room { get; }
+    public int VictimIndex { get; }
+    public ExoticSpeciesDef Definition { get; }
+    internal SpeciesDonor? Grounded { get; }
+    internal CrossSpeciesImporter.TheriDonor? Theri { get; }
+}
+
+public sealed record CrossSpeciesPreflight(
+    bool Success,
+    string Note,
+    byte[]? RoomBytes,
+    IReadOnlyList<ExePatchRequest> Requests)
+{
+    public static CrossSpeciesPreflight Refused(string note)
+        => new(false, note, null, Array.Empty<ExePatchRequest>());
+}
+
+public sealed record CrossSpeciesImportResult(
+    byte[] RoomBytes,
+    IReadOnlyList<ExePatchRequest> Requests,
+    string Note);
+
 /// <summary>
 /// The real importer: reuses <see cref="SpeciesImporter"/> / <see cref="TextureImporter"/> with the same recipe
 /// as the CLI <c>--swap-species</c> path (docs/decisions/dc1/theri/THERI-0203-SWAP-PLAN.md / TREX-INTO-0102-FEASIBILITY.md), and
 /// emits the matching <see cref="ExePatchRequest"/>s instead of calling <see cref="GameInstaller"/> directly.
 /// Only the enabled catalog species with a usable donor in the corpus are offered.
 /// </summary>
-public sealed class CrossSpeciesImporter : ICrossSpeciesImporter
+public sealed class CrossSpeciesImporter : ICrossSpeciesImporter, IPlannedCrossSpeciesImporter
 {
     // The Therizinosaurus VRAM identity (data/dc1/enemy-textures.json cat8): X=640 column, palette row 511.
     private static readonly ushort[] TheriTpages = { 0x8a, 0x9a };
@@ -37,11 +78,16 @@ public sealed class CrossSpeciesImporter : ICrossSpeciesImporter
     private static readonly int[] TheriProtectedClips = { 1, 12, 13, 15, 19, 48 };
 
     private readonly IReadOnlyList<RoomFile> _corpus;
+    private readonly int? _maxDonorOverride;
     private readonly Dictionary<DinoSpecies, SpeciesDonor> _grounded = new();
     private TheriDonor? _theri;
     private bool _theriSearched;
 
-    public CrossSpeciesImporter(IReadOnlyList<RoomFile> corpus) => _corpus = corpus;
+    public CrossSpeciesImporter(IReadOnlyList<RoomFile> corpus, int? maxDonorOverride = null)
+    {
+        _corpus = corpus;
+        _maxDonorOverride = maxDonorOverride;
+    }
 
     public IReadOnlyCollection<DinoSpecies> AvailableDonors
     {
@@ -61,39 +107,93 @@ public sealed class CrossSpeciesImporter : ICrossSpeciesImporter
         _ => false, // gated kinds are never enabled this increment
     };
 
+    public CrossSpeciesImportPlan? Plan(RoomFile room, int victimIdx, DinoSpecies species)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+
+        var def = ExoticSpeciesCatalog.For(species);
+        if (def is not { Enabled: true } || !def.AllowsStage(room.Stage)) return null;
+        if (victimIdx < 0 || victimIdx >= room.Enemies.Count) return null;
+        var victim = room.Enemies[victimIdx];
+        if (!victim.IsRandomizableDino || victim.Species != DinoSpecies.Velociraptor) return null;
+
+        return def.Kind switch
+        {
+            PlacementKind.SameCategoryNoPatch => FindGroundedDonor(species) is { } donor
+                ? new(room, victimIdx, def, donor, null) : null,
+            PlacementKind.Cat8Therizinosaurus => FindTheriDonor() is { } theri
+                ? new(room, victimIdx, def, null, theri) : null,
+            _ => null,
+        };
+    }
+
+    public CrossSpeciesPreflight Preflight(CrossSpeciesImportPlan plan)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+
+        try
+        {
+            var work = RoomFile.Read(plan.Room.Stage, plan.Room.Room, plan.Room.Write());
+            return plan.Definition.Kind switch
+            {
+                PlacementKind.SameCategoryNoPatch => PreflightGrounded(plan, work),
+                PlacementKind.Cat8Therizinosaurus => PreflightTheri(plan, work),
+                _ => CrossSpeciesPreflight.Refused($"{plan.Definition.Species} is disabled"),
+            };
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentOutOfRangeException)
+        {
+            return CrossSpeciesPreflight.Refused(ex.Message);
+        }
+    }
+
+    public CrossSpeciesImportResult Apply(CrossSpeciesImportPlan plan, CrossSpeciesPreflight preflight)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+        ArgumentNullException.ThrowIfNull(preflight);
+        if (!preflight.Success || preflight.RoomBytes is null)
+            throw new InvalidOperationException($"cannot apply refused cross-species import: {preflight.Note}");
+
+        if (plan.Definition.Kind == PlacementKind.SameCategoryNoPatch)
+            plan.Room.AdoptSerialized(preflight.RoomBytes);
+        return new(preflight.RoomBytes, preflight.Requests, preflight.Note);
+    }
+
     public bool TryImport(RandomizationContext context, RoomFile room, int victimIdx, ExoticSpeciesDef def,
                           out IReadOnlyList<ExePatchRequest> patches, out string note)
     {
         patches = Array.Empty<ExePatchRequest>();
-        return def.Kind switch
-        {
-            PlacementKind.SameCategoryNoPatch => TryImportGrounded(room, victimIdx, def, out note),
-            PlacementKind.Cat8Therizinosaurus => TryImportTheri(context, room, victimIdx, out patches, out note),
-            _ => Fail(out note, $"{def.Species} placement kind {def.Kind} is not enabled"),
-        };
+        var plan = Plan(room, victimIdx, def.Species);
+        if (plan is null) { note = "plan refused"; return false; }
+        var preflight = Preflight(plan);
+        if (!preflight.Success) { note = preflight.Note; return false; }
+        var result = Apply(plan, preflight);
+        if (!room.Write().AsSpan().SequenceEqual(result.RoomBytes))
+            context.SetRoomOutput(room, result.RoomBytes);
+        patches = result.Requests;
+        note = result.Note;
+        return true;
     }
 
-    // ---- Grounded same-category (RaptorHeavy): geometry+texture into the RoomFile, no EXE patch ----
-
-    private bool TryImportGrounded(RoomFile room, int victimIdx, ExoticSpeciesDef def, out string note)
+    private CrossSpeciesPreflight PreflightGrounded(CrossSpeciesImportPlan plan, RoomFile work)
     {
-        var donor = FindGroundedDonor(def.Species);
-        if (donor is null) { note = $"no {def.Species} donor"; return false; }
-        if (!room.TryImportSpeciesTexturedAtomic(
-                donor, victimIdx, SpeciesImporter.ResidentPoolFloor, out var fit, out var tex))
+        if (plan.Grounded is null) return CrossSpeciesPreflight.Refused("no grounded donor");
+        if (!work.TryImportSpeciesTexturedAtomic(
+                plan.Grounded, plan.VictimIndex, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture))
         {
-            note = fit.Limiting == ImportFitConstraint.RdtBudget
+            var refusalNote = fit.Limiting == ImportFitConstraint.RdtBudget
                 ? $"RDT refusal: {fit.Reason}"
                 : $"texture/VRAM refusal: {fit.Reason}";
-            return false;
+            return CrossSpeciesPreflight.Refused(refusalNote);
         }
-        note = tex!.Outcome switch
+
+        var note = texture!.Outcome switch
         {
             RoomFile.TextureImportOutcome.Relocated => "geometry + texture relocated",
             RoomFile.TextureImportOutcome.ReclaimedVictim => "geometry + texture (victim column reclaimed)",
-            _ => throw new InvalidOperationException($"atomic grounded import returned {tex.Outcome}"),
+            _ => throw new InvalidOperationException($"atomic grounded import returned {texture.Outcome}"),
         };
-        return true;
+        return new(true, note, work.Write(), Array.Empty<ExePatchRequest>());
     }
 
     private SpeciesDonor? FindGroundedDonor(DinoSpecies species)
@@ -115,62 +215,36 @@ public sealed class CrossSpeciesImporter : ICrossSpeciesImporter
         return null;
     }
 
-    // ---- Cat-8 Therizinosaurus: closure import + clip-strip + texture + 3 EXE patches ----
-
-    private bool TryImportTheri(RandomizationContext context, RoomFile room, int victimIdx,
-                               out IReadOnlyList<ExePatchRequest> patches, out string note)
+    private CrossSpeciesPreflight PreflightTheri(CrossSpeciesImportPlan plan, RoomFile work)
     {
-        patches = Array.Empty<ExePatchRequest>();
-        var d = FindTheriDonor();
-        if (d is null) { note = "no Therizinosaurus donor"; return false; }
+        var d = plan.Theri ?? throw new InvalidOperationException("no Therizinosaurus donor");
 
-        // Import into a FRESH parse of the room, not the shared instance: the geometry mutation happens before
-        // the clip-strip/ceiling/texture checks that can fail, so committing only on success (via the output
-        // override) guarantees a skip never leaves the runner writing a half-imported room.
-        var work = RoomFile.Read(room.Stage, room.Room, room.OriginalBytes);
-
-        // Geometry: closure import, auto clip-strip to fit ≤ the resident-pool floor (defect A).
         int vanillaLen = work.RdtBuffer.Length;
         int maxDonor = SpeciesImporter.ResidentPoolFloor - ((vanillaLen + 3) & ~3);
+        if (_maxDonorOverride is { } forced && forced < maxDonor) maxDonor = forced;
         var geoDonor = d.Donor;
         if (d.Donor.Blocks.Bytes.Length > maxDonor)
         {
-            try
-            {
-                geoDonor = SpeciesImporter.ExtractDonorClosureStripped(
-                    d.Rdt, d.Record, maxDonor, TheriProtectedClips, out int dropped, out _);
-                if (dropped > SpeciesImporter.MaxClipStripDropCount)
-                {
-                    note = $"needs {dropped} clips dropped (> {SpeciesImporter.MaxClipStripDropCount} quality limit)";
-                    return false;
-                }
-            }
-            catch (InvalidOperationException ex) { note = $"too big for the Theri even after clip-strip: {ex.Message}"; return false; }
+            geoDonor = SpeciesImporter.ExtractDonorClosureStripped(
+                d.Rdt, d.Record, maxDonor, TheriProtectedClips, out int dropped, out _);
+            if (dropped > SpeciesImporter.MaxClipStripDropCount)
+                return CrossSpeciesPreflight.Refused(
+                    $"needs {dropped} clips dropped (> {SpeciesImporter.MaxClipStripDropCount} quality limit)");
         }
-        work.ImportSpecies(geoDonor, victimIdx);
+        work.ImportSpecies(geoDonor, plan.VictimIndex);
         if (work.RdtBuffer.Length > SpeciesImporter.ResidentPoolFloor)
-        {
-            note = $"RDT {work.RdtBuffer.Length} B over the resident-pool floor {SpeciesImporter.ResidentPoolFloor} B";
-            return false;
-        }
+            return CrossSpeciesPreflight.Refused(
+                $"RDT {work.RdtBuffer.Length} B over the resident-pool floor {SpeciesImporter.ResidentPoolFloor} B");
 
-        // Texture: fixed-column overwrite-or-append on the serialized bytes → output override (post-serialization).
-        byte[] geo = work.Write();
-        byte[] final;
-        try { final = TextureImporter.ImportSpeciesTexture(geo, d.File, TheriTpages, TheriClut); }
-        catch (InvalidOperationException ex) { note = $"texture import failed: {ex.Message}"; return false; }
-        context.SetRoomOutput(room, final);
+        byte[] final = TextureImporter.ImportSpeciesTexture(work.Write(), d.File, TheriTpages, TheriClut);
 
-        // EXE patches: cat8 AI-slot (so the spawn dispatches to the real Theri AI), the cat8 hit-reaction fix
-        // (sourced from the donor's RDT) + walker NULL-guard, and the per-room enemy SE retarget (Theri sounds).
-        patches = new[]
+        var requests = new[]
         {
-            ExePatchRequest.CatSlot(room.Stage, 8, ExePatcher.TheriCat8HandlerVa),
+            ExePatchRequest.CatSlot(plan.Room.Stage, 8, ExePatcher.TheriCat8HandlerVa),
             ExePatchRequest.Cat8HitReaction(d.Stage, d.Room, d.FileName),
-            ExePatchRequest.RoomEnemySe(room.Stage, room.Room, donorStage: 6, donorRoom: 5),
+            ExePatchRequest.RoomEnemySe(plan.Room.Stage, plan.Room.Room, donorStage: 6, donorRoom: 5),
         };
-        note = "cat8 closure + texture + 3 exe patches";
-        return true;
+        return new(true, "cat8 closure + texture + 3 exe patches", final, requests);
     }
 
     /// <summary>Find a stage-6 Therizinosaurus donor (preferring st603, the canonical reaction host) whose model
@@ -208,8 +282,6 @@ public sealed class CrossSpeciesImporter : ICrossSpeciesImporter
         }
     }
 
-    private static bool Fail(out string note, string message) { note = message; return false; }
-
-    private sealed record TheriDonor(
+    internal sealed record TheriDonor(
         SpeciesDonorMulti Donor, byte[] File, byte[] Rdt, EnemyRecord Record, int Stage, int Room, string FileName);
 }
