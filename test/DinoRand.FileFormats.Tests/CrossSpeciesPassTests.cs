@@ -58,6 +58,35 @@ public class CrossSpeciesPassTests
     }
 
     [Fact]
+    public void Catalog_Pteranodon_RecordsProvenBirthHandler_ButRequiresRuntimeWitness()
+    {
+        var def = ExoticSpeciesCatalog.For(DinoSpecies.Pteranodon)!;
+
+        Assert.False(def.Enabled);
+        Assert.Empty(def.FreeStages);
+        Assert.False(def.AllowsStage(1));
+        Assert.Contains("0x599CDC", def.Blocker);
+        Assert.Contains("0x599D92", def.Blocker);
+        Assert.Contains("runtime witness", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("room eligibility", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("SE", def.Blocker);
+        Assert.Contains("death", def.Blocker, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Importer_Pteranodon_RemainsRefusedWithoutRuntimeWitness()
+    {
+        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) }));
+
+        var importer = new CrossSpeciesImporter(new[] { room });
+
+        Assert.DoesNotContain(DinoSpecies.Pteranodon, importer.AvailableDonors);
+        Assert.Null(importer.Plan(room, 0, DinoSpecies.Pteranodon));
+    }
+
+    [Fact]
     public void Importer_DisabledSpecies_IsRejectedBeforeMutation()
     {
         var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
