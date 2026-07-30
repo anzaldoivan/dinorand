@@ -122,6 +122,31 @@ public sealed class CliCharacterizationTests
     }
 
     [Fact]
+    public void Swap_species_pteranodon_reports_the_known_handler_and_remaining_gate()
+    {
+        string root = Directory.CreateTempSubdirectory("dinorand-cli-pteranodon-gate-").FullName;
+        try
+        {
+            string install = SyntheticInputs.CreateDc1Install(root);
+
+            var result = Run("--install", install, "--swap-species", "103", "--species", "pteranodon");
+
+            Assert.Equal(1, result.ExitCode);
+            Assert.Contains("cat-7 birth handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("0x599CDC", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("0x599D92", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("per-stage dispatch", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("room eligibility", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("enemy SE", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("death behavior", result.Stderr, StringComparison.Ordinal);
+            Assert.DoesNotContain("handler not located", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("texture", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("flyer AI handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void Synthetic_randomize_install_and_restore_record_then_exactly_replay_all_observables()
     {
         var value = CaptureScenario();

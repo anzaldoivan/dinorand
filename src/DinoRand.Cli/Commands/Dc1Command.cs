@@ -764,7 +764,9 @@ internal sealed partial class CliApplication
         }
         if (species == DinoSpecies.Pteranodon)
         {
-            Console.Error.WriteLine("error: Pteranodon is disabled — cat7 flyer AI handler not located per stage");
+            Console.Error.WriteLine("error: Pteranodon remains gated — cat-7 birth handler is known at 0x599CDC " +
+                "(guard 0x599D92); verified remaining blockers are runtime witness for per-stage dispatch, " +
+                "room eligibility, enemy SE, and death behavior");
             return 1;
         }
 
