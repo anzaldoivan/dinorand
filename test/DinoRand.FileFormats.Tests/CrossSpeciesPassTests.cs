@@ -34,7 +34,6 @@ public class CrossSpeciesPassTests
         Assert.True(theri.NeedsCatSlotPatch);
         Assert.True(theri.AllowsStage(1));
         Assert.True(theri.AllowsStage(2));
-        Assert.True(theri.AllowsStage(6)); // stage 6 hosts cat8 natively
         Assert.False(theri.AllowsStage(3)); // stage 3's cat8 slot is not verified free
     }
 
@@ -56,18 +55,6 @@ public class CrossSpeciesPassTests
         var def = ExoticSpeciesCatalog.For(species)!;
         Assert.False(def.Enabled);
         Assert.False(string.IsNullOrEmpty(def.Blocker));
-    }
-
-    [Fact]
-    public void Importer_DisabledSpecies_IsRejectedWithoutRoomMutation()
-    {
-        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
-            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
-            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) }));
-        var before = room.Write();
-
-        Assert.Null(new CrossSpeciesImporter(new[] { room }).Plan(room, 0, DinoSpecies.Pteranodon));
-        Assert.Equal(before, room.Write());
     }
 
     // ---- Pure placement planner (stage-scoping) ----
@@ -206,25 +193,6 @@ public class CrossSpeciesPassTests
         Assert.Empty(ctx.ExePatchRequests);
     }
 
-    [Fact]
-    public void Pass_PlannedImporter_PublishesPreparedRoomBytes()
-    {
-        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
-            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
-            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) }));
-        var prepared = room.Write();
-        var importer = new PlannedFakeImporter(room, prepared);
-        var pass = new CrossSpeciesEnemyPass(_ => importer);
-        var ctx = new RandomizationContext(new DinoCrisis1(), new[] { room }, RoomGraph.Build(new[] { room }),
-            new Seed(1), new RandomizerConfig { CrossRoomEnemySpecies = true, EnemyDifficulty = 1.0 }, _ => { });
-
-        pass.Apply(ctx);
-
-        Assert.True(importer.Planned);
-        Assert.True(ctx.TryGetRoomOutput(room, out var output));
-        Assert.Equal(prepared, output);
-    }
-
     private static RandomizationContext NewContext(IReadOnlyList<RoomFile> rooms)
         => new(new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(1),
                new RandomizerConfig { CrossRoomEnemySpecies = true }, _ => { });
@@ -236,43 +204,6 @@ public class CrossSpeciesPassTests
         public bool TryImport(RandomizationContext context, RoomFile room, int victimIdx, ExoticSpeciesDef def,
                               out IReadOnlyList<ExePatchRequest> patches, out string note)
         { patches = Array.Empty<ExePatchRequest>(); note = "fake"; return true; }
-    }
-
-    private sealed class PlannedFakeImporter : ICrossSpeciesImporter, IPlannedCrossSpeciesImporter
-    {
-        private readonly RoomFile _room;
-        private readonly byte[] _prepared;
-
-        public PlannedFakeImporter(RoomFile room, byte[] prepared)
-        {
-            _room = room;
-            _prepared = prepared;
-        }
-
-        public bool Planned { get; private set; }
-        public IReadOnlyCollection<DinoSpecies> AvailableDonors => new[] { DinoSpecies.Therizinosaurus };
-
-        public CrossSpeciesImportPlan? Plan(RoomFile room, int victimIdx, DinoSpecies species)
-        {
-            Planned = true;
-            return room == _room
-                ? new CrossSpeciesImportPlan(room, victimIdx, ExoticSpeciesCatalog.For(species)!, null, null)
-                : null;
-        }
-
-        public CrossSpeciesPreflight Preflight(CrossSpeciesImportPlan plan)
-            => new(true, "prepared", _prepared, Array.Empty<ExePatchRequest>());
-
-        public CrossSpeciesImportResult Apply(CrossSpeciesImportPlan plan, CrossSpeciesPreflight preflight)
-            => new(_prepared, Array.Empty<ExePatchRequest>(), "prepared");
-
-        public bool TryImport(RandomizationContext context, RoomFile room, int victimIdx, ExoticSpeciesDef def,
-                              out IReadOnlyList<ExePatchRequest> patches, out string note)
-        {
-            patches = Array.Empty<ExePatchRequest>();
-            note = "legacy path";
-            return false;
-        }
     }
 
     // ---- Gated real-install end-to-end ----

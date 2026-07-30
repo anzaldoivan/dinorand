@@ -78,40 +78,15 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
             var victim = room.Enemies.First(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
             int idx = room.Enemies.IndexOf(victim);
 
-            if (importer is not IPlannedCrossSpeciesImporter planned)
-            {
-                if (!importer.TryImport(context, room, idx, def, out var patches, out var note))
-                {
-                    skipped++;
-                    context.Log($"[cross-species] {room} {p.Species}: skipped — {note}");
-                    continue;
-                }
-                context.ExePatchRequests.AddRange(patches);
-                placed++;
-                context.Log($"[cross-species] {room} slot{victim.Slot}: Velociraptor -> {p.Species} ({note})");
-                continue;
-            }
-
-            var plan = planned.Plan(room, idx, p.Species);
-            if (plan is null)
+            if (!importer.TryImport(context, room, idx, def, out var patches, out var note))
             {
                 skipped++;
-                context.Log($"[cross-species] {room} {p.Species}: skipped — plan refused");
+                context.Log($"[cross-species] {room} {p.Species}: skipped — {note}");
                 continue;
             }
-            var preflight = planned.Preflight(plan);
-            if (!preflight.Success)
-            {
-                skipped++;
-                context.Log($"[cross-species] {room} {p.Species}: skipped — {preflight.Note}");
-                continue;
-            }
-            var applied = planned.Apply(plan, preflight);
-            if (def.Kind == PlacementKind.Cat8Therizinosaurus)
-                context.SetRoomOutput(room, applied.RoomBytes);
-            context.ExePatchRequests.AddRange(applied.Requests);
+            context.ExePatchRequests.AddRange(patches);
             placed++;
-            context.Log($"[cross-species] {room} slot{victim.Slot}: Velociraptor -> {p.Species} ({applied.Note})");
+            context.Log($"[cross-species] {room} slot{victim.Slot}: Velociraptor -> {p.Species} ({note})");
         }
 
         context.Log($"[cross-species] placed {placed} foreign species ({skipped} skipped) across "

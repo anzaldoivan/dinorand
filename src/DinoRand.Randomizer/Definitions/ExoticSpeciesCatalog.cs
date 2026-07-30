@@ -60,7 +60,7 @@ public static class ExoticSpeciesCatalog
     {
         // PROVEN — live-CE-verified killable, stages 1 & 2 (cat8 NULL/stub).
         new ExoticSpeciesDef(DinoSpecies.Therizinosaurus, PlacementKind.Cat8Therizinosaurus, Category: 8,
-            Enabled: true, Blocker: null, FreeStages: new[] { 1, 2, 6 }),
+            Enabled: true, Blocker: null, FreeStages: new[] { 1, 2 }),
 
         // PROVEN — same-category grounded raptor; no EXE patch, so no stage constraint (Category n/a).
         new ExoticSpeciesDef(DinoSpecies.RaptorHeavy, PlacementKind.SameCategoryNoPatch, Category: -1,
