@@ -14,7 +14,9 @@ public sealed class Dc1BlueRaptorProfilePass : IRandomizationPass
     {
         if (!string.Equals(context.Game.Id, "dc1", StringComparison.OrdinalIgnoreCase)) return;
 
-        var target = context.AllRooms().FirstOrDefault(r => r.Stage == 1 && r.Room == 0x02);
+        var target = context.AllRooms().FirstOrDefault(r =>
+            r.Stage == Dc1RaptorVisualVariantProfiles.BlueTargetStage
+            && r.Room == Dc1RaptorVisualVariantProfiles.BlueTargetRoom);
         var donor = context.AllRooms().FirstOrDefault(r =>
             r.Stage == Dc1RaptorVisualVariantProfiles.BlueDonorStage
             && r.Room == Dc1RaptorVisualVariantProfiles.BlueDonorRoom);

@@ -87,6 +87,12 @@ public sealed class Dc1RaptorVisualVariantTests
     [Fact]
     public void BlueProfile_IsDonorExactSt508_AndAuthoringIsAiOnly()
     {
+        Assert.Equal((1, 0x02),
+            (Dc1RaptorVisualVariantProfiles.BlueTargetStage,
+             Dc1RaptorVisualVariantProfiles.BlueTargetRoom));
+        Assert.Equal(0x5A000, Dc1RaptorVisualVariantProfiles.BlueTargetLength);
+        Assert.Equal("E1E1386AB982F05A6B18249D6F1D77B08F68453BAEFE304013F4628579D42979",
+            Dc1RaptorVisualVariantProfiles.BlueTargetSha256);
         Assert.Equal((5, 0x08),
             (Dc1RaptorVisualVariantProfiles.Blue.DonorStage,
              Dc1RaptorVisualVariantProfiles.Blue.DonorRoom));
@@ -99,6 +105,62 @@ public sealed class Dc1RaptorVisualVariantTests
         Assert.Equal(43062, Dc1RaptorVisualVariantProfiles.BlueTargetTexturePayloadLength);
         Assert.Equal(new Dc1RaptorVisualVariantAuthoring(AiParam: 6),
              Dc1RaptorVisualVariantProfiles.Blue.Authoring);
+    }
+
+    [Fact]
+    public void BlueProfile_RejectsCompatibleShapedSubstituteBeforeTextureRepack()
+    {
+        var target = RoomFile.Read(1, 2, BluePackage(43062, 0x11, 0x5A000));
+        var donor = RoomFile.Read(5, 8, BluePackage(43891, 0xA5, 0x8C000));
+        var enemy = new EnemyRecord
+        {
+            Opcode = DcOpcodes.Enemy2,
+            Category = 2,
+            SpeciesBoneCount = 21,
+            AiParam = 3,
+        };
+        target.Enemies.Add(enemy);
+        var beforeTarget = target.OriginalBytes.ToArray();
+
+        var result = Dc1RaptorVisualVariantEditor.TryApplyProfile(
+            target, donor, enemy, Dc1RaptorVisualVariantProfiles.Blue);
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
+        Assert.Contains("pinned pristine ST102", result.Note, StringComparison.OrdinalIgnoreCase);
+        Assert.Null(result.PatchedBytes);
+        Assert.Equal(beforeTarget, target.OriginalBytes);
+        Assert.Equal((byte)3, enemy.AiParam);
+    }
+
+    [Fact]
+    public void BlueProfile_RejectsWrongStageOrRoomBeforeHashCheck()
+    {
+        var target = RoomFile.Read(1, 3, BluePackage(43062, 0x11, 0x5A000));
+        var donor = RoomFile.Read(5, 8, BluePackage(43891, 0xA5, 0x8C000));
+        var enemy = new EnemyRecord { Opcode = DcOpcodes.Enemy2, Category = 2, SpeciesBoneCount = 21 };
+
+        var result = Dc1RaptorVisualVariantEditor.TryApplyProfile(
+            target, donor, enemy, Dc1RaptorVisualVariantProfiles.Blue);
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
+        Assert.Contains("not the pinned ST102", result.Note, StringComparison.OrdinalIgnoreCase);
+        Assert.Null(result.PatchedBytes);
+    }
+
+    [Fact]
+    public void BlueProfilePayloadFixture_RepackCopiesDonorPayloadAndPreservesRdt()
+    {
+        var target = BluePackage(43062, 0x11, 0x5A000);
+        var donor = BluePackage(43891, 0xA5, 0x8C000);
+
+        var patched = TextureImporter.ReplaceSpeciesTexturePayloadAndPalette(
+            target, donor, new ushort[] { 0x8b, 0x9b }, 0x7ff0);
+
+        Assert.Equal(donor.AsSpan(2048, 43891).ToArray(), patched.AsSpan(2048, 43891).ToArray());
+        int paletteOffset = 2048 + ((43891 + 2047) & ~2047);
+        Assert.Equal(donor.AsSpan(paletteOffset, 512).ToArray(), patched.AsSpan(paletteOffset, 512).ToArray());
+        int rdtOffset = paletteOffset + 2048;
+        Assert.Equal(Enumerable.Repeat((byte)0x22, 64), patched.AsSpan(rdtOffset, 64).ToArray());
     }
 
     [Fact]
@@ -289,6 +351,33 @@ public sealed class Dc1RaptorVisualVariantTests
         BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(16, 4), (uint)GianEntryType.Data);
         BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(20, 4), 4);
         bytes.AsSpan(2048, 512).Fill(fill);
+        return bytes;
+    }
+
+    private static byte[] BluePackage(int textureLength, byte textureFill, int totalLength)
+    {
+        const int header = 2048;
+        const int sector = 2048;
+        int textureAligned = (textureLength + sector - 1) & ~(sector - 1);
+        int rdtLength = totalLength - header - textureAligned - sector;
+        var bytes = new byte[totalLength];
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(0, 4), (uint)GianEntryType.Lzss2);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(4, 4), (uint)textureLength);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(8, 2), 704);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(10, 2), 0);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(12, 2), 64);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(14, 2), 512);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(16, 4), (uint)GianEntryType.Palette);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(20, 4), 512);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(24, 2), 768);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(26, 2), 511);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(28, 2), 256);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(30, 2), 1);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(32, 4), (uint)GianEntryType.Data);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(36, 4), (uint)rdtLength);
+        bytes.AsSpan(header, textureLength).Fill(textureFill);
+        bytes.AsSpan(header + textureAligned, sector - 1536).Fill(0x33);
+        bytes.AsSpan(header + textureAligned + sector, rdtLength).Fill(0x22);
         return bytes;
     }
 

@@ -79,6 +79,11 @@ public sealed record Dc1RaptorVisualVariantProfile(
 /// <summary>Approved manually selected DC1 Raptor profiles.</summary>
 public static class Dc1RaptorVisualVariantProfiles
 {
+    public const int BlueTargetStage = 1;
+    public const int BlueTargetRoom = 0x02;
+    public const int BlueTargetLength = 0x5A000;
+    public const string BlueTargetSha256 =
+        "E1E1386AB982F05A6B18249D6F1D77B08F68453BAEFE304013F4628579D42979";
     public const int BlueDonorStage = 5;
     public const int BlueDonorRoom = 0x08;
     public const int BlueDonorLength = 0x8C000;
@@ -175,6 +180,15 @@ public static class Dc1RaptorVisualVariantEditor
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(donor);
         ArgumentNullException.ThrowIfNull(profile);
+        if (target.Stage != Dc1RaptorVisualVariantProfiles.BlueTargetStage
+            || target.Room != Dc1RaptorVisualVariantProfiles.BlueTargetRoom)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "target is not the pinned ST102 Blue profile room");
+        if (target.OriginalBytes.Length != Dc1RaptorVisualVariantProfiles.BlueTargetLength
+            || !Convert.ToHexString(SHA256.HashData(target.OriginalBytes)).Equals(
+                Dc1RaptorVisualVariantProfiles.BlueTargetSha256, StringComparison.OrdinalIgnoreCase))
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "target bytes are not the pinned pristine ST102 GOG package");
         var donorCheck = TryApplyBlueTexture(target.OriginalBytes, donor, enemy, profile.Evidence);
         if (donorCheck.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
             return donorCheck;
