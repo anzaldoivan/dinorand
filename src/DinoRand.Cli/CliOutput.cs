@@ -19,7 +19,7 @@ internal static class CliOutput
             "\r\n" +
             "Usage:\r\n" +
             "  dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]\r\n" +
-            "           [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items]\r\n" +
+            "           [--no-items] [--no-enemies] [--dc1-blue-raptor] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items]\r\n" +
             "           [--dc1-cutscene-safe] [--no-dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--pickup-ground-models] [--no-pickup-ground-models]   (dc1)\r\n" +
             "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
             "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
@@ -144,6 +144,8 @@ internal static class CliOutput
             "    rooms (e.g. ST706 Mosasaurus) — the same room-level guards the bulk pass applies — unless\r\n" +
             "    --force is given (distinct from --allow-unsafe, which overrides the donor-habitat guard).\r\n" +
             "    Inherently DC2 (no --game needed). docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.\r\n" +
+            "  - --dc1-blue-raptor (dc1, off by default) applies only the pinned ST102 Blue Raptor profile; it is independent of --no-enemies.\r\n" +
+            "    Use --no-items --no-enemies --no-dc1-door-skip when installing only this profile.\r\n" +
             "  - --dc1-enemy-hp (dc1, off by default) overrides each eligible enemy's maxHP per placement:\r\n" +
             "    it writes a seeded, --difficulty-scaled value into the 0x20 spawn record's +6 word (entity\r\n" +
             "    +0x11A), bypassing the game's birth roll. A plain room-file edit (no DINO.exe patch, no\r\n" +

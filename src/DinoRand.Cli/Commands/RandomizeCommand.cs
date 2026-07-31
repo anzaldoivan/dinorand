@@ -22,6 +22,7 @@ internal sealed partial class CliApplication
         {
             RandomizeItems = !argv.Contains("--no-items"),
             RandomizeEnemies = !argv.Contains("--no-enemies"),
+            Dc1BlueRaptorProfile = argv.Contains("--dc1-blue-raptor"),
             // DC1 per-placement enemy maxHP override (off by default). Writes a seeded, --difficulty-scaled HP into
             // eligible 0x20 spawns' +6 word (entity +0x11A), bypassing the {750,850,1000} roll — plain SCD file edit.
             // docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".

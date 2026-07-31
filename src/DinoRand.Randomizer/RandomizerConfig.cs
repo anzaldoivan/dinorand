@@ -12,6 +12,8 @@ public sealed class RandomizerConfig
 {
     public bool RandomizeItems { get; set; } = true;
     public bool RandomizeEnemies { get; set; } = true;
+    /// <summary>DC1 only (off by default). Apply the fixed ST102 Blue Raptor profile independently of enemy randomization.</summary>
+    public bool Dc1BlueRaptorProfile { get; set; } = false;
     public bool RandomizeStartingInventory { get; set; } = false;
 
     /// <summary>

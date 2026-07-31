@@ -10,6 +10,20 @@ namespace DinoRand.FileFormats.Tests;
 public sealed class Dc1BlueRaptorProfilePassTests
 {
     [Fact]
+    public void IsEnabled_requires_explicit_opt_in_and_ignores_enemy_randomization_switch()
+    {
+        var pass = new Dc1BlueRaptorProfilePass();
+
+        Assert.False(pass.IsEnabled(new RandomizerConfig()));
+        Assert.False(pass.IsEnabled(new RandomizerConfig { RandomizeEnemies = false }));
+        Assert.True(pass.IsEnabled(new RandomizerConfig
+        {
+            RandomizeEnemies = false,
+            Dc1BlueRaptorProfile = true,
+        }));
+    }
+
+    [Fact]
     public void Apply_UsesOnlyPinnedSt508ForSt102_AndQueuesDescriptorPatch()
     {
         var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");

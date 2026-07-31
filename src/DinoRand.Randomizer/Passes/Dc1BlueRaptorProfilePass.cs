@@ -8,7 +8,7 @@ public sealed class Dc1BlueRaptorProfilePass : IRandomizationPass
 {
     public string Name => "dc1-blue-raptor-profile";
 
-    public bool IsEnabled(RandomizerConfig config) => config.RandomizeEnemies;
+    public bool IsEnabled(RandomizerConfig config) => config.Dc1BlueRaptorProfile;
 
     public void Apply(RandomizationContext context)
     {
