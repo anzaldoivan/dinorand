@@ -85,6 +85,7 @@ internal static class ExePatchInstaller
                 ExePatchKind.CatSlot => $"cat-slot:{req.Stage}:{req.Category}",
                 ExePatchKind.Cat8HitReaction => "cat8-hit-reaction",
                 ExePatchKind.RoomEnemySe => $"room-se:{req.Stage}:{req.Room}",
+                ExePatchKind.BlueRaptorDescriptor => "blue-raptor-descriptor",
                 _ => throw new InvalidOperationException($"unknown exe-patch kind {req.Kind}"),
             };
             if (byTarget.TryGetValue(key, out var previous) && previous != req)
@@ -96,7 +97,8 @@ internal static class ExePatchInstaller
         var bytes = (byte[])pristine.Clone();
         var entries = new List<string>();
         foreach (var req in byTarget.Values
-                     .OrderBy(r => r.Kind).ThenBy(r => r.Stage).ThenBy(r => r.Room)
+                     .OrderBy(r => r.Kind == ExePatchKind.BlueRaptorDescriptor ? 0 : 1)
+                     .ThenBy(r => r.Kind).ThenBy(r => r.Stage).ThenBy(r => r.Room)
                      .ThenBy(r => r.Category).ThenBy(r => r.DonorStage).ThenBy(r => r.DonorRoom))
         {
             switch (req.Kind)
@@ -128,6 +130,16 @@ internal static class ExePatchInstaller
                     entries.Add($"room enemy SE st{req.Stage}{req.Room:X2} -> donor " +
                                 $"st{req.DonorStage}{req.DonorRoom:X2} ({result.RecordsWritten}/{result.Capacity} " +
                                 $"dino records @ block 0x{result.TargetBlockVa:X})");
+                    break;
+                }
+                case ExePatchKind.BlueRaptorDescriptor:
+                {
+                    if (req.BuildSha256 is null || req.BuildLength <= 0)
+                        throw new InvalidOperationException(
+                            "Blue-Raptor descriptor request has no exact build hash/length.");
+                    Dc1BlueRaptorDescriptorPatch.Apply(bytes, req.BuildSha256, req.BuildLength);
+                    entries.Add($"ST102 Blue descriptor 0 +0x0A: {Dc1BlueRaptorDescriptorPatch.ExpectedMaxHp} -> " +
+                                $"{Dc1BlueRaptorDescriptorPatch.BlueMaxHp}");
                     break;
                 }
             }

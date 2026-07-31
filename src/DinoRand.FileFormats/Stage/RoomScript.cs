@@ -280,6 +280,8 @@ public sealed class RoomScript
                         MotionPtr = motion,
                         OriginalModelPtr = model,
                         OriginalMotionPtr = motion,
+                        AiParam = buffer[pos + EnemyRecord.AiParamOffset],
+                        OriginalAiParam = buffer[pos + EnemyRecord.AiParamOffset],
                         SpeciesBoneCount = EnemySkeleton.ReadBoneCount(buffer, model),
                         Raw = buffer.Slice(pos, len).ToArray(),
                         FileOffset = pos,
@@ -481,10 +483,13 @@ public sealed class RoomScript
             // provably byte-exact — RoomFileRoundTripTests.Enemy_MaxHpWord_SurvivesModelEditRoundTrip).
             if (enemy.Opcode == DcOpcodes.Enemy && enemy.MaxHp != enemy.OriginalMaxHp)
                 WriteU16(buffer, enemy.FileOffset + EnemyRecord.MaxHpOffset, enemy.MaxHp);
-            if (enemy.Opcode == DcOpcodes.Enemy)
+            if (enemy.Opcode is DcOpcodes.Enemy or DcOpcodes.Enemy2)
             {
                 if (enemy.AiParam != buffer[enemy.FileOffset + EnemyRecord.AiParamOffset])
                     buffer[enemy.FileOffset + EnemyRecord.AiParamOffset] = enemy.AiParam;
+            }
+            if (enemy.Opcode == DcOpcodes.Enemy)
+            {
                 if (enemy.BirthMode != buffer[enemy.FileOffset + EnemyRecord.BirthModeOffset])
                     buffer[enemy.FileOffset + EnemyRecord.BirthModeOffset] = enemy.BirthMode;
             }

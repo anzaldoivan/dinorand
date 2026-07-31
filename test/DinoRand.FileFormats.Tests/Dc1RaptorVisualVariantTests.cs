@@ -62,6 +62,90 @@ public sealed class Dc1RaptorVisualVariantTests
     }
 
     [Fact]
+    public void Authoring_Enemy2AiOnly_PatchesAiAndPreservesUnsupportedFields()
+    {
+        var enemy = new EnemyRecord
+        {
+            Opcode = DcOpcodes.Enemy2,
+            Category = 2,
+            SpeciesBoneCount = 21,
+            MaxHp = 777,
+            AiParam = 7,
+            BirthMode = 2,
+        };
+
+        var result = Dc1RaptorVisualVariantEditor.TryAuthor(
+            enemy, new Dc1RaptorVisualVariantAuthoring(AiParam: 6));
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Applied, result.Outcome);
+        Assert.Equal((ushort)777, enemy.MaxHp);
+        Assert.Equal((byte)6, enemy.AiParam);
+        Assert.Equal((byte)2, enemy.BirthMode);
+    }
+
+    [Fact]
+    public void BlueProfile_IsDonorExactSt508_AndAuthoringIsAiOnly()
+    {
+        Assert.Equal((5, 0x08),
+            (Dc1RaptorVisualVariantProfiles.Blue.DonorStage,
+             Dc1RaptorVisualVariantProfiles.Blue.DonorRoom));
+        Assert.Equal(TextureImporter.MakeClut(768, 511),
+            Dc1RaptorVisualVariantProfiles.Blue.ClutCode);
+        Assert.Equal(new Dc1RaptorVisualVariantAuthoring(AiParam: 6),
+             Dc1RaptorVisualVariantProfiles.Blue.Authoring);
+    }
+
+    [Fact]
+    public void BlueProfile_ComposesClutCopyAnd0x59AiWithoutChangingModelMotion()
+    {
+        var target = PackageWithPalette(0x11);
+        var donor = PackageWithPalette(0x99);
+        var enemy = new EnemyRecord
+        {
+            Opcode = DcOpcodes.Enemy2,
+            Category = 2,
+            SpeciesBoneCount = 21,
+            ModelPtr = 0x80101234,
+            MotionPtr = 0x80105678,
+            InstanceIndex = 8,
+            AiParam = 7,
+            MaxHp = 850,
+            BirthMode = 2,
+        };
+
+        var result = Dc1RaptorVisualVariantEditor.TryApplyProfile(
+            target, donor, enemy, Dc1RaptorVisualVariantProfiles.Blue);
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Applied, result.Outcome);
+        Assert.Equal((byte)6, enemy.AiParam);
+        Assert.Equal((uint)0x80101234, enemy.ModelPtr);
+        Assert.Equal((uint)0x80105678, enemy.MotionPtr);
+        Assert.Equal((byte)8, enemy.InstanceIndex);
+        Assert.Equal((ushort)850, enemy.MaxHp);
+        Assert.Equal((byte)2, enemy.BirthMode);
+        Assert.All(result.PatchedBytes![2048..(2048 + 512)], b => Assert.Equal(0x99, b));
+    }
+
+    [Fact]
+    public void RoomRoundTrip_0x59AiAuthoringChangesOnlyInlineAiByte()
+    {
+        var room = RoomFile.Read(1, 2,
+            SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+                new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy2, 2, 21) }));
+        var enemy = room.Enemies.Single();
+        var before = enemy.Raw.ToArray();
+        enemy.AiParam = 6;
+
+        var reread = RoomFile.Read(1, 2, room.Write());
+
+        Assert.Equal((byte)6, reread.Enemies.Single().AiParam);
+        var after = reread.Enemies.Single().Raw;
+        for (int i = 0; i < before.Length; i++)
+            if (i != EnemyRecord.AiParamOffset)
+                Assert.Equal(before[i], after[i]);
+    }
+
+    [Fact]
     public void Authoring_Pteranodon_IsUnsupportedAndNonMutating()
     {
         var enemy = new EnemyRecord

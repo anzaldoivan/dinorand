@@ -1,6 +1,7 @@
 using DinoRand.FileFormats.Exe;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Install;
+using System.Security.Cryptography;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -113,6 +114,29 @@ public class GameInstallerExeTests : IDisposable
         // Second run patched stage 1 from pristine; stage 2 is back to its pristine value.
         Assert.Equal(ExePatcher.SetupFnStage2, ExePatcher.ReadSetupFn(exe, 1));
         Assert.Equal(ExePatcher.SetupFnStage2, ExePatcher.ReadSetupFn(exe, 2));
+    }
+
+    [Fact]
+    public void ApplyBlueDescriptor_AndRestoreReversesTheExactWord()
+    {
+        var pristine = BuildSyntheticExe();
+        ExePatcher.WriteUInt16(pristine,
+            ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa),
+            Dc1BlueRaptorDescriptorPatch.ExpectedMaxHp);
+        File.WriteAllBytes(ExePath, pristine);
+        var hash = Convert.ToHexString(SHA256.HashData(pristine));
+        var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
+        {
+            ExePatchRequest.BlueRaptorDescriptor(hash, pristine.Length),
+        });
+
+        GameInstaller.ApplyExePatchPlan(DataDir, plan, _root);
+
+        var patched = File.ReadAllBytes(ExePath);
+        Assert.Equal(Dc1BlueRaptorDescriptorPatch.BlueMaxHp,
+            ExePatcher.ReadUInt16AtVa(patched, Dc1BlueRaptorDescriptorPatch.MaxHpVa));
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
     }
 
     /// <summary>Write the full stock JP-master keypad table (all rows, both region halves) into the
