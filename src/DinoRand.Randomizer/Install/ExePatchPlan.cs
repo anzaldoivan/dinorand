@@ -42,9 +42,7 @@ public sealed record ExePatchRequest(
     uint HandlerVa = 0,
     string? DonorRoomFile = null,
     int DonorStage = 0,
-    int DonorRoom = 0,
-    string? BuildSha256 = null,
-    int BuildLength = 0)
+    int DonorRoom = 0)
 {
     /// <summary>A cat-slot repoint of <paramref name="stage"/>'s installed AI record (e.g. cat8 = Theri).</summary>
     public static ExePatchRequest CatSlot(int stage, int category, uint handlerVa)
@@ -61,8 +59,8 @@ public sealed record ExePatchRequest(
         => new(ExePatchKind.RoomEnemySe, Stage: stage, Room: room, DonorStage: donorStage, DonorRoom: donorRoom);
 
     /// <summary>Declare the donor-exact ST508 Blue profile's guarded stage-1 descriptor edit.</summary>
-    public static ExePatchRequest BlueRaptorDescriptor(string buildSha256, int buildLength)
-        => new(ExePatchKind.BlueRaptorDescriptor, BuildSha256: buildSha256, BuildLength: buildLength);
+    public static ExePatchRequest BlueRaptorDescriptor()
+        => new(ExePatchKind.BlueRaptorDescriptor);
 }
 
 /// <summary>

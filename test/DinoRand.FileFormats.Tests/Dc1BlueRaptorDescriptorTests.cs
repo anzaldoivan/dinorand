@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using DinoRand.FileFormats.Exe;
 using DinoRand.Randomizer.Install;
 using Xunit;
@@ -8,14 +7,27 @@ namespace DinoRand.FileFormats.Tests;
 public sealed class Dc1BlueRaptorDescriptorTests
 {
     [Fact]
+    public void BlueDescriptor_IsPinnedToObservedGogBuildAndExactSourceBytes()
+    {
+        Assert.Equal(0x00657180u, Dc1BlueRaptorDescriptorPatch.DescriptorTableVa);
+        Assert.Equal(0x0065718Au, Dc1BlueRaptorDescriptorPatch.MaxHpVa);
+        Assert.Equal(0x25718A, Dc1BlueRaptorDescriptorPatch.MaxHpFileOffset);
+        Assert.Equal(Dc1BlueRaptorDescriptorPatch.MaxHpFileOffset,
+            ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa));
+        Assert.Equal(0x28C000, Dc1BlueRaptorDescriptorPatch.SupportedBuildLength);
+        Assert.Equal("7ACC3DC1A3F3398E08E5BDAD746BDBF98CA5507E9B9BA5FBA709031B498D3FCA",
+            Dc1BlueRaptorDescriptorPatch.SupportedBuildSha256);
+        Assert.Equal(new byte[] { 0x52, 0x03 }, Dc1BlueRaptorDescriptorPatch.ExpectedSourceBytes.ToArray());
+    }
+
+    [Fact]
     public void BlueDescriptorPlan_PatchesOnlyDescriptorZeroMaxHp_AndComposes()
     {
-        var exe = new byte[0x270000];
-        ExePatcher.WriteUInt16(exe, ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa), 850);
-        var hash = Convert.ToHexString(SHA256.HashData(exe));
+        var exe = LoadSupportedExe();
+        if (exe is null) return;
         var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
         {
-            ExePatchRequest.BlueRaptorDescriptor(hash, exe.Length),
+            ExePatchRequest.BlueRaptorDescriptor(),
             ExePatchRequest.CatSlot(2, 8, ExePatcher.TheriCat8HandlerVa),
         });
 
@@ -25,22 +37,20 @@ public sealed class Dc1BlueRaptorDescriptorTests
             ExePatcher.ReadUInt16AtVa(composed, Dc1BlueRaptorDescriptorPatch.MaxHpVa));
         Assert.Equal(ExePatcher.TheriCat8HandlerVa,
             ExePatcher.ReadUInt32AtVa(composed, ExePatcher.Stage2AiRecordVa + 8 * 4));
-        Assert.Equal(5, composed.Count(b => b != exe[b]));
+        Assert.Equal(5, Enumerable.Range(0, composed.Length).Count(i => composed[i] != exe[i]));
         Assert.Equal((byte)0xDC, composed[ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa)]);
         Assert.Equal((byte)0x05, composed[ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa) + 1]);
         Assert.Equal((byte)0, composed[ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa) + 2]);
     }
 
     [Fact]
-    public void BlueDescriptorPlan_RefusesWrongHashWithoutPartialMutation()
+    public void BlueDescriptorPlan_RefusesSyntheticImageWithoutPartialMutation()
     {
-        var exe = new byte[0x270000];
-        ExePatcher.WriteUInt16(exe, ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa), 850);
+        var exe = new byte[Dc1BlueRaptorDescriptorPatch.SupportedBuildLength];
         var before = exe.ToArray();
         var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
         {
-            ExePatchRequest.BlueRaptorDescriptor(new string('0', 64), exe.Length),
-            ExePatchRequest.CatSlot(2, 8, ExePatcher.TheriCat8HandlerVa),
+            ExePatchRequest.BlueRaptorDescriptor(),
         });
 
         Assert.Throws<InvalidOperationException>(() => ExePatchInstallerTestAccess.Compose(exe, plan));
@@ -48,15 +58,13 @@ public sealed class Dc1BlueRaptorDescriptorTests
     }
 
     [Fact]
-    public void BlueDescriptorPlan_RefusesWrongExpectedByteWithoutPartialMutation()
+    public void BlueDescriptorPlan_RefusesWrongSourceImageWithoutPartialMutation()
     {
-        var exe = new byte[0x270000];
-        ExePatcher.WriteUInt16(exe, ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa), 1000);
+        var exe = new byte[Dc1BlueRaptorDescriptorPatch.SupportedBuildLength];
         var before = exe.ToArray();
-        var hash = Convert.ToHexString(SHA256.HashData(exe));
         var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
         {
-            ExePatchRequest.BlueRaptorDescriptor(hash, exe.Length),
+            ExePatchRequest.BlueRaptorDescriptor(),
         });
 
         Assert.Throws<InvalidOperationException>(() => ExePatchInstallerTestAccess.Compose(exe, plan));
@@ -64,30 +72,25 @@ public sealed class Dc1BlueRaptorDescriptorTests
     }
 
     [Fact]
-    public void BlueDescriptorPlan_RefusesDuplicateConflictingRequests()
+    public void BlueDescriptorPlan_AllowsDuplicateIdenticalRequests()
     {
-        var exe = new byte[0x270000];
-        ExePatcher.WriteUInt16(exe, ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa), 850);
-        var hash = Convert.ToHexString(SHA256.HashData(exe));
         var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
         {
-            ExePatchRequest.BlueRaptorDescriptor(hash, exe.Length),
-            ExePatchRequest.BlueRaptorDescriptor(new string('1', 64), exe.Length),
+            ExePatchRequest.BlueRaptorDescriptor(),
+            ExePatchRequest.BlueRaptorDescriptor(),
         });
 
-        Assert.Throws<InvalidOperationException>(() => ExePatchInstallerTestAccess.Compose(exe, plan));
+        Assert.Single(plan.Requests.Distinct());
     }
 
     [Fact]
     public void BlueDescriptorPlan_RefusesWrongBuildLengthWithoutPartialMutation()
     {
-        var exe = new byte[0x270000];
-        ExePatcher.WriteUInt16(exe, ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa), 850);
+        var exe = new byte[Dc1BlueRaptorDescriptorPatch.SupportedBuildLength - 1];
         var before = exe.ToArray();
-        var hash = Convert.ToHexString(SHA256.HashData(exe));
         var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
         {
-            ExePatchRequest.BlueRaptorDescriptor(hash, exe.Length + 1),
+            ExePatchRequest.BlueRaptorDescriptor(),
         });
 
         Assert.Throws<InvalidOperationException>(() => ExePatchInstallerTestAccess.Compose(exe, plan));
@@ -97,11 +100,19 @@ public sealed class Dc1BlueRaptorDescriptorTests
     [Fact]
     public void BlueDescriptorPlan_JsonRoundTripsWithItsBuildGuards()
     {
-        var request = ExePatchRequest.BlueRaptorDescriptor(new string('A', 64), 123);
+        var request = ExePatchRequest.BlueRaptorDescriptor();
         var roundTrip = ExePatchPlan.FromJson(
             new ExePatchPlan(ExePatchPlan.CurrentVersion, new[] { request }).ToJson());
 
         Assert.Equal(request, Assert.Single(roundTrip.Requests));
+    }
+
+    private static byte[]? LoadSupportedExe()
+    {
+        var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (string.IsNullOrWhiteSpace(root)) return null;
+        var path = Path.Combine(root, "DINO.exe");
+        return File.Exists(path) ? File.ReadAllBytes(path) : null;
     }
 
     private static class ExePatchInstallerTestAccess

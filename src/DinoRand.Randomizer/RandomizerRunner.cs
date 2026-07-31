@@ -51,6 +51,8 @@ public sealed class RandomizerRunner
         // rooms the two enemy passes above refuse to touch. Must run AFTER every room-record-mutating
         // pass — its room-output override freezes the serialized bytes.
         new Dc1CutscenePalettePass(),
+        // Fixed DC1-only profile; uses the exact ST508 donor and queues the pinned DINO.exe edit.
+        new Dc1BlueRaptorProfilePass(),
         // Phase 4, experimental + hard-gated off (VoiceManifestLayout.IsDecoded=false): cutscene
         // character-voice rando. Wired in but emits nothing until the DC1 voice addressing is decoded.
         // docs/decisions/dc1/voice/VOICE-RANDO-PLAN.md.

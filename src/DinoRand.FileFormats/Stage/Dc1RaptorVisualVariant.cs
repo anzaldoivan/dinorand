@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace DinoRand.FileFormats.Stage;
 
 /// <summary>Corpus evidence for one manually registered DC1 Raptor visual palette.</summary>
@@ -77,10 +79,16 @@ public sealed record Dc1RaptorVisualVariantProfile(
 /// <summary>Approved manually selected DC1 Raptor profiles.</summary>
 public static class Dc1RaptorVisualVariantProfiles
 {
+    public const int BlueDonorStage = 5;
+    public const int BlueDonorRoom = 0x08;
+    public const int BlueDonorLength = 0x8C000;
+    public const string BlueDonorSha256 =
+        "F6775BEBB1509870C57DB4D8729A98AD63599CBB1EEB1C8EA8679116384C8773";
+
     public static Dc1RaptorVisualVariantProfile Blue { get; } = new(
         new Dc1RaptorVisualVariantEvidence(
             "blue", Dc1RaptorVisualVariantRegistry.RaptorHeavyPaletteFamily,
-            DinoSpecies.RaptorHeavy, 2, 21, 5, 0x08,
+            DinoSpecies.RaptorHeavy, 2, 21, BlueDonorStage, BlueDonorRoom,
             TextureImporter.MakeClut(768, 511),
             "ST508 Blue profile; category 2 / 21-bone RaptorHeavy"),
         new Dc1RaptorVisualVariantAuthoring(AiParam: 6));
@@ -105,10 +113,11 @@ public sealed record Dc1RaptorVisualVariantPaletteResult(
 public static class Dc1RaptorVisualVariantEditor
 {
     public static Dc1RaptorVisualVariantPaletteResult TryApplyPalette(
-        ReadOnlySpan<byte> target, ReadOnlySpan<byte> donor,
+        ReadOnlySpan<byte> target, RoomFile donor,
         EnemyRecord enemy, Dc1RaptorVisualVariantEvidence evidence)
     {
         ArgumentNullException.ThrowIfNull(enemy);
+        ArgumentNullException.ThrowIfNull(donor);
         try { Dc1RaptorVisualVariantRegistry.Validate(evidence); }
         catch (ArgumentException ex)
         {
@@ -118,9 +127,19 @@ public static class Dc1RaptorVisualVariantEditor
         if (enemy.Species != DinoSpecies.RaptorHeavy || enemy.Category != 2)
             return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
                 "target is not a RaptorHeavy record");
+        if (donor.Stage != evidence.DonorStage || donor.Room != evidence.DonorRoom)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "palette donor is not the evidence-pinned room");
+        if (evidence.DonorStage != Dc1RaptorVisualVariantProfiles.BlueDonorStage
+            || evidence.DonorRoom != Dc1RaptorVisualVariantProfiles.BlueDonorRoom
+            || donor.OriginalBytes.Length != Dc1RaptorVisualVariantProfiles.BlueDonorLength
+            || !Convert.ToHexString(SHA256.HashData(donor.OriginalBytes)).Equals(
+                Dc1RaptorVisualVariantProfiles.BlueDonorSha256, StringComparison.OrdinalIgnoreCase))
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "palette donor bytes are not the pinned ST508 GOG donor");
 
         // CopySpeciesPalette returns a fresh package and does not mutate either input.
-        var patched = TextureImporter.CopySpeciesPalette(target, donor, evidence.ClutCode);
+        var patched = TextureImporter.CopySpeciesPalette(target, donor.OriginalBytes, evidence.ClutCode);
         return new(Dc1RaptorVisualVariantOutcome.Applied, patched,
             $"{evidence.VariantId} palette from ST{evidence.DonorStage:X}{evidence.DonorRoom:X2}");
     }
@@ -148,16 +167,21 @@ public static class Dc1RaptorVisualVariantEditor
     }
 
     public static Dc1RaptorVisualVariantPaletteResult TryApplyProfile(
-        ReadOnlySpan<byte> target, ReadOnlySpan<byte> donor,
+        RoomFile target, RoomFile donor,
         EnemyRecord enemy, Dc1RaptorVisualVariantProfile profile)
     {
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(donor);
         ArgumentNullException.ThrowIfNull(profile);
-        var palette = TryApplyPalette(target, donor, enemy, profile.Evidence);
-        if (palette.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
-            return palette;
+        var donorCheck = TryApplyPalette(target.OriginalBytes, donor, enemy, profile.Evidence);
+        if (donorCheck.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
+            return donorCheck;
         var authoring = TryAuthor(enemy, profile.Authoring);
         if (authoring.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
             return new(authoring.Outcome, null, authoring.Note);
+        var palette = TryApplyPalette(target.Write(), donor, enemy, profile.Evidence);
+        if (palette.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
+            return palette;
         return palette with { Note = $"{profile.Evidence.VariantId}: palette + {authoring.Note}" };
     }
 }

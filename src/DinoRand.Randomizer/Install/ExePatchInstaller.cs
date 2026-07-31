@@ -134,10 +134,7 @@ internal static class ExePatchInstaller
                 }
                 case ExePatchKind.BlueRaptorDescriptor:
                 {
-                    if (req.BuildSha256 is null || req.BuildLength <= 0)
-                        throw new InvalidOperationException(
-                            "Blue-Raptor descriptor request has no exact build hash/length.");
-                    Dc1BlueRaptorDescriptorPatch.Apply(bytes, req.BuildSha256, req.BuildLength);
+                    Dc1BlueRaptorDescriptorPatch.Apply(bytes);
                     entries.Add($"ST102 Blue descriptor 0 +0x0A: {Dc1BlueRaptorDescriptorPatch.ExpectedMaxHp} -> " +
                                 $"{Dc1BlueRaptorDescriptorPatch.BlueMaxHp}");
                     break;

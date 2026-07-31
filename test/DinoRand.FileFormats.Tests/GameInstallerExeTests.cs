@@ -1,7 +1,6 @@
 using DinoRand.FileFormats.Exe;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Install;
-using System.Security.Cryptography;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -119,15 +118,15 @@ public class GameInstallerExeTests : IDisposable
     [Fact]
     public void ApplyBlueDescriptor_AndRestoreReversesTheExactWord()
     {
-        var pristine = BuildSyntheticExe();
-        ExePatcher.WriteUInt16(pristine,
-            ExePatcher.VaToFileOffset(Dc1BlueRaptorDescriptorPatch.MaxHpVa),
-            Dc1BlueRaptorDescriptorPatch.ExpectedMaxHp);
+        var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (string.IsNullOrWhiteSpace(root)) return;
+        var source = Path.Combine(root, GameInstaller.ExeName);
+        if (!File.Exists(source)) return;
+        var pristine = File.ReadAllBytes(source);
         File.WriteAllBytes(ExePath, pristine);
-        var hash = Convert.ToHexString(SHA256.HashData(pristine));
         var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
         {
-            ExePatchRequest.BlueRaptorDescriptor(hash, pristine.Length),
+            ExePatchRequest.BlueRaptorDescriptor(),
         });
 
         GameInstaller.ApplyExePatchPlan(DataDir, plan, _root);

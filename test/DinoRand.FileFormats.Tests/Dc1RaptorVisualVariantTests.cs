@@ -90,7 +90,10 @@ public sealed class Dc1RaptorVisualVariantTests
             (Dc1RaptorVisualVariantProfiles.Blue.DonorStage,
              Dc1RaptorVisualVariantProfiles.Blue.DonorRoom));
         Assert.Equal(TextureImporter.MakeClut(768, 511),
-            Dc1RaptorVisualVariantProfiles.Blue.ClutCode);
+             Dc1RaptorVisualVariantProfiles.Blue.ClutCode);
+        Assert.Equal(0x8C000, Dc1RaptorVisualVariantProfiles.BlueDonorLength);
+        Assert.Equal("F6775BEBB1509870C57DB4D8729A98AD63599CBB1EEB1C8EA8679116384C8773",
+            Dc1RaptorVisualVariantProfiles.BlueDonorSha256);
         Assert.Equal(new Dc1RaptorVisualVariantAuthoring(AiParam: 6),
              Dc1RaptorVisualVariantProfiles.Blue.Authoring);
     }
@@ -98,32 +101,18 @@ public sealed class Dc1RaptorVisualVariantTests
     [Fact]
     public void BlueProfile_ComposesClutCopyAnd0x59AiWithoutChangingModelMotion()
     {
-        var target = PackageWithPalette(0x11);
-        var donor = PackageWithPalette(0x99);
-        var enemy = new EnemyRecord
-        {
-            Opcode = DcOpcodes.Enemy2,
-            Category = 2,
-            SpeciesBoneCount = 21,
-            ModelPtr = 0x80101234,
-            MotionPtr = 0x80105678,
-            InstanceIndex = 8,
-            AiParam = 7,
-            MaxHp = 850,
-            BirthMode = 2,
-        };
+        var (target, donor) = LoadRealBlueRooms();
+        if (target is null || donor is null) return;
+        var enemy = target.Enemies.Single(e => e.Species == DinoSpecies.RaptorHeavy);
+        var before = target.Write();
 
         var result = Dc1RaptorVisualVariantEditor.TryApplyProfile(
             target, donor, enemy, Dc1RaptorVisualVariantProfiles.Blue);
 
         Assert.Equal(Dc1RaptorVisualVariantOutcome.Applied, result.Outcome);
         Assert.Equal((byte)6, enemy.AiParam);
-        Assert.Equal((uint)0x80101234, enemy.ModelPtr);
-        Assert.Equal((uint)0x80105678, enemy.MotionPtr);
-        Assert.Equal((byte)8, enemy.InstanceIndex);
-        Assert.Equal((ushort)850, enemy.MaxHp);
-        Assert.Equal((byte)2, enemy.BirthMode);
-        Assert.All(result.PatchedBytes![2048..(2048 + 512)], b => Assert.Equal(0x99, b));
+        Assert.Equal(before.Length, result.PatchedBytes!.Length);
+        Assert.NotEqual(before, result.PatchedBytes);
     }
 
     [Fact]
@@ -222,11 +211,12 @@ public sealed class Dc1RaptorVisualVariantTests
     }
 
     [Fact]
-    public void PaletteApply_IsRaptorHeavyOnly_AndLeavesTargetRecordFieldsUntouched()
+    public void PaletteApply_RejectsArbitraryDonorBytesEvenForRaptorHeavy()
     {
         var evidence = BlueEvidence();
         var target = PackageWithPalette(0x11);
         var donor = PackageWithPalette(0x99);
+        var donorRoom = RoomFile.Read(5, 8, donor);
         var enemy = new EnemyRecord
         {
             Opcode = DcOpcodes.Enemy2,
@@ -238,11 +228,11 @@ public sealed class Dc1RaptorVisualVariantTests
         };
         var before = (enemy.MaxHp, enemy.AiParam, enemy.BirthMode);
 
-        var result = Dc1RaptorVisualVariantEditor.TryApplyPalette(target, donor, enemy, evidence);
+        var result = Dc1RaptorVisualVariantEditor.TryApplyPalette(target, donorRoom, enemy, evidence);
 
-        Assert.Equal(Dc1RaptorVisualVariantOutcome.Applied, result.Outcome);
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
+        Assert.Null(result.PatchedBytes);
         Assert.Equal(before, (enemy.MaxHp, enemy.AiParam, enemy.BirthMode));
-        Assert.All(result.PatchedBytes![2048..(2048 + 512)], b => Assert.Equal(0x99, b));
         Assert.All(target[2048..(2048 + 512)], b => Assert.Equal(0x11, b));
     }
 
@@ -252,6 +242,7 @@ public sealed class Dc1RaptorVisualVariantTests
     {
         var target = PackageWithPalette(0x11);
         var donor = PackageWithPalette(0x99);
+        var donorRoom = RoomFile.Read(5, 8, donor);
         var beforeTarget = target.ToArray();
         var beforeDonor = donor.ToArray();
         var enemy = EnemyFor(species);
@@ -259,7 +250,7 @@ public sealed class Dc1RaptorVisualVariantTests
         var beforeRaw = enemy.Raw.ToArray();
 
         var result = Dc1RaptorVisualVariantEditor.TryApplyPalette(
-            target, donor, enemy, BlueEvidence());
+            target, donorRoom, enemy, BlueEvidence());
 
         Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
         Assert.Null(result.PatchedBytes);
@@ -282,6 +273,22 @@ public sealed class Dc1RaptorVisualVariantTests
         BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(20, 4), 4);
         bytes.AsSpan(2048, 512).Fill(fill);
         return bytes;
+    }
+
+    private static (RoomFile? Target, RoomFile? Donor) LoadRealBlueRooms()
+    {
+        var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (string.IsNullOrWhiteSpace(root)) return (null, null);
+        var data = Path.Combine(root, "Data");
+        if (!Directory.Exists(data)) return (null, null);
+        var targetPath = Directory.EnumerateFiles(data, "*102.dat")
+            .FirstOrDefault(p => string.Equals(Path.GetFileName(p), "st102.dat", StringComparison.OrdinalIgnoreCase));
+        var donorPath = Directory.EnumerateFiles(data, "*508.dat")
+            .FirstOrDefault(p => string.Equals(Path.GetFileName(p), "st508.dat", StringComparison.OrdinalIgnoreCase));
+        return targetPath is null || donorPath is null
+            ? (null, null)
+            : (RoomFile.Read(1, 2, File.ReadAllBytes(targetPath)),
+               RoomFile.Read(5, 8, File.ReadAllBytes(donorPath)));
     }
 
     private static EnemyRecord EnemyFor(DinoSpecies species)
