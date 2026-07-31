@@ -12,6 +12,8 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+### Added
+
 - **The Archipelago tab is available in the GUI.** DC1 users can create a minimal player YAML,
   connect after a confirmation, install and restore placements, and launch the game from the tab;
   DC2 explains that runtime connection is not available yet, and the YAML helper never saves a
