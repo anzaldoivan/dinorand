@@ -89,6 +89,43 @@ public sealed class ApGuiReenableTests
         }
     }
 
+    [Fact]
+    public async Task Runner_session_ready_log_marks_connected_and_updates_title_and_status()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "dinorand_ap_ready_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(Path.Combine(root, "Data"));
+        File.WriteAllBytes(Path.Combine(root, "Data", "st102.dat"), new byte[16]);
+        using var started = new ManualResetEventSlim();
+        try
+        {
+            var vm = new MainWindowViewModel(new SavingPicker(null), new AcceptingDialogs(), () => null!,
+                new AppSettings(), (h, s, p, i, o, log, error, ct) =>
+                {
+                    log("connected: seed TEST, slot #1 'Player', goal room 060d");
+                    log("session-ready: seed TEST; placement installed; starting DINO.exe poll");
+                    started.Set();
+                    ct.WaitHandle.WaitOne();
+                    return 0;
+                }, a => a());
+            vm.GamePath = root;
+            vm.ApSlot = "Player";
+
+            vm.ApToggleConnectCommand.Execute(null);
+            Assert.True(started.Wait(TimeSpan.FromSeconds(5)));
+
+            Assert.True(vm.ApConnected);
+            Assert.Contains("Connected", vm.WindowTitle);
+            Assert.Equal("Connected — ready to poll.", vm.ApStatusText);
+
+            vm.ApToggleConnectCommand.Execute(null);
+            await vm.ApSessionTask;
+        }
+        finally
+        {
+            try { Directory.Delete(root, recursive: true); } catch { }
+        }
+    }
+
     [Theory]
     [InlineData("error: server world logic_version 3 is obsolete")]
     [InlineData("error: slot_data has no placement — preflight failed")]

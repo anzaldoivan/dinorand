@@ -223,7 +223,7 @@ namespace DinoRand.App
             if (ApRunning && line.StartsWith(Dc1ApRunner.SessionReadyPrefix, StringComparison.Ordinal))
             {
                 ApConnected = true;
-                ApSetStatus(line, Brushes.Green);
+                ApSetStatus("Connected — ready to poll.", Brushes.Green);
             }
         });
 
