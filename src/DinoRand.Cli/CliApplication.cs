@@ -100,6 +100,12 @@ internal sealed partial class CliApplication
         return i >= 0 && i + 1 < argv.Length ? argv[i + 1] : null;
     }
 
+    IEnumerable<string> GetOpts(string name)
+    {
+        for (int i = 0; i + 1 < argv.Length; i++)
+            if (argv[i] == name) yield return argv[i + 1];
+    }
+
     // Parse a hex (0x..) or decimal integer token; null if malformed.
     // cont.57 false-handoff RCA: every single-file edit rebuilds the file FROM the pristine backup, so
     // edits do NOT stack — a second edit silently replaced the first. Make the replacement explicit.

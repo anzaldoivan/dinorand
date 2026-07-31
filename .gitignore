@@ -37,6 +37,7 @@
 !/data/dc1/ap-location-policy.json
 !/data/dc1/suppressed-pickups.json
 !/data/dc1/laser-fences.json
+!/data/dc1/enemy-distribution.json
 !/data/dc2/
 /data/dc2/*
 !/data/dc2/item-sources.json

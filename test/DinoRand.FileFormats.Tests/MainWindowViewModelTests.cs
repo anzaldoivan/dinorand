@@ -7,7 +7,9 @@ using Avalonia.Input.Platform;
 using DinoRand.App;
 using DinoRand.App.Services;
 using DinoRand.FileFormats.Exe;
+using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
+using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Spoiler;
 using Xunit;
@@ -54,6 +56,34 @@ public class MainWindowViewModelTests
     // (a shared %APPDATA% file would make the starting game/seed order-dependent across tests).
     private static MainWindowViewModel NewVm() =>
         new(new FakeFilePicker(), new FakeDialogs(), () => null!, new AppSettings());
+
+    [Fact]
+    public void Dc1EnemyDistributionPanel_IsVisibleSyncsAndResetsAcrossGames()
+    {
+        var vm = NewVm();
+        Assert.True(vm.Dc1EnemyOptionsVisible);
+        vm.Dc1EnemyModeIndex = 1;
+        vm.SelectedDc1FixedSpecies = vm.Dc1FixedSpeciesOptions.Single(option =>
+            option.Species == DinoSpecies.Therizinosaurus);
+        Assert.Equal(Dc1EnemyDistributionMode.Fixed, vm.CurrentConfig.Dc1EnemyMode);
+        Assert.Equal(DinoSpecies.Therizinosaurus, vm.CurrentConfig.Dc1FixedSpecies);
+
+        vm.SelectedGameIndex = 1;
+        Assert.False(vm.Dc1EnemyOptionsVisible);
+        Assert.Equal(0, vm.Dc1EnemyModeIndex);
+        vm.SelectedGameIndex = 0;
+        Assert.True(vm.Dc1EnemyOptionsVisible);
+        Assert.Equal(Dc1EnemyDistributionMode.Fixed, vm.CurrentConfig.Dc1EnemyMode);
+    }
+
+    [Fact]
+    public void Dc1EnemyWeightChangesRoundTripThroughSeedUi()
+    {
+        var vm = NewVm();
+        var raptor = vm.Dc1WeightOptions.Single(option => option.Species == DinoSpecies.RaptorHeavy);
+        raptor.Weight = 1;
+        Assert.Equal((byte)1, vm.CurrentConfig.Dc1SpeciesWeights![DinoSpecies.RaptorHeavy]);
+    }
 
     [Fact]
     public void Browse_files_opens_the_exact_last_successful_gui_spoiler()

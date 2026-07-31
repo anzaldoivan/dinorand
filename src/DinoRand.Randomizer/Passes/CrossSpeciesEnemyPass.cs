@@ -1,5 +1,6 @@
 using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Definitions;
+using DinoRand.Randomizer.Dc1;
 
 namespace DinoRand.Randomizer.Passes;
 
@@ -68,7 +69,12 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
             candidates.Add(new RoomCandidate(room.Stage, room.Room, hasVictim, present));
         }
 
-        var placements = CrossSpeciesPlanner.Plan(candidates, donors, chance, rng);
+        var distribution = Dc1EnemyDistribution.LoadEmbedded();
+        var picker = context.Config.Dc1EnemyMode == Dc1EnemyDistributionMode.Fixed
+            ? Dc1DonorPicker.Fixed(context.Config.Dc1FixedSpecies
+                ?? throw new InvalidOperationException("DC1 fixed enemy mode requires a fixed species"))
+            : Dc1DonorPicker.Weighted(distribution.EffectiveWeights(context.Config.Dc1SpeciesWeights));
+        var placements = CrossSpeciesPlanner.Plan(candidates, donors, chance, rng, picker);
 
         int placed = 0, skipped = 0;
         foreach (var p in placements)
@@ -116,6 +122,8 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
 
         context.Log($"[cross-species] placed {placed} foreign species ({skipped} skipped) across "
                     + $"{placements.Select(p => p.Stage * 0x100 + p.Room).Distinct().Count()} rooms; "
-                    + $"{context.ExePatchRequests.Count} exe patches queued (donors: {string.Join(", ", donors)})");
+                    + $"{context.ExePatchRequests.Count} exe patches queued (donors: {string.Join(", ", donors)}; "
+                    + $"tally: {string.Join(", ", placements.GroupBy(p => p.Species).OrderBy(g => g.Key)
+                        .Select(g => $"{g.Key}={g.Count()}"))})");
     }
 }

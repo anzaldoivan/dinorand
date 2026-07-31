@@ -128,6 +128,33 @@
                               ToolTip.Tip="Permute enemy types within each room (same-category swaps; scripted bosses left untouched)."
                               IsChecked="{Binding RandomizeEnemies, Mode=TwoWay}" />
 
+                    <StackPanel Margin="20,0,0,4" IsVisible="{Binding Dc1EnemyOptionsVisible}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="DC1 donor selection:" VerticalAlignment="Center" />
+                            <ComboBox SelectedIndex="{Binding Dc1EnemyModeIndex, Mode=TwoWay}" MinWidth="110">
+                                <ComboBoxItem Content="Weighted" />
+                                <ComboBoxItem Content="Fixed species" />
+                            </ComboBox>
+                            <ComboBox ItemsSource="{Binding Dc1FixedSpeciesOptions}"
+                                      SelectedItem="{Binding SelectedDc1FixedSpecies, Mode=TwoWay}"
+                                      IsVisible="{Binding Dc1FixedOptionsVisible}" MinWidth="145" />
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Dc1WeightOptions}"
+                                      IsVisible="{Binding Dc1WeightedOptionsVisible}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="130,140,Auto" Margin="0,1">
+                                        <TextBlock Grid.Column="0" Text="{Binding Creature}" VerticalAlignment="Center" />
+                                        <Slider Grid.Column="1" Minimum="0" Maximum="255" TickFrequency="1"
+                                                IsSnapToTickEnabled="True" Value="{Binding Weight, Mode=TwoWay}" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Weight, StringFormat={}{0:0}}"
+                                                   VerticalAlignment="Center" Margin="6,0,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
                     <CheckBox Content="Shuffle Key Items (Normal/Original Mode Only)" Margin="0,2"
                               IsVisible="{Binding PrimaryItemOptionsVisible}"
                               IsEnabled="{Binding CanShuffleKeyItems}"

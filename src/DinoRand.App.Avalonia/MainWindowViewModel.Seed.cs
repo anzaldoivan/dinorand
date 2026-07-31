@@ -14,9 +14,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DinoRand.App.Services;
 using DinoRand.FileFormats.Exe;
+using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Dc2;
+using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Dc2.Passes;   // Dc2CharacterSkin
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
@@ -42,6 +44,13 @@ namespace DinoRand.App
                 RandomizeItems = _appSeed.Config.RandomizeItems;
                 RandomizeEnemies = _appSeed.Config.RandomizeEnemies;
                 RandomizeEnemyHp = _appSeed.Config.RandomizeEnemyHp;
+                Dc1EnemyModeIndex = _appSeed.Config.Dc1EnemyMode == Dc1EnemyDistributionMode.Fixed ? 1 : 0;
+                SelectedDc1FixedSpecies = Dc1FixedSpeciesOptions
+                    .FirstOrDefault(option => option.Species == _appSeed.Config.Dc1FixedSpecies)
+                    ?? Dc1FixedSpeciesOptions[0];
+                var dc1Weights = Dc1Distribution.EffectiveWeights(_appSeed.Config.Dc1SpeciesWeights);
+                foreach (var row in Dc1WeightOptions)
+                    row.Weight = dc1Weights.GetValueOrDefault(row.Species);
                 IncludeDc2SetpieceEnemies = _appSeed.Config.IncludeDc2SetpieceEnemies;
                 IncludeDc2BossEnemies = _appSeed.Config.IncludeDc2BossEnemies;
                 Dc2EnemyModeIndex = _appSeed.Config.Dc2EnemyMode == Dc2EnemyDistributionMode.Fixed ? 1 : 0;
@@ -113,6 +122,14 @@ namespace DinoRand.App
                 : Dc2WeightOptions.ToDictionary(r => r.Type, r => (byte)Math.Round(r.Weight));
         }
 
+        private IReadOnlyDictionary<DinoSpecies, byte> CollectDc1Weights()
+        {
+            bool allDefault = Dc1WeightOptions.All(row =>
+                (byte)Math.Round(row.Weight) == Dc1Distribution.DefaultWeights.GetValueOrDefault(row.Species));
+            return allDefault ? null : Dc1WeightOptions.ToDictionary(
+                row => row.Species, row => (byte)Math.Clamp(Math.Round(row.Weight), 0, 255));
+        }
+
         /// <summary>Raptor-tier rows as a config override map — <c>null</c> on all-default rows,
         /// same contract as <see cref="CollectDc2Weights"/>.</summary>
         private IReadOnlyDictionary<int, byte> CollectDc2RaptorTierWeights()
@@ -137,6 +154,10 @@ namespace DinoRand.App
                 RandomizeItems = RandomizeItems,
                 RandomizeEnemies = RandomizeEnemies,
                 RandomizeEnemyHp = RandomizeEnemyHp && CanRandomizeEnemyHp,
+                Dc1EnemyMode = Dc1EnemyModeIndex == 1
+                    ? Dc1EnemyDistributionMode.Fixed : Dc1EnemyDistributionMode.Weighted,
+                Dc1FixedSpecies = Dc1EnemyModeIndex == 1 ? SelectedDc1FixedSpecies?.Species : null,
+                Dc1SpeciesWeights = SelectedGame.Id == "dc1" ? CollectDc1Weights() : null,
                 IncludeDc2SetpieceEnemies = IncludeDc2SetpieceEnemies,
                 IncludeDc2BossEnemies = IncludeDc2BossEnemies,
                 Dc2AllowWaterLevelEnemySwaps = Dc2AllowWaterLevelEnemySwaps,

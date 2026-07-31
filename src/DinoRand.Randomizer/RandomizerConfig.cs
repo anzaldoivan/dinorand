@@ -1,4 +1,5 @@
 using DinoRand.Randomizer.Definitions;
+using DinoRand.FileFormats.Stage;
 
 namespace DinoRand.Randomizer;
 
@@ -518,6 +519,15 @@ public sealed class RandomizerConfig
     /// requires <see cref="RandomizeEnemies"/>, so the enemy-randomizer master switch remains authoritative.
     /// </summary>
     public bool CrossRoomEnemySpecies { get; set; } = true;
+
+    /// <summary>DC1 only. How the enabled production cross-species donors are selected.</summary>
+    public Dc1.Dc1EnemyDistributionMode Dc1EnemyMode { get; set; } = Dc1.Dc1EnemyDistributionMode.Weighted;
+
+    /// <summary>DC1 only. The fixed production donor, used only in fixed mode.</summary>
+    public DinoSpecies? Dc1FixedSpecies { get; set; }
+
+    /// <summary>DC1 only. Weight overrides for the enabled production donor registry.</summary>
+    public IReadOnlyDictionary<DinoSpecies, byte>? Dc1SpeciesWeights { get; set; }
 
     /// <summary>
     /// Opt-in (default off; DC1 only). Cutscene-safe enemy randomization: rooms in the derived

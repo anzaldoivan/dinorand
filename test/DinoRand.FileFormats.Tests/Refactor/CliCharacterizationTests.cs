@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using DinoRand.FileFormats.Exe;
 using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
+using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Spoiler;
 using Xunit;
 
@@ -24,6 +25,9 @@ public sealed class CliCharacterizationTests
         Assert.Contains("--install", value.Help.Stdout);
         Assert.Contains("--no-dc1-door-skip", value.Help.Stdout);
         Assert.Contains("--dc1-blue-raptor", value.Help.Stdout);
+        Assert.Contains("--dc1-enemy-mode weighted|fixed", value.Help.Stdout);
+        Assert.Contains("--dc1-fixed-species", value.Help.Stdout);
+        Assert.Contains("--dc1-weight", value.Help.Stdout);
         Assert.Contains("button press", value.Help.Stdout, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("", value.Help.Stderr);
         Assert.NotEqual(0, value.Invalid.ExitCode);
@@ -31,6 +35,20 @@ public sealed class CliCharacterizationTests
         Assert.Equal("", value.Invalid.Stdout);
         Assert.Equal(value, CaptureTextInvocations());
         RecordOrCompare("cli-text", value, nameof(Help_and_invalid_invocations_pin_exit_stdout_and_stderr));
+    }
+
+    [Theory]
+    [InlineData("--dc1-enemy-mode", "bogus")]
+    [InlineData("--dc1-enemy-mode", "fixed")]
+    [InlineData("--dc1-fixed-species", "Velociraptor")]
+    [InlineData("--dc1-weight", "RaptorHeavy=256")]
+    [InlineData("--dc1-weight", "RaptorHeavy=-1")]
+    [InlineData("--dc1-weight", "UnknownSpecies=1")]
+    public void Dc1_enemy_distribution_cli_rejects_invalid_options(string option, string value)
+    {
+        var result = Run("--install", "/tmp/dinorand-nonexistent-install", option, value);
+        Assert.NotEqual(0, result.ExitCode);
+        Assert.Contains("error", result.Stderr, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

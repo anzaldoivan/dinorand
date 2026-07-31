@@ -14,9 +14,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DinoRand.App.Services;
 using DinoRand.FileFormats.Exe;
+using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Dc2;
+using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Dc2.Passes;   // Dc2CharacterSkin
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
@@ -108,7 +110,10 @@ namespace DinoRand.App
                 row.Changed = UpdateSeedFromUi;
             foreach (var row in Dc2RaptorTierOptions)
                 row.Changed = UpdateSeedFromUi;
+            foreach (var row in Dc1WeightOptions)
+                row.Changed = UpdateSeedFromUi;
             _selectedDc2FixedSpecies = Dc2FixedSpeciesOptions[0];
+            _selectedDc1FixedSpecies = Dc1FixedSpeciesOptions[0];
             RefreshDc2WeightVisibility(); // initial state: toggles start false ⇒ boss/setpiece rows hidden
 
             // Mirror Window_Loaded: seed the persisted fields under the guard so their change-hooks don't
@@ -157,6 +162,7 @@ namespace DinoRand.App
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Dc2EnemyOptionsVisible))]
+        [NotifyPropertyChangedFor(nameof(Dc1EnemyOptionsVisible))]
         [NotifyPropertyChangedFor(nameof(EnemyDifficultyEnabled))]
         private bool _randomizeEnemies;
 
@@ -197,6 +203,25 @@ namespace DinoRand.App
         private int _dc2EnemyModeIndex;
 
         [ObservableProperty] private Dc2FixedSpeciesOption _selectedDc2FixedSpecies;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Dc1WeightedOptionsVisible))]
+        [NotifyPropertyChangedFor(nameof(Dc1FixedOptionsVisible))]
+        private int _dc1EnemyModeIndex;
+
+        [ObservableProperty] private Dc1FixedSpeciesOption _selectedDc1FixedSpecies;
+
+        private static readonly Dc1EnemyDistribution Dc1Distribution = Dc1EnemyDistribution.LoadEmbedded();
+
+        public IReadOnlyList<Dc1FixedSpeciesOption> Dc1FixedSpeciesOptions { get; } =
+            Dc1Distribution.Rows.Select(row => new Dc1FixedSpeciesOption(row.Creature, row.Species)).ToList();
+
+        public ObservableCollection<Dc1WeightOption> Dc1WeightOptions { get; } = new(
+            Dc1Distribution.Rows.Select(row => new Dc1WeightOption(row.Creature, row.Species, row.DefaultWeight)));
+
+        public bool Dc1EnemyOptionsVisible => RandomizeEnemies && SelectedGame.Id == "dc1";
+        public bool Dc1WeightedOptionsVisible => Dc1EnemyModeIndex == 0;
+        public bool Dc1FixedOptionsVisible => Dc1EnemyModeIndex == 1;
 
         /// <summary>Pinnable donors for fixed mode: every Known+LAND species (a pin IS the
         /// boss/setpiece opt-in, plan D3), plus the aquatic (wave-only) donors while the
@@ -448,6 +473,13 @@ namespace DinoRand.App
             if (!CanRandomizeItems) RandomizeItems = false;
             if (!CanRandomizeEnemies) RandomizeEnemies = false;
             if (!CanRandomizeEnemyHp) RandomizeEnemyHp = false;
+            if (SelectedGame.Id != "dc1")
+            {
+                Dc1EnemyModeIndex = 0;
+                SelectedDc1FixedSpecies = Dc1FixedSpeciesOptions[0];
+                foreach (var row in Dc1WeightOptions)
+                    row.Weight = Dc1Distribution.DefaultWeights.GetValueOrDefault(row.Species);
+            }
             // DC2-only sub-options: clear on any game that can't host them, so a greyed/hidden toggle
             // never leaks a true into the config (DC1 ignores these fields anyway).
             if (SelectedGame.Id != "dc2")
@@ -521,6 +553,7 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanRandomizeEnemyHp));
             OnPropertyChanged(nameof(EnemyDifficultyEnabled));
             OnPropertyChanged(nameof(Dc2EnemyOptionsVisible));
+            OnPropertyChanged(nameof(Dc1EnemyOptionsVisible));
             OnPropertyChanged(nameof(Dc2RaptorPanelVisible));
             OnPropertyChanged(nameof(CanSwapDc2PlayerCharacters));
             OnPropertyChanged(nameof(CanRandomizeDoors));
@@ -713,6 +746,8 @@ namespace DinoRand.App
         partial void OnRandomizeItemsChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeEnemiesChanged(bool value) => UpdateSeedFromUi();
         partial void OnRandomizeEnemyHpChanged(bool value) => UpdateSeedFromUi();
+        partial void OnDc1EnemyModeIndexChanged(int value) => UpdateSeedFromUi();
+        partial void OnSelectedDc1FixedSpeciesChanged(Dc1FixedSpeciesOption value) => UpdateSeedFromUi();
         // The pool toggles also drive weight-row visibility — refreshed OUTSIDE UpdateSeedFromUi so
         // it happens on every path (user click, seed paste, game switch), _suspend included.
         partial void OnIncludeDc2SetpieceEnemiesChanged(bool value)
@@ -899,6 +934,33 @@ namespace DinoRand.App
         {
             Creature = creature;
             Type = type;
+            _weight = weight;
+        }
+    }
+
+    public sealed class Dc1FixedSpeciesOption
+    {
+        public string Display { get; }
+        public DinoSpecies Species { get; }
+        public Dc1FixedSpeciesOption(string display, DinoSpecies species) { Display = display; Species = species; }
+        public override string ToString() => Display;
+    }
+
+    public sealed class Dc1WeightOption : ObservableObject
+    {
+        public string Creature { get; }
+        public DinoSpecies Species { get; }
+        public Action Changed { get; set; }
+        private double _weight;
+        public double Weight
+        {
+            get => _weight;
+            set { if (SetProperty(ref _weight, value)) Changed?.Invoke(); }
+        }
+        public Dc1WeightOption(string creature, DinoSpecies species, byte weight)
+        {
+            Creature = creature;
+            Species = species;
             _weight = weight;
         }
     }

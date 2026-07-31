@@ -1,6 +1,7 @@
 {
   "_source": "dinocrisis.fandom.com (MediaWiki API), generated 2026-06-20",
-  "_placed_enemies": "placed_enemies = ground truth decoded from the room .dat via the 0x20+0x59 enemy opcodes; species by model skeleton bone count (docs/dc1/STATIC-SCD-RE.md cont.20-22). category/bones map = data/dc1/enemies.json.",
+  "census_scope": "normalized_production_placements",
+  "_placed_enemies": "placed_enemies = normalized production placement census decoded from the room .dat via the 0x20+0x59 enemy opcodes; it is not the broader raw every-valid-record RoomFile.Enemies census. Species by model skeleton bone count (docs/dc1/STATIC-SCD-RE.md cont.20-22). category/bones map = data/dc1/enemies.json.",
   "_flag_glossary": {
     "0:0": {
       "label": "story progress flag 0:0 (engine-set; gates the Medical Room velociraptor)",

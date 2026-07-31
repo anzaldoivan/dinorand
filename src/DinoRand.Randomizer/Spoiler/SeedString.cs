@@ -1,4 +1,6 @@
 using DinoRand.Randomizer.Dc2;
+using DinoRand.FileFormats.Stage;
+using DinoRand.Randomizer.Dc1;
 
 namespace DinoRand.Randomizer.Spoiler;
 
@@ -10,7 +12,7 @@ namespace DinoRand.Randomizer.Spoiler;
 /// The byte layout is UNCHANGED and locked by <c>AppSeedTests</c> + <c>SeedStringTests</c>.
 /// </summary>
 /// <remarks>
-/// Encoding is 10, 11, 16, 17, 22 or 23 bytes (legacy 6-, 8-, and 9-byte payloads still parse;
+/// Encoding is 10, 11, 16, 17, 22, 23 or 27 bytes (legacy 6-, 8-, and 9-byte payloads still parse;
 /// byte 22 = the DC2 starting-weapon byte, present only when the option is on: bit7 = enabled,
 /// bits 0–2 = Dylan selection (0 = random, n = DylanWeaponIds[n−1]), bits 3–5 = Regina selection;
 /// bytes 17–21 = the DC2 raptor-tier block, present only when non-default: byte 17 = enable bit7 +
@@ -34,9 +36,13 @@ namespace DinoRand.Randomizer.Spoiler;
 ///              Dc2CanonicalSpecies[n−1]) | setpiece bit4 | boss bit5 | character-skin bits 6–7
 ///              (Dc2CharacterSkin: 0=Stock, 1=Gail, 2=Rick, 3=Random); bytes 12–15 = eight
 ///              weight nibbles in Dc2CanonicalSpecies order, LOW nibble first (8th reserved).
-/// Back-compat: shorter historical payloads decode with the defaults their era implied, so an
-/// old shared seed reproduces its original run. See the original AppSeed remarks for the full
-/// per-era table.
+///   bytes 23–26 = DC1 distribution block when non-default: byte 23 = 0xd1 (or 0xd3 when the
+///              DC2 raptor block is present), byte 24 = mode nibble (0=Weighted, 1..2=Fixed in
+///              Dc1CanonicalSpecies order), bytes 25–26 = the two donor weights.
+/// Back-compat: shorter historical payloads retain their payload and parse shape. In particular,
+/// a legacy enemy-enabled payload with no DC1 block decodes as the new weighted policy using the
+/// current curated donor defaults; its donor outcomes are intentionally not preserved as uniform.
+/// See the original AppSeed remarks for the full per-era table.
 /// </remarks>
 public static class SeedString
 {
@@ -46,6 +52,9 @@ public static class SeedString
     /// against data/dc2/enemy-distribution.json by AppSeedTests.</summary>
     public static readonly IReadOnlyList<int> Dc2CanonicalSpecies =
         new[] { 0x02, 0x03, 0x06, 0x07, 0x08, 0x09, 0x0e };
+
+    public static readonly IReadOnlyList<DinoSpecies> Dc1CanonicalSpecies =
+        new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus };
 
     private static readonly Lazy<Dc2EnemyDistribution> Dc2Distribution =
         new(Dc2EnemyDistribution.LoadEmbedded);
@@ -93,11 +102,22 @@ public static class SeedString
         bool startWeaponByte = config.Dc2RandomizeStartWeapon;
         if (startWeaponByte) { dc2Block = true; reginaByte = true; raptorBlock = true; }
 
+        var dc1Distribution = Dc1EnemyDistribution.LoadEmbedded();
+        int dc1FixedIdx = config.Dc1EnemyMode == Dc1EnemyDistributionMode.Fixed
+            ? IndexOfDc1Species(config.Dc1FixedSpecies) : -1;
+        if (config.Dc1EnemyMode == Dc1EnemyDistributionMode.Fixed && dc1FixedIdx < 0)
+            throw new ArgumentException("DC1 fixed enemy mode requires an enabled donor species", nameof(config));
+        var dc1Weights = dc1Distribution.EffectiveWeights(config.Dc1SpeciesWeights);
+        bool dc1WeightsDefault = Dc1CanonicalSpecies.All(species =>
+            dc1Weights.GetValueOrDefault(species) == dc1Distribution.DefaultWeights.GetValueOrDefault(species));
+        bool dc1Block = dc1FixedIdx >= 0 || config.Dc1EnemyMode != Dc1EnemyDistributionMode.Weighted
+                        || !dc1WeightsDefault;
+
         // 11 bytes only when ammo is reduced; otherwise 10, so every non-reducing config keeps its
         // historical byte-identical seed string. The DC2 block needs fixed byte positions, so its
         // presence forces byte 10 (even when 0).
         byte ammoReduction = Math.Min((byte)7, config.AmmoReduction);
-        var bytes = new byte[startWeaponByte ? 23 : raptorBlock ? 22 : reginaByte ? 17 : dc2Block ? 16 : ammoReduction > 0 ? 11 : 10];
+        var bytes = new byte[dc1Block ? 27 : startWeaponByte ? 23 : raptorBlock ? 22 : reginaByte ? 17 : dc2Block ? 16 : ammoReduction > 0 ? 11 : 10];
         BitConverter.TryWriteBytes(bytes.AsSpan(0, 4), seed.Value);
         bytes[4] = (byte)(
             (config.RandomizeItems             ? 1 : 0) |
@@ -156,6 +176,13 @@ public static class SeedString
                         | (config.Dc2AddAndEquipStartWeapon ? 0x40 : 0));   // bit 6 = add-and-equip (full band)
             }
         }
+        if (dc1Block)
+        {
+            bytes[23] = (byte)(raptorBlock ? 0xd3 : 0xd1);
+            bytes[24] = (byte)(dc1FixedIdx < 0 ? 0 : dc1FixedIdx + 1);
+            bytes[25] = dc1Weights.GetValueOrDefault(Dc1CanonicalSpecies[0]);
+            bytes[26] = dc1Weights.GetValueOrDefault(Dc1CanonicalSpecies[1]);
+        }
         var b64 = Convert.ToBase64String(bytes).TrimEnd('=')
                          .Replace('+', '-').Replace('/', '_');
         return $"DINO-{b64}";
@@ -174,7 +201,11 @@ public static class SeedString
         {
             var b64 = s[5..].Replace('-', '+').Replace('_', '/');
             var bytes = Convert.FromBase64String(b64.PadRight((b64.Length + 3) / 4 * 4, '='));
-            if (bytes.Length is not (6 or 8 or 9 or 10 or 11 or 16 or 17 or 22 or 23)) return false;
+            if (bytes.Length is not (6 or 8 or 9 or 10 or 11 or 16 or 17 or 22 or 23 or 27)) return false;
+            bool hasDc1Block = bytes.Length == 27;
+            if (hasDc1Block && bytes[23] is not (0xd1 or 0xd3)) return false;
+            bool hasDc2Block = bytes.Length >= 16 && (!hasDc1Block || bytes[23] == 0xd3
+                || bytes[11..17].Any(value => value != 0));
             var seedVal = BitConverter.ToInt32(bytes, 0);
             var flags = bytes[4];
             var diff = bytes[5] / 255.0;
@@ -208,7 +239,7 @@ public static class SeedString
             bool dc2ShuffleShop = false, dc2PuzzleCodes = false, dc2Circuits = false, dc2RekeyPlate = false;
             bool dc2CrossCharWeapons = false, dc2RandomizeWeapons = false;
             IReadOnlyDictionary<int, byte>? dc2Weights = null;
-            if (bytes.Length >= 16)
+            if (hasDc2Block)
             {
                 int modeNibble = bytes[11] & 0x0f;
                 if (modeNibble is >= 1 && modeNibble <= Dc2CanonicalSpecies.Count)
@@ -255,7 +286,7 @@ public static class SeedString
             int blueCombo = 20;
             var raptorColourMode = Dc2RaptorColourMode.RoomTier;
             IReadOnlyDictionary<int, byte>? tierWeights = null;
-            if (bytes.Length >= 22)
+            if (bytes.Length >= 22 && (!hasDc1Block || bytes[23] == 0xd3))
             {
                 raptorTiers = (bytes[17] & 0x80) != 0;
                 raptorColourMode = (bytes[17] & 0x20) != 0
@@ -276,13 +307,32 @@ public static class SeedString
             // seed, where the option defaults off.
             bool startWeapon = false, addAndEquip = false;
             byte? dylanStartId = null, reginaStartId = null;
-            if (bytes.Length >= 23)
+            if (bytes.Length >= 23 && (!hasDc1Block || bytes[23] == 0xd3))
             {
                 startWeapon = (bytes[22] & 0x80) != 0;
                 addAndEquip = (bytes[22] & 0x40) != 0; // bit 6 = add-and-equip → full band selectable
                 if (!TryIdOf(FileFormats.Exe.Dc2StartingLoadoutPatch.DylanWeaponIds, bytes[22] & 0x07, addAndEquip, out dylanStartId)
                     || !TryIdOf(FileFormats.Exe.Dc2StartingLoadoutPatch.ReginaWeaponIds, (bytes[22] >> 3) & 0x07, addAndEquip, out reginaStartId))
                     return false; // reserved selection value from a future format — refuse, don't guess
+            }
+
+            var dc1Mode = Dc1EnemyDistributionMode.Weighted;
+            DinoSpecies? dc1FixedSpecies = null;
+            IReadOnlyDictionary<DinoSpecies, byte>? dc1Weights = null;
+            if (hasDc1Block)
+            {
+                int mode = bytes[24] & 0x0f;
+                if ((bytes[24] & 0xf0) != 0 || mode > Dc1CanonicalSpecies.Count) return false;
+                if (mode > 0)
+                {
+                    dc1Mode = Dc1EnemyDistributionMode.Fixed;
+                    dc1FixedSpecies = Dc1CanonicalSpecies[mode - 1];
+                }
+                var decoded = Dc1CanonicalSpecies.Select((species, index) => (species, index))
+                    .ToDictionary(item => item.species, item => bytes[25 + item.index]);
+                var defaults = Dc1EnemyDistribution.LoadEmbedded().DefaultWeights;
+                dc1Weights = decoded.All(kv => defaults.GetValueOrDefault(kv.Key) == kv.Value)
+                    ? null : decoded;
             }
 
             config = new RandomizerConfig
@@ -324,6 +374,9 @@ public static class SeedString
                 Dc2AddAndEquipStartWeapon  = addAndEquip,
                 Dc2DylanStartWeaponId      = dylanStartId,
                 Dc2ReginaStartWeaponId     = reginaStartId,
+                Dc1EnemyMode               = dc1Mode,
+                Dc1FixedSpecies            = dc1FixedSpecies,
+                Dc1SpeciesWeights          = dc1Weights,
             };
             seed = new Seed(seedVal);
             return true;
@@ -335,6 +388,14 @@ public static class SeedString
     {
         for (int i = 0; i < Dc2CanonicalSpecies.Count; i++)
             if (Dc2CanonicalSpecies[i] == type) return i;
+        return -1;
+    }
+
+    private static int IndexOfDc1Species(DinoSpecies? species)
+    {
+        if (species is not { } value) return -1;
+        for (int i = 0; i < Dc1CanonicalSpecies.Count; i++)
+            if (Dc1CanonicalSpecies[i] == value) return i;
         return -1;
     }
 

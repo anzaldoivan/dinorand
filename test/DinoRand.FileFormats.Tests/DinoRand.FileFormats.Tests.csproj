@@ -30,6 +30,7 @@
     <Content Include="..\..\data\dc1\emergency-boxes.json" Link="data\dc1\emergency-boxes.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\map.json" Link="data\dc1\map.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\room-data.json" Link="data\dc1\room-data.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\dc1\enemy-distribution.json" Link="data\dc1\enemy-distribution.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\voice.json" Link="data\dc1\voice.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc2\door-guards.json" Link="data\dc2\door-guards.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

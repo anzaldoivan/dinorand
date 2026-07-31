@@ -1,6 +1,7 @@
 #nullable enable
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Spoiler;
+using DinoRand.FileFormats.Stage;
 
 namespace DinoRand.App;
 
@@ -22,6 +23,7 @@ public sealed class AppSeed
     /// <summary>Read-only view of the frozen DC2 canonical species order (a wire-format constant
     /// owned by <see cref="SeedString"/>) for the drift-lock test.</summary>
     public static IReadOnlyList<int> Dc2CanonicalSpeciesOrder => SeedString.Dc2CanonicalSpecies;
+    public static IReadOnlyList<DinoSpecies> Dc1CanonicalSpeciesOrder => SeedString.Dc1CanonicalSpecies;
 
     public Seed Seed { get; }
     public RandomizerConfig Config { get; }

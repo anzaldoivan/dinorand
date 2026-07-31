@@ -21,8 +21,9 @@ internal static class CliOutput
             "  dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]\r\n" +
             "           [--no-items] [--no-enemies] [--dc1-blue-raptor] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items]\r\n" +
             "           [--dc1-cutscene-safe] [--no-dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--pickup-ground-models] [--no-pickup-ground-models]   (dc1)\r\n" +
-            "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
-            "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
+             "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
+             "           [--dc1-enemy-mode weighted|fixed] [--dc1-fixed-species <name>] [--dc1-weight <name>=<0..255>]... (dc1)\r\n" +
+             "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
             "           [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)\r\n" +
             "           [--dc2-character-skin stock|gail|rick|random]           (dc2)\r\n" +
             "           [--dc2-regina-skin stock|gail|rick|random]              (dc2)\r\n" +
@@ -109,7 +110,11 @@ internal static class CliOutput
             "    species doesn't need the include-* toggles. --dc2-weight overrides one species' weight\r\n" +
             "    (repeatable, e.g. --dc2-weight trex=5 --dc2-weight velociraptor=0; 0 excludes the\r\n" +
             "    species; weighted mode only). Per-species room caps (T-Rex 2 / Giga 1) come from\r\n" +
-            "    data/dc2/enemy-distribution.json.\r\n" +
+             "    data/dc2/enemy-distribution.json.\r\n" +
+             "  - --dc1-enemy-mode (dc1 enemy rando, default weighted) selects the two enabled production donors,\r\n" +
+             "    RaptorHeavy and Therizinosaurus. Defaults use the vanilla 46:9 placed-enemy census;\r\n" +
+             "    --dc1-fixed-species pins one donor (and implies fixed mode), while repeated --dc1-weight\r\n" +
+             "    overrides a donor's 0..255 weighted draw. Zero excludes that donor; all-zero rooms stay vanilla.\r\n" +
             "  - --dc2-raptor-tiers (dc2, off by default) randomizes raptor colour/HP tier variants\r\n" +
             "    (docs/reference/dc2/enemies/RAPTOR-TIER-RE.md): static spawns get per-spawn weighted variants (room-file\r\n" +
             "    edit, non-destructive); wave rooms get the seeded pair-table patch written to the\r\n" +
