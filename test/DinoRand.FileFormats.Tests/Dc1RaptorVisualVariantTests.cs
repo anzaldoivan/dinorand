@@ -1,6 +1,7 @@
 using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
 using System.Buffers.Binary;
+using System.Security.Cryptography;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -94,6 +95,8 @@ public sealed class Dc1RaptorVisualVariantTests
         Assert.Equal(0x8C000, Dc1RaptorVisualVariantProfiles.BlueDonorLength);
         Assert.Equal("F6775BEBB1509870C57DB4D8729A98AD63599CBB1EEB1C8EA8679116384C8773",
             Dc1RaptorVisualVariantProfiles.BlueDonorSha256);
+        Assert.Equal(43891, Dc1RaptorVisualVariantProfiles.BlueTexturePayloadLength);
+        Assert.Equal(43062, Dc1RaptorVisualVariantProfiles.BlueTargetTexturePayloadLength);
         Assert.Equal(new Dc1RaptorVisualVariantAuthoring(AiParam: 6),
              Dc1RaptorVisualVariantProfiles.Blue.Authoring);
     }
@@ -113,6 +116,20 @@ public sealed class Dc1RaptorVisualVariantTests
         Assert.Equal((byte)6, enemy.AiParam);
         Assert.Equal(before.Length, result.PatchedBytes!.Length);
         Assert.NotEqual(before, result.PatchedBytes);
+
+        var donorTexture = TextureImporter.ExtractSpeciesTexture(
+            donor.OriginalBytes, new ushort[] { 0x8b, 0x9b }, 0x7ff0);
+        var output = RoomFile.Read(1, 2, result.PatchedBytes);
+        var outputTexture = TextureImporter.ExtractSpeciesTexture(
+            result.PatchedBytes, new ushort[] { 0x8b, 0x9b }, 0x7ff0);
+        Assert.Equal(new VramRect(704, 0, 64, 512), outputTexture.Texture.Dst);
+        Assert.Equal(new VramRect(768, 511, 256, 1), outputTexture.Palette.Dst);
+        Assert.Equal(SHA256.HashData(donorTexture.Texture.Pixels),
+            SHA256.HashData(outputTexture.Texture.Pixels));
+        Assert.Equal(SHA256.HashData(donorTexture.Palette.Pixels),
+            SHA256.HashData(outputTexture.Palette.Pixels));
+        Assert.True(output.ParsedCleanly);
+        Assert.Equal(result.PatchedBytes, output.Write());
     }
 
     [Fact]

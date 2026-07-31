@@ -84,6 +84,8 @@ public static class Dc1RaptorVisualVariantProfiles
     public const int BlueDonorLength = 0x8C000;
     public const string BlueDonorSha256 =
         "F6775BEBB1509870C57DB4D8729A98AD63599CBB1EEB1C8EA8679116384C8773";
+    public const int BlueTexturePayloadLength = 43891;
+    public const int BlueTargetTexturePayloadLength = 43062;
 
     public static Dc1RaptorVisualVariantProfile Blue { get; } = new(
         new Dc1RaptorVisualVariantEvidence(
@@ -173,15 +175,78 @@ public static class Dc1RaptorVisualVariantEditor
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(donor);
         ArgumentNullException.ThrowIfNull(profile);
-        var donorCheck = TryApplyPalette(target.OriginalBytes, donor, enemy, profile.Evidence);
+        var donorCheck = TryApplyBlueTexture(target.OriginalBytes, donor, enemy, profile.Evidence);
         if (donorCheck.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
             return donorCheck;
+        var before = (enemy.MaxHp, enemy.AiParam, enemy.BirthMode);
         var authoring = TryAuthor(enemy, profile.Authoring);
         if (authoring.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
             return new(authoring.Outcome, null, authoring.Note);
-        var palette = TryApplyPalette(target.Write(), donor, enemy, profile.Evidence);
+        try
+        {
+            var patched = TryApplyBlueTexture(target.Write(), donor, enemy, profile.Evidence);
+            if (patched.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
+            {
+                RestoreAuthoring(enemy, before);
+                return patched;
+            }
+            return patched with { Note = $"{profile.Evidence.VariantId}: texture + palette + {authoring.Note}" };
+        }
+        catch (InvalidDataException ex)
+        {
+            RestoreAuthoring(enemy, before);
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            RestoreAuthoring(enemy, before);
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+    }
+
+    private static Dc1RaptorVisualVariantPaletteResult TryApplyBlueTexture(
+        ReadOnlySpan<byte> target, RoomFile donor, EnemyRecord enemy,
+        Dc1RaptorVisualVariantEvidence evidence)
+    {
+        var palette = TryApplyPalette(target, donor, enemy, evidence);
         if (palette.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
             return palette;
-        return palette with { Note = $"{profile.Evidence.VariantId}: palette + {authoring.Note}" };
+
+        try
+        {
+            var targetEntries = PackageRepacker.ReadDc1Entries(target);
+            var donorEntries = PackageRepacker.ReadDc1Entries(donor.OriginalBytes);
+            var textureRect = new VramRect(704, 0, 64, 512);
+            var paletteRect = new VramRect(768, 511, 256, 1);
+            var targetTextures = targetEntries.Where(e => e.Type == GianEntryType.Lzss2 && e.Dst == textureRect).ToList();
+            var donorTextures = donorEntries.Where(e => e.Type == GianEntryType.Lzss2 && e.Dst == textureRect).ToList();
+            var targetPalettes = targetEntries.Where(e => e.Type == GianEntryType.Palette && e.Dst == paletteRect).ToList();
+            var donorPalettes = donorEntries.Where(e => e.Type == GianEntryType.Palette && e.Dst == paletteRect).ToList();
+            if (targetTextures.Count != 1 || donorTextures.Count != 1
+                || targetPalettes.Count != 1 || donorPalettes.Count != 1
+                || targetTextures[0].Size != Dc1RaptorVisualVariantProfiles.BlueTargetTexturePayloadLength
+                || donorTextures[0].Size != Dc1RaptorVisualVariantProfiles.BlueTexturePayloadLength)
+                return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                    "ST102/ST508 texture or palette entries are not the pinned profile");
+
+            var patched = TextureImporter.ReplaceSpeciesTexturePayloadAndPalette(
+                target, donor.OriginalBytes, new ushort[] { 0x8b, 0x9b }, evidence.ClutCode);
+            return new(Dc1RaptorVisualVariantOutcome.Applied, patched, "pinned ST508 texture and palette");
+        }
+        catch (InvalidDataException ex)
+        {
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+    }
+
+    private static void RestoreAuthoring(EnemyRecord enemy, (ushort MaxHp, byte AiParam, byte BirthMode) before)
+    {
+        enemy.MaxHp = before.MaxHp;
+        enemy.AiParam = before.AiParam;
+        enemy.BirthMode = before.BirthMode;
     }
 }

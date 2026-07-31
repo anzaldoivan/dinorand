@@ -531,6 +531,55 @@ public static class TextureImporter
         return patched;
     }
 
+    /// <summary>Replace a compressed species texture entry with the larger donor stream and copy its
+    /// palette in the same fresh package buffer. The target texture's type and VRAM rect are retained;
+    /// all entry positions are rebuilt at 2048-byte alignment and the RDT remains last.</summary>
+    public static byte[] ReplaceSpeciesTexturePayloadAndPalette(
+        ReadOnlySpan<byte> target, ReadOnlySpan<byte> donor,
+        IReadOnlyCollection<ushort> tpageCodes, ushort clutCode)
+    {
+        if (tpageCodes.Count == 0) throw new ArgumentException("no tpage codes", nameof(tpageCodes));
+        var (px, py) = TpageOrigin(tpageCodes.First());
+        var (clX, clY) = ClutOrigin(clutCode);
+        var targetEntries = PackageRepacker.ReadDc1Entries(target);
+        var donorEntries = PackageRepacker.ReadDc1Entries(donor);
+
+        var targetTextures = targetEntries.Where(e => IsCompressed(e.Type) && e.Dst.Contains(px, py)).ToList();
+        var donorTextures = donorEntries.Where(e => IsCompressed(e.Type) && e.Dst.Contains(px, py)).ToList();
+        if (targetTextures.Count != 1 || donorTextures.Count != 1)
+            throw new InvalidDataException("texture target or donor is missing or ambiguous");
+        var targetTexture = targetTextures[0];
+        var donorTexture = donorTextures[0];
+        if (targetTexture.Type != donorTexture.Type || targetTexture.Dst != donorTexture.Dst)
+            throw new InvalidDataException("texture type or VRAM rect differs between target and donor");
+        if (donorTexture.Size <= targetTexture.Size)
+            throw new InvalidDataException("donor texture payload is not larger than the target payload");
+        if (tpageCodes.Any(tp => !targetTexture.Dst.Contains(TpageOrigin(tp).X, TpageOrigin(tp).Y)))
+            throw new InvalidDataException("model tpage codes are not covered by the target texture rect");
+
+        var targetPalettes = targetEntries.Where(e => e.Type == GianEntryType.Palette
+                                                       && e.Dst.X == clX && e.Dst.Y == clY).ToList();
+        var donorPalettes = donorEntries.Where(e => e.Type == GianEntryType.Palette
+                                                      && e.Dst.X == clX && e.Dst.Y == clY).ToList();
+        if (targetPalettes.Count != 1 || donorPalettes.Count != 1)
+            throw new InvalidDataException("palette target or donor is missing or ambiguous");
+        var targetPalette = targetPalettes[0];
+        var donorPalette = donorPalettes[0];
+        if (targetPalette.Dst != donorPalette.Dst || targetPalette.Size != donorPalette.Size)
+            throw new InvalidDataException("palette rect or payload size differs between target and donor");
+
+        int targetTextureIndex = targetEntries.IndexOf(targetTexture);
+        int targetPaletteIndex = targetEntries.IndexOf(targetPalette);
+        var patched = PackageRepacker.ReplaceEntryDc1(
+            target, targetTextureIndex, targetTexture.Type, targetTexture.Dst,
+            donor.Slice(donorTexture.PayloadOffset, donorTexture.Size));
+        var repackedEntries = PackageRepacker.ReadDc1Entries(patched);
+        donor.Slice(donorPalette.PayloadOffset, donorPalette.Size)
+            .CopyTo(patched.AsSpan(repackedEntries[targetPaletteIndex].PayloadOffset,
+                targetPalette.Size));
+        return patched;
+    }
+
     private static RawEntry FindTexEntry(List<RawEntry> es, int px, int py, string which)
     {
         foreach (var e in es)
