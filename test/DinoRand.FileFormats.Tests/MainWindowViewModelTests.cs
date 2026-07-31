@@ -673,6 +673,7 @@ public class MainWindowViewModelTests
             runs++;
             seen = ct;
             log($"connected: seed TEST, slot #1 '{slot}', goal room 060d");
+            log("session-ready: seed TEST; placement installed; starting DINO.exe poll");
             started.Set();
             ct.WaitHandle.WaitOne();          // a live session blocks until cancelled
             log("disconnected");

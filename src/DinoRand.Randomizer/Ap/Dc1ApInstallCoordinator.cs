@@ -18,7 +18,8 @@ public static class Dc1ApInstallCoordinator
         string outDir,
         ApConnection connection,
         Dc1ClientChecks checks,
-        Action<string>? log = null)
+        Action<string>? log = null,
+        Action<string, string>? applyPickupCancelPatch = null)
     {
         if (connection.Slot <= 0)
             throw new InvalidOperationException("AP login returned an invalid player slot");
@@ -60,7 +61,9 @@ public static class Dc1ApInstallCoordinator
         bool pickupCancelPatchApplied = false;
         if (File.Exists(GameInstaller.ExePath(dataDir)))
         {
-            GameInstaller.PatchExeItemPickupCancelFix(dataDir, connection.SeedName);
+            var patch = applyPickupCancelPatch
+                ?? ((data, seed) => GameInstaller.PatchExeItemPickupCancelFix(data, seed));
+            patch(dataDir, connection.SeedName);
             pickupCancelPatchApplied = true;
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using DinoRand.App;
 using DinoRand.App.Services;
@@ -81,6 +82,46 @@ public sealed class ApGuiReenableTests
             Assert.True(dialogs.ConfirmCalled);
             Assert.False(runnerStarted);
             Assert.False(vm.ApRunning);
+        }
+        finally
+        {
+            try { Directory.Delete(root, recursive: true); } catch { }
+        }
+    }
+
+    [Theory]
+    [InlineData("error: server world logic_version 3 is obsolete")]
+    [InlineData("error: slot_data has no placement — preflight failed")]
+    public async Task Early_auth_log_does_not_mark_the_session_connected_when_validation_or_preflight_fails(
+        string failure)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "dinorand_ap_lifecycle_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(Path.Combine(root, "Data"));
+        File.WriteAllBytes(Path.Combine(root, "Data", "st102.dat"), new byte[16]);
+        using var started = new ManualResetEventSlim();
+        try
+        {
+            var vm = new MainWindowViewModel(new SavingPicker(null), new AcceptingDialogs(), () => null!,
+                new AppSettings(), (h, s, p, i, o, log, error, ct) =>
+                {
+                    log("connected: seed TEST, slot #1 'Player', goal room 060d");
+                    log(failure);
+                    started.Set();
+                    ct.WaitHandle.WaitOne();
+                    return 1; // auth succeeded, but install/preflight did not complete
+                }, a => a());
+            vm.GamePath = root;
+            vm.ApSlot = "Player";
+
+            vm.ApToggleConnectCommand.Execute(null);
+            Assert.True(started.Wait(TimeSpan.FromSeconds(5)));
+            Assert.False(vm.ApConnected);
+            Assert.Contains("Connecting", vm.WindowTitle);
+            vm.ApToggleConnectCommand.Execute(null);
+            await vm.ApSessionTask;
+
+            Assert.False(vm.ApConnected);
+            Assert.DoesNotContain("Connected", vm.WindowTitle);
         }
         finally
         {

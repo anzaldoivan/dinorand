@@ -17,6 +17,7 @@ public static class Dc1ApRunner
 {
     public const int DefaultPort = 38281;
     public const string DefaultOutDir = "mod_dinorand_ap";
+    public const string SessionReadyPrefix = "session-ready:";
     internal const int LogicVersion = 4;
 
     internal static void ValidateLogicVersion(int actual)
@@ -97,6 +98,7 @@ public static class Dc1ApRunner
                 + "The install above is done — rerun this command from Windows to play.");
             return 1;
         }
+        log($"{SessionReadyPrefix} seed {conn.SeedName}; placement installed; starting DINO.exe poll");
         return PollLoop(session, conn, checks, outDir, slot, log, error, ct);
     }
 

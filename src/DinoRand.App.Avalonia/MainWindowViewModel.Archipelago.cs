@@ -218,8 +218,9 @@ namespace DinoRand.App
             ApLog.Add(line);
             while (ApLog.Count > ApLogMaxLines)
                 ApLog.RemoveAt(0);
-            // The first line the runner emits after login confirms the session is live.
-            if (ApRunning && line.StartsWith("connected:", StringComparison.Ordinal))
+            // The runner emits this only after auth, logic validation, room preflight, restore/install,
+            // and any justified executable patch have succeeded.
+            if (ApRunning && line.StartsWith(Dc1ApRunner.SessionReadyPrefix, StringComparison.Ordinal))
             {
                 ApConnected = true;
                 ApSetStatus(line, Brushes.Green);
