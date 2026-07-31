@@ -222,6 +222,7 @@ namespace DinoRand.App
             // and any justified executable patch have succeeded.
             if (ApRunning && line.StartsWith(Dc1ApRunner.SessionReadyPrefix, StringComparison.Ordinal))
             {
+                RefreshInstallStatus();
                 ApConnected = true;
                 ApSetStatus("Connected — ready to poll.", Brushes.Green);
             }

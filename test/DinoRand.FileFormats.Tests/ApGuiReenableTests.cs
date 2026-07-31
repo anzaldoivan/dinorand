@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DinoRand.App;
 using DinoRand.App.Services;
+using DinoRand.Randomizer.Install;
 using Xunit;
 
 namespace DinoRand.FileFormats.Tests;
@@ -94,7 +95,10 @@ public sealed class ApGuiReenableTests
     {
         var root = Path.Combine(Path.GetTempPath(), "dinorand_ap_ready_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(Path.Combine(root, "Data"));
-        File.WriteAllBytes(Path.Combine(root, "Data", "st102.dat"), new byte[16]);
+        var room = SyntheticRoom.Dc1Room(
+            new[] { new SyntheticRoom.Item(0x16, 6) },
+            Array.Empty<SyntheticRoom.Door>(), Array.Empty<SyntheticRoom.Enemy>());
+        File.WriteAllBytes(Path.Combine(root, "Data", "st102.dat"), room);
         using var started = new ManualResetEventSlim();
         try
         {
@@ -102,11 +106,14 @@ public sealed class ApGuiReenableTests
                 new AppSettings(), (h, s, p, i, o, log, error, ct) =>
                 {
                     log("connected: seed TEST, slot #1 'Player', goal room 060d");
+                    Directory.CreateDirectory(o);
+                    File.WriteAllBytes(Path.Combine(o, "st102.dat"), room);
+                    GameInstaller.Install(Path.Combine(i, "Data"), o, "AP TEST", new[] { "st102.dat" });
                     log("session-ready: seed TEST; placement installed; starting DINO.exe poll");
                     started.Set();
                     ct.WaitHandle.WaitOne();
                     return 0;
-                }, a => a());
+                }, a => a(), workingModDir: () => Path.Combine(root, "mod"));
             vm.GamePath = root;
             vm.ApSlot = "Player";
 
@@ -116,9 +123,12 @@ public sealed class ApGuiReenableTests
             Assert.True(vm.ApConnected);
             Assert.Contains("Connected", vm.WindowTitle);
             Assert.Equal("Connected — ready to poll.", vm.ApStatusText);
+            Assert.True(vm.CanRestore);
+            Assert.False(vm.ApCanRestore); // the active session keeps Restore disabled
 
             vm.ApToggleConnectCommand.Execute(null);
             await vm.ApSessionTask;
+            Assert.True(vm.ApCanRestore);
         }
         finally
         {
