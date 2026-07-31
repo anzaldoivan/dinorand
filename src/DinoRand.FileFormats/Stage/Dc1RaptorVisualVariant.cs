@@ -180,6 +180,9 @@ public static class Dc1RaptorVisualVariantEditor
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(donor);
         ArgumentNullException.ThrowIfNull(profile);
+        if (profile != Dc1RaptorVisualVariantProfiles.Blue)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "profile is not the fixed Blue profile/evidence (CLUT 0x7FF0)");
         if (target.Stage != Dc1RaptorVisualVariantProfiles.BlueTargetStage
             || target.Room != Dc1RaptorVisualVariantProfiles.BlueTargetRoom)
             return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,

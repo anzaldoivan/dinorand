@@ -133,6 +133,35 @@ public sealed class Dc1RaptorVisualVariantTests
     }
 
     [Fact]
+    public void BlueProfile_RejectsDifferentClutBeforeAnyMutation()
+    {
+        var target = RoomFile.Read(1, 2, BluePackage(43062, 0x11, 0x5A000));
+        var donor = RoomFile.Read(5, 8, BluePackage(43891, 0xA5, 0x8C000));
+        var enemy = new EnemyRecord
+        {
+            Opcode = DcOpcodes.Enemy2,
+            Category = 2,
+            SpeciesBoneCount = 21,
+            AiParam = 3,
+        };
+        target.Enemies.Add(enemy);
+        var beforeTarget = target.OriginalBytes.ToArray();
+        var clone = Dc1RaptorVisualVariantProfiles.Blue with
+        {
+            Evidence = Dc1RaptorVisualVariantProfiles.Blue.Evidence with { ClutCode = 0x7FB0 },
+        };
+
+        var result = Dc1RaptorVisualVariantEditor.TryApplyProfile(target, donor, enemy, clone);
+
+        Assert.Equal(Dc1RaptorVisualVariantOutcome.Unsupported, result.Outcome);
+        Assert.Contains("fixed Blue profile", result.Note, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("CLUT 0x7FF0", result.Note, StringComparison.OrdinalIgnoreCase);
+        Assert.Null(result.PatchedBytes);
+        Assert.Equal(beforeTarget, target.OriginalBytes);
+        Assert.Equal((byte)3, enemy.AiParam);
+    }
+
+    [Fact]
     public void BlueProfile_RejectsWrongStageOrRoomBeforeHashCheck()
     {
         var target = RoomFile.Read(1, 3, BluePackage(43062, 0x11, 0x5A000));
