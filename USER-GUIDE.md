@@ -175,12 +175,17 @@ apworld, write a player YAML and generate a seed, then have it hosted (a local
 ### Connect (GUI)
 
 1. **Close the game** — connecting rewrites room files, and a running game holds them locked.
-2. **Randomizer tab**: set your Game Location. (The Archipelago tab stays greyed out until it
-   resolves — it needs a game to install into.)
-3. **Archipelago tab**: server `host:port` (the default AP port is 38281), your slot name exactly
-   as it appears in your YAML's `name:`, password only if the room has one → **Connect**.
-4. Wait for the placement install — the log lists each room as it goes.
-5. Launch the game and start a **new game**, then leave DinoRand open while you play. Closing it
+2. **Randomizer tab**: set your Game Location. The visible Archipelago tab becomes available
+   once it resolves a game to install into; DC2 currently shows setup guidance but keeps Connect
+   disabled because its runtime client is not shipped yet.
+3. **Archipelago tab**: expand **AP setup** for the official Archipelago links and the **Save
+   Player YAML** helper, or use the world README above. The helper writes only the quoted player
+   name and `game: Dino Crisis 1`; it does not write a server, password, or world options.
+4. Enter server `host:port` (the default AP port is 38281), your slot name exactly as it appears
+   in the YAML's `name:`, and a password only if the room has one → **Connect**.
+5. Confirm the placement install, then wait for it — the log lists each room as it goes. Use
+   **Restore Originals** or **Play** directly in this tab when ready.
+6. Launch the game and start a **new game**, then leave DinoRand open while you play. Closing it
    ends the session (it asks first).
 
 ### Connect (CLI)

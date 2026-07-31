@@ -56,6 +56,27 @@ namespace DinoRand.App.Services
             return result.Count > 0 ? result[0].TryGetLocalPath() : null;
         }
 
+        public async Task<string?> SaveFileAsync(SaveFileRequest request)
+        {
+            var storage = TopLevel.GetTopLevel(_anchor)?.StorageProvider;
+            if (storage is null)
+                return null;
+
+            var options = new FilePickerSaveOptions
+            {
+                Title = request.Title,
+                SuggestedFileName = request.SuggestedFileName,
+                SuggestedStartLocation = await ResolveStartFolder(storage, request.SuggestedStartPath),
+            };
+            if (request.FileTypes is { Count: > 0 })
+                options.FileTypeChoices = request.FileTypes
+                    .Select(t => new FilePickerFileType(t.Name) { Patterns = t.Patterns.ToArray() })
+                    .ToList();
+
+            var result = await storage.SaveFilePickerAsync(options);
+            return result?.TryGetLocalPath();
+        }
+
         // Map a filesystem path to a start folder for the picker, ignoring a missing/blank path.
         private static async Task<IStorageFolder?> ResolveStartFolder(IStorageProvider storage, string? path)
         {

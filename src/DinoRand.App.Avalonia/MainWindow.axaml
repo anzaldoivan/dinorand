@@ -612,13 +612,34 @@
              optional password / one Connect–Disconnect toggle / scrolling status log). Everything
              it drives is Dc1ApRunner — the same session the CLI's ap-connect command runs. -->
         <TabItem Header="Archipelago"
-                 IsVisible="False"
                  IsEnabled="{Binding ApTabEnabled}"
                  ToolTip.Tip="Set your Dino Crisis game location on the Randomizer tab first — connecting installs the multiworld's item placement into that game.">
             <DockPanel Margin="8">
                 <StackPanel DockPanel.Dock="Top">
                     <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,8"
                                Text="Play Dino Crisis 1 in an Archipelago multiworld. Connecting installs the multiworld's item placement into your game (your originals are backed up, and 'Restore Originals' undoes it) — that step takes several minutes — then DinoRand watches the running game to send your checks and deliver items. Windows only: the game must run on this machine. Uses the game folder set on the Randomizer tab." />
+
+                    <Expander Header="AP setup" Margin="0,0,0,8">
+                        <StackPanel Margin="4">
+                            <TextBlock TextWrapping="Wrap"
+                                       Text="Install the Dino Crisis 1 world in Archipelago, add a player, and generate the multiworld. This creates a player YAML only; the server, password, and world options stay in Archipelago." />
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+                                <HyperlinkButton Content="Archipelago official site"
+                                                 NavigateUri="https://archipelago.gg" />
+                                <HyperlinkButton Content="Latest Archipelago release"
+                                                 NavigateUri="https://github.com/ArchipelagoMW/Archipelago/releases/latest" />
+                            </StackPanel>
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,6,0,0">
+                                <TextBlock Grid.Column="0" Text="Player name" VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <TextBox Grid.Column="1" Text="{Binding ApPlayerName, Mode=TwoWay}"
+                                         VerticalContentAlignment="Center" />
+                                <Button Grid.Column="2" Content="Save Player YAML" Margin="8,0,0,0"
+                                        Command="{Binding SavePlayerYamlCommand}" />
+                            </Grid>
+                            <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,6,0,0"
+                                       Text="After generation, start the Archipelago server, then enter the server and slot below. Use the exact player name from the YAML." />
+                        </StackPanel>
+                    </Expander>
 
                     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,8">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Server" VerticalAlignment="Center" Margin="0,2,8,2" />
@@ -641,7 +662,8 @@
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button Content="{Binding ApConnectButtonText}" Padding="14,6" FontWeight="Bold"
-                                Command="{Binding ApToggleConnectCommand}" />
+                                Command="{Binding ApToggleConnectCommand}"
+                                IsEnabled="{Binding ApConnectEnabled}" />
                         <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                                    Text="{Binding ApStatusText}"
                                    Foreground="{Binding ApStatusBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
@@ -655,6 +677,12 @@
                                IsVisible="{Binding ApRunning}"
                                Text="Keep this window open while you play — DinoRand must stay running to send your checks and deliver your items. Closing it ends the session (the game itself keeps running)." />
                     <ProgressBar Height="6" Margin="0,8,0,4" IsIndeterminate="True" IsVisible="{Binding ApRunning}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                        <Button Content="▶ Play" Padding="12,6"
+                                Command="{Binding PlayCommand}" IsEnabled="{Binding CanPlayNow}" />
+                        <Button Content="Restore Originals" Padding="12,6"
+                                Command="{Binding RestoreCommand}" IsEnabled="{Binding ApCanRestore}" />
+                    </StackPanel>
                 </StackPanel>
 
                 <ListBox Margin="0,4,0,0" ItemsSource="{Binding ApLog}"

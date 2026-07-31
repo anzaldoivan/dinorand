@@ -14,6 +14,7 @@ public sealed class ViewModelCharacterizationTests
     {
         public Task<string?> PickFileAsync(FilePickerRequest request) => Task.FromResult<string?>(null);
         public Task<string?> PickFolderAsync(FolderPickerRequest request) => Task.FromResult<string?>(null);
+        public Task<string?> SaveFileAsync(SaveFileRequest request) => Task.FromResult<string?>(null);
     }
 
     private sealed class Dialogs : IDialogs

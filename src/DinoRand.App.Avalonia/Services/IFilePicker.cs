@@ -14,6 +14,7 @@ namespace DinoRand.App.Services
     {
         Task<string?> PickFileAsync(FilePickerRequest request);
         Task<string?> PickFolderAsync(FolderPickerRequest request);
+        Task<string?> SaveFileAsync(SaveFileRequest request);
     }
 
     /// <summary>A named set of filename patterns (e.g. "Dino Crisis executable" → ["DINO.exe"]).</summary>
@@ -31,5 +32,12 @@ namespace DinoRand.App.Services
     /// <summary>Open-a-folder request. <paramref name="SuggestedStartPath"/> seeds the initial directory.</summary>
     public sealed record FolderPickerRequest(
         string Title,
+        string? SuggestedStartPath = null);
+
+    /// <summary>Save-file request. The result is the chosen local path, or <c>null</c> when cancelled.</summary>
+    public sealed record SaveFileRequest(
+        string Title,
+        string SuggestedFileName,
+        IReadOnlyList<FilePickerFileFilter>? FileTypes = null,
         string? SuggestedStartPath = null);
 }

@@ -28,6 +28,7 @@ public class MainWindowViewModelTests
     {
         public Task<string?> PickFileAsync(FilePickerRequest request) => Task.FromResult<string?>(null);
         public Task<string?> PickFolderAsync(FolderPickerRequest request) => Task.FromResult<string?>(null);
+        public Task<string?> SaveFileAsync(SaveFileRequest request) => Task.FromResult<string?>(null);
     }
 
     private sealed class FakeDialogs : IDialogs
@@ -786,6 +787,8 @@ public class MainWindowViewModelTests
         vm.ApSlot = "Regina";
         vm.ApHostPort = "archipelago.gg:38281";
         vm.ApRunning = true;
+        Assert.Contains("Connecting", vm.WindowTitle);
+        vm.ApConnected = true;
         Assert.Contains("Regina", vm.WindowTitle);
         Assert.Contains("Connected", vm.WindowTitle);
 

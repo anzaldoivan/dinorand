@@ -539,6 +539,7 @@ namespace DinoRand.App
             OnPropertyChanged(nameof(CanRandomizeBoxes));
             OnPropertyChanged(nameof(CanScramblePuzzleCodes));
             OnPropertyChanged(nameof(CanUseArchipelago));
+            OnPropertyChanged(nameof(ApConnectEnabled));
             OnPropertyChanged(nameof(GameContentPlaceholder));
 
             // Re-sync the seed to the (possibly forced-off) toggles so the seed string and the checkboxes
@@ -611,11 +612,16 @@ namespace DinoRand.App
         [NotifyPropertyChangedFor(nameof(CanPlayNow))]
         [NotifyPropertyChangedFor(nameof(ShouldConfirmClose))]
         [NotifyPropertyChangedFor(nameof(CloseConfirmMessage))]
+        [NotifyPropertyChangedFor(nameof(ApConnectEnabled))]
+        [NotifyPropertyChangedFor(nameof(ApCanRestore))]
         private bool _isBusy;
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ApTabEnabled))]
+        [NotifyPropertyChangedFor(nameof(ApConnectEnabled))]
         private bool _canInstall;
-        [ObservableProperty] private bool _canRestore;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ApCanRestore))]
+        private bool _canRestore;
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CanPlayNow))]
         private bool _canPlay;
