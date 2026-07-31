@@ -19,6 +19,7 @@ public static class Dc1ApInstallCoordinator
         ApConnection connection,
         Dc1ClientChecks checks,
         Action<string>? log = null,
+        Action<string>? restoreInstalled = null,
         Action<string, string>? applyPickupCancelPatch = null)
     {
         if (connection.Slot <= 0)
@@ -55,7 +56,14 @@ public static class Dc1ApInstallCoordinator
         // overlay is restored only after that preflight succeeds, so a bad server placement cannot
         // destroy the currently installed seed.
         var written = ApPlacementInstaller.WriteRooms(dataDir, outDir, patches, log);
-        GameInstaller.Restore(dataDir);
+        if (GameInstaller.IsInstalled(dataDir))
+        {
+            if (restoreInstalled is null)
+                GameInstaller.Restore(dataDir);
+            else
+                restoreInstalled(dataDir);
+            log?.Invoke("restored standalone DinoRand mode before AP placement");
+        }
         var installed = GameInstaller.Install(dataDir, outDir, $"AP {connection.SeedName}", written.WrittenFiles);
 
         bool pickupCancelPatchApplied = false;

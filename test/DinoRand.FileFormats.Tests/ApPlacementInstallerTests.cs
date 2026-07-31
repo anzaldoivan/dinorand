@@ -175,6 +175,22 @@ public class ApPlacementInstallerTests
     }
 
     [Fact]
+    public void Coordinator_FreshData_DoesNotChooseRestore()
+    {
+        using var temp = new TempLayout();
+        var source = temp.AddRoom("010d", 0x16, 6);
+        int restoreCalls = 0;
+        var logs = new List<string>();
+
+        Dc1ApInstallCoordinator.Install(
+            temp.DataDir, Path.Combine(temp.Root, "fresh"), Connection(0x23), ChecksFor(source),
+            log: logs.Add, restoreInstalled: _ => restoreCalls++);
+
+        Assert.Equal(0, restoreCalls);
+        Assert.DoesNotContain(logs, l => l.Contains("restored standalone", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public void Coordinator_Success_PreflightsRestoresOverlaysExactFilesAndPatchesOnlyExistingExe()
     {
         using var temp = new TempLayout();
@@ -189,9 +205,17 @@ public class ApPlacementInstallerTests
         Directory.CreateDirectory(outDir);
         File.WriteAllBytes(Path.Combine(outDir, "st10e.dat"), new byte[] { 0x7f });
         var patchObservedInstalled = false;
+        int restoreCalls = 0;
+        var logs = new List<string>();
 
         var result = Dc1ApInstallCoordinator.Install(
             temp.DataDir, outDir, Connection(0x23), ChecksFor(source),
+            log: logs.Add,
+            restoreInstalled: dataDir =>
+            {
+                restoreCalls++;
+                GameInstaller.Restore(dataDir);
+            },
             applyPickupCancelPatch: (dataDir, seed) =>
             {
                 patchObservedInstalled = GameInstaller.IsInstalled(dataDir);
@@ -199,6 +223,8 @@ public class ApPlacementInstallerTests
 
         Assert.Equal(new[] { "st10d.dat" }, result.Placement.WrittenFiles);
         Assert.True(result.PickupCancelPatchApplied);
+        Assert.Equal(1, restoreCalls);
+        Assert.Contains(logs, l => l.Contains("restored standalone DinoRand mode", StringComparison.Ordinal));
         Assert.True(patchObservedInstalled);
         Assert.Equal(untouchedBytes, File.ReadAllBytes(Path.Combine(temp.DataDir, "st10e.dat")));
         var installed = Assert.Single(RoomFile.ReadFromFile(1, 0x0d,

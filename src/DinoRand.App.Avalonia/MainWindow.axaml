@@ -621,23 +621,33 @@
 
                     <Expander Header="AP setup" Margin="0,0,0,8">
                         <StackPanel Margin="4">
-                            <TextBlock TextWrapping="Wrap"
-                                       Text="Install the Dino Crisis 1 world in Archipelago, add a player, and generate the multiworld. This creates a player YAML only; the server, password, and world options stay in Archipelago." />
+                            <TextBlock TextWrapping="Wrap" Text="1. Install the current Dino Crisis 1 .apworld from the DinoRand latest release into Archipelago's custom_worlds folder." />
+                            <TextBlock TextWrapping="Wrap" Text="2. Create and save a player YAML below." />
+                            <TextBlock TextWrapping="Wrap" Text="3. Generate the multiworld locally in Archipelago." />
+                            <TextBlock TextWrapping="Wrap" Text="4. Host the generated result; hosting does not need DINO.exe." />
+                            <TextBlock TextWrapping="Wrap" Text="5. Connect here, launch a new game, and keep DinoRand open while you play." />
                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
-                                <HyperlinkButton Content="Archipelago official site"
-                                                 NavigateUri="https://archipelago.gg" />
+                                <HyperlinkButton Content="DinoRand latest release"
+                                                 NavigateUri="https://github.com/anzaldoivan/dinorand/releases/latest" />
+                                <HyperlinkButton Content="Official Archipelago setup guide"
+                                                 NavigateUri="https://archipelago.gg/tutorial/Archipelago/setup_en" />
                                 <HyperlinkButton Content="Latest Archipelago release"
                                                  NavigateUri="https://github.com/ArchipelagoMW/Archipelago/releases/latest" />
                             </StackPanel>
                             <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,6,0,0">
-                                <TextBlock Grid.Column="0" Text="Player name" VerticalAlignment="Center" Margin="0,2,8,2" />
+                                <TextBlock Grid.Column="0" Text="Player name" VerticalAlignment="Center" Margin="0,2,8,2"
+                                           ToolTip.Tip="The case-sensitive player name used by Archipelago." />
                                 <TextBox Grid.Column="1" Text="{Binding ApPlayerName, Mode=TwoWay}"
-                                         VerticalContentAlignment="Center" />
+                                         VerticalContentAlignment="Center"
+                                         ToolTip.Tip="Enter the case-sensitive player name to write into the YAML."
+                                         AutomationProperties.Name="Archipelago player name"
+                                         AutomationProperties.HelpText="Case-sensitive name used by Archipelago." />
                                 <Button Grid.Column="2" Content="Save Player YAML" Margin="8,0,0,0"
-                                        Command="{Binding SavePlayerYamlCommand}" />
+                                        Command="{Binding SavePlayerYamlCommand}"
+                                        ToolTip.Tip="Save the minimal player YAML for local Archipelago generation."
+                                        AutomationProperties.Name="Save player YAML"
+                                        AutomationProperties.HelpText="Save the player YAML file." />
                             </Grid>
-                            <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,6,0,0"
-                                       Text="After generation, start the Archipelago server, then enter the server and slot below. Use the exact player name from the YAML." />
                         </StackPanel>
                     </Expander>
 
