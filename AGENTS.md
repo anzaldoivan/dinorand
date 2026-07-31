@@ -50,8 +50,9 @@ Before editing, a worker packet must identify:
   temporary directory outside the repository and clean it up on success or
   failure.
 - Modifying an original installation, executable, or process memory requires
-  explicit user scope and a reversible backup/restore path. This includes
-  runtime writes, breakpoints, input injection, warps, and flag changes.
+  explicit mutation scope and a reversible backup/restore path. This includes
+  runtime memory/register/code writes, software or code-patching breakpoints,
+  input injection, warps, flag changes, and save-state creation or loading.
 
 ## Scope and evidence
 
@@ -71,11 +72,42 @@ Before editing, a worker packet must identify:
   selectors for program-scoped MCP calls and verify program metadata first.
 - Prefer the narrowest relevant skill for specialized RE, validation, planning,
   or release work; confirm required integrations first.
-- Do not use Ghidra scripts, emulation, debugger, or process-memory tools
-  without a separately authorized runtime task; never write an original image.
+- Read-only static Ghidra analysis or scripts are not runtime operations when
+  the requested task requires them and exact program metadata is verified.
+  Emulation, debugger, and process-memory tools follow the runtime authorization
+  contract below; never write an original image.
 - For substantial RE, follow `docs/CONTRIBUTING-RE.md` and the selected skill
   for evidence, confidence, escalation, and read-only close-out. Record durable
   findings in the owning registry/topic, not only in a Ghidra database.
+
+## Runtime authorization
+
+- Complete offline preparation and tool readiness first, then use one bundled
+  authorization request for a bounded runtime observation. Present the exact
+  executable/build/process identity, unresolved question, ordinary user-driven
+  action, debugger controls, addresses/ranges and captured fields, event/time
+  limits, and proposed cleanup before asking.
+- The user may approve that complete observation plan once. Accept any
+  unambiguous natural-language approval. Do not require prescribed approval
+  wording or ask the user to restate cleanup the agent already proposed.
+- If a native runtime tool will show an approval prompt, present the complete
+  plan immediately before that call and use it as the single approval surface.
+  Do not ask the same question in chat and then again through the tool.
+- Authorization lasts until the observation completes, fails, times out, or is
+  cancelled and its approved cleanup is attempted. Re-prompt only when a
+  material scope change is needed: a different executable, build, process,
+  observation target, broader address/range, captured field, event/time limit,
+  debugger capability, user action, or cleanup action.
+- Bounded reads and non-patching hardware or logging breakpoints are
+  observation when they only capture declared values and execution context.
+  Track session-owned breakpoint IDs, refuse target-address collisions, remove
+  only those IDs, and verify the final inventory against the baseline. Never
+  use a clear-all operation as normal cleanup.
+- Memory/register/code writes, software or code-patching breakpoints, input
+  injection or automated play, warps, flag changes, source-image changes, and
+  save-state creation or loading are runtime mutation. Exclude them from an
+  observation plan; each requires separately authorized mutation scope and a
+  reversible restore plan. Authorization to observe never authorizes mutation.
 
 ## Orchestrated local integration
 
@@ -171,8 +203,9 @@ static-to-runtime escalation order, and read-only close-out.
   repository evidence.
 - Keep PC x86, PSX MIPS, disc, overlay, emulator, and host address domains
   explicit. Never write to an original game installation, executable, or image.
-- Do not use Ghidra scripts, emulation, debugger, or process-memory tools
-  without a separately authorized runtime task.
+- Static Ghidra scripts may operate only on the ignored analysis project within
+  requested task scope. Emulation, debugger, and process-memory tools require
+  the bounded runtime authorization defined above.
 
 ## Public documentation
 

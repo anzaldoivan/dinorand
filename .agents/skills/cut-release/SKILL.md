@@ -36,7 +36,7 @@ The user wants to cut a release: "release vX.Y.Z", "bump the version", "generate
 
 Automated validation may read a configured original GOG install and its pristine backups without additional approval. Before resolving or using an install path, read the gitignored `.env`; use only `DINORAND_DC1_DIR` and `DINORAND_DC2_DIR` from it, and do not search for an install elsewhere. `RealInstallGate` reads those sources but does not write them; its install/restore exercise mutates only temporary copies. Every mutation test must use a unique temporary directory outside the repository and clean it up on success or failure.
 
-Exact user authorization is still required before writing an original installation, executable, or process memory, including runtime writes, breakpoints, input injection, warps, and flag changes. Preserve the GOG/source-path restrictions above.
+Exact user authorization is still required before writing an original installation, executable, or process memory, including runtime memory/register/code writes, software or code-patching breakpoints, input injection, warps, and flag changes. Bounded observational hardware or logging breakpoints follow the repository's bundled runtime-observation contract and do not authorize mutation. Preserve the GOG/source-path restrictions above.
 
 Any required-mode receipt and test-results directory must be unique to this run and outside the repository. After exporting the configured paths read from `.env`, the safe required-mode command is below. The xUnit/VSTest trait-key/value OR filter selects both `[Trait("RealInstall", "DC1")]` and `[Trait("RealInstall", "DC2")]` cases:
 
