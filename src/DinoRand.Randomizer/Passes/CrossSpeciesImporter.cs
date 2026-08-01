@@ -115,7 +115,7 @@ public sealed class CrossSpeciesImporter : ICrossSpeciesImporter, IPlannedCrossS
         if (def is not { Enabled: true } || !def.AllowsStage(room.Stage)) return null;
         if (victimIdx < 0 || victimIdx >= room.Enemies.Count) return null;
         var victim = room.Enemies[victimIdx];
-        if (!victim.IsRandomizableDino || victim.Species != DinoSpecies.Velociraptor) return null;
+        if (!victim.IsRandomizableDino) return null;
 
         return def.Kind switch
         {

@@ -55,8 +55,9 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
         }
 
         // Build the (pure) placement candidates: a room is a candidate when it isn't scripted/cutscene and has a
-        // randomizable Velociraptor to replace.
+        // randomizable dinosaur record to replace. Keep the selected record alongside the room-level plan.
         var byCode = new Dictionary<int, RoomFile>();
+        var victimIndexByCode = new Dictionary<int, int>();
         var candidates = new List<RoomCandidate>();
         foreach (var room in corpus)
         {
@@ -64,8 +65,10 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
             byCode[code] = room;
             bool eligible = room.Enemies.Count > 0 && !scripted.Contains(code) && !cutscene.Contains(code)
                             && !choreography.Contains(code);
-            bool hasVictim = eligible && room.Enemies.Any(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
+            int victimIndex = eligible ? room.Enemies.FindIndex(e => e.IsRandomizableDino) : -1;
+            bool hasVictim = victimIndex >= 0;
             var present = room.Enemies.Select(e => e.Species).ToHashSet();
+            if (hasVictim) victimIndexByCode[code] = victimIndex;
             candidates.Add(new RoomCandidate(room.Stage, room.Room, hasVictim, present));
         }
 
@@ -81,8 +84,14 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
         {
             var room = byCode[p.Stage * 0x100 + p.Room];
             var def = ExoticSpeciesCatalog.For(p.Species)!;
-            var victim = room.Enemies.First(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
-            int idx = room.Enemies.IndexOf(victim);
+            int idx = victimIndexByCode[p.Stage * 0x100 + p.Room];
+            var victim = room.Enemies[idx];
+            if (!victim.IsRandomizableDino)
+            {
+                skipped++;
+                context.Log($"[cross-species] {room} {p.Species}: skipped — selected record is no longer eligible");
+                continue;
+            }
 
             if (importer is IPlannedCrossSpeciesImporter planned)
             {
@@ -105,7 +114,7 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
                     context.SetRoomOutput(room, applied.RoomBytes);
                 context.ExePatchRequests.AddRange(applied.Requests);
                 placed++;
-                context.Log($"[cross-species] {room} slot{victim.Slot}: Velociraptor -> {p.Species} ({applied.Note})");
+                context.Log($"[cross-species] {room} slot{victim.Slot}: {victim.Species} -> {p.Species} ({applied.Note})");
                 continue;
             }
 
@@ -117,7 +126,7 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
             }
             context.ExePatchRequests.AddRange(patches);
             placed++;
-            context.Log($"[cross-species] {room} slot{victim.Slot}: Velociraptor -> {p.Species} ({note})");
+            context.Log($"[cross-species] {room} slot{victim.Slot}: {victim.Species} -> {p.Species} ({note})");
         }
 
         context.Log($"[cross-species] placed {placed} foreign species ({skipped} skipped) across "

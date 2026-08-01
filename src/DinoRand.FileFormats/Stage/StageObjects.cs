@@ -536,9 +536,11 @@ public sealed class EnemyRecord
     /// multi-raptor spawns never trip the rule: identical raptors share <i>both</i> pointers (one distinct
     /// model), and distinct raptors each get their own motion. Bone count / bind-pose cannot tell an NPC
     /// actor from a raptor (the NPC placement even embeds a raptor skeleton), so this relational check is
-    /// the only reliable static discriminator.
+    /// the only reliable static discriminator. The 0308 and 0406 scene shells are additionally identified
+    /// by room-scoped evidence: those rooms have no randomizable dinosaur placement, so every parsed 0x20
+    /// record in either room is excluded (0308 slot 1 at RDT 0x42554; 0406 slots 3/2 at RDT 0x37644..0x37844).
     /// </summary>
-    public static void MarkNpcSceneActors(IReadOnlyList<EnemyRecord> roomEnemies)
+    public static void MarkNpcSceneActors(IReadOnlyList<EnemyRecord> roomEnemies, int stage = -1, int room = -1)
     {
         var distinctModelsByMotion = new Dictionary<uint, HashSet<uint>>();
         foreach (var e in roomEnemies)
@@ -553,8 +555,14 @@ public sealed class EnemyRecord
             if (e.Opcode != DcOpcodes.Enemy) continue;
             if (distinctModelsByMotion.TryGetValue(e.OriginalMotionPtr, out var models) && models.Count >= 2)
                 e.IsNpcSceneActor = true;
+            if (IsRoomScopedSceneShell(e, stage, room))
+                e.IsNpcSceneActor = true;
         }
     }
+
+    private static bool IsRoomScopedSceneShell(EnemyRecord e, int stage, int room)
+        => e.Opcode == DcOpcodes.Enemy && ((stage == 3 && room == 0x08)
+            || (stage == 4 && room == 0x06));
 
     public byte[] Raw { get; set; } = Array.Empty<byte>();
 

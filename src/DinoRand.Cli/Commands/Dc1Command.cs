@@ -882,10 +882,10 @@ internal sealed partial class CliApplication
         int targetIndex = rooms.FindIndex(r => r.Stage == stage && r.Room == room);
         rooms[targetIndex] = target;
 
-        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
+        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
         if (victim is null)
         {
-            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable raptor to replace");
+            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable dinosaur to replace");
             return 1;
         }
 
@@ -906,7 +906,7 @@ internal sealed partial class CliApplication
 
         var applied = importer.Apply(plan, preflight);
         File.WriteAllBytes(targetRef.Path, applied.RoomBytes);
-        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: Velociraptor -> RaptorHeavy ({applied.Note})");
+        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {victim.Species} -> RaptorHeavy ({applied.Note})");
         Console.WriteLine($"wrote   : {targetRef.Path}");
         Console.WriteLine($"backup  : {backupPath}");
         Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");

@@ -113,7 +113,7 @@ public sealed class RoomFile
         {
             (rf.RdtBuffer, rf.RdtCompressed) = RoomPackageCodec.DecodeRdt(bytes, rdt);
 
-            rf.Script = RoomScript.Parse(rf.RdtBuffer);
+            rf.Script = RoomScript.Parse(rf.RdtBuffer, stage, room);
             if (rf.Script.ParsedCleanly && DcOpcodes.IsTrustworthy)
             {
                 rf.Items.AddRange(rf.Script.Items);
@@ -474,7 +474,7 @@ public sealed class RoomFile
     /// <summary>Re-walk the (grown) <see cref="RdtBuffer"/> and refresh the record lists / script.</summary>
     internal void Reparse()
     {
-        Script = RoomScript.Parse(RdtBuffer);
+        Script = RoomScript.Parse(RdtBuffer, Stage, Room);
         Items.Clear(); Enemies.Clear(); Doors.Clear();
         if (Script.ParsedCleanly && DcOpcodes.IsTrustworthy)
         {

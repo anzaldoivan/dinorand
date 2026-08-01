@@ -263,6 +263,22 @@ public class CrossSpeciesPassTests
             RoomFile.Read(room.Stage, room.Room, output).Enemies.Single().Species);
     }
 
+    [Fact]
+    public void Pass_SelectsParsedEnemy2RaptorHeavyTarget()
+    {
+        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy2, 2, 21) }));
+        var importer = new PlannedFakeImporter(room, room.Write(), DinoSpecies.Therizinosaurus);
+        var pass = new CrossSpeciesEnemyPass(_ => importer);
+        var ctx = new RandomizationContext(new DinoCrisis1(), new[] { room }, RoomGraph.Build(new[] { room }),
+            new Seed(1), new RandomizerConfig { CrossRoomEnemySpecies = true, EnemyDifficulty = 1.0 }, _ => { });
+
+        pass.Apply(ctx);
+
+        Assert.Equal(new[] { 0 }, importer.VictimIndices);
+    }
+
     private static RandomizationContext NewContext(IReadOnlyList<RoomFile> rooms)
         => new(new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(1),
                new RandomizerConfig { CrossRoomEnemySpecies = true }, _ => { });
@@ -281,6 +297,7 @@ public class CrossSpeciesPassTests
         private readonly RoomFile _room;
         private readonly byte[] _prepared;
         private readonly DinoSpecies _species;
+        public List<int> VictimIndices { get; } = new();
 
         public PlannedFakeImporter(RoomFile room, byte[] prepared, DinoSpecies species)
         {
@@ -292,9 +309,11 @@ public class CrossSpeciesPassTests
         public IReadOnlyCollection<DinoSpecies> AvailableDonors => new[] { _species };
 
         public CrossSpeciesImportPlan? Plan(RoomFile room, int victimIdx, DinoSpecies species)
-            => room == _room && species == _species
-                ? new CrossSpeciesImportPlan(room, victimIdx, ExoticSpeciesCatalog.For(species)!, null, null)
-                : null;
+        {
+            if (room != _room || species != _species) return null;
+            VictimIndices.Add(victimIdx);
+            return new CrossSpeciesImportPlan(room, victimIdx, ExoticSpeciesCatalog.For(species)!, null, null);
+        }
 
         public CrossSpeciesPreflight Preflight(CrossSpeciesImportPlan plan)
             => new(true, "prepared", _prepared, Array.Empty<ExePatchRequest>());
@@ -462,7 +481,7 @@ public class CrossSpeciesPassTests
 
         new CrossSpeciesEnemyPass().Apply(ctx);
 
-        Assert.Contains(log, l => l.Contains("Velociraptor ->"));
+        Assert.Contains(log, l => l.Contains(" -> "));
 
         // Any room placed via the output override (the Theri's textured bytes) must reparse cleanly and carry
         // the imported species.

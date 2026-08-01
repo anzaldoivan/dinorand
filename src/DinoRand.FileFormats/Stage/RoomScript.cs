@@ -95,7 +95,7 @@ public sealed class RoomScript
     /// <summary>
     /// Parse the SCD script out of a decompressed RDT <paramref name="buffer"/>.
     /// </summary>
-    public static RoomScript Parse(ReadOnlySpan<byte> buffer)
+    public static RoomScript Parse(ReadOnlySpan<byte> buffer, int stage = -1, int room = -1)
     {
         if (!TryReadFunctionTable(buffer, out int tableOffset, out var starts))
             return new RoomScript(false, -1, 0, Array.Empty<ItemRecord>(),
@@ -120,7 +120,7 @@ public sealed class RoomScript
 
         // Flag NPC-scene actors (Rick/Gail/Kirk) once all 0x20 records are visible: the shared-motion /
         // distinct-model tell is relational, so it can't be decided per-record at parse (cont.41).
-        EnemyRecord.MarkNpcSceneActors(enemies);
+        EnemyRecord.MarkNpcSceneActors(enemies, stage, room);
         return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors, scenerySlots);
     }
 
