@@ -63,7 +63,13 @@ public class ApClientTests
     {
         var checks = Dc1ClientChecks.LoadEmbedded();
         var excluded = checks.Locations.Where(l => l.Excluded).ToList();
-        Assert.Equal(6, excluded.Count);
+        Assert.Equal(new[]
+        {
+            "010f:40:-5120,3584",
+            "030b:40:-5120,3584",
+            "0504:4f:-2912,3872",
+            "0504:50:4896,-3840",
+        }, excluded.Select(l => l.Key).OrderBy(key => key).ToArray());
         Assert.All(excluded, l => Assert.True(l.Class is "pinned-shared" or "poisoned", l.Class));
     }
 

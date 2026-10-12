@@ -42,7 +42,7 @@
     }
    ],
    "class": "poisoned",
-     "excluded": true,
+   "excluded": true,
    "sharedWith": [
     "Backup Generator Room B1 (030b) - Startup Battery. R \" Charged \" @-5120,3584"
    ]
@@ -122,7 +122,7 @@
     }
    ],
    "class": "poisoned",
-     "excluded": true,
+   "excluded": true,
    "sharedWith": [
     "Backup Generator Room 1F (010f) - Startup Battery. R \" Charged \" @-5120,3584"
    ]
@@ -1504,9 +1504,8 @@
    "predicate": {
     "kind": "flag",
     "group": 7,
-     "anyOf": [
-      18,
-      19
+    "anyOf": [
+     39
     ]
    },
    "records": [
@@ -1529,7 +1528,7 @@
       3088,
       -2816
      ],
-     "take": 18
+     "take": 39
     },
     {
      "room": "0303",
@@ -1550,31 +1549,31 @@
       3088,
       -2816
      ],
-      "take": 18
-     },
-     {
-      "room": "0303",
-      "rec": "0x50b20",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 70,
-      "vanillaAmount": 1,
-      "vanillaTake": 39,
-      "geometry": [
-       3328,
-       -2560,
-       4608,
-       -2560,
-       4608,
-       -3584,
-       3328,
-       -3584
-      ],
-      "take": 19
-     }
+     "take": 39
+    },
+    {
+     "room": "0303",
+     "rec": "0x50b20",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 70,
+     "vanillaAmount": 1,
+     "vanillaTake": 39,
+     "geometry": [
+      3328,
+      -2560,
+      4608,
+      -2560,
+      4608,
+      -3584,
+      3328,
+      -3584
+     ],
+     "take": 39
+    }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Gas Experiment Room (0303) - Small Size Key @3088,-1008",
@@ -1668,32 +1667,31 @@
       -3072,
       2048
      ],
-      "take": 90
-     },
-     {
-      "room": "0615",
-      "rec": "0x21cbc",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 102,
-      "vanillaAmount": 1,
-      "vanillaTake": 90,
-      "geometry": [
-       -3072,
-       3328,
-       -1536,
-       3328,
-       -1536,
-       2048,
-       -3072,
-       2048
-      ],
-      "take": 90
-     }
+     "take": 90
+    },
+    {
+     "room": "0615",
+     "rec": "0x21cbc",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 102,
+     "vanillaAmount": 1,
+     "vanillaTake": 90,
+     "geometry": [
+      -3072,
+      3328,
+      -1536,
+      3328,
+      -1536,
+      2048,
+      -3072,
+      2048
+     ],
+     "take": 90
+    }
    ],
-   "class": "pinned-shared",
-    "excluded": true
+   "class": "clean"
   },
   {
    "name": "General Weapons Storage (0605) - Hemostat @12032,384",
@@ -1704,10 +1702,9 @@
    "predicate": {
     "kind": "flag",
     "group": 7,
-     "anyOf": [
-      24,
-      25
-     ]
+    "anyOf": [
+     196
+    ]
    },
    "records": [
     {
@@ -1729,31 +1726,31 @@
       12032,
       -768
      ],
-      "take": 24
-     },
-     {
-      "room": "0615",
-      "rec": "0x21c90",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 27,
-      "vanillaAmount": 1,
-      "vanillaTake": 196,
-      "geometry": [
-       12032,
-       384,
-       13440,
-       384,
-       13440,
-       -768,
-       12032,
-       -768
-      ],
-      "take": 25
-     }
+     "take": 196
+    },
+    {
+     "room": "0615",
+     "rec": "0x21c90",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 27,
+     "vanillaAmount": 1,
+     "vanillaTake": 196,
+     "geometry": [
+      12032,
+      384,
+      13440,
+      384,
+      13440,
+      -768,
+      12032,
+      -768
+     ],
+     "take": 196
+    }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Hall 2F (0203) - SG Bullets @4800,4100",
@@ -1879,7 +1876,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     26
+     19
     ]
    },
    "records": [
@@ -1902,7 +1899,7 @@
       -5888,
       -14080
      ],
-     "take": 26
+     "take": 19
     }
    ],
    "class": "rekeyed"
@@ -2328,8 +2325,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-      28,
-      29
+     76
     ]
    },
    "records": [
@@ -2352,31 +2348,31 @@
       -3956,
       -2928
      ],
-      "take": 28
-     },
-     {
-      "room": "0406",
-      "rec": "0x37fa0",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 107,
-      "vanillaAmount": 1,
-      "vanillaTake": 76,
-      "geometry": [
-       -4352,
-       224,
-       752,
-       224,
-       752,
-       -4224,
-       -4352,
-       -4192
-      ],
-      "take": 29
-     }
+     "take": 76
+    },
+    {
+     "room": "0406",
+     "rec": "0x37fa0",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 107,
+     "vanillaAmount": 1,
+     "vanillaTake": 76,
+     "geometry": [
+      -4352,
+      224,
+      752,
+      224,
+      752,
+      -4224,
+      -4352,
+      -4192
+     ],
+     "take": 76
+    }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Large Size Elevator Control Room (0406) - DDK Input Disc L @-3456,1280",
@@ -2536,12 +2532,12 @@
    "key": "0108:2b:-8256,-7904",
    "logicalId": "0108:2b:-8256,-7904",
    "room": "0108",
-    "predicate": {
-     "kind": "flag",
-     "group": 7,
-     "anyOf": [
-      99
-     ]
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     99
+    ]
    },
    "records": [
     {
@@ -2563,31 +2559,31 @@
       -7488,
       -7904
      ],
-      "take": 99
-     },
-     {
-      "room": "0108",
-      "rec": "0x3db08",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 43,
-      "vanillaAmount": 1,
-      "vanillaTake": 99,
-      "geometry": [
-       -8240,
-       -7904,
-       -8256,
-       -6832,
-       -7472,
-       -6992,
-       -7488,
-       -7936
-      ],
-      "take": 99
-     }
+     "take": 99
+    },
+    {
+     "room": "0108",
+     "rec": "0x3db08",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 43,
+     "vanillaAmount": 1,
+     "vanillaTake": 99,
+     "geometry": [
+      -8240,
+      -7904,
+      -8256,
+      -6832,
+      -7472,
+      -6992,
+      -7488,
+      -7936
+     ],
+     "take": 99
+    }
    ],
-    "class": "clean"
+   "class": "clean"
   },
   {
    "name": "Library Room (0305) - B1 Key Chip \" with number \"(3695) @-6400,-4864",
@@ -3055,7 +3051,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     30
+     23
     ]
    },
    "records": [
@@ -3078,7 +3074,7 @@
       -2800,
       224
      ],
-     "take": 30
+     "take": 23
     }
    ],
    "class": "rekeyed"
@@ -3131,7 +3127,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     31
+     24
     ]
    },
    "records": [
@@ -3154,7 +3150,7 @@
       2288,
       -2992
      ],
-     "take": 31
+     "take": 24
     }
    ],
    "class": "rekeyed"
@@ -3478,7 +3474,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     35
+     25
     ]
    },
    "records": [
@@ -3501,7 +3497,7 @@
       -1193,
       495
      ],
-     "take": 35
+     "take": 25
     }
    ],
    "class": "rekeyed"
@@ -3554,7 +3550,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     40
+     26
     ]
    },
    "records": [
@@ -3577,7 +3573,7 @@
       -1193,
       495
      ],
-     "take": 40
+     "take": 26
     }
    ],
    "class": "rekeyed"
@@ -3862,7 +3858,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     43
+     27
     ]
    },
    "records": [
@@ -3885,7 +3881,7 @@
       -9024,
       -8688
      ],
-     "take": 43
+     "take": 27
     }
    ],
    "class": "rekeyed"
@@ -3900,7 +3896,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     45
+     28
     ]
    },
    "records": [
@@ -3923,7 +3919,7 @@
       5632,
       2048
      ],
-     "take": 45
+     "take": 28
     }
    ],
    "class": "rekeyed"
@@ -4090,7 +4086,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     46
+     29
     ]
    },
    "records": [
@@ -4113,7 +4109,7 @@
       10064,
       14320
      ],
-     "take": 46
+     "take": 29
     }
    ],
    "class": "rekeyed"
@@ -4128,7 +4124,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     50
+     30
     ]
    },
    "records": [
@@ -4151,7 +4147,7 @@
       10064,
       14320
      ],
-     "take": 50
+     "take": 30
     }
    ],
    "class": "rekeyed"
@@ -4546,7 +4542,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     51
+     31
     ]
    },
    "records": [
@@ -4569,7 +4565,7 @@
       -1792,
       -1408
      ],
-     "take": 51
+     "take": 31
     }
    ],
    "class": "rekeyed"
@@ -4710,18 +4706,18 @@
    "class": "clean"
   },
   {
-    "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
-    "apId": 230817918,
+   "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
+   "apId": 230817918,
    "key": "0504:50:4896,-3840",
    "logicalId": "0504:50:4896,-3840",
    "room": "0504",
    "predicate": {
     "kind": "flag",
     "group": 7,
-     "anyOf": [
-      48,
-      49
-     ]
+    "anyOf": [
+     48,
+     49
+    ]
    },
    "records": [
     {
@@ -4743,96 +4739,102 @@
       4896,
       -4992
      ],
-      "take": 49
-     },
-     {
-      "room": "0504",
-      "rec": "0x5028c",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 80,
-      "vanillaAmount": 1,
-      "vanillaTake": 48,
-      "geometry": [
-       -2912,
-       3872,
-       -1792,
-       3872,
-       -1792,
-       2960,
-       -2912,
-       2960
-      ],
-      "take": 48
-     }
+     "take": 49
+    },
+    {
+     "room": "0504",
+     "rec": "0x5028c",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 80,
+     "vanillaAmount": 1,
+     "vanillaTake": 48,
+     "geometry": [
+      -2912,
+      3872,
+      -1792,
+      3872,
+      -1792,
+      2960,
+      -2912,
+      2960
+     ],
+     "take": 48
+    }
    ],
    "class": "pinned-shared",
-    "excluded": true
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872"
+   ]
   },
-   {
-    "name": "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872",
-    "apId": 230817919,
-    "key": "0504:4f:-2912,3872",
-    "logicalId": "0504:4f:-2912,3872",
-    "room": "0504",
-    "predicate": {
-     "kind": "flag",
-     "group": 7,
-     "anyOf": [
-      48,
-      49
-     ]
-    },
-    "records": [
-     {
-      "room": "0504",
-      "rec": "0x4fbf0",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 79,
-      "vanillaAmount": 1,
-      "vanillaTake": 48,
-      "geometry": [
-       -2912,
-       3872,
-       -1792,
-       3872,
-       -1792,
-       2960,
-       -2912,
-       2960
-      ],
-      "take": 48
-     },
-     {
-      "room": "0504",
-      "rec": "0x500f8",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 79,
-      "vanillaAmount": 1,
-      "vanillaTake": 49,
-      "geometry": [
-       4896,
-       -3840,
-       5920,
-       -3840,
-       5920,
-       -4992,
-       4896,
-       -4992
-      ],
-      "take": 49
-     }
-    ],
-    "class": "pinned-shared",
-    "excluded": true
+  {
+   "name": "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872",
+   "apId": 230817919,
+   "key": "0504:4f:-2912,3872",
+   "logicalId": "0504:4f:-2912,3872",
+   "room": "0504",
+   "predicate": {
+    "kind": "flag",
+    "group": 7,
+    "anyOf": [
+     48,
+     49
+    ]
    },
-   {
-    "name": "Stabilizer Experiment Room (0503) - DDK Code Disc D @-2800,-3088",
+   "records": [
+    {
+     "room": "0504",
+     "rec": "0x4fbf0",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 79,
+     "vanillaAmount": 1,
+     "vanillaTake": 48,
+     "geometry": [
+      -2912,
+      3872,
+      -1792,
+      3872,
+      -1792,
+      2960,
+      -2912,
+      2960
+     ],
+     "take": 48
+    },
+    {
+     "room": "0504",
+     "rec": "0x500f8",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 79,
+     "vanillaAmount": 1,
+     "vanillaTake": 49,
+     "geometry": [
+      4896,
+      -3840,
+      5920,
+      -3840,
+      5920,
+      -4992,
+      4896,
+      -4992
+     ],
+     "take": 49
+    }
+   ],
+   "class": "pinned-shared",
+   "excluded": true,
+   "sharedWith": [
+    "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840"
+   ]
+  },
+  {
+   "name": "Stabilizer Experiment Room (0503) - DDK Code Disc D @-2800,-3088",
    "apId": 230817921,
    "key": "0503:6f:-2800,-3088",
    "logicalId": "0503:6f:-2800,-3088",
@@ -4840,10 +4842,9 @@
    "predicate": {
     "kind": "flag",
     "group": 7,
-     "anyOf": [
-      55,
-      58
-     ]
+    "anyOf": [
+     69
+    ]
    },
    "records": [
     {
@@ -4865,31 +4866,31 @@
       -2800,
       -4752
      ],
-      "take": 55
-     },
-     {
-      "room": "0511",
-      "rec": "0x57258",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 111,
-      "vanillaAmount": 1,
-      "vanillaTake": 69,
-      "geometry": [
-       -2800,
-       -3088,
-       -1136,
-       -3088,
-       -1136,
-       -4752,
-       -2800,
-       -4752
-      ],
-      "take": 58
-     }
+     "take": 69
+    },
+    {
+     "room": "0511",
+     "rec": "0x57258",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 111,
+     "vanillaAmount": 1,
+     "vanillaTake": 69,
+     "geometry": [
+      -2800,
+      -3088,
+      -1136,
+      -3088,
+      -1136,
+      -4752,
+      -2800,
+      -4752
+     ],
+     "take": 69
+    }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Stabilizer Experiment Room (0503) - Initializer @-3468,2768",
@@ -4938,10 +4939,9 @@
    "predicate": {
     "kind": "flag",
     "group": 7,
-     "anyOf": [
-      56,
-      59
-     ]
+    "anyOf": [
+     118
+    ]
    },
    "records": [
     {
@@ -4963,31 +4963,31 @@
       -10240,
       -7168
      ],
-      "take": 56
-     },
-     {
-      "room": "0511",
-      "rec": "0x5722c",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 43,
-      "vanillaAmount": 1,
-      "vanillaTake": 118,
-      "geometry": [
-       -10240,
-       -5248,
-       -8192,
-       -5248,
-       -8192,
-       -7168,
-       -10240,
-       -7168
-      ],
-      "take": 59
-     }
+     "take": 118
+    },
+    {
+     "room": "0511",
+     "rec": "0x5722c",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 43,
+     "vanillaAmount": 1,
+     "vanillaTake": 118,
+     "geometry": [
+      -10240,
+      -5248,
+      -8192,
+      -5248,
+      -8192,
+      -7168,
+      -10240,
+      -7168
+     ],
+     "take": 118
+    }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Stabilizer Experiment Room (0503) - Protect P. 2-B @-3468,2768",
@@ -5037,7 +5037,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     57
+     35
     ]
    },
    "records": [
@@ -5060,7 +5060,7 @@
       -1792,
       -1408
      ],
-     "take": 57
+     "take": 35
     }
    ],
    "class": "rekeyed"
@@ -5098,32 +5098,31 @@
       -10240,
       3584
      ],
-      "take": 208
-     },
-     {
-      "room": "0511",
-      "rec": "0x575c0",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 11,
-      "vanillaAmount": 1,
-      "vanillaTake": 208,
-      "geometry": [
-       -10240,
-       4480,
-       -8960,
-       4480,
-       -8960,
-       3584,
-       -10240,
-       3584
-      ],
-      "take": 208
-     }
+     "take": 208
+    },
+    {
+     "room": "0511",
+     "rec": "0x575c0",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 11,
+     "vanillaAmount": 1,
+     "vanillaTake": 208,
+     "geometry": [
+      -10240,
+      4480,
+      -8960,
+      4480,
+      -8960,
+      3584,
+      -10240,
+      3584
+     ],
+     "take": 208
+    }
    ],
-   "class": "pinned-shared",
-    "excluded": true
+   "class": "clean"
   },
   {
    "name": "Stabilizer Experiment Room (0503) - Stabilizer @-3468,2768",
@@ -5552,10 +5551,10 @@
    "predicate": {
     "kind": "flag",
     "group": 7,
-     "anyOf": [
-      104,
-      105
-     ]
+    "anyOf": [
+     104,
+     105
+    ]
    },
    "records": [
     {
@@ -5577,29 +5576,29 @@
       6144,
       -3584
      ],
-      "take": 104
-     },
-     {
-      "room": "0606",
-      "rec": "0x3e5cc",
-      "expectedOpcode": 40,
-      "expectedSubtype": 4,
-      "expectedLength": 44,
-      "vanillaItemId": 43,
-      "vanillaAmount": 1,
-      "vanillaTake": 105,
-      "geometry": [
-       6912,
-       -11392,
-       6912,
-       -9216,
-       8832,
-       -9216,
-       8832,
-       -11392
-      ],
-      "take": 105
-     }
+     "take": 104
+    },
+    {
+     "room": "0606",
+     "rec": "0x3e5cc",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 43,
+     "vanillaAmount": 1,
+     "vanillaTake": 105,
+     "geometry": [
+      6912,
+      -11392,
+      6912,
+      -9216,
+      8832,
+      -9216,
+      8832,
+      -11392
+     ],
+     "take": 105
+    }
    ],
    "class": "clean"
   },

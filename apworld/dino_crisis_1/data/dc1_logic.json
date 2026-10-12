@@ -11026,15 +11026,17 @@
         "0503",
         "0511"
       ],
-      "excluded": true,
       "node": "0503",
       "accessNodes": [
         "0503",
         "0511"
       ],
       "apId": 230817926,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
     },
     {
       "key": "0605:1b:12032,384",
@@ -11161,15 +11163,40 @@
         "0605",
         "0615"
       ],
-      "excluded": true,
       "node": "0605",
       "accessNodes": [
         "0605",
         "0615"
       ],
       "apId": 230817835,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     }
   ],
   "tombstones": [
