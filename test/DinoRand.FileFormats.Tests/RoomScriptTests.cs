@@ -89,6 +89,60 @@ public class RoomScriptTests
         return r;
     }
 
+    /// <summary>Build a 44-byte 0x5B scripted-entrance record (slot/category at the 0x20 offsets,
+    /// position @ +4/+6/+8, rotation @ +0x0A, model @ +0x0C, motion @ +0x10).</summary>
+    private static byte[] Enemy3Rec(byte slot, byte category, uint model, uint motion,
+                                    short x = 0, short y = 0, short z = 0, short rot = 0)
+    {
+        var r = new byte[DcOpcodes.Enemy3Length];
+        r[0] = DcOpcodes.Enemy3;                       // 0x5B
+        r[EnemyRecord.SlotOffset] = slot;
+        r[EnemyRecord.CategoryOffset] = category;
+        r[EnemyRecord.Enemy3PosXOffset] = (byte)x; r[EnemyRecord.Enemy3PosXOffset + 1] = (byte)(x >> 8);
+        r[EnemyRecord.Enemy3PosYOffset] = (byte)y; r[EnemyRecord.Enemy3PosYOffset + 1] = (byte)(y >> 8);
+        r[EnemyRecord.Enemy3PosZOffset] = (byte)z; r[EnemyRecord.Enemy3PosZOffset + 1] = (byte)(z >> 8);
+        r[EnemyRecord.Enemy3RotationOffset] = (byte)rot; r[EnemyRecord.Enemy3RotationOffset + 1] = (byte)(rot >> 8);
+        WriteU32(r, EnemyRecord.Enemy3ModelOffset, model);
+        WriteU32(r, EnemyRecord.Enemy3MotionOffset, motion);
+        return r;
+    }
+
+    /// <summary>0x5B is the scripted enemy entrance (cont.98): a real dinosaur an event script brings
+    /// on. It is surfaced separately from <see cref="RoomScript.Enemies"/> so every pass that edits or
+    /// counts enemies keeps seeing exactly the records it saw before.</summary>
+    [Fact]
+    public void Walk_CollectsScriptedEntrances_0x5B_ApartFromEnemies()
+    {
+        var rdt = BuildRdt(
+            EnemyRec(0x02, 0x02, 0x8010f3b4, 0x8014cdd4, killFlag: 0x12),
+            Enemy3Rec(0x01, 0x02, 0x8010aaac, 0x8010d600, x: -2550, y: 0, z: 2686, rot: 1508));
+        var s = RoomScript.Parse(rdt);
+
+        Assert.True(s.ParsedCleanly);
+        Assert.Single(s.Enemies);                       // the 0x20 record only
+        var e = Assert.Single(s.ScriptedEntrances);
+        Assert.Equal(DcOpcodes.Enemy3, e.Opcode);
+        Assert.Equal(DcOpcodes.Enemy3, rdt[e.FileOffset]);
+        Assert.Equal(1, e.Slot);
+        Assert.Equal(2, e.Category);
+        Assert.Equal(-2550, e.PosX);
+        Assert.Equal(2686, e.PosZ);
+        Assert.Equal(1508, e.Rotation);
+        Assert.Equal(0x8010aaacu, e.ModelPtr);
+        Assert.Equal(0x8010d600u, e.MotionPtr);
+        Assert.Equal(EnemyRecord.Enemy3ModelOffset, e.ModelFieldOffset);
+        Assert.Equal(EnemyRecord.Enemy3MotionOffset, e.MotionFieldOffset);
+        Assert.False(e.IsRandomizableDino);             // choreographed: never a swap candidate
+    }
+
+    [Fact]
+    public void Walk_IgnoresA0x5BWhoseModelPointerIsNotLoaded()
+    {
+        var s = RoomScript.Parse(BuildRdt(Enemy3Rec(0x01, 0x02, 0x00800080, 0x00800080)));
+        Assert.True(s.ParsedCleanly);
+        Assert.Empty(s.ScriptedEntrances);
+    }
+
     /// <summary>Build a 48-byte 0x28 subtype-0 door record (dest stage/room, lock, type, entry pose).
     /// The entry pose words sit at the CE-decoded offsets +0x1e/+0x20/+0x22/+0x24 (plan §3.2).</summary>
     private static byte[] DoorRec(byte stage, byte room, byte lockId = 0, byte doorType = 0,

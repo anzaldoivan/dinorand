@@ -29,7 +29,10 @@ public class RoomFileRoundTripTests
         var dataDir = string.IsNullOrEmpty(root) ? null : FindDataDir(root);
         dataDir ??= MockRooms.Dc1DataDir();
 
-        foreach (var path in Directory.EnumerateFiles(dataDir, "st*.dat"))
+        // Case-insensitive: the GOG install ships St502.dat and StB0D.dat with a capital S, which a
+        // plain "st*.dat" glob drops on Linux/WSL — these theories then silently skipped two rooms.
+        foreach (var path in Directory.EnumerateFiles(dataDir, "st*.dat",
+                     new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive }))
             if (RoomPattern.IsMatch(Path.GetFileName(path)))
                 yield return new object[] { path };
     }

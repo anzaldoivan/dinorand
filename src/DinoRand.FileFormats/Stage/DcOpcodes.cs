@@ -47,6 +47,15 @@ public static class DcOpcodes
     /// <summary>Total length of an enemy (<c>0x59</c>) record, opcode byte included.</summary>
     public const int Enemy2Length = 20;
 
+    /// <summary>Scripted enemy entrance (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.98): a 44-byte record in an
+    /// <i>event</i> subroutine that brings a dinosaur on stage along a path. Handler <c>0x42A80D</c> is a
+    /// nine-state machine keyed on the word at <c>record+0x22</c>. Category, position, model and motion
+    /// are inline. Read-only for the randomizer: the placements are choreographed.</summary>
+    public const byte Enemy3 = 0x5b;
+
+    /// <summary>Total length of a scripted-entrance (<c>0x5B</c>) record, opcode byte included.</summary>
+    public const int Enemy3Length = 44;
+
     /// <summary>Item-placement opcode (the SCD "area-of-things" placement; subtype 4 = item).</summary>
     public const byte Item = 0x28;
 

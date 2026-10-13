@@ -376,6 +376,15 @@ public sealed class EnemyRecord
     /// (selects the position + kill-flag entry resolved at load).</summary>
     public const int Enemy2IndexOffset = 0x10;
 
+    /// <summary>Field offsets of a <c>0x5B</c> (<see cref="DcOpcodes.Enemy3"/>) scripted-entrance record:
+    /// slot and category share the <c>0x20</c> offsets; the rest differ.</summary>
+    public const int Enemy3PosXOffset = 0x04;
+    public const int Enemy3PosYOffset = 0x06;
+    public const int Enemy3PosZOffset = 0x08;
+    public const int Enemy3RotationOffset = 0x0a;
+    public const int Enemy3ModelOffset = 0x0c;
+    public const int Enemy3MotionOffset = 0x10;
+
     /// <summary>The placement opcode this record was parsed from — <see cref="DcOpcodes.Enemy"/>
     /// (<c>0x20</c>, the default) or <see cref="DcOpcodes.Enemy2"/> (<c>0x59</c>). Determines the
     /// model/motion byte offsets (<see cref="ModelFieldOffset"/>/<see cref="MotionFieldOffset"/>) so
@@ -383,9 +392,19 @@ public sealed class EnemyRecord
     public byte Opcode { get; set; } = DcOpcodes.Enemy;
 
     /// <summary>Model-pointer byte offset within this record, selected by <see cref="Opcode"/>.</summary>
-    public int ModelFieldOffset => Opcode == DcOpcodes.Enemy2 ? Enemy2ModelOffset : ModelOffset;
+    public int ModelFieldOffset => Opcode switch
+    {
+        DcOpcodes.Enemy2 => Enemy2ModelOffset,
+        DcOpcodes.Enemy3 => Enemy3ModelOffset,
+        _ => ModelOffset,
+    };
     /// <summary>Motion-pointer byte offset within this record, selected by <see cref="Opcode"/>.</summary>
-    public int MotionFieldOffset => Opcode == DcOpcodes.Enemy2 ? Enemy2MotionOffset : MotionOffset;
+    public int MotionFieldOffset => Opcode switch
+    {
+        DcOpcodes.Enemy2 => Enemy2MotionOffset,
+        DcOpcodes.Enemy3 => Enemy3MotionOffset,
+        _ => MotionOffset,
+    };
 
     /// <summary>For a <see cref="DcOpcodes.Enemy2"/> (<c>0x59</c>) record, the secondary instance-table
     /// index (<c>record+0x10</c>) that supplies position + kill-flag at load; 0 for a <c>0x20</c>
@@ -497,7 +516,8 @@ public sealed class EnemyRecord
     /// "is a known dinosaur" check from the per-AI-category permute eligibility.</para>
     /// </summary>
     public bool IsRandomizableDino =>
-        SpeciesMatchesCategory && Species != DinoSpecies.Tyrannosaurus && !IsNpcSceneActor;
+        SpeciesMatchesCategory && Species != DinoSpecies.Tyrannosaurus && !IsNpcSceneActor
+        && Opcode != DcOpcodes.Enemy3;   // a scripted entrance is choreographed (cont.98)
 
     /// <summary>
     /// True when this species' birth-init <b>keeps</b> a nonzero preset <see cref="MaxHp"/> — i.e. the

@@ -142,4 +142,28 @@ public class RoomDataSelectionTests
 
         Assert.True(file.ParsedCleanly, $"{name}: room script did not walk cleanly");
     }
+
+    /// <summary>Real-install census of the scripted entrances (0x5B, cont.98): 127 records in 60 rooms
+    /// (28 of them campaign rooms), every one a Velociraptor or a Therizinosaurus. Most sit in a room's
+    /// last subroutine. No-ops on the synthetic corpus.</summary>
+    [Fact]
+    public void RealInstall_ScriptedEntrances_AreRaptorsAndTherizinosaurs()
+    {
+        var files = RoomFileRoundTripTests.RoomFiles().Select(r => (string)r[0]).ToList();
+        if (files.Count < 100) return;   // synthetic corpus
+
+        var found = new List<(string Room, DinoSpecies Species)>();
+        foreach (var path in files)
+        {
+            var script = RoomScript.Parse(RoomFile.Read(0, 0, File.ReadAllBytes(path)).RdtBuffer);
+            found.AddRange(script.ScriptedEntrances.Select(e =>
+                (Path.GetFileNameWithoutExtension(path).ToLowerInvariant(), e.Species)));
+        }
+
+        Assert.Equal(127, found.Count);
+        Assert.Equal(60, found.Select(f => f.Room).Distinct().Count());
+        Assert.All(found, f => Assert.True(
+            f.Species is DinoSpecies.Velociraptor or DinoSpecies.Therizinosaurus, $"{f.Room}: {f.Species}"));
+        Assert.Equal(28, found.Select(f => f.Room).Where(r => r[2] is >= '1' and <= '6').Distinct().Count());
+    }
 }
