@@ -433,6 +433,18 @@ public sealed class EnemyRecord
     /// pass leaves it untouched. DC1-G2, EXE-SYMBOLS <c>0x42656A</c> / entity <c>+0x11A</c>.</summary>
     public ushort MaxHp { get; set; }
 
+    /// <summary>Per-entity AI parameter decoded from a <c>0x20</c> record.</summary>
+    public byte AiParam { get; set; }
+
+    /// <summary>AI parameter as decoded from the file.</summary>
+    public byte OriginalAiParam { get; set; }
+
+    /// <summary>Birth behavior bitfield decoded from a <c>0x20</c> record.</summary>
+    public byte BirthMode { get; set; }
+
+    /// <summary>Birth behavior bitfield as decoded from the file.</summary>
+    public byte OriginalBirthMode { get; set; }
+
     /// <summary>MaxHP word as decoded from the file, before any randomizer edit (drives change detection so
     /// a model-only permute leaves <c>+6</c> byte-exact).</summary>
     public ushort OriginalMaxHp { get; set; }
@@ -524,9 +536,11 @@ public sealed class EnemyRecord
     /// multi-raptor spawns never trip the rule: identical raptors share <i>both</i> pointers (one distinct
     /// model), and distinct raptors each get their own motion. Bone count / bind-pose cannot tell an NPC
     /// actor from a raptor (the NPC placement even embeds a raptor skeleton), so this relational check is
-    /// the only reliable static discriminator.
+    /// the only reliable static discriminator. The 0308 and 0406 scene shells are additionally identified
+    /// by room-scoped evidence: those rooms have no randomizable dinosaur placement, so every parsed 0x20
+    /// record in either room is excluded (0308 slot 1 at RDT 0x42554; 0406 slots 3/2 at RDT 0x37644..0x37844).
     /// </summary>
-    public static void MarkNpcSceneActors(IReadOnlyList<EnemyRecord> roomEnemies)
+    public static void MarkNpcSceneActors(IReadOnlyList<EnemyRecord> roomEnemies, int stage = -1, int room = -1)
     {
         var distinctModelsByMotion = new Dictionary<uint, HashSet<uint>>();
         foreach (var e in roomEnemies)
@@ -541,8 +555,14 @@ public sealed class EnemyRecord
             if (e.Opcode != DcOpcodes.Enemy) continue;
             if (distinctModelsByMotion.TryGetValue(e.OriginalMotionPtr, out var models) && models.Count >= 2)
                 e.IsNpcSceneActor = true;
+            if (IsRoomScopedSceneShell(e, stage, room))
+                e.IsNpcSceneActor = true;
         }
     }
+
+    private static bool IsRoomScopedSceneShell(EnemyRecord e, int stage, int room)
+        => e.Opcode == DcOpcodes.Enemy && ((stage == 3 && room == 0x08)
+            || (stage == 4 && room == 0x06));
 
     public byte[] Raw { get; set; } = Array.Empty<byte>();
 
@@ -553,7 +573,7 @@ public sealed class EnemyRecord
     /// </summary>
     public int FileOffset { get; set; } = -1;
 
-    /// <summary>True once the model/motion pointer or the preset maxHP has been changed from the original.</summary>
+    /// <summary>True once a model, motion, preset maxHP, AI parameter, or birth mode has changed.</summary>
     public bool IsEdited => ModelPtr != OriginalModelPtr || MotionPtr != OriginalMotionPtr
-        || MaxHp != OriginalMaxHp;
+        || MaxHp != OriginalMaxHp || AiParam != OriginalAiParam || BirthMode != OriginalBirthMode;
 }

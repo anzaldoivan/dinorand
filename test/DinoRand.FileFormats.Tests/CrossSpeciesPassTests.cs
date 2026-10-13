@@ -57,6 +57,55 @@ public class CrossSpeciesPassTests
         Assert.False(string.IsNullOrEmpty(def.Blocker));
     }
 
+    [Fact]
+    public void Catalog_Pteranodon_RecordsDispatchEvidence_ButRetainsRuntimeGates()
+    {
+        var def = ExoticSpeciesCatalog.For(DinoSpecies.Pteranodon)!;
+
+        Assert.False(def.Enabled);
+        Assert.Empty(def.FreeStages);
+        Assert.False(def.AllowsStage(1));
+        Assert.Contains("cat-7 dispatch handler", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("0x5998F0", def.Blocker);
+        Assert.Contains("model/motion state and texture import evidence are proven", def.Blocker,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("texture behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("SE behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("damage behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("death behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("kill-flag behavior", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("end-to-end runtime-witness gate", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("free-slot/open-arena eligibility", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("birth handler", def.Blocker, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("0x599CDC", def.Blocker);
+        Assert.DoesNotContain("0x599D92", def.Blocker);
+    }
+
+    [Fact]
+    public void Importer_Pteranodon_RemainsRefusedWithoutRuntimeWitness()
+    {
+        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) }));
+
+        var importer = new CrossSpeciesImporter(new[] { room });
+
+        Assert.DoesNotContain(DinoSpecies.Pteranodon, importer.AvailableDonors);
+        Assert.Null(importer.Plan(room, 0, DinoSpecies.Pteranodon));
+    }
+
+    [Fact]
+    public void Importer_DisabledSpecies_IsRejectedBeforeMutation()
+    {
+        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) }));
+        var before = room.Write();
+
+        Assert.Null(new CrossSpeciesImporter(new[] { room }).Plan(room, 0, DinoSpecies.Pteranodon));
+        Assert.Equal(before, room.Write());
+    }
+
     // ---- Pure placement planner (stage-scoping) ----
 
     private static RoomCandidate Cand(int stage, int room, bool victim = true, params DinoSpecies[] present)
@@ -193,6 +242,43 @@ public class CrossSpeciesPassTests
         Assert.Empty(ctx.ExePatchRequests);
     }
 
+    [Fact]
+    public void Pass_PlannedImporter_PublishesPreparedRoomBytesForGroundedPlacement()
+    {
+        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) }));
+        var prepared = SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21) });
+        var importer = new PlannedFakeImporter(room, prepared, DinoSpecies.RaptorHeavy);
+        var pass = new CrossSpeciesEnemyPass(_ => importer);
+        var ctx = new RandomizationContext(new DinoCrisis1(), new[] { room }, RoomGraph.Build(new[] { room }),
+            new Seed(1), new RandomizerConfig { CrossRoomEnemySpecies = true, EnemyDifficulty = 1.0 }, _ => { });
+
+        pass.Apply(ctx);
+
+        Assert.True(ctx.TryGetRoomOutput(room, out var output));
+        Assert.Equal(DinoSpecies.RaptorHeavy,
+            RoomFile.Read(room.Stage, room.Room, output).Enemies.Single().Species);
+    }
+
+    [Fact]
+    public void Pass_SelectsParsedEnemy2RaptorHeavyTarget()
+    {
+        var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
+            Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
+            new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy2, 2, 21) }));
+        var importer = new PlannedFakeImporter(room, room.Write(), DinoSpecies.Therizinosaurus);
+        var pass = new CrossSpeciesEnemyPass(_ => importer);
+        var ctx = new RandomizationContext(new DinoCrisis1(), new[] { room }, RoomGraph.Build(new[] { room }),
+            new Seed(1), new RandomizerConfig { CrossRoomEnemySpecies = true, EnemyDifficulty = 1.0 }, _ => { });
+
+        pass.Apply(ctx);
+
+        Assert.Equal(new[] { 0 }, importer.VictimIndices);
+    }
+
     private static RandomizationContext NewContext(IReadOnlyList<RoomFile> rooms)
         => new(new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(1),
                new RandomizerConfig { CrossRoomEnemySpecies = true }, _ => { });
@@ -204,6 +290,40 @@ public class CrossSpeciesPassTests
         public bool TryImport(RandomizationContext context, RoomFile room, int victimIdx, ExoticSpeciesDef def,
                               out IReadOnlyList<ExePatchRequest> patches, out string note)
         { patches = Array.Empty<ExePatchRequest>(); note = "fake"; return true; }
+    }
+
+    private sealed class PlannedFakeImporter : ICrossSpeciesImporter, IPlannedCrossSpeciesImporter
+    {
+        private readonly RoomFile _room;
+        private readonly byte[] _prepared;
+        private readonly DinoSpecies _species;
+        public List<int> VictimIndices { get; } = new();
+
+        public PlannedFakeImporter(RoomFile room, byte[] prepared, DinoSpecies species)
+        {
+            _room = room;
+            _prepared = prepared;
+            _species = species;
+        }
+
+        public IReadOnlyCollection<DinoSpecies> AvailableDonors => new[] { _species };
+
+        public CrossSpeciesImportPlan? Plan(RoomFile room, int victimIdx, DinoSpecies species)
+        {
+            if (room != _room || species != _species) return null;
+            VictimIndices.Add(victimIdx);
+            return new CrossSpeciesImportPlan(room, victimIdx, ExoticSpeciesCatalog.For(species)!, null, null);
+        }
+
+        public CrossSpeciesPreflight Preflight(CrossSpeciesImportPlan plan)
+            => new(true, "prepared", _prepared, Array.Empty<ExePatchRequest>());
+
+        public CrossSpeciesImportResult Apply(CrossSpeciesImportPlan plan, CrossSpeciesPreflight preflight)
+            => new(_prepared, Array.Empty<ExePatchRequest>(), "prepared");
+
+        public bool TryImport(RandomizationContext context, RoomFile room, int victimIdx, ExoticSpeciesDef def,
+                              out IReadOnlyList<ExePatchRequest> patches, out string note)
+        { patches = Array.Empty<ExePatchRequest>(); note = "legacy path"; return false; }
     }
 
     // ---- Gated real-install end-to-end ----
@@ -361,7 +481,7 @@ public class CrossSpeciesPassTests
 
         new CrossSpeciesEnemyPass().Apply(ctx);
 
-        Assert.Contains(log, l => l.Contains("Velociraptor ->"));
+        Assert.Contains(log, l => l.Contains(" -> "));
 
         // Any room placed via the output override (the Theri's textured bytes) must reparse cleanly and carry
         // the imported species.

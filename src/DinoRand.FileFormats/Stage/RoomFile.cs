@@ -113,7 +113,7 @@ public sealed class RoomFile
         {
             (rf.RdtBuffer, rf.RdtCompressed) = RoomPackageCodec.DecodeRdt(bytes, rdt);
 
-            rf.Script = RoomScript.Parse(rf.RdtBuffer);
+            rf.Script = RoomScript.Parse(rf.RdtBuffer, stage, room);
             if (rf.Script.ParsedCleanly && DcOpcodes.IsTrustworthy)
             {
                 rf.Items.AddRange(rf.Script.Items);
@@ -148,6 +148,26 @@ public sealed class RoomFile
     /// </summary>
     public void ImportSpecies(SpeciesDonorMulti donor, int enemyIndex)
         => RoomSpeciesEditor.Import(this, donor, enemyIndex);
+
+    internal void AdoptSerialized(ReadOnlySpan<byte> bytes)
+    {
+        var committed = Read(Stage, Room, bytes);
+        if (!committed.ParsedCleanly)
+            throw new InvalidOperationException("serialized room did not parse cleanly");
+        OriginalBytes = committed.OriginalBytes;
+        Package = committed.Package;
+        RdtBuffer = committed.RdtBuffer;
+        RdtCompressed = committed.RdtCompressed;
+        Script = committed.Script;
+        Items.Clear();
+        Items.AddRange(committed.Items);
+        Enemies.Clear();
+        Enemies.AddRange(committed.Enemies);
+        Doors.Clear();
+        Doors.AddRange(committed.Doors);
+        _structurallyEdited = false;
+        _textureStager.Clear();
+    }
 
     /// <summary>
     /// <b>⚠ DORMANT — DOES NOT WORK IN-ENGINE.</b> Overlay-in-place was CE-tested and <b>crashes on room
@@ -454,7 +474,7 @@ public sealed class RoomFile
     /// <summary>Re-walk the (grown) <see cref="RdtBuffer"/> and refresh the record lists / script.</summary>
     internal void Reparse()
     {
-        Script = RoomScript.Parse(RdtBuffer);
+        Script = RoomScript.Parse(RdtBuffer, Stage, Room);
         Items.Clear(); Enemies.Clear(); Doors.Clear();
         if (Script.ParsedCleanly && DcOpcodes.IsTrustworthy)
         {

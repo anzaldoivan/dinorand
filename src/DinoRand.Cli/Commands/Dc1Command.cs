@@ -8,6 +8,7 @@ using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Passes;
 using DinoRand.Randomizer.Voice;
 
 internal sealed partial class CliApplication
@@ -25,7 +26,7 @@ internal sealed partial class CliApplication
             // --max-donor <bytes>: DEBUG/test override — force the Theri clip-strip to this donor budget even when
             // the room would fit unstripped (used to reproduce 0102's exact strip in a native-Theri room, e.g. st612).
             int? maxDonorOverride = GetOpt("--max-donor") is { } md && int.TryParse(md, out int mdv) ? mdv : null;
-            return SwapSpecies(install, swapRoom, GetOpt("--species") ?? "largeground", maxDonorOverride);
+            return SwapSpecies(install, swapRoom, GetOpt("--species") ?? "raptorheavy", maxDonorOverride);
         }
 
         // Targeted single-room ADD-enemy (inject a brand-new 0x20 record into a room that has none —
@@ -98,7 +99,7 @@ internal sealed partial class CliApplication
             return ShuffleBgm(install, GetOpt("--seed"));
 
         // Puzzle-code randomizer (docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md §17): scramble the shared keypad-code
-        // family (Mgmt Office / Lounge / Computer-Room-gas safes + Stabilizer codes) from --seed, and rewrite the
+        // family (Mgmt Office / Lounge / Computer-Room-gas safes + eligible Stabilizer codes) from --seed, and rewrite the
         // in-game documents that state the code so displayed == checked. EXE table + st100/st200/st302 edits; read
         // at load, so the game must be CLOSED and relaunched. Same backup/--restore contract.
         if (argv.Contains("--scramble-puzzle-codes"))
@@ -761,6 +762,14 @@ internal sealed partial class CliApplication
                 "(largeground | raptorheavy | pteranodon | tyrannosaurus | swarm | velociraptor | therizinosaurus)");
             return 1;
         }
+        if (species == DinoSpecies.Pteranodon)
+        {
+            Console.Error.WriteLine("error: Pteranodon remains gated — cat-7 dispatch handler proven at 0x5998F0; " +
+                "model/motion state and texture import evidence are proven; mandatory remaining gates: texture " +
+                "behavior, SE behavior, damage behavior, death behavior, kill-flag behavior, end-to-end runtime-witness gate, " +
+                "and verified free-slot/open-arena eligibility");
+            return 1;
+        }
 
         int code;
         try { code = Convert.ToInt32(roomArg.Replace("0x", "", StringComparison.OrdinalIgnoreCase), 16); }
@@ -791,6 +800,9 @@ internal sealed partial class CliApplication
         // be RELOCATED (it shares the raptor's exact VRAM column/row), so it has its own path.
         if (species == DinoSpecies.Swarm)
             return SwapSwarm(installDir, dataDir, code, stage, room, targetRef, refs);
+
+        if (species == DinoSpecies.RaptorHeavy)
+            return SwapRaptorHeavy(installDir, code, stage, room, targetRef, refs);
 
         // Find a clean donor for the requested species anywhere in the game (carrying its texture).
         SpeciesDonor? donor = null;
@@ -857,6 +869,48 @@ internal sealed partial class CliApplication
                     yield return (int)(e.OriginalMotionPtr - SpeciesImporter.PsxBase);
             }
         }
+    }
+
+    static int SwapRaptorHeavy(string installDir, int code, int stage, int room,
+                               RoomFileRef targetRef, IReadOnlyList<RoomFileRef> refs)
+    {
+        var game = new DinoCrisis1();
+        var dataDir = game.GetDataDir(installDir)!;
+        var backupPath = BackupOnceWarned(dataDir, targetRef.Path);
+        var rooms = refs.Select(r => RoomFile.ReadFromFile(r.Stage, r.Room, r.Path)).ToList();
+        var target = RoomFile.Read(stage, room, File.ReadAllBytes(backupPath));
+        int targetIndex = rooms.FindIndex(r => r.Stage == stage && r.Room == room);
+        rooms[targetIndex] = target;
+
+        var victim = target.Enemies.FirstOrDefault(e => e.IsRandomizableDino);
+        if (victim is null)
+        {
+            Console.Error.WriteLine($"error: ST{code:X3} has no randomizable dinosaur to replace");
+            return 1;
+        }
+
+        var importer = new CrossSpeciesImporter(rooms);
+        var plan = importer.Plan(target, target.Enemies.IndexOf(victim), DinoSpecies.RaptorHeavy);
+        if (plan is null)
+        {
+            Console.Error.WriteLine($"error: ST{code:X3}+RaptorHeavy refused — no verified donor or stage support");
+            return 1;
+        }
+        var preflight = importer.Preflight(plan);
+        if (!preflight.Success)
+        {
+            Console.Error.WriteLine($"error: ST{code:X3}+RaptorHeavy refused — {preflight.Note}");
+            Console.Error.WriteLine("hint : nothing was written.");
+            return 1;
+        }
+
+        var applied = importer.Apply(plan, preflight);
+        File.WriteAllBytes(targetRef.Path, applied.RoomBytes);
+        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {victim.Species} -> RaptorHeavy ({applied.Note})");
+        Console.WriteLine($"wrote   : {targetRef.Path}");
+        Console.WriteLine($"backup  : {backupPath}");
+        Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
+        return 0;
     }
 
     // Inject a brand-new enemy into a room that has none, writing the edited file straight into Data
@@ -1762,7 +1816,7 @@ internal sealed partial class CliApplication
         Console.WriteLine($"backup  : {res.BackupPath}");
         Console.WriteLine($"seed    : {seed}");
         foreach (var r in res.Repoints) Console.WriteLine($"code    : {r}");
-        Console.WriteLine("effect  : each keypad safe now accepts a new seed-derived code; the document that states "
+        Console.WriteLine("effect  : each eligible keypad safe now accepts a new seed-derived code; the document that states "
             + "the code (where one exists) is rewritten to match.");
         Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
         Console.WriteLine("verify  : CLOSE then RELAUNCH the game (codes are read at load) and try a safe.");

@@ -95,7 +95,7 @@ public sealed class RoomScript
     /// <summary>
     /// Parse the SCD script out of a decompressed RDT <paramref name="buffer"/>.
     /// </summary>
-    public static RoomScript Parse(ReadOnlySpan<byte> buffer)
+    public static RoomScript Parse(ReadOnlySpan<byte> buffer, int stage = -1, int room = -1)
     {
         if (!TryReadFunctionTable(buffer, out int tableOffset, out var starts))
             return new RoomScript(false, -1, 0, Array.Empty<ItemRecord>(),
@@ -120,7 +120,7 @@ public sealed class RoomScript
 
         // Flag NPC-scene actors (Rick/Gail/Kirk) once all 0x20 records are visible: the shared-motion /
         // distinct-model tell is relational, so it can't be decided per-record at parse (cont.41).
-        EnemyRecord.MarkNpcSceneActors(enemies);
+        EnemyRecord.MarkNpcSceneActors(enemies, stage, room);
         return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors, scenerySlots);
     }
 
@@ -247,6 +247,10 @@ public sealed class RoomScript
                         // Preset maxHP (+6) — 0x20 only; copied to entity +0x11A by 0x42656A (DC1-G2).
                         MaxHp = (ushort)ReadU16(buffer, pos + EnemyRecord.MaxHpOffset),
                         OriginalMaxHp = (ushort)ReadU16(buffer, pos + EnemyRecord.MaxHpOffset),
+                        AiParam = buffer[pos + EnemyRecord.AiParamOffset],
+                        OriginalAiParam = buffer[pos + EnemyRecord.AiParamOffset],
+                        BirthMode = buffer[pos + EnemyRecord.BirthModeOffset],
+                        OriginalBirthMode = buffer[pos + EnemyRecord.BirthModeOffset],
                         // Decode the species from the model's embedded skeleton (cont.14): the
                         // model block lives in this same buffer at modelPtr - PSX base.
                         SpeciesBoneCount = EnemySkeleton.ReadBoneCount(buffer, model),
@@ -276,6 +280,8 @@ public sealed class RoomScript
                         MotionPtr = motion,
                         OriginalModelPtr = model,
                         OriginalMotionPtr = motion,
+                        AiParam = buffer[pos + EnemyRecord.AiParamOffset],
+                        OriginalAiParam = buffer[pos + EnemyRecord.AiParamOffset],
                         SpeciesBoneCount = EnemySkeleton.ReadBoneCount(buffer, model),
                         Raw = buffer.Slice(pos, len).ToArray(),
                         FileOffset = pos,
@@ -477,6 +483,16 @@ public sealed class RoomScript
             // provably byte-exact — RoomFileRoundTripTests.Enemy_MaxHpWord_SurvivesModelEditRoundTrip).
             if (enemy.Opcode == DcOpcodes.Enemy && enemy.MaxHp != enemy.OriginalMaxHp)
                 WriteU16(buffer, enemy.FileOffset + EnemyRecord.MaxHpOffset, enemy.MaxHp);
+            if (enemy.Opcode is DcOpcodes.Enemy or DcOpcodes.Enemy2)
+            {
+                if (enemy.AiParam != buffer[enemy.FileOffset + EnemyRecord.AiParamOffset])
+                    buffer[enemy.FileOffset + EnemyRecord.AiParamOffset] = enemy.AiParam;
+            }
+            if (enemy.Opcode == DcOpcodes.Enemy)
+            {
+                if (enemy.BirthMode != buffer[enemy.FileOffset + EnemyRecord.BirthModeOffset])
+                    buffer[enemy.FileOffset + EnemyRecord.BirthModeOffset] = enemy.BirthMode;
+            }
         }
     }
 

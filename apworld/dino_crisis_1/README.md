@@ -1,7 +1,7 @@
 # Dino Crisis 1 — Archipelago world
 
 A Python [Archipelago](https://archipelago.gg) world that lets AP **generate** a logically-valid
-Dino Crisis 1 seed from DinoRand's authored physical logic. The **runtime half ships too** (logic contract v3):
+Dino Crisis 1 seed from DinoRand's authored physical logic. The **runtime half ships too** (logic contract v4):
 slot_data carries AP's item placement (`placements` + `item_ids`), and the DinoRand CLI's
 `--ap-connect` client patches it into the local GOG install and syncs the running game
 (pickups → checks, received items → inventory, goal → completion) — live-verified end-to-end

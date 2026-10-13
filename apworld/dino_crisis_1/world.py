@@ -1,4 +1,4 @@
-"""Dino Crisis 1 Archipelago world over DinoRand's physical v3 logic contract."""
+"""Dino Crisis 1 Archipelago world over DinoRand's physical v4 logic contract."""
 from __future__ import annotations
 
 from typing import Any, Callable, Mapping
@@ -42,7 +42,8 @@ class DinoCrisis1World(World):
             mw.regions.append(r)
 
         for loc in dc1.LOCATIONS:
-            parent = regions[loc["node"]]
+            access_nodes = loc.get("accessNodes", [loc["node"]])
+            parent = menu if len(access_nodes) > 1 else regions[loc["node"]]
             ap_loc = DinoCrisis1Location(player, loc["name"], loc["apId"], parent)
             # Shared-taken-flag locations the runtime client cannot attribute individually
             # (ap-client-checks.json `excluded`): keep progression out; the client fires the
@@ -51,7 +52,15 @@ class DinoCrisis1World(World):
                 ap_loc.progress_type = LocationProgressType.EXCLUDED
             required_items = [dc1.ITEM_NAMES[item_id] for item_id in loc["requiresItems"]]
             required_rooms = [room_regions[room] for room in loc["requiresRooms"]]
-            ap_loc.access_rule = self._requirement_rule(required_items, [], required_rooms)
+            base_rule = self._requirement_rule(required_items, [], required_rooms)
+            if len(access_nodes) > 1:
+                ap_loc.access_rule = lambda state, base=base_rule, nodes=access_nodes: (
+                    base(state) and any(
+                        state.can_reach_region(regions[node].name, player) for node in nodes
+                    )
+                )
+            else:
+                ap_loc.access_rule = base_rule
             allowed = {dc1.ITEM_NAMES[item_id] for item_id in loc["allowedProgressionItemIds"]}
             if allowed != dc1.PROGRESSION_ITEM_NAMES:
                 ap_loc.item_rule = lambda item, allowed=allowed: (

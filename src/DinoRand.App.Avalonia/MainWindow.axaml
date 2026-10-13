@@ -149,10 +149,14 @@
 
                     <!-- Tested DC1 accessibility/pace patches. Visible in the primary list; door skip is default ON,
                          backup-protected, restored byte-identically, and not part of the seed string. -->
-                    <CheckBox Content="Door Skip (Button Press)" Margin="0,2"
-                              IsVisible="{Binding CanDc1DoorSkip}"
-                              ToolTip.Tip="On by default: patch DINO.exe so a newly mapped door transition advances on the button press while existing transitions keep their original prologue and the destination background still loads correctly. Turn it off for a room-only install. Reversed by Restore and not part of the shareable seed string. CLOSE the game first — it edits the executable, and the change is seen after the next launch."
-                              IsChecked="{Binding Dc1DoorSkip, Mode=TwoWay}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,2"
+                                IsVisible="{Binding CanDc1DoorSkip}"
+                                ToolTip.Tip="Session-only DC1 door behavior; not part of the shareable seed string. OnPress advances newly mapped transitions on a button press. Auto: all door transitions skip automatically. Both are reversed by Restore. CLOSE the game first — the change is seen after the next launch.">
+                        <TextBlock Text="Door Skip:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <ComboBox ItemsSource="{Binding Dc1DoorSkipModes}"
+                                  SelectedItem="{Binding Dc1DoorSkipMode, Mode=TwoWay}"
+                                  MinWidth="90" />
+                    </StackPanel>
                     <CheckBox Content="Disable laser fences" Margin="0,2"
                               IsVisible="{Binding CanDisableLaserFences}"
                               ToolTip.Tip="Accessibility bypass: keeps each fence down until its natural cutscene enables the keypad; after that, the keypad can turn it on and off normally. Fence flags and keypad logic are untouched. Reversed by Restore and not part of the shareable seed string."
@@ -389,6 +393,33 @@
                                       IsChecked="{Binding RandomizeEnemyHp, Mode=TwoWay}"
                                       ToolTip.Tip="DC1 only, off by default. Give eligible RaptorHeavy and Pteranodon placements a seeded, difficulty-scaled max-HP override. Velociraptor, Swarm, Therizinosaurus, scripted T-Rex and cutscene placements are unchanged. This is a room-file edit; it does not patch DINO.exe." />
 
+                            <StackPanel Margin="20,0,0,4" IsVisible="{Binding Dc1EnemyOptionsVisible}">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="DC1 donor selection:" VerticalAlignment="Center" />
+                                    <ComboBox SelectedIndex="{Binding Dc1EnemyModeIndex, Mode=TwoWay}" MinWidth="110">
+                                        <ComboBoxItem Content="Weighted" />
+                                        <ComboBoxItem Content="Fixed species" />
+                                    </ComboBox>
+                                    <ComboBox ItemsSource="{Binding Dc1FixedSpeciesOptions}"
+                                              SelectedItem="{Binding SelectedDc1FixedSpecies, Mode=TwoWay}"
+                                              IsVisible="{Binding Dc1FixedOptionsVisible}" MinWidth="145" />
+                                </StackPanel>
+                                <ItemsControl ItemsSource="{Binding Dc1WeightOptions}"
+                                              IsVisible="{Binding Dc1WeightedOptionsVisible}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="130,140,Auto" Margin="0,1">
+                                                <TextBlock Grid.Column="0" Text="{Binding Creature}" VerticalAlignment="Center" />
+                                                <Slider Grid.Column="1" Minimum="0" Maximum="255" TickFrequency="1"
+                                                        IsSnapToTickEnabled="True" Value="{Binding Weight, Mode=TwoWay}" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Weight, StringFormat={}{0:0}}"
+                                                           VerticalAlignment="Center" Margin="6,0,0,0" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
                             <!-- Enemy Difficulty tunes normal enemy randomization and DC1 HP overrides. -->
                             <local:RandoSlider Margin="0,8,0,0"
                                                Heading="Enemy Difficulty" LowText="Easy" HighText="Hard" Maximum="31"
@@ -608,13 +639,44 @@
              optional password / one Connect–Disconnect toggle / scrolling status log). Everything
              it drives is Dc1ApRunner — the same session the CLI's ap-connect command runs. -->
         <TabItem Header="Archipelago"
-                 IsVisible="False"
                  IsEnabled="{Binding ApTabEnabled}"
                  ToolTip.Tip="Set your Dino Crisis game location on the Randomizer tab first — connecting installs the multiworld's item placement into that game.">
             <DockPanel Margin="8">
                 <StackPanel DockPanel.Dock="Top">
                     <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,8"
                                Text="Play Dino Crisis 1 in an Archipelago multiworld. Connecting installs the multiworld's item placement into your game (your originals are backed up, and 'Restore Originals' undoes it) — that step takes several minutes — then DinoRand watches the running game to send your checks and deliver items. Windows only: the game must run on this machine. Uses the game folder set on the Randomizer tab." />
+
+                    <Expander Header="AP setup" Margin="0,0,0,8">
+                        <StackPanel Margin="4">
+                            <TextBlock TextWrapping="Wrap" Text="1. Install the current Dino Crisis 1 .apworld from the DinoRand latest release into Archipelago's custom_worlds folder." />
+                            <TextBlock TextWrapping="Wrap" Text="2. Create and save a player YAML below." />
+                            <TextBlock TextWrapping="Wrap" Text="3. Generate the multiworld locally in Archipelago." />
+                            <TextBlock TextWrapping="Wrap" Text="4. Host the generated result; hosting does not need DINO.exe." />
+                            <TextBlock TextWrapping="Wrap" Text="5. Connect here, launch a new game, and keep DinoRand open while you play." />
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+                                <HyperlinkButton Content="DinoRand latest release"
+                                                 NavigateUri="https://github.com/anzaldoivan/dinorand/releases/latest" />
+                                <HyperlinkButton Content="Official Archipelago setup guide"
+                                                 NavigateUri="https://archipelago.gg/tutorial/Archipelago/setup_en" />
+                                <HyperlinkButton Content="Latest Archipelago release"
+                                                 NavigateUri="https://github.com/ArchipelagoMW/Archipelago/releases/latest" />
+                            </StackPanel>
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,6,0,0">
+                                <TextBlock Grid.Column="0" Text="Player name" VerticalAlignment="Center" Margin="0,2,8,2"
+                                           ToolTip.Tip="The case-sensitive player name used by Archipelago." />
+                                <TextBox Grid.Column="1" Text="{Binding ApPlayerName, Mode=TwoWay}"
+                                         VerticalContentAlignment="Center"
+                                         ToolTip.Tip="Enter the case-sensitive player name to write into the YAML."
+                                         AutomationProperties.Name="Archipelago player name"
+                                         AutomationProperties.HelpText="Case-sensitive name used by Archipelago." />
+                                <Button Grid.Column="2" Content="Save Player YAML" Margin="8,0,0,0"
+                                        Command="{Binding SavePlayerYamlCommand}"
+                                        ToolTip.Tip="Save the minimal player YAML for local Archipelago generation."
+                                        AutomationProperties.Name="Save player YAML"
+                                        AutomationProperties.HelpText="Save the player YAML file." />
+                            </Grid>
+                        </StackPanel>
+                    </Expander>
 
                     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,8">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Server" VerticalAlignment="Center" Margin="0,2,8,2" />
@@ -637,7 +699,8 @@
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button Content="{Binding ApConnectButtonText}" Padding="14,6" FontWeight="Bold"
-                                Command="{Binding ApToggleConnectCommand}" />
+                                Command="{Binding ApToggleConnectCommand}"
+                                IsEnabled="{Binding ApConnectEnabled}" />
                         <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                                    Text="{Binding ApStatusText}"
                                    Foreground="{Binding ApStatusBrush, Converter={x:Static local:NullToUnsetConverter.Instance}}" />
@@ -651,6 +714,12 @@
                                IsVisible="{Binding ApRunning}"
                                Text="Keep this window open while you play — DinoRand must stay running to send your checks and deliver your items. Closing it ends the session (the game itself keeps running)." />
                     <ProgressBar Height="6" Margin="0,8,0,4" IsIndeterminate="True" IsVisible="{Binding ApRunning}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                        <Button Content="▶ Play" Padding="12,6"
+                                Command="{Binding PlayCommand}" IsEnabled="{Binding CanPlayNow}" />
+                        <Button Content="Restore Originals" Padding="12,6"
+                                Command="{Binding RestoreCommand}" IsEnabled="{Binding ApCanRestore}" />
+                    </StackPanel>
                 </StackPanel>
 
                 <ListBox Margin="0,4,0,0" ItemsSource="{Binding ApLog}"

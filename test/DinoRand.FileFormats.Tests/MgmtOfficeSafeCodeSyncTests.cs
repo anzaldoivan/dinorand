@@ -181,6 +181,21 @@ public class MgmtOfficeSafeCodeSyncTests
         }
     }
 
+    [Fact]
+    public void Scramble_SeedLeavesStabilizerExperimentSafeStock()
+    {
+        var exe = BuildExeWithDefaultCode();
+        var results = Dc1PuzzleCodeSync.Scramble(
+            exe,
+            _ => null,
+            lk => Dc1PuzzleCodeSync.DeriveRowCode(seed: 4242, lk.Row),
+            requireDocuments: false);
+
+        Assert.Equal(new[] { 1, 2, 8, 1 }, results[5].NewCode);
+        Assert.Equal(new[] { 1, 2, 8, 1 }, MgmtOfficeSafeCode.ReadRow(exe, 5, us: false));
+        Assert.Equal(new[] { 1, 2, 8, 1 }, MgmtOfficeSafeCode.ReadRow(exe, 5, us: true));
+    }
+
     /// <summary>
     /// End-to-end on-disk repack against a real inline-text (GOG European) install: scramble the family, and
     /// for each documented lock re-read the repacked room file from scratch (LZSS decompress + package parse)
@@ -205,6 +220,10 @@ public class MgmtOfficeSafeCodeSyncTests
         Assert.Equal(6, results.Count);
         foreach (var r in results)
         {
+            int[] expected = r.Lock.Randomize
+                ? Dc1PuzzleCodeSync.DeriveRowCode(seed: 4242, r.Lock.Row)
+                : r.Lock.OriginalDigits;
+            Assert.Equal(expected, r.NewCode);
             // EXE row (both regions) now holds the new code.
             Assert.Equal(r.NewCode, MgmtOfficeSafeCode.ReadRow(exe, r.Lock.Row, us: false));
             Assert.Equal(r.NewCode, MgmtOfficeSafeCode.ReadRow(exe, r.Lock.Row, us: true));

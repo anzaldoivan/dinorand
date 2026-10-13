@@ -1,0 +1,269 @@
+using System.Security.Cryptography;
+
+namespace DinoRand.FileFormats.Stage;
+
+/// <summary>Corpus evidence for one manually registered DC1 Raptor visual palette.</summary>
+public sealed record Dc1RaptorVisualVariantEvidence(
+    string VariantId,
+    string PaletteFamily,
+    DinoSpecies Species,
+    int Category,
+    int BoneCount,
+    int DonorStage,
+    int DonorRoom,
+    ushort ClutCode,
+    string Provenance);
+
+/// <summary>Manual/evidence registry for DC1 Raptor palette variants.</summary>
+public sealed class Dc1RaptorVisualVariantRegistry
+{
+    public const string RaptorHeavyPaletteFamily = "RaptorHeavy";
+
+    // No stable visual census is available in this checkout, so automatic selection stays off.
+    public static bool AutomaticSelectionEnabled => false;
+
+    private readonly Dictionary<string, Dc1RaptorVisualVariantEvidence> _variants =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    public IReadOnlyCollection<Dc1RaptorVisualVariantEvidence> Variants => _variants.Values;
+
+    public void Register(Dc1RaptorVisualVariantEvidence evidence)
+    {
+        Validate(evidence);
+        if (!_variants.TryAdd(evidence.VariantId, evidence))
+            throw new ArgumentException($"visual variant '{evidence.VariantId}' is already registered",
+                nameof(evidence));
+    }
+
+    public Dc1RaptorVisualVariantEvidence Get(string variantId)
+        => _variants.TryGetValue(variantId, out var evidence)
+            ? evidence
+            : throw new KeyNotFoundException($"visual variant '{variantId}' is not registered");
+
+    public static void Validate(Dc1RaptorVisualVariantEvidence evidence)
+    {
+        ArgumentNullException.ThrowIfNull(evidence);
+        if (string.IsNullOrWhiteSpace(evidence.VariantId)
+            || string.IsNullOrWhiteSpace(evidence.PaletteFamily)
+            || string.IsNullOrWhiteSpace(evidence.Provenance))
+            throw new ArgumentException("visual variant identity and provenance are required", nameof(evidence));
+        if (evidence.DonorStage is < 1 or > 12 || evidence.DonorRoom is < 0 or > 0xff)
+            throw new ArgumentException("visual variant donor room is outside the DC1 room domain", nameof(evidence));
+        if (evidence.Species != DinoSpecies.RaptorHeavy
+            || evidence.PaletteFamily != RaptorHeavyPaletteFamily
+            || evidence.Category != 2
+            || evidence.BoneCount != 21)
+            throw new ArgumentException("DC1 Raptor visual variants are restricted to RaptorHeavy evidence",
+                nameof(evidence));
+    }
+}
+
+/// <summary>Fields proven safe for authored DC1 0x20 and inline 0x59 enemy records.</summary>
+public readonly record struct Dc1RaptorVisualVariantAuthoring(
+    ushort? MaxHp = null,
+    byte? AiParam = null,
+    byte? BirthMode = null)
+{
+    public bool IsEmpty => MaxHp is null && AiParam is null && BirthMode is null;
+}
+
+public sealed record Dc1RaptorVisualVariantProfile(
+    Dc1RaptorVisualVariantEvidence Evidence,
+    Dc1RaptorVisualVariantAuthoring Authoring)
+{
+    public int DonorStage => Evidence.DonorStage;
+    public int DonorRoom => Evidence.DonorRoom;
+    public ushort ClutCode => Evidence.ClutCode;
+}
+
+/// <summary>Approved manually selected DC1 Raptor profiles.</summary>
+public static class Dc1RaptorVisualVariantProfiles
+{
+    public const int BlueTargetStage = 1;
+    public const int BlueTargetRoom = 0x02;
+    public const int BlueTargetLength = 0x5A000;
+    public const string BlueTargetSha256 =
+        "E1E1386AB982F05A6B18249D6F1D77B08F68453BAEFE304013F4628579D42979";
+    public const int BlueDonorStage = 5;
+    public const int BlueDonorRoom = 0x08;
+    public const int BlueDonorLength = 0x8C000;
+    public const string BlueDonorSha256 =
+        "F6775BEBB1509870C57DB4D8729A98AD63599CBB1EEB1C8EA8679116384C8773";
+    public const int BlueTexturePayloadLength = 43891;
+    public const int BlueTargetTexturePayloadLength = 43062;
+
+    public static Dc1RaptorVisualVariantProfile Blue { get; } = new(
+        new Dc1RaptorVisualVariantEvidence(
+            "blue", Dc1RaptorVisualVariantRegistry.RaptorHeavyPaletteFamily,
+            DinoSpecies.RaptorHeavy, 2, 21, BlueDonorStage, BlueDonorRoom,
+            TextureImporter.MakeClut(768, 511),
+            "ST508 Blue profile; category 2 / 21-bone RaptorHeavy"),
+        new Dc1RaptorVisualVariantAuthoring(AiParam: 6));
+}
+
+public enum Dc1RaptorVisualVariantOutcome
+{
+    Applied,
+    Unsupported,
+}
+
+public readonly record struct Dc1RaptorVisualVariantAuthoringResult(
+    Dc1RaptorVisualVariantOutcome Outcome,
+    string Note);
+
+public sealed record Dc1RaptorVisualVariantPaletteResult(
+    Dc1RaptorVisualVariantOutcome Outcome,
+    byte[]? PatchedBytes,
+    string Note);
+
+/// <summary>Applies only the author fields proven by the current DC1 record model.</summary>
+public static class Dc1RaptorVisualVariantEditor
+{
+    public static Dc1RaptorVisualVariantPaletteResult TryApplyPalette(
+        ReadOnlySpan<byte> target, RoomFile donor,
+        EnemyRecord enemy, Dc1RaptorVisualVariantEvidence evidence)
+    {
+        ArgumentNullException.ThrowIfNull(enemy);
+        ArgumentNullException.ThrowIfNull(donor);
+        try { Dc1RaptorVisualVariantRegistry.Validate(evidence); }
+        catch (ArgumentException ex)
+        {
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+
+        if (enemy.Species != DinoSpecies.RaptorHeavy || enemy.Category != 2)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "target is not a RaptorHeavy record");
+        if (donor.Stage != evidence.DonorStage || donor.Room != evidence.DonorRoom)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "palette donor is not the evidence-pinned room");
+        if (evidence.DonorStage != Dc1RaptorVisualVariantProfiles.BlueDonorStage
+            || evidence.DonorRoom != Dc1RaptorVisualVariantProfiles.BlueDonorRoom
+            || donor.OriginalBytes.Length != Dc1RaptorVisualVariantProfiles.BlueDonorLength
+            || !Convert.ToHexString(SHA256.HashData(donor.OriginalBytes)).Equals(
+                Dc1RaptorVisualVariantProfiles.BlueDonorSha256, StringComparison.OrdinalIgnoreCase))
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "palette donor bytes are not the pinned ST508 GOG donor");
+
+        // CopySpeciesPalette returns a fresh package and does not mutate either input.
+        var patched = TextureImporter.CopySpeciesPalette(target, donor.OriginalBytes, evidence.ClutCode);
+        return new(Dc1RaptorVisualVariantOutcome.Applied, patched,
+            $"{evidence.VariantId} palette from ST{evidence.DonorStage:X}{evidence.DonorRoom:X2}");
+    }
+
+    public static Dc1RaptorVisualVariantAuthoringResult TryAuthor(
+        EnemyRecord enemy, Dc1RaptorVisualVariantAuthoring authoring)
+    {
+        ArgumentNullException.ThrowIfNull(enemy);
+        if (enemy.Species != DinoSpecies.RaptorHeavy || enemy.Category != 2)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported,
+                "target is not a RaptorHeavy record");
+        if (authoring.IsEmpty)
+            return new(Dc1RaptorVisualVariantOutcome.Applied, "no authored fields");
+        if (enemy.Opcode == DcOpcodes.Enemy2 && (authoring.MaxHp is not null || authoring.BirthMode is not null))
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported,
+                "0x59 records only have a proven safe inline AI authoring field");
+        if (enemy.Opcode is not DcOpcodes.Enemy and not DcOpcodes.Enemy2)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, "unsupported enemy opcode");
+
+        if (authoring.MaxHp is ushort hp) enemy.MaxHp = hp;
+        if (authoring.AiParam is byte ai) enemy.AiParam = ai;
+        if (authoring.BirthMode is byte birth) enemy.BirthMode = birth;
+        return new(Dc1RaptorVisualVariantOutcome.Applied,
+            enemy.Opcode == DcOpcodes.Enemy2 ? "authored proven 0x59 AI field" : "authored proven 0x20 fields");
+    }
+
+    public static Dc1RaptorVisualVariantPaletteResult TryApplyProfile(
+        RoomFile target, RoomFile donor,
+        EnemyRecord enemy, Dc1RaptorVisualVariantProfile profile)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(donor);
+        ArgumentNullException.ThrowIfNull(profile);
+        if (profile != Dc1RaptorVisualVariantProfiles.Blue)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "profile is not the fixed Blue profile/evidence (CLUT 0x7FF0)");
+        if (target.Stage != Dc1RaptorVisualVariantProfiles.BlueTargetStage
+            || target.Room != Dc1RaptorVisualVariantProfiles.BlueTargetRoom)
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "target is not the pinned ST102 Blue profile room");
+        if (target.OriginalBytes.Length != Dc1RaptorVisualVariantProfiles.BlueTargetLength
+            || !Convert.ToHexString(SHA256.HashData(target.OriginalBytes)).Equals(
+                Dc1RaptorVisualVariantProfiles.BlueTargetSha256, StringComparison.OrdinalIgnoreCase))
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                "target bytes are not the pinned pristine ST102 GOG package");
+        var donorCheck = TryApplyBlueTexture(target.OriginalBytes, donor, enemy, profile.Evidence);
+        if (donorCheck.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
+            return donorCheck;
+        var before = (enemy.MaxHp, enemy.AiParam, enemy.BirthMode);
+        var authoring = TryAuthor(enemy, profile.Authoring);
+        if (authoring.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
+            return new(authoring.Outcome, null, authoring.Note);
+        try
+        {
+            var patched = TryApplyBlueTexture(target.Write(), donor, enemy, profile.Evidence);
+            if (patched.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
+            {
+                RestoreAuthoring(enemy, before);
+                return patched;
+            }
+            return patched with { Note = $"{profile.Evidence.VariantId}: texture + palette + {authoring.Note}" };
+        }
+        catch (InvalidDataException ex)
+        {
+            RestoreAuthoring(enemy, before);
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            RestoreAuthoring(enemy, before);
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+    }
+
+    private static Dc1RaptorVisualVariantPaletteResult TryApplyBlueTexture(
+        ReadOnlySpan<byte> target, RoomFile donor, EnemyRecord enemy,
+        Dc1RaptorVisualVariantEvidence evidence)
+    {
+        var palette = TryApplyPalette(target, donor, enemy, evidence);
+        if (palette.Outcome != Dc1RaptorVisualVariantOutcome.Applied)
+            return palette;
+
+        try
+        {
+            var targetEntries = PackageRepacker.ReadDc1Entries(target);
+            var donorEntries = PackageRepacker.ReadDc1Entries(donor.OriginalBytes);
+            var textureRect = new VramRect(704, 0, 64, 512);
+            var paletteRect = new VramRect(768, 511, 256, 1);
+            var targetTextures = targetEntries.Where(e => e.Type == GianEntryType.Lzss2 && e.Dst == textureRect).ToList();
+            var donorTextures = donorEntries.Where(e => e.Type == GianEntryType.Lzss2 && e.Dst == textureRect).ToList();
+            var targetPalettes = targetEntries.Where(e => e.Type == GianEntryType.Palette && e.Dst == paletteRect).ToList();
+            var donorPalettes = donorEntries.Where(e => e.Type == GianEntryType.Palette && e.Dst == paletteRect).ToList();
+            if (targetTextures.Count != 1 || donorTextures.Count != 1
+                || targetPalettes.Count != 1 || donorPalettes.Count != 1
+                || targetTextures[0].Size != Dc1RaptorVisualVariantProfiles.BlueTargetTexturePayloadLength
+                || donorTextures[0].Size != Dc1RaptorVisualVariantProfiles.BlueTexturePayloadLength)
+                return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
+                    "ST102/ST508 texture or palette entries are not the pinned profile");
+
+            var patched = TextureImporter.ReplaceSpeciesTexturePayloadAndPalette(
+                target, donor.OriginalBytes, new ushort[] { 0x8b, 0x9b }, evidence.ClutCode);
+            return new(Dc1RaptorVisualVariantOutcome.Applied, patched, "pinned ST508 texture and palette");
+        }
+        catch (InvalidDataException ex)
+        {
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
+        }
+    }
+
+    private static void RestoreAuthoring(EnemyRecord enemy, (ushort MaxHp, byte AiParam, byte BirthMode) before)
+    {
+        enemy.MaxHp = before.MaxHp;
+        enemy.AiParam = before.AiParam;
+        enemy.BirthMode = before.BirthMode;
+    }
+}

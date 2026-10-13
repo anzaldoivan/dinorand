@@ -4,7 +4,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DinoRand.FileFormats.Exe;
+using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
+using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Spoiler;
 using Xunit;
 
@@ -22,6 +24,10 @@ public sealed class CliCharacterizationTests
         Assert.Contains("DinoRand", value.Help.Stdout);
         Assert.Contains("--install", value.Help.Stdout);
         Assert.Contains("--no-dc1-door-skip", value.Help.Stdout);
+        Assert.Contains("--dc1-blue-raptor", value.Help.Stdout);
+        Assert.Contains("--dc1-enemy-mode weighted|fixed", value.Help.Stdout);
+        Assert.Contains("--dc1-fixed-species", value.Help.Stdout);
+        Assert.Contains("--dc1-weight", value.Help.Stdout);
         Assert.Contains("button press", value.Help.Stdout, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("", value.Help.Stderr);
         Assert.NotEqual(0, value.Invalid.ExitCode);
@@ -29,6 +35,20 @@ public sealed class CliCharacterizationTests
         Assert.Equal("", value.Invalid.Stdout);
         Assert.Equal(value, CaptureTextInvocations());
         RecordOrCompare("cli-text", value, nameof(Help_and_invalid_invocations_pin_exit_stdout_and_stderr));
+    }
+
+    [Theory]
+    [InlineData("--dc1-enemy-mode", "bogus")]
+    [InlineData("--dc1-enemy-mode", "fixed")]
+    [InlineData("--dc1-fixed-species", "Velociraptor")]
+    [InlineData("--dc1-weight", "RaptorHeavy=256")]
+    [InlineData("--dc1-weight", "RaptorHeavy=-1")]
+    [InlineData("--dc1-weight", "UnknownSpecies=1")]
+    public void Dc1_enemy_distribution_cli_rejects_invalid_options(string option, string value)
+    {
+        var result = Run("--install", "/tmp/dinorand-nonexistent-install", option, value);
+        Assert.NotEqual(0, result.ExitCode);
+        Assert.Contains("error", result.Stderr, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -91,6 +111,62 @@ public sealed class CliCharacterizationTests
                 StringComparison.Ordinal);
             Assert.True(File.Exists(Path.Combine(output, spoilerFileName)));
             Assert.False(File.Exists(Path.Combine(output, SpoilerLogBuilder.LegacyFileName)));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Swap_species_without_species_uses_an_enabled_plan()
+    {
+        string root = Directory.CreateTempSubdirectory("dinorand-cli-swap-default-").FullName;
+        try
+        {
+            string install = SyntheticInputs.CreateDc1Install(root);
+            string donorPath = Path.Combine(install, "Data", "st104.dat");
+            var donorRoom = RoomFile.ReadFromFile(1, 4, donorPath);
+            var donor = donorRoom.Enemies.Single(e => e.Species == DinoSpecies.RaptorHeavy);
+            donor.MotionPtr = donor.ModelPtr;
+            File.WriteAllBytes(donorPath, donorRoom.Write());
+            var rereadDonor = RoomFile.ReadFromFile(1, 4, donorPath);
+            Assert.Equal(donor.OriginalModelPtr, rereadDonor.Enemies.Single().OriginalMotionPtr);
+
+            var result = Run("--install", install, "--swap-species", "103");
+
+            Assert.Equal(1, result.ExitCode);
+            Assert.Contains("ST103+RaptorHeavy refused", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("texture/VRAM refusal", result.Stderr, StringComparison.Ordinal);
+            Assert.DoesNotContain("is disabled", result.Stderr, StringComparison.OrdinalIgnoreCase);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void Swap_species_pteranodon_reports_the_known_handler_and_remaining_gate()
+    {
+        string root = Directory.CreateTempSubdirectory("dinorand-cli-pteranodon-gate-").FullName;
+        try
+        {
+            string install = SyntheticInputs.CreateDc1Install(root);
+
+            var result = Run("--install", install, "--swap-species", "103", "--species", "pteranodon");
+
+            Assert.Equal(1, result.ExitCode);
+            Assert.Contains("cat-7 dispatch handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("0x5998F0", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("model/motion state and texture import evidence are proven", result.Stderr,
+                StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("texture behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("SE behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("damage behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("death behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("kill-flag behavior", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("end-to-end runtime-witness gate", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("free-slot/open-arena eligibility", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("birth handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("0x599CDC", result.Stderr, StringComparison.Ordinal);
+            Assert.DoesNotContain("0x599D92", result.Stderr, StringComparison.Ordinal);
+            Assert.DoesNotContain("handler not located", result.Stderr, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("flyer AI handler", result.Stderr, StringComparison.OrdinalIgnoreCase);
         }
         finally { Directory.Delete(root, recursive: true); }
     }

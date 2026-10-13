@@ -32,13 +32,13 @@ The user wants to cut a release: "release vX.Y.Z", "bump the version", "generate
   an owner fine-grained PAT limited to this repository with `Contents: read/write`. The token owner
   must retain administrator status so the existing protected-tag creation bypass applies.
 
-## HARD GATE: approval before real-install validation
+## HARD GATE: original-install and process-memory writes
 
-Do not run any test command that can discover or use a configured real game install until the user has explicitly authorized the exact real-install scope. The approval must name each game, the exact `DINORAND_DC1_DIR` and/or `DINORAND_DC2_DIR` path, the test command, and whether the test is allowed to read the install or must use a temporary copy. If that approval is absent, do not run the command.
+Automated validation may read a configured original GOG install and its pristine backups without additional approval. Before resolving or using an install path, read the gitignored `.env`; use only `DINORAND_DC1_DIR` and `DINORAND_DC2_DIR` from it, and do not search for an install elsewhere. `RealInstallGate` reads those sources but does not write them; its install/restore exercise mutates only temporary copies. Every mutation test must use a unique temporary directory outside the repository and clean it up on success or failure.
 
-Before resolving or using any install path, read the gitignored `.env`. Use only `DINORAND_DC1_DIR` and `DINORAND_DC2_DIR` from it; do not use any other `.env` setting or search for an install elsewhere. State in the approval record whether the test touches the install or uses temporary copies. `RealInstallGate` reads the configured install and its pristine backups but does not write to them; its install/restore exercise writes only to temporary test trees.
+Exact user authorization is still required before writing an original installation, executable, or process memory, including runtime memory/register/code writes, software or code-patching breakpoints, input injection, warps, and flag changes. Bounded observational hardware or logging breakpoints follow the repository's bundled runtime-observation contract and do not authorize mutation. Preserve the GOG/source-path restrictions above.
 
-Any required-mode receipt and test-results directory must be unique to this run and outside the repository. After approval, and only after exporting the approved paths from `.env`, the safe required-mode command is below. The xUnit/VSTest trait-key/value OR filter selects both `[Trait("RealInstall", "DC1")]` and `[Trait("RealInstall", "DC2")]` cases:
+Any required-mode receipt and test-results directory must be unique to this run and outside the repository. After exporting the configured paths read from `.env`, the safe required-mode command is below. The xUnit/VSTest trait-key/value OR filter selects both `[Trait("RealInstall", "DC1")]` and `[Trait("RealInstall", "DC2")]` cases:
 
 ```bash
 run_root="$(mktemp -d /tmp/dinorand-release-real-install-XXXXXX)"
@@ -55,7 +55,7 @@ dotnet test test/DinoRand.FileFormats.Tests/DinoRand.FileFormats.Tests.csproj \
   --results-directory "$results_dir"
 ```
 
-This command requires both approved game paths because it runs both `RealInstallGate` cases. If the user authorizes only one game, do not run this both-game command; use a separately reviewed command that selects only the approved case and its approved variable. Never broaden the scope without new approval. Do not place receipts, test results, or copied game data in the repository.
+This command requires both configured game paths because it runs both `RealInstallGate` cases. If only one game is configured, select only that case and export only its configured variable. Do not place receipts, test results, or copied game data in the repository.
 
 ## Steps
 

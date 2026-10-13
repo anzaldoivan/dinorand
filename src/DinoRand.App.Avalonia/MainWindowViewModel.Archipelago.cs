@@ -56,6 +56,7 @@ namespace DinoRand.App
         [ObservableProperty] private string _apHostPort = DefaultApHostPort;
         [ObservableProperty] private string _apSlot = "";
         [ObservableProperty] private string _apPassword = "";   // session-only, never persisted
+        [ObservableProperty] private string _apPlayerName = "";
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ApConnectButtonText))]
@@ -63,7 +64,14 @@ namespace DinoRand.App
         [NotifyPropertyChangedFor(nameof(WindowTitle))]
         [NotifyPropertyChangedFor(nameof(ShouldConfirmClose))]
         [NotifyPropertyChangedFor(nameof(CloseConfirmMessage))]
+        [NotifyPropertyChangedFor(nameof(ApConnectEnabled))]
+        [NotifyPropertyChangedFor(nameof(ApCanRestore))]
         private bool _apRunning;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(WindowTitle))]
+        [NotifyPropertyChangedFor(nameof(CloseConfirmMessage))]
+        private bool _apConnected;
 
         [ObservableProperty] private string _apStatusText = "";
         [ObservableProperty] private IBrush _apStatusBrush;
@@ -73,6 +81,8 @@ namespace DinoRand.App
 
         public string ApConnectButtonText => ApRunning ? "Disconnect" : "Connect";
         public bool ApFieldsEnabled => !ApRunning;
+        public bool ApConnectEnabled => ApRunning || (ApTabEnabled && CanUseArchipelago && !IsBusy);
+        public bool ApCanRestore => CanRestore && !ApRunning && !IsBusy;
 
         /// <summary>AP support is DC1-only today (plan D4), so the tab's Connect is gated on the game.</summary>
         public bool CanUseArchipelago => SelectedGame.Id == "dc1";
@@ -94,7 +104,9 @@ namespace DinoRand.App
         /// <summary>Connected state in the title bar, so the taskbar itself carries it (the
         /// PopTracker / kvui convention).</summary>
         public string WindowTitle => ApRunning
-            ? $"DinoRand — ● Connected: {ApSlot}@{ApHostPort}"
+            ? ApConnected
+                ? $"DinoRand — ● Connected: {ApSlot}@{ApHostPort}"
+                : $"DinoRand — ◌ Connecting: {ApSlot}@{ApHostPort}"
             : DefaultWindowTitle;
 
         /// <summary>True when closing would interrupt something the user cares about. An idle
@@ -109,6 +121,9 @@ namespace DinoRand.App
         public string CloseConfirmMessage => IsBusy
             ? "DinoRand is still installing to your game.\n\nClosing now interrupts it and can leave "
               + "the game's files partially modified — use “Restore Originals” to put them back.\n\nClose anyway?"
+            : !ApConnected
+                ? "DinoRand is still connecting to Archipelago.\n\nClosing now cancels the connection and any "
+                  + "placement install in progress.\n\nClose anyway?"
             : "Your Archipelago session is still connected.\n\nThe game will keep running, but closing "
               + "DinoRand stops your checks from reaching the multiworld until you reconnect — other "
               + "players waiting on your items will stay blocked.\n\nClose anyway?";
@@ -125,7 +140,7 @@ namespace DinoRand.App
         /// <summary>One button, two meanings (the AP client convention): start a session, or cancel the
         /// running one — cancellation is exactly the CLI's Ctrl-C path (clean disconnect + state save).</summary>
         [RelayCommand]
-        private void ApToggleConnect()
+        private async Task ApToggleConnect()
         {
             if (_apStop is { } running)
             {
@@ -151,11 +166,22 @@ namespace DinoRand.App
                 return;
             }
 
+            if (!await _dialogs.ConfirmAsync(
+                    "Connect to Archipelago",
+                    "DinoRand will connect to the multiworld, validate its placement, and overlay the "
+                    + "written room files onto your game. Your originals are backed up first and can be "
+                    + "restored from the AP tab. Close the game before continuing.\n\nProceed?"))
+            {
+                ApSetStatus("Connection cancelled.", null);
+                return;
+            }
+
             _settings.ApHostPort = ApHostPort;
             _settings.ApSlot = ApSlot;
             _settings.Save();
 
             ApLog.Clear();
+            ApConnected = false;
             ApRunning = true;
             ApSetStatus("Connecting… the placement install can take several minutes.", null);
 
@@ -178,6 +204,7 @@ namespace DinoRand.App
                     else
                         ApSetStatus("Session ended — see the log above.", Brushes.OrangeRed);
 
+                    ApConnected = false;
                     cts.Dispose();
                     _apStop = null;
                     ApRunning = false;
@@ -191,10 +218,47 @@ namespace DinoRand.App
             ApLog.Add(line);
             while (ApLog.Count > ApLogMaxLines)
                 ApLog.RemoveAt(0);
-            // The first line the runner emits after login confirms the session is live.
-            if (ApRunning && line.StartsWith("connected:", StringComparison.Ordinal))
-                ApSetStatus(line, Brushes.Green);
+            // The runner emits this only after auth, logic validation, room preflight, restore/install,
+            // and any justified executable patch have succeeded.
+            if (ApRunning && line.StartsWith(Dc1ApRunner.SessionReadyPrefix, StringComparison.Ordinal))
+            {
+                RefreshInstallStatus();
+                ApConnected = true;
+                ApSetStatus("Connected — ready to poll.", Brushes.Green);
+            }
         });
+
+        [RelayCommand]
+        private async Task SavePlayerYaml()
+        {
+            string yaml;
+            try
+            {
+                yaml = PlayerYamlRenderer.Render(ApPlayerName);
+            }
+            catch (ArgumentException ex)
+            {
+                await _dialogs.ShowErrorAsync("Save Player YAML", ex.Message);
+                return;
+            }
+
+            var path = await _filePicker.SaveFileAsync(new SaveFileRequest(
+                "Save Archipelago player YAML",
+                "Player.yaml",
+                new[] { new FilePickerFileFilter("YAML files (*.yaml)", new[] { "*.yaml", "*.yml" }) }));
+            if (path is null)
+                return;
+
+            try
+            {
+                File.WriteAllText(path, yaml);
+                ApSetStatus($"Saved player YAML: {Path.GetFileName(path)}", Brushes.Green);
+            }
+            catch (Exception ex)
+            {
+                await _dialogs.ShowErrorAsync("Save Player YAML", ex.Message);
+            }
+        }
 
         private void ApSetStatus(string text, IBrush brush)
         {

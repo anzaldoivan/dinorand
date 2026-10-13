@@ -1,7 +1,7 @@
 {
   "_generated_by": "scripts/gen_ap_logic.py",
-  "_source": "data/dc1/{map,items,room-data,reachability-oracle,suppressed-pickups}.json + ap-client-checks.json",
-  "version": 3,
+  "_source": "data/dc1/{map,items,room-data,reachability-oracle,suppressed-pickups,ap-location-policy}.json + ap-client-checks.json",
+  "version": 4,
   "topology": "physical",
   "startRoom": "010d",
   "goalRoom": "060d",
@@ -3610,6 +3610,7 @@
   "locations": [
     {
       "key": "0100:12:-1712,-2528",
+      "logicalId": "0100:12:-1712,-2528",
       "name": "Locker Room (0100) - An. Darts S @-1712,-2528",
       "room": "0100",
       "itemId": 18,
@@ -3633,7 +3634,16 @@
       "recordOffsets": [
         234424
       ],
+      "physicalRecords": [
+        {
+          "room": "0100",
+          "offset": 234424
+        }
+      ],
       "node": "0100",
+      "accessNodes": [
+        "0100"
+      ],
       "apId": 230817867,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -3666,6 +3676,7 @@
     },
     {
       "key": "0100:69:-1088,2976",
+      "logicalId": "0100:69:-1088,2976",
       "name": "Locker Room (0100) - DDK Code Disc H @-1088,2976",
       "room": "0100",
       "itemId": 105,
@@ -3689,7 +3700,16 @@
       "recordOffsets": [
         234468
       ],
+      "physicalRecords": [
+        {
+          "room": "0100",
+          "offset": 234468
+        }
+      ],
       "node": "0100",
+      "accessNodes": [
+        "0100"
+      ],
       "apId": 230817868,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -3722,6 +3742,7 @@
     },
     {
       "key": "0103:01:2288,-2224",
+      "logicalId": "0103:01:2288,-2224",
       "name": "Management Office (0103) - Shotgun \"Model PA3\" (pump-action) @2288,-2224",
       "room": "0103",
       "itemId": 1,
@@ -3745,7 +3766,16 @@
       "recordOffsets": [
         76012
       ],
+      "physicalRecords": [
+        {
+          "room": "0103",
+          "offset": 76012
+        }
+      ],
       "node": "0103",
+      "accessNodes": [
+        "0103"
+      ],
       "apId": 230817878,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -3778,6 +3808,7 @@
     },
     {
       "key": "0103:3e:-2800,992",
+      "logicalId": "0103:3e:-2800,992",
       "name": "Management Office (0103) - Panel Key 2 @-2800,992",
       "room": "0103",
       "itemId": 62,
@@ -3801,7 +3832,16 @@
       "recordOffsets": [
         76076
       ],
+      "physicalRecords": [
+        {
+          "room": "0103",
+          "offset": 76076
+        }
+      ],
       "node": "0103",
+      "accessNodes": [
+        "0103"
+      ],
       "apId": 230817876,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -3834,6 +3874,7 @@
     },
     {
       "key": "0103:62:-512,1072",
+      "logicalId": "0103:62:-512,1072",
       "name": "Management Office (0103) - DDK Input Disc H @-512,1072",
       "room": "0103",
       "itemId": 98,
@@ -3857,14 +3898,24 @@
       "recordOffsets": [
         77128
       ],
+      "physicalRecords": [
+        {
+          "room": "0103",
+          "offset": 77128
+        }
+      ],
       "gateFlag": "7:84",
       "node": "0103",
+      "accessNodes": [
+        "0103"
+      ],
       "apId": 230817874,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0103:2b:-544,640",
+      "logicalId": "0103:2b:-544,640",
       "name": "Management Office (0103) - Plug @-544,640",
       "room": "0103",
       "itemId": 43,
@@ -3888,13 +3939,23 @@
       "recordOffsets": [
         77228
       ],
+      "physicalRecords": [
+        {
+          "room": "0103",
+          "offset": 77228
+        }
+      ],
       "node": "0103",
+      "accessNodes": [
+        "0103"
+      ],
       "apId": 230817877,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0103:20:-2576,3008",
+      "logicalId": "0103:20:-2576,3008",
       "name": "Management Office (0103) - An. Aid @-2576,3008",
       "room": "0103",
       "itemId": 32,
@@ -3918,7 +3979,16 @@
       "recordOffsets": [
         78348
       ],
+      "physicalRecords": [
+        {
+          "room": "0103",
+          "offset": 78348
+        }
+      ],
       "node": "0103",
+      "accessNodes": [
+        "0103"
+      ],
       "apId": 230817873,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -3951,6 +4021,7 @@
     },
     {
       "key": "0103:2e:-2576,3008",
+      "logicalId": "0103:2e:-2576,3008",
       "name": "Management Office (0103) - Entrance Key @-2576,3008",
       "room": "0103",
       "itemId": 46,
@@ -3974,7 +4045,16 @@
       "recordOffsets": [
         78404
       ],
+      "physicalRecords": [
+        {
+          "room": "0103",
+          "offset": 78404
+        }
+      ],
       "node": "0103",
+      "accessNodes": [
+        "0103"
+      ],
       "apId": 230817875,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4007,6 +4087,7 @@
     },
     {
       "key": "0104:41:-2352,-272",
+      "logicalId": "0104:41:-2352,-272",
       "name": "Strategy Room (0104) - F. C. Device \" without FingerPrint \" @-2352,-272",
       "room": "0104",
       "itemId": 65,
@@ -4030,7 +4111,16 @@
       "recordOffsets": [
         215052
       ],
+      "physicalRecords": [
+        {
+          "room": "0104",
+          "offset": 215052
+        }
+      ],
       "node": "0104",
+      "accessNodes": [
+        "0104"
+      ],
       "apId": 230817932,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4063,6 +4153,7 @@
     },
     {
       "key": "0104:6c:-528,1280",
+      "logicalId": "0104:6c:-528,1280",
       "name": "Strategy Room (0104) - DDK Code Disc E @-528,1280",
       "room": "0104",
       "itemId": 108,
@@ -4086,7 +4177,16 @@
       "recordOffsets": [
         215116
       ],
+      "physicalRecords": [
+        {
+          "room": "0104",
+          "offset": 215116
+        }
+      ],
       "node": "0104",
+      "accessNodes": [
+        "0104"
+      ],
       "apId": 230817931,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4119,6 +4219,7 @@
     },
     {
       "key": "0104:2b:-2880,-2032",
+      "logicalId": "0104:2b:-2880,-2032",
       "name": "Strategy Room (0104) - Plug @-2880,-2032",
       "room": "0104",
       "itemId": 43,
@@ -4142,7 +4243,16 @@
       "recordOffsets": [
         215172
       ],
+      "physicalRecords": [
+        {
+          "room": "0104",
+          "offset": 215172
+        }
+      ],
       "node": "0104",
+      "accessNodes": [
+        "0104"
+      ],
       "apId": 230817933,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4175,6 +4285,7 @@
     },
     {
       "key": "0105:16:-4096,3072",
+      "logicalId": "0105:16:-4096,3072",
       "name": "Control Room Hall (0105) - 9mm Parabellum @-4096,3072",
       "room": "0105",
       "itemId": 22,
@@ -4198,7 +4309,16 @@
       "recordOffsets": [
         272784
       ],
+      "physicalRecords": [
+        {
+          "room": "0105",
+          "offset": 272784
+        }
+      ],
       "node": "0105",
+      "accessNodes": [
+        "0105"
+      ],
       "apId": 230817813,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4231,6 +4351,7 @@
     },
     {
       "key": "0107:20:2384,-2208",
+      "logicalId": "0107:20:2384,-2208",
       "name": "Main Entrance (0107) - An. Aid @2384,-2208",
       "room": "0107",
       "itemId": 32,
@@ -4254,7 +4375,16 @@
       "recordOffsets": [
         80192
       ],
+      "physicalRecords": [
+        {
+          "room": "0107",
+          "offset": 80192
+        }
+      ],
       "node": "0107",
+      "accessNodes": [
+        "0107"
+      ],
       "apId": 230817871,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4287,6 +4417,7 @@
     },
     {
       "key": "0108:2b:-8256,-7904",
+      "logicalId": "0108:2b:-8256,-7904",
       "name": "Lecture Room Hallway (0108) - Plug @-8256,-7904",
       "room": "0108",
       "itemId": 43,
@@ -4305,51 +4436,34 @@
       "requiresItems": [],
       "requiresRooms": [],
       "physicalIds": [
-        "0108:0x3d82c"
-      ],
-      "recordOffsets": [
-        251948
-      ],
-      "excluded": true,
-      "node": "0108",
-      "apId": 230817862,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
-    },
-    {
-      "key": "0108:2b:-8240,-7904",
-      "name": "Lecture Room Hallway (0108) - Plug @-8240,-7904",
-      "room": "0108",
-      "itemId": 43,
-      "itemName": "Plug",
-      "pos": [
-        -8240,
-        -7904
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 43
-      },
-      "source": "event-granted",
-      "visual": "interaction-only",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
+        "0108:0x3d82c",
         "0108:0x3db08"
       ],
       "recordOffsets": [
+        251948,
         252680
       ],
-      "gateFlag": "7:99",
-      "excluded": true,
+      "physicalRecords": [
+        {
+          "room": "0108",
+          "offset": 251948
+        },
+        {
+          "room": "0108",
+          "offset": 252680
+        }
+      ],
       "node": "0108",
-      "apId": 230817861,
-      "placementClass": "excluded",
+      "accessNodes": [
+        "0108"
+      ],
+      "apId": 230817862,
+      "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0109:2f:2560,-1632",
+      "logicalId": "0109:2f:2560,-1632",
       "name": "Lecture Room (0109) - BG Room B1 Key @2560,-1632",
       "room": "0109",
       "itemId": 47,
@@ -4373,7 +4487,16 @@
       "recordOffsets": [
         345516
       ],
+      "physicalRecords": [
+        {
+          "room": "0109",
+          "offset": 345516
+        }
+      ],
       "node": "0109",
+      "accessNodes": [
+        "0109"
+      ],
       "apId": 230817860,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4406,6 +4529,7 @@
     },
     {
       "key": "010b:36:5008,-840",
+      "logicalId": "010b:36:5008,-840",
       "name": "Office (010b) - ID Card Type \" Researcher \" @5008,-840",
       "room": "010b",
       "itemId": 54,
@@ -4429,13 +4553,23 @@
       "recordOffsets": [
         232528
       ],
+      "physicalRecords": [
+        {
+          "room": "010b",
+          "offset": 232528
+        }
+      ],
       "node": "010b",
+      "accessNodes": [
+        "010b"
+      ],
       "apId": 230817889,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "010c:1d:704,2928",
+      "logicalId": "010c:1d:704,2928",
       "name": "Material Storage (010c) - Med. Pak M @704,2928",
       "room": "010c",
       "itemId": 29,
@@ -4459,7 +4593,16 @@
       "recordOffsets": [
         55624
       ],
+      "physicalRecords": [
+        {
+          "room": "010c",
+          "offset": 55624
+        }
+      ],
       "node": "010c",
+      "accessNodes": [
+        "010c"
+      ],
       "apId": 230817880,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4492,6 +4635,7 @@
     },
     {
       "key": "010c:30:-2992,2720",
+      "logicalId": "010c:30:-2992,2720",
       "name": "Material Storage (010c) - BG Area Key @-2992,2720",
       "room": "010c",
       "itemId": 48,
@@ -4515,7 +4659,16 @@
       "recordOffsets": [
         55680
       ],
+      "physicalRecords": [
+        {
+          "room": "010c",
+          "offset": 55680
+        }
+      ],
       "node": "010c",
+      "accessNodes": [
+        "010c"
+      ],
       "apId": 230817879,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4548,6 +4701,7 @@
     },
     {
       "key": "010d:20:-6144,768",
+      "logicalId": "010d:20:-6144,768",
       "name": "Backyard of the Facility (010d) - An. Aid @-6144,768",
       "room": "010d",
       "itemId": 32,
@@ -4573,7 +4727,16 @@
       "recordOffsets": [
         256272
       ],
+      "physicalRecords": [
+        {
+          "room": "010d",
+          "offset": 256272
+        }
+      ],
       "node": "010d",
+      "accessNodes": [
+        "010d"
+      ],
       "apId": 230817796,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4606,6 +4769,7 @@
     },
     {
       "key": "010e:20:-9024,-7760",
+      "logicalId": "010e:20:-9024,-7760",
       "name": "Passageway to the Backup Generator (010e) - An. Aid @-9024,-7760",
       "room": "010e",
       "itemId": 32,
@@ -4629,7 +4793,16 @@
       "recordOffsets": [
         117328
       ],
+      "physicalRecords": [
+        {
+          "room": "010e",
+          "offset": 117328
+        }
+      ],
       "node": "010e",
+      "accessNodes": [
+        "010e"
+      ],
       "apId": 230817895,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -4639,6 +4812,7 @@
     },
     {
       "key": "010f:40:-5120,3584",
+      "logicalId": "010f:40:-5120,3584",
       "name": "Backup Generator Room 1F (010f) - Startup Battery. R \" Charged \" @-5120,3584",
       "room": "010f",
       "itemId": 64,
@@ -4662,14 +4836,24 @@
       "recordOffsets": [
         91920
       ],
+      "physicalRecords": [
+        {
+          "room": "010f",
+          "offset": 91920
+        }
+      ],
       "excluded": true,
       "node": "010f",
+      "accessNodes": [
+        "010f"
+      ],
       "apId": 230817792,
       "placementClass": "excluded",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0113:2b:-7008,2928",
+      "logicalId": "0113:2b:-7008,2928",
       "name": "Elevator Hall (0113) - Plug @-7008,2928",
       "room": "0113",
       "itemId": 43,
@@ -4693,7 +4877,16 @@
       "recordOffsets": [
         65844
       ],
+      "physicalRecords": [
+        {
+          "room": "0113",
+          "offset": 65844
+        }
+      ],
       "node": "0113",
+      "accessNodes": [
+        "0113"
+      ],
       "apId": 230817821,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4726,6 +4919,7 @@
     },
     {
       "key": "0114:20:5632,3184",
+      "logicalId": "0114:20:5632,3184",
       "name": "Passageway to the Backup Generator (0114) - An. Aid @5632,3184",
       "room": "0114",
       "itemId": 32,
@@ -4749,7 +4943,16 @@
       "recordOffsets": [
         262100
       ],
+      "physicalRecords": [
+        {
+          "room": "0114",
+          "offset": 262100
+        }
+      ],
       "node": "0114",
+      "accessNodes": [
+        "0114"
+      ],
       "apId": 230817896,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -4759,6 +4962,7 @@
     },
     {
       "key": "0202:63:-3568,720",
+      "logicalId": "0202:63:-3568,720",
       "name": "Chief's Room (0202) - DDK Input Disc N @-3568,720",
       "room": "0202",
       "itemId": 99,
@@ -4782,7 +4986,16 @@
       "recordOffsets": [
         327436
       ],
+      "physicalRecords": [
+        {
+          "room": "0202",
+          "offset": 327436
+        }
+      ],
       "node": "0202",
+      "accessNodes": [
+        "0202"
+      ],
       "apId": 230817802,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4815,6 +5028,7 @@
     },
     {
       "key": "0202:10:2020,-1392",
+      "logicalId": "0202:10:2020,-1392",
       "name": "Chief's Room (0202) - SG Bullets @2020,-1392",
       "room": "0202",
       "itemId": 16,
@@ -4838,7 +5052,16 @@
       "recordOffsets": [
         327708
       ],
+      "physicalRecords": [
+        {
+          "room": "0202",
+          "offset": 327708
+        }
+      ],
       "node": "0202",
+      "accessNodes": [
+        "0202"
+      ],
       "apId": 230817805,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4871,6 +5094,7 @@
     },
     {
       "key": "0202:3d:-1792,1792",
+      "logicalId": "0202:3d:-1792,1792",
       "name": "Chief's Room (0202) - Panel Key 1 @-1792,1792",
       "room": "0202",
       "itemId": 61,
@@ -4894,13 +5118,23 @@
       "recordOffsets": [
         328748
       ],
+      "physicalRecords": [
+        {
+          "room": "0202",
+          "offset": 328748
+        }
+      ],
       "node": "0202",
+      "accessNodes": [
+        "0202"
+      ],
       "apId": 230817804,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0202:47:-3468,2768",
+      "logicalId": "0202:47:-3468,2768",
       "name": "Chief's Room (0202) - Key Card L @-3468,2768",
       "room": "0202",
       "itemId": 71,
@@ -4924,14 +5158,24 @@
       "recordOffsets": [
         334452
       ],
+      "physicalRecords": [
+        {
+          "room": "0202",
+          "offset": 334452
+        }
+      ],
       "gateFlag": "2:11",
       "node": "0202",
+      "accessNodes": [
+        "0202"
+      ],
       "apId": 230817803,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0203:10:4800,4100",
+      "logicalId": "0203:10:4800,4100",
       "name": "Hall 2F (0203) - SG Bullets @4800,4100",
       "room": "0203",
       "itemId": 16,
@@ -4955,7 +5199,16 @@
       "recordOffsets": [
         249252
       ],
+      "physicalRecords": [
+        {
+          "room": "0203",
+          "offset": 249252
+        }
+      ],
       "node": "0203",
+      "accessNodes": [
+        "0203"
+      ],
       "apId": 230817839,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -4988,6 +5241,7 @@
     },
     {
       "key": "0204:13:3800,2800",
+      "logicalId": "0204:13:3800,2800",
       "name": "Lounge (0204) - An. Darts M @3800,2800",
       "room": "0204",
       "itemId": 19,
@@ -5011,7 +5265,16 @@
       "recordOffsets": [
         244384
       ],
+      "physicalRecords": [
+        {
+          "room": "0204",
+          "offset": 244384
+        }
+      ],
       "node": "0204",
+      "accessNodes": [
+        "0204"
+      ],
       "apId": 230817869,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5043,64 +5306,8 @@
       ]
     },
     {
-      "key": "0204:0e:2000,-3000",
-      "name": "Lounge (0204) - Handgun Slides (upgrade To Glock 35) @2000,-3000",
-      "room": "0204",
-      "itemId": 14,
-      "itemName": "Handgun Slides (upgrade To Glock 35)",
-      "pos": [
-        2000,
-        -3000
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 14
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0204:0x3bdfc"
-      ],
-      "recordOffsets": [
-        245244
-      ],
-      "gateFlag": "2:11",
-      "node": "0204",
-      "apId": 230817870,
-      "placementClass": "progression",
-      "allowedProgressionItemIds": [
-        46,
-        47,
-        48,
-        49,
-        56,
-        57,
-        58,
-        65,
-        70,
-        71,
-        72,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111
-      ]
-    },
-    {
       "key": "0205:11:-208,-1248",
+      "logicalId": "0205:11:-208,-1248",
       "name": "Communication Room (0205) - Slag Bullets @-208,-1248",
       "room": "0205",
       "itemId": 17,
@@ -5124,7 +5331,16 @@
       "recordOffsets": [
         49868
       ],
+      "physicalRecords": [
+        {
+          "room": "0205",
+          "offset": 49868
+        }
+      ],
       "node": "0205",
+      "accessNodes": [
+        "0205"
+      ],
       "apId": 230817807,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5157,6 +5373,7 @@
     },
     {
       "key": "0205:45:-2032,1632",
+      "logicalId": "0205:45:-2032,1632",
       "name": "Communication Room (0205) - Antenna Key @-2032,1632",
       "room": "0205",
       "itemId": 69,
@@ -5180,14 +5397,24 @@
       "recordOffsets": [
         50400
       ],
+      "physicalRecords": [
+        {
+          "room": "0205",
+          "offset": 50400
+        }
+      ],
       "gateFlag": "7:38",
       "node": "0205",
+      "accessNodes": [
+        "0205"
+      ],
       "apId": 230817806,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0206:20:-656,-3168",
+      "logicalId": "0206:20:-656,-3168",
       "name": "Main Entrance (0206) - An. Aid @-656,-3168",
       "room": "0206",
       "itemId": 32,
@@ -5211,7 +5438,16 @@
       "recordOffsets": [
         66984
       ],
+      "physicalRecords": [
+        {
+          "room": "0206",
+          "offset": 66984
+        }
+      ],
       "node": "0206",
+      "accessNodes": [
+        "0206"
+      ],
       "apId": 230817872,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5244,6 +5480,7 @@
     },
     {
       "key": "0300:0c:4512,-944",
+      "logicalId": "0300:0c:4512,-944",
       "name": "Experiment Simulation Room (0300) - Shotgun Stock @4512,-944",
       "room": "0300",
       "itemId": 12,
@@ -5267,7 +5504,16 @@
       "recordOffsets": [
         63856
       ],
+      "physicalRecords": [
+        {
+          "room": "0300",
+          "offset": 63856
+        }
+      ],
       "node": "0300",
+      "accessNodes": [
+        "0300"
+      ],
       "apId": 230817827,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5300,6 +5546,7 @@
     },
     {
       "key": "0300:14:-8048,4560",
+      "logicalId": "0300:14:-8048,4560",
       "name": "Experiment Simulation Room (0300) - An. Darts L @-8048,4560",
       "room": "0300",
       "itemId": 20,
@@ -5323,7 +5570,16 @@
       "recordOffsets": [
         63900
       ],
+      "physicalRecords": [
+        {
+          "room": "0300",
+          "offset": 63900
+        }
+      ],
       "node": "0300",
+      "accessNodes": [
+        "0300"
+      ],
       "apId": 230817826,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5356,6 +5612,7 @@
     },
     {
       "key": "0302:2b:2880,-3056",
+      "logicalId": "0302:2b:2880,-3056",
       "name": "Research Meeting Room (0302) - Plug @2880,-3056",
       "room": "0302",
       "itemId": 43,
@@ -5379,7 +5636,16 @@
       "recordOffsets": [
         250788
       ],
+      "physicalRecords": [
+        {
+          "room": "0302",
+          "offset": 250788
+        }
+      ],
       "node": "0302",
+      "accessNodes": [
+        "0302"
+      ],
       "apId": 230817905,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -5389,6 +5655,7 @@
     },
     {
       "key": "0302:65:-1280,1152",
+      "logicalId": "0302:65:-1280,1152",
       "name": "Research Meeting Room (0302) - DDK Input Disc E @-1280,1152",
       "room": "0302",
       "itemId": 101,
@@ -5412,7 +5679,16 @@
       "recordOffsets": [
         251112
       ],
+      "physicalRecords": [
+        {
+          "room": "0302",
+          "offset": 251112
+        }
+      ],
       "node": "0302",
+      "accessNodes": [
+        "0302"
+      ],
       "apId": 230817904,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5445,6 +5721,7 @@
     },
     {
       "key": "0303:2d:3088,-1008",
+      "logicalId": "0303:2d:3088,-1008",
       "name": "Gas Experiment Room (0303) - Small Size Key @3088,-1008",
       "room": "0303",
       "itemId": 45,
@@ -5470,14 +5747,28 @@
         326768,
         330608
       ],
+      "physicalRecords": [
+        {
+          "room": "0303",
+          "offset": 326768
+        },
+        {
+          "room": "0303",
+          "offset": 330608
+        }
+      ],
       "gateFlag": "0:90",
       "node": "0303",
+      "accessNodes": [
+        "0303"
+      ],
       "apId": 230817834,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0303:46:3088,-1008",
+      "logicalId": "0303:46:3088,-1008",
       "name": "Gas Experiment Room (0303) - B1 Key Chip @3088,-1008",
       "room": "0303",
       "itemId": 70,
@@ -5497,51 +5788,40 @@
       "requiresRooms": [],
       "physicalIds": [
         "0303:0x4fd5c",
-        "0303:0x50700"
+        "0303:0x50700",
+        "0303:0x50b20"
       ],
       "recordOffsets": [
         327004,
-        329472
+        329472,
+        330528
+      ],
+      "physicalRecords": [
+        {
+          "room": "0303",
+          "offset": 327004
+        },
+        {
+          "room": "0303",
+          "offset": 329472
+        },
+        {
+          "room": "0303",
+          "offset": 330528
+        }
       ],
       "gateFlag": "0:86",
       "node": "0303",
+      "accessNodes": [
+        "0303"
+      ],
       "apId": 230817831,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
-      "key": "0303:46:3328,-2560",
-      "name": "Gas Experiment Room (0303) - B1 Key Chip @3328,-2560",
-      "room": "0303",
-      "itemId": 70,
-      "itemName": "B1 Key Chip",
-      "pos": [
-        3328,
-        -2560
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 70
-      },
-      "source": "static",
-      "visual": "interaction-only",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0303:0x50b20"
-      ],
-      "recordOffsets": [
-        330528
-      ],
-      "gateFlag": "0:86",
-      "node": "0303",
-      "apId": 230817832,
-      "placementClass": "fixed",
-      "allowedProgressionItemIds": []
-    },
-    {
       "key": "0304:2b:-4700,6100",
+      "logicalId": "0304:2b:-4700,6100",
       "name": "Computer Room (0304) - Plug @-4700,6100",
       "room": "0304",
       "itemId": 43,
@@ -5565,7 +5845,16 @@
       "recordOffsets": [
         153240
       ],
+      "physicalRecords": [
+        {
+          "room": "0304",
+          "offset": 153240
+        }
+      ],
       "node": "0304",
+      "accessNodes": [
+        "0304"
+      ],
       "apId": 230817808,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5598,6 +5887,7 @@
     },
     {
       "key": "0304:44:-1500,0",
+      "logicalId": "0304:44:-1500,0",
       "name": "Computer Room (0304) - Screwdriver @-1500,0",
       "room": "0304",
       "itemId": 68,
@@ -5621,14 +5911,24 @@
       "recordOffsets": [
         155308
       ],
+      "physicalRecords": [
+        {
+          "room": "0304",
+          "offset": 155308
+        }
+      ],
       "gateFlag": "7:37",
       "node": "0304",
+      "accessNodes": [
+        "0304"
+      ],
       "apId": 230817809,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0305:1d:-6864,5888",
+      "logicalId": "0305:1d:-6864,5888",
       "name": "Library Room (0305) - Med. Pak M @-6864,5888",
       "room": "0305",
       "itemId": 29,
@@ -5652,7 +5952,16 @@
       "recordOffsets": [
         225440
       ],
+      "physicalRecords": [
+        {
+          "room": "0305",
+          "offset": 225440
+        }
+      ],
       "node": "0305",
+      "accessNodes": [
+        "0305"
+      ],
       "apId": 230817866,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5685,6 +5994,7 @@
     },
     {
       "key": "0305:0d:-2176,2032",
+      "logicalId": "0305:0d:-2176,2032",
       "name": "Library Room (0305) - Handgun Sights (critical hit) @-2176,2032",
       "room": "0305",
       "itemId": 13,
@@ -5708,7 +6018,16 @@
       "recordOffsets": [
         225484
       ],
+      "physicalRecords": [
+        {
+          "room": "0305",
+          "offset": 225484
+        }
+      ],
       "node": "0305",
+      "accessNodes": [
+        "0305"
+      ],
       "apId": 230817864,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5741,6 +6060,7 @@
     },
     {
       "key": "0305:5e:-6400,-4864",
+      "logicalId": "0305:5e:-6400,-4864",
       "name": "Library Room (0305) - B1 Key Chip \" with number \"(3695) @-6400,-4864",
       "room": "0305",
       "itemId": 94,
@@ -5766,14 +6086,24 @@
       "recordOffsets": [
         227264
       ],
+      "physicalRecords": [
+        {
+          "room": "0305",
+          "offset": 227264
+        }
+      ],
       "gateFlag": "0:96",
       "node": "0305",
+      "accessNodes": [
+        "0305"
+      ],
       "apId": 230817863,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0305:48:2304,2560",
+      "logicalId": "0305:48:2304,2560",
       "name": "Library Room (0305) - Key Card R @2304,2560",
       "room": "0305",
       "itemId": 72,
@@ -5799,7 +6129,16 @@
       "recordOffsets": [
         227684
       ],
+      "physicalRecords": [
+        {
+          "room": "0305",
+          "offset": 227684
+        }
+      ],
       "node": "0305",
+      "accessNodes": [
+        "0305"
+      ],
       "apId": 230817865,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -5809,6 +6148,7 @@
     },
     {
       "key": "0308:1d:1536,-2464",
+      "logicalId": "0308:1d:1536,-2464",
       "name": "Medical Room (0308) - Med. Pak M @1536,-2464",
       "room": "0308",
       "itemId": 29,
@@ -5834,13 +6174,27 @@
         270928,
         270972
       ],
+      "physicalRecords": [
+        {
+          "room": "0308",
+          "offset": 270928
+        },
+        {
+          "room": "0308",
+          "offset": 270972
+        }
+      ],
       "node": "0308",
+      "accessNodes": [
+        "0308"
+      ],
       "apId": 230817885,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0308:2b:-368,2512",
+      "logicalId": "0308:2b:-368,2512",
       "name": "Medical Room (0308) - Plug @-368,2512",
       "room": "0308",
       "itemId": 43,
@@ -5864,7 +6218,16 @@
       "recordOffsets": [
         271016
       ],
+      "physicalRecords": [
+        {
+          "room": "0308",
+          "offset": 271016
+        }
+      ],
       "node": "0308",
+      "accessNodes": [
+        "0308"
+      ],
       "apId": 230817887,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -5874,6 +6237,7 @@
     },
     {
       "key": "0308:34:-128,-1792",
+      "logicalId": "0308:34:-128,-1792",
       "name": "Medical Room (0308) - ID Card Type \" Colonel \" @-128,-1792",
       "room": "0308",
       "itemId": 52,
@@ -5897,7 +6261,16 @@
       "recordOffsets": [
         271060
       ],
+      "physicalRecords": [
+        {
+          "room": "0308",
+          "offset": 271060
+        }
+      ],
       "node": "0308",
+      "accessNodes": [
+        "0308"
+      ],
       "apId": 230817883,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -5930,6 +6303,7 @@
     },
     {
       "key": "0308:23:-1185,1451",
+      "logicalId": "0308:23:-1185,1451",
       "name": "Medical Room (0308) - Multiplier @-1185,1451",
       "room": "0308",
       "itemId": 35,
@@ -5953,7 +6327,16 @@
       "recordOffsets": [
         273184
       ],
+      "physicalRecords": [
+        {
+          "room": "0308",
+          "offset": 273184
+        }
+      ],
       "node": "0308",
+      "accessNodes": [
+        "0308"
+      ],
       "apId": 230817886,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -5963,6 +6346,7 @@
     },
     {
       "key": "0308:1d:-1185,1451",
+      "logicalId": "0308:1d:-1185,1451",
       "name": "Medical Room (0308) - Med. Pak M @-1185,1451",
       "room": "0308",
       "itemId": 29,
@@ -5988,13 +6372,27 @@
         273228,
         273320
       ],
+      "physicalRecords": [
+        {
+          "room": "0308",
+          "offset": 273228
+        },
+        {
+          "room": "0308",
+          "offset": 273320
+        }
+      ],
       "node": "0308",
+      "accessNodes": [
+        "0308"
+      ],
       "apId": 230817884,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0308:1f:-1185,1451",
+      "logicalId": "0308:1f:-1185,1451",
       "name": "Medical Room (0308) - Resuscitation @-1185,1451",
       "room": "0308",
       "itemId": 31,
@@ -6018,7 +6416,16 @@
       "recordOffsets": [
         273276
       ],
+      "physicalRecords": [
+        {
+          "room": "0308",
+          "offset": 273276
+        }
+      ],
       "node": "0308",
+      "accessNodes": [
+        "0308"
+      ],
       "apId": 230817888,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -6028,6 +6435,7 @@
     },
     {
       "key": "030b:2b:-4272,-1296",
+      "logicalId": "030b:2b:-4272,-1296",
       "name": "Backup Generator Room B1 (030b) - Plug @-4272,-1296",
       "room": "030b",
       "itemId": 43,
@@ -6051,7 +6459,16 @@
       "recordOffsets": [
         103700
       ],
+      "physicalRecords": [
+        {
+          "room": "030b",
+          "offset": 103700
+        }
+      ],
       "node": "030b",
+      "accessNodes": [
+        "030b"
+      ],
       "apId": 230817793,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6084,6 +6501,7 @@
     },
     {
       "key": "030b:40:-5120,3584",
+      "logicalId": "030b:40:-5120,3584",
       "name": "Backup Generator Room B1 (030b) - Startup Battery. R \" Charged \" @-5120,3584",
       "room": "030b",
       "itemId": 64,
@@ -6107,14 +6525,24 @@
       "recordOffsets": [
         106748
       ],
+      "physicalRecords": [
+        {
+          "room": "030b",
+          "offset": 106748
+        }
+      ],
       "excluded": true,
       "node": "030b",
+      "accessNodes": [
+        "030b"
+      ],
       "apId": 230817794,
       "placementClass": "excluded",
       "allowedProgressionItemIds": []
     },
     {
       "key": "030c:13:-7700,6900",
+      "logicalId": "030c:13:-7700,6900",
       "name": "Carrying Out Room B1 (030c) - An. Darts M @-7700,6900",
       "room": "030c",
       "itemId": 19,
@@ -6138,13 +6566,23 @@
       "recordOffsets": [
         301984
       ],
+      "physicalRecords": [
+        {
+          "room": "030c",
+          "offset": 301984
+        }
+      ],
       "node": "030c",
+      "accessNodes": [
+        "030c"
+      ],
       "apId": 230817797,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "030c:35:-7700,6900",
+      "logicalId": "030c:35:-7700,6900",
       "name": "Carrying Out Room B1 (030c) - ID Card Type \" Communicator \" @-7700,6900",
       "room": "030c",
       "itemId": 53,
@@ -6168,13 +6606,23 @@
       "recordOffsets": [
         311364
       ],
+      "physicalRecords": [
+        {
+          "room": "030c",
+          "offset": 311364
+        }
+      ],
       "node": "030c",
+      "accessNodes": [
+        "030c"
+      ],
       "apId": 230817798,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0400:6a:13264,1792",
+      "logicalId": "0400:6a:13264,1792",
       "name": "Front Area of Entrance (0400) - DDK Code Disc N @13264,1792",
       "room": "0400",
       "itemId": 106,
@@ -6198,7 +6646,16 @@
       "recordOffsets": [
         182684
       ],
+      "physicalRecords": [
+        {
+          "room": "0400",
+          "offset": 182684
+        }
+      ],
       "node": "0400",
+      "accessNodes": [
+        "0400"
+      ],
       "apId": 230817829,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6231,6 +6688,7 @@
     },
     {
       "key": "0400:20:12576,1328",
+      "logicalId": "0400:20:12576,1328",
       "name": "Front Area of Entrance (0400) - An. Aid @12576,1328",
       "room": "0400",
       "itemId": 32,
@@ -6254,7 +6712,16 @@
       "recordOffsets": [
         182784
       ],
+      "physicalRecords": [
+        {
+          "room": "0400",
+          "offset": 182784
+        }
+      ],
       "node": "0400",
+      "accessNodes": [
+        "0400"
+      ],
       "apId": 230817828,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -6264,6 +6731,7 @@
     },
     {
       "key": "0400:10:7984,1104",
+      "logicalId": "0400:10:7984,1104",
       "name": "Front Area of Entrance (0400) - SG Bullets @7984,1104",
       "room": "0400",
       "itemId": 16,
@@ -6287,7 +6755,16 @@
       "recordOffsets": [
         182828
       ],
+      "physicalRecords": [
+        {
+          "room": "0400",
+          "offset": 182828
+        }
+      ],
       "node": "0400",
+      "accessNodes": [
+        "0400"
+      ],
       "apId": 230817830,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6320,6 +6797,7 @@
     },
     {
       "key": "0402:18:5888,-12960",
+      "logicalId": "0402:18:5888,-12960",
       "name": "Hangar (0402) - Grenade Bullets @5888,-12960",
       "room": "0402",
       "itemId": 24,
@@ -6343,7 +6821,16 @@
       "recordOffsets": [
         138168
       ],
+      "physicalRecords": [
+        {
+          "room": "0402",
+          "offset": 138168
+        }
+      ],
       "node": "0402",
+      "accessNodes": [
+        "0402"
+      ],
       "apId": 230817841,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6376,6 +6863,7 @@
     },
     {
       "key": "0402:18:-4352,-12992",
+      "logicalId": "0402:18:-4352,-12992",
       "name": "Hangar (0402) - Grenade Bullets @-4352,-12992",
       "room": "0402",
       "itemId": 24,
@@ -6399,7 +6887,16 @@
       "recordOffsets": [
         138224
       ],
+      "physicalRecords": [
+        {
+          "room": "0402",
+          "offset": 138224
+        }
+      ],
       "node": "0402",
+      "accessNodes": [
+        "0402"
+      ],
       "apId": 230817840,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6432,6 +6929,7 @@
     },
     {
       "key": "0402:09:-5888,-11520",
+      "logicalId": "0402:09:-5888,-11520",
       "name": "Hangar (0402) - Grenade Gun (40mmHK) @-5888,-11520",
       "room": "0402",
       "itemId": 9,
@@ -6455,7 +6953,16 @@
       "recordOffsets": [
         138280
       ],
+      "physicalRecords": [
+        {
+          "room": "0402",
+          "offset": 138280
+        }
+      ],
       "node": "0402",
+      "accessNodes": [
+        "0402"
+      ],
       "apId": 230817842,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6488,6 +6995,7 @@
     },
     {
       "key": "0404:11:-4200,3200",
+      "logicalId": "0404:11:-4200,3200",
       "name": "Large Size Elevator Passageway (0404) - Slag Bullets @-4200,3200",
       "room": "0404",
       "itemId": 17,
@@ -6511,7 +7019,16 @@
       "recordOffsets": [
         240396
       ],
+      "physicalRecords": [
+        {
+          "room": "0404",
+          "offset": 240396
+        }
+      ],
       "node": "0404",
+      "accessNodes": [
+        "0404"
+      ],
       "apId": 230817858,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6544,6 +7061,7 @@
     },
     {
       "key": "0404:11:5300,3000",
+      "logicalId": "0404:11:5300,3000",
       "name": "Large Size Elevator Passageway (0404) - Slag Bullets @5300,3000",
       "room": "0404",
       "itemId": 17,
@@ -6567,7 +7085,16 @@
       "recordOffsets": [
         240452
       ],
+      "physicalRecords": [
+        {
+          "room": "0404",
+          "offset": 240452
+        }
+      ],
       "node": "0404",
+      "accessNodes": [
+        "0404"
+      ],
       "apId": 230817859,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6600,6 +7127,7 @@
     },
     {
       "key": "0405:2b:1008,11296",
+      "logicalId": "0405:2b:1008,11296",
       "name": "Large Size Elevator (0405) - Plug @1008,11296",
       "room": "0405",
       "itemId": 43,
@@ -6623,7 +7151,16 @@
       "recordOffsets": [
         347896
       ],
+      "physicalRecords": [
+        {
+          "room": "0405",
+          "offset": 347896
+        }
+      ],
       "node": "0405",
+      "accessNodes": [
+        "0405"
+      ],
       "apId": 230817850,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -6633,6 +7170,7 @@
     },
     {
       "key": "0406:64:-3456,1280",
+      "logicalId": "0406:64:-3456,1280",
       "name": "Large Size Elevator Control Room (0406) - DDK Input Disc L @-3456,1280",
       "room": "0406",
       "itemId": 100,
@@ -6656,7 +7194,16 @@
       "recordOffsets": [
         226628
       ],
+      "physicalRecords": [
+        {
+          "room": "0406",
+          "offset": 226628
+        }
+      ],
       "node": "0406",
+      "accessNodes": [
+        "0406"
+      ],
       "apId": 230817857,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6689,6 +7236,7 @@
     },
     {
       "key": "0406:6b:-3956,-1600",
+      "logicalId": "0406:6b:-3956,-1600",
       "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-3956,-1600",
       "room": "0406",
       "itemId": 107,
@@ -6707,49 +7255,35 @@
       "requiresItems": [],
       "requiresRooms": [],
       "physicalIds": [
-        "0406:0x37674"
+        "0406:0x37674",
+        "0406:0x37fa0"
       ],
       "recordOffsets": [
-        226932
+        226932,
+        229280
+      ],
+      "physicalRecords": [
+        {
+          "room": "0406",
+          "offset": 226932
+        },
+        {
+          "room": "0406",
+          "offset": 229280
+        }
       ],
       "gateFlag": "0:1",
       "node": "0406",
+      "accessNodes": [
+        "0406"
+      ],
       "apId": 230817855,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
-      "key": "0406:6b:-4352,224",
-      "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-4352,224",
-      "room": "0406",
-      "itemId": 107,
-      "itemName": "DDK Code Disc L",
-      "pos": [
-        -4352,
-        224
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 107
-      },
-      "source": "event-granted",
-      "visual": "interaction-only",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0406:0x37fa0"
-      ],
-      "recordOffsets": [
-        229280
-      ],
-      "node": "0406",
-      "apId": 230817856,
-      "placementClass": "fixed",
-      "allowedProgressionItemIds": []
-    },
-    {
       "key": "0408:43:-2576,-5568",
+      "logicalId": "0408:43:-2576,-5568",
       "name": "Elevator Power Room (0408) - B1 Crane Card @-2576,-5568",
       "room": "0408",
       "itemId": 67,
@@ -6773,7 +7307,16 @@
       "recordOffsets": [
         107344
       ],
+      "physicalRecords": [
+        {
+          "room": "0408",
+          "offset": 107344
+        }
+      ],
       "node": "0408",
+      "accessNodes": [
+        "0408"
+      ],
       "apId": 230817822,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6806,6 +7349,7 @@
     },
     {
       "key": "040b:20:240,-2266",
+      "logicalId": "040b:20:240,-2266",
       "name": "Materials Room (040b) - An. Aid @240,-2266",
       "room": "040b",
       "itemId": 32,
@@ -6829,7 +7373,16 @@
       "recordOffsets": [
         81328
       ],
+      "physicalRecords": [
+        {
+          "room": "040b",
+          "offset": 81328
+        }
+      ],
       "node": "040b",
+      "accessNodes": [
+        "040b"
+      ],
       "apId": 230817881,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -6839,6 +7392,7 @@
     },
     {
       "key": "040b:3c:2816,-2496",
+      "logicalId": "040b:3c:2816,-2496",
       "name": "Materials Room (040b) - C. O. Pass Card @2816,-2496",
       "room": "040b",
       "itemId": 60,
@@ -6862,7 +7416,16 @@
       "recordOffsets": [
         81524
       ],
+      "physicalRecords": [
+        {
+          "room": "040b",
+          "offset": 81524
+        }
+      ],
       "node": "040b",
+      "accessNodes": [
+        "040b"
+      ],
       "apId": 230817882,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6895,6 +7458,7 @@
     },
     {
       "key": "0500:20:-7568,6672",
+      "logicalId": "0500:20:-7568,6672",
       "name": "Passageway to the Experiment Area (0500) - An. Aid @-7568,6672",
       "room": "0500",
       "itemId": 32,
@@ -6918,7 +7482,16 @@
       "recordOffsets": [
         253368
       ],
+      "physicalRecords": [
+        {
+          "room": "0500",
+          "offset": 253368
+        }
+      ],
       "node": "0500",
+      "accessNodes": [
+        "0500"
+      ],
       "apId": 230817897,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -6951,6 +7524,7 @@
     },
     {
       "key": "0502:38:-9472,3840",
+      "logicalId": "0502:38:-9472,3840",
       "name": "Experiment Room Hall (0502) - Key Card Lv. C @-9472,3840",
       "room": "0502",
       "itemId": 56,
@@ -6974,7 +7548,16 @@
       "recordOffsets": [
         294904
       ],
+      "physicalRecords": [
+        {
+          "room": "0502",
+          "offset": 294904
+        }
+      ],
       "node": "0502",
+      "accessNodes": [
+        "0502"
+      ],
       "apId": 230817824,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7007,6 +7590,7 @@
     },
     {
       "key": "0502:21:-16384,-4352",
+      "logicalId": "0502:21:-16384,-4352",
       "name": "Experiment Room Hall (0502) - Recovery Aid @-16384,-4352",
       "room": "0502",
       "itemId": 33,
@@ -7030,7 +7614,16 @@
       "recordOffsets": [
         294960
       ],
+      "physicalRecords": [
+        {
+          "room": "0502",
+          "offset": 294960
+        }
+      ],
       "node": "0502",
+      "accessNodes": [
+        "0502"
+      ],
       "apId": 230817825,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7063,6 +7656,7 @@
     },
     {
       "key": "0502:14:4480,-6656",
+      "logicalId": "0502:14:4480,-6656",
       "name": "Experiment Room Hall (0502) - An. Darts L @4480,-6656",
       "room": "0502",
       "itemId": 20,
@@ -7086,7 +7680,16 @@
       "recordOffsets": [
         295016
       ],
+      "physicalRecords": [
+        {
+          "room": "0502",
+          "offset": 295016
+        }
+      ],
       "node": "0502",
+      "accessNodes": [
+        "0502"
+      ],
       "apId": 230817823,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7119,6 +7722,7 @@
     },
     {
       "key": "0503:4c:-3468,2768",
+      "logicalId": "0503:4c:-3468,2768",
       "name": "Stabilizer Experiment Room (0503) - Stabilizer @-3468,2768",
       "room": "0503",
       "itemId": 76,
@@ -7142,14 +7746,24 @@
       "recordOffsets": [
         312816
       ],
+      "physicalRecords": [
+        {
+          "room": "0503",
+          "offset": 312816
+        }
+      ],
       "gateFlag": "11:83",
       "node": "0503",
+      "accessNodes": [
+        "0503"
+      ],
       "apId": 230817927,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0503:4d:-3468,2768",
+      "logicalId": "0503:4d:-3468,2768",
       "name": "Stabilizer Experiment Room (0503) - Initializer @-3468,2768",
       "room": "0503",
       "itemId": 77,
@@ -7173,14 +7787,24 @@
       "recordOffsets": [
         313028
       ],
+      "physicalRecords": [
+        {
+          "room": "0503",
+          "offset": 313028
+        }
+      ],
       "gateFlag": "11:83",
       "node": "0503",
+      "accessNodes": [
+        "0503"
+      ],
       "apId": 230817922,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0503:51:-3468,2768",
+      "logicalId": "0503:51:-3468,2768",
       "name": "Stabilizer Experiment Room (0503) - Protect P. 2-B @-3468,2768",
       "room": "0503",
       "itemId": 81,
@@ -7204,7 +7828,16 @@
       "recordOffsets": [
         314368
       ],
+      "physicalRecords": [
+        {
+          "room": "0503",
+          "offset": 314368
+        }
+      ],
       "node": "0503",
+      "accessNodes": [
+        "0503"
+      ],
       "apId": 230817924,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -7213,151 +7846,8 @@
       ]
     },
     {
-      "key": "0503:2b:-10240,-5248",
-      "name": "Stabilizer Experiment Room (0503) - Plug @-10240,-5248",
-      "room": "0503",
-      "itemId": 43,
-      "itemName": "Plug",
-      "pos": [
-        -10240,
-        -5248
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 43
-      },
-      "source": "static",
-      "visual": "generic-panel",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0503:0x4d168"
-      ],
-      "recordOffsets": [
-        315752
-      ],
-      "node": "0503",
-      "apId": 230817923,
-      "placementClass": "progression",
-      "allowedProgressionItemIds": [
-        46,
-        47,
-        48,
-        49,
-        56,
-        57,
-        58,
-        65,
-        70,
-        71,
-        72,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111
-      ]
-    },
-    {
-      "key": "0503:6f:-2800,-3088",
-      "name": "Stabilizer Experiment Room (0503) - DDK Code Disc D @-2800,-3088",
-      "room": "0503",
-      "itemId": 111,
-      "itemName": "DDK Code Disc D",
-      "pos": [
-        -2800,
-        -3088
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 111
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0503:0x4d194"
-      ],
-      "recordOffsets": [
-        315796
-      ],
-      "node": "0503",
-      "apId": 230817921,
-      "placementClass": "progression",
-      "allowedProgressionItemIds": [
-        46,
-        47,
-        48,
-        49,
-        56,
-        57,
-        58,
-        65,
-        70,
-        71,
-        72,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111
-      ]
-    },
-    {
-      "key": "0503:0b:-10240,4480",
-      "name": "Stabilizer Experiment Room (0503) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
-      "room": "0503",
-      "itemId": 11,
-      "itemName": "Shotgun Parts (upgrade To SPAS12)",
-      "pos": [
-        -10240,
-        4480
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 11
-      },
-      "source": "static",
-      "visual": "interaction-only",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0503:0x4d4fc"
-      ],
-      "recordOffsets": [
-        316668
-      ],
-      "gateFlag": "2:11",
-      "excluded": true,
-      "node": "0503",
-      "apId": 230817926,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
-    },
-    {
       "key": "0503:5b:-1792,1792",
+      "logicalId": "0503:5b:-1792,1792",
       "name": "Stabilizer Experiment Room (0503) - Secret Disc \" With Data \" @-1792,1792",
       "room": "0503",
       "itemId": 91,
@@ -7381,13 +7871,23 @@
       "recordOffsets": [
         318800
       ],
+      "physicalRecords": [
+        {
+          "room": "0503",
+          "offset": 318800
+        }
+      ],
       "node": "0503",
+      "accessNodes": [
+        "0503"
+      ],
       "apId": 230817925,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0504:6d:-1632,2304",
+      "logicalId": "0504:6d:-1632,2304",
       "name": "Stabilizer Design Room (0504) - DDK Code Disc W @-1632,2304",
       "room": "0504",
       "itemId": 109,
@@ -7411,7 +7911,16 @@
       "recordOffsets": [
         325816
       ],
+      "physicalRecords": [
+        {
+          "room": "0504",
+          "offset": 325816
+        }
+      ],
       "node": "0504",
+      "accessNodes": [
+        "0504"
+      ],
       "apId": 230817915,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7444,6 +7953,7 @@
     },
     {
       "key": "0504:4f:-2912,3872",
+      "logicalId": "0504:4f:-2912,3872",
       "name": "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872",
       "room": "0504",
       "itemId": 79,
@@ -7462,20 +7972,36 @@
       "requiresItems": [],
       "requiresRooms": [],
       "physicalIds": [
-        "0504:0x4fbf0"
+        "0504:0x4fbf0",
+        "0504:0x500f8"
       ],
       "recordOffsets": [
-        326640
+        326640,
+        327928
+      ],
+      "physicalRecords": [
+        {
+          "room": "0504",
+          "offset": 326640
+        },
+        {
+          "room": "0504",
+          "offset": 327928
+        }
       ],
       "gateFlag": "2:11",
       "excluded": true,
       "node": "0504",
+      "accessNodes": [
+        "0504"
+      ],
       "apId": 230817919,
       "placementClass": "excluded",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0504:50:4896,-3840",
+      "logicalId": "0504:50:4896,-3840",
       "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
       "room": "0504",
       "itemId": 80,
@@ -7494,20 +8020,36 @@
       "requiresItems": [],
       "requiresRooms": [],
       "physicalIds": [
-        "0504:0x4feb4"
+        "0504:0x4feb4",
+        "0504:0x5028c"
       ],
       "recordOffsets": [
-        327348
+        327348,
+        328332
+      ],
+      "physicalRecords": [
+        {
+          "room": "0504",
+          "offset": 327348
+        },
+        {
+          "room": "0504",
+          "offset": 328332
+        }
       ],
       "gateFlag": "2:11",
       "excluded": true,
       "node": "0504",
+      "accessNodes": [
+        "0504"
+      ],
       "apId": 230817918,
       "placementClass": "excluded",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0504:4e:2256,-3840",
+      "logicalId": "0504:4e:2256,-3840",
       "name": "Stabilizer Design Room (0504) - Protect P. 1-A @2256,-3840",
       "room": "0504",
       "itemId": 78,
@@ -7533,77 +8075,28 @@
         327392,
         328104
       ],
+      "physicalRecords": [
+        {
+          "room": "0504",
+          "offset": 327392
+        },
+        {
+          "room": "0504",
+          "offset": 328104
+        }
+      ],
       "gateFlag": "2:11",
       "node": "0504",
+      "accessNodes": [
+        "0504"
+      ],
       "apId": 230817916,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
-      "key": "0504:4f:4896,-3840",
-      "name": "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840",
-      "room": "0504",
-      "itemId": 79,
-      "itemName": "Protect P. 2-A",
-      "pos": [
-        4896,
-        -3840
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 79
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0504:0x500f8"
-      ],
-      "recordOffsets": [
-        327928
-      ],
-      "gateFlag": "7:49",
-      "excluded": true,
-      "node": "0504",
-      "apId": 230817920,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
-    },
-    {
-      "key": "0504:50:-2912,3872",
-      "name": "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872",
-      "room": "0504",
-      "itemId": 80,
-      "itemName": "Protect P. 1-B",
-      "pos": [
-        -2912,
-        3872
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 80
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0504:0x5028c"
-      ],
-      "recordOffsets": [
-        328332
-      ],
-      "excluded": true,
-      "node": "0504",
-      "apId": 230817917,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
-    },
-    {
       "key": "0505:2b:-1100,1800",
+      "logicalId": "0505:2b:-1100,1800",
       "name": "Researcher Rest Room (0505) - Plug @-1100,1800",
       "room": "0505",
       "itemId": 43,
@@ -7627,7 +8120,16 @@
       "recordOffsets": [
         294100
       ],
+      "physicalRecords": [
+        {
+          "room": "0505",
+          "offset": 294100
+        }
+      ],
       "node": "0505",
+      "accessNodes": [
+        "0505"
+      ],
       "apId": 230817906,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -7637,6 +8139,7 @@
     },
     {
       "key": "0506:56:-5696,-1232",
+      "logicalId": "0506:56:-5696,-1232",
       "name": "Security Pass Room (0506) - B2 Key Chip 1 @-5696,-1232",
       "room": "0506",
       "itemId": 86,
@@ -7660,7 +8163,16 @@
       "recordOffsets": [
         141216
       ],
+      "physicalRecords": [
+        {
+          "room": "0506",
+          "offset": 141216
+        }
+      ],
       "node": "0506",
+      "accessNodes": [
+        "0506"
+      ],
       "apId": 230817908,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7693,6 +8205,7 @@
     },
     {
       "key": "0506:67:3840,2592",
+      "logicalId": "0506:67:3840,2592",
       "name": "Security Pass Room (0506) - DDK Input Disc S @3840,2592",
       "room": "0506",
       "itemId": 103,
@@ -7716,7 +8229,16 @@
       "recordOffsets": [
         141272
       ],
+      "physicalRecords": [
+        {
+          "room": "0506",
+          "offset": 141272
+        }
+      ],
       "node": "0506",
+      "accessNodes": [
+        "0506"
+      ],
       "apId": 230817909,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7749,6 +8271,7 @@
     },
     {
       "key": "0506:2b:-6144,128",
+      "logicalId": "0506:2b:-6144,128",
       "name": "Security Pass Room (0506) - Plug @-6144,128",
       "room": "0506",
       "itemId": 43,
@@ -7772,7 +8295,16 @@
       "recordOffsets": [
         141360
       ],
+      "physicalRecords": [
+        {
+          "room": "0506",
+          "offset": 141360
+        }
+      ],
       "node": "0506",
+      "accessNodes": [
+        "0506"
+      ],
       "apId": 230817911,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -7782,6 +8314,7 @@
     },
     {
       "key": "0506:3b:-6912,3328",
+      "logicalId": "0506:3b:-6912,3328",
       "name": "Security Pass Room (0506) - ID Card Type \" Project Superintendent \" (Dr. Kirk) @-6912,3328",
       "room": "0506",
       "itemId": 59,
@@ -7805,14 +8338,24 @@
       "recordOffsets": [
         143924
       ],
+      "physicalRecords": [
+        {
+          "room": "0506",
+          "offset": 143924
+        }
+      ],
       "gateFlag": "2:4",
       "node": "0506",
+      "accessNodes": [
+        "0506"
+      ],
       "apId": 230817910,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0507:2b:6144,3088",
+      "logicalId": "0507:2b:6144,3088",
       "name": "Parts Storage (0507) - Plug @6144,3088",
       "room": "0507",
       "itemId": 43,
@@ -7836,7 +8379,16 @@
       "recordOffsets": [
         267236
       ],
+      "physicalRecords": [
+        {
+          "room": "0507",
+          "offset": 267236
+        }
+      ],
       "node": "0507",
+      "accessNodes": [
+        "0507"
+      ],
       "apId": 230817893,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7869,6 +8421,7 @@
     },
     {
       "key": "0507:0f:-4352,10000",
+      "logicalId": "0507:0f:-4352,10000",
       "name": "Parts Storage (0507) - Grenade Gun @-4352,10000",
       "room": "0507",
       "itemId": 15,
@@ -7894,7 +8447,16 @@
       "recordOffsets": [
         267280
       ],
+      "physicalRecords": [
+        {
+          "room": "0507",
+          "offset": 267280
+        }
+      ],
       "node": "0507",
+      "accessNodes": [
+        "0507"
+      ],
       "apId": 230817892,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -7927,6 +8489,7 @@
     },
     {
       "key": "0507:52:4352,7824",
+      "logicalId": "0507:52:4352,7824",
       "name": "Parts Storage (0507) - Core Parts 1 @4352,7824",
       "room": "0507",
       "itemId": 82,
@@ -7952,14 +8515,28 @@
         268028,
         273112
       ],
+      "physicalRecords": [
+        {
+          "room": "0507",
+          "offset": 268028
+        },
+        {
+          "room": "0507",
+          "offset": 273112
+        }
+      ],
       "gateFlag": "0:213",
       "node": "0507",
+      "accessNodes": [
+        "0507"
+      ],
       "apId": 230817890,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0507:53:4352,9616",
+      "logicalId": "0507:53:4352,9616",
       "name": "Parts Storage (0507) - Core Parts 2 @4352,9616",
       "room": "0507",
       "itemId": 83,
@@ -7985,14 +8562,28 @@
         268084,
         273168
       ],
+      "physicalRecords": [
+        {
+          "room": "0507",
+          "offset": 268084
+        },
+        {
+          "room": "0507",
+          "offset": 273168
+        }
+      ],
       "gateFlag": "0:213",
       "node": "0507",
+      "accessNodes": [
+        "0507"
+      ],
       "apId": 230817891,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0508:20:-1728,-9456",
+      "logicalId": "0508:20:-1728,-9456",
       "name": "Passageway (0508) - An. Aid @-1728,-9456",
       "room": "0508",
       "itemId": 32,
@@ -8016,7 +8607,16 @@
       "recordOffsets": [
         319228
       ],
+      "physicalRecords": [
+        {
+          "room": "0508",
+          "offset": 319228
+        }
+      ],
       "node": "0508",
+      "accessNodes": [
+        "0508"
+      ],
       "apId": 230817894,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8049,6 +8649,7 @@
     },
     {
       "key": "050a:2b:7344,4736",
+      "logicalId": "050a:2b:7344,4736",
       "name": "Third Energy Area B3 (050a) - Plug @7344,4736",
       "room": "050a",
       "itemId": 43,
@@ -8072,13 +8673,23 @@
       "recordOffsets": [
         218596
       ],
+      "physicalRecords": [
+        {
+          "room": "050a",
+          "offset": 218596
+        }
+      ],
       "node": "050a",
+      "accessNodes": [
+        "050a"
+      ],
       "apId": 230817934,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "050b:2b:6656,-3328",
+      "logicalId": "050b:2b:6656,-3328",
       "name": "Third Energy Control Room (050b) - Plug @6656,-3328",
       "room": "050b",
       "itemId": 43,
@@ -8102,7 +8713,16 @@
       "recordOffsets": [
         199240
       ],
+      "physicalRecords": [
+        {
+          "room": "050b",
+          "offset": 199240
+        }
+      ],
       "node": "050b",
+      "accessNodes": [
+        "050b"
+      ],
       "apId": 230817935,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8135,6 +8755,7 @@
     },
     {
       "key": "050c:5d:-3328,5616",
+      "logicalId": "050c:5d:-3328,5616",
       "name": "Power Freq. Room (050c) - Researcher Memo \" with number \"(1281) @-3328,5616",
       "room": "050c",
       "itemId": 93,
@@ -8158,14 +8779,24 @@
       "recordOffsets": [
         277452
       ],
+      "physicalRecords": [
+        {
+          "room": "050c",
+          "offset": 277452
+        }
+      ],
       "gateFlag": "7:162",
       "node": "050c",
+      "accessNodes": [
+        "050c"
+      ],
       "apId": 230817903,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "050e:2b:-2100,-2700",
+      "logicalId": "050e:2b:-2100,-2700",
       "name": "Dr. Kirk's Personal Lab (050e) - Plug @-2100,-2700",
       "room": "050e",
       "itemId": 43,
@@ -8189,7 +8820,16 @@
       "recordOffsets": [
         254044
       ],
+      "physicalRecords": [
+        {
+          "room": "050e",
+          "offset": 254044
+        }
+      ],
       "node": "050e",
+      "accessNodes": [
+        "050e"
+      ],
       "apId": 230817820,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -8199,6 +8839,7 @@
     },
     {
       "key": "050e:3a:-7700,6900",
+      "logicalId": "050e:3a:-7700,6900",
       "name": "Dr. Kirk's Personal Lab (050e) - Key Card Lv. A @-7700,6900",
       "room": "050e",
       "itemId": 58,
@@ -8222,7 +8863,16 @@
       "recordOffsets": [
         260208
       ],
+      "physicalRecords": [
+        {
+          "room": "050e",
+          "offset": 260208
+        }
+      ],
       "node": "050e",
+      "accessNodes": [
+        "050e"
+      ],
       "apId": 230817818,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -8232,6 +8882,7 @@
     },
     {
       "key": "050e:61:-7700,6900",
+      "logicalId": "050e:61:-7700,6900",
       "name": "Dr. Kirk's Personal Lab (050e) - Planning Disc @-7700,6900",
       "room": "050e",
       "itemId": 97,
@@ -8255,14 +8906,24 @@
       "recordOffsets": [
         263008
       ],
+      "physicalRecords": [
+        {
+          "room": "050e",
+          "offset": 263008
+        }
+      ],
       "gateFlag": "0:5",
       "node": "050e",
+      "accessNodes": [
+        "050e"
+      ],
       "apId": 230817819,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "050f:1d:-1100,-2100",
+      "logicalId": "050f:1d:-1100,-2100",
       "name": "Dr. Kirk's Library Room (050f) - Med. Pak M @-1100,-2100",
       "room": "050f",
       "itemId": 29,
@@ -8286,7 +8947,16 @@
       "recordOffsets": [
         181592
       ],
+      "physicalRecords": [
+        {
+          "room": "050f",
+          "offset": 181592
+        }
+      ],
       "node": "050f",
+      "accessNodes": [
+        "050f"
+      ],
       "apId": 230817816,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8319,6 +8989,7 @@
     },
     {
       "key": "050f:58:-7700,6900",
+      "logicalId": "050f:58:-7700,6900",
       "name": "Dr. Kirk's Library Room (050f) - Pulse Receiver @-7700,6900",
       "room": "050f",
       "itemId": 88,
@@ -8342,13 +9013,23 @@
       "recordOffsets": [
         187268
       ],
+      "physicalRecords": [
+        {
+          "room": "050f",
+          "offset": 187268
+        }
+      ],
       "node": "050f",
+      "accessNodes": [
+        "050f"
+      ],
       "apId": 230817817,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0510:39:4336,3344",
+      "logicalId": "0510:39:4336,3344",
       "name": "Third Energy Control Room (0510) - Key Card Lv. B @4336,3344",
       "room": "0510",
       "itemId": 57,
@@ -8372,7 +9053,16 @@
       "recordOffsets": [
         198064
       ],
+      "physicalRecords": [
+        {
+          "room": "0510",
+          "offset": 198064
+        }
+      ],
       "node": "0510",
+      "accessNodes": [
+        "0510"
+      ],
       "apId": 230817937,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8405,6 +9095,7 @@
     },
     {
       "key": "0510:22:0,-5280",
+      "logicalId": "0510:22:0,-5280",
       "name": "Third Energy Control Room (0510) - Intensifier @0,-5280",
       "room": "0510",
       "itemId": 34,
@@ -8428,7 +9119,16 @@
       "recordOffsets": [
         198244
       ],
+      "physicalRecords": [
+        {
+          "room": "0510",
+          "offset": 198244
+        }
+      ],
       "node": "0510",
+      "accessNodes": [
+        "0510"
+      ],
       "apId": 230817936,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8460,151 +9160,8 @@
       ]
     },
     {
-      "key": "0511:2b:-10240,-5248",
-      "name": "Stabilizer Experiment Room (0511) - Plug @-10240,-5248",
-      "room": "0511",
-      "itemId": 43,
-      "itemName": "Plug",
-      "pos": [
-        -10240,
-        -5248
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 43
-      },
-      "source": "static",
-      "visual": "generic-panel",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0511:0x5722c"
-      ],
-      "recordOffsets": [
-        356908
-      ],
-      "node": "0511",
-      "apId": 230817929,
-      "placementClass": "progression",
-      "allowedProgressionItemIds": [
-        46,
-        47,
-        48,
-        49,
-        56,
-        57,
-        58,
-        65,
-        70,
-        71,
-        72,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111
-      ]
-    },
-    {
-      "key": "0511:6f:-2800,-3088",
-      "name": "Stabilizer Experiment Room (0511) - DDK Code Disc D @-2800,-3088",
-      "room": "0511",
-      "itemId": 111,
-      "itemName": "DDK Code Disc D",
-      "pos": [
-        -2800,
-        -3088
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 111
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0511:0x57258"
-      ],
-      "recordOffsets": [
-        356952
-      ],
-      "node": "0511",
-      "apId": 230817928,
-      "placementClass": "progression",
-      "allowedProgressionItemIds": [
-        46,
-        47,
-        48,
-        49,
-        56,
-        57,
-        58,
-        65,
-        70,
-        71,
-        72,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111
-      ]
-    },
-    {
-      "key": "0511:0b:-10240,4480",
-      "name": "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
-      "room": "0511",
-      "itemId": 11,
-      "itemName": "Shotgun Parts (upgrade To SPAS12)",
-      "pos": [
-        -10240,
-        4480
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 11
-      },
-      "source": "static",
-      "visual": "interaction-only",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0511:0x575c0"
-      ],
-      "recordOffsets": [
-        357824
-      ],
-      "gateFlag": "2:11",
-      "excluded": true,
-      "node": "0511",
-      "apId": 230817930,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
-    },
-    {
       "key": "0600:18:-1616,4480",
+      "logicalId": "0600:18:-1616,4480",
       "name": "Carrying Out Room B3 (0600) - Grenade Bullets @-1616,4480",
       "room": "0600",
       "itemId": 24,
@@ -8628,7 +9185,16 @@
       "recordOffsets": [
         344760
       ],
+      "physicalRecords": [
+        {
+          "room": "0600",
+          "offset": 344760
+        }
+      ],
       "node": "0600",
+      "accessNodes": [
+        "0600"
+      ],
       "apId": 230817799,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8661,6 +9227,7 @@
     },
     {
       "key": "0600:5a:-5120,3584",
+      "logicalId": "0600:5a:-5120,3584",
       "name": "Carrying Out Room B3 (0600) - Startup Battery. W \" Large \" @-5120,3584",
       "room": "0600",
       "itemId": 90,
@@ -8684,14 +9251,24 @@
       "recordOffsets": [
         349592
       ],
+      "physicalRecords": [
+        {
+          "room": "0600",
+          "offset": 349592
+        }
+      ],
       "gateFlag": "2:4",
       "node": "0600",
+      "accessNodes": [
+        "0600"
+      ],
       "apId": 230817800,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0601:5a:-5120,3584",
+      "logicalId": "0601:5a:-5120,3584",
       "name": "Backup Generator Room B3 (0601) - Startup Battery. W \" Large \" @-5120,3584",
       "room": "0601",
       "itemId": 90,
@@ -8715,14 +9292,24 @@
       "recordOffsets": [
         69492
       ],
+      "physicalRecords": [
+        {
+          "room": "0601",
+          "offset": 69492
+        }
+      ],
       "gateFlag": "2:4",
       "node": "0601",
+      "accessNodes": [
+        "0601"
+      ],
       "apId": 230817795,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0602:2b:1856,4224",
+      "logicalId": "0602:2b:1856,4224",
       "name": "Control Room B3 (0602) - Plug @1856,4224",
       "room": "0602",
       "itemId": 43,
@@ -8746,7 +9333,16 @@
       "recordOffsets": [
         92608
       ],
+      "physicalRecords": [
+        {
+          "room": "0602",
+          "offset": 92608
+        }
+      ],
       "node": "0602",
+      "accessNodes": [
+        "0602"
+      ],
       "apId": 230817812,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8779,6 +9375,7 @@
     },
     {
       "key": "0602:49:-3072,4096",
+      "logicalId": "0602:49:-3072,4096",
       "name": "Control Room B3 (0602) - B3 Crane Card 1 @-3072,4096",
       "room": "0602",
       "itemId": 73,
@@ -8802,7 +9399,16 @@
       "recordOffsets": [
         92716
       ],
+      "physicalRecords": [
+        {
+          "room": "0602",
+          "offset": 92716
+        }
+      ],
       "node": "0602",
+      "accessNodes": [
+        "0602"
+      ],
       "apId": 230817810,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8835,6 +9441,7 @@
     },
     {
       "key": "0602:4a:2608,-32",
+      "logicalId": "0602:4a:2608,-32",
       "name": "Control Room B3 (0602) - B3 Crane Card 2 @2608,-32",
       "room": "0602",
       "itemId": 74,
@@ -8858,7 +9465,16 @@
       "recordOffsets": [
         92816
       ],
+      "physicalRecords": [
+        {
+          "room": "0602",
+          "offset": 92816
+        }
+      ],
       "node": "0602",
+      "accessNodes": [
+        "0602"
+      ],
       "apId": 230817811,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -8891,6 +9507,7 @@
     },
     {
       "key": "0604:2b:3024,224",
+      "logicalId": "0604:2b:3024,224",
       "name": "Rest Station (0604) - Plug @3024,224",
       "room": "0604",
       "itemId": 43,
@@ -8914,7 +9531,16 @@
       "recordOffsets": [
         261000
       ],
+      "physicalRecords": [
+        {
+          "room": "0604",
+          "offset": 261000
+        }
+      ],
       "node": "0604",
+      "accessNodes": [
+        "0604"
+      ],
       "apId": 230817907,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -8923,94 +9549,8 @@
       ]
     },
     {
-      "key": "0605:1b:12032,384",
-      "name": "General Weapons Storage (0605) - Hemostat @12032,384",
-      "room": "0605",
-      "itemId": 27,
-      "itemName": "Hemostat",
-      "pos": [
-        12032,
-        384
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 27
-      },
-      "source": "static",
-      "visual": "generic-panel",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0605:0x5c0b0"
-      ],
-      "recordOffsets": [
-        377008
-      ],
-      "node": "0605",
-      "apId": 230817836,
-      "placementClass": "progression",
-      "allowedProgressionItemIds": [
-        46,
-        47,
-        48,
-        49,
-        56,
-        57,
-        58,
-        65,
-        70,
-        71,
-        72,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111
-      ]
-    },
-    {
-      "key": "0605:66:-3072,3328",
-      "name": "General Weapons Storage (0605) - DDK Input Disc W @-3072,3328",
-      "room": "0605",
-      "itemId": 102,
-      "itemName": "DDK Input Disc W",
-      "pos": [
-        -3072,
-        3328
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 102
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0605:0x5c0dc"
-      ],
-      "recordOffsets": [
-        377052
-      ],
-      "excluded": true,
-      "node": "0605",
-      "apId": 230817835,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
-    },
-    {
       "key": "0606:2b:6144,-2560",
+      "logicalId": "0606:2b:6144,-2560",
       "name": "Transport Passageway (0606) - Plug @6144,-2560",
       "room": "0606",
       "itemId": 43,
@@ -9029,48 +9569,34 @@
       "requiresItems": [],
       "requiresRooms": [],
       "physicalIds": [
-        "0606:0x3e5a0"
+        "0606:0x3e5a0",
+        "0606:0x3e5cc"
       ],
       "recordOffsets": [
-        255392
+        255392,
+        255436
+      ],
+      "physicalRecords": [
+        {
+          "room": "0606",
+          "offset": 255392
+        },
+        {
+          "room": "0606",
+          "offset": 255436
+        }
       ],
       "node": "0606",
+      "accessNodes": [
+        "0606"
+      ],
       "apId": 230817941,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
-      "key": "0606:2b:6912,-11392",
-      "name": "Transport Passageway (0606) - Plug @6912,-11392",
-      "room": "0606",
-      "itemId": 43,
-      "itemName": "Plug",
-      "pos": [
-        6912,
-        -11392
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 43
-      },
-      "source": "static",
-      "visual": "interaction-only",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "0606:0x3e5cc"
-      ],
-      "recordOffsets": [
-        255436
-      ],
-      "node": "0606",
-      "apId": 230817942,
-      "placementClass": "fixed",
-      "allowedProgressionItemIds": []
-    },
-    {
       "key": "0606:18:3328,-2560",
+      "logicalId": "0606:18:3328,-2560",
       "name": "Transport Passageway (0606) - Grenade Bullets @3328,-2560",
       "room": "0606",
       "itemId": 24,
@@ -9094,7 +9620,16 @@
       "recordOffsets": [
         255480
       ],
+      "physicalRecords": [
+        {
+          "room": "0606",
+          "offset": 255480
+        }
+      ],
       "node": "0606",
+      "accessNodes": [
+        "0606"
+      ],
       "apId": 230817940,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -9104,6 +9639,7 @@
     },
     {
       "key": "0606:31:-7648,2880",
+      "logicalId": "0606:31:-7648,2880",
       "name": "Transport Passageway (0606) - C. O. Area Key @-7648,2880",
       "room": "0606",
       "itemId": 49,
@@ -9127,7 +9663,16 @@
       "recordOffsets": [
         255524
       ],
+      "physicalRecords": [
+        {
+          "room": "0606",
+          "offset": 255524
+        }
+      ],
       "node": "0606",
+      "accessNodes": [
+        "0606"
+      ],
       "apId": 230817939,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -9160,6 +9705,7 @@
     },
     {
       "key": "0606:4b:-7680,3392",
+      "logicalId": "0606:4b:-7680,3392",
       "name": "Transport Passageway (0606) - B3 Crane Card 3 @-7680,3392",
       "room": "0606",
       "itemId": 75,
@@ -9183,7 +9729,16 @@
       "recordOffsets": [
         255580
       ],
+      "physicalRecords": [
+        {
+          "room": "0606",
+          "offset": 255580
+        }
+      ],
       "node": "0606",
+      "accessNodes": [
+        "0606"
+      ],
       "apId": 230817938,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -9216,6 +9771,7 @@
     },
     {
       "key": "0607:4d:4480,640",
+      "logicalId": "0607:4d:4480,640",
       "name": "Special Weapons Storage (0607) - Initializer @4480,640",
       "room": "0607",
       "itemId": 77,
@@ -9239,14 +9795,24 @@
       "recordOffsets": [
         331848
       ],
+      "physicalRecords": [
+        {
+          "room": "0607",
+          "offset": 331848
+        }
+      ],
       "gateFlag": "0:4",
       "node": "0607",
+      "accessNodes": [
+        "0607"
+      ],
       "apId": 230817912,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0607:4c:4480,640",
+      "logicalId": "0607:4c:4480,640",
       "name": "Special Weapons Storage (0607) - Stabilizer @4480,640",
       "room": "0607",
       "itemId": 76,
@@ -9270,14 +9836,24 @@
       "recordOffsets": [
         331892
       ],
+      "physicalRecords": [
+        {
+          "room": "0607",
+          "offset": 331892
+        }
+      ],
       "gateFlag": "0:4",
       "node": "0607",
+      "accessNodes": [
+        "0607"
+      ],
       "apId": 230817914,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0607:5b:-1792,1792",
+      "logicalId": "0607:5b:-1792,1792",
       "name": "Special Weapons Storage (0607) - Secret Disc \" With Data \" @-1792,1792",
       "room": "0607",
       "itemId": 91,
@@ -9301,13 +9877,23 @@
       "recordOffsets": [
         335204
       ],
+      "physicalRecords": [
+        {
+          "room": "0607",
+          "offset": 335204
+        }
+      ],
       "node": "0607",
+      "accessNodes": [
+        "0607"
+      ],
       "apId": 230817913,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "0608:2b:-7936,6400",
+      "logicalId": "0608:2b:-7936,6400",
       "name": "Central Stairway (0608) - Plug @-7936,6400",
       "room": "0608",
       "itemId": 43,
@@ -9331,7 +9917,16 @@
       "recordOffsets": [
         261112
       ],
+      "physicalRecords": [
+        {
+          "room": "0608",
+          "offset": 261112
+        }
+      ],
       "node": "0608",
+      "accessNodes": [
+        "0608"
+      ],
       "apId": 230817801,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -9364,6 +9959,7 @@
     },
     {
       "key": "0609:57:-1360,1152",
+      "logicalId": "0609:57:-1360,1152",
       "name": "Disembarkation Immigration Office (0609) - B2 Key Chip 2 @-1360,1152",
       "room": "0609",
       "itemId": 87,
@@ -9387,7 +9983,16 @@
       "recordOffsets": [
         305588
       ],
+      "physicalRecords": [
+        {
+          "room": "0609",
+          "offset": 305588
+        }
+      ],
       "node": "0609",
+      "accessNodes": [
+        "0609"
+      ],
       "apId": 230817814,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -9420,6 +10025,7 @@
     },
     {
       "key": "0609:2b:5760,512",
+      "logicalId": "0609:2b:5760,512",
       "name": "Disembarkation Immigration Office (0609) - Plug @5760,512",
       "room": "0609",
       "itemId": 43,
@@ -9443,7 +10049,16 @@
       "recordOffsets": [
         305644
       ],
+      "physicalRecords": [
+        {
+          "room": "0609",
+          "offset": 305644
+        }
+      ],
       "node": "0609",
+      "accessNodes": [
+        "0609"
+      ],
       "apId": 230817815,
       "placementClass": "hidden-no-worse-than-vanilla",
       "allowedProgressionItemIds": [
@@ -9453,6 +10068,7 @@
     },
     {
       "key": "060a:21:10064,15104",
+      "logicalId": "060a:21:10064,15104",
       "name": "Port (060a) - Recovery Aid @10064,15104",
       "room": "060a",
       "itemId": 33,
@@ -9476,7 +10092,16 @@
       "recordOffsets": [
         174636
       ],
+      "physicalRecords": [
+        {
+          "room": "060a",
+          "offset": 174636
+        }
+      ],
       "node": "060a",
+      "accessNodes": [
+        "060a"
+      ],
       "apId": 230817901,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -9509,6 +10134,7 @@
     },
     {
       "key": "060a:55:-5120,3584",
+      "logicalId": "060a:55:-5120,3584",
       "name": "Port (060a) - Nucleum @-5120,3584",
       "room": "060a",
       "itemId": 85,
@@ -9532,13 +10158,23 @@
       "recordOffsets": [
         176424
       ],
+      "physicalRecords": [
+        {
+          "room": "060a",
+          "offset": 176424
+        }
+      ],
       "node": "060a",
+      "accessNodes": [
+        "060a"
+      ],
       "apId": 230817900,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
       "key": "060b:6e:2736,-6656",
+      "logicalId": "060b:6e:2736,-6656",
       "name": "Passageway to the Port (060b) - DDK Code Disc S @2736,-6656",
       "room": "060b",
       "itemId": 110,
@@ -9562,7 +10198,16 @@
       "recordOffsets": [
         125416
       ],
+      "physicalRecords": [
+        {
+          "room": "060b",
+          "offset": 125416
+        }
+      ],
       "node": "060b",
+      "accessNodes": [
+        "060b"
+      ],
       "apId": 230817898,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -9595,6 +10240,7 @@
     },
     {
       "key": "060b:23:-4480,5760",
+      "logicalId": "060b:23:-4480,5760",
       "name": "Passageway to the Port (060b) - Multiplier @-4480,5760",
       "room": "060b",
       "itemId": 35,
@@ -9618,7 +10264,16 @@
       "recordOffsets": [
         125472
       ],
+      "physicalRecords": [
+        {
+          "room": "060b",
+          "offset": 125472
+        }
+      ],
       "node": "060b",
+      "accessNodes": [
+        "060b"
+      ],
       "apId": 230817899,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
@@ -9651,6 +10306,7 @@
     },
     {
       "key": "060d:09:-2816,10368",
+      "logicalId": "060d:09:-2816,10368",
       "name": "Underground Heliport (060d) - Grenade Gun (40mmHK) @-2816,10368",
       "room": "060d",
       "itemId": 9,
@@ -9674,8 +10330,17 @@
       "recordOffsets": [
         184760
       ],
+      "physicalRecords": [
+        {
+          "room": "060d",
+          "offset": 184760
+        }
+      ],
       "gateFlag": "11:10",
       "node": "060d",
+      "accessNodes": [
+        "060d"
+      ],
       "protected": true,
       "apId": 230817944,
       "placementClass": "fixed",
@@ -9683,6 +10348,7 @@
     },
     {
       "key": "060d:2b:-2816,10368",
+      "logicalId": "060d:2b:-2816,10368",
       "name": "Underground Heliport (060d) - Plug @-2816,10368",
       "room": "060d",
       "itemId": 43,
@@ -9708,8 +10374,21 @@
         184824,
         184996
       ],
+      "physicalRecords": [
+        {
+          "room": "060d",
+          "offset": 184824
+        },
+        {
+          "room": "060d",
+          "offset": 184996
+        }
+      ],
       "gateFlag": "11:10",
       "node": "060d",
+      "accessNodes": [
+        "060d"
+      ],
       "protected": true,
       "apId": 230817945,
       "placementClass": "fixed",
@@ -9717,6 +10396,7 @@
     },
     {
       "key": "060d:18:-2816,10368",
+      "logicalId": "060d:18:-2816,10368",
       "name": "Underground Heliport (060d) - Grenade Bullets @-2816,10368",
       "room": "060d",
       "itemId": 24,
@@ -9746,141 +10426,37 @@
         185052,
         185108
       ],
+      "physicalRecords": [
+        {
+          "room": "060d",
+          "offset": 184880
+        },
+        {
+          "room": "060d",
+          "offset": 184936
+        },
+        {
+          "room": "060d",
+          "offset": 185052
+        },
+        {
+          "room": "060d",
+          "offset": 185108
+        }
+      ],
       "gateFlag": "11:10",
       "node": "060d",
+      "accessNodes": [
+        "060d"
+      ],
       "protected": true,
       "apId": 230817943,
       "placementClass": "fixed",
       "allowedProgressionItemIds": []
     },
     {
-      "key": "060f:68:4128,448",
-      "name": "Large Size Elevator (060f) - DDK Input Disc D @4128,448",
-      "room": "060f",
-      "itemId": 104,
-      "itemName": "DDK Input Disc D",
-      "pos": [
-        4128,
-        448
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 104
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "060f:0x3bb48"
-      ],
-      "recordOffsets": [
-        244552
-      ],
-      "gateFlag": "0:184",
-      "node": "060f",
-      "apId": 230817851,
-      "placementClass": "fixed",
-      "allowedProgressionItemIds": []
-    },
-    {
-      "key": "060f:32:288,-1920",
-      "name": "Large Size Elevator (060f) - Port Card Key @288,-1920",
-      "room": "060f",
-      "itemId": 50,
-      "itemName": "Port Card Key",
-      "pos": [
-        288,
-        -1920
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 50
-      },
-      "source": "static",
-      "visual": "bespoke-mesh",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "060f:0x3bb80"
-      ],
-      "recordOffsets": [
-        244608
-      ],
-      "gateFlag": "0:184",
-      "node": "060f",
-      "apId": 230817854,
-      "placementClass": "fixed",
-      "allowedProgressionItemIds": []
-    },
-    {
-      "key": "060f:2b:864,8240",
-      "name": "Large Size Elevator (060f) - Plug @864,8240",
-      "room": "060f",
-      "itemId": 43,
-      "itemName": "Plug",
-      "pos": [
-        864,
-        8240
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 43
-      },
-      "source": "static",
-      "visual": "interaction-only",
-      "priority": "fixed",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "060f:0x3bbac"
-      ],
-      "recordOffsets": [
-        244652
-      ],
-      "gateFlag": "0:184",
-      "node": "060f",
-      "apId": 230817852,
-      "placementClass": "fixed",
-      "allowedProgressionItemIds": []
-    },
-    {
-      "key": "060f:15:3344,1264",
-      "name": "Large Size Elevator (060f) - Poison Dart @3344,1264",
-      "room": "060f",
-      "itemId": 21,
-      "itemName": "Poison Dart",
-      "pos": [
-        3344,
-        1264
-      ],
-      "collectedFlag": {
-        "group": 8,
-        "bit": 21
-      },
-      "source": "static",
-      "visual": "interaction-only",
-      "priority": "normal",
-      "requiresItems": [],
-      "requiresRooms": [],
-      "physicalIds": [
-        "060f:0x3cc40"
-      ],
-      "recordOffsets": [
-        248896
-      ],
-      "node": "060f",
-      "apId": 230817853,
-      "placementClass": "hidden-no-worse-than-vanilla",
-      "allowedProgressionItemIds": [
-        58,
-        72
-      ]
-    },
-    {
       "key": "0610:54:-1664,-2016",
+      "logicalId": "0610:54:-1664,-2016",
       "name": "Hovercraft Storage (0610) - Energy Tank @-1664,-2016",
       "room": "0610",
       "itemId": 84,
@@ -9904,8 +10480,17 @@
       "recordOffsets": [
         141984
       ],
+      "physicalRecords": [
+        {
+          "room": "0610",
+          "offset": 141984
+        }
+      ],
       "gateFlag": "2:18",
       "node": "0610",
+      "accessNodes": [
+        "0610"
+      ],
       "protected": true,
       "apId": 230817846,
       "placementClass": "fixed",
@@ -9913,6 +10498,7 @@
     },
     {
       "key": "0610:09:-1024,-2048",
+      "logicalId": "0610:09:-1024,-2048",
       "name": "Hovercraft Storage (0610) - Grenade Gun (40mmHK) @-1024,-2048",
       "room": "0610",
       "itemId": 9,
@@ -9936,8 +10522,17 @@
       "recordOffsets": [
         145384
       ],
+      "physicalRecords": [
+        {
+          "room": "0610",
+          "offset": 145384
+        }
+      ],
       "gateFlag": "11:10",
       "node": "0610",
+      "accessNodes": [
+        "0610"
+      ],
       "protected": true,
       "apId": 230817848,
       "placementClass": "fixed",
@@ -9945,6 +10540,7 @@
     },
     {
       "key": "0610:2b:-1024,-2048",
+      "logicalId": "0610:2b:-1024,-2048",
       "name": "Hovercraft Storage (0610) - Plug @-1024,-2048",
       "room": "0610",
       "itemId": 43,
@@ -9970,8 +10566,21 @@
         145440,
         145576
       ],
+      "physicalRecords": [
+        {
+          "room": "0610",
+          "offset": 145440
+        },
+        {
+          "room": "0610",
+          "offset": 145576
+        }
+      ],
       "gateFlag": "11:10",
       "node": "0610",
+      "accessNodes": [
+        "0610"
+      ],
       "protected": true,
       "apId": 230817849,
       "placementClass": "fixed",
@@ -9979,6 +10588,7 @@
     },
     {
       "key": "0610:18:-1024,-2048",
+      "logicalId": "0610:18:-1024,-2048",
       "name": "Hovercraft Storage (0610) - Grenade Bullets @-1024,-2048",
       "room": "0610",
       "itemId": 24,
@@ -10008,8 +10618,29 @@
         145620,
         145664
       ],
+      "physicalRecords": [
+        {
+          "room": "0610",
+          "offset": 145484
+        },
+        {
+          "room": "0610",
+          "offset": 145528
+        },
+        {
+          "room": "0610",
+          "offset": 145620
+        },
+        {
+          "room": "0610",
+          "offset": 145664
+        }
+      ],
       "gateFlag": "11:10",
       "node": "0610",
+      "accessNodes": [
+        "0610"
+      ],
       "protected": true,
       "apId": 230817847,
       "placementClass": "fixed",
@@ -10017,6 +10648,7 @@
     },
     {
       "key": "0612:2b:-896,0",
+      "logicalId": "0612:2b:-896,0",
       "name": "Hovercraft (0612) - Plug @-896,0",
       "room": "0612",
       "itemId": 43,
@@ -10040,7 +10672,16 @@
       "recordOffsets": [
         144072
       ],
+      "physicalRecords": [
+        {
+          "room": "0612",
+          "offset": 144072
+        }
+      ],
       "node": "0612",
+      "accessNodes": [
+        "0612"
+      ],
       "protected": true,
       "ending": true,
       "apId": 230817845,
@@ -10049,6 +10690,7 @@
     },
     {
       "key": "0612:09:-896,0",
+      "logicalId": "0612:09:-896,0",
       "name": "Hovercraft (0612) - Grenade Gun (40mmHK) @-896,0",
       "room": "0612",
       "itemId": 9,
@@ -10072,8 +10714,17 @@
       "recordOffsets": [
         144132
       ],
+      "physicalRecords": [
+        {
+          "room": "0612",
+          "offset": 144132
+        }
+      ],
       "gateFlag": "11:10",
       "node": "0612",
+      "accessNodes": [
+        "0612"
+      ],
       "protected": true,
       "ending": true,
       "apId": 230817844,
@@ -10082,6 +10733,7 @@
     },
     {
       "key": "0612:18:-896,0",
+      "logicalId": "0612:18:-896,0",
       "name": "Hovercraft (0612) - Grenade Bullets @-896,0",
       "room": "0612",
       "itemId": 24,
@@ -10107,7 +10759,20 @@
         144176,
         144220
       ],
+      "physicalRecords": [
+        {
+          "room": "0612",
+          "offset": 144176
+        },
+        {
+          "room": "0612",
+          "offset": 144220
+        }
+      ],
       "node": "0612",
+      "accessNodes": [
+        "0612"
+      ],
       "protected": true,
       "ending": true,
       "apId": 230817843,
@@ -10116,6 +10781,7 @@
     },
     {
       "key": "0613:21:10064,15104",
+      "logicalId": "0613:21:10064,15104",
       "name": "Port (0613) - Recovery Aid @10064,15104",
       "room": "0613",
       "itemId": 33,
@@ -10139,25 +10805,35 @@
       "recordOffsets": [
         258304
       ],
+      "physicalRecords": [
+        {
+          "room": "0613",
+          "offset": 258304
+        }
+      ],
       "node": "0613",
+      "accessNodes": [
+        "0613"
+      ],
       "ending": true,
       "apId": 230817902,
       "placementClass": "ending",
       "allowedProgressionItemIds": []
     },
     {
-      "key": "0615:1b:12032,384",
-      "name": "General Weapons Storage (0615) - Hemostat @12032,384",
-      "room": "0615",
-      "itemId": 27,
-      "itemName": "Hemostat",
+      "key": "0503:2b:-10240,-5248",
+      "logicalId": "0503:2b:-10240,-5248",
+      "name": "Stabilizer Experiment Room (0503) - Plug @-10240,-5248",
+      "room": "0503",
+      "itemId": 43,
+      "itemName": "Plug",
       "pos": [
-        12032,
-        384
+        -10240,
+        -5248
       ],
       "collectedFlag": {
         "group": 8,
-        "bit": 27
+        "bit": 43
       },
       "source": "static",
       "visual": "generic-panel",
@@ -10165,13 +10841,36 @@
       "requiresItems": [],
       "requiresRooms": [],
       "physicalIds": [
-        "0615:0x21c90"
+        "0503:0x4d168",
+        "0511:0x5722c"
       ],
       "recordOffsets": [
-        138384
+        315752,
+        356908
       ],
-      "node": "0615",
-      "apId": 230817838,
+      "physicalRecords": [
+        {
+          "room": "0503",
+          "offset": 315752
+        },
+        {
+          "room": "0511",
+          "offset": 356908
+        }
+      ],
+      "aliases": [
+        "Stabilizer Experiment Room (0511) - Plug @-10240,-5248"
+      ],
+      "accessRooms": [
+        "0503",
+        "0511"
+      ],
+      "node": "0503",
+      "accessNodes": [
+        "0503",
+        "0511"
+      ],
+      "apId": 230817923,
       "placementClass": "progression",
       "allowedProgressionItemIds": [
         46,
@@ -10202,9 +10901,228 @@
       ]
     },
     {
-      "key": "0615:66:-3072,3328",
-      "name": "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328",
-      "room": "0615",
+      "key": "0503:6f:-2800,-3088",
+      "logicalId": "0503:6f:-2800,-3088",
+      "name": "Stabilizer Experiment Room (0503) - DDK Code Disc D @-2800,-3088",
+      "room": "0503",
+      "itemId": 111,
+      "itemName": "DDK Code Disc D",
+      "pos": [
+        -2800,
+        -3088
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 111
+      },
+      "source": "static",
+      "visual": "bespoke-mesh",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4d194",
+        "0511:0x57258"
+      ],
+      "recordOffsets": [
+        315796,
+        356952
+      ],
+      "physicalRecords": [
+        {
+          "room": "0503",
+          "offset": 315796
+        },
+        {
+          "room": "0511",
+          "offset": 356952
+        }
+      ],
+      "aliases": [
+        "Stabilizer Experiment Room (0511) - DDK Code Disc D @-2800,-3088"
+      ],
+      "accessRooms": [
+        "0503",
+        "0511"
+      ],
+      "node": "0503",
+      "accessNodes": [
+        "0503",
+        "0511"
+      ],
+      "apId": 230817921,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
+    },
+    {
+      "key": "0503:0b:-10240,4480",
+      "logicalId": "0503:0b:-10240,4480",
+      "name": "Stabilizer Experiment Room (0503) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+      "room": "0503",
+      "itemId": 11,
+      "itemName": "Shotgun Parts (upgrade To SPAS12)",
+      "pos": [
+        -10240,
+        4480
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 11
+      },
+      "source": "static",
+      "visual": "interaction-only",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0503:0x4d4fc",
+        "0511:0x575c0"
+      ],
+      "recordOffsets": [
+        316668,
+        357824
+      ],
+      "physicalRecords": [
+        {
+          "room": "0503",
+          "offset": 316668
+        },
+        {
+          "room": "0511",
+          "offset": 357824
+        }
+      ],
+      "gateFlag": "2:11",
+      "aliases": [
+        "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480"
+      ],
+      "accessRooms": [
+        "0503",
+        "0511"
+      ],
+      "node": "0503",
+      "accessNodes": [
+        "0503",
+        "0511"
+      ],
+      "apId": 230817926,
+      "placementClass": "hidden-no-worse-than-vanilla",
+      "allowedProgressionItemIds": [
+        58,
+        72
+      ]
+    },
+    {
+      "key": "0605:1b:12032,384",
+      "logicalId": "0605:1b:12032,384",
+      "name": "General Weapons Storage (0605) - Hemostat @12032,384",
+      "room": "0605",
+      "itemId": 27,
+      "itemName": "Hemostat",
+      "pos": [
+        12032,
+        384
+      ],
+      "collectedFlag": {
+        "group": 8,
+        "bit": 27
+      },
+      "source": "static",
+      "visual": "generic-panel",
+      "priority": "normal",
+      "requiresItems": [],
+      "requiresRooms": [],
+      "physicalIds": [
+        "0605:0x5c0b0",
+        "0615:0x21c90"
+      ],
+      "recordOffsets": [
+        377008,
+        138384
+      ],
+      "physicalRecords": [
+        {
+          "room": "0605",
+          "offset": 377008
+        },
+        {
+          "room": "0615",
+          "offset": 138384
+        }
+      ],
+      "aliases": [
+        "General Weapons Storage (0615) - Hemostat @12032,384"
+      ],
+      "accessRooms": [
+        "0605",
+        "0615"
+      ],
+      "node": "0605",
+      "accessNodes": [
+        "0605",
+        "0615"
+      ],
+      "apId": 230817836,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
+    },
+    {
+      "key": "0605:66:-3072,3328",
+      "logicalId": "0605:66:-3072,3328",
+      "name": "General Weapons Storage (0605) - DDK Input Disc W @-3072,3328",
+      "room": "0605",
       "itemId": 102,
       "itemName": "DDK Input Disc W",
       "pos": [
@@ -10221,17 +11139,182 @@
       "requiresItems": [],
       "requiresRooms": [],
       "physicalIds": [
+        "0605:0x5c0dc",
         "0615:0x21cbc"
       ],
       "recordOffsets": [
+        377052,
         138428
       ],
-      "excluded": true,
-      "node": "0615",
-      "apId": 230817837,
-      "placementClass": "excluded",
-      "allowedProgressionItemIds": []
+      "physicalRecords": [
+        {
+          "room": "0605",
+          "offset": 377052
+        },
+        {
+          "room": "0615",
+          "offset": 138428
+        }
+      ],
+      "aliases": [
+        "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328"
+      ],
+      "accessRooms": [
+        "0605",
+        "0615"
+      ],
+      "node": "0605",
+      "accessNodes": [
+        "0605",
+        "0615"
+      ],
+      "apId": 230817835,
+      "placementClass": "progression",
+      "allowedProgressionItemIds": [
+        46,
+        47,
+        48,
+        49,
+        56,
+        57,
+        58,
+        65,
+        70,
+        71,
+        72,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
     }
+  ],
+  "tombstones": [
+    {
+      "key": "0303:46:3328,-2560",
+      "name": "Gas Experiment Room (0303) - B1 Key Chip @3328,-2560",
+      "id": 230817832,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0615:66:-3072,3328",
+      "name": "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328",
+      "id": 230817837,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0615:1b:12032,384",
+      "name": "General Weapons Storage (0615) - Hemostat @12032,384",
+      "id": 230817838,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "060f:68:4128,448",
+      "name": "Large Size Elevator (060f) - DDK Input Disc D @4128,448",
+      "id": 230817851,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "060f:2b:864,8240",
+      "name": "Large Size Elevator (060f) - Plug @864,8240",
+      "id": 230817852,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "060f:15:3344,1264",
+      "name": "Large Size Elevator (060f) - Poison Dart @3344,1264",
+      "id": 230817853,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "060f:32:288,-1920",
+      "name": "Large Size Elevator (060f) - Port Card Key @288,-1920",
+      "id": 230817854,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0406:6b:-4352,224",
+      "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-4352,224",
+      "id": 230817856,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0108:2b:-8240,-7904",
+      "name": "Lecture Room Hallway (0108) - Plug @-8240,-7904",
+      "id": 230817861,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0204:0e:2000,-3000",
+      "name": "Lounge (0204) - Handgun Slides (upgrade To Glock 35) @2000,-3000",
+      "id": 230817870,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0504:50:-2912,3872",
+      "name": "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872",
+      "id": 230817917,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0504:4f:4896,-3840",
+      "name": "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840",
+      "id": 230817920,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0511:6f:-2800,-3088",
+      "name": "Stabilizer Experiment Room (0511) - DDK Code Disc D @-2800,-3088",
+      "id": 230817928,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0511:2b:-10240,-5248",
+      "name": "Stabilizer Experiment Room (0511) - Plug @-10240,-5248",
+      "id": 230817929,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0511:0b:-10240,4480",
+      "name": "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
+      "id": 230817930,
+      "aliases": [],
+      "status": "tombstone"
+    },
+    {
+      "key": "0606:2b:6912,-11392",
+      "name": "Transport Passageway (0606) - Plug @6912,-11392",
+      "id": 230817942,
+      "aliases": [],
+      "status": "tombstone"
+    }
+  ],
+  "unavailableProgressionItemIds": [
+    104
   ],
   "items": {
     "names": {

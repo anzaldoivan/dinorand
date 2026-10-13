@@ -328,15 +328,17 @@ public static class GameInstaller
     => ExePatchInstaller.PatchExeShuffleBgm(dataDir, seed, seedLabel);
 
     /// <summary>
-    /// Apply the DC1 "door skip (button press)" lever to <c>DINO.exe</c>: accelerate a newly mapped door
-    /// transition on its button press while keeping existing transition bytes and the destination background/room-view commit
-    /// intact (cont.78). A guarded reversible <c>.text</c> hook + code cave via
-    /// <see cref="ExePatcher.ApplyDoorSkip"/>; idempotent and additive (composes with any other exe patch,
-    /// leaves the shared animation stepper untouched). Backs up the pristine exe once, records the patch in
-    /// the manifest, and is reversed byte-identically by <see cref="Restore"/>. Not seed-dependent.
+    /// Apply the DC1 door-skip lever to <c>DINO.exe</c> in the selected mode. <see cref="DoorSkipMode.OnPress"/>
+    /// advances newly mapped transitions on a button press; <see cref="DoorSkipMode.Auto"/> skips all door
+    /// transitions automatically. Both are additive, backup-protected, idempotent, not seed-dependent, and
+    /// reversed byte-identically by <see cref="Restore"/>.
     /// </summary>
     public static ExePatchResult PatchExeDoorSkip(string dataDir, string? seedLabel = null)
-    => ExePatchInstaller.PatchExeDoorSkip(dataDir, seedLabel);
+    => PatchExeDoorSkip(dataDir, DoorSkipMode.OnPress, seedLabel);
+
+    /// <summary>Apply the selected DC1 door-skip mode with the existing backup/restore contract.</summary>
+    public static ExePatchResult PatchExeDoorSkip(string dataDir, DoorSkipMode mode, string? seedLabel = null)
+    => ExePatchInstaller.PatchExeDoorSkip(dataDir, mode, seedLabel);
 
     /// <summary>
     /// Apply the DC1 "fast-forward cutscenes (experimental / crash risk)" lever to <c>DINO.exe</c>: repoint the
@@ -361,7 +363,7 @@ public static class GameInstaller
 
     /// <summary>
     /// Scramble the DC1 keypad-code puzzle family (Management Office / Lounge / Computer-Room-gas safes +
-    /// the Stabilizer codes) so each lock's accepted 4-digit code is seed-derived, and keep the in-game
+    /// the Stabilizer codes) so each eligible lock's accepted 4-digit code is seed-derived, and keep the in-game
     /// document that states the code in sync — the <b>displayed == checked</b> invariant
     /// (<see cref="Dc1PuzzleCodeSync"/>, docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md §17–18).
     ///

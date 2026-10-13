@@ -115,6 +115,35 @@ public class EnemyNpcSceneActorTests
         Assert.All(room.Enemies, e => Assert.False(e.IsNpcSceneActor));
         Assert.All(room.Enemies, e => Assert.True(e.IsRandomizableDino));
     }
+
+    [Fact]
+    public void RoomScopedSceneShells_AreNotRandomizable()
+    {
+        var room0308 = new RoomFile(3, 0x08);
+        var shell0308 = Enemy(1, 0x80110E58, 0x8013FA5C);
+        shell0308.Slot = 1;
+        room0308.Enemies.Add(shell0308);
+        room0308.Enemies.Add(Enemy(1, 0x80112222, 0x80134444));
+        EnemyRecord.MarkNpcSceneActors(room0308.Enemies, room0308.Stage, room0308.Room);
+
+        var room0406 = new RoomFile(4, 0x06);
+        var shell0406a = Enemy(1, 0x8011F9CC, 0x801349A0);
+        shell0406a.Slot = 3;
+        room0406.Enemies.Add(shell0406a);
+        var shell0406b = Enemy(1, 0x8011F9CC, 0x801349A0);
+        shell0406b.Slot = 3;
+        room0406.Enemies.Add(shell0406b);
+        var shell0406c = Enemy(1, 0x8011BEDC, 0x801326FC);
+        shell0406c.Slot = 2;
+        room0406.Enemies.Add(shell0406c);
+        EnemyRecord.MarkNpcSceneActors(room0406.Enemies, room0406.Stage, room0406.Room);
+
+        Assert.All(room0308.Enemies.Concat(room0406.Enemies), e =>
+        {
+            Assert.True(e.IsNpcSceneActor);
+            Assert.False(e.IsRandomizableDino);
+        });
+    }
 }
 
 /// <summary>

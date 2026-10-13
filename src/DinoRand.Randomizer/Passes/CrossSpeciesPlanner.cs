@@ -1,5 +1,6 @@
 using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Definitions;
+using DinoRand.Randomizer.Dc1;
 
 namespace DinoRand.Randomizer.Passes;
 
@@ -31,18 +32,38 @@ public static class CrossSpeciesPlanner
         IReadOnlyList<RoomCandidate> candidates,
         IReadOnlyCollection<DinoSpecies> availableDonors,
         double chance,
-        Random rng)
+        Random rng,
+        Dc1DonorPicker? picker = null)
     {
-        var enabled = ExoticSpeciesCatalog.Enabled
+        var registry = Dc1EnemyDistribution.LoadEmbedded();
+        var enabled = registry.Rows
+            .Select(row => ExoticSpeciesCatalog.For(row.Species)!)
+            .Where(def => def.Enabled && availableDonors.Contains(def.Species))
+            .ToList();
+        var chanceResults = candidates
+            .Where(candidate => candidate.HasVictim)
+            .OrderBy(candidate => candidate.Stage)
+            .ThenBy(candidate => candidate.Room)
+            .Select(candidate => (candidate, selected: rng.NextDouble() <= chance))
+            .ToDictionary(item => (item.candidate.Stage, item.candidate.Room), item => item.selected);
+        picker ??= Dc1DonorPicker.Weighted(registry.DefaultWeights);
+
+        var sortedCandidates = candidates
+            .OrderBy(candidate => candidate.Stage)
+            .ThenBy(candidate => candidate.Room);
+        var enabledChoices = registry.Rows
+            .Select(row => enabled.FirstOrDefault(def => def.Species == row.Species))
+            .Where(def => def is not null)
+            .Cast<ExoticSpeciesDef>()
             .Where(d => availableDonors.Contains(d.Species))
             .ToList();
         var placements = new List<CrossSpeciesPlacement>();
-        if (enabled.Count == 0) return placements;
+        if (enabledChoices.Count == 0) return placements;
 
         // The single cat-slot species locked in for each (stage, category) — once chosen it is reused.
         var stageCatSlot = new Dictionary<(int Stage, int Category), DinoSpecies>();
 
-        foreach (var c in candidates)
+        foreach (var c in sortedCandidates)
         {
             if (!c.HasVictim) continue;
 
@@ -54,9 +75,11 @@ public static class CrossSpeciesPlanner
                  || locked == d.Species)).ToList();
             if (choices.Count == 0) continue;
 
-            if (rng.NextDouble() > chance) continue;
+            if (!chanceResults[(c.Stage, c.Room)]) continue;
 
-            var def = choices[rng.Next(choices.Count)];
+            var species = picker.Pick(choices.Select(choice => choice.Species).ToArray(), rng);
+            if (species is null) continue;
+            var def = choices.First(choice => choice.Species == species.Value);
             if (def.NeedsCatSlotPatch) stageCatSlot[(c.Stage, def.Category)] = def.Species;
             placements.Add(new CrossSpeciesPlacement(c.Stage, c.Room, def.Species));
         }

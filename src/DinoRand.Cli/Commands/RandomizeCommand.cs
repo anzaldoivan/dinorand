@@ -6,6 +6,7 @@ using DinoRand.Randomizer;
 using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
+using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
 using DinoRand.Randomizer.Spoiler;
@@ -22,6 +23,7 @@ internal sealed partial class CliApplication
         {
             RandomizeItems = !argv.Contains("--no-items"),
             RandomizeEnemies = !argv.Contains("--no-enemies"),
+            Dc1BlueRaptorProfile = argv.Contains("--dc1-blue-raptor"),
             // DC1 per-placement enemy maxHP override (off by default). Writes a seeded, --difficulty-scaled HP into
             // eligible 0x20 spawns' +6 word (entity +0x11A), bypassing the {750,850,1000} roll — plain SCD file edit.
             // docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md "Gap 4 — REVERSED".
@@ -72,6 +74,7 @@ internal sealed partial class CliApplication
             // queues the EXE patches they need. --no-enemies disables both passes; the old --exotic-enemies spelling
             // remains a harmless compatibility no-op. With --install-to-data, CLOSE the game before DINO.exe patches.
             CrossRoomEnemySpecies = !argv.Contains("--no-enemies"),
+            Dc1EnemyMode = Dc1EnemyDistributionMode.Weighted,
             // Experimental: with --install-to-data, patch DINO.exe so a new game starts with a randomized supply
             // kit (the Handgun + ammo are always granted, so it stays beatable). docs/reference/dc1/items/STARTING-INVENTORY.md.
             RandomizeStartingInventory = argv.Contains("--random-inventory"),
@@ -87,6 +90,56 @@ internal sealed partial class CliApplication
             RandomizeBgm = argv.Contains("--bgm-import"),
             BgmPacksRoot = GetOpt("--bgm-packs"),
         };
+        if (GetOpt("--dc1-enemy-mode") is { } dc1Mode)
+        {
+            if (dc1Mode.Equals("weighted", StringComparison.OrdinalIgnoreCase))
+                config.Dc1EnemyMode = Dc1EnemyDistributionMode.Weighted;
+            else if (dc1Mode.Equals("fixed", StringComparison.OrdinalIgnoreCase))
+                config.Dc1EnemyMode = Dc1EnemyDistributionMode.Fixed;
+            else
+            {
+                Console.Error.WriteLine($"error: --dc1-enemy-mode: invalid '{dc1Mode}' (expected weighted or fixed)");
+                return 1;
+            }
+        }
+        if (GetOpt("--dc1-fixed-species") is { } dc1Fixed)
+        {
+            if (!TryParseDc1Species(dc1Fixed, out var species))
+            {
+                Console.Error.WriteLine("error: --dc1-fixed-species: unknown enabled donor");
+                return 1;
+            }
+            config.Dc1EnemyMode = Dc1EnemyDistributionMode.Fixed;
+            config.Dc1FixedSpecies = species;
+        }
+        var dc1Weights = new Dictionary<DinoSpecies, byte>();
+        foreach (var value in GetOpts("--dc1-weight"))
+        {
+            var parts = value.Split('=', 2, StringSplitOptions.TrimEntries);
+            if (parts.Length != 2 || !TryParseDc1Species(parts[0], out var species)
+                || !byte.TryParse(parts[1], out var weight))
+            {
+                Console.Error.WriteLine($"error: --dc1-weight: invalid '{value}' (expected <enabled-donor>=<0..255>)");
+                return 1;
+            }
+            if (!dc1Weights.TryAdd(species, weight))
+            {
+                Console.Error.WriteLine($"error: --dc1-weight: duplicate donor '{parts[0]}'");
+                return 1;
+            }
+        }
+        if (dc1Weights.Count > 0) config.Dc1SpeciesWeights = dc1Weights;
+        if (!config.RandomizeEnemies)
+        {
+            config.Dc1EnemyMode = Dc1EnemyDistributionMode.Weighted;
+            config.Dc1FixedSpecies = null;
+            config.Dc1SpeciesWeights = null;
+        }
+        if (config.Dc1EnemyMode == Dc1EnemyDistributionMode.Fixed && config.Dc1FixedSpecies is null)
+        {
+            Console.Error.WriteLine("error: --dc1-enemy-mode fixed requires --dc1-fixed-species <enabled donor>");
+            return 1;
+        }
         if (GetOpt("--difficulty") is { } d && double.TryParse(d, out var diff))
             config.EnemyDifficulty = Math.Clamp(diff, 0, 1);
 
@@ -209,5 +262,23 @@ internal sealed partial class CliApplication
                 return 1;
         }
         return 0;
+    }
+
+    private static bool TryParseDc1Species(string text, out DinoSpecies species)
+    {
+        species = DinoSpecies.Unknown;
+        var row = Dc1EnemyDistribution.LoadEmbedded().Rows.FirstOrDefault(candidate =>
+            candidate.Creature.Equals(text, StringComparison.OrdinalIgnoreCase)
+            || candidate.Species.ToString().Equals(text, StringComparison.OrdinalIgnoreCase)
+            || (text.Equals("raptor-heavy", StringComparison.OrdinalIgnoreCase)
+                && candidate.Species == DinoSpecies.RaptorHeavy));
+        if (row is null && int.TryParse(text.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ? text[2..] : text,
+            text.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+                ? System.Globalization.NumberStyles.HexNumber : System.Globalization.NumberStyles.Integer,
+            null, out var value))
+            row = Dc1EnemyDistribution.LoadEmbedded().Rows.FirstOrDefault(candidate => (int)candidate.Species == value);
+        if (row is null) return false;
+        species = row.Species;
+        return true;
     }
 }

@@ -10,7 +10,8 @@ namespace DinoRand.FileFormats.Stage;
 /// <c>docs/reference/dc1/puzzle/MGMT-OFFICE-SAFE-PUZZLE-DECODE.md</c> §17–18) with one common function: for each of the six
 /// 4-digit locks it writes the new code into every recompiled copy of the DINO.exe keypad table (both
 /// region halves) and, for the three locks that also have an in-game document stating the code, rewrites the
-/// room document's glyph-token run to the same number — preserving <b>displayed == checked</b>.
+/// room document's glyph-token run to the same number — preserving <b>displayed == checked</b>. Locks marked
+/// non-randomized retain their stock code.
 ///
 /// <para>The document edit here is the <b>inline-RDT</b> lever (GOG European installs): decompress the room
 /// RDT (via <see cref="RoomFile"/>), rewrite the digit glyphs (<see cref="MgmtOfficeDocumentCode"/>),
@@ -32,8 +33,9 @@ public static class Dc1PuzzleCodeSync
     /// <param name="DocFile">Room .dat that displays the code, or null if none.</param>
     /// <param name="DocStage">Stage index for <see cref="RoomFile.Read"/> (metadata only).</param>
     /// <param name="DocRoom">Room index for <see cref="RoomFile.Read"/> (metadata only).</param>
+    /// <param name="Randomize">Whether the lock receives a seed-derived code.</param>
     public sealed record CodeLock(int Row, int[] OriginalDigits, int[] UsDigits, string Name,
-                                  string? DocFile, int DocStage, int DocRoom);
+                                  string? DocFile, int DocStage, int DocRoom, bool Randomize = true);
 
     /// <summary>The six locks, in table-row order (JP-build codes; US half per puzzle-codes.json).</summary>
     public static readonly IReadOnlyList<CodeLock> Family = new[]
@@ -43,7 +45,7 @@ public static class Dc1PuzzleCodeSync
         new CodeLock(2, new[] { 5, 0, 3, 7 }, new[] { 7, 2, 4, 8 }, "Computer Room gas-room code",   "st302.dat", 3, 2),
         new CodeLock(3, new[] { 0, 3, 6, 7 }, new[] { 0, 3, 6, 7 }, "Stabilizer Design Room code A", null, 0, 0),
         new CodeLock(4, new[] { 0, 2, 0, 4 }, new[] { 0, 2, 0, 4 }, "Stabilizer Design Room code B", null, 0, 0),
-        new CodeLock(5, new[] { 1, 2, 8, 1 }, new[] { 1, 2, 8, 1 }, "Stabilizer Experiment Room safe", null, 0, 0),
+        new CodeLock(5, new[] { 1, 2, 8, 1 }, new[] { 1, 2, 8, 1 }, "Stabilizer Experiment Room safe", null, 0, 0, Randomize: false),
     };
 
     /// <summary>
@@ -103,7 +105,7 @@ public static class Dc1PuzzleCodeSync
         var results = new List<LockResult>(Family.Count);
         foreach (var lk in Family)
         {
-            int[] code = codeForRow(lk);
+            int[] code = lk.Randomize ? codeForRow(lk) : lk.OriginalDigits;
             if (code.Length != MgmtOfficeSafeCode.DigitCount)
                 throw new ArgumentException($"row {lk.Row}: code must be 4 digits");
 

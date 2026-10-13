@@ -1,7 +1,7 @@
 {
  "_generated_by": "scripts/gen_ap_client_checks.py",
- "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + data/dc1/{room-data,suppressed-pickups}.json + the english/Data room corpus",
- "version": 2,
+ "_source": "DINO.exe 0x426C9C/0x44A411 take-flag decode (EXE-SYMBOLS cont.80) + data/dc1/{room-data,map,suppressed-pickups,ap-location-policy}.json + the english/Data room corpus",
+ "version": 4,
  "game": "dc1",
  "flagGroup": 7,
  "locations": [
@@ -1505,7 +1505,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     18
+     39
     ]
    },
    "records": [
@@ -1528,7 +1528,7 @@
       3088,
       -2816
      ],
-     "take": 18
+     "take": 39
     },
     {
      "room": "0303",
@@ -1549,25 +1549,8 @@
       3088,
       -2816
      ],
-     "take": 18
-    }
-   ],
-   "class": "rekeyed"
-  },
-  {
-   "name": "Gas Experiment Room (0303) - B1 Key Chip @3328,-2560",
-   "apId": 230817832,
-   "key": "0303:46:3328,-2560",
-   "logicalId": "0303:46:3328,-2560",
-   "room": "0303",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     19
-    ]
-   },
-   "records": [
+     "take": 39
+    },
     {
      "room": "0303",
      "rec": "0x50b20",
@@ -1587,10 +1570,10 @@
       3328,
       -3584
      ],
-     "take": 19
+     "take": 39
     }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Gas Experiment Room (0303) - Small Size Key @3088,-1008",
@@ -1685,66 +1668,7 @@
       2048
      ],
      "take": 90
-    }
-   ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328"
-   ]
-  },
-  {
-   "name": "General Weapons Storage (0605) - Hemostat @12032,384",
-   "apId": 230817836,
-   "key": "0605:1b:12032,384",
-   "logicalId": "0605:1b:12032,384",
-   "room": "0605",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     24
-    ]
-   },
-   "records": [
-    {
-     "room": "0605",
-     "rec": "0x5c0b0",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 27,
-     "vanillaAmount": 1,
-     "vanillaTake": 196,
-     "geometry": [
-      12032,
-      384,
-      13440,
-      384,
-      13440,
-      -768,
-      12032,
-      -768
-     ],
-     "take": 24
-    }
-   ],
-   "class": "rekeyed"
-  },
-  {
-   "name": "General Weapons Storage (0615) - DDK Input Disc W @-3072,3328",
-   "apId": 230817837,
-   "key": "0615:66:-3072,3328",
-   "logicalId": "0615:66:-3072,3328",
-   "room": "0615",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     90
-    ]
-   },
-   "records": [
+    },
     {
      "room": "0615",
      "rec": "0x21cbc",
@@ -1767,26 +1691,43 @@
      "take": 90
     }
    ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "General Weapons Storage (0605) - DDK Input Disc W @-3072,3328"
-   ]
+   "class": "clean"
   },
   {
-   "name": "General Weapons Storage (0615) - Hemostat @12032,384",
-   "apId": 230817838,
-   "key": "0615:1b:12032,384",
-   "logicalId": "0615:1b:12032,384",
-   "room": "0615",
+   "name": "General Weapons Storage (0605) - Hemostat @12032,384",
+   "apId": 230817836,
+   "key": "0605:1b:12032,384",
+   "logicalId": "0605:1b:12032,384",
+   "room": "0605",
    "predicate": {
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     25
+     196
     ]
    },
    "records": [
+    {
+     "room": "0605",
+     "rec": "0x5c0b0",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 27,
+     "vanillaAmount": 1,
+     "vanillaTake": 196,
+     "geometry": [
+      12032,
+      384,
+      13440,
+      384,
+      13440,
+      -768,
+      12032,
+      -768
+     ],
+     "take": 196
+    },
     {
      "room": "0615",
      "rec": "0x21c90",
@@ -1806,10 +1747,10 @@
       12032,
       -768
      ],
-     "take": 25
+     "take": 196
     }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Hall 2F (0203) - SG Bullets @4800,4100",
@@ -1935,7 +1876,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     26
+     19
     ]
    },
    "records": [
@@ -1958,7 +1899,7 @@
       -5888,
       -14080
      ],
-     "take": 26
+     "take": 19
     }
    ],
    "class": "rekeyed"
@@ -2375,158 +2316,6 @@
    "class": "clean"
   },
   {
-   "name": "Large Size Elevator (060f) - DDK Input Disc D @4128,448",
-   "apId": 230817851,
-   "key": "060f:68:4128,448",
-   "logicalId": "060f:68:4128,448",
-   "room": "060f",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     89
-    ]
-   },
-   "records": [
-    {
-     "room": "060f",
-     "rec": "0x3bb48",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 104,
-     "vanillaAmount": 1,
-     "vanillaTake": 89,
-     "geometry": [
-      4128,
-      448,
-      4128,
-      -560,
-      3072,
-      -560,
-      3072,
-      448
-     ],
-     "take": 89
-    }
-   ],
-   "class": "clean"
-  },
-  {
-   "name": "Large Size Elevator (060f) - Plug @864,8240",
-   "apId": 230817852,
-   "key": "060f:2b:864,8240",
-   "logicalId": "060f:2b:864,8240",
-   "room": "060f",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     203
-    ]
-   },
-   "records": [
-    {
-     "room": "060f",
-     "rec": "0x3bbac",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 43,
-     "vanillaAmount": 1,
-     "vanillaTake": 203,
-     "geometry": [
-      864,
-      8240,
-      1680,
-      7616,
-      80,
-      6128,
-      -736,
-      6848
-     ],
-     "take": 203
-    }
-   ],
-   "class": "clean"
-  },
-  {
-   "name": "Large Size Elevator (060f) - Poison Dart @3344,1264",
-   "apId": 230817853,
-   "key": "060f:15:3344,1264",
-   "logicalId": "060f:15:3344,1264",
-   "room": "060f",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     27
-    ]
-   },
-   "records": [
-    {
-     "room": "060f",
-     "rec": "0x3cc40",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 21,
-     "vanillaAmount": 3,
-     "vanillaTake": 0,
-     "geometry": [
-      3344,
-      1264,
-      4432,
-      1504,
-      4736,
-      -64,
-      3808,
-      -336
-     ],
-     "take": 27
-    }
-   ],
-   "class": "rekeyed"
-  },
-  {
-   "name": "Large Size Elevator (060f) - Port Card Key @288,-1920",
-   "apId": 230817854,
-   "key": "060f:32:288,-1920",
-   "logicalId": "060f:32:288,-1920",
-   "room": "060f",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     181
-    ]
-   },
-   "records": [
-    {
-     "room": "060f",
-     "rec": "0x3bb80",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 50,
-     "vanillaAmount": 1,
-     "vanillaTake": 181,
-     "geometry": [
-      288,
-      -1920,
-      288,
-      -2928,
-      -768,
-      -2928,
-      -768,
-      -1920
-     ],
-     "take": 181
-    }
-   ],
-   "class": "clean"
-  },
-  {
    "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-3956,-1600",
    "apId": 230817855,
    "key": "0406:6b:-3956,-1600",
@@ -2536,7 +2325,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     28
+     76
     ]
    },
    "records": [
@@ -2559,25 +2348,8 @@
       -3956,
       -2928
      ],
-     "take": 28
-    }
-   ],
-   "class": "rekeyed"
-  },
-  {
-   "name": "Large Size Elevator Control Room (0406) - DDK Code Disc L @-4352,224",
-   "apId": 230817856,
-   "key": "0406:6b:-4352,224",
-   "logicalId": "0406:6b:-4352,224",
-   "room": "0406",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     29
-    ]
-   },
-   "records": [
+     "take": 76
+    },
     {
      "room": "0406",
      "rec": "0x37fa0",
@@ -2597,10 +2369,10 @@
       -4352,
       -4192
      ],
-     "take": 29
+     "take": 76
     }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Large Size Elevator Control Room (0406) - DDK Input Disc L @-3456,1280",
@@ -2755,48 +2527,6 @@
    "class": "clean"
   },
   {
-   "name": "Lecture Room Hallway (0108) - Plug @-8240,-7904",
-   "apId": 230817861,
-   "key": "0108:2b:-8240,-7904",
-   "logicalId": "0108:2b:-8240,-7904",
-   "room": "0108",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     99
-    ]
-   },
-   "records": [
-    {
-     "room": "0108",
-     "rec": "0x3db08",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 43,
-     "vanillaAmount": 1,
-     "vanillaTake": 99,
-     "geometry": [
-      -8240,
-      -7904,
-      -8256,
-      -6832,
-      -7472,
-      -6992,
-      -7488,
-      -7936
-     ],
-     "take": 99
-    }
-   ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "Lecture Room Hallway (0108) - Plug @-8256,-7904"
-   ]
-  },
-  {
    "name": "Lecture Room Hallway (0108) - Plug @-8256,-7904",
    "apId": 230817862,
    "key": "0108:2b:-8256,-7904",
@@ -2830,13 +2560,30 @@
       -7904
      ],
      "take": 99
+    },
+    {
+     "room": "0108",
+     "rec": "0x3db08",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 43,
+     "vanillaAmount": 1,
+     "vanillaTake": 99,
+     "geometry": [
+      -8240,
+      -7904,
+      -8256,
+      -6832,
+      -7472,
+      -6992,
+      -7488,
+      -7936
+     ],
+     "take": 99
     }
    ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "Lecture Room Hallway (0108) - Plug @-8240,-7904"
-   ]
+   "class": "clean"
   },
   {
    "name": "Library Room (0305) - B1 Key Chip \" with number \"(3695) @-6400,-4864",
@@ -3105,44 +2852,6 @@
    "class": "clean"
   },
   {
-   "name": "Lounge (0204) - Handgun Slides (upgrade To Glock 35) @2000,-3000",
-   "apId": 230817870,
-   "key": "0204:0e:2000,-3000",
-   "logicalId": "0204:0e:2000,-3000",
-   "room": "0204",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     141
-    ]
-   },
-   "records": [
-    {
-     "room": "0204",
-     "rec": "0x3bdfc",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 14,
-     "vanillaAmount": 1,
-     "vanillaTake": 141,
-     "geometry": [
-      2000,
-      -3000,
-      5300,
-      -3000,
-      5300,
-      -6400,
-      2000,
-      -6400
-     ],
-     "take": 141
-    }
-   ],
-   "class": "clean"
-  },
-  {
    "name": "Main Entrance (0107) - An. Aid @2384,-2208",
    "apId": 230817871,
    "key": "0107:20:2384,-2208",
@@ -3342,7 +3051,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     30
+     23
     ]
    },
    "records": [
@@ -3365,7 +3074,7 @@
       -2800,
       224
      ],
-     "take": 30
+     "take": 23
     }
    ],
    "class": "rekeyed"
@@ -3418,7 +3127,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     31
+     24
     ]
    },
    "records": [
@@ -3441,7 +3150,7 @@
       2288,
       -2992
      ],
-     "take": 31
+     "take": 24
     }
    ],
    "class": "rekeyed"
@@ -3765,7 +3474,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     35
+     25
     ]
    },
    "records": [
@@ -3788,7 +3497,7 @@
       -1193,
       495
      ],
-     "take": 35
+     "take": 25
     }
    ],
    "class": "rekeyed"
@@ -3841,7 +3550,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     40
+     26
     ]
    },
    "records": [
@@ -3864,7 +3573,7 @@
       -1193,
       495
      ],
-     "take": 40
+     "take": 26
     }
    ],
    "class": "rekeyed"
@@ -4149,7 +3858,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     43
+     27
     ]
    },
    "records": [
@@ -4172,7 +3881,7 @@
       -9024,
       -8688
      ],
-     "take": 43
+     "take": 27
     }
    ],
    "class": "rekeyed"
@@ -4187,7 +3896,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     45
+     28
     ]
    },
    "records": [
@@ -4210,7 +3919,7 @@
       5632,
       2048
      ],
-     "take": 45
+     "take": 28
     }
    ],
    "class": "rekeyed"
@@ -4377,7 +4086,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     46
+     29
     ]
    },
    "records": [
@@ -4400,7 +4109,7 @@
       10064,
       14320
      ],
-     "take": 46
+     "take": 29
     }
    ],
    "class": "rekeyed"
@@ -4415,7 +4124,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     50
+     30
     ]
    },
    "records": [
@@ -4438,7 +4147,7 @@
       10064,
       14320
      ],
-     "take": 50
+     "take": 30
     }
    ],
    "class": "rekeyed"
@@ -4833,7 +4542,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     51
+     31
     ]
    },
    "records": [
@@ -4856,7 +4565,7 @@
       -1792,
       -1408
      ],
-     "take": 51
+     "take": 31
     }
    ],
    "class": "rekeyed"
@@ -4997,19 +4706,41 @@
    "class": "clean"
   },
   {
-   "name": "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872",
-   "apId": 230817917,
-   "key": "0504:50:-2912,3872",
-   "logicalId": "0504:50:-2912,3872",
+   "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
+   "apId": 230817918,
+   "key": "0504:50:4896,-3840",
+   "logicalId": "0504:50:4896,-3840",
    "room": "0504",
    "predicate": {
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     48
+     48,
+     49
     ]
    },
    "records": [
+    {
+     "room": "0504",
+     "rec": "0x4feb4",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 80,
+     "vanillaAmount": 1,
+     "vanillaTake": 49,
+     "geometry": [
+      4896,
+      -3840,
+      5920,
+      -3840,
+      5920,
+      -4992,
+      4896,
+      -4992
+     ],
+     "take": 49
+    },
     {
      "room": "0504",
      "rec": "0x5028c",
@@ -5039,48 +4770,6 @@
    ]
   },
   {
-   "name": "Stabilizer Design Room (0504) - Protect P. 1-B @4896,-3840",
-   "apId": 230817918,
-   "key": "0504:50:4896,-3840",
-   "logicalId": "0504:50:4896,-3840",
-   "room": "0504",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     49
-    ]
-   },
-   "records": [
-    {
-     "room": "0504",
-     "rec": "0x4feb4",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 80,
-     "vanillaAmount": 1,
-     "vanillaTake": 49,
-     "geometry": [
-      4896,
-      -3840,
-      5920,
-      -3840,
-      5920,
-      -4992,
-      4896,
-      -4992
-     ],
-     "take": 49
-    }
-   ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840"
-   ]
-  },
-  {
    "name": "Stabilizer Design Room (0504) - Protect P. 2-A @-2912,3872",
    "apId": 230817919,
    "key": "0504:4f:-2912,3872",
@@ -5090,7 +4779,8 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     48
+     48,
+     49
     ]
    },
    "records": [
@@ -5114,28 +4804,7 @@
       2960
      ],
      "take": 48
-    }
-   ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "Stabilizer Design Room (0504) - Protect P. 1-B @-2912,3872"
-   ]
-  },
-  {
-   "name": "Stabilizer Design Room (0504) - Protect P. 2-A @4896,-3840",
-   "apId": 230817920,
-   "key": "0504:4f:4896,-3840",
-   "logicalId": "0504:4f:4896,-3840",
-   "room": "0504",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     49
-    ]
-   },
-   "records": [
+    },
     {
      "room": "0504",
      "rec": "0x500f8",
@@ -5174,7 +4843,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     55
+     69
     ]
    },
    "records": [
@@ -5197,10 +4866,31 @@
       -2800,
       -4752
      ],
-     "take": 55
+     "take": 69
+    },
+    {
+     "room": "0511",
+     "rec": "0x57258",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 111,
+     "vanillaAmount": 1,
+     "vanillaTake": 69,
+     "geometry": [
+      -2800,
+      -3088,
+      -1136,
+      -3088,
+      -1136,
+      -4752,
+      -2800,
+      -4752
+     ],
+     "take": 69
     }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Stabilizer Experiment Room (0503) - Initializer @-3468,2768",
@@ -5250,7 +4940,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     56
+     118
     ]
    },
    "records": [
@@ -5273,10 +4963,31 @@
       -10240,
       -7168
      ],
-     "take": 56
+     "take": 118
+    },
+    {
+     "room": "0511",
+     "rec": "0x5722c",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 43,
+     "vanillaAmount": 1,
+     "vanillaTake": 118,
+     "geometry": [
+      -10240,
+      -5248,
+      -8192,
+      -5248,
+      -8192,
+      -7168,
+      -10240,
+      -7168
+     ],
+     "take": 118
     }
    ],
-   "class": "rekeyed"
+   "class": "clean"
   },
   {
    "name": "Stabilizer Experiment Room (0503) - Protect P. 2-B @-3468,2768",
@@ -5326,7 +5037,7 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     57
+     35
     ]
    },
    "records": [
@@ -5349,7 +5060,7 @@
       -1792,
       -1408
      ],
-     "take": 57
+     "take": 35
     }
    ],
    "class": "rekeyed"
@@ -5388,13 +5099,30 @@
       3584
      ],
      "take": 208
+    },
+    {
+     "room": "0511",
+     "rec": "0x575c0",
+     "expectedOpcode": 40,
+     "expectedSubtype": 4,
+     "expectedLength": 44,
+     "vanillaItemId": 11,
+     "vanillaAmount": 1,
+     "vanillaTake": 208,
+     "geometry": [
+      -10240,
+      4480,
+      -8960,
+      4480,
+      -8960,
+      3584,
+      -10240,
+      3584
+     ],
+     "take": 208
     }
    ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480"
-   ]
+   "class": "clean"
   },
   {
    "name": "Stabilizer Experiment Room (0503) - Stabilizer @-3468,2768",
@@ -5433,124 +5161,6 @@
     }
    ],
    "class": "clean"
-  },
-  {
-   "name": "Stabilizer Experiment Room (0511) - DDK Code Disc D @-2800,-3088",
-   "apId": 230817928,
-   "key": "0511:6f:-2800,-3088",
-   "logicalId": "0511:6f:-2800,-3088",
-   "room": "0511",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     58
-    ]
-   },
-   "records": [
-    {
-     "room": "0511",
-     "rec": "0x57258",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 111,
-     "vanillaAmount": 1,
-     "vanillaTake": 69,
-     "geometry": [
-      -2800,
-      -3088,
-      -1136,
-      -3088,
-      -1136,
-      -4752,
-      -2800,
-      -4752
-     ],
-     "take": 58
-    }
-   ],
-   "class": "rekeyed"
-  },
-  {
-   "name": "Stabilizer Experiment Room (0511) - Plug @-10240,-5248",
-   "apId": 230817929,
-   "key": "0511:2b:-10240,-5248",
-   "logicalId": "0511:2b:-10240,-5248",
-   "room": "0511",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     59
-    ]
-   },
-   "records": [
-    {
-     "room": "0511",
-     "rec": "0x5722c",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 43,
-     "vanillaAmount": 1,
-     "vanillaTake": 118,
-     "geometry": [
-      -10240,
-      -5248,
-      -8192,
-      -5248,
-      -8192,
-      -7168,
-      -10240,
-      -7168
-     ],
-     "take": 59
-    }
-   ],
-   "class": "rekeyed"
-  },
-  {
-   "name": "Stabilizer Experiment Room (0511) - Shotgun Parts (upgrade To SPAS12) @-10240,4480",
-   "apId": 230817930,
-   "key": "0511:0b:-10240,4480",
-   "logicalId": "0511:0b:-10240,4480",
-   "room": "0511",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     208
-    ]
-   },
-   "records": [
-    {
-     "room": "0511",
-     "rec": "0x575c0",
-     "expectedOpcode": 40,
-     "expectedSubtype": 4,
-     "expectedLength": 44,
-     "vanillaItemId": 11,
-     "vanillaAmount": 1,
-     "vanillaTake": 208,
-     "geometry": [
-      -10240,
-      4480,
-      -8960,
-      4480,
-      -8960,
-      3584,
-      -10240,
-      3584
-     ],
-     "take": 208
-    }
-   ],
-   "class": "pinned-shared",
-   "excluded": true,
-   "sharedWith": [
-    "Stabilizer Experiment Room (0503) - Shotgun Parts (upgrade To SPAS12) @-10240,4480"
-   ]
   },
   {
    "name": "Strategy Room (0104) - DDK Code Disc E @-528,1280",
@@ -5942,7 +5552,8 @@
     "kind": "flag",
     "group": 7,
     "anyOf": [
-     104
+     104,
+     105
     ]
    },
    "records": [
@@ -5966,24 +5577,7 @@
       -3584
      ],
      "take": 104
-    }
-   ],
-   "class": "clean"
-  },
-  {
-   "name": "Transport Passageway (0606) - Plug @6912,-11392",
-   "apId": 230817942,
-   "key": "0606:2b:6912,-11392",
-   "logicalId": "0606:2b:6912,-11392",
-   "room": "0606",
-   "predicate": {
-    "kind": "flag",
-    "group": 7,
-    "anyOf": [
-     105
-    ]
-   },
-   "records": [
+    },
     {
      "room": "0606",
      "rec": "0x3e5cc",

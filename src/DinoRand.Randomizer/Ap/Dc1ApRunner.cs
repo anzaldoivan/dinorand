@@ -1,6 +1,5 @@
 using System.Runtime.Versioning;
 using DinoRand.ApClient;
-using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
 
@@ -18,13 +17,14 @@ public static class Dc1ApRunner
 {
     public const int DefaultPort = 38281;
     public const string DefaultOutDir = "mod_dinorand_ap";
-    internal const int LogicVersion = 3;
+    public const string SessionReadyPrefix = "session-ready:";
+    internal const int LogicVersion = 4;
 
     internal static void ValidateLogicVersion(int actual)
     {
         if (actual != LogicVersion)
             throw new InvalidOperationException(
-                $"server world logic_version {actual} is obsolete; this client requires DC1 AP v3 — "
+                $"server world logic_version {actual} is obsolete; this client requires DC1 AP v4 — "
                 + "regenerate the multiworld with the matching current dino_crisis_1.apworld");
     }
 
@@ -44,7 +44,7 @@ public static class Dc1ApRunner
     public static int Run(string hostPort, string? slot, string? password, string? install,
         string? outDirArg, Action<string> log, Action<string> error, CancellationToken ct)
     {
-        if (slot is null || install is null)
+        if (string.IsNullOrWhiteSpace(slot) || install is null)
         {
             error("error: --ap-connect needs --ap-slot <name> and --install <dc1GameDir>");
             return 1;
@@ -81,40 +81,16 @@ public static class Dc1ApRunner
             error($"error: {ex.Message}");
             return 1;
         }
-        // --- loop-closing install (D5): AP's fill replaces KeyItemPlacer ---
         string outDir = outDirArg ?? DefaultOutDir;
-        var patches = new List<ApPlacementInstaller.RecordPatch>();
-        foreach (var entry in checks.Locations)
+        try
         {
-            if (!conn.Placements.TryGetValue(entry.ApId, out int placed))
-            {
-                error($"error: slot_data has no placement for '{entry.Name}' — apworld/client contract drift");
-                return 1;
-            }
-            byte itemId = placed == ApSession.OtherWorldMarker
-                ? Dc1Symbols.OtherWorldMarkerItemId
-                : checked((byte)placed);
-            foreach (var rec in entry.Records)
-                patches.Add(new ApPlacementInstaller.RecordPatch(
-                    rec.Room,
-                    rec.RecOffset,
-                    new Dc1ItemRecordClass(
-                        checked((byte)rec.ExpectedOpcode),
-                        checked((byte)rec.ExpectedSubtype),
-                        rec.ExpectedLength),
-                    rec.VanillaItemId,
-                    rec.VanillaAmount,
-                    checked((ushort)rec.VanillaTake),
-                    itemId,
-                    1,
-                    checked((ushort)rec.Take),
-                    Visual: null));
+            Dc1ApInstallCoordinator.Install(dataDir, outDir, conn, checks, log);
         }
-        var written = ApPlacementInstaller.WriteRooms(dataDir, outDir, patches, log);
-        var installed = GameInstaller.Install(
-            dataDir, outDir, $"AP {conn.SeedName}", written.WrittenFiles);
-        log($"installed AP placement: {written.RecordsPatched} records in {written.RoomsWritten} rooms "
-            + $"(backed up {installed.BackedUp}, overlaid {installed.Overlaid})");
+        catch (Exception ex)
+        {
+            error($"error: {ex.Message}");
+            return 1;
+        }
 
         if (!OperatingSystem.IsWindows())
         {
@@ -122,6 +98,7 @@ public static class Dc1ApRunner
                 + "The install above is done — rerun this command from Windows to play.");
             return 1;
         }
+        log($"{SessionReadyPrefix} seed {conn.SeedName}; placement installed; starting DINO.exe poll");
         return PollLoop(session, conn, checks, outDir, slot, log, error, ct);
     }
 

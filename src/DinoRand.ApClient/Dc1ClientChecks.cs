@@ -78,7 +78,7 @@ public sealed class Dc1ClientChecks
     {
         var shape = JsonSerializer.Deserialize<FileShape>(stream)
                     ?? throw new InvalidOperationException("ap-client-checks.json: empty");
-        if (shape.Version != 2 || shape.FlagGroup != 7)
+        if (shape.Version != 4 || shape.FlagGroup != 7)
             throw new InvalidOperationException(
                 $"ap-client-checks.json: unsupported version {shape.Version}/group {shape.FlagGroup}");
         return new Dc1ClientChecks { Locations = shape.Locations };

@@ -1,0 +1,8 @@
+{
+  "census_scope": "normalized_production_placements",
+  "comment": "DC1 production cross-species donor distribution. The enabled pool is deliberately limited to the two witnessed donors; default weights are the normalized placed_enemies[].count production census (46:9), not the broader raw RoomFile.Enemies record census.",
+  "species": [
+    { "species": "RaptorHeavy", "creature": "RaptorHeavy", "default_weight": 46, "vanilla_count": 46 },
+    { "species": "Therizinosaurus", "creature": "Therizinosaurus", "default_weight": 9, "vanilla_count": 9 }
+  ]
+}

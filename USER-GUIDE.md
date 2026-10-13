@@ -167,20 +167,28 @@ DinoRand ships Archipelago multiworld worlds under `apworld/` (DC1 + DC2 generat
 new — a **DC1 runtime client**: your pickups become multiworld checks and items other players
 find for you appear in your inventory.
 
-**Connecting joins a multiworld that already exists — it doesn't create one.** First install the
-apworld, write a player YAML and generate a seed, then have it hosted (a local
-`ArchipelagoServer` or archipelago.gg). All of that is one-time setup:
+**Connecting joins a multiworld that already exists — it doesn't create one.** Custom worlds are
+generated locally: install the current `.apworld`, write a player YAML, and generate the seed in
+Archipelago before hosting the generated result. Hosting does not need `DINO.exe`. All of that is
+one-time setup:
 [apworld/dino_crisis_1/README.md](apworld/dino_crisis_1/README.md).
 
 ### Connect (GUI)
 
 1. **Close the game** — connecting rewrites room files, and a running game holds them locked.
-2. **Randomizer tab**: set your Game Location. (The Archipelago tab stays greyed out until it
-   resolves — it needs a game to install into.)
-3. **Archipelago tab**: server `host:port` (the default AP port is 38281), your slot name exactly
-   as it appears in your YAML's `name:`, password only if the room has one → **Connect**.
-4. Wait for the placement install — the log lists each room as it goes.
-5. Launch the game and start a **new game**, then leave DinoRand open while you play. Closing it
+2. **Randomizer tab**: set your Game Location. The visible Archipelago tab becomes available
+   once it resolves a game to install into; DC2 currently shows setup guidance but keeps Connect
+   disabled because its runtime client is not shipped yet.
+3. **Archipelago tab**: expand **AP setup** for the official Archipelago links and the **Save
+   Player YAML** helper, or use the world README above. The helper writes only the quoted player
+   name and `game: Dino Crisis 1`; it does not write a server, password, or world options.
+4. Enter server `host:port` (the default AP port is 38281), your **case-sensitive** slot name
+   exactly as it appears in the YAML's `name:`, and a password only if the room has one →
+   **Connect**.
+5. Before installing AP rooms, DinoRand restores the currently installed DinoRand mode. Confirm
+   the placement install, then wait for it — the log lists each room as it goes. Use
+   **Restore Originals** or **Play** directly in this tab when ready.
+6. Launch the game and start a **new game**, then leave DinoRand open while you play. Closing it
    ends the session (it asks first).
 
 ### Connect (CLI)
@@ -191,8 +199,9 @@ dinorand --ap-connect server.example:38281 --ap-slot MySlot --install "C:\...\Di
 
 Same flow, headless: it installs the placement, then stays running — Ctrl-C to disconnect.
 
-- The placement install is the **same backup-and-swap as a normal seed** — undo it with "Restore
-  Originals" (GUI) or `--restore` (CLI).
+- The placement install is the **same backup-and-swap as a normal seed** — it restores the current
+  DinoRand mode before overlaying AP rooms. "Restore Originals" (GUI) or `--restore` (CLI) reverses
+  the AP rooms and the AP-required pickup safety patch.
 - Reconnect any time by connecting again: the server keeps your progress, and nothing is granted
   twice. Verified against Archipelago 0.6.7.
 - **Windows only**: the client reads the running `DINO.exe`'s memory, so it must run on the

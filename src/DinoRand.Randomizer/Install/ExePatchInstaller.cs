@@ -85,6 +85,7 @@ internal static class ExePatchInstaller
                 ExePatchKind.CatSlot => $"cat-slot:{req.Stage}:{req.Category}",
                 ExePatchKind.Cat8HitReaction => "cat8-hit-reaction",
                 ExePatchKind.RoomEnemySe => $"room-se:{req.Stage}:{req.Room}",
+                ExePatchKind.BlueRaptorDescriptor => "blue-raptor-descriptor",
                 _ => throw new InvalidOperationException($"unknown exe-patch kind {req.Kind}"),
             };
             if (byTarget.TryGetValue(key, out var previous) && previous != req)
@@ -96,7 +97,8 @@ internal static class ExePatchInstaller
         var bytes = (byte[])pristine.Clone();
         var entries = new List<string>();
         foreach (var req in byTarget.Values
-                     .OrderBy(r => r.Kind).ThenBy(r => r.Stage).ThenBy(r => r.Room)
+                     .OrderBy(r => r.Kind == ExePatchKind.BlueRaptorDescriptor ? 0 : 1)
+                     .ThenBy(r => r.Kind).ThenBy(r => r.Stage).ThenBy(r => r.Room)
                      .ThenBy(r => r.Category).ThenBy(r => r.DonorStage).ThenBy(r => r.DonorRoom))
         {
             switch (req.Kind)
@@ -128,6 +130,13 @@ internal static class ExePatchInstaller
                     entries.Add($"room enemy SE st{req.Stage}{req.Room:X2} -> donor " +
                                 $"st{req.DonorStage}{req.DonorRoom:X2} ({result.RecordsWritten}/{result.Capacity} " +
                                 $"dino records @ block 0x{result.TargetBlockVa:X})");
+                    break;
+                }
+                case ExePatchKind.BlueRaptorDescriptor:
+                {
+                    Dc1BlueRaptorDescriptorPatch.Apply(bytes);
+                    entries.Add($"ST102 Blue descriptor 0 +0x0A: {Dc1BlueRaptorDescriptorPatch.ExpectedMaxHp} -> " +
+                                $"{Dc1BlueRaptorDescriptorPatch.BlueMaxHp}");
                     break;
                 }
             }
@@ -507,9 +516,14 @@ internal static class ExePatchInstaller
         return new ExePatchResult(exePath, exeBackup, new[] { entry });
     }
 
-    internal static ExePatchResult PatchExeDoorSkip(string dataDir, string? seedLabel = null)
+    internal static ExePatchResult PatchExeDoorSkip(string dataDir, DoorSkipMode mode = DoorSkipMode.OnPress, string? seedLabel = null)
     {
+        if (mode is not DoorSkipMode.OnPress and not DoorSkipMode.Auto)
+            throw new ArgumentOutOfRangeException(nameof(mode), mode, "unsupported DC1 door-skip mode");
+
         var exePath = ResolveExeForPatch(dataDir);
+        byte[] bytes = File.ReadAllBytes(exePath);
+        ExePatcher.ApplyDoorSkip(bytes, mode); // validate and patch before creating backup or writing
 
         var backupDir = Path.Combine(dataDir, BackupDirName);
         Directory.CreateDirectory(backupDir);
@@ -517,12 +531,11 @@ internal static class ExePatchInstaller
         if (!File.Exists(exeBackup))
             File.Copy(exePath, exeBackup); // capture the pristine exe once (for --restore)
 
-        byte[] bytes = File.ReadAllBytes(exePath);
-        ExePatcher.ApplyDoorSkip(bytes); // idempotent + guarded against an unexpected build
         File.WriteAllBytes(exePath, bytes);
 
-        string entry = $"door skip (button press): guarded new-edge hook @0x{ExePatcher.DoorSkipHookVa:X}, " +
-                       $"code cave @0x{ExePatcher.DoorSkipCaveVa:X}";
+        string entry = mode == DoorSkipMode.Auto
+            ? $"door skip (auto): all door transitions skip automatically; leaf sweep @0x{ExePatcher.DoorSkipHookVa:X}, hold gate @0x{ExePatcher.DoorHoldGateVa:X} = 0x{ExePatcher.DoorHoldPatched:X2}"
+            : $"door skip (on-press): newly mapped transitions advance on button press; guarded hook @0x{ExePatcher.DoorSkipHookVa:X}, code cave @0x{ExePatcher.DoorSkipCaveVa:X}";
         const string key = "door skip";
         var manifest = ReadManifest(dataDir) ?? new InstallManifest(seedLabel, DateTime.UtcNow.ToString("o"),
             Array.Empty<string>());

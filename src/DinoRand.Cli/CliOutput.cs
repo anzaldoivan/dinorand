@@ -19,10 +19,11 @@ internal static class CliOutput
             "\r\n" +
             "Usage:\r\n" +
             "  dinorand --install <gameDir> [--game dc1|dc2] [--out <dir>] [--seed <n>]\r\n" +
-            "           [--no-items] [--no-enemies] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items]\r\n" +
+            "           [--no-items] [--no-enemies] [--dc1-blue-raptor] [--dc1-enemy-hp] [--shuffle-keys] [--scatter-key-items]\r\n" +
             "           [--dc1-cutscene-safe] [--no-dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--pickup-ground-models] [--no-pickup-ground-models]   (dc1)\r\n" +
-            "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
-            "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
+             "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
+             "           [--dc1-enemy-mode weighted|fixed] [--dc1-fixed-species <name>] [--dc1-weight <name>=<0..255>]... (dc1)\r\n" +
+             "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
             "           [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)\r\n" +
             "           [--dc2-character-skin stock|gail|rick|random]           (dc2)\r\n" +
             "           [--dc2-regina-skin stock|gail|rick|random]              (dc2)\r\n" +
@@ -109,7 +110,11 @@ internal static class CliOutput
             "    species doesn't need the include-* toggles. --dc2-weight overrides one species' weight\r\n" +
             "    (repeatable, e.g. --dc2-weight trex=5 --dc2-weight velociraptor=0; 0 excludes the\r\n" +
             "    species; weighted mode only). Per-species room caps (T-Rex 2 / Giga 1) come from\r\n" +
-            "    data/dc2/enemy-distribution.json.\r\n" +
+             "    data/dc2/enemy-distribution.json.\r\n" +
+             "  - --dc1-enemy-mode (dc1 enemy rando, default weighted) selects the two enabled production donors,\r\n" +
+             "    RaptorHeavy and Therizinosaurus. Defaults use the vanilla 46:9 placed-enemy census;\r\n" +
+             "    --dc1-fixed-species pins one donor (and implies fixed mode), while repeated --dc1-weight\r\n" +
+             "    overrides a donor's 0..255 weighted draw. Zero excludes that donor; all-zero rooms stay vanilla.\r\n" +
             "  - --dc2-raptor-tiers (dc2, off by default) randomizes raptor colour/HP tier variants\r\n" +
             "    (docs/reference/dc2/enemies/RAPTOR-TIER-RE.md): static spawns get per-spawn weighted variants (room-file\r\n" +
             "    edit, non-destructive); wave rooms get the seeded pair-table patch written to the\r\n" +
@@ -144,6 +149,8 @@ internal static class CliOutput
             "    rooms (e.g. ST706 Mosasaurus) — the same room-level guards the bulk pass applies — unless\r\n" +
             "    --force is given (distinct from --allow-unsafe, which overrides the donor-habitat guard).\r\n" +
             "    Inherently DC2 (no --game needed). docs/decisions/dc2/enemies/CROSS-SPECIES-RANDO-PLAN.md.\r\n" +
+            "  - --dc1-blue-raptor (dc1, off by default) applies only the pinned ST102 Blue Raptor profile; it is independent of --no-enemies.\r\n" +
+            "    Use --no-items --no-enemies --no-dc1-door-skip when installing only this profile.\r\n" +
             "  - --dc1-enemy-hp (dc1, off by default) overrides each eligible enemy's maxHP per placement:\r\n" +
             "    it writes a seeded, --difficulty-scaled value into the 0x20 spawn record's +6 word (entity\r\n" +
             "    +0x11A), bypassing the game's birth roll. A plain room-file edit (no DINO.exe patch, no\r\n" +
@@ -185,10 +192,10 @@ internal static class CliOutput
             "    no relaunch is needed; it writes via the same backup contract, so --restore undoes it. This is\r\n" +
             "    the listen-test BEFORE the production voice pass is ungated (it bypasses the hard gate on purpose).\r\n" +
             "  - Door randomization is Phase 3 and not yet enabled.\r\n" +
-            "  - --swap-species imports a foreign species (default largeground; also\r\n" +
-            "    raptorheavy|pteranodon|tyrannosaurus|swarm) over the first raptor in one\r\n" +
+            "  - --swap-species imports a foreign species (default raptorheavy; also\r\n" +
+            "    therizinosaurus|largeground|tyrannosaurus|swarm|velociraptor) over the first raptor in one\r\n" +
             "    room, writing it into Data with a backup (undo with --restore). For\r\n" +
-            "    in-game testing of the cross-room importer; geometry only (may be mis-coloured).\r\n" +
+            "    in-game testing of the cross-room importer; Pteranodon remains disabled.\r\n" +
             "  - --add-enemy INJECTS a new enemy (default raptorheavy) into a room's init\r\n" +
             "    script — for rooms that ship with no placed enemy. --at x,y,z[,rot] sets the\r\n" +
             "    spawn (signed 16-bit; Y is height, 0 = floor); without it the position falls\r\n" +

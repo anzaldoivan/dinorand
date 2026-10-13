@@ -34,8 +34,10 @@
 !/data/dc1/
 /data/dc1/*
 !/data/dc1/ap-id-registry.json
+!/data/dc1/ap-location-policy.json
 !/data/dc1/suppressed-pickups.json
 !/data/dc1/laser-fences.json
+!/data/dc1/enemy-distribution.json
 !/data/dc2/
 /data/dc2/*
 !/data/dc2/item-sources.json
@@ -43,6 +45,9 @@
 # Top-level project files
 !/.gitignore
 !/README.md
+!/SPEC.md
+!/ROADMAP.md
+!/TASKS.md
 !/USER-GUIDE.md
 !/MODDING.md
 !/CONTRIBUTING.md
@@ -53,6 +58,7 @@
 !/SECURITY.md
 !/SUPPORT.md
 !/CHANGELOG.md
+!/AGENTS.md
 !/DinoRand.sln
 !/Directory.Build.props
 !/global.json

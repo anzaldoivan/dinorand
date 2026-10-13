@@ -206,6 +206,90 @@ public class TextureImportTests
     }
 
     [Fact]
+    public void ReplaceTexturePayload_RebuildsSectorRangesAndCopiesPaletteAtomically()
+    {
+        var targetTexture = Enumerable.Repeat((byte)0x11, 100).ToArray();
+        var donorTexture = Enumerable.Repeat((byte)0xA5, 2200).ToArray(); // crosses a sector boundary
+        var targetPalette = new byte[] { 1, 2, 3, 4 };
+        var donorPalette = new byte[] { 9, 8, 7, 6 };
+        var rdt = new byte[] { 0x62, 0x02, 0xAA };
+        var target = BuildTexturePackage(
+            (GianEntryType.Data, 0, 0, 1, 1, new byte[] { 0x31 }),
+            (GianEntryType.Lzss2, 704, 0, 64, 512, targetTexture),
+            (GianEntryType.Palette, 768, 511, 256, 1, targetPalette),
+            (GianEntryType.Unknown, 0, 0, 0, 0, rdt));
+        var donor = BuildTexturePackage(
+            (GianEntryType.Data, 0, 0, 1, 1, new byte[] { 0x41 }),
+            (GianEntryType.Lzss2, 704, 0, 64, 512, donorTexture),
+            (GianEntryType.Palette, 768, 511, 256, 1, donorPalette),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 0x52 }));
+
+        var patched = TextureImporter.ReplaceSpeciesTexturePayloadAndPalette(
+            target, donor, new ushort[] { 0x8b, 0x9b }, 0x7ff0);
+
+        var expectedHeader = target[..2048].ToArray();
+        WriteU32(expectedHeader, 16 + 4, (uint)donorTexture.Length);
+        Assert.Equal(expectedHeader, patched[..2048]);
+
+        int targetTextureOffset = PayloadOffset(target, 1);
+        int patchedTextureOffset = PayloadOffset(patched, 1);
+        int patchedPaletteOffset = PayloadOffset(patched, 2);
+        int patchedRdtOffset = PayloadOffset(patched, 3);
+        Assert.Equal(4096, targetTextureOffset);
+        Assert.Equal(donorTexture, patched.AsSpan(patchedTextureOffset, donorTexture.Length).ToArray());
+        Assert.Equal(donorPalette, patched.AsSpan(patchedPaletteOffset, donorPalette.Length).ToArray());
+        Assert.Equal(rdt, patched.AsSpan(patchedRdtOffset, rdt.Length).ToArray());
+        Assert.Equal(4096, patchedTextureOffset);
+        Assert.Equal(8192, patchedPaletteOffset);
+        Assert.Equal(10240, patchedRdtOffset);
+        Assert.Equal(target.AsSpan(PayloadOffset(target, 3), 2048).ToArray(),
+            patched.AsSpan(patchedRdtOffset, 2048).ToArray());
+        Assert.Equal(12288, patched.Length);
+    }
+
+    [Fact]
+    public void ReplaceTexturePayload_RejectsMalformedAndAmbiguousPackagesWithoutMutation()
+    {
+        var texture = new byte[] { 1, 2, 3 };
+        var donor = BuildTexturePackage(
+            (GianEntryType.Lzss2, 704, 0, 64, 512, new byte[] { 7, 7, 7, 7 }),
+            (GianEntryType.Palette, 768, 511, 256, 1, new byte[] { 8 }),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 9 }));
+        var ambiguous = BuildTexturePackage(
+            (GianEntryType.Lzss2, 704, 0, 64, 512, texture),
+            (GianEntryType.Lzss2, 704, 0, 64, 512, texture),
+            (GianEntryType.Palette, 768, 511, 256, 1, new byte[] { 8 }),
+            (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 9 }));
+        var before = ambiguous.ToArray();
+
+        Assert.Throws<InvalidDataException>(() => TextureImporter.ReplaceSpeciesTexturePayloadAndPalette(
+            ambiguous, donor, new ushort[] { 0x8b, 0x9b }, 0x7ff0));
+        Assert.Equal(before, ambiguous);
+        Assert.Throws<InvalidDataException>(() => TextureImporter.ReplaceSpeciesTexturePayloadAndPalette(
+            ambiguous[..^1], donor, new ushort[] { 0x8b, 0x9b }, 0x7ff0));
+
+        var wrongType = donor.ToArray();
+        WriteU32(wrongType, 0, (uint)GianEntryType.Texture);
+        Assert.Throws<InvalidDataException>(() => TextureImporter.ReplaceSpeciesTexturePayloadAndPalette(
+            target: BuildTexturePackage(
+                (GianEntryType.Lzss2, 704, 0, 64, 512, new byte[] { 1 }),
+                (GianEntryType.Palette, 768, 511, 256, 1, new byte[] { 2 }),
+                (GianEntryType.Unknown, 0, 0, 0, 0, new byte[] { 3 })),
+            donor: wrongType, tpageCodes: new ushort[] { 0x8b, 0x9b }, clutCode: 0x7ff0));
+    }
+
+    private static int PayloadOffset(byte[] package, int index)
+    {
+        int pos = 2048;
+        for (int i = 0; i < index; i++)
+            pos += (int)((ReadU32(package, i * 16 + 4) + 2047) & ~2047u);
+        return pos;
+    }
+
+    private static uint ReadU32(byte[] b, int o)
+        => (uint)(b[o] | (b[o + 1] << 8) | (b[o + 2] << 16) | (b[o + 3] << 24));
+
+    [Fact]
     public void OverwriteInPlace_TargetLacksColumn_Throws()
     {
         // Target uploads the X=704 column; asking for the X=640 (Theri) column finds no covering entry.

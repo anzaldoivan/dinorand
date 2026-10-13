@@ -1,5 +1,6 @@
 using DinoRand.FileFormats.Stage;
 using DinoRand.ApClient;
+using DinoRand.Randomizer.Ap;
 using DinoRand.Randomizer.Install;
 using Xunit;
 
@@ -151,5 +152,131 @@ public class ApPlacementInstallerTests
 
         Assert.Equal(1, local.Amount);
         Assert.Equal(1, remoteWrite.Bytes[1]);
+    }
+
+    [Fact]
+    public void Coordinator_FailedPreflight_PreservesExistingInstalledSeed()
+    {
+        using var temp = new TempLayout();
+        var source = temp.AddRoom("010d", 0x16, 6);
+        var old = ApPlacementInstaller.WriteRooms(temp.DataDir, temp.OutDir,
+            new[] { Patch("010d", source, placedId: 0x22) });
+        GameInstaller.Install(temp.DataDir, temp.OutDir, "standalone", old.WrittenFiles);
+        var installedBefore = File.ReadAllBytes(Path.Combine(temp.DataDir, "st10d.dat"));
+
+        var checks = ChecksFor(source, expectedItemId: 0x99);
+        var connection = Connection(0x23);
+
+        Assert.Throws<InvalidDataException>(() => Dc1ApInstallCoordinator.Install(
+            temp.DataDir, Path.Combine(temp.Root, "failed"), connection, checks));
+
+        Assert.Equal(installedBefore, File.ReadAllBytes(Path.Combine(temp.DataDir, "st10d.dat")));
+        Assert.True(GameInstaller.IsInstalled(temp.DataDir));
+    }
+
+    [Fact]
+    public void Coordinator_FreshData_DoesNotChooseRestore()
+    {
+        using var temp = new TempLayout();
+        var source = temp.AddRoom("010d", 0x16, 6);
+        int restoreCalls = 0;
+        var logs = new List<string>();
+
+        Dc1ApInstallCoordinator.Install(
+            temp.DataDir, Path.Combine(temp.Root, "fresh"), Connection(0x23), ChecksFor(source),
+            log: logs.Add, restoreInstalled: _ => restoreCalls++);
+
+        Assert.Equal(0, restoreCalls);
+        Assert.DoesNotContain(logs, l => l.Contains("restored standalone", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Coordinator_Success_PreflightsRestoresOverlaysExactFilesAndPatchesOnlyExistingExe()
+    {
+        using var temp = new TempLayout();
+        var source = temp.AddRoom("010d", 0x16, 6);
+        var untouched = temp.AddRoom("010e", 0x1d, 2);
+        var untouchedBytes = untouched.OriginalBytes.ToArray();
+        var old = ApPlacementInstaller.WriteRooms(temp.DataDir, temp.OutDir,
+            new[] { Patch("010d", source, placedId: 0x22), Patch("010e", untouched, placedId: 0x24) });
+        GameInstaller.Install(temp.DataDir, temp.OutDir, "standalone", old.WrittenFiles);
+        File.WriteAllBytes(Path.Combine(temp.Root, "DINO.exe"), Array.Empty<byte>());
+        var outDir = Path.Combine(temp.Root, "new");
+        Directory.CreateDirectory(outDir);
+        File.WriteAllBytes(Path.Combine(outDir, "st10e.dat"), new byte[] { 0x7f });
+        var patchObservedInstalled = false;
+        int restoreCalls = 0;
+        var logs = new List<string>();
+
+        var result = Dc1ApInstallCoordinator.Install(
+            temp.DataDir, outDir, Connection(0x23), ChecksFor(source),
+            log: logs.Add,
+            restoreInstalled: dataDir =>
+            {
+                restoreCalls++;
+                GameInstaller.Restore(dataDir);
+            },
+            applyPickupCancelPatch: (dataDir, seed) =>
+            {
+                patchObservedInstalled = GameInstaller.IsInstalled(dataDir);
+            });
+
+        Assert.Equal(new[] { "st10d.dat" }, result.Placement.WrittenFiles);
+        Assert.True(result.PickupCancelPatchApplied);
+        Assert.Equal(1, restoreCalls);
+        Assert.Contains(logs, l => l.Contains("restored standalone DinoRand mode", StringComparison.Ordinal));
+        Assert.True(patchObservedInstalled);
+        Assert.Equal(untouchedBytes, File.ReadAllBytes(Path.Combine(temp.DataDir, "st10e.dat")));
+        var installed = Assert.Single(RoomFile.ReadFromFile(1, 0x0d,
+            Path.Combine(temp.DataDir, "st10d.dat")).Items);
+        Assert.Equal(0x23, installed.ItemId);
+    }
+
+    private static ApConnection Connection(int placedId) => new(
+        "TEST", 1, 4, "060d",
+        new Dictionary<long, int> { [123] = placedId },
+        new Dictionary<long, int>(),
+        new HashSet<long>());
+
+    private static Dc1ClientChecks ChecksFor(RoomFile source, int expectedItemId = 0x16)
+    {
+        var item = Assert.Single(source.Items);
+        return new Dc1ClientChecks
+        {
+            Locations = new[]
+            {
+                new Dc1ClientChecks.Entry
+                {
+                    Name = "Synthetic pickup",
+                    ApId = 123,
+                    Key = "synthetic",
+                    LogicalId = "synthetic",
+                    Room = "010d",
+                    Class = "normal",
+                    Predicate = new Dc1ClientChecks.Predicate
+                    {
+                        Kind = "any",
+                        Group = 7,
+                        AnyOf = new[] { 1 },
+                    },
+                    Records = new[]
+                    {
+                        new Dc1ClientChecks.RecordPlan
+                        {
+                            Room = "010d",
+                            Rec = $"0x{item.FileOffset:x}",
+                            ExpectedOpcode = Dc1ItemRecordClass.Pickup.Opcode,
+                            ExpectedSubtype = Dc1ItemRecordClass.Pickup.Subtype,
+                            ExpectedLength = Dc1ItemRecordClass.Pickup.Length,
+                            VanillaItemId = expectedItemId,
+                            VanillaAmount = item.OriginalAmount,
+                            VanillaTake = item.OriginalTakeIndex,
+                            Geometry = Array.Empty<int>(),
+                            Take = item.OriginalTakeIndex,
+                        },
+                    },
+                },
+            },
+        };
     }
 }

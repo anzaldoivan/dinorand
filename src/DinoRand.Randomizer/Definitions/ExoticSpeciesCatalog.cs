@@ -18,8 +18,8 @@ public enum PlacementKind
     /// <summary>The cat-3 Tyrannosaurus boss rig: closure import + texture + cat3 AI-slot patch.</summary>
     Cat3Tyrannosaurus,
 
-    /// <summary>A cat-7 flyer / cat-5 swarm: needs the target stage to expose that category's handler
-    /// (un-located) — reserved.</summary>
+    /// <summary>A cat-7 flyer / cat-5 swarm: the target stage must expose a compatible category handler
+    /// and the species-specific runtime contract must be witnessed — reserved.</summary>
     CatFlyerOrSwarm,
 }
 
@@ -72,9 +72,14 @@ public static class ExoticSpeciesCatalog
             Enabled: false, Blocker: "renders invisible in 0102 (engine draw-gate, RE paused)",
             FreeStages: new[] { 1 }),
 
-        // GATED — the per-stage cat7 flyer / cat5 swarm AI handler is not located.
+        // GATED — the cat7 dispatch handler and model/motion + texture import are proven, but the runtime
+        // behavior and placement eligibility gates are not.
         new ExoticSpeciesDef(DinoSpecies.Pteranodon, PlacementKind.CatFlyerOrSwarm, Category: 7,
-            Enabled: false, Blocker: "cat7 flyer AI handler not located per stage", FreeStages: Array.Empty<int>()),
+            Enabled: false,
+            Blocker: "cat-7 dispatch handler proven at 0x5998F0; model/motion state and texture import evidence are " +
+                     "proven; mandatory remaining gates: texture behavior, SE behavior, damage behavior, death " +
+                     "behavior, kill-flag behavior, end-to-end runtime-witness gate, and verified free-slot/open-arena eligibility",
+            FreeStages: Array.Empty<int>()),
         // GATED — cat5 handler LOCATED + live-verified (0x5C8116; stage-1 cat5 slot is free), but the compy is a
         // coordinated-GROUP entity: a single-victim cross-import spawns one, leaves the group-coordination block
         // entity+0x1C0..+0x1CC all-zero, and the swarm AI NULL-derefs it in multiple functions (entry 0x5C6ADD,

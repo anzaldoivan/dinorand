@@ -26,6 +26,9 @@ public static class PackageRepacker
 
     private readonly record struct Existing(GianEntryType Type, int Size, VramRect Dst, int PayloadOffset);
 
+    internal readonly record struct Dc1Entry(GianEntryType Type, int Size, VramRect Dst,
+                                             int PayloadOffset, int AlignedSize);
+
     /// <summary>
     /// Return a copy of <paramref name="package"/> with <paramref name="inserts"/> added as new
     /// entries immediately before the RDT (the last entry). The relative order of the existing
@@ -80,6 +83,81 @@ public static class PackageRepacker
             pos += Align(sz);
         }
         return result;
+    }
+
+    /// <summary>Replace one DC1 entry with a payload of a different size. The entry header and every
+    /// other entry remain byte-identical; only the selected size field and sector-aligned payload
+    /// positions change.</summary>
+    internal static byte[] ReplaceEntryDc1(ReadOnlySpan<byte> package, int entryIndex,
+                                            GianEntryType expectedType, VramRect expectedRect,
+                                            ReadOnlySpan<byte> newPayload)
+    {
+        var entries = ReadDc1Entries(package);
+        if (entryIndex < 0 || entryIndex >= entries.Count - 1)
+            throw new InvalidDataException("replacement entry is missing or is the RDT");
+        var entry = entries[entryIndex];
+        if (entry.Type != expectedType || entry.Dst != expectedRect)
+            throw new InvalidDataException("replacement entry type or VRAM rect does not match");
+        if (newPayload.Length == 0)
+            throw new InvalidDataException("replacement payload is empty");
+
+        int newAligned = Align(newPayload.Length);
+        long total = HeaderSize;
+        for (int i = 0; i < entries.Count; i++)
+            total += Align(i == entryIndex ? newPayload.Length : entries[i].Size);
+        if (total > int.MaxValue) throw new InvalidDataException("repacked package is too large");
+
+        var result = new byte[(int)total];
+        package[..HeaderSize].CopyTo(result);
+        BinaryPrimitives.WriteUInt32LittleEndian(result.AsSpan(entryIndex * 16 + 4, 4),
+            (uint)newPayload.Length);
+
+        int pos = HeaderSize;
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var e = entries[i];
+            int aligned = i == entryIndex ? newAligned : e.AlignedSize;
+            int preserved = Math.Min(e.AlignedSize, aligned);
+            package.Slice(e.PayloadOffset, preserved).CopyTo(result.AsSpan(pos, preserved));
+            if (i == entryIndex)
+                newPayload.CopyTo(result.AsSpan(pos, newPayload.Length));
+            pos += aligned;
+        }
+        return result;
+    }
+
+    internal static List<Dc1Entry> ReadDc1Entries(ReadOnlySpan<byte> file)
+    {
+        if (file.Length < HeaderSize)
+            throw new InvalidDataException("DC1 package is shorter than its header");
+
+        var list = new List<Dc1Entry>();
+        int pos = HeaderSize;
+        for (int i = 0; i < HeaderSize / 16; i++)
+        {
+            int hdr = i * 16;
+            uint type = BinaryPrimitives.ReadUInt32LittleEndian(file.Slice(hdr, 4));
+            uint size = BinaryPrimitives.ReadUInt32LittleEndian(file.Slice(hdr + 4, 4));
+            if (type > (uint)GianEntryType.Lzss2 || size == 0)
+            {
+                if (list.Count == 0 || list[^1].Type is not (GianEntryType.Data or GianEntryType.Unknown)
+                    || pos != file.Length)
+                    throw new InvalidDataException("invalid DC1 package terminator or RDT layout");
+                return list;
+            }
+
+            int aligned = Align(size);
+            if (pos + (long)size > file.Length || pos + (long)aligned > file.Length)
+                throw new InvalidDataException("DC1 package entry exceeds the file");
+            var rect = new VramRect(
+                BinaryPrimitives.ReadUInt16LittleEndian(file.Slice(hdr + 8, 2)),
+                BinaryPrimitives.ReadUInt16LittleEndian(file.Slice(hdr + 10, 2)),
+                BinaryPrimitives.ReadUInt16LittleEndian(file.Slice(hdr + 12, 2)),
+                BinaryPrimitives.ReadUInt16LittleEndian(file.Slice(hdr + 14, 2)));
+            list.Add(new Dc1Entry((GianEntryType)type, (int)size, rect, pos, aligned));
+            pos += aligned;
+        }
+        throw new InvalidDataException("DC1 package entry table has no terminator");
     }
 
     /// <summary>
@@ -161,4 +239,6 @@ public static class PackageRepacker
     }
 
     private static int Align(int v) => (v + SectorSize - 1) & ~(SectorSize - 1);
+
+    private static int Align(uint v) => (int)((v + (uint)(SectorSize - 1)) & ~(uint)(SectorSize - 1));
 }

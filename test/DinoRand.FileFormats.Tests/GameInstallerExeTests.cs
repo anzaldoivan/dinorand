@@ -40,6 +40,8 @@ public class GameInstallerExeTests : IDisposable
             .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.ItemPickupSessionCloseVa));
         new byte[] { 0xC7, 0x45, 0xF0, 0x00, 0x00, 0x80, 0x1F, 0x81, 0x7D, 0xF0, 0x00, 0x00, 0x80, 0x1F }
             .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa));
+        new byte[] { 0x83, 0xFA, ExePatcher.DoorHoldPristine }
+            .CopyTo(exe, ExePatcher.VaToFileOffset(ExePatcher.DoorHoldGateVa));
         ExePatcher.WriteUInt32AtVa(exe, ExePatcher.SetupFnFieldVa(1), ExePatcher.SetupFnBasicRaptor);
         ExePatcher.WriteUInt32AtVa(exe, ExePatcher.SetupFnFieldVa(2), ExePatcher.SetupFnStage2);
         for (int r = 0; r < ExePatcher.HitDescriptorTotalRecords; r++)
@@ -113,6 +115,29 @@ public class GameInstallerExeTests : IDisposable
         Assert.Equal(ExePatcher.SetupFnStage2, ExePatcher.ReadSetupFn(exe, 2));
     }
 
+    [Fact]
+    public void ApplyBlueDescriptor_AndRestoreReversesTheExactWord()
+    {
+        var root = Environment.GetEnvironmentVariable("DINORAND_DC1_DIR");
+        if (string.IsNullOrWhiteSpace(root)) return;
+        var source = Path.Combine(root, GameInstaller.ExeName);
+        if (!File.Exists(source)) return;
+        var pristine = File.ReadAllBytes(source);
+        File.WriteAllBytes(ExePath, pristine);
+        var plan = new ExePatchPlan(ExePatchPlan.CurrentVersion, new[]
+        {
+            ExePatchRequest.BlueRaptorDescriptor(),
+        });
+
+        GameInstaller.ApplyExePatchPlan(DataDir, plan, _root);
+
+        var patched = File.ReadAllBytes(ExePath);
+        Assert.Equal(Dc1BlueRaptorDescriptorPatch.BlueMaxHp,
+            ExePatcher.ReadUInt16AtVa(patched, Dc1BlueRaptorDescriptorPatch.MaxHpVa));
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
     /// <summary>Write the full stock JP-master keypad table (all rows, both region halves) into the
     /// synthetic exe — <see cref="DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.VerifyStockKeypadTable"/>
     /// requires it before any scramble.</summary>
@@ -156,11 +181,13 @@ public class GameInstallerExeTests : IDisposable
         var res = GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 777, seedLabel: "777");
         Assert.Equal(6, res.Repoints.Count);
 
-        // Each exe row now decodes to the seed-derived code (both region halves).
+        // Each exe row now decodes to its seed-derived code, except the stock-locked row (both region halves).
         var exe = File.ReadAllBytes(ExePath);
         foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
         {
-            int[] want = DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row);
+            int[] want = lk.Randomize
+                ? DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row)
+                : lk.OriginalDigits;
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: false));
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: true));
         }
@@ -247,11 +274,13 @@ public class GameInstallerExeTests : IDisposable
         var res = GameInstaller.PatchExeSyncPuzzleCodes(DataDir, seed: 777);
         Assert.Contains(res.Repoints, r => r.Contains("ddraw.dll", StringComparison.Ordinal));
 
-        // exe rows hold the seed codes (both halves), and the DLL carries the text patch.
+        // exe rows hold the seed codes (both halves), except the stock-locked row; the DLL carries the text patch.
         var exe = File.ReadAllBytes(ExePath);
         foreach (var lk in DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.Family)
         {
-            int[] want = DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row);
+            int[] want = lk.Randomize
+                ? DinoRand.FileFormats.Stage.Dc1PuzzleCodeSync.DeriveRowCode(777, lk.Row)
+                : lk.OriginalDigits;
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: false));
             Assert.Equal(want, MgmtOfficeSafeCode.ReadRow(exe, lk.Row, us: true));
         }
@@ -562,9 +591,58 @@ public class GameInstallerExeTests : IDisposable
 
         Assert.NotNull(result);
         Assert.True(ExePatcher.IsDoorSkipApplied(File.ReadAllBytes(ExePath)));
+        Assert.Contains(GameInstaller.ReadManifest(DataDir)!.ExeRepoints!,
+            entry => entry.Contains("door skip (on-press)", StringComparison.Ordinal)
+                && entry.Contains("newly mapped transitions advance on button press", StringComparison.Ordinal)
+                && !entry.Contains("all door transitions", StringComparison.Ordinal));
 
         GameInstaller.Restore(DataDir);
         Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Fact]
+    public void PatchExeDoorSkip_Auto_SelectsAutoMode_AndManifestSaysSo()
+    {
+        var pristine = File.ReadAllBytes(ExePath);
+
+        GameInstaller.PatchExeDoorSkip(DataDir, DoorSkipMode.Auto, "auto-test");
+
+        var patched = File.ReadAllBytes(ExePath);
+        Assert.True(ExePatcher.IsDoorSkipApplied(patched, DoorSkipMode.Auto));
+        Assert.False(ExePatcher.IsDoorSkipApplied(patched, DoorSkipMode.OnPress));
+        Assert.Contains(GameInstaller.ReadManifest(DataDir)!.ExeRepoints!,
+            entry => entry.Contains("door skip (auto)", StringComparison.Ordinal)
+                && entry.Contains("all door transitions skip automatically", StringComparison.Ordinal)
+                && !entry.Contains("newly mapped", StringComparison.Ordinal));
+
+        GameInstaller.Restore(DataDir);
+        Assert.Equal(pristine, File.ReadAllBytes(ExePath));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PatchExeDoorSkip_RejectsUnexpectedOrCrossModeWithoutBackupOrWrite(bool crossMode)
+    {
+        if (crossMode)
+        {
+            var onPress = File.ReadAllBytes(ExePath);
+            ExePatcher.ApplyDoorSkip(onPress, DoorSkipMode.OnPress);
+            File.WriteAllBytes(ExePath, onPress);
+        }
+        else
+        {
+            var unexpected = File.ReadAllBytes(ExePath);
+            unexpected[ExePatcher.VaToFileOffset(ExePatcher.DoorSkipHookVa)] ^= 0xFF;
+            File.WriteAllBytes(ExePath, unexpected);
+        }
+
+        var before = File.ReadAllBytes(ExePath);
+        var mode = crossMode ? DoorSkipMode.Auto : DoorSkipMode.OnPress;
+
+        Assert.Throws<InvalidOperationException>(() => GameInstaller.PatchExeDoorSkip(DataDir, mode));
+        Assert.False(File.Exists(Path.Combine(DataDir, GameInstaller.BackupDirName, GameInstaller.ExeName)));
+        Assert.Equal(before, File.ReadAllBytes(ExePath));
     }
 
     [Fact]

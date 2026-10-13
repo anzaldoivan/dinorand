@@ -19,18 +19,29 @@ public class ApClientTests
     {
         var ex = Assert.Throws<InvalidOperationException>(() => Dc1ApRunner.ValidateLogicVersion(2));
         Assert.Contains("regenerate", ex.Message, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("v3", ex.Message, StringComparison.OrdinalIgnoreCase);
-        Dc1ApRunner.ValidateLogicVersion(3);
+        Assert.Contains("v4", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Throws<InvalidOperationException>(() => Dc1ApRunner.ValidateLogicVersion(3));
+        Dc1ApRunner.ValidateLogicVersion(4);
+    }
+
+    [Fact]
+    public void Dc1Checks_RejectsV3_AndAcceptsV4()
+    {
+        static MemoryStream Contract(int version) => new(
+            System.Text.Encoding.UTF8.GetBytes($"{{\"version\":{version},\"flagGroup\":7,\"locations\":[]}}"));
+
+        Assert.Throws<InvalidOperationException>(() => Dc1ClientChecks.Load(Contract(3)));
+        Assert.Empty(Dc1ClientChecks.Load(Contract(4)).Locations);
     }
 
     // ---- embedded checks contract -------------------------------------------------------
 
     [Fact]
-    public void EmbeddedChecks_Load_153Locations_UniqueApIds_UniqueNonExcludedFlags()
+    public void EmbeddedChecks_Load_137Locations_UniqueApIds_UniqueNonExcludedFlags()
     {
         var checks = Dc1ClientChecks.LoadEmbedded();
-        Assert.Equal(153, checks.Locations.Count);
-        Assert.Equal(153, checks.Locations.Select(l => l.ApId).Distinct().Count());
+        Assert.Equal(137, checks.Locations.Count);
+        Assert.Equal(137, checks.Locations.Select(l => l.ApId).Distinct().Count());
 
         var seen = new Dictionary<int, string>();
         foreach (var loc in checks.Locations.Where(l => !l.Excluded))
@@ -52,7 +63,13 @@ public class ApClientTests
     {
         var checks = Dc1ClientChecks.LoadEmbedded();
         var excluded = checks.Locations.Where(l => l.Excluded).ToList();
-        Assert.Equal(12, excluded.Count);
+        Assert.Equal(new[]
+        {
+            "010f:40:-5120,3584",
+            "030b:40:-5120,3584",
+            "0504:4f:-2912,3872",
+            "0504:50:4896,-3840",
+        }, excluded.Select(l => l.Key).OrderBy(key => key).ToArray());
         Assert.All(excluded, l => Assert.True(l.Class is "pinned-shared" or "poisoned", l.Class));
     }
 
@@ -340,6 +357,148 @@ public class ApClientTests
         // A pre-contract-v2 room could carry any shape here — never coerce, always refuse.
         var slotData = new Dictionary<string, object> { ["placements"] = "not a map" };
         Assert.Throws<InvalidOperationException>(() => ApSession.ParseIntMap(slotData, "placements"));
+    }
+
+    // ---- AP session seam ------------------------------------------------------------------
+
+    [Fact]
+    public void ApSession_ConnectsSnapshotAndFiltersUnknownItemsInServerOrder()
+    {
+        var factory = new FakeApProtocolSessionFactory(new ApLoginResult(
+            true,
+            null,
+            new ApLoginSnapshot(
+                "SEED", 7, 4, "060d",
+                new Dictionary<long, int> { [100] = 0x30 },
+                new Dictionary<long, int> { [10] = 0x18, [20] = 0x1D },
+                new HashSet<long> { 100 })));
+        factory.Session.Items.Add(new ApReceivedItem(10, 7));
+        factory.Session.Items.Add(new ApReceivedItem(999, 7));
+        factory.Session.Items.Add(new ApReceivedItem(20, 3));
+
+        using var session = new ApSession(factory);
+        var connection = session.Connect("localhost", 38281, "Regina", "secret");
+
+        Assert.Equal("localhost", factory.Host);
+        Assert.Equal(38281, factory.Port);
+        Assert.Equal((ApSession.GameName, "Regina", "secret"),
+            (factory.Session.GameName, factory.Session.SlotName, factory.Session.Password));
+        Assert.Equal("SEED", connection.SeedName);
+        Assert.Equal(7, connection.Slot);
+        Assert.Equal(4, connection.LogicVersion);
+        Assert.Equal("060d", connection.GoalRoom);
+        Assert.Equal(new HashSet<long> { 100 }, connection.CheckedLocations);
+        Assert.Equal(new[]
+        {
+            new ReceivedGameItem(0, 0x18, true),
+            new ReceivedGameItem(2, 0x1D, false),
+        }, session.ReceivedItems());
+    }
+
+    [Fact]
+    public void ApSession_LoginFailurePreservesFailureMessage()
+    {
+        var factory = new FakeApProtocolSessionFactory(new ApLoginResult(false, "bad slot; denied", null));
+        using var session = new ApSession(factory);
+
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => session.Connect("host", 1, "slot", null));
+
+        Assert.Equal("AP login failed: bad slot; denied", ex.Message);
+        Assert.True(factory.Session.Disconnected);
+        Assert.Throws<InvalidOperationException>(() => session.Connection);
+    }
+
+    [Fact]
+    public void ApSession_SendsOnlyNonemptyChecksAndReportsGoal()
+    {
+        var factory = new FakeApProtocolSessionFactory(SuccessfulSnapshot());
+        using var session = new ApSession(factory);
+        var connection = session.Connect("host", 1, "slot", null);
+
+        Assert.Equal("060d", connection.GoalRoom);
+        session.SendChecks(Array.Empty<long>());
+        session.SendChecks(new long[] { 10, 20 });
+        session.SetGoalAchieved();
+
+        Assert.Equal(new[] { new long[] { 10, 20 } }, factory.Session.SentChecks);
+        Assert.Equal(1, factory.Session.GoalCalls);
+    }
+
+    [Fact]
+    public void ApSession_DisposeClearsStateWhenDisconnectSucceedsOrFails()
+    {
+        foreach (bool throws in new[] { false, true })
+        {
+            var factory = new FakeApProtocolSessionFactory(SuccessfulSnapshot())
+            { Session = { DisconnectThrows = throws } };
+            var session = new ApSession(factory);
+            session.Connect("host", 1, "slot", null);
+
+            session.Dispose();
+
+            Assert.True(factory.Session.Disconnected);
+            Assert.Equal(TimeSpan.FromSeconds(3), factory.Session.DisconnectTimeout);
+            Assert.Throws<InvalidOperationException>(() => session.Connection);
+            Assert.Throws<InvalidOperationException>(() => session.ReceivedItems());
+        }
+    }
+
+    private static ApLoginSnapshot SuccessfulSnapshot() => new(
+        "SEED", 1, 4, null,
+        new Dictionary<long, int>(),
+        new Dictionary<long, int>(),
+        new HashSet<long>());
+
+    private sealed class FakeApProtocolSessionFactory : IApProtocolSessionFactory
+    {
+        public FakeApProtocolSessionFactory(ApLoginResult result) => Session = new(result);
+        public FakeApProtocolSessionFactory(ApLoginSnapshot snapshot)
+            : this(new ApLoginResult(true, null, snapshot)) { }
+        public FakeApProtocolSession Session { get; }
+        public string? Host { get; private set; }
+        public int Port { get; private set; }
+
+        public IApProtocolSession CreateSession(string host, int port)
+        {
+            Host = host;
+            Port = port;
+            return Session;
+        }
+    }
+
+    private sealed class FakeApProtocolSession : IApProtocolSession
+    {
+        private readonly ApLoginResult _result;
+
+        public FakeApProtocolSession(ApLoginResult result) => _result = result;
+        public string? GameName { get; private set; }
+        public string? SlotName { get; private set; }
+        public string? Password { get; private set; }
+        public List<ApReceivedItem> Items { get; } = new();
+        public List<long[]> SentChecks { get; } = new();
+        public int GoalCalls { get; private set; }
+        public bool DisconnectThrows { get; set; }
+        public bool Disconnected { get; private set; }
+        public TimeSpan DisconnectTimeout { get; private set; }
+        public IReadOnlyList<ApReceivedItem> AllItemsReceived => Items;
+
+        public ApLoginResult TryConnectAndLogin(string gameName, string slotName, string? password)
+        {
+            GameName = gameName;
+            SlotName = slotName;
+            Password = password;
+            return _result;
+        }
+
+        public void CompleteLocationChecks(IReadOnlyList<long> locationIds) => SentChecks.Add(locationIds.ToArray());
+        public void SetGoalAchieved() => GoalCalls++;
+        public void Disconnect(TimeSpan timeout)
+        {
+            DisconnectTimeout = timeout;
+            Disconnected = true;
+            if (DisconnectThrows) throw new InvalidOperationException("socket failed");
+        }
     }
 
     // ---- crash-safe state file (GUI-SHUTDOWN-AND-CANCEL-PLAN.md S5) --------------------------

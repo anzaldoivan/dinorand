@@ -1,5 +1,6 @@
 using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer.Definitions;
+using DinoRand.Randomizer.Dc1;
 
 namespace DinoRand.Randomizer.Passes;
 
@@ -54,8 +55,9 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
         }
 
         // Build the (pure) placement candidates: a room is a candidate when it isn't scripted/cutscene and has a
-        // randomizable Velociraptor to replace.
+        // randomizable dinosaur record to replace. Keep the selected record alongside the room-level plan.
         var byCode = new Dictionary<int, RoomFile>();
+        var victimIndexByCode = new Dictionary<int, int>();
         var candidates = new List<RoomCandidate>();
         foreach (var room in corpus)
         {
@@ -63,20 +65,58 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
             byCode[code] = room;
             bool eligible = room.Enemies.Count > 0 && !scripted.Contains(code) && !cutscene.Contains(code)
                             && !choreography.Contains(code);
-            bool hasVictim = eligible && room.Enemies.Any(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
+            int victimIndex = eligible ? room.Enemies.FindIndex(e => e.IsRandomizableDino) : -1;
+            bool hasVictim = victimIndex >= 0;
             var present = room.Enemies.Select(e => e.Species).ToHashSet();
+            if (hasVictim) victimIndexByCode[code] = victimIndex;
             candidates.Add(new RoomCandidate(room.Stage, room.Room, hasVictim, present));
         }
 
-        var placements = CrossSpeciesPlanner.Plan(candidates, donors, chance, rng);
+        var distribution = Dc1EnemyDistribution.LoadEmbedded();
+        var picker = context.Config.Dc1EnemyMode == Dc1EnemyDistributionMode.Fixed
+            ? Dc1DonorPicker.Fixed(context.Config.Dc1FixedSpecies
+                ?? throw new InvalidOperationException("DC1 fixed enemy mode requires a fixed species"))
+            : Dc1DonorPicker.Weighted(distribution.EffectiveWeights(context.Config.Dc1SpeciesWeights));
+        var placements = CrossSpeciesPlanner.Plan(candidates, donors, chance, rng, picker);
 
         int placed = 0, skipped = 0;
         foreach (var p in placements)
         {
             var room = byCode[p.Stage * 0x100 + p.Room];
             var def = ExoticSpeciesCatalog.For(p.Species)!;
-            var victim = room.Enemies.First(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
-            int idx = room.Enemies.IndexOf(victim);
+            int idx = victimIndexByCode[p.Stage * 0x100 + p.Room];
+            var victim = room.Enemies[idx];
+            if (!victim.IsRandomizableDino)
+            {
+                skipped++;
+                context.Log($"[cross-species] {room} {p.Species}: skipped — selected record is no longer eligible");
+                continue;
+            }
+
+            if (importer is IPlannedCrossSpeciesImporter planned)
+            {
+                var plan = planned.Plan(room, idx, p.Species);
+                if (plan is null)
+                {
+                    skipped++;
+                    context.Log($"[cross-species] {room} {p.Species}: skipped — plan refused");
+                    continue;
+                }
+                var preflight = planned.Preflight(plan);
+                if (!preflight.Success)
+                {
+                    skipped++;
+                    context.Log($"[cross-species] {room} {p.Species}: skipped — {preflight.Note}");
+                    continue;
+                }
+                var applied = planned.Apply(plan, preflight);
+                if (!room.Write().AsSpan().SequenceEqual(applied.RoomBytes))
+                    context.SetRoomOutput(room, applied.RoomBytes);
+                context.ExePatchRequests.AddRange(applied.Requests);
+                placed++;
+                context.Log($"[cross-species] {room} slot{victim.Slot}: {victim.Species} -> {p.Species} ({applied.Note})");
+                continue;
+            }
 
             if (!importer.TryImport(context, room, idx, def, out var patches, out var note))
             {
@@ -86,11 +126,13 @@ public sealed class CrossSpeciesEnemyPass : IRandomizationPass
             }
             context.ExePatchRequests.AddRange(patches);
             placed++;
-            context.Log($"[cross-species] {room} slot{victim.Slot}: Velociraptor -> {p.Species} ({note})");
+            context.Log($"[cross-species] {room} slot{victim.Slot}: {victim.Species} -> {p.Species} ({note})");
         }
 
         context.Log($"[cross-species] placed {placed} foreign species ({skipped} skipped) across "
                     + $"{placements.Select(p => p.Stage * 0x100 + p.Room).Distinct().Count()} rooms; "
-                    + $"{context.ExePatchRequests.Count} exe patches queued (donors: {string.Join(", ", donors)})");
+                    + $"{context.ExePatchRequests.Count} exe patches queued (donors: {string.Join(", ", donors)}; "
+                    + $"tally: {string.Join(", ", placements.GroupBy(p => p.Species).OrderBy(g => g.Key)
+                        .Select(g => $"{g.Key}={g.Count()}"))})");
     }
 }

@@ -22,6 +22,9 @@ public enum ExePatchKind
     /// <summary>Retarget a room's enemy SE block to a donor species' set
     /// (<see cref="GameInstaller.PatchExeRoomEnemySe"/>).</summary>
     RoomEnemySe,
+
+    /// <summary>Set the guarded DC1 stage-1 Blue-Raptor descriptor maxHP word.</summary>
+    BlueRaptorDescriptor,
 }
 
 /// <summary>
@@ -54,6 +57,10 @@ public sealed record ExePatchRequest(
     /// <summary>Retarget room (<paramref name="stage"/>,<paramref name="room"/>)'s enemy SE to the donor room's set.</summary>
     public static ExePatchRequest RoomEnemySe(int stage, int room, int donorStage, int donorRoom)
         => new(ExePatchKind.RoomEnemySe, Stage: stage, Room: room, DonorStage: donorStage, DonorRoom: donorRoom);
+
+    /// <summary>Declare the donor-exact ST508 Blue profile's guarded stage-1 descriptor edit.</summary>
+    public static ExePatchRequest BlueRaptorDescriptor()
+        => new(ExePatchKind.BlueRaptorDescriptor);
 }
 
 /// <summary>
