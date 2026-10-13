@@ -12,12 +12,40 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+## [0.6.4] — 2026-10-13
+
 ### Added
 
-- **The Archipelago tab is available in the GUI.** DC1 users can create a minimal player YAML,
-  connect after a confirmation, install and restore placements, and launch the game from the tab;
-  DC2 explains that runtime connection is not available yet, and the YAML helper never saves a
-  server, password, or world options.
+- **Archipelago setup is available in the GUI.** DC1 users can save a minimal player YAML, confirm
+  placement installation, connect, launch the game, and restore originals from the Archipelago
+  tab. The YAML helper excludes server details, passwords, and world options; the Avalonia GUI
+  remains PREVIEW, and DC2 remains generation-only.
+- **DC1 enemy replacements have weighted and fixed-species controls.** Advanced settings and the
+  CLI offer the supported RaptorHeavy and Therizinosaurus donors, with adjustable weights. Enemy
+  randomization remains experimental and carries crash risk.
+- **An optional Blue Raptor encounter profile is available for DC1.** Enable the fixed supported
+  profile with `--dc1-blue-raptor`; it is CLI-only, off by default, and its executable change is
+  reversible through Restore. Broader in-game verification remains pending.
+
+### Changed
+
+- **DC1 Archipelago requires the matching v4 world package.** Install the current `.apworld` and
+  regenerate older multiworlds before connecting; duplicate pickup locations now share one check,
+  and unavailable pickups are omitted.
+- **DC1 Door Skip offers OnPress and Auto modes.** OnPress remains the default for newly mapped
+  transitions; Auto skips all door transitions automatically. Choose the mode in the GUI or CLI;
+  it is independent of the shareable seed and reversible through Restore.
+- **Targeted DC1 species swaps default to RaptorHeavy.** `--swap-species` without `--species` now
+  uses the supported donor; the documented backup/restore path still applies.
+
+### Fixed
+
+- **The Stabilizer Experiment Room safe keeps its original code** when puzzle randomization is
+  enabled.
+- **DC1 enemy replacement preserves identified NPC scene actors** and checks eligible targets,
+  donor compatibility, and room capacity before applying supported replacements.
+- **Archipelago closes failed-login sessions and reports the GUI session ready only after
+  placement installation completes.**
 
 ## [0.6.3] — 2026-07-29
 
@@ -313,6 +341,8 @@ Initial feature set — everything prior to the voice randomizer.
   was.
 - Self-contained single-file release builds.
 
+[Unreleased]: https://github.com/anzaldoivan/dinorand/compare/v0.6.4...HEAD
+[0.6.4]: https://github.com/anzaldoivan/dinorand/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.3
 [0.6.2]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.2
 [0.6.1]: https://github.com/anzaldoivan/dinorand/releases/tag/v0.6.1
