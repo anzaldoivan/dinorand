@@ -1,0 +1,27 @@
+name: tools-validation
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tools-validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tools-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          submodules: recursive
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          global-json-file: tools/global.json
+      - name: Install investigator dependencies
+        run: python3 -m pip install -r tools/requirements.txt
+      - name: Verify pin, source provenance, scan, locked restore, build and tests
+        run: python3 scripts/validate-tools.py
+      - name: Negative integration gates
+        run: PYTHONPATH=scripts python3 -m unittest scripts/test_validate_tools.py -v

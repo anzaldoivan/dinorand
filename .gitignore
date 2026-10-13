@@ -22,7 +22,8 @@
 
 # Tooling, git hooks, CI
 !/scripts/
-# !/tools/  (held back from publish for now — kept local)
+!/tools
+!/.gitmodules
 !/.github/
 !/.githooks/
 !/.config/
