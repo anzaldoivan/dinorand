@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # the test project links tools/scd_re/scd_opcode_table.json (opcode-table drift test)
+          submodules: recursive
 
       - name: Release hardening contracts
         run: >-
