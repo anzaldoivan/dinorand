@@ -2058,7 +2058,7 @@ internal sealed partial class CliApplication
         }
 
         int pkgOk = 0, cleanWalk = 0, byteExact = 0, totalItems = 0, totalDoors = 0, lockedDoors = 0;
-        var lastEntryTypes = new SortedDictionary<GianEntryType, int>();
+        var roomDataTypes = new SortedDictionary<GianEntryType, int>();
         var itemIds = new SortedDictionary<int, int>();
 
         foreach (var r in refs)
@@ -2070,7 +2070,7 @@ internal sealed partial class CliApplication
             {
                 pkgOk++;
                 if (pkg.RoomDataEntry is { } e)
-                    lastEntryTypes[e.Type] = lastEntryTypes.GetValueOrDefault(e.Type) + 1;
+                    roomDataTypes[e.Type] = roomDataTypes.GetValueOrDefault(e.Type) + 1;
             }
             if (room.ParsedCleanly) cleanWalk++;
             if (room.Write().AsSpan().SequenceEqual(bytes)) byteExact++;
@@ -2093,7 +2093,7 @@ internal sealed partial class CliApplication
         Console.WriteLine($"byte-exact write    : {byteExact}/{refs.Count}  (non-destructive guarantee)");
         Console.WriteLine($"item records found  : {totalItems}");
         Console.WriteLine($"door records found  : {totalDoors}  ({lockedDoors} gated)");
-        Console.WriteLine($"last-entry types    : {string.Join(", ", lastEntryTypes.Select(kv => $"{kv.Key}={kv.Value}"))}");
+        Console.WriteLine($"room-data types     : {string.Join(", ", roomDataTypes.Select(kv => $"{kv.Key}={kv.Value}"))}");
         if (itemIds.Count > 0)
             Console.WriteLine($"item id histogram   : {string.Join(", ", itemIds.Select(kv => $"0x{kv.Key:X2}×{kv.Value}"))}");
         return 0;

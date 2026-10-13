@@ -142,7 +142,7 @@ public static class TextureImporter
     /// 16-byte entry table (stopping at the first out-of-range type, like the engine and
     /// <see cref="GianPackage"/>), and for each texture entry read its <see cref="VramRect"/> from
     /// the header and its pixels from the payload — LZSS-decompressed and trimmed to <c>W*H*2</c>
-    /// for compressed types (5/6/8), raw for type-1/2. The RDT (last entry) and audio entries are
+    /// for compressed types (5/6/8), raw for type-1/2. The RDT and audio entries are
     /// skipped.
     /// </summary>
     public static List<VramBlock> ParseVramBlocks(ReadOnlySpan<byte> file)
@@ -346,6 +346,7 @@ public static class TextureImporter
 
         var tEntries = RawEntries(target);
         if (tEntries.Count == 0) throw new InvalidOperationException("target is not a parseable package");
+        PackageRepacker.RequireRoomDataLast(target);
         if (tEntries.Any(e => IsTextureEntry(e.Type) && e.Type != GianEntryType.Palette && e.Dst.Contains(px, py))
             || tEntries.Any(e => e.Type == GianEntryType.Palette && e.Dst.X == clX && e.Dst.Y == clY))
             throw new InvalidOperationException(
@@ -459,6 +460,7 @@ public static class TextureImporter
         }
 
         // Materialise each entry's payload; overwrite present resources from the donor, keep others verbatim.
+        PackageRepacker.RequireRoomDataLast(target);
         int rdtIdx = tEntries.Count - 1;
         var plan = new List<(GianEntryType Type, VramRect Dst, byte[] Payload)>();
         for (int i = 0; i < tEntries.Count; i++)

@@ -5,7 +5,7 @@ namespace DinoRand.FileFormats.Stage;
 /// the item-placement records the randomizer edits (doors/enemies later).
 ///
 /// <para><b>Layout (proven — see <c>docs/reference/dc1/_registries/STATIC-SCD-RE.md</c>).</b> The RDT buffer is the
-/// decompressed payload of the room file's last package entry (LZSS for type-7 entries, raw for
+/// decompressed payload of the room file's room-data package entry (LZSS for type-7 entries, raw for
 /// type-0). Its header dword at offset <c>0x14</c> is a PSX pointer (<c>0x8010xxxx</c>) to a
 /// self-describing function-offset table: the first dword is the table size in bytes, so it
 /// holds <c>size/4</c> subroutine offsets (each relative to the table base). This is the same

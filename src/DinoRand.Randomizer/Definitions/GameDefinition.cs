@@ -210,6 +210,12 @@ public abstract class GameDefinition
     public abstract IReadOnlyList<RoomFileRef> EnumerateRooms(string installDir);
 
     /// <summary>
+    /// Whether the randomizer may edit this room. Rooms outside the mapped campaign are still
+    /// enumerated and copied to the output, but read opaquely so no pass sees their records.
+    /// </summary>
+    public virtual bool IsRandomizedRoom(int stage, int room) => true;
+
+    /// <summary>
     /// Locate the game's data folder (where the per-room files live) inside an install
     /// dir, or <c>null</c> if none is found. Same discovery <see cref="EnumerateRooms"/>
     /// uses; the installer overlays randomized files here against a backup.

@@ -144,6 +144,51 @@ internal static class SyntheticRoom
             (GianEntryType.Data, rdt));
     }
 
+    /// <summary>PSX load address of the trailing sound-table entry in the extra-stage rooms.</summary>
+    public const uint SoundTableBase = 0x801FE9C0;
+
+    /// <summary>Build a DC1 room laid out like the extra-stage files: the room data is <b>not</b> the last
+    /// entry — <c>[filler Texture, room data @0x80100000, Sound, Mp3, Data @0x801FE9C0]</c>. The room data
+    /// is stored as <paramref name="rdtType"/> (<see cref="GianEntryType.Unknown"/> = LZSS, like most real
+    /// rooms; <see cref="GianEntryType.Data"/> = raw).</summary>
+    public static byte[] Dc1RoomWithTrailingEntries(IReadOnlyList<Item> items, IReadOnlyList<Door> doors,
+                                                    IReadOnlyList<Enemy> enemies,
+                                                    GianEntryType rdtType = GianEntryType.Unknown)
+    {
+        byte[] rdt = BuildRdt(items, doors, enemies);
+        byte[] stored = rdtType == GianEntryType.Unknown ? Lzss.Compress(rdt) : rdt;
+        return Dc1PackageWithLoad(
+            (GianEntryType.Texture, new byte[] { 0xDC, 0x1D, 0x00, 0x00 }, 0),
+            (rdtType, stored, Psx),
+            (GianEntryType.Sound, Fill(0x51, 40), 0),
+            (GianEntryType.Mp3, Fill(0x52, 3000), 0),
+            (GianEntryType.Data, Fill(0x53, 280), SoundTableBase));
+    }
+
+    /// <summary>DC1 package whose entries carry a PSX load address in the header x/y words
+    /// (<c>y = 0x8000 | hi15</c>, <c>x = lo16</c>); 0 = no load address.</summary>
+    internal static byte[] Dc1PackageWithLoad(params (GianEntryType type, byte[] payload, uint load)[] entries)
+    {
+        var buf = Package(GianPackage.Dc1EntrySize, entries.Select(e => (e.type, e.payload)).ToArray());
+        for (int i = 0; i < entries.Length; i++)
+        {
+            uint load = entries[i].load;
+            if (load == 0) continue;
+            int hdr = i * GianPackage.Dc1EntrySize;
+            buf[hdr + 8] = (byte)load; buf[hdr + 9] = (byte)(load >> 8);
+            ushort y = (ushort)(0x8000 | ((load >> 16) & 0x7FFF));
+            buf[hdr + 10] = (byte)y; buf[hdr + 11] = (byte)(y >> 8);
+        }
+        return buf;
+    }
+
+    private static byte[] Fill(byte value, int length)
+    {
+        var b = new byte[length];
+        Array.Fill(b, value);
+        return b;
+    }
+
     // ---- DC2 ------------------------------------------------------------------------------------------
 
     /// <summary>Build a full DC2 room <c>.dat</c>: an LZSS0 SCD blob (varying with <paramref name="variant"/>)

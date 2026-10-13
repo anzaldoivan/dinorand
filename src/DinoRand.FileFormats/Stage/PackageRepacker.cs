@@ -39,6 +39,7 @@ public static class PackageRepacker
         var existing = Walk(package);
         if (existing.Count == 0) throw new InvalidOperationException("not a Gian package (no entries)");
         if (inserts.Count == 0) return package.ToArray();
+        RequireRoomDataLast(package);
 
         int total = existing.Count + inserts.Count;
         if (total > HeaderSize / 16)
@@ -213,6 +214,17 @@ public static class PackageRepacker
             pos += Align(src.Length);
         }
         return result;
+    }
+
+    /// <summary>The entry-inserting repacks all rebuild the table as <c>[others] + [new] + [RDT]</c>.
+    /// That is only layout-preserving when the room data already is the last entry; on the rooms where
+    /// sound entries follow it, refuse rather than reorder what the engine loads.</summary>
+    internal static void RequireRoomDataLast(ReadOnlySpan<byte> package)
+    {
+        var pkg = GianPackage.TryParse(package);
+        if (pkg is not null && pkg.RoomDataIndex != pkg.Entries.Count - 1)
+            throw new InvalidOperationException(
+                "room data is not the last entry of this package; inserting entries is not supported here");
     }
 
     private static List<Existing> Walk(ReadOnlySpan<byte> file)

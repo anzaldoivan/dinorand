@@ -159,7 +159,8 @@ public class Dc1ReachabilityOracleTests
             Assert.False(required, "required DC1 oracle fixture contains no recognized rooms");
             return;
         }
-        var rooms = refs.Select(r => RoomFile.ReadFromFile(r.Stage, r.Room, r.Path)).ToList();
+        // Same room view as the randomizer: rooms outside the campaign are opaque (no doors).
+        var rooms = DinoRand.Randomizer.RandomizerRunner.LoadRooms(Game, refs);
         var expected = BuildOracleJson(rooms);
 
         var path = FindRepoFile(Path.Combine("data", "dc1", "reachability-oracle.json"));
