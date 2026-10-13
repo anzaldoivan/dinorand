@@ -143,6 +143,37 @@ public class RoomScriptTests
         Assert.Empty(s.ScriptedEntrances);
     }
 
+    private static byte[] CameraRec(byte opcode, int targetAt, (short X, short Y, short Z) eye,
+                                    (short X, short Y, short Z) target)
+    {
+        var r = new byte[DcOpcodes.Lengths[opcode]];
+        r[0] = opcode;
+        void W(int at, short v) { r[at] = (byte)v; r[at + 1] = (byte)(v >> 8); }
+        W(2, eye.X); W(4, eye.Y); W(6, eye.Z);
+        W(targetAt, target.X); W(targetAt + 2, target.Y); W(targetAt + 4, target.Z);
+        return r;
+    }
+
+    /// <summary>0x2E and 0x4C both hand one xyz triple to the engine's camera-position setter and a
+    /// second to its camera-target setter (cont.99); the target sits at +8 in 0x2E and +0x12 in 0x4C.</summary>
+    [Fact]
+    public void Walk_CollectsCameraShots_FromBothCameraOpcodes()
+    {
+        var rdt = BuildRdt(
+            CameraRec(DcOpcodes.CameraShort, CameraShot.ShortTargetOffset, (100, -200, 300), (-1, -2, -3)),
+            CameraRec(DcOpcodes.CameraLong, CameraShot.LongTargetOffset, (7000, -1500, -7000), (40, 50, 60)));
+        var s = RoomScript.Parse(rdt);
+
+        Assert.True(s.ParsedCleanly);
+        Assert.Equal(2, s.CameraShots.Count);
+        Assert.Equal(new CameraShot(DcOpcodes.CameraShort, s.CameraShots[0].FileOffset, 100, -200, 300, -1, -2, -3),
+            s.CameraShots[0]);
+        Assert.Equal(DcOpcodes.CameraShort, rdt[s.CameraShots[0].FileOffset]);
+        Assert.Equal(DcOpcodes.CameraLong, s.CameraShots[1].Opcode);
+        Assert.Equal((7000, -1500, -7000), (s.CameraShots[1].EyeX, s.CameraShots[1].EyeY, s.CameraShots[1].EyeZ));
+        Assert.Equal((40, 50, 60), (s.CameraShots[1].TargetX, s.CameraShots[1].TargetY, s.CameraShots[1].TargetZ));
+    }
+
     /// <summary>Build a 48-byte 0x28 subtype-0 door record (dest stage/room, lock, type, entry pose).
     /// The entry pose words sit at the CE-decoded offsets +0x1e/+0x20/+0x22/+0x24 (plan §3.2).</summary>
     private static byte[] DoorRec(byte stage, byte room, byte lockId = 0, byte doorType = 0,

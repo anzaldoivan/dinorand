@@ -56,6 +56,14 @@ public static class DcOpcodes
     /// <summary>Total length of a scripted-entrance (<c>0x5B</c>) record, opcode byte included.</summary>
     public const int Enemy3Length = 44;
 
+    /// <summary>Camera set, 20 bytes (handler <c>0x4272B8</c>): position at <c>+2</c>, target at
+    /// <c>+8</c> (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.99).</summary>
+    public const byte CameraShort = 0x2e;
+
+    /// <summary>Camera set, 32 bytes (handler <c>0x428B71</c>): position at <c>+2</c>, target at
+    /// <c>+0x12</c>, plus two four-word blocks at <c>+8</c> and <c>+0x18</c> (cont.99).</summary>
+    public const byte CameraLong = 0x4c;
+
     /// <summary>Item-placement opcode (the SCD "area-of-things" placement; subtype 4 = item).</summary>
     public const byte Item = 0x28;
 

@@ -87,6 +87,9 @@ public sealed class RoomScript
     /// and never written back. Empty when the script did not parse.</summary>
     public IReadOnlyList<EnemyRecord> ScriptedEntrances { get; private init; } = Array.Empty<EnemyRecord>();
 
+    /// <summary>Cameras set by the script (<c>0x2E</c> / <c>0x4C</c>, cont.99). Read-only.</summary>
+    public IReadOnlyList<CameraShot> CameraShots { get; private init; } = Array.Empty<CameraShot>();
+
     /// <summary>All raw door / area-transition records (<c>0x28</c> subtype 0) found in every
     /// function-table subroutine. Use <see cref="DoorRecord.IsTraversableRoomTransition"/> for the
     /// activation-aware graph transition contract; event records remain here for lossless consumers.</summary>
@@ -110,6 +113,7 @@ public sealed class RoomScript
         var items = new List<ItemRecord>();
         var enemies = new List<EnemyRecord>();
         var entrances = new List<EnemyRecord>();
+        var cameras = new List<CameraShot>();
         var doors = new List<DoorRecord>();
         var scenerySlots = new HashSet<byte>();
         var activationKinds = ClassifyDoorActivations(buffer, starts);
@@ -119,7 +123,7 @@ public sealed class RoomScript
             int start = starts[i];
             int end = i + 1 < starts.Count ? starts[i + 1] : buffer.Length;
             bool ok = WalkSubroutine(buffer, start, end, i, activationKinds[i], items, enemies, entrances,
-                                     doors, scenerySlots);
+                                     cameras, doors, scenerySlots);
             // A derail anywhere but the last subroutine means an unknown/misaligned opcode.
             if (!ok && i != starts.Count - 1) clean = false;
         }
@@ -130,6 +134,7 @@ public sealed class RoomScript
         return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors, scenerySlots)
         {
             ScriptedEntrances = entrances,
+            CameraShots = cameras,
         };
     }
 
@@ -171,7 +176,7 @@ public sealed class RoomScript
     private static bool WalkSubroutine(ReadOnlySpan<byte> buffer, int start, int end, int subroutineIndex,
                                        DoorActivationKind activationKind,
                                        List<ItemRecord> items, List<EnemyRecord> enemies,
-                                       List<EnemyRecord> entrances,
+                                       List<EnemyRecord> entrances, List<CameraShot> cameras,
                                        List<DoorRecord> doors, HashSet<byte> scenerySlots)
     {
         if (start < 0 || end > buffer.Length) return false;
@@ -297,6 +302,16 @@ public sealed class RoomScript
                         FileOffset = pos,
                     });
                 }
+            }
+            else if (buffer[pos] is DcOpcodes.CameraShort or DcOpcodes.CameraLong)
+            {
+                int target = pos + (buffer[pos] == DcOpcodes.CameraShort
+                    ? CameraShot.ShortTargetOffset : CameraShot.LongTargetOffset);
+                int eye = pos + CameraShot.EyeOffset;
+                cameras.Add(new CameraShot(buffer[pos], pos,
+                    (short)ReadU16(buffer, eye), (short)ReadU16(buffer, eye + 2), (short)ReadU16(buffer, eye + 4),
+                    (short)ReadU16(buffer, target), (short)ReadU16(buffer, target + 2),
+                    (short)ReadU16(buffer, target + 4)));
             }
             else if (buffer[pos] == DcOpcodes.Enemy3 && len == DcOpcodes.Enemy3Length)
             {
