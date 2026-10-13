@@ -4,12 +4,12 @@
   "_placed_enemies": "placed_enemies = normalized production placement census decoded from the room .dat via the 0x20+0x59 enemy opcodes; it is not the broader raw every-valid-record RoomFile.Enemies census. Species by model skeleton bone count (docs/dc1/STATIC-SCD-RE.md cont.20-22). category/bones map = data/dc1/enemies.json.",
   "_flag_glossary": {
     "0:0": {
-      "label": "story progress flag 0:0 (engine-set; gates the Medical Room velociraptor)",
+      "label": "story progress flag 0:0 (engine-set; gates the Medical Room human-character placement)",
       "event_room": null,
       "set_by": []
     },
     "0:1": {
-      "label": "story progress flag 0:1 (engine-set; gates the Elevator Control Room velociraptor)",
+      "label": "story progress flag 0:1 (engine-set; gates the Elevator Control Room human-character placement)",
       "event_room": null,
       "set_by": []
     },
@@ -83,7 +83,7 @@
       ]
     },
     "0:44": {
-      "label": "the Backyard velociraptor ambush",
+      "label": "the Backyard human-character scene",
       "event_room": "010D",
       "set_by": [
         {
@@ -110,7 +110,7 @@
       ]
     },
     "0:47": {
-      "label": "the Backup Generator passage velociraptor encounter",
+      "label": "the Backup Generator passage human-character scene",
       "event_room": "010E",
       "set_by": [
         {
@@ -235,7 +235,7 @@
       ]
     },
     "0:120": {
-      "label": "the Carrying Out Room B1 velociraptor encounter",
+      "label": "the Carrying Out Room B1 human-character scene",
       "event_room": "030C",
       "set_by": [
         {
@@ -300,7 +300,7 @@
       ]
     },
     "0:132": {
-      "label": "the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62)",
+      "label": "the Large Elevator Control Room human-character scene (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62)",
       "event_room": "0406",
       "set_by": [
         {
@@ -311,7 +311,7 @@
       ]
     },
     "0:133": {
-      "label": "the Large Elevator Control Room velociraptor encounter (B)",
+      "label": "the Large Elevator Control Room human-character scene (B)",
       "event_room": "0406",
       "set_by": [
         {
@@ -344,7 +344,7 @@
       ]
     },
     "0:137": {
-      "label": "the Researcher Rest Room velociraptor encounter (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62)",
+      "label": "the Researcher Rest Room human-character scene (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62)",
       "event_room": "0505",
       "set_by": [
         {
@@ -360,7 +360,7 @@
       ]
     },
     "0:143": {
-      "label": "the Personal Lab Passage velociraptor encounter",
+      "label": "the Personal Lab Passage human-character scene",
       "event_room": "050D",
       "set_by": [
         {
@@ -387,7 +387,7 @@
       ]
     },
     "0:145": {
-      "label": "the Dr. Kirk's Library velociraptor encounter (A)",
+      "label": "the Dr. Kirk's Library human-character scene (A)",
       "event_room": "050F",
       "set_by": [
         {
@@ -431,7 +431,7 @@
       ]
     },
     "0:169": {
-      "label": "the Dr. Kirk's Library velociraptor encounter (B)",
+      "label": "the Dr. Kirk's Library human-character scene (B)",
       "event_room": "050F",
       "set_by": [
         {
@@ -491,7 +491,7 @@
       ]
     },
     "0:204": {
-      "label": "the Underground Heliport velociraptor encounter (A)",
+      "label": "the Underground Heliport human-character scene (A)",
       "event_room": "060D",
       "set_by": [
         {
@@ -502,7 +502,7 @@
       ]
     },
     "0:205": {
-      "label": "the Underground Heliport velociraptor encounter (B)",
+      "label": "the Underground Heliport human-character scene (B)",
       "event_room": "060D",
       "set_by": [
         {
@@ -513,7 +513,7 @@
       ]
     },
     "0:211": {
-      "label": "the Carrying Out Room B3 velociraptor encounter",
+      "label": "the Carrying Out Room B3 human-character scene",
       "event_room": "0600",
       "set_by": [
         {
@@ -842,7 +842,7 @@
           {
             "rec_offset": "0x39618",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -886,9 +886,9 @@
               "trigger": "room entry",
               "condition": "only until the Locker Room raptor ambush has happened",
               "condition_flag": "0:9",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Locker Room raptor ambush has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Locker Room raptor ambush has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x39618 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 9) @0x39564 -> 0x0e skip-if-true @0x39568; flag 0:9 set_by [0100/sub6=1, 0304/sub16=1].",
             "confidence": "confirmed"
@@ -1052,7 +1052,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -1181,7 +1181,7 @@
           {
             "rec_offset": "0x3a150",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -1204,9 +1204,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "stage the RaptorHeavy model (functioning enemy is engine-spawned)",
+              "effect": "stage the Velociraptor model (functioning enemy is engine-spawned)",
               "oneShot": false,
-              "plain": "On load, Management Office Hall relocates the RaptorHeavy model, but the functioning RaptorHeavy is spawned natively by the engine, not by this record."
+              "plain": "On load, Management Office Hall relocates the Velociraptor model, but the functioning Velociraptor is spawned natively by the engine, not by this record."
             },
             "logic": "0x59 reloc @0x3a150 in sub0 (init); reachable=True dominated=True. gate: unconditional (post-dominates sub entry).",
             "confidence": "inferred"
@@ -1241,7 +1241,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -1699,7 +1699,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -1821,7 +1821,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -1841,7 +1841,7 @@
           {
             "rec_offset": "0x2e330",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -1868,9 +1868,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Control Room 1F, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Control Room 1F, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x2e330 in sub0 (init); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -1878,7 +1878,7 @@
           {
             "rec_offset": "0x2e348",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -1905,9 +1905,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Control Room 1F, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Control Room 1F, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x2e348 in sub0 (init); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -1916,7 +1916,7 @@
       },
       "scripted_enemy": false,
       "special_properties": [
-        "Two velociraptors placed unconditionally at init (both 0x20 dominated, kill-id 0)"
+        "Two human characters (Rick + Gail) placed unconditionally at init (both 0x20 dominated, kill-id 0)"
       ],
       "id": "0106",
       "name": "Control Room 1F",
@@ -1939,7 +1939,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -2308,7 +2308,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -2430,14 +2430,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 1
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x20",
@@ -2457,7 +2457,7 @@
           {
             "rec_offset": "0x48860",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -2501,9 +2501,9 @@
               "trigger": "room entry",
               "condition": "only until the Office Hallway window ambush has happened",
               "condition_flag": "0:35",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Office Hallway window ambush has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Office Hallway window ambush has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x48860 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 35) @0x487d4 -> 0x0e skip-if-true @0x487d8; flag 0:35 set_by [010A/sub9=1, 0A0A/sub9=1].",
             "confidence": "confirmed"
@@ -2511,7 +2511,7 @@
           {
             "rec_offset": "0x48b9c",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 8,
             "spawn_path": "event(sub8)",
@@ -2549,9 +2549,9 @@
               "trigger": "entering the Office Hallway trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "When you enter the Office Hallway trigger zone, spawn a RaptorHeavy."
+              "plain": "When you enter the Office Hallway trigger zone, spawn a Velociraptor."
             },
             "logic": "0x59 reloc @0x48b9c in sub8 (event(sub8)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x48814] -> run sub8.",
             "confidence": "confirmed"
@@ -2559,7 +2559,7 @@
           {
             "rec_offset": "0x48fec",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 9,
             "spawn_path": "event(sub9)",
@@ -2597,9 +2597,9 @@
               "trigger": "entering the Office Hallway trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "When you enter the Office Hallway trigger zone, spawn a RaptorHeavy. This is a one-shot encounter."
+              "plain": "When you enter the Office Hallway trigger zone, spawn a Velociraptor. This is a one-shot encounter."
             },
             "logic": "0x59 reloc @0x48fec in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x48838] -> run sub9.",
             "confidence": "confirmed"
@@ -2681,7 +2681,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -2701,7 +2701,7 @@
           {
             "rec_offset": "0x38434",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -2755,9 +2755,9 @@
               "trigger": "room entry",
               "condition": "only until the Office room-state flag (11:52) has happened",
               "condition_flag": "11:52",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Office room-state flag (11:52) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Office room-state flag (11:52) has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x38434 in sub0 (init); reachable=True dominated=False. gate: 0x52 GetFlag(group 11, index 52) — key/item held @0x3842c -> 0x0e skip-if-true @0x38430; flag 11:52 set_by [010B/sub10=1, 010B/sub10=0, 0A0B/sub10=1, 0A0B/sub10=0].",
             "confidence": "confirmed"
@@ -2765,7 +2765,7 @@
           {
             "rec_offset": "0x38448",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -2819,9 +2819,9 @@
               "trigger": "room entry",
               "condition": "only until the Office room-state flag (11:52) has happened",
               "condition_flag": "11:52",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Office room-state flag (11:52) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Office room-state flag (11:52) has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x38448 in sub0 (init); reachable=True dominated=False. gate: 0x52 GetFlag(group 11, index 52) — key/item held @0x3842c -> 0x0e skip-if-true @0x38430; flag 11:52 set_by [010B/sub10=1, 010B/sub10=0, 0A0B/sub10=1, 0A0B/sub10=0].",
             "confidence": "confirmed"
@@ -2939,7 +2939,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -3071,7 +3071,7 @@
           {
             "rec_offset": "0x3eae0",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -3112,11 +3112,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Backyard velociraptor ambush has happened",
+              "condition": "only until the Backyard human-character scene has happened",
               "condition_flag": "0:44",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Backyard velociraptor ambush has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Backyard human-character scene has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x3eae0 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 44) @0x3ead8 -> 0x0e skip-if-true @0x3eadc; flag 0:44 set_by [010D/sub19=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3124,7 +3124,7 @@
           {
             "rec_offset": "0x3f048",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 10,
             "spawn_path": "event(sub10)",
@@ -3155,9 +3155,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Backyard of the Facility, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Backyard of the Facility, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x3f048 in sub10 (event(sub10)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3165,7 +3165,7 @@
           {
             "rec_offset": "0x400cc",
             "opcode": "0x20",
-            "species": "Raptor (heavy rig)",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 22,
             "spawn_path": "event(sub22)",
@@ -3196,9 +3196,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Raptor (heavy rig)",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Every time you enter Backyard of the Facility, spawn a Raptor (heavy rig) (until it has been killed)."
+              "plain": "Every time you enter Backyard of the Facility, spawn a Velociraptor (until it has been killed)."
             },
             "logic": "0x20 placement @0x400cc in sub22 (event(sub22)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3320,14 +3320,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 2
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x20",
@@ -3347,7 +3347,7 @@
           {
             "rec_offset": "0x1ca94",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -3388,11 +3388,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Backup Generator passage velociraptor encounter has happened",
+              "condition": "only until the Backup Generator passage human-character scene has happened",
               "condition_flag": "0:47",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Backup Generator passage velociraptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Backup Generator passage human-character scene has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x1ca94 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 47) @0x1ca8c -> 0x0e skip-if-true @0x1ca90; flag 0:47 set_by [010E/sub12=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3400,7 +3400,7 @@
           {
             "rec_offset": "0x1cad4",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -3441,11 +3441,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Backup Generator passage velociraptor encounter has happened",
+              "condition": "only until the Backup Generator passage human-character scene has happened",
               "condition_flag": "0:47",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Backup Generator passage velociraptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Backup Generator passage human-character scene has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x1cad4 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 47) @0x1ca8c -> 0x0e skip-if-true @0x1ca90; flag 0:47 set_by [010E/sub12=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3525,7 +3525,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -3704,7 +3704,7 @@
           {
             "rec_offset": "0x4f144",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -3748,9 +3748,9 @@
               "trigger": "room entry",
               "condition": "only until the Backup Generator area raptor encounter has happened",
               "condition_flag": "0:45",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Backup Generator area raptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Backup Generator area raptor encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x4f144 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 45) @0x4f13c -> 0x0e skip-if-true @0x4f140; flag 0:45 set_by [010D/sub22=1, 0112/sub14=1].",
             "confidence": "confirmed"
@@ -3758,7 +3758,7 @@
           {
             "rec_offset": "0x4f1c0",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 9,
             "spawn_path": "event(sub9)",
@@ -3789,9 +3789,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter The Backyard, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter The Backyard, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4f1c0 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3799,7 +3799,7 @@
           {
             "rec_offset": "0x4f1d8",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 9,
             "spawn_path": "event(sub9)",
@@ -3830,9 +3830,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter The Backyard, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter The Backyard, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4f1d8 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3840,7 +3840,7 @@
           {
             "rec_offset": "0x4fea8",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 19,
             "spawn_path": "event(sub19)",
@@ -3871,9 +3871,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter The Backyard, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter The Backyard, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4fea8 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -3906,14 +3906,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 2
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -4042,7 +4042,7 @@
           {
             "rec_offset": "0x400bc",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -4091,9 +4091,9 @@
               "trigger": "room entry",
               "condition": "only until the Backup Generator passage raptor event (0:51) has happened",
               "condition_flag": "0:51",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a RaptorHeavy on entry only until the Backup Generator passage raptor event (0:51) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Backup Generator passage raptor event (0:51) has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x400bc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 51) @0x400b4 -> 0x0e skip-if-true @0x400b8; flag 0:51 set_by [010D/sub22=1, 0112/sub0=1, 0112/sub20=1].",
             "confidence": "confirmed"
@@ -4101,7 +4101,7 @@
           {
             "rec_offset": "0x400e8",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -4145,9 +4145,9 @@
               "trigger": "room entry",
               "condition": "only until the Backup Generator area raptor encounter has happened",
               "condition_flag": "0:45",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a RaptorHeavy on entry only until the Backup Generator area raptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Backup Generator area raptor encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x400e8 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 45) @0x400ac -> 0x0e skip-if-true @0x400b0; flag 0:45 set_by [010D/sub22=1, 0112/sub14=1].",
             "confidence": "confirmed"
@@ -4155,7 +4155,7 @@
           {
             "rec_offset": "0x40194",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 12,
             "spawn_path": "event(sub12)",
@@ -4193,9 +4193,9 @@
               "trigger": "entering the Passageway to the Backup Generator trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "When you enter the Passageway to the Backup Generator trigger zone, spawn a RaptorHeavy."
+              "plain": "When you enter the Passageway to the Backup Generator trigger zone, spawn a Velociraptor."
             },
             "logic": "0x59 reloc @0x40194 in sub12 (event(sub12)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x40084] -> run sub12.",
             "confidence": "confirmed"
@@ -4275,7 +4275,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -4499,7 +4499,7 @@
           {
             "rec_offset": "0x4fb3c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -4542,9 +4542,9 @@
               "trigger": "room entry",
               "condition": "only until the Chief's Room T-Rex window-smash has happened",
               "condition_flag": "0:63",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Chief's Room T-Rex window-smash has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Chief's Room T-Rex window-smash has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x4fb3c in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 63) @0x4fb2c -> 0x0e skip-if-true @0x4fb30; flag 0:63 set_by [0202/sub14=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -4932,7 +4932,7 @@
       },
       "scripted_enemy": true,
       "special_properties": [
-        "Scripted T-Rex window-smash (ScriptedEnemyRoomCode 0x202): cat-4 T-Rex (Chief's Room rig) placed in event sub14 (dominated); a velociraptor 0x20 at init is gated by 0x26 @0x4fb2c"
+        "Scripted T-Rex window-smash (ScriptedEnemyRoomCode 0x202): cat-4 T-Rex (Chief's Room rig) placed in event sub14 (dominated); a human-rig 0x20 at init is gated by 0x26 @0x4fb2c"
       ],
       "id": "0202",
       "name": "Chief's Room",
@@ -4958,7 +4958,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -5088,7 +5088,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -5446,7 +5446,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -5966,7 +5966,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -6083,7 +6083,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -6103,7 +6103,7 @@
           {
             "rec_offset": "0x4fc3c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -6130,9 +6130,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Gas Experiment Room, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Gas Experiment Room, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4fc3c in sub0 (init); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -6140,7 +6140,7 @@
           {
             "rec_offset": "0x4fca4",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -6179,9 +6179,9 @@
               "trigger": "room entry",
               "condition": "only after the Gas Experiment Room heavy-raptor encounter",
               "condition_flag": "0:88",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy only after the Gas Experiment Room heavy-raptor encounter; otherwise this spot stays empty."
+              "plain": "Spawn a Velociraptor only after the Gas Experiment Room heavy-raptor encounter; otherwise this spot stays empty."
             },
             "logic": "0x59 reloc @0x4fca4 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 88) @0x4fc9c -> 0x0e skip-if-false @0x4fca0; flag 0:88 set_by [0303/sub15=1].",
             "confidence": "confirmed"
@@ -6189,7 +6189,7 @@
           {
             "rec_offset": "0x50cf0",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 15,
             "spawn_path": "event(sub15)",
@@ -6240,9 +6240,9 @@
               "trigger": "entering the Gas Experiment Room trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "When you enter the Gas Experiment Room trigger zone, spawn a RaptorHeavy. This is a one-shot encounter."
+              "plain": "When you enter the Gas Experiment Room trigger zone, spawn a Velociraptor. This is a one-shot encounter."
             },
             "logic": "0x59 reloc @0x50cf0 in sub15 (event(sub15)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x50b4c, 0x50ca0] -> run sub15.",
             "confidence": "confirmed"
@@ -6691,14 +6691,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 1
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -6718,7 +6718,7 @@
           {
             "rec_offset": "0x25934",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -6761,9 +6761,9 @@
               "trigger": "room entry",
               "condition": "only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened",
               "condition_flag": "0:200",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x25934 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 200) @0x2592c -> 0x0e skip-if-true @0x25930; flag 0:200 set_by [0300/sub16=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -6771,7 +6771,7 @@
           {
             "rec_offset": "0x25974",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -6814,9 +6814,9 @@
               "trigger": "room entry",
               "condition": "only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened",
               "condition_flag": "0:200",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Experiment Simulation Room event (armed in 0300; also arms the 0304 sub14 facility-lockdown 0:91 on re-entry, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x25974 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 200) @0x2592c -> 0x0e skip-if-true @0x25930; flag 0:200 set_by [0300/sub16=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -6824,7 +6824,7 @@
           {
             "rec_offset": "0x263ac",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 12,
             "spawn_path": "event(sub12)",
@@ -6855,9 +6855,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Computer Room, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Computer Room, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x263ac in sub12 (event(sub12)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[11] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -7047,7 +7047,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -7067,7 +7067,7 @@
           {
             "rec_offset": "0x372c8",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -7111,9 +7111,9 @@
               "trigger": "room entry",
               "condition": "only until the Library Room state flag (11:70) has happened",
               "condition_flag": "11:70",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Library Room state flag (11:70) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Library Room state flag (11:70) has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x372c8 in sub0 (init); reachable=True dominated=False. gate: 0x52 GetFlag(group 11, index 70) — key/item held @0x372c0 -> 0x0e skip-if-true @0x372c4; flag 11:70 set_by [0305/sub12=1, 0305/sub12=0].",
             "confidence": "confirmed"
@@ -7121,7 +7121,7 @@
           {
             "rec_offset": "0x372dc",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -7165,9 +7165,9 @@
               "trigger": "room entry",
               "condition": "only until the Library Room state flag (11:70) has happened",
               "condition_flag": "11:70",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Library Room state flag (11:70) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Library Room state flag (11:70) has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x372dc in sub0 (init); reachable=True dominated=False. gate: 0x52 GetFlag(group 11, index 70) — key/item held @0x372c0 -> 0x0e skip-if-true @0x372c4; flag 11:70 set_by [0305/sub12=1, 0305/sub12=0].",
             "confidence": "confirmed"
@@ -7472,7 +7472,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -7499,7 +7499,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -7778,7 +7778,7 @@
           {
             "rec_offset": "0x42554",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -7813,11 +7813,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only after story progress flag 0:0 (engine-set; gates the Medical Room velociraptor)",
+              "condition": "only after story progress flag 0:0 (engine-set; gates the Medical Room human-character placement)",
               "condition_flag": "0:0",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor only after story progress flag 0:0 (engine-set; gates the Medical Room velociraptor); otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after story progress flag 0:0 (engine-set; gates the Medical Room human-character placement); otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x42554 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 0) @0x4252c -> 0x0e skip-if-false @0x42530; flag 0:0 set_by [(none)]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -7825,7 +7825,7 @@
           {
             "rec_offset": "0x42844",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 7,
             "spawn_path": "event(sub7)",
@@ -7856,9 +7856,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Medical Room, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Medical Room, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x42844 in sub7 (event(sub7)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[6] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -7866,7 +7866,7 @@
           {
             "rec_offset": "0x42994",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 9,
             "spawn_path": "event(sub9)",
@@ -7897,9 +7897,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Medical Room, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Medical Room, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x42994 in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -7907,7 +7907,7 @@
           {
             "rec_offset": "0x429ac",
             "opcode": "0x20",
-            "species": "Raptor (heavy rig)",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 9,
             "spawn_path": "event(sub9)",
@@ -7938,9 +7938,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Raptor (heavy rig)",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Every time you enter Medical Room, spawn a Raptor (heavy rig) (until it has been killed)."
+              "plain": "Every time you enter Medical Room, spawn a Velociraptor (until it has been killed)."
             },
             "logic": "0x20 placement @0x429ac in sub9 (event(sub9)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,17).",
             "confidence": "confirmed"
@@ -8355,14 +8355,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 2
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x20",
@@ -8382,7 +8382,7 @@
           {
             "rec_offset": "0x3dfcc",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -8421,9 +8421,9 @@
               "trigger": "room entry",
               "condition": "only after the Hall B1 heavy-raptor encounter",
               "condition_flag": "0:106",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy only after the Hall B1 heavy-raptor encounter; otherwise this spot stays empty."
+              "plain": "Spawn a Velociraptor only after the Hall B1 heavy-raptor encounter; otherwise this spot stays empty."
             },
             "logic": "0x59 reloc @0x3dfcc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 106) @0x3dfc4 -> 0x0e skip-if-false @0x3dfc8; flag 0:106 set_by [0309/sub17=1].",
             "confidence": "confirmed"
@@ -8431,7 +8431,7 @@
           {
             "rec_offset": "0x3dfe0",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -8470,9 +8470,9 @@
               "trigger": "room entry",
               "condition": "only after the Hall B1 heavy-raptor encounter",
               "condition_flag": "0:106",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy only after the Hall B1 heavy-raptor encounter; otherwise this spot stays empty."
+              "plain": "Spawn a Velociraptor only after the Hall B1 heavy-raptor encounter; otherwise this spot stays empty."
             },
             "logic": "0x59 reloc @0x3dfe0 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 106) @0x3dfc4 -> 0x0e skip-if-false @0x3dfc8; flag 0:106 set_by [0309/sub17=1].",
             "confidence": "confirmed"
@@ -8480,7 +8480,7 @@
           {
             "rec_offset": "0x3e91c",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 18,
             "spawn_path": "event(sub18)",
@@ -8507,9 +8507,9 @@
               "trigger": "an in-room event",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Every time you enter Hall B1, spawn a RaptorHeavy (until it has been killed)."
+              "plain": "Every time you enter Hall B1, spawn a Velociraptor (until it has been killed)."
             },
             "logic": "0x59 reloc @0x3e91c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[17] (rooted: unrooted).",
             "confidence": "confirmed"
@@ -8712,7 +8712,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -8788,14 +8788,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 2
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x20",
@@ -8929,7 +8929,7 @@
           {
             "rec_offset": "0x49d54",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -8970,11 +8970,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only after the Carrying Out Room B1 velociraptor encounter",
+              "condition": "only after the Carrying Out Room B1 human-character scene",
               "condition_flag": "0:120",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor only after the Carrying Out Room B1 velociraptor encounter; otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after the Carrying Out Room B1 human-character scene; otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x49d54 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 120) @0x49d20 -> 0x0e skip-if-false @0x49d24; flag 0:120 set_by [030C/sub17=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -8982,7 +8982,7 @@
           {
             "rec_offset": "0x49d98",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -9023,11 +9023,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only after the Carrying Out Room B1 velociraptor encounter",
+              "condition": "only after the Carrying Out Room B1 human-character scene",
               "condition_flag": "0:120",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor only after the Carrying Out Room B1 velociraptor encounter; otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after the Carrying Out Room B1 human-character scene; otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x49d98 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 120) @0x49d20 -> 0x0e skip-if-false @0x49d24; flag 0:120 set_by [030C/sub17=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -9035,7 +9035,7 @@
           {
             "rec_offset": "0x4a770",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 16,
             "spawn_path": "event(sub16)",
@@ -9066,9 +9066,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4a770 in sub16 (event(sub16)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -9076,7 +9076,7 @@
           {
             "rec_offset": "0x4a7b4",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 16,
             "spawn_path": "event(sub16)",
@@ -9107,9 +9107,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4a7b4 in sub16 (event(sub16)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -9117,7 +9117,7 @@
           {
             "rec_offset": "0x4af9c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 18,
             "spawn_path": "event(sub18)",
@@ -9148,9 +9148,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4af9c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -9158,7 +9158,7 @@
           {
             "rec_offset": "0x4b1b8",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 18,
             "spawn_path": "event(sub18)",
@@ -9189,9 +9189,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4b1b8 in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -9199,7 +9199,7 @@
           {
             "rec_offset": "0x4b388",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 19,
             "spawn_path": "event(sub19)",
@@ -9230,9 +9230,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4b388 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -9240,7 +9240,7 @@
           {
             "rec_offset": "0x4b3a0",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 19,
             "spawn_path": "event(sub19)",
@@ -9271,9 +9271,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Carrying Out Room B1, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Carrying Out Room B1, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x4b3a0 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -9473,7 +9473,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -9493,7 +9493,7 @@
           {
             "rec_offset": "0x487b8",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -9537,9 +9537,9 @@
               "trigger": "room entry",
               "condition": "only until the Materials-Carrying Hallway raptor encounter has happened",
               "condition_flag": "0:109",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Materials-Carrying Hallway raptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Materials-Carrying Hallway raptor encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x487b8 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 109) @0x48748 -> 0x0e skip-if-true @0x4874c; flag 0:109 set_by [0304/sub16=1, 030D/sub8=1].",
             "confidence": "confirmed"
@@ -9547,7 +9547,7 @@
           {
             "rec_offset": "0x487cc",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -9591,9 +9591,9 @@
               "trigger": "room entry",
               "condition": "only until the Materials-Carrying Hallway raptor encounter has happened",
               "condition_flag": "0:109",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Materials-Carrying Hallway raptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Materials-Carrying Hallway raptor encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x487cc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 109) @0x48748 -> 0x0e skip-if-true @0x4874c; flag 0:109 set_by [0304/sub16=1, 030D/sub8=1].",
             "confidence": "confirmed"
@@ -9601,7 +9601,7 @@
           {
             "rec_offset": "0x48a28",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 8,
             "spawn_path": "event(sub8)",
@@ -9639,9 +9639,9 @@
               "trigger": "entering the Hallway for Carrying in Materials trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "When you enter the Hallway for Carrying in Materials trigger zone, spawn a RaptorHeavy. This is a one-shot encounter."
+              "plain": "When you enter the Hallway for Carrying in Materials trigger zone, spawn a Velociraptor. This is a one-shot encounter."
             },
             "logic": "0x59 reloc @0x48a28 in sub8 (event(sub8)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x48790] -> run sub8.",
             "confidence": "confirmed"
@@ -9714,7 +9714,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -9920,7 +9920,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -10278,7 +10278,7 @@
           {
             "rec_offset": "0x37400",
             "opcode": "0x20",
-            "species": "Raptor (heavy rig)",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -10321,9 +10321,9 @@
               "trigger": "room entry",
               "condition": "only until the Heliport Passage heavy-raptor encounter (phase 1) has happened",
               "condition_flag": "0:123",
-              "effect": "spawn a Raptor (heavy rig)",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a Raptor (heavy rig) on entry only until the Heliport Passage heavy-raptor encounter (phase 1) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Heliport Passage heavy-raptor encounter (phase 1) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x37400 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 123) @0x373b8 -> 0x0e skip-if-true @0x373bc; flag 0:123 set_by [0401/sub18=1]. kill_flag GetFlag(4,23).",
             "confidence": "confirmed"
@@ -10331,7 +10331,7 @@
           {
             "rec_offset": "0x37448",
             "opcode": "0x20",
-            "species": "Raptor (heavy rig)",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -10374,9 +10374,9 @@
               "trigger": "room entry",
               "condition": "only until the Heliport Passage heavy-raptor encounter (phase 2) has happened",
               "condition_flag": "0:124",
-              "effect": "spawn a Raptor (heavy rig)",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a Raptor (heavy rig) on entry only until the Heliport Passage heavy-raptor encounter (phase 2) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Heliport Passage heavy-raptor encounter (phase 2) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x37448 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 124) @0x37418 -> 0x0e skip-if-true @0x3741c; flag 0:124 set_by [0401/sub20=1]. kill_flag GetFlag(4,24).",
             "confidence": "confirmed"
@@ -10384,7 +10384,7 @@
           {
             "rec_offset": "0x37780",
             "opcode": "0x20",
-            "species": "Raptor (heavy rig)",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 18,
             "spawn_path": "event(sub18)",
@@ -10426,9 +10426,9 @@
               "trigger": "entering the Passageway to the Heliport trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Raptor (heavy rig)",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "When you enter the Passageway to the Heliport trigger zone, spawn a Raptor (heavy rig). This is a one-shot encounter."
+              "plain": "When you enter the Passageway to the Heliport trigger zone, spawn a Velociraptor. This is a one-shot encounter."
             },
             "logic": "0x20 placement @0x37780 in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x373c0] -> run sub18. kill_flag GetFlag(4,23).",
             "confidence": "confirmed"
@@ -10436,7 +10436,7 @@
           {
             "rec_offset": "0x378c8",
             "opcode": "0x20",
-            "species": "Raptor (heavy rig)",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 20,
             "spawn_path": "event(sub20)",
@@ -10478,9 +10478,9 @@
               "trigger": "entering the Passageway to the Heliport trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Raptor (heavy rig)",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "When you enter the Passageway to the Heliport trigger zone, spawn a Raptor (heavy rig). This is a one-shot encounter."
+              "plain": "When you enter the Passageway to the Heliport trigger zone, spawn a Velociraptor. This is a one-shot encounter."
             },
             "logic": "0x20 placement @0x378c8 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x37420] -> run sub20. kill_flag GetFlag(4,24).",
             "confidence": "confirmed"
@@ -10602,7 +10602,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x20",
@@ -10871,7 +10871,7 @@
           {
             "rec_offset": "0x557b8",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 19,
             "spawn_path": "event(sub19)",
@@ -10913,9 +10913,9 @@
               "trigger": "entering the Heliport trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "When you enter the Heliport trigger zone, spawn a Velociraptor. This is a one-shot encounter."
+              "plain": "When you enter the Heliport trigger zone, spawn a Humanoid. This is a one-shot encounter."
             },
             "logic": "0x20 placement @0x557b8 in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x54f44] -> run sub19. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -10923,7 +10923,7 @@
           {
             "rec_offset": "0x558c4",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 20,
             "spawn_path": "event(sub20)",
@@ -10954,9 +10954,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Every time you enter Heliport, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Heliport, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x558c4 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[18] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -11119,7 +11119,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -11146,7 +11146,7 @@
           {
             "rec_offset": "0x3ab9c",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -11190,9 +11190,9 @@
               "trigger": "room entry",
               "condition": "only until the Large Elevator Passageway raptor encounter has happened",
               "condition_flag": "0:128",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Large Elevator Passageway raptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Passageway raptor encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x3ab9c in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 128) @0x3ab78 -> 0x0e skip-if-true @0x3ab7c; flag 0:128 set_by [030C/sub0=1, 0404/sub5=1].",
             "confidence": "confirmed"
@@ -11200,7 +11200,7 @@
           {
             "rec_offset": "0x3abbc",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -11244,9 +11244,9 @@
               "trigger": "room entry",
               "condition": "only until the Large Elevator Passageway raptor encounter has happened",
               "condition_flag": "0:128",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Large Elevator Passageway raptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Passageway raptor encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x3abbc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 128) @0x3ab78 -> 0x0e skip-if-true @0x3ab7c; flag 0:128 set_by [030C/sub0=1, 0404/sub5=1].",
             "confidence": "confirmed"
@@ -11363,7 +11363,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -11383,7 +11383,7 @@
           {
             "rec_offset": "0x55094",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -11426,9 +11426,9 @@
               "trigger": "room entry",
               "condition": "only after the Elevator Power Room event (armed in 0408)",
               "condition_flag": "0:135",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor only after the Elevator Power Room event (armed in 0408); otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after the Elevator Power Room event (armed in 0408); otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x55094 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 135) @0x5508c -> 0x0e skip-if-false @0x55090; flag 0:135 set_by [0408/sub31=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -11630,7 +11630,7 @@
           {
             "rec_offset": "0x5653c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 19,
             "spawn_path": "event(sub19)",
@@ -11661,9 +11661,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Large Size Elevator, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Large Size Elevator, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x5653c in sub19 (event(sub19)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[18] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -11834,7 +11834,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -11861,7 +11861,7 @@
           {
             "rec_offset": "0x37644",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -11896,11 +11896,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only after story progress flag 0:1 (engine-set; gates the Elevator Control Room velociraptor)",
+              "condition": "only after story progress flag 0:1 (engine-set; gates the Elevator Control Room human-character placement)",
               "condition_flag": "0:1",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor only after story progress flag 0:1 (engine-set; gates the Elevator Control Room velociraptor); otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after story progress flag 0:1 (engine-set; gates the Elevator Control Room human-character placement); otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x37644 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 1) @0x3763c -> 0x0e skip-if-false @0x37640; flag 0:1 set_by [(none)]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -11908,7 +11908,7 @@
           {
             "rec_offset": "0x376fc",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -11949,11 +11949,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened",
+              "condition": "only until the Large Elevator Control Room human-character scene (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened",
               "condition_flag": "0:132",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Large Elevator Control Room human-character scene (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x376fc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 132) @0x376ec -> 0x0e skip-if-true @0x376f0; flag 0:132 set_by [0406/sub12=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -11961,7 +11961,7 @@
           {
             "rec_offset": "0x37714",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -12002,11 +12002,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened",
+              "condition": "only until the Large Elevator Control Room human-character scene (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened",
               "condition_flag": "0:132",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Large Elevator Control Room human-character scene (A) (0406 sub12 also re-arms the 030A/030D fence keypads: sets 0:249, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x37714 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 132) @0x376ec -> 0x0e skip-if-true @0x376f0; flag 0:132 set_by [0406/sub12=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -12014,7 +12014,7 @@
           {
             "rec_offset": "0x37764",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -12057,9 +12057,9 @@
               "trigger": "room entry",
               "condition": "only until the Large Elevator event (armed in 0405) has happened",
               "condition_flag": "0:146",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator event (armed in 0405) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Large Elevator event (armed in 0405) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x37764 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 146) @0x37754 -> 0x0e skip-if-true @0x37758; flag 0:146 set_by [0405/sub15=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -12067,7 +12067,7 @@
           {
             "rec_offset": "0x3777c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -12110,9 +12110,9 @@
               "trigger": "room entry",
               "condition": "only until the Large Elevator event (armed in 0405) has happened",
               "condition_flag": "0:146",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator event (armed in 0405) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Large Elevator event (armed in 0405) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x3777c in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 146) @0x37754 -> 0x0e skip-if-true @0x37758; flag 0:146 set_by [0405/sub15=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -12120,7 +12120,7 @@
           {
             "rec_offset": "0x37844",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -12161,11 +12161,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Large Elevator Control Room velociraptor encounter (B) has happened",
+              "condition": "only until the Large Elevator Control Room human-character scene (B) has happened",
               "condition_flag": "0:133",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (B) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Large Elevator Control Room human-character scene (B) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x37844 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 133) @0x37810 -> 0x0e skip-if-true @0x37814; flag 0:133 set_by [0406/sub18=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -12173,7 +12173,7 @@
           {
             "rec_offset": "0x3785c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -12214,11 +12214,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Large Elevator Control Room velociraptor encounter (B) has happened",
+              "condition": "only until the Large Elevator Control Room human-character scene (B) has happened",
               "condition_flag": "0:133",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Large Elevator Control Room velociraptor encounter (B) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Large Elevator Control Room human-character scene (B) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x3785c in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 133) @0x37810 -> 0x0e skip-if-true @0x37814; flag 0:133 set_by [0406/sub18=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -12353,11 +12353,11 @@
             },
             "summary": {
               "trigger": "room entry",
-              "condition": "only after story progress flag 0:1 (engine-set; gates the Elevator Control Room velociraptor)",
+              "condition": "only after story progress flag 0:1 (engine-set; gates the Elevator Control Room human-character placement)",
               "condition_flag": "0:1",
               "effect": "place the DDK Code Disc L",
               "oneShot": false,
-              "plain": "Place the DDK Code Disc L here only after story progress flag 0:1 (engine-set; gates the Elevator Control Room velociraptor)."
+              "plain": "Place the DDK Code Disc L here only after story progress flag 0:1 (engine-set; gates the Elevator Control Room human-character placement)."
             },
             "logic": "0x28 item @0x37674 in sub0 (init); id=0x6b (DDK Code Disc L) count=1; reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 1) @0x3763c -> 0x0e skip-if-false @0x37640; flag 0:1 set_by [(none)]. collected_flag GetFlag(8,107).",
             "confidence": "confirmed"
@@ -12428,7 +12428,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -12942,7 +12942,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -13563,7 +13563,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -13664,7 +13664,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -13753,7 +13753,7 @@
           {
             "rec_offset": "0x480ec",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -13792,9 +13792,9 @@
               "trigger": "room entry",
               "condition": "only until the Experiment Room Hall raptor event has happened",
               "condition_flag": "0:15",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Experiment Room Hall raptor event has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Experiment Room Hall raptor event has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x480ec in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 15) @0x480a8 -> 0x0e skip-if-true @0x480ac; flag 0:15 set_by [0502/sub14=1].",
             "confidence": "confirmed"
@@ -13802,7 +13802,7 @@
           {
             "rec_offset": "0x4810c",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -13841,9 +13841,9 @@
               "trigger": "room entry",
               "condition": "only until the Experiment Room Hall raptor event has happened",
               "condition_flag": "0:15",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "Spawn a RaptorHeavy on entry only until the Experiment Room Hall raptor event has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until the Experiment Room Hall raptor event has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x4810c in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 15) @0x480a8 -> 0x0e skip-if-true @0x480ac; flag 0:15 set_by [0502/sub14=1].",
             "confidence": "confirmed"
@@ -13851,7 +13851,7 @@
           {
             "rec_offset": "0x48404",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 14,
             "spawn_path": "event(sub14)",
@@ -13889,9 +13889,9 @@
               "trigger": "entering the Experiment Room Hall trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": true,
-              "plain": "When you enter the Experiment Room Hall trigger zone, spawn a RaptorHeavy. This is a one-shot encounter."
+              "plain": "When you enter the Experiment Room Hall trigger zone, spawn a Velociraptor. This is a one-shot encounter."
             },
             "logic": "0x59 reloc @0x48404 in sub14 (event(sub14)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x480b0] -> run sub14.",
             "confidence": "confirmed"
@@ -13899,7 +13899,7 @@
           {
             "rec_offset": "0x4888c",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 18,
             "spawn_path": "event(sub18)",
@@ -13926,9 +13926,9 @@
               "trigger": "entering the Experiment Room Hall trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Every time you enter Experiment Room Hall, spawn a RaptorHeavy (until it has been killed)."
+              "plain": "Every time you enter Experiment Room Hall, spawn a Velociraptor (until it has been killed)."
             },
             "logic": "0x59 reloc @0x4888c in sub18 (event(sub18)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[14] (rooted: aot_zone(sub14)).",
             "confidence": "confirmed"
@@ -14066,7 +14066,7 @@
       },
       "scripted_enemy": false,
       "special_properties": [
-        "'Blue Raptor' = cat-2 RaptorHeavy palette swap (not a distinct rig): 2x 0x59 gated at init (0x26 @0x480a8) + 2x in event subs 14/18 (dominated)"
+        "'Blue Raptor' = cat-2 Velociraptor palette swap (not a distinct rig): 2x 0x59 gated at init (0x26 @0x480a8) + 2x in event subs 14/18 (dominated)"
       ],
       "id": "0502",
       "name": "Experiment Room Hall",
@@ -14095,7 +14095,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -14676,7 +14676,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -15493,7 +15493,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -15513,7 +15513,7 @@
           {
             "rec_offset": "0x47f30",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -15559,11 +15559,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Researcher Rest Room velociraptor encounter (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62) has happened",
+              "condition": "only until the Researcher Rest Room human-character scene (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62) has happened",
               "condition_flag": "0:137",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Researcher Rest Room velociraptor encounter (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Researcher Rest Room human-character scene (0505 sub17; also arms the 0608 sub6 fence-unlock event, cont.62) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x47f30 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 137) @0x47f28 -> 0x0e skip-if-true @0x47f2c; flag 0:137 set_by [0505/sub0=0, 0505/sub17=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -15571,7 +15571,7 @@
           {
             "rec_offset": "0x47f60",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -15610,9 +15610,9 @@
               "trigger": "room entry",
               "condition": "only after the Experiment Room Hall raptor event",
               "condition_flag": "0:15",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a RaptorHeavy only after the Experiment Room Hall raptor event; otherwise this spot stays empty."
+              "plain": "Spawn a Velociraptor only after the Experiment Room Hall raptor event; otherwise this spot stays empty."
             },
             "logic": "0x59 reloc @0x47f60 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 15) @0x47f58 -> 0x0e skip-if-false @0x47f5c; flag 0:15 set_by [0502/sub14=1].",
             "confidence": "confirmed"
@@ -15620,7 +15620,7 @@
           {
             "rec_offset": "0x47f74",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -15659,9 +15659,9 @@
               "trigger": "room entry",
               "condition": "only after the Experiment Room Hall raptor event",
               "condition_flag": "0:15",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a RaptorHeavy only after the Experiment Room Hall raptor event; otherwise this spot stays empty."
+              "plain": "Spawn a Velociraptor only after the Experiment Room Hall raptor event; otherwise this spot stays empty."
             },
             "logic": "0x59 reloc @0x47f74 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 15) @0x47f58 -> 0x0e skip-if-false @0x47f5c; flag 0:15 set_by [0502/sub14=1].",
             "confidence": "confirmed"
@@ -15822,14 +15822,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 1
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -16400,7 +16400,7 @@
           {
             "rec_offset": "0x4e1bc",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -16433,9 +16433,9 @@
               "trigger": "room entry",
               "condition": "only until story progress flag 0:5 (engine-set; gates the Passageway heavy raptor) has happened",
               "condition_flag": "0:5",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a RaptorHeavy on entry only until story progress flag 0:5 (engine-set; gates the Passageway heavy raptor) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Velociraptor on entry only until story progress flag 0:5 (engine-set; gates the Passageway heavy raptor) has happened; afterwards it never spawns here again."
             },
             "logic": "0x59 reloc @0x4e1bc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 5) @0x4e1b0 -> 0x0e skip-if-true @0x4e1b4; flag 0:5 set_by [(none)].",
             "confidence": "confirmed"
@@ -16511,7 +16511,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -16695,7 +16695,7 @@
           {
             "rec_offset": "0x4355c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -16738,9 +16738,9 @@
               "trigger": "room entry",
               "condition": "only after the Third Energy Control event (armed in 050B)",
               "condition_flag": "0:197",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor only after the Third Energy Control event (armed in 050B); otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after the Third Energy Control event (armed in 050B); otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x4355c in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 197) @0x43510 -> 0x0e skip-if-false @0x43514; flag 0:197 set_by [050B/sub22=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -16748,7 +16748,7 @@
           {
             "rec_offset": "0x435f4",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -16792,9 +16792,9 @@
               "trigger": "room entry",
               "condition": "only after the Dr. Kirk's Personal Lab area encounter",
               "condition_flag": "0:144",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a RaptorHeavy only after the Dr. Kirk's Personal Lab area encounter; otherwise this spot stays empty."
+              "plain": "Spawn a Velociraptor only after the Dr. Kirk's Personal Lab area encounter; otherwise this spot stays empty."
             },
             "logic": "0x59 reloc @0x435f4 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 144) @0x435ec -> 0x0e skip-if-false @0x435f0; flag 0:144 set_by [050E/sub0=0, 050E/sub8=1].",
             "confidence": "confirmed"
@@ -16802,7 +16802,7 @@
           {
             "rec_offset": "0x436c8",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -16845,9 +16845,9 @@
               "trigger": "room entry",
               "condition": "only after the Third Energy Control event (armed in 050B)",
               "condition_flag": "0:197",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor only after the Third Energy Control event (armed in 050B); otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after the Third Energy Control event (armed in 050B); otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x436c8 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 197) @0x43510 -> 0x0e skip-if-false @0x43514; flag 0:197 set_by [050B/sub22=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -16989,14 +16989,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 1
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -17016,7 +17016,7 @@
           {
             "rec_offset": "0x3a650",
             "opcode": "0x59",
-            "species": "RaptorHeavy",
+            "species": "Velociraptor",
             "category": 2,
             "sub": 0,
             "spawn_path": "init",
@@ -17060,9 +17060,9 @@
               "trigger": "room entry",
               "condition": "only after the Dr. Kirk's Personal Lab area encounter",
               "condition_flag": "0:144",
-              "effect": "spawn a RaptorHeavy",
+              "effect": "spawn a Velociraptor",
               "oneShot": false,
-              "plain": "Spawn a RaptorHeavy only after the Dr. Kirk's Personal Lab area encounter; otherwise this spot stays empty."
+              "plain": "Spawn a Velociraptor only after the Dr. Kirk's Personal Lab area encounter; otherwise this spot stays empty."
             },
             "logic": "0x59 reloc @0x3a650 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 144) @0x3a648 -> 0x0e skip-if-false @0x3a64c; flag 0:144 set_by [050E/sub0=0, 050E/sub8=1].",
             "confidence": "confirmed"
@@ -17070,7 +17070,7 @@
           {
             "rec_offset": "0x3a674",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17111,11 +17111,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Personal Lab Passage velociraptor encounter has happened",
+              "condition": "only until the Personal Lab Passage human-character scene has happened",
               "condition_flag": "0:143",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Personal Lab Passage velociraptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Personal Lab Passage human-character scene has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x3a674 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 143) @0x3a66c -> 0x0e skip-if-true @0x3a670; flag 0:143 set_by [050D/sub7=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17139,14 +17139,14 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
           "count": 1
         },
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -17166,7 +17166,7 @@
           {
             "rec_offset": "0x3e300",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17214,9 +17214,9 @@
               "trigger": "room entry",
               "condition": "only until the Dr. Kirk's Personal Lab area encounter has happened",
               "condition_flag": "0:144",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Dr. Kirk's Personal Lab area encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Dr. Kirk's Personal Lab area encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x3e300 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 144) @0x3e2b4 -> 0x0e skip-if-true @0x3e2b8; flag 0:144 set_by [050E/sub0=0, 050E/sub8=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17224,7 +17224,7 @@
           {
             "rec_offset": "0x3e318",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17272,9 +17272,9 @@
               "trigger": "room entry",
               "condition": "only until the Dr. Kirk's Personal Lab area encounter has happened",
               "condition_flag": "0:144",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Dr. Kirk's Personal Lab area encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Dr. Kirk's Personal Lab area encounter has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x3e318 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 144) @0x3e2b4 -> 0x0e skip-if-true @0x3e2b8; flag 0:144 set_by [050E/sub0=0, 050E/sub8=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17282,7 +17282,7 @@
           {
             "rec_offset": "0x3f8f4",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 8,
             "spawn_path": "event(sub8)",
@@ -17324,9 +17324,9 @@
               "trigger": "entering the Dr. Kirk's Personal Lab trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "When you enter the Dr. Kirk's Personal Lab trigger zone, spawn a Velociraptor. This is a one-shot encounter."
+              "plain": "When you enter the Dr. Kirk's Personal Lab trigger zone, spawn a Humanoid. This is a one-shot encounter."
             },
             "logic": "0x20 placement @0x3f8f4 in sub8 (event(sub8)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x3e2bc] -> run sub8. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17521,7 +17521,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -17541,7 +17541,7 @@
           {
             "rec_offset": "0x2c748",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17584,9 +17584,9 @@
               "trigger": "room entry",
               "condition": "only until the Third Energy Control event (armed in 0510) has happened",
               "condition_flag": "0:168",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Third Energy Control event (armed in 0510) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Third Energy Control event (armed in 0510) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c748 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 168) @0x2c6f8 -> 0x0e skip-if-true @0x2c6fc; flag 0:168 set_by [0510/sub9=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17594,7 +17594,7 @@
           {
             "rec_offset": "0x2c778",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17637,9 +17637,9 @@
               "trigger": "room entry",
               "condition": "only until the Third Energy Control event (armed in 0510) has happened",
               "condition_flag": "0:168",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Third Energy Control event (armed in 0510) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Third Energy Control event (armed in 0510) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c778 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 168) @0x2c6f8 -> 0x0e skip-if-true @0x2c6fc; flag 0:168 set_by [0510/sub9=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17647,7 +17647,7 @@
           {
             "rec_offset": "0x2c7c0",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17688,11 +17688,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Dr. Kirk's Library velociraptor encounter (A) has happened",
+              "condition": "only until the Dr. Kirk's Library human-character scene (A) has happened",
               "condition_flag": "0:145",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Dr. Kirk's Library velociraptor encounter (A) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Dr. Kirk's Library human-character scene (A) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c7c0 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 145) @0x2c7ac -> 0x0e skip-if-true @0x2c7b0; flag 0:145 set_by [050F/sub10=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17700,7 +17700,7 @@
           {
             "rec_offset": "0x2c7f0",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17741,11 +17741,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Dr. Kirk's Library velociraptor encounter (A) has happened",
+              "condition": "only until the Dr. Kirk's Library human-character scene (A) has happened",
               "condition_flag": "0:145",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Dr. Kirk's Library velociraptor encounter (A) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Dr. Kirk's Library human-character scene (A) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c7f0 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 145) @0x2c7ac -> 0x0e skip-if-true @0x2c7b0; flag 0:145 set_by [050F/sub10=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17753,7 +17753,7 @@
           {
             "rec_offset": "0x2c83c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -17794,11 +17794,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Dr. Kirk's Library velociraptor encounter (B) has happened",
+              "condition": "only until the Dr. Kirk's Library human-character scene (B) has happened",
               "condition_flag": "0:169",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Dr. Kirk's Library velociraptor encounter (B) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Dr. Kirk's Library human-character scene (B) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c83c in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 169) @0x2c830 -> 0x0e skip-if-true @0x2c834; flag 0:169 set_by [050F/sub16=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17806,7 +17806,7 @@
           {
             "rec_offset": "0x2ce6c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 10,
             "spawn_path": "event(sub10)",
@@ -17837,9 +17837,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Every time you enter Dr. Kirk's Library Room, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Dr. Kirk's Library Room, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x2ce6c in sub10 (event(sub10)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -17954,7 +17954,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -18397,7 +18397,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "RaptorHeavy",
+          "species": "Velociraptor",
           "category": 2,
           "bones": 21,
           "opcode": "0x59",
@@ -18417,7 +18417,7 @@
           {
             "rec_offset": "0x545a4",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -18458,11 +18458,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Carrying Out Room B3 velociraptor encounter has happened",
+              "condition": "only until the Carrying Out Room B3 human-character scene has happened",
               "condition_flag": "0:211",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Carrying Out Room B3 velociraptor encounter has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Carrying Out Room B3 human-character scene has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x545a4 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 211) @0x54578 -> 0x0e skip-if-true @0x5457c; flag 0:211 set_by [0600/sub16=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -18522,7 +18522,7 @@
           {
             "rec_offset": "0x55c14",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 20,
             "spawn_path": "event(sub20)",
@@ -18564,9 +18564,9 @@
               "trigger": "entering the Carrying Out Room B3 trigger zone",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "When you enter the Carrying Out Room B3 trigger zone, spawn a Velociraptor."
+              "plain": "When you enter the Carrying Out Room B3 trigger zone, spawn a Humanoid."
             },
             "logic": "0x20 placement @0x55c14 in sub20 (event(sub20)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: 0x28 subtype-3 enter-zone @[0x5463c] -> run sub20. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -18615,7 +18615,7 @@
           {
             "rec_offset": "0x56a0c",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 31,
             "spawn_path": "event(sub31)",
@@ -18646,9 +18646,9 @@
               "trigger": "room entry",
               "condition": "none",
               "condition_flag": null,
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Every time you enter Carrying Out Room B3, spawn a Velociraptor (until it has been killed)."
+              "plain": "Every time you enter Carrying Out Room B3, spawn a Humanoid (until it has been killed)."
             },
             "logic": "0x20 placement @0x56a0c in sub31 (event(sub31)); reachable=True dominated=True. gate: unconditional (post-dominates sub entry). trigger: op 0x01 task-spawn from sub[0] (rooted: init). kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -18894,7 +18894,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -19072,7 +19072,7 @@
           {
             "rec_offset": "0x16bb8",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -19115,9 +19115,9 @@
               "trigger": "room entry",
               "condition": "only until the Immigration Office event (armed in 0609) has happened",
               "condition_flag": "0:160",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor on entry only until the Immigration Office event (armed in 0609) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Immigration Office event (armed in 0609) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x16bb8 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 160) @0x16b8c -> 0x0e skip-if-true @0x16b90; flag 0:160 set_by [0609/sub13=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -19318,7 +19318,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -20312,7 +20312,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -20520,7 +20520,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -20830,7 +20830,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -20879,7 +20879,7 @@
           {
             "rec_offset": "0x2c5ac",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -20920,11 +20920,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Underground Heliport velociraptor encounter (B) has happened",
+              "condition": "only until the Underground Heliport human-character scene (B) has happened",
               "condition_flag": "0:205",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Underground Heliport velociraptor encounter (B) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Underground Heliport human-character scene (B) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c5ac in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 205) @0x2c5a4 -> 0x0e skip-if-true @0x2c5a8; flag 0:205 set_by [060D/sub19=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -20932,7 +20932,7 @@
           {
             "rec_offset": "0x2c5c4",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -20973,11 +20973,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Underground Heliport velociraptor encounter (B) has happened",
+              "condition": "only until the Underground Heliport human-character scene (B) has happened",
               "condition_flag": "0:205",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Underground Heliport velociraptor encounter (B) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Underground Heliport human-character scene (B) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c5c4 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 205) @0x2c5a4 -> 0x0e skip-if-true @0x2c5a8; flag 0:205 set_by [060D/sub19=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -20985,7 +20985,7 @@
           {
             "rec_offset": "0x2c640",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -21026,11 +21026,11 @@
             ],
             "summary": {
               "trigger": "room entry",
-              "condition": "only until the Underground Heliport velociraptor encounter (A) has happened",
+              "condition": "only until the Underground Heliport human-character scene (A) has happened",
               "condition_flag": "0:204",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": true,
-              "plain": "Spawn a Velociraptor on entry only until the Underground Heliport velociraptor encounter (A) has happened; afterwards it never spawns here again."
+              "plain": "Spawn a Humanoid on entry only until the Underground Heliport human-character scene (A) has happened; afterwards it never spawns here again."
             },
             "logic": "0x20 placement @0x2c640 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 204) @0x2c614 -> 0x0e skip-if-true @0x2c618; flag 0:204 set_by [060D/sub6=1]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -21495,7 +21495,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -21839,7 +21839,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -21859,7 +21859,7 @@
           {
             "rec_offset": "0x223bc",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -21896,9 +21896,9 @@
               "trigger": "room entry",
               "condition": "only after story progress flag 0:6 (engine-set; arms the Hovercraft Storage encounter)",
               "condition_flag": "0:6",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor only after story progress flag 0:6 (engine-set; arms the Hovercraft Storage encounter); otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after story progress flag 0:6 (engine-set; arms the Hovercraft Storage encounter); otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x223bc in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 6) @0x22380 -> 0x0e skip-if-false @0x22384; flag 0:6 set_by [(none)]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -21906,7 +21906,7 @@
           {
             "rec_offset": "0x22484",
             "opcode": "0x20",
-            "species": "Velociraptor",
+            "species": "Humanoid",
             "category": 1,
             "sub": 0,
             "spawn_path": "init",
@@ -21943,9 +21943,9 @@
               "trigger": "room entry",
               "condition": "only after story progress flag 0:6 (engine-set; arms the Hovercraft Storage encounter)",
               "condition_flag": "0:6",
-              "effect": "spawn a Velociraptor",
+              "effect": "spawn a Humanoid",
               "oneShot": false,
-              "plain": "Spawn a Velociraptor only after story progress flag 0:6 (engine-set; arms the Hovercraft Storage encounter); otherwise this spot stays empty."
+              "plain": "Spawn a Humanoid only after story progress flag 0:6 (engine-set; arms the Hovercraft Storage encounter); otherwise this spot stays empty."
             },
             "logic": "0x20 placement @0x22484 in sub0 (init); reachable=True dominated=False. gate: 0x26 GetFlag(group 0, index 6) @0x22380 -> 0x0e skip-if-false @0x22384; flag 0:6 set_by [(none)]. kill_flag GetFlag(4,0).",
             "confidence": "confirmed"
@@ -22437,7 +22437,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -22474,7 +22474,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",
@@ -22692,7 +22692,7 @@
       "tracks": [],
       "placed_enemies": [
         {
-          "species": "Velociraptor",
+          "species": "Humanoid",
           "category": 1,
           "bones": 15,
           "opcode": "0x20",

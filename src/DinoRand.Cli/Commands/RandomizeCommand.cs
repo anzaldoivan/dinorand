@@ -70,7 +70,7 @@ internal sealed partial class CliApplication
             // --no-pickup-ground-models spelling as a hard off switch for existing scripts.
             ImportPickupModels = argv.Contains("--pickup-ground-models")
                               && !argv.Contains("--no-pickup-ground-models"),
-            // DC1 enemy randomization includes foreign species (cat8 Theri + grounded RaptorHeavy) by default and
+            // DC1 enemy randomization includes foreign species (cat8 Theri + grounded Velociraptor) by default and
             // queues the EXE patches they need. --no-enemies disables both passes; the old --exotic-enemies spelling
             // remains a harmless compatibility no-op. With --install-to-data, CLOSE the game before DINO.exe patches.
             CrossRoomEnemySpecies = !argv.Contains("--no-enemies"),
@@ -269,9 +269,7 @@ internal sealed partial class CliApplication
         species = DinoSpecies.Unknown;
         var row = Dc1EnemyDistribution.LoadEmbedded().Rows.FirstOrDefault(candidate =>
             candidate.Creature.Equals(text, StringComparison.OrdinalIgnoreCase)
-            || candidate.Species.ToString().Equals(text, StringComparison.OrdinalIgnoreCase)
-            || (text.Equals("raptor-heavy", StringComparison.OrdinalIgnoreCase)
-                && candidate.Species == DinoSpecies.RaptorHeavy));
+            || (EnemySkeleton.TryParseSpeciesName(text, out var named) && candidate.Species == named));
         if (row is null && int.TryParse(text.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ? text[2..] : text,
             text.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
                 ? System.Globalization.NumberStyles.HexNumber : System.Globalization.NumberStyles.Integer,

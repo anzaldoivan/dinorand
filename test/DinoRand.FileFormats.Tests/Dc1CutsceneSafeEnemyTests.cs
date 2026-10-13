@@ -115,7 +115,7 @@ public class Dc1CutsceneSafeEnemyTests
     {
         public readonly List<int> ImportedRooms = new();
         public IReadOnlyCollection<DinoSpecies> AvailableDonors { get; } =
-            new[] { DinoSpecies.RaptorHeavy };
+            new[] { DinoSpecies.Velociraptor };
         public bool TryImport(RandomizationContext context, RoomFile room, int victimIdx,
                               ExoticSpeciesDef def, out IReadOnlyList<ExePatchRequest> patches, out string note)
         {
@@ -145,7 +145,7 @@ public class Dc1CutsceneSafeEnemyTests
     [Fact]
     public void CrossSpecies_ChoreographyRoom_OptionOn_IsNeverACandidate()
     {
-        // The victim shape the pass looks for: a randomizable Velociraptor in a flagged room (010E).
+        // The victim shape the pass looks for: a randomizable Humanoid in a flagged room (010E).
         for (int seed = 1; seed <= 20; seed++)
         {
             var importer = RunCrossSpecies(TwoRaptorRoom(1, 0x0e), cutsceneSafe: true, seed);

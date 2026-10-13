@@ -47,6 +47,23 @@ public static class DcOpcodes
     /// <summary>Total length of an enemy (<c>0x59</c>) record, opcode byte included.</summary>
     public const int Enemy2Length = 20;
 
+    /// <summary>Scripted enemy entrance (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.98): a 44-byte record in an
+    /// <i>event</i> subroutine that brings a dinosaur on stage along a path. Handler <c>0x42A80D</c> is a
+    /// nine-state machine keyed on the word at <c>record+0x22</c>. Category, position, model and motion
+    /// are inline. Read-only for the randomizer: the placements are choreographed.</summary>
+    public const byte Enemy3 = 0x5b;
+
+    /// <summary>Total length of a scripted-entrance (<c>0x5B</c>) record, opcode byte included.</summary>
+    public const int Enemy3Length = 44;
+
+    /// <summary>Camera set, 20 bytes (handler <c>0x4272B8</c>): position at <c>+2</c>, target at
+    /// <c>+8</c> (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.99).</summary>
+    public const byte CameraShort = 0x2e;
+
+    /// <summary>Camera set, 32 bytes (handler <c>0x428B71</c>): position at <c>+2</c>, target at
+    /// <c>+0x12</c>, plus two four-word blocks at <c>+8</c> and <c>+0x18</c> (cont.99).</summary>
+    public const byte CameraLong = 0x4c;
+
     /// <summary>Item-placement opcode (the SCD "area-of-things" placement; subtype 4 = item).</summary>
     public const byte Item = 0x28;
 
@@ -96,6 +113,28 @@ public static class DcOpcodes
         [0x68]=8, [0x69]=4, [0x6a]=8, [0x6b]=4, [0x6c]=4, [0x6d]=4, [0x6e]=4, [0x6f]=4,
         [0x70]=1, [0x71]=1,
     };
+
+    /// <summary>
+    /// Names for the opcodes whose behaviour is established from their handlers
+    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md). An opcode without proof has no entry — callers
+    /// print <c>OP_xx</c>. Mirrors the <c>name</c> field of <c>tools/scd_re/scd_opcode_table.json</c>,
+    /// which is the source of truth; <c>DcOpcodesTableDriftTests</c> fails if the two differ.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<byte, string> Names = new Dictionary<byte, string>
+    {
+        [0x00]="NOP", [0x01]="TASK_SPAWN", [0x05]="GOTO_SUB", [0x0a]="LOOP_NEXT", [0x0b]="LOOP_SET",
+        [0x0c]="GOTO", [0x0e]="BRANCH_IF", [0x0f]="GOSUB", [0x10]="RETURN", [0x11]="HALT", [0x12]="MSG_WAIT",
+        [0x19]="NOP", [0x1a]="NOP", [0x1b]="NOP", [0x1c]="NOP", [0x1d]="NOP", [0x1e]="NOP", [0x1f]="NOP",
+        [0x20]="ENEMY", [0x21]="BEHAVIOR_CALL", [0x22]="BIND_TARGET", [0x23]="SCENERY",
+        [0x24]="SET_RESOURCE", [0x25]="FLAG_SET", [0x26]="FLAG_TEST", [0x28]="AOT", [0x2a]="TARGET_FIELD",
+        [0x2e]="CAMERA", [0x36]="TARGET_POS", [0x37]="TARGET_ROT", [0x3a]="BEHAVIOR_INSTALL",
+        [0x3b]="RELEASE", [0x3c]="OBJ_STATE", [0x3e]="VOICE", [0x48]="OBJ_FLAG", [0x4c]="CAMERA_EX",
+        [0x52]="ITEM_HELD_TEST", [0x59]="ENEMY2", [0x5a]="BEHAVIOR_INSTALL_N", [0x5b]="ENEMY_ENTRANCE",
+        [0x64]="FLOOR_STEP", [0x67]="TABLE_LOAD", [0x70]="NOP", [0x71]="NOP",
+    };
+
+    /// <summary>The proven name of <paramref name="opcode"/>, or <c>OP_xx</c>.</summary>
+    public static string Name(byte opcode) => Names.TryGetValue(opcode, out var n) ? n : $"OP_{opcode:X2}";
 
     /// <summary>
     /// Total record length of the opcode at <paramref name="pos"/> in <paramref name="buffer"/>,

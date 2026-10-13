@@ -391,7 +391,7 @@
                             <CheckBox Content="Randomize Enemy HP" Margin="0,8,0,0"
                                       IsVisible="{Binding CanRandomizeEnemyHp}"
                                       IsChecked="{Binding RandomizeEnemyHp, Mode=TwoWay}"
-                                      ToolTip.Tip="DC1 only, off by default. Give eligible RaptorHeavy and Pteranodon placements a seeded, difficulty-scaled max-HP override. Velociraptor, Swarm, Therizinosaurus, scripted T-Rex and cutscene placements are unchanged. This is a room-file edit; it does not patch DINO.exe." />
+                                      ToolTip.Tip="DC1 only, off by default. Give eligible Velociraptor and Pteranodon placements a seeded, difficulty-scaled max-HP override. Human characters, Swarm, Therizinosaurus, scripted T-Rex and cutscene placements are unchanged. This is a room-file edit; it does not patch DINO.exe." />
 
                             <StackPanel Margin="20,0,0,4" IsVisible="{Binding Dc1EnemyOptionsVisible}">
                                 <StackPanel Orientation="Horizontal" Spacing="6">

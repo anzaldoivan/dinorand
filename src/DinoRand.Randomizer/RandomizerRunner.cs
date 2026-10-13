@@ -71,6 +71,19 @@ public sealed class RandomizerRunner
     /// <summary>Test seam for the mandatory post-pass verification gate.</summary>
     internal Func<RandomizationContext, KeyItemPlacer.PlacementResult>? FinalProgressionVerifier { get; init; }
 
+    /// <summary>Load every enumerated room. Rooms the game definition does not randomize
+    /// (<see cref="GameDefinition.IsRandomizedRoom"/>) are wrapped opaquely: they are written back
+    /// unchanged and expose no records, so no pass can consider them.</summary>
+    public static List<RoomFile> LoadRooms(GameDefinition game, IEnumerable<RoomFileRef> refs)
+    {
+        var rooms = new List<RoomFile>();
+        foreach (var rref in refs)
+            rooms.Add(game.IsRandomizedRoom(rref.Stage, rref.Room)
+                ? RoomFile.ReadFromFile(rref.Stage, rref.Room, rref.Path)
+                : RoomFile.ReadOpaque(rref.Stage, rref.Room, File.ReadAllBytes(rref.Path)));
+        return rooms;
+    }
+
     /// <param name="emitSpoiler">Write the per-seed spoiler file (<c>&lt;encoded-seed&gt;_spoiler.md</c>) beside the room files (docs/decisions/cross/SPOILER-LOG-PLAN.md).
     /// The spoiler is a pure projection of the passes' recorded decisions, built strictly AFTER every
     /// game file is written — turning it off changes no other output byte (regression-locked).</param>
@@ -93,9 +106,7 @@ public sealed class RandomizerRunner
 
         // 1. Discover and load per-room files (read-only; originals untouched).
         var refs = _game.EnumerateRooms(installDir);
-        var rooms = new List<RoomFile>();
-        foreach (var rref in refs)
-            rooms.Add(RoomFile.ReadFromFile(rref.Stage, rref.Room, rref.Path));
+        var rooms = LoadRooms(_game, refs);
         Log($"[load] {rooms.Count} room files across {refs.Select(r => r.Stage).Distinct().Count()} stages");
 
         // 2. Build the room graph (used by key-item logic / door pass).

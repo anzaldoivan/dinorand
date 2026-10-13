@@ -22,8 +22,8 @@ namespace DinoRand.Randomizer.Passes;
 ///
 /// <para><b>NPCs are out of scope (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.15, corrected cont.41).</b> <c>0x20</c> is
 /// the general entity opcode, and — refuting cont.15 — the live NPC characters (Rick/Gail/Kirk) <i>are</i>
-/// placed by it in scene-hub rooms (0106 etc.), carrying a vestigial raptor skeleton so bone count /
-/// category / bind-pose all mis-decode them as a Velociraptor. They are excluded by
+/// placed by it in scene-hub rooms (0106 etc.) on the 15-bone cat-1 human rig
+/// (<see cref="DinoSpecies.Humanoid"/>, cont.97). They are excluded by
 /// <see cref="EnemyRecord.IsNpcSceneActor"/> (folded into <see cref="EnemyRecord.IsRandomizableDino"/>):
 /// a motion pointer shared by ≥2 distinct model pointers is a two-character shared biped motion set. The
 /// <c>st50c</c> humanoid corpse (a singleton) is still covered by the ≥2-records rule, and the

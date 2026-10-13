@@ -5,7 +5,7 @@ namespace DinoRand.FileFormats.Stage;
 /// the item-placement records the randomizer edits (doors/enemies later).
 ///
 /// <para><b>Layout (proven — see <c>docs/reference/dc1/_registries/STATIC-SCD-RE.md</c>).</b> The RDT buffer is the
-/// decompressed payload of the room file's last package entry (LZSS for type-7 entries, raw for
+/// decompressed payload of the room file's room-data package entry (LZSS for type-7 entries, raw for
 /// type-0). Its header dword at offset <c>0x14</c> is a PSX pointer (<c>0x8010xxxx</c>) to a
 /// self-describing function-offset table: the first dword is the table size in bytes, so it
 /// holds <c>size/4</c> subroutine offsets (each relative to the table base). This is the same
@@ -82,6 +82,14 @@ public sealed class RoomScript
     /// them); a record's <see cref="EnemyRecord.ModelFieldOffset"/> follows its opcode.</summary>
     public IReadOnlyList<EnemyRecord> Enemies { get; }
 
+    /// <summary>Scripted enemy entrances (<c>0x5B</c>, cont.98): dinosaurs an event subroutine brings on
+    /// stage. Deliberately <b>not</b> part of <see cref="Enemies"/> — no pass edits or counts them —
+    /// and never written back. Empty when the script did not parse.</summary>
+    public IReadOnlyList<EnemyRecord> ScriptedEntrances { get; private init; } = Array.Empty<EnemyRecord>();
+
+    /// <summary>Cameras set by the script (<c>0x2E</c> / <c>0x4C</c>, cont.99). Read-only.</summary>
+    public IReadOnlyList<CameraShot> CameraShots { get; private init; } = Array.Empty<CameraShot>();
+
     /// <summary>All raw door / area-transition records (<c>0x28</c> subtype 0) found in every
     /// function-table subroutine. Use <see cref="DoorRecord.IsTraversableRoomTransition"/> for the
     /// activation-aware graph transition contract; event records remain here for lossless consumers.</summary>
@@ -104,6 +112,8 @@ public sealed class RoomScript
 
         var items = new List<ItemRecord>();
         var enemies = new List<EnemyRecord>();
+        var entrances = new List<EnemyRecord>();
+        var cameras = new List<CameraShot>();
         var doors = new List<DoorRecord>();
         var scenerySlots = new HashSet<byte>();
         var activationKinds = ClassifyDoorActivations(buffer, starts);
@@ -112,8 +122,8 @@ public sealed class RoomScript
         {
             int start = starts[i];
             int end = i + 1 < starts.Count ? starts[i + 1] : buffer.Length;
-            bool ok = WalkSubroutine(buffer, start, end, i, activationKinds[i], items, enemies, doors,
-                                     scenerySlots);
+            bool ok = WalkSubroutine(buffer, start, end, i, activationKinds[i], items, enemies, entrances,
+                                     cameras, doors, scenerySlots);
             // A derail anywhere but the last subroutine means an unknown/misaligned opcode.
             if (!ok && i != starts.Count - 1) clean = false;
         }
@@ -121,14 +131,18 @@ public sealed class RoomScript
         // Flag NPC-scene actors (Rick/Gail/Kirk) once all 0x20 records are visible: the shared-motion /
         // distinct-model tell is relational, so it can't be decided per-record at parse (cont.41).
         EnemyRecord.MarkNpcSceneActors(enemies, stage, room);
-        return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors, scenerySlots);
+        return new RoomScript(clean, tableOffset, starts.Count, items, enemies, doors, scenerySlots)
+        {
+            ScriptedEntrances = entrances,
+            CameraShots = cameras,
+        };
     }
 
     /// <summary>
     /// Read the self-describing function-offset table at header dword <c>0x14</c>. Returns its
     /// buffer offset and the list of subroutine start offsets, or false if it isn't valid.
     /// </summary>
-    private static bool TryReadFunctionTable(ReadOnlySpan<byte> buffer, out int tableOffset,
+    internal static bool TryReadFunctionTable(ReadOnlySpan<byte> buffer, out int tableOffset,
                                              out List<int> starts)
     {
         tableOffset = -1;
@@ -162,6 +176,7 @@ public sealed class RoomScript
     private static bool WalkSubroutine(ReadOnlySpan<byte> buffer, int start, int end, int subroutineIndex,
                                        DoorActivationKind activationKind,
                                        List<ItemRecord> items, List<EnemyRecord> enemies,
+                                       List<EnemyRecord> entrances, List<CameraShot> cameras,
                                        List<DoorRecord> doors, HashSet<byte> scenerySlots)
     {
         if (start < 0 || end > buffer.Length) return false;
@@ -282,6 +297,42 @@ public sealed class RoomScript
                         OriginalMotionPtr = motion,
                         AiParam = buffer[pos + EnemyRecord.AiParamOffset],
                         OriginalAiParam = buffer[pos + EnemyRecord.AiParamOffset],
+                        SpeciesBoneCount = EnemySkeleton.ReadBoneCount(buffer, model),
+                        Raw = buffer.Slice(pos, len).ToArray(),
+                        FileOffset = pos,
+                    });
+                }
+            }
+            else if (buffer[pos] is DcOpcodes.CameraShort or DcOpcodes.CameraLong)
+            {
+                int target = pos + (buffer[pos] == DcOpcodes.CameraShort
+                    ? CameraShot.ShortTargetOffset : CameraShot.LongTargetOffset);
+                int eye = pos + CameraShot.EyeOffset;
+                cameras.Add(new CameraShot(buffer[pos], pos,
+                    (short)ReadU16(buffer, eye), (short)ReadU16(buffer, eye + 2), (short)ReadU16(buffer, eye + 4),
+                    (short)ReadU16(buffer, target), (short)ReadU16(buffer, target + 2),
+                    (short)ReadU16(buffer, target + 4)));
+            }
+            else if (buffer[pos] == DcOpcodes.Enemy3 && len == DcOpcodes.Enemy3Length)
+            {
+                // Scripted entrance (0x5B, cont.98): everything is inline. Same loaded-pointer guard.
+                uint model = ReadU32(buffer, pos + EnemyRecord.Enemy3ModelOffset);
+                if (IsLoadedPtr(model))
+                {
+                    uint motion = ReadU32(buffer, pos + EnemyRecord.Enemy3MotionOffset);
+                    entrances.Add(new EnemyRecord
+                    {
+                        Opcode = DcOpcodes.Enemy3,
+                        Slot = buffer[pos + EnemyRecord.SlotOffset],
+                        Category = buffer[pos + EnemyRecord.CategoryOffset],
+                        PosX = (short)ReadU16(buffer, pos + EnemyRecord.Enemy3PosXOffset),
+                        PosY = (short)ReadU16(buffer, pos + EnemyRecord.Enemy3PosYOffset),
+                        PosZ = (short)ReadU16(buffer, pos + EnemyRecord.Enemy3PosZOffset),
+                        Rotation = (short)ReadU16(buffer, pos + EnemyRecord.Enemy3RotationOffset),
+                        ModelPtr = model,
+                        MotionPtr = motion,
+                        OriginalModelPtr = model,
+                        OriginalMotionPtr = motion,
                         SpeciesBoneCount = EnemySkeleton.ReadBoneCount(buffer, model),
                         Raw = buffer.Slice(pos, len).ToArray(),
                         FileOffset = pos,

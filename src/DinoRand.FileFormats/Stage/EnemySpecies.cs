@@ -29,16 +29,19 @@ public enum DinoSpecies
     /// <summary>Model skeleton did not decode to a known species class.</summary>
     Unknown = 0,
 
-    /// <summary>15-bone skeleton, AI category 1 — the standard Velociraptor (the workhorse enemy,
-    /// 33 rooms). FAQ "Raptor".</summary>
-    Velociraptor = 1,
+    /// <summary>15-bone skeleton, AI category 1 — the <b>human</b> rig: the NPCs and corpses placed
+    /// by <c>0x20</c> (Rick, Gail, Tom, the <c>st50c</c> body…). Every category-1 model in the 148-room
+    /// corpus is an upright ~1.8 m figure (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.97); no
+    /// dinosaur uses this rig. Was mislabelled "Velociraptor" until cont.97. Never randomized.</summary>
+    Humanoid = 1,
 
-    /// <summary>21-bone skeleton, AI category 2 — a distinct raptor-class rig (rooms
-    /// 0109/010D/0308/030A/0401; the FAQ still calls these "Raptor"). Heaviest skeleton. The stage-5
+    /// <summary>21-bone skeleton, AI category 2 — the <b>Velociraptor</b>, the game's common raptor: a
+    /// ~4.4 m tailed body placed in 50+ rooms (mostly via <c>0x59</c>). Was named "RaptorHeavy" until
+    /// cont.97, when the 15-bone rig it was contrasted with turned out to be the human one. The stage-5
     /// <b>"Blue Raptor"</b> is this species, live-confirmed in 0511 (entity+0x27=2 and model+0x14=21
-    /// bones; it dies normally and sets its group-4 kill-flag, so "Blue" is palette only and just
-    /// handgun-tanky — not immune or distinct; docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.26).</summary>
-    RaptorHeavy = 2,
+    /// bones); "Blue" is a room palette, with HP authored separately on the stage-5 placements
+    /// (cont.26, cont.95).</summary>
+    Velociraptor = 2,
 
     /// <summary>The Tyrannosaurus — DC1's single large theropod, shipped as <b>two</b> model classes
     /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.23): the 20-bone AI-category-3 boss placed as a scripted set-piece in
@@ -121,8 +124,8 @@ public static class EnemySkeleton
     /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.23) — species is the biological animal, not the model class.</summary>
     public static DinoSpecies FromBoneCount(int boneCount) => boneCount switch
     {
-        15 => DinoSpecies.Velociraptor,
-        21 => DinoSpecies.RaptorHeavy,
+        15 => DinoSpecies.Humanoid,
+        21 => DinoSpecies.Velociraptor,
         20 => DinoSpecies.Tyrannosaurus, // 20-bone cat-3 T-Rex boss (cont.23)
         10 => DinoSpecies.Tyrannosaurus, // 10-bone cat-4 T-Rex variant, Chief's Room only
         7 => DinoSpecies.Swarm,
@@ -141,8 +144,8 @@ public static class EnemySkeleton
     /// </summary>
     public static DinoSpecies SpeciesForCategory(int category) => category switch
     {
-        1 => DinoSpecies.Velociraptor,
-        2 => DinoSpecies.RaptorHeavy,
+        1 => DinoSpecies.Humanoid,
+        2 => DinoSpecies.Velociraptor,
         3 => DinoSpecies.Tyrannosaurus, // 20-bone boss
         4 => DinoSpecies.Tyrannosaurus, // 10-bone Chief's-Room rig
         5 => DinoSpecies.Swarm,
@@ -150,6 +153,29 @@ public static class EnemySkeleton
         8 => DinoSpecies.Therizinosaurus,
         _ => DinoSpecies.Unknown,
     };
+
+    /// <summary>
+    /// Parse a species name typed by a user (case-insensitive; <c>-</c>/<c>_</c> ignored). Accepts the
+    /// names used before the cont.97 correction so old command lines keep their meaning:
+    /// <c>raptorheavy</c>/<c>heavy</c> were always the 21-bone raptor and still are; <c>velociraptor</c>
+    /// and <c>raptor</c> now name that same animal instead of the 15-bone human rig.
+    /// </summary>
+    public static bool TryParseSpeciesName(string name, out DinoSpecies species)
+    {
+        species = name.Trim().ToLowerInvariant().Replace("-", "").Replace("_", "") switch
+        {
+            "velociraptor" or "raptor" or "raptorheavy" or "heavy" or "heavyraptor" => DinoSpecies.Velociraptor,
+            "humanoid" or "human" or "npc" => DinoSpecies.Humanoid,
+            "pteranodon" or "flyer" or "ptera" => DinoSpecies.Pteranodon,
+            // "largeground"/"large"/"ground" were the 20-bone class now known to be the Tyrannosaurus (cont.23).
+            "tyrannosaurus" or "trex" or "rex" or "tyrant" or "largeground" or "large" or "ground"
+                => DinoSpecies.Tyrannosaurus,
+            "swarm" => DinoSpecies.Swarm,
+            "therizinosaurus" or "theri" or "theriz" or "scythe" => DinoSpecies.Therizinosaurus,
+            _ => DinoSpecies.Unknown,
+        };
+        return species != DinoSpecies.Unknown;
+    }
 
     /// <summary>Decode the species of an enemy from its model pointer and the RDT buffer.</summary>
     public static DinoSpecies Decode(ReadOnlySpan<byte> buffer, uint modelPtr)

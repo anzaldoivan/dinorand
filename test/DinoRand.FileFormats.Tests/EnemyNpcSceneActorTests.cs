@@ -11,7 +11,7 @@ namespace DinoRand.FileFormats.Tests;
 /// Regression tests for the NPC-scene-actor exclusion (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.41).
 /// A DC1 scene hub (e.g. 0106 "Control Room 1F", the Kirk/Gail rooms) places its NPC characters as
 /// <c>0x20</c> records whose embedded skeleton is a vestigial <b>raptor</b> rig — so bone count / AI
-/// category / bind-pose all mis-read them as a Velociraptor. The one file-static tell (PS1-confirmed)
+/// category / bind-pose all mis-read them as a Humanoid. The one file-static tell (PS1-confirmed)
 /// is relational: within the room a single motion pointer is shared by ≥2 <i>distinct</i> model
 /// pointers (two characters on one shared biped motion set). Neither the permute nor the HP pass may
 /// touch such records.
@@ -57,8 +57,8 @@ public class EnemyNpcSceneActorTests
     public void NpcSceneActor_IsNotRandomizableDino()
     {
         var room = ControlRoom1F();
-        // They still decode as a (bogus) Velociraptor — that is exactly the trap — but must be excluded.
-        Assert.All(room.Enemies, e => Assert.Equal(DinoSpecies.Velociraptor, e.Species));
+        // They still decode as a (bogus) Humanoid — that is exactly the trap — but must be excluded.
+        Assert.All(room.Enemies, e => Assert.Equal(DinoSpecies.Humanoid, e.Species));
         Assert.All(room.Enemies, e => Assert.False(e.IsRandomizableDino));
     }
 

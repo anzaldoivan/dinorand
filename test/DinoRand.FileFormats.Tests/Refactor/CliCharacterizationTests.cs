@@ -40,9 +40,9 @@ public sealed class CliCharacterizationTests
     [Theory]
     [InlineData("--dc1-enemy-mode", "bogus")]
     [InlineData("--dc1-enemy-mode", "fixed")]
-    [InlineData("--dc1-fixed-species", "Velociraptor")]
-    [InlineData("--dc1-weight", "RaptorHeavy=256")]
-    [InlineData("--dc1-weight", "RaptorHeavy=-1")]
+    [InlineData("--dc1-fixed-species", "Humanoid")]
+    [InlineData("--dc1-weight", "Velociraptor=256")]
+    [InlineData("--dc1-weight", "Velociraptor=-1")]
     [InlineData("--dc1-weight", "UnknownSpecies=1")]
     public void Dc1_enemy_distribution_cli_rejects_invalid_options(string option, string value)
     {
@@ -124,7 +124,7 @@ public sealed class CliCharacterizationTests
             string install = SyntheticInputs.CreateDc1Install(root);
             string donorPath = Path.Combine(install, "Data", "st104.dat");
             var donorRoom = RoomFile.ReadFromFile(1, 4, donorPath);
-            var donor = donorRoom.Enemies.Single(e => e.Species == DinoSpecies.RaptorHeavy);
+            var donor = donorRoom.Enemies.Single(e => e.Species == DinoSpecies.Velociraptor);
             donor.MotionPtr = donor.ModelPtr;
             File.WriteAllBytes(donorPath, donorRoom.Write());
             var rereadDonor = RoomFile.ReadFromFile(1, 4, donorPath);
@@ -133,7 +133,7 @@ public sealed class CliCharacterizationTests
             var result = Run("--install", install, "--swap-species", "103");
 
             Assert.Equal(1, result.ExitCode);
-            Assert.Contains("ST103+RaptorHeavy refused", result.Stderr, StringComparison.Ordinal);
+            Assert.Contains("ST103+Velociraptor refused", result.Stderr, StringComparison.Ordinal);
             Assert.Contains("texture/VRAM refusal", result.Stderr, StringComparison.Ordinal);
             Assert.DoesNotContain("is disabled", result.Stderr, StringComparison.OrdinalIgnoreCase);
         }

@@ -268,6 +268,10 @@ public sealed class DinoCrisis1 : GameDefinition
 
     public override string? GetDataDir(string installDir) => FindDataDir(installDir);
 
+    /// <summary>The campaign is stages 1-6 (the only ones in <c>map.json</c>). Stages 7-9 are Operation
+    /// Wipe Out and A-C are extra stages: unmapped, never play-tested with edits, so left untouched.</summary>
+    public override bool IsRandomizedRoom(int stage, int room) => stage is >= 1 and <= 6;
+
     public override IReadOnlyList<RoomFileRef> EnumerateRooms(string installDir)
     {
         // Room files live in a "Data" folder under a language dir (english/, japanese/…)

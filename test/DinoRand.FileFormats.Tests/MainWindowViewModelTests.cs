@@ -80,9 +80,9 @@ public class MainWindowViewModelTests
     public void Dc1EnemyWeightChangesRoundTripThroughSeedUi()
     {
         var vm = NewVm();
-        var raptor = vm.Dc1WeightOptions.Single(option => option.Species == DinoSpecies.RaptorHeavy);
+        var raptor = vm.Dc1WeightOptions.Single(option => option.Species == DinoSpecies.Velociraptor);
         raptor.Weight = 1;
-        Assert.Equal((byte)1, vm.CurrentConfig.Dc1SpeciesWeights![DinoSpecies.RaptorHeavy]);
+        Assert.Equal((byte)1, vm.CurrentConfig.Dc1SpeciesWeights![DinoSpecies.Velociraptor]);
     }
 
     [Fact]

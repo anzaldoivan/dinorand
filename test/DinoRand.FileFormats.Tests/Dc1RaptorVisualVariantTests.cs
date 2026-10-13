@@ -8,15 +8,15 @@ namespace DinoRand.FileFormats.Tests;
 
 public sealed class Dc1RaptorVisualVariantTests
 {
-    public static IEnumerable<object[]> NonRaptorHeavySpecies() =>
+    public static IEnumerable<object[]> NonVelociraptorSpecies() =>
         Enum.GetValues<DinoSpecies>()
-            .Where(species => species != DinoSpecies.RaptorHeavy)
+            .Where(species => species != DinoSpecies.Velociraptor)
             .Select(species => new object[] { species });
 
     private static Dc1RaptorVisualVariantEvidence BlueEvidence() => new(
         "blue",
-        "RaptorHeavy",
-        DinoSpecies.RaptorHeavy,
+        "Velociraptor",
+        DinoSpecies.Velociraptor,
         2,
         21,
         5,
@@ -25,13 +25,13 @@ public sealed class Dc1RaptorVisualVariantTests
         "ST511 type-2 palette census; model category 2 / 21 bones");
 
     [Fact]
-    public void Registry_ManualBlueEvidence_IsRaptorHeavyOnly_AndAutomaticSelectionIsOff()
+    public void Registry_ManualBlueEvidence_IsVelociraptorOnly_AndAutomaticSelectionIsOff()
     {
         var registry = new Dc1RaptorVisualVariantRegistry();
         registry.Register(BlueEvidence());
 
         Assert.False(Dc1RaptorVisualVariantRegistry.AutomaticSelectionEnabled);
-        Assert.Equal("RaptorHeavy", registry.Get("blue").PaletteFamily);
+        Assert.Equal("Velociraptor", registry.Get("blue").PaletteFamily);
         Assert.Throws<ArgumentException>(() => registry.Register(BlueEvidence() with
         {
             VariantId = "blue",
@@ -197,7 +197,7 @@ public sealed class Dc1RaptorVisualVariantTests
     {
         var (target, donor) = LoadRealBlueRooms();
         if (target is null || donor is null) return;
-        var enemy = target.Enemies.Single(e => e.Species == DinoSpecies.RaptorHeavy);
+        var enemy = target.Enemies.Single(e => e.Species == DinoSpecies.Velociraptor);
         var before = target.Write();
 
         var result = Dc1RaptorVisualVariantEditor.TryApplyProfile(
@@ -264,8 +264,8 @@ public sealed class Dc1RaptorVisualVariantTests
     }
 
     [Theory]
-    [MemberData(nameof(NonRaptorHeavySpecies))]
-    public void Authoring_EveryNonRaptorHeavySpecies_IsRejectedAndNonMutating(DinoSpecies species)
+    [MemberData(nameof(NonVelociraptorSpecies))]
+    public void Authoring_EveryNonVelociraptorSpecies_IsRejectedAndNonMutating(DinoSpecies species)
     {
         var enemy = EnemyFor(species);
         var before = Snapshot(enemy);
@@ -319,7 +319,7 @@ public sealed class Dc1RaptorVisualVariantTests
     }
 
     [Fact]
-    public void PaletteApply_RejectsArbitraryDonorBytesEvenForRaptorHeavy()
+    public void PaletteApply_RejectsArbitraryDonorBytesEvenForVelociraptor()
     {
         var evidence = BlueEvidence();
         var target = PackageWithPalette(0x11);
@@ -345,8 +345,8 @@ public sealed class Dc1RaptorVisualVariantTests
     }
 
     [Theory]
-    [MemberData(nameof(NonRaptorHeavySpecies))]
-    public void PaletteApply_EveryNonRaptorHeavySpecies_IsRejectedAndNonMutating(DinoSpecies species)
+    [MemberData(nameof(NonVelociraptorSpecies))]
+    public void PaletteApply_EveryNonVelociraptorSpecies_IsRejectedAndNonMutating(DinoSpecies species)
     {
         var target = PackageWithPalette(0x11);
         var donor = PackageWithPalette(0x99);
@@ -430,7 +430,7 @@ public sealed class Dc1RaptorVisualVariantTests
     {
         var (category, bones) = species switch
         {
-            DinoSpecies.Velociraptor => (1, 15),
+            DinoSpecies.Humanoid => (1, 15),
             DinoSpecies.Tyrannosaurus => (3, 20),
             DinoSpecies.Swarm => (5, 7),
             DinoSpecies.Pteranodon => (7, 18),

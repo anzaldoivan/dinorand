@@ -22,11 +22,11 @@ public sealed class Dc1EnemyDistributionTests
             distribution.RootElement.GetProperty("census_scope").GetString());
 
         var registry = Dc1EnemyDistribution.LoadEmbedded();
-        Assert.Equal(new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus },
+        Assert.Equal(new[] { DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus },
             registry.Rows.Select(row => row.Species));
-        Assert.Equal((byte)46, registry.DefaultWeights[DinoSpecies.RaptorHeavy]);
+        Assert.Equal((byte)46, registry.DefaultWeights[DinoSpecies.Velociraptor]);
         Assert.Equal((byte)9, registry.DefaultWeights[DinoSpecies.Therizinosaurus]);
-        Assert.Equal(new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus },
+        Assert.Equal(new[] { DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus },
             AppSeed.Dc1CanonicalSpeciesOrder);
     }
 
@@ -44,29 +44,29 @@ public sealed class Dc1EnemyDistributionTests
             }
         var registry = Dc1EnemyDistribution.LoadEmbedded();
         Assert.All(registry.Rows, row => Assert.Equal(counts[row.Species.ToString()], row.VanillaCount));
-        Assert.Equal(46, counts[nameof(DinoSpecies.RaptorHeavy)]);
+        Assert.Equal(46, counts[nameof(DinoSpecies.Velociraptor)]);
         Assert.Equal(9, counts[nameof(DinoSpecies.Therizinosaurus)]);
     }
 
     [Fact]
     public void Picker_WeightedZeroAndFixedAvoidDisabledDonors()
     {
-        var pool = new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus };
+        var pool = new[] { DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus };
         Assert.Equal(DinoSpecies.Therizinosaurus,
             Dc1DonorPicker.Weighted(new Dictionary<DinoSpecies, byte>
-                { [DinoSpecies.RaptorHeavy] = 0, [DinoSpecies.Therizinosaurus] = 1 })
+                { [DinoSpecies.Velociraptor] = 0, [DinoSpecies.Therizinosaurus] = 1 })
                 .Pick(pool, new Random(1)));
         Assert.Null(Dc1DonorPicker.Weighted(new Dictionary<DinoSpecies, byte>()).Pick(pool, new Random(1)));
-        Assert.Null(Dc1DonorPicker.Fixed(DinoSpecies.Velociraptor).Pick(pool, new Random(1)));
+        Assert.Null(Dc1DonorPicker.Fixed(DinoSpecies.Humanoid).Pick(pool, new Random(1)));
     }
 
     [Fact]
     public void Picker_FixedConsumesNoRng()
     {
         var rng = new Random(42);
-        Assert.Equal(DinoSpecies.RaptorHeavy,
-            Dc1DonorPicker.Fixed(DinoSpecies.RaptorHeavy)
-                .Pick(new[] { DinoSpecies.Therizinosaurus, DinoSpecies.RaptorHeavy }, rng));
+        Assert.Equal(DinoSpecies.Velociraptor,
+            Dc1DonorPicker.Fixed(DinoSpecies.Velociraptor)
+                .Pick(new[] { DinoSpecies.Therizinosaurus, DinoSpecies.Velociraptor }, rng));
         Assert.Equal(new Random(42).Next(1000), rng.Next(1000));
     }
 
@@ -75,15 +75,15 @@ public sealed class Dc1EnemyDistributionTests
     {
         var candidates = new[]
         {
-            new RoomCandidate(1, 2, true, new[] { DinoSpecies.Velociraptor }),
-            new RoomCandidate(1, 1, true, new[] { DinoSpecies.Velociraptor }),
+            new RoomCandidate(1, 2, true, new[] { DinoSpecies.Humanoid }),
+            new RoomCandidate(1, 1, true, new[] { DinoSpecies.Humanoid }),
         };
         var weighted = CrossSpeciesPlanner.Plan(candidates,
-            new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus }, 0.5,
+            new[] { DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus }, 0.5,
             new Random(7), Dc1DonorPicker.Weighted(Dc1EnemyDistribution.LoadEmbedded().DefaultWeights));
         var fixedMode = CrossSpeciesPlanner.Plan(candidates.Reverse().ToArray(),
-            new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus }, 0.5,
-            new Random(7), Dc1DonorPicker.Fixed(DinoSpecies.RaptorHeavy));
+            new[] { DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus }, 0.5,
+            new Random(7), Dc1DonorPicker.Fixed(DinoSpecies.Velociraptor));
         Assert.Equal(weighted.Select(p => (p.Stage, p.Room)), fixedMode.Select(p => (p.Stage, p.Room)));
     }
 
@@ -99,7 +99,7 @@ public sealed class Dc1EnemyDistributionTests
             Dc1FixedSpecies = DinoSpecies.Therizinosaurus,
             Dc1SpeciesWeights = new Dictionary<DinoSpecies, byte>
             {
-                [DinoSpecies.RaptorHeavy] = 0,
+                [DinoSpecies.Velociraptor] = 0,
                 [DinoSpecies.Therizinosaurus] = 15,
             },
         };
@@ -108,7 +108,7 @@ public sealed class Dc1EnemyDistributionTests
         Assert.Equal(encoded, SeedString.Encode(seed, parsed));
         Assert.Equal(Dc1EnemyDistributionMode.Fixed, parsed.Dc1EnemyMode);
         Assert.Equal(DinoSpecies.Therizinosaurus, parsed.Dc1FixedSpecies);
-        Assert.Equal((byte)0, parsed.Dc1SpeciesWeights![DinoSpecies.RaptorHeavy]);
+        Assert.Equal((byte)0, parsed.Dc1SpeciesWeights![DinoSpecies.Velociraptor]);
     }
 
     [Fact]
@@ -118,9 +118,9 @@ public sealed class Dc1EnemyDistributionTests
         Assert.True(SeedString.TryParse(legacy, out _, out var config));
         Assert.Equal(Dc1EnemyDistributionMode.Weighted, config.Dc1EnemyMode);
         Assert.Null(config.Dc1SpeciesWeights);
-        Assert.Equal(DinoSpecies.RaptorHeavy,
+        Assert.Equal(DinoSpecies.Velociraptor,
             Dc1DonorPicker.Weighted(Dc1EnemyDistribution.LoadEmbedded().DefaultWeights)
-                .Pick(new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus }, new Random(1)));
+                .Pick(new[] { DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus }, new Random(1)));
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public sealed class Dc1EnemyDistributionTests
         {
             Dc1SpeciesWeights = new Dictionary<DinoSpecies, byte>
             {
-                [DinoSpecies.RaptorHeavy] = 1,
+                [DinoSpecies.Velociraptor] = 1,
                 [DinoSpecies.Therizinosaurus] = 1,
             },
         };
@@ -142,7 +142,7 @@ public sealed class Dc1EnemyDistributionTests
         Assert.Throws<ArgumentException>(() => SeedString.Encode(new Seed(7), new RandomizerConfig
         {
             Dc1EnemyMode = Dc1EnemyDistributionMode.Fixed,
-            Dc1FixedSpecies = DinoSpecies.Velociraptor,
+            Dc1FixedSpecies = DinoSpecies.Humanoid,
         }));
     }
 
@@ -152,10 +152,10 @@ public sealed class Dc1EnemyDistributionTests
         var config = new RandomizerConfig
         {
             Dc1EnemyMode = Dc1EnemyDistributionMode.Fixed,
-            Dc1FixedSpecies = DinoSpecies.RaptorHeavy,
+            Dc1FixedSpecies = DinoSpecies.Velociraptor,
             Dc1SpeciesWeights = new Dictionary<DinoSpecies, byte>
             {
-                [DinoSpecies.RaptorHeavy] = 0,
+                [DinoSpecies.Velociraptor] = 0,
                 [DinoSpecies.Therizinosaurus] = 7,
             },
             Dc2RandomizeRaptorTiers = true,
@@ -164,8 +164,8 @@ public sealed class Dc1EnemyDistributionTests
         var encoded = SeedString.Encode(new Seed(321), config);
         Assert.True(SeedString.TryParse(encoded, out var seed, out var parsed));
         Assert.Equal(encoded, SeedString.Encode(seed, parsed));
-        Assert.Equal(DinoSpecies.RaptorHeavy, parsed.Dc1FixedSpecies);
-        Assert.Equal((byte)0, parsed.Dc1SpeciesWeights![DinoSpecies.RaptorHeavy]);
+        Assert.Equal(DinoSpecies.Velociraptor, parsed.Dc1FixedSpecies);
+        Assert.Equal((byte)0, parsed.Dc1SpeciesWeights![DinoSpecies.Velociraptor]);
         Assert.True(parsed.Dc2RandomizeRaptorTiers);
         Assert.Equal(7, parsed.Dc2BlueRaptorComboThreshold);
     }
@@ -177,12 +177,13 @@ public sealed class Dc1EnemyDistributionTests
         if (string.IsNullOrWhiteSpace(root)) return;
         var refs = new DinoCrisis1().EnumerateRooms(root);
         if (refs.Count == 0) return;
-        var counts = refs
-            .Select(reference => RoomFile.ReadFromFile(reference.Stage, reference.Room, reference.Path))
+        // The randomizer's own room view: campaign stages 1-6 only. (The former 67 also counted the
+        // 10 raptor records of the unmapped stage-A rooms, which used to load like campaign rooms.)
+        var counts = DinoRand.Randomizer.RandomizerRunner.LoadRooms(new DinoCrisis1(), refs)
             .SelectMany(room => room.Enemies)
             .GroupBy(enemy => enemy.Species)
             .ToDictionary(group => group.Key, group => group.Count());
-        Assert.Equal(67, counts.GetValueOrDefault(DinoSpecies.RaptorHeavy));
+        Assert.Equal(57, counts.GetValueOrDefault(DinoSpecies.Velociraptor));
         Assert.Equal(11, counts.GetValueOrDefault(DinoSpecies.Therizinosaurus));
     }
 

@@ -36,6 +36,7 @@ internal static class CliOutput
             "           [--disable-weapons handgun,shotgun,grenade] [--install-to-data]\r\n" +
             "           [--no-spoiler]      (skip the per-seed spoiler file; game files identical either way)\r\n" +
             "  dinorand --install <gameDir> --restore\r\n" +
+            "  dinorand --install <gameDir> --dump-room <roomCode>   (read-only: package entries, doors/items/enemies, camera and floor zones, named script instructions)\r\n" +
             "  dinorand --install <gameDir> --verify-backup   (read-only: audit .dinorand_backup for poisoned captures; works for dc1 and dc2)\r\n" +
             "  dinorand --install <gameDir> --swap-species <roomCode> [--species <name>]\r\n" +
             "  dinorand --install <gameDir> --fix-sound <roomCode>\r\n" +
@@ -112,7 +113,7 @@ internal static class CliOutput
             "    species; weighted mode only). Per-species room caps (T-Rex 2 / Giga 1) come from\r\n" +
              "    data/dc2/enemy-distribution.json.\r\n" +
              "  - --dc1-enemy-mode (dc1 enemy rando, default weighted) selects the two enabled production donors,\r\n" +
-             "    RaptorHeavy and Therizinosaurus. Defaults use the vanilla 46:9 placed-enemy census;\r\n" +
+             "    Velociraptor and Therizinosaurus. Defaults use the vanilla 46:9 placed-enemy census;\r\n" +
              "    --dc1-fixed-species pins one donor (and implies fixed mode), while repeated --dc1-weight\r\n" +
              "    overrides a donor's 0..255 weighted draw. Zero excludes that donor; all-zero rooms stay vanilla.\r\n" +
             "  - --dc2-raptor-tiers (dc2, off by default) randomizes raptor colour/HP tier variants\r\n" +
@@ -154,8 +155,8 @@ internal static class CliOutput
             "  - --dc1-enemy-hp (dc1, off by default) overrides each eligible enemy's maxHP per placement:\r\n" +
             "    it writes a seeded, --difficulty-scaled value into the 0x20 spawn record's +6 word (entity\r\n" +
             "    +0x11A), bypassing the game's birth roll. A plain room-file edit (no DINO.exe patch, no\r\n" +
-            "    Cheat Engine). Eligible = RaptorHeavy (cat-2) and Pteranodon (cat-7) 0x20 records only —\r\n" +
-            "    the only PC birth-inits that KEEP a nonzero preset; Velociraptor and Swarm births overwrite\r\n" +
+            "    Cheat Engine). Eligible = Velociraptor (cat-2) and Pteranodon (cat-7) 0x20 records only —\r\n" +
+            "    the only PC birth-inits that KEEP a nonzero preset; human-rig (cat-1) and Swarm births overwrite\r\n" +
             "    maxHP with 1000 unconditionally, so they are skipped rather than silently no-op'd\r\n" +
             "    (STATIC-SCD-RE cont.48). Scripted T-Rex and cutscene rooms skipped; 0x59-placed enemies\r\n" +
             "    untouched. Higher --difficulty widens the band upward; HP gates no progression, so seeds\r\n" +
@@ -177,7 +178,7 @@ internal static class CliOutput
             "    (not only other door-key spots); discs/items conserved. (The old --scatter-key-items\r\n" +
             "    flag is now redundant — scatter is on by default with --shuffle-keys.)\r\n" +
             "  - DC1 enemy randomization includes FOREIGN-species imports by default: the cat8\r\n" +
-            "    Therizinosaurus (stages 1-2) and grounded RaptorHeavy in eligible rooms. With\r\n" +
+            "    Therizinosaurus (stages 1-2) and grounded Velociraptor in eligible rooms. With\r\n" +
             "    --install-to-data it applies the EXE patches they need\r\n" +
             "    (cat-slot / hit-reaction / enemy-SE). Stage-scoped + CE-sensitive: CLOSE the game\r\n" +
             "    first (it writes DINO.exe), then relaunch and CE-verify. Reversed by --restore.\r\n" +
@@ -192,11 +193,11 @@ internal static class CliOutput
             "    no relaunch is needed; it writes via the same backup contract, so --restore undoes it. This is\r\n" +
             "    the listen-test BEFORE the production voice pass is ungated (it bypasses the hard gate on purpose).\r\n" +
             "  - Door randomization is Phase 3 and not yet enabled.\r\n" +
-            "  - --swap-species imports a foreign species (default raptorheavy; also\r\n" +
-            "    therizinosaurus|largeground|tyrannosaurus|swarm|velociraptor) over the first raptor in one\r\n" +
+            "  - --swap-species imports a foreign species (default velociraptor; also\r\n" +
+            "    therizinosaurus|tyrannosaurus|swarm|pteranodon|humanoid) over the first raptor in one\r\n" +
             "    room, writing it into Data with a backup (undo with --restore). For\r\n" +
             "    in-game testing of the cross-room importer; Pteranodon remains disabled.\r\n" +
-            "  - --add-enemy INJECTS a new enemy (default raptorheavy) into a room's init\r\n" +
+            "  - --add-enemy INJECTS a new enemy (default velociraptor) into a room's init\r\n" +
             "    script — for rooms that ship with no placed enemy. --at x,y,z[,rot] sets the\r\n" +
             "    spawn (signed 16-bit; Y is height, 0 = floor); without it the position falls\r\n" +
             "    back to a DOOR ENTRY POSE — a real floor point the game spawns the player on\r\n" +
@@ -210,20 +211,20 @@ internal static class CliOutput
             "    \"already dead\" (no entity) — pass a high/unused id (e.g. 0x60) to rule it out.\r\n" +
             "  - --add-enemy-at <room>:<rdtOffset> is the same as --add-enemy but injects at a\r\n" +
             "    CALLER-CHOSEN RDT offset (hex, from the room's decoded script) instead of the\r\n" +
-            "    init script. Activation is PER-CATEGORY (cont.49/57): a cat-2 enemy (raptorheavy)\r\n" +
+            "    init script. Activation is PER-CATEGORY (cont.49/57): a cat-2 enemy (velociraptor)\r\n" +
             "    self-activates and hunts from ANY reached offset — init sub-0 included; a cat-1\r\n" +
-            "    enemy (velociraptor) parks in passive state-1 unless a script activates it —\r\n" +
+            "    enemy (humanoid) parks in passive state-1 unless a script activates it —\r\n" +
             "    use --activate or an event-sub offset. The offset must be a clean, 4-aligned\r\n" +
             "    opcode boundary; the tool reports which sub it lands in and the category's\r\n" +
             "    activation behavior. The sub must already load the species' resources.\r\n" +
             "  - --add-enemy/--add-enemy-at authored record fields (all default 0 = the proven-neutral\r\n" +
             "    template, STATIC-SCD-RE cont.48/51): --hp <n> presets maxHP (record +6; only cat-2\r\n" +
-            "    RaptorHeavy / cat-7 Pteranodon births KEEP it); --ai-param <n> sets the per-entity AI\r\n" +
+            "    Velociraptor / cat-7 Pteranodon births KEEP it); --ai-param <n> sets the per-entity AI\r\n" +
             "    byte (+3 -> entity +0x2F); --birth-mode <n> selects the birth behavior (+5 low 2 bits:\r\n" +
             "    0=default, 1=behavior 0x19, 2/3=0x1A — cat-2 semantics, CE-gated).\r\n" +
             "  - --activate <behavior>[:<blobHex16>[:<b3>]] (CE-gate lab, cont.49) EMITS the script\r\n" +
             "    activation pair right after the injected record: op 0x22 binding the record's slot +\r\n" +
-            "    op 0x3a installing <behavior>. This is what wakes a cat-1 (Velociraptor) placed by init;\r\n" +
+            "    op 0x3a installing <behavior>. This is what wakes a cat-1 (human rig) placed by init;\r\n" +
             "    cat-2 self-activates without it. blobHex16 = the 0x3a's 8 operand bytes (16 hex chars);\r\n" +
             "    b3 = the 0x3a's byte[3] (semantics unmapped; retail behavior-1 installs carry 0x1F..0x21).\r\n" +
             "    Omitted = both copied together from the room's first native 0x3a, preferring a matching\r\n" +
@@ -231,7 +232,7 @@ internal static class CliOutput
             "  - --slot <n> forces the injected record's large-entity slot. The auto-pick dedupes only\r\n" +
             "    against parsed 0x20/0x59 records -- it cannot see natively-installed occupants (cont.18's\r\n" +
             "    0102 slot-0 collision); pass a known-free slot when the room has native enemies.\r\n" +
-            "  - --copy-enemy-palette <srcRoom>:<dstRoom> copies the --species (default raptorheavy)\r\n" +
+            "  - --copy-enemy-palette <srcRoom>:<dstRoom> copies the --species (default velociraptor)\r\n" +
             "    palette — the room's type-2 CLUT entry, 512 bytes at the same VRAM rect — from src into\r\n" +
             "    dst, tinting dst's enemies with src's colours (e.g. 511:102 = Blue Raptor into the Mgmt\r\n" +
             "    Office hall; STATIC-SCD-RE cont.51). Room-file only, same backup/--restore contract.\r\n" +

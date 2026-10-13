@@ -51,6 +51,6 @@ public sealed class Dc1BlueRaptorProfilePassTests
             context.ExePatchRequests[0].Kind);
         Assert.True(context.TryGetRoomOutput(target, out var output));
         Assert.NotEqual(target.OriginalBytes, output);
-        Assert.Equal((byte)6, target.Enemies.Single(e => e.Species == DinoSpecies.RaptorHeavy).AiParam);
+        Assert.Equal((byte)6, target.Enemies.Single(e => e.Species == DinoSpecies.Velociraptor).AiParam);
     }
 }

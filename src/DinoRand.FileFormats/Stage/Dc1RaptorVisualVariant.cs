@@ -17,7 +17,7 @@ public sealed record Dc1RaptorVisualVariantEvidence(
 /// <summary>Manual/evidence registry for DC1 Raptor palette variants.</summary>
 public sealed class Dc1RaptorVisualVariantRegistry
 {
-    public const string RaptorHeavyPaletteFamily = "RaptorHeavy";
+    public const string VelociraptorPaletteFamily = "Velociraptor";
 
     // No stable visual census is available in this checkout, so automatic selection stays off.
     public static bool AutomaticSelectionEnabled => false;
@@ -49,11 +49,11 @@ public sealed class Dc1RaptorVisualVariantRegistry
             throw new ArgumentException("visual variant identity and provenance are required", nameof(evidence));
         if (evidence.DonorStage is < 1 or > 12 || evidence.DonorRoom is < 0 or > 0xff)
             throw new ArgumentException("visual variant donor room is outside the DC1 room domain", nameof(evidence));
-        if (evidence.Species != DinoSpecies.RaptorHeavy
-            || evidence.PaletteFamily != RaptorHeavyPaletteFamily
+        if (evidence.Species != DinoSpecies.Velociraptor
+            || evidence.PaletteFamily != VelociraptorPaletteFamily
             || evidence.Category != 2
             || evidence.BoneCount != 21)
-            throw new ArgumentException("DC1 Raptor visual variants are restricted to RaptorHeavy evidence",
+            throw new ArgumentException("DC1 Raptor visual variants are restricted to Velociraptor evidence",
                 nameof(evidence));
     }
 }
@@ -94,10 +94,10 @@ public static class Dc1RaptorVisualVariantProfiles
 
     public static Dc1RaptorVisualVariantProfile Blue { get; } = new(
         new Dc1RaptorVisualVariantEvidence(
-            "blue", Dc1RaptorVisualVariantRegistry.RaptorHeavyPaletteFamily,
-            DinoSpecies.RaptorHeavy, 2, 21, BlueDonorStage, BlueDonorRoom,
+            "blue", Dc1RaptorVisualVariantRegistry.VelociraptorPaletteFamily,
+            DinoSpecies.Velociraptor, 2, 21, BlueDonorStage, BlueDonorRoom,
             TextureImporter.MakeClut(768, 511),
-            "ST508 Blue profile; category 2 / 21-bone RaptorHeavy"),
+            "ST508 Blue profile; category 2 / 21-bone Velociraptor"),
         new Dc1RaptorVisualVariantAuthoring(AiParam: 6));
 }
 
@@ -131,9 +131,9 @@ public static class Dc1RaptorVisualVariantEditor
             return new(Dc1RaptorVisualVariantOutcome.Unsupported, null, ex.Message);
         }
 
-        if (enemy.Species != DinoSpecies.RaptorHeavy || enemy.Category != 2)
+        if (enemy.Species != DinoSpecies.Velociraptor || enemy.Category != 2)
             return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
-                "target is not a RaptorHeavy record");
+                "target is not a Velociraptor record");
         if (donor.Stage != evidence.DonorStage || donor.Room != evidence.DonorRoom)
             return new(Dc1RaptorVisualVariantOutcome.Unsupported, null,
                 "palette donor is not the evidence-pinned room");
@@ -155,9 +155,9 @@ public static class Dc1RaptorVisualVariantEditor
         EnemyRecord enemy, Dc1RaptorVisualVariantAuthoring authoring)
     {
         ArgumentNullException.ThrowIfNull(enemy);
-        if (enemy.Species != DinoSpecies.RaptorHeavy || enemy.Category != 2)
+        if (enemy.Species != DinoSpecies.Velociraptor || enemy.Category != 2)
             return new(Dc1RaptorVisualVariantOutcome.Unsupported,
-                "target is not a RaptorHeavy record");
+                "target is not a Velociraptor record");
         if (authoring.IsEmpty)
             return new(Dc1RaptorVisualVariantOutcome.Applied, "no authored fields");
         if (enemy.Opcode == DcOpcodes.Enemy2 && (authoring.MaxHp is not null || authoring.BirthMode is not null))

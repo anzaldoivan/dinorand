@@ -44,6 +44,52 @@ public class RunnerMockCorpusTests
 
     // ---- DC1 --------------------------------------------------------------------------------------
 
+    /// <summary>Rooms outside the mapped campaign (stages 7-C: Operation Wipe Out and the extra stages)
+    /// are copied through untouched, whatever the seed — they carry items and enemies the passes would
+    /// otherwise edit now that their room data parses.</summary>
+    [Theory]
+    [InlineData(1)]
+    [InlineData(4242)]
+    [InlineData(987654)]
+    public void Dc1_Run_LeavesRoomsOutsideTheCampaignUntouched(int seed)
+    {
+        var root = NewTemp();
+        try
+        {
+            var install = NewDc1Install(root);
+            var extra = SyntheticRoom.Dc1RoomWithTrailingEntries(
+                new[] { new SyntheticRoom.Item(0x16, 1), new SyntheticRoom.Item(0x21, 1) },
+                Array.Empty<SyntheticRoom.Door>(),
+                new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21), new SyntheticRoom.Enemy(DcOpcodes.Enemy, 7, 18) });
+            File.WriteAllBytes(Path.Combine(install, "Data", "st701.dat"), extra);
+            Assert.NotEmpty(RoomFile.Read(7, 1, extra).Items);   // it does parse — exclusion is a choice
+
+            var outDir = Path.Combine(root, "out");
+            new RandomizerRunner(new DinoCrisis1())
+                .Run(install, outDir, new Seed(seed), new RandomizerConfig { EnsureBeatable = false });
+
+            Assert.Equal(extra, File.ReadAllBytes(Path.Combine(outDir, "st701.dat")));
+
+            // Not merely unedited by luck: the passes are handed a room with no records at all.
+            var game = new DinoCrisis1();
+            var loaded = RandomizerRunner.LoadRooms(game, game.EnumerateRooms(install));
+            var excluded = loaded.Single(r => r.Stage == 7);
+            Assert.Empty(excluded.Items);
+            Assert.Empty(excluded.Enemies);
+            Assert.Contains(loaded, r => r.Stage == 1 && r.Items.Count > 0);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Theory]
+    [InlineData(1, 0x00, true)]
+    [InlineData(6, 0x0d, true)]
+    [InlineData(7, 0x01, false)]
+    [InlineData(0xA, 0x04, false)]
+    [InlineData(0xC, 0x10, false)]
+    public void Dc1_OnlyCampaignStagesAreRandomized(int stage, int room, bool expected)
+        => Assert.Equal(expected, new DinoCrisis1().IsRandomizedRoom(stage, room));
+
     [Fact]
     public void Dc1_Run_OutputsReparse_AndCountsAreConsistent()
     {

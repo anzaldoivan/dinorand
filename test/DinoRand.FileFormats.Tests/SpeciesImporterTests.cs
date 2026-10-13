@@ -255,7 +255,7 @@ public class SpeciesImporterTests
 
         // Target: raptor room st10e; repoint its first raptor to the Pteranodon.
         var target = Load(dir, 1, 0x0e, "st10e.dat");
-        var victim = target.Enemies.First(e => e.Species == DinoSpecies.Velociraptor);
+        var victim = target.Enemies.First(e => e.Species == DinoSpecies.Humanoid);
         int victimIndex = target.Enemies.IndexOf(victim);
         uint otherOriginalModel = target.Enemies.Count > 1
             ? target.Enemies.First(e => target.Enemies.IndexOf(e) != victimIndex).OriginalModelPtr
@@ -340,7 +340,7 @@ public class SpeciesImporterTests
 
         // Target: a raptor room; repoint its first raptor to the Theri.
         var target = Load(dir, 1, 0x0e, "st10e.dat");
-        var victim = target.Enemies.First(e => e.Species == DinoSpecies.Velociraptor);
+        var victim = target.Enemies.First(e => e.Species == DinoSpecies.Humanoid);
         int victimIndex = target.Enemies.IndexOf(victim);
         uint otherOriginalModel = target.Enemies.Count > 1
             ? target.Enemies.First(e => target.Enemies.IndexOf(e) != victimIndex).OriginalModelPtr
@@ -536,7 +536,7 @@ public class SpeciesImporterTests
         var donor = SpeciesImporter.ExtractDonorClosure(donorRf.RdtBuffer, theri);
 
         var rf = RoomFile.Read(2, 0x03, File.ReadAllBytes(p203));
-        var victim = rf.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == DinoSpecies.RaptorHeavy);
+        var victim = rf.Enemies.FirstOrDefault(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
         if (victim is null) return;                            // not pristine 0203: skip
         int before = rf.RdtBuffer.Length;
 

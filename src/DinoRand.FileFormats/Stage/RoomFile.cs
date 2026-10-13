@@ -39,19 +39,20 @@ public readonly record struct EnemyAuthoring
 /// One Dino Crisis 1 room — physically one <c>stNXX.dat</c> file (N = stage 1–9/A/B/C,
 /// XX = room number in hex), e.g. <c>st10a.dat</c> = stage&#160;1, room&#160;0x0A.
 /// This is the DC analogue of Resident Evil's per-room RDT, so the engine treats it the
-/// same way: a chunked container whose last entry holds the room's RDT (camera, collision,
+/// same way: a chunked container with one entry holding the room's RDT (camera, collision,
 /// the SCD script, …) from which items / doors / enemies are read.
 ///
 /// <para>The file is a "Gian package" (<see cref="GianPackage"/>). The room RDT is the
-/// package's <b>last entry</b>; for most rooms it is LZSS-compressed (type
+/// entry loaded at <c>0x80100000</c> (<see cref="GianPackage.RoomDataIndex"/>) — usually, but
+/// not always, the last one; for most rooms it is LZSS-compressed (type
 /// <see cref="GianEntryType.Unknown"/>), for a few it is stored raw
 /// (<see cref="GianEntryType.Data"/>). We decompress it to <see cref="RdtBuffer"/> and walk
 /// the SCD script (<see cref="RoomScript"/>) to find item records.</para>
 ///
 /// <para><b>Round-trip.</b> <see cref="Write"/> is byte-exact when no item id was edited.
 /// When ids change, the edited RDT buffer is re-emitted (re-compressed for type-7 entries)
-/// and the (last) entry's size in the header is updated; because it is the last entry, no
-/// other entry's offset shifts.</para>
+/// and that entry's size in the header is updated; any entries after it are carried over
+/// verbatim.</para>
 /// </summary>
 public sealed class RoomFile
 {
@@ -83,10 +84,10 @@ public sealed class RoomFile
     /// <summary>Parsed package container, or null if the file isn't a recognized Gian package.</summary>
     public GianPackage? Package { get; private set; }
 
-    /// <summary>The decompressed room RDT buffer (the last entry's payload, LZSS-expanded), or empty.</summary>
+    /// <summary>The decompressed room RDT buffer (the room-data entry's payload, LZSS-expanded), or empty.</summary>
     public byte[] RdtBuffer { get; private set; } = Array.Empty<byte>();
 
-    /// <summary>True if the last entry was LZSS-compressed (so <see cref="Write"/> re-compresses).</summary>
+    /// <summary>True if the room-data entry was LZSS-compressed (so <see cref="Write"/> re-compresses).</summary>
     public bool RdtCompressed { get; private set; }
 
     /// <summary>The walked SCD script, or null if the file isn't a recognized package.</summary>
@@ -486,11 +487,11 @@ public sealed class RoomFile
 
     /// <summary>
     /// Serialize back. Byte-exact when no item id changed; otherwise the edited RDT buffer is
-    /// re-emitted into the (last) package entry, re-compressed when the entry was compressed.
+    /// re-emitted into the room-data package entry, re-compressed when the entry was compressed.
     /// </summary>
     public byte[] Write()
     {
-        if (Script is not { ParsedCleanly: true } || Package?.RoomDataEntry is not { } entry)
+        if (Script is not { ParsedCleanly: true } || Package?.RoomDataEntry is null)
             return OriginalBytes;
 
         bool changed = _structurallyEdited;
@@ -512,23 +513,28 @@ public sealed class RoomFile
         Script.ApplyDoorEdits(edited, Doors);
 
         byte[] payload = RoomPackageCodec.EncodeRdt(edited, RdtCompressed);
-        byte[] result = RoomPackageCodec.RebuildLastEntry(OriginalBytes, Package!, entry, payload);
+        byte[] result = RoomPackageCodec.RebuildRoomData(OriginalBytes, Package!, payload);
         return _textureStager.Apply(result);
     }
 
     /// <summary>
     /// Rebuild the on-disk file bytes from an externally-edited <b>decompressed</b> RDT buffer: re-LZSS (if
-    /// the original RDT entry was compressed) then repack the last package entry (size field + sector pad).
+    /// the original RDT entry was compressed) then repack the room-data package entry (size field + sector pad).
     /// Use for raw RDT edits that bypass the Script/Items/Enemies/Doors path — e.g. document glyph-token
     /// rewrites (<see cref="MgmtOfficeDocumentCode"/>). The game re-reads the entry's declared size, so a
     /// re-compressed payload of any length is fine. Returns <see cref="OriginalBytes"/> if unpackaged.
     /// </summary>
     public byte[] WriteWithRdt(ReadOnlySpan<byte> editedDecompressedRdt)
     {
-        if (Package?.RoomDataEntry is not { } entry) return OriginalBytes;
+        if (Package?.RoomDataEntry is null) return OriginalBytes;
         return RoomPackageCodec.RewriteRdt(
-            OriginalBytes, Package, entry, RdtCompressed, editedDecompressedRdt);
+            OriginalBytes, Package, RdtCompressed, editedDecompressedRdt);
     }
+
+    /// <summary>Wrap a room file without parsing it: no records surface and <see cref="Write"/> returns
+    /// the bytes unchanged. For rooms the randomizer carries through but must not edit.</summary>
+    public static RoomFile ReadOpaque(int stage, int room, ReadOnlySpan<byte> bytes)
+        => new(stage, room) { OriginalBytes = bytes.ToArray() };
 
     public static RoomFile ReadFromFile(int stage, int room, string path)
         => Read(stage, room, File.ReadAllBytes(path));

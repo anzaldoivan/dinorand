@@ -24,6 +24,8 @@
     <!-- Reference data tables locked to the C# definitions by EnemySpeciesTableTests /
          ItemTableTests / RoomDataConsistencyTests; copy them to the test output so the guards
          can read them. -->
+    <!-- The opcode table lives in the tools submodule and is the source of truth for DcOpcodes (drift test). -->
+    <Content Include="..\..\tools\scd_re\scd_opcode_table.json" Link="tools\scd_re\scd_opcode_table.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\enemies.json" Link="data\dc1\enemies.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\enemy-textures.json" Link="data\dc1\enemy-textures.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\dc1\items.json" Link="data\dc1\items.json" CopyToOutputDirectory="PreserveNewest" />
