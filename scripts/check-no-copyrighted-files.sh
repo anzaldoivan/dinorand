@@ -43,7 +43,22 @@ is_binary() {
 fail=0
 note() { echo "  ✗ $1"; fail=1; }
 
+declare -A gitlinks=()
+while IFS= read -r -d '' entry; do
+  if [ "${entry%% *}" = "160000" ]; then
+    gitlinks["${entry#*$'\t'}"]=1
+  fi
+done < <(git ls-files --stage -z)
+
 for f in "${files[@]}"; do
+  if [ "${gitlinks["$f"]:-0}" = "1" ]; then
+    if [ "$f" != "tools" ]; then
+      note "submodule has no registered content scan: $f"
+      continue
+    fi
+    python3 scripts/validate-tools.py --scan-only || fail=1
+    continue
+  fi
   [ -f "$f" ] || continue   # skip deletions / vanished paths
 
   if printf '%s' "$f" | grep -qiE "$FORBIDDEN_EXT_RE"; then
