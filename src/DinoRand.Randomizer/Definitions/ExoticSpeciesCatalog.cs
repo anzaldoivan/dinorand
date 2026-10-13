@@ -51,7 +51,7 @@ public sealed record ExoticSpeciesDef(
 /// <summary>
 /// The data-driven registry of exotic species the cross-species pass can place. Spans all five species; only
 /// the CE-proven paths are <see cref="ExoticSpeciesDef.Enabled"/> this increment (cat-8 Therizinosaurus +
-/// grounded RaptorHeavy). T-Rex/flyer/swarm are present but gated off with their blockers recorded.
+/// grounded Velociraptor). T-Rex/flyer/swarm are present but gated off with their blockers recorded.
 /// See docs/decisions/dc1/enemies/CROSS-SPECIES-PASS-PLAN.md.
 /// </summary>
 public static class ExoticSpeciesCatalog
@@ -63,7 +63,7 @@ public static class ExoticSpeciesCatalog
             Enabled: true, Blocker: null, FreeStages: new[] { 1, 2 }),
 
         // PROVEN — same-category grounded raptor; no EXE patch, so no stage constraint (Category n/a).
-        new ExoticSpeciesDef(DinoSpecies.RaptorHeavy, PlacementKind.SameCategoryNoPatch, Category: -1,
+        new ExoticSpeciesDef(DinoSpecies.Velociraptor, PlacementKind.SameCategoryNoPatch, Category: -1,
             Enabled: true, Blocker: null, FreeStages: Array.Empty<int>()),
 
         // GATED — imports + AI-dispatches but renders invisible in 0102 (engine draw-gate, RE paused;

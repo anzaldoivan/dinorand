@@ -154,16 +154,16 @@ public class RoomFileAddEnemyTests
         if (dir is null) return; // no game files: no-op (CI)
         if (!File.Exists(Path.Combine(dir, "st10a.dat"))) return;
 
-        // st10a's window-ambush spawns RaptorHeavy, so that model is already loaded by the room.
+        // st10a's window-ambush spawns Velociraptor, so that model is already loaded by the room.
         var target = Load(dir, 1, 0x0a, "st10a.dat");
-        var native = target.Enemies.First(e => e.Species == DinoSpecies.RaptorHeavy);
+        var native = target.Enemies.First(e => e.Species == DinoSpecies.Velociraptor);
         uint loadedModel = native.OriginalModelPtr, loadedMotion = native.OriginalMotionPtr;
 
-        // A clean RaptorHeavy donor from anywhere in the install (as the CLI finds one). Because the
-        // target room ALREADY loads RaptorHeavy, AddEnemyAt must REUSE the loaded model — a freshly
+        // A clean Velociraptor donor from anywhere in the install (as the CLI finds one). Because the
+        // target room ALREADY loads Velociraptor, AddEnemyAt must REUSE the loaded model — a freshly
         // imported copy is never loaded into a renderable node, so the event-spawned enemy render-AVs
         // (docs/dc1/ADD-ENEMY-EVENT-INJECTION-CRASH-RCA.md).
-        var donor = FindDonor(dir, DinoSpecies.RaptorHeavy);
+        var donor = FindDonor(dir, DinoSpecies.Velociraptor);
         if (donor is null) return; // no cleanly-importable donor (not expected on a full install)
         int off = FindEventSubOffset(target.RdtBuffer);
         Assert.True(off > 0, "no event-sub boundary found in st10a");
@@ -202,9 +202,9 @@ public class RoomFileAddEnemyTests
         Assert.Equal(SpawnActivation.Active, site.Activation);
         Assert.Equal(SpawnPersistence.EveryEntry, site.Persistence);
 
-        var native = target.Enemies.First(e => e.Species == DinoSpecies.RaptorHeavy);
+        var native = target.Enemies.First(e => e.Species == DinoSpecies.Velociraptor);
         uint loadedModel = native.OriginalModelPtr, loadedMotion = native.OriginalMotionPtr;
-        var donor = FindDonor(dir, DinoSpecies.RaptorHeavy);
+        var donor = FindDonor(dir, DinoSpecies.Velociraptor);
         if (donor is null) return; // no cleanly-importable donor (not expected on a full install)
 
         int before = target.Enemies.Count;
@@ -212,7 +212,7 @@ public class RoomFileAddEnemyTests
         var added = target.AddEnemyStanding(donor, 7696, 0, -6896, 0);
 
         Assert.Equal(standing, added.FileOffset);              // landed at the copy-B site
-        Assert.Equal(DinoSpecies.RaptorHeavy, added.Species);
+        Assert.Equal(DinoSpecies.Velociraptor, added.Species);
         Assert.Equal(loadedModel, added.ModelPtr);             // reused the room's loaded model (no AV)
         Assert.Equal(loadedMotion, added.MotionPtr);
         Assert.Equal(beforeLen + DcOpcodes.EnemyLength, target.RdtBuffer.Length); // grew by 24 only
@@ -281,7 +281,7 @@ public class RoomFileAddEnemyTests
         if (dir is null) return; // no game files: no-op (CI)
         if (!File.Exists(Path.Combine(dir, "st102.dat"))) return;
 
-        var donor = FindDonor(dir, DinoSpecies.RaptorHeavy);
+        var donor = FindDonor(dir, DinoSpecies.Velociraptor);
         if (donor is null) return;
         var target = Load(dir, 1, 0x02, "st102.dat");
 

@@ -48,7 +48,7 @@ public class EnemyAuthoringTests
         if (!File.Exists(path)) return;
 
         var target = Load(dir, 1, 0x02, "st102.dat");
-        // st102's only enemy is the 0x59 RaptorHeavy at slot 0 (cont.52) — donor from its own record.
+        // st102's only enemy is the 0x59 Velociraptor at slot 0 (cont.52) — donor from its own record.
         var native = target.Enemies.Single();
         Assert.Equal(DcOpcodes.Enemy2, native.Opcode);
         Assert.Equal(0, native.Slot);
@@ -126,7 +126,7 @@ public class EnemyAuthoringTests
         if (!File.Exists(Path.Combine(dir, "st10e.dat"))) return;
 
         var target = Load(dir, 1, 0x0e, "st10e.dat");
-        var native = target.Enemies.First(e => e.Species == DinoSpecies.Velociraptor);
+        var native = target.Enemies.First(e => e.Species == DinoSpecies.Humanoid);
         var donor = SpeciesImporter.ExtractDonor(target.RdtBuffer, native, Heads(target));
 
         const int off = 0x1CB18; // sub0 tail: post both raptors, before the op-0x01 task-spawn (cont.53 prep)

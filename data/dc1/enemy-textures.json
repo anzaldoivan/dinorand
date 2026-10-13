@@ -3,18 +3,18 @@
   "_xref": "Each row joins to data/dc1/enemies.json on (category == species.id) AND (bones == species.bones). enemies.json carries the species prose; this file carries its VRAM texture footprint. donor_room is one canonical room that loads this species' texture; place_op is the SCD opcode that places it (0x20 inline record, model@+0x10; 0x59 record, model@+0x04).",
   "textures": [
     {
-      "category": 1, "bones": 15, "name": "Velociraptor",
+      "category": 1, "bones": 15, "name": "Humanoid",
       "donor_room": "10e", "place_op": "0x20", "model_ptr": "0x80110e70",
       "tpage_codes": ["0x8b", "0x9b"], "clut_code": "0x7fb0",
       "texture_rect": [704, 0, 64, 512], "palette_rect": [768, 510, 256, 1],
-      "note": "Shares the X=704 texture column with Raptor-heavy, Pteranodon and Swarm; distinguished only by palette row 510 (CLUT 0x7fb0)."
+      "note": "Shares the X=704 texture column with Velociraptor, Pteranodon and Swarm; distinguished only by palette row 510 (CLUT 0x7fb0)."
     },
     {
-      "category": 2, "bones": 21, "name": "Raptor (heavy rig)",
+      "category": 2, "bones": 21, "name": "Velociraptor",
       "donor_room": "401", "place_op": "0x20", "model_ptr": "0x801081c0",
       "tpage_codes": ["0x8b", "0x9b"], "clut_code": "0x7ff0",
       "texture_rect": [704, 0, 64, 512], "palette_rect": [768, 511, 256, 1],
-      "note": "Shares the X=704 column with Velociraptor/Pteranodon/Swarm; palette row 511 (CLUT 0x7ff0). st401 hosts only cat2 enemies, so the slot is unambiguous."
+      "note": "Shares the X=704 column with Humanoid/Pteranodon/Swarm; palette row 511 (CLUT 0x7ff0). st401 hosts only cat2 enemies, so the slot is unambiguous."
     },
     {
       "category": 3, "bones": 20, "name": "Tyrannosaurus (boss rig)",
@@ -35,14 +35,14 @@
       "donor_room": "307", "place_op": "0x20", "model_ptr": "0x8010e39c",
       "tpage_codes": ["0x8b"], "clut_code": "0x7ff0",
       "texture_rect": [704, 0, 64, 128], "palette_rect": [768, 511, 256, 1],
-      "note": "SWARM CAVEAT: all instances share ONE model pointer (st307: 4 slots, same 0x8010e39c). Only a single tpage (0x8b) — the texture block is just 64x128 (top of the X=704 column), not the full 512. Shares the X=704 column + palette row 511 with Raptor-heavy/Pteranodon."
+      "note": "SWARM CAVEAT: all instances share ONE model pointer (st307: 4 slots, same 0x8010e39c). Only a single tpage (0x8b) — the texture block is just 64x128 (top of the X=704 column), not the full 512. Shares the X=704 column + palette row 511 with Velociraptor/Pteranodon."
     },
     {
       "category": 7, "bones": 18, "name": "Pteranodon",
       "donor_room": "400", "place_op": "0x20", "model_ptr": "0x80109bd8",
       "tpage_codes": ["0x8b", "0x9b"], "clut_code": "0x7ff0",
       "texture_rect": [704, 0, 64, 512], "palette_rect": [768, 511, 256, 1],
-      "note": "Shares the X=704 column + palette row 511 (CLUT 0x7ff0) with Raptor-heavy/Swarm — this is why a Pteranodon imported into a raptor room (0102) wore the raptor skin (same VRAM coords, different palette content)."
+      "note": "Shares the X=704 column + palette row 511 (CLUT 0x7ff0) with Velociraptor/Swarm — this is why a Pteranodon imported into a raptor room (0102) wore the raptor skin (same VRAM coords, different palette content)."
     },
     {
       "category": 8, "bones": 22, "name": "Therizinosaurus",

@@ -21,7 +21,7 @@ public sealed class Dc1BlueRaptorProfilePass : IRandomizationPass
             r.Stage == Dc1RaptorVisualVariantProfiles.BlueDonorStage
             && r.Room == Dc1RaptorVisualVariantProfiles.BlueDonorRoom);
         var enemy = target?.Enemies.FirstOrDefault(e => e.IsRandomizableDino
-                                                         && e.Species == DinoSpecies.RaptorHeavy
+                                                         && e.Species == DinoSpecies.Velociraptor
                                                          && e.Category == 2
                                                          && e.SpeciesBoneCount == 21);
         if (target is null || donor is null || enemy is null)

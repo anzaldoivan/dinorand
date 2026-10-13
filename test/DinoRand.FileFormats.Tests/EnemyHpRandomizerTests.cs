@@ -42,7 +42,7 @@ public class EnemyHpRandomizerTests
 
             var model = new byte[EnemySkeleton.BoneArrayOffset + 21 * EnemySkeleton.BoneStride];
             model[EnemySkeleton.BoneCountOffset] = 21;
-            var donor = new SpeciesDonor(DinoSpecies.RaptorHeavy, 2,
+            var donor = new SpeciesDonor(DinoSpecies.Velociraptor, 2,
                 new SpeciesBlock(model, 0x100, Array.Empty<int>()),
                 new SpeciesBlock(new byte[0x20], 0x300, Array.Empty<int>()));
             room.ImportSpecies(donor, victimIdx);
@@ -54,7 +54,7 @@ public class EnemyHpRandomizerTests
     {
         var candidates = new[]
         {
-            new RoomCandidate(stage, 3, true, new[] { DinoSpecies.Velociraptor }),
+            new RoomCandidate(stage, 3, true, new[] { DinoSpecies.Humanoid }),
         };
         for (int seed = 1; seed < 10000; seed++)
             if (CrossSpeciesPlanner.Plan(candidates, new[] { species }, 0.75,
@@ -126,7 +126,7 @@ public class EnemyHpRandomizerTests
     public void SetsNonZeroMaxHp_OnEligibleDinos()
     {
         var room = new RoomFile(5, 0x03); // plain (non-scripted, non-cutscene) room
-        room.Enemies.Add(Enemy(0x02, 0x80124d28, 0x80146d10)); // RaptorHeavy — guarded birth
+        room.Enemies.Add(Enemy(0x02, 0x80124d28, 0x80146d10)); // Velociraptor — guarded birth
         room.Enemies.Add(Enemy(0x07, 0x80128868, 0x80148fb4)); // Pteranodon — guarded birth
 
         Run(room, difficulty: 0.5); // band 680..2040
@@ -198,7 +198,7 @@ public class EnemyHpRandomizerTests
     [Fact]
     public void BirthFrozenSpecies_AreSkipped()
     {
-        // cat-1 Velociraptor and cat-5 Swarm births overwrite maxHP with 1000 unconditionally on the PC
+        // cat-1 Humanoid and cat-5 Swarm births overwrite maxHP with 1000 unconditionally on the PC
         // build (STATIC-SCD-RE cont.48) — a +6 preset would be clobbered, so the pass must not write or
         // report one. The eligible cat-2 in the same room proves the pass itself ran.
         var room = new RoomFile(5, 0x03);
@@ -275,31 +275,31 @@ public class EnemyHpRandomizerTests
     }
 
     [Fact]
-    public void CrossSpeciesOnly_RaptorHeavy_FinalSerializedPresetRemainsZero()
+    public void CrossSpeciesOnly_Velociraptor_FinalSerializedPresetRemainsZero()
     {
         var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
             new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
         var room = RoomFile.Read(3, 3, raw);
-        int seed = SeedThatPlaces(DinoSpecies.RaptorHeavy, room.Stage);
+        int seed = SeedThatPlaces(DinoSpecies.Velociraptor, room.Stage);
         var rooms = new[] { room };
         var ctx = new RandomizationContext(new DinoCrisis1(), rooms, RoomGraph.Build(rooms), new Seed(seed),
             new RandomizerConfig { CrossRoomEnemySpecies = true, EnemyDifficulty = 1.0 }, _ => { });
 
-        new CrossSpeciesEnemyPass(_ => new ImportingFake(DinoSpecies.RaptorHeavy)).Apply(ctx);
+        new CrossSpeciesEnemyPass(_ => new ImportingFake(DinoSpecies.Velociraptor)).Apply(ctx);
 
         var final = RoomFile.Read(room.Stage, room.Room, room.Write());
-        Assert.Equal(DinoSpecies.RaptorHeavy, final.Enemies.Single().Species);
+        Assert.Equal(DinoSpecies.Velociraptor, final.Enemies.Single().Species);
         Assert.Equal(0, final.Enemies.Single().MaxHp);
     }
 
     [Fact]
-    public void CombinedRaptorHeavy_FinalSerializedRecordGetsHp_WithoutChangingHpStream()
+    public void CombinedVelociraptor_FinalSerializedRecordGetsHp_WithoutChangingHpStream()
     {
         var targetRaw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
             new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
         var combined = RoomFile.Read(3, 3, targetRaw);
-        int seed = SeedThatPlaces(DinoSpecies.RaptorHeavy, combined.Stage);
-        var (_, combinedHp) = RunCombined(combined, DinoSpecies.RaptorHeavy);
+        int seed = SeedThatPlaces(DinoSpecies.Velociraptor, combined.Stage);
+        var (_, combinedHp) = RunCombined(combined, DinoSpecies.Velociraptor);
 
         var hpOnlyRaw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
             new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21) });
@@ -310,7 +310,7 @@ public class EnemyHpRandomizerTests
         Assert.Equal(hpOnly.Enemies.Single().MaxHp, combinedHp);
         var final = RoomFile.Read(combined.Stage, combined.Room, combined.Write());
         var imported = final.Enemies.Single();
-        Assert.Equal(DinoSpecies.RaptorHeavy, imported.Species);
+        Assert.Equal(DinoSpecies.Velociraptor, imported.Species);
         Assert.Equal(combinedHp, imported.MaxHp);
         int hpOffset = imported.FileOffset + EnemyRecord.MaxHpOffset;
         Assert.Equal(combinedHp,

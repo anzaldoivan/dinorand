@@ -22,7 +22,7 @@ public class CrossSpeciesPassTests
     public void Catalog_EnablesOnlyProvenSpecies()
     {
         var enabled = ExoticSpeciesCatalog.Enabled.Select(d => d.Species).ToHashSet();
-        Assert.Equal(new[] { DinoSpecies.Therizinosaurus, DinoSpecies.RaptorHeavy }.ToHashSet(), enabled);
+        Assert.Equal(new[] { DinoSpecies.Therizinosaurus, DinoSpecies.Velociraptor }.ToHashSet(), enabled);
     }
 
     [Fact]
@@ -38,9 +38,9 @@ public class CrossSpeciesPassTests
     }
 
     [Fact]
-    public void Catalog_RaptorHeavy_NeedsNoPatch_AnyStage()
+    public void Catalog_Velociraptor_NeedsNoPatch_AnyStage()
     {
-        var rh = ExoticSpeciesCatalog.For(DinoSpecies.RaptorHeavy)!;
+        var rh = ExoticSpeciesCatalog.For(DinoSpecies.Velociraptor)!;
         Assert.True(rh.Enabled);
         Assert.False(rh.NeedsCatSlotPatch);
         Assert.True(rh.AllowsStage(7)); // no stage constraint when no slot patch
@@ -109,7 +109,7 @@ public class CrossSpeciesPassTests
     // ---- Pure placement planner (stage-scoping) ----
 
     private static RoomCandidate Cand(int stage, int room, bool victim = true, params DinoSpecies[] present)
-        => new(stage, room, victim, present.Length == 0 ? new[] { DinoSpecies.Velociraptor } : present);
+        => new(stage, room, victim, present.Length == 0 ? new[] { DinoSpecies.Humanoid } : present);
 
     [Fact]
     public void Planner_PlacesTheri_OnlyInFreeStages()
@@ -124,11 +124,11 @@ public class CrossSpeciesPassTests
     }
 
     [Fact]
-    public void Planner_RaptorHeavy_PlaceableAnyStage()
+    public void Planner_Velociraptor_PlaceableAnyStage()
     {
-        var p = CrossSpeciesPlanner.Plan(new[] { Cand(3, 1) }, new[] { DinoSpecies.RaptorHeavy }, 1.0, new Random(1));
+        var p = CrossSpeciesPlanner.Plan(new[] { Cand(3, 1) }, new[] { DinoSpecies.Velociraptor }, 1.0, new Random(1));
         Assert.Single(p);
-        Assert.Equal(DinoSpecies.RaptorHeavy, p[0].Species);
+        Assert.Equal(DinoSpecies.Velociraptor, p[0].Species);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class CrossSpeciesPassTests
     public void Planner_NeverPlacesASpeciesARoomAlreadyHas()
     {
         var p = CrossSpeciesPlanner.Plan(
-            new[] { Cand(1, 2, true, DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus) },
+            new[] { Cand(1, 2, true, DinoSpecies.Humanoid, DinoSpecies.Therizinosaurus) },
             new[] { DinoSpecies.Therizinosaurus }, 1.0, new Random(1));
         Assert.Empty(p); // Theri already present; no other donor → nothing
     }
@@ -179,7 +179,7 @@ public class CrossSpeciesPassTests
     public void Planner_IsDeterministicForSeed()
     {
         var cands = new[] { Cand(1, 1), Cand(2, 1), Cand(3, 1), Cand(1, 2) };
-        var donors = new[] { DinoSpecies.Therizinosaurus, DinoSpecies.RaptorHeavy };
+        var donors = new[] { DinoSpecies.Therizinosaurus, DinoSpecies.Velociraptor };
         var a = CrossSpeciesPlanner.Plan(cands, donors, 0.6, new Random(99));
         var b = CrossSpeciesPlanner.Plan(cands, donors, 0.6, new Random(99));
         Assert.Equal(a, b);
@@ -251,7 +251,7 @@ public class CrossSpeciesPassTests
         var prepared = SyntheticRoom.Dc1Room(
             Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
             new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21) });
-        var importer = new PlannedFakeImporter(room, prepared, DinoSpecies.RaptorHeavy);
+        var importer = new PlannedFakeImporter(room, prepared, DinoSpecies.Velociraptor);
         var pass = new CrossSpeciesEnemyPass(_ => importer);
         var ctx = new RandomizationContext(new DinoCrisis1(), new[] { room }, RoomGraph.Build(new[] { room }),
             new Seed(1), new RandomizerConfig { CrossRoomEnemySpecies = true, EnemyDifficulty = 1.0 }, _ => { });
@@ -259,12 +259,12 @@ public class CrossSpeciesPassTests
         pass.Apply(ctx);
 
         Assert.True(ctx.TryGetRoomOutput(room, out var output));
-        Assert.Equal(DinoSpecies.RaptorHeavy,
+        Assert.Equal(DinoSpecies.Velociraptor,
             RoomFile.Read(room.Stage, room.Room, output).Enemies.Single().Species);
     }
 
     [Fact]
-    public void Pass_SelectsParsedEnemy2RaptorHeavyTarget()
+    public void Pass_SelectsParsedEnemy2VelociraptorTarget()
     {
         var room = RoomFile.Read(1, 2, SyntheticRoom.Dc1Room(
             Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
@@ -492,7 +492,7 @@ public class CrossSpeciesPassTests
             Assert.True(reread.ParsedCleanly, $"{room} override did not reparse");
         }
 
-        // RaptorHeavy rooms commit atomically into the shared RoomFile. Every changed grounded room must
+        // Velociraptor rooms commit atomically into the shared RoomFile. Every changed grounded room must
         // stay within the resident-pool budget and its final imported model must resolve to a texture upload;
         // GeometryOnly is never an installed production outcome.
         foreach (var room in rooms)
@@ -503,7 +503,7 @@ public class CrossSpeciesPassTests
             Assert.True(reread.RdtBuffer.Length <= SpeciesImporter.ResidentPoolFloor,
                 $"{room} grounded import exceeded the resident-pool floor");
             var imported = Assert.Single(reread.Enemies, e =>
-                e.Species == DinoSpecies.RaptorHeavy && e.SpeciesMatchesCategory);
+                e.Species == DinoSpecies.Velociraptor && e.SpeciesMatchesCategory);
             var codes = TextureImporter.ReadModelTextureCodes(reread.RdtBuffer, imported.ModelPtr);
             Assert.NotNull(TextureImporter.ExtractSpeciesTexture(reread.OriginalBytes, codes.Tpages, codes.Clut));
         }

@@ -250,7 +250,7 @@ public class TextureAwareImportTests
             with { Texture = SpeciesImporter.TryExtractTexture(drf.OriginalBytes, drf.RdtBuffer, drec.OriginalModelPtr) };
         Assert.NotNull(donor.Texture);
 
-        // Target: st10e's Velociraptor (occupies X=704), so the donor must relocate to a free column.
+        // Target: st10e's Humanoid (occupies X=704), so the donor must relocate to a free column.
         var trf = RoomFile.ReadFromFile(1, 0x0e, targetPath);
         var victim = trf.Enemies.First(e => e.IsRandomizableDino);
         int idx = trf.Enemies.IndexOf(victim);
@@ -285,7 +285,7 @@ public class TextureAwareImportTests
         if (!File.Exists(donorPath) || !File.Exists(targetPath)) return;
 
         var drf = RoomFile.ReadFromFile(1, 0, donorPath);
-        var drec = drf.Enemies.First(e => e.IsRandomizableDino && e.Species == DinoSpecies.RaptorHeavy);
+        var drec = drf.Enemies.First(e => e.IsRandomizableDino && e.Species == DinoSpecies.Velociraptor);
         var donor = SpeciesImporter.ExtractDonor(drf.RdtBuffer, drec, Heads(drf))
             with { Texture = SpeciesImporter.TryExtractTexture(drf.OriginalBytes, drf.RdtBuffer, drec.OriginalModelPtr) };
         Assert.NotNull(donor.Texture);

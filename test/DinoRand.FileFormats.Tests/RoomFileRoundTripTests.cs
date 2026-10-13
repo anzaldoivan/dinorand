@@ -256,8 +256,8 @@ public class RoomFileRoundTripTests
         const ushort maxHp = 850; // a plausible preset (record +6 → entity +0x11A)
         var enemies = new[]
         {
-            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15), // Velociraptor
-            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21), // RaptorHeavy — a distinct model to swap in
+            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15), // Humanoid
+            new SyntheticRoom.Enemy(DcOpcodes.Enemy, 2, 21), // Velociraptor — a distinct model to swap in
         };
         var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(),
                                         Array.Empty<SyntheticRoom.Door>(), enemies);

@@ -481,14 +481,12 @@ public sealed class EnemyRecord
     /// never edited.
     ///
     /// <para><b>What this does and does NOT catch (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.15, corrected cont.41).</b>
-    /// <c>0x20</c> is the general entity opcode; it also places non-dinosaurs that <i>share the 15-bone
-    /// biped rig</i>, decoding as a 15-bone cat-1 "Velociraptor" because the rig is identical: the
-    /// humanoid corpse in <c>st50c</c>, and — <b>refuting cont.15's "NPCs are never <c>0x20</c>
-    /// entities"</b> — the live NPC characters (Rick/Gail/Kirk) placed in scene-hub rooms such as
-    /// <c>0106</c> (PS1-confirmed on <c>ST106.DAT</c>, cont.41). Bone count / AI category / bind-pose
-    /// <b>cannot</b> separate any of these from a real raptor (the NPC placements even carry a vestigial
-    /// <i>raptor</i> skeleton — the real character model is loaded into the heap by the cutscene system
-    /// at runtime). So this flag is a sanity net against garbage/undecodable models, not an NPC detector.
+    /// <c>0x20</c> is the general entity opcode; it also places the human characters, which decode as
+    /// the 15-bone cat-1 <see cref="DinoSpecies.Humanoid"/> rig: the corpse in <c>st50c</c> and the
+    /// live NPCs (Rick/Gail/Kirk) placed in scene-hub rooms such as <c>0106</c> (cont.41). Until
+    /// cont.97 that rig was taken for a raptor, which is why older notes say an NPC "carries a
+    /// vestigial raptor skeleton" — it carries a human one. This flag is a sanity net against
+    /// garbage/undecodable models, not an NPC detector.
     /// NPC-scene actors are excluded instead by <see cref="IsNpcSceneActor"/> (the shared-motion /
     /// distinct-model tell), folded in below, plus the singleton rule and
     /// <see cref="DinoRand.Randomizer.Definitions.GameDefinition.CutsceneRoomCodes"/>.</para>
@@ -504,23 +502,22 @@ public sealed class EnemyRecord
     /// <summary>
     /// True when this species' birth-init <b>keeps</b> a nonzero preset <see cref="MaxHp"/> — i.e. the
     /// <c>+6</c> HP override actually takes effect in-game. Per-category, from the PC birth handlers
-    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.48): cat-2 RaptorHeavy (<c>0x4C0FED</c>:
+    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.48): cat-2 Velociraptor (<c>0x4C0FED</c>:
     /// <c>test maxHP; jne keep</c> at <c>0x4C10D2</c>, else the PSX-standard roll <c>0x5E5ECC</c>) and
     /// cat-7 Pteranodon (<c>0x599CDC</c>, guard <c>0x599D92</c>) kept the PSX keep-if-nonzero idiom.
-    /// cat-1 Velociraptor (<c>0x4DBB3D</c>, stores at <c>0x4DBB7F/0x4DBB8B</c>) and cat-5 Swarm
+    /// cat-1 Humanoid (<c>0x4DBB3D</c>, stores at <c>0x4DBB7F/0x4DBB8B</c>) and cat-5 Swarm
     /// (<c>0x4F83D5</c> family) write <c>1000/1000</c> <b>unconditionally</b> — a preset is clobbered at
     /// birth, so writing <c>+6</c> for them is a silent no-op the HP pass must not claim.
     /// </summary>
     public bool IsHpPresettable =>
-        Species is DinoSpecies.RaptorHeavy or DinoSpecies.Pteranodon;
+        Species is DinoSpecies.Velociraptor or DinoSpecies.Pteranodon;
 
     /// <summary>
     /// True when this <c>0x20</c> record is an <b>NPC-scene actor</b> (Rick/Gail/Kirk placed in a scene
     /// hub), not a randomizable dinosaur — set by <see cref="MarkNpcSceneActors"/> at parse time
-    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.41). Such records carry a <i>vestigial raptor skeleton</i> in the RDT
-    /// (byte-identical raptor bind-pose — the cutscene system loads the real character model into the
-    /// heap at runtime and the file <see cref="MaxHp"/> is ignored), so bone count / AI
-    /// <see cref="Category"/> / bind-pose all mis-decode them as a Velociraptor.
+    /// (docs/reference/dc1/_registries/STATIC-SCD-RE.md cont.41). Such records are category-1
+    /// <see cref="DinoSpecies.Humanoid"/> placements; the cutscene system loads the character's own
+    /// model at runtime and the file <see cref="MaxHp"/> is ignored.
     /// </summary>
     public bool IsNpcSceneActor { get; set; }
 

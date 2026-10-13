@@ -12,8 +12,8 @@ namespace DinoRand.Randomizer.Passes;
 /// <para><b>Eligibility</b> starts from <see cref="EnemyRandomizer"/>'s filter (positively-decoded
 /// dinosaurs via <see cref="EnemyRecord.IsRandomizableDino"/>; scripted T-Rex + cutscene rooms skipped;
 /// <b><c>0x20</c> records only</b> — a <c>0x59</c> record's <c>+6</c> is model-pointer bytes) and then
-/// requires <see cref="EnemyRecord.IsHpPresettable"/>: only cat-2 RaptorHeavy and cat-7 Pteranodon births
-/// keep a nonzero preset — cat-1 Velociraptor and cat-5 Swarm births overwrite maxHP with 1000
+/// requires <see cref="EnemyRecord.IsHpPresettable"/>: only cat-2 Velociraptor and cat-7 Pteranodon births
+/// keep a nonzero preset — cat-1 Humanoid and cat-5 Swarm births overwrite maxHP with 1000
 /// unconditionally on the PC build, so editing them would be a silent no-op (STATIC-SCD-RE cont.48).
 /// HP gates no progression (key/door logic ignores it), so beatability is unaffected; the drawn value is
 /// clamped to a ushort-safe, never-zero band.</para>

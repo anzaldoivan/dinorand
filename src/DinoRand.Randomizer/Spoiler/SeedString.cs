@@ -54,7 +54,7 @@ public static class SeedString
         new[] { 0x02, 0x03, 0x06, 0x07, 0x08, 0x09, 0x0e };
 
     public static readonly IReadOnlyList<DinoSpecies> Dc1CanonicalSpecies =
-        new[] { DinoSpecies.RaptorHeavy, DinoSpecies.Therizinosaurus };
+        new[] { DinoSpecies.Velociraptor, DinoSpecies.Therizinosaurus };
 
     private static readonly Lazy<Dc2EnemyDistribution> Dc2Distribution =
         new(Dc2EnemyDistribution.LoadEmbedded);

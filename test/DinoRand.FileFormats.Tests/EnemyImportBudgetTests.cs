@@ -113,7 +113,7 @@ public class EnemyImportBudgetTests
     private static SpeciesBlock Block(int len)
         => new(new byte[len], 0x100, Array.Empty<int>());
 
-    private static SpeciesDonor TexturedRaptorHeavyDonor(int modelLength = 0x1e0)
+    private static SpeciesDonor TexturedVelociraptorDonor(int modelLength = 0x1e0)
     {
         const int bones = 21;
         const int packet = 0x1c0;
@@ -131,7 +131,7 @@ public class EnemyImportBudgetTests
             new VramBlock(1, GianEntryType.Palette, new VramRect(768, 511, 256, 1), new byte[512]),
             new ushort[] { 0x8a }, 0x7ff0);
         return new SpeciesDonor(
-            DinoSpecies.RaptorHeavy, 2,
+            DinoSpecies.Velociraptor, 2,
             new SpeciesBlock(model, 0x100, modelLength > packet + 0x10 ? new[] { EnemySkeleton.BoneArrayOffset + 8 } : Array.Empty<int>()),
             Block(0x20))
         { Texture = texture };
@@ -276,7 +276,7 @@ public class EnemyImportBudgetTests
         var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
             new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
         var room = RoomFile.Read(3, 1, raw);
-        var donor = TexturedRaptorHeavyDonor(SpeciesImporter.ResidentPoolFloor);
+        var donor = TexturedVelociraptorDonor(SpeciesImporter.ResidentPoolFloor);
         var before = room.Write();
 
         bool imported = room.TryImportSpeciesTexturedAtomic(
@@ -286,7 +286,7 @@ public class EnemyImportBudgetTests
         Assert.Equal(ImportFitConstraint.RdtBudget, fit.Limiting);
         Assert.Null(texture);
         Assert.Equal(before, room.Write());
-        Assert.Equal(DinoSpecies.Velociraptor, room.Enemies[0].Species);
+        Assert.Equal(DinoSpecies.Humanoid, room.Enemies[0].Species);
     }
 
     [Fact]
@@ -295,7 +295,7 @@ public class EnemyImportBudgetTests
         var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
             new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
         var room = RoomFile.Read(3, 1, raw);
-        var donor = TexturedRaptorHeavyDonor() with { Texture = null };
+        var donor = TexturedVelociraptorDonor() with { Texture = null };
         var before = room.Write();
 
         bool imported = room.TryImportSpeciesTexturedAtomic(
@@ -305,7 +305,7 @@ public class EnemyImportBudgetTests
         Assert.Equal(ImportFitConstraint.Vram, fit.Limiting);
         Assert.Null(texture);
         Assert.Equal(before, room.Write());
-        Assert.Equal(DinoSpecies.Velociraptor, room.Enemies[0].Species);
+        Assert.Equal(DinoSpecies.Humanoid, room.Enemies[0].Species);
     }
 
     [Fact]
@@ -316,7 +316,7 @@ public class EnemyImportBudgetTests
         var room = RoomFile.Read(3, 1, raw);
 
         bool imported = room.TryImportSpeciesTexturedAtomic(
-            TexturedRaptorHeavyDonor(), 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
+            TexturedVelociraptorDonor(), 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
 
         Assert.True(imported);
         Assert.True(fit.Fits);
@@ -325,7 +325,7 @@ public class EnemyImportBudgetTests
         Assert.True(room.RdtBuffer.Length <= SpeciesImporter.ResidentPoolFloor);
         var reread = RoomFile.Read(room.Stage, room.Room, room.Write());
         Assert.True(reread.ParsedCleanly);
-        Assert.Equal(DinoSpecies.RaptorHeavy, reread.Enemies[0].Species);
+        Assert.Equal(DinoSpecies.Velociraptor, reread.Enemies[0].Species);
         Assert.True(reread.Enemies[0].SpeciesMatchesCategory);
     }
 
@@ -335,7 +335,7 @@ public class EnemyImportBudgetTests
         var raw = SyntheticRoom.Dc1Room(Array.Empty<SyntheticRoom.Item>(), Array.Empty<SyntheticRoom.Door>(),
             new[] { new SyntheticRoom.Enemy(DcOpcodes.Enemy, 1, 15) });
         var seeded = RoomFile.Read(3, 1, raw);
-        var first = seeded.ImportSpeciesTextured(TexturedRaptorHeavyDonor(), 0);
+        var first = seeded.ImportSpeciesTextured(TexturedVelociraptorDonor(), 0);
         Assert.Equal(RoomFile.TextureImportOutcome.Relocated, first.Outcome);
         seeded = RoomFile.Read(3, 1, seeded.Write());
 
@@ -348,7 +348,7 @@ public class EnemyImportBudgetTests
         var room = RoomFile.Read(3, 1, PackageRepacker.InsertEntriesBeforeRdt(seeded.Write(), occupied));
 
         bool imported = room.TryImportSpeciesTexturedAtomic(
-            TexturedRaptorHeavyDonor(), 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
+            TexturedVelociraptorDonor(), 0, SpeciesImporter.ResidentPoolFloor, out var fit, out var texture);
 
         Assert.True(imported);
         Assert.True(fit.Fits);

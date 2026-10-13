@@ -416,8 +416,8 @@ public class RoomScriptTests
     }
 
     [Theory]
-    [InlineData((byte)1, 15, DinoSpecies.Velociraptor)]
-    [InlineData((byte)2, 21, DinoSpecies.RaptorHeavy)]
+    [InlineData((byte)1, 15, DinoSpecies.Humanoid)]
+    [InlineData((byte)2, 21, DinoSpecies.Velociraptor)]
     [InlineData((byte)3, 20, DinoSpecies.Tyrannosaurus)] // 20-bone cat-3 T-Rex boss (cont.23)
     [InlineData((byte)4, 10, DinoSpecies.Tyrannosaurus)]
     [InlineData((byte)5, 7, DinoSpecies.Swarm)]
@@ -446,8 +446,8 @@ public class RoomScriptTests
     }
 
     [Theory]
-    [InlineData(15, DinoSpecies.Velociraptor)]
-    [InlineData(21, DinoSpecies.RaptorHeavy)]
+    [InlineData(15, DinoSpecies.Humanoid)]
+    [InlineData(21, DinoSpecies.Velociraptor)]
     [InlineData(20, DinoSpecies.Tyrannosaurus)] // both T-Rex rigs decode to Tyrannosaurus (cont.23)
     [InlineData(10, DinoSpecies.Tyrannosaurus)]
     [InlineData(7, DinoSpecies.Swarm)]

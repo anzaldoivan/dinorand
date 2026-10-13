@@ -26,7 +26,7 @@ internal sealed partial class CliApplication
             // --max-donor <bytes>: DEBUG/test override — force the Theri clip-strip to this donor budget even when
             // the room would fit unstripped (used to reproduce 0102's exact strip in a native-Theri room, e.g. st612).
             int? maxDonorOverride = GetOpt("--max-donor") is { } md && int.TryParse(md, out int mdv) ? mdv : null;
-            return SwapSpecies(install, swapRoom, GetOpt("--species") ?? "raptorheavy", maxDonorOverride);
+            return SwapSpecies(install, swapRoom, GetOpt("--species") ?? "velociraptor", maxDonorOverride);
         }
 
         // Targeted single-room ADD-enemy (inject a brand-new 0x20 record into a room that has none —
@@ -44,19 +44,19 @@ internal sealed partial class CliApplication
                 Console.Error.WriteLine($"error: --add-enemy-at expects <room>:<rdtOffset> (e.g. 10a:0x49000), got '{addAtSpec}'");
                 return 1;
             }
-            return AddEnemy(install, parts[0], GetOpt("--species") ?? "raptorheavy", GetOpt("--at"),
+            return AddEnemy(install, parts[0], GetOpt("--species") ?? "velociraptor", GetOpt("--at"),
                             GetOpt("--kill-flag"), GetOpt("--seed"), parts[1],
                             GetOpt("--hp"), GetOpt("--ai-param"), GetOpt("--birth-mode"), GetOpt("--activate"), GetOpt("--slot"));
         }
         if (GetOpt("--add-enemy") is { } addRoom)
-            return AddEnemy(install, addRoom, GetOpt("--species") ?? "raptorheavy", GetOpt("--at"), GetOpt("--kill-flag"), GetOpt("--seed"),
+            return AddEnemy(install, addRoom, GetOpt("--species") ?? "velociraptor", GetOpt("--at"), GetOpt("--kill-flag"), GetOpt("--seed"),
                             null, GetOpt("--hp"), GetOpt("--ai-param"), GetOpt("--birth-mode"), GetOpt("--activate"), GetOpt("--slot"));
 
         // Palette-copy lab (STATIC-SCD-RE cont.51): copy one species' type-2 CLUT entry (512 B, same VRAM
         // rect) from a donor room into a target room — the "tint an enemy" lever (Blue Raptor = st511's
         // recoloured palette row). Room-file only; same backup/--restore contract as the other room ops.
         if (GetOpt("--copy-enemy-palette") is { } palSpec)
-            return CopyEnemyPalette(install, palSpec, GetOpt("--species") ?? "raptorheavy");
+            return CopyEnemyPalette(install, palSpec, GetOpt("--species") ?? "velociraptor");
 
         // Targeted door retarget (docs/decisions/dc1/doors/DOOR-RANDOMIZER-PLAN.md): change one door's destination. spec is
         // room:fromDest:toDest as 3-hex room codes, e.g. 103:102:511 = in Management Office (0103) change the
@@ -759,7 +759,7 @@ internal sealed partial class CliApplication
         if (!TryParseSpecies(speciesName, out var species))
         {
             Console.Error.WriteLine($"error: unknown species '{speciesName}' " +
-                "(largeground | raptorheavy | pteranodon | tyrannosaurus | swarm | velociraptor | therizinosaurus)");
+                "(velociraptor | pteranodon | tyrannosaurus | swarm | humanoid | therizinosaurus; raptorheavy = velociraptor)");
             return 1;
         }
         if (species == DinoSpecies.Pteranodon)
@@ -801,8 +801,8 @@ internal sealed partial class CliApplication
         if (species == DinoSpecies.Swarm)
             return SwapSwarm(installDir, dataDir, code, stage, room, targetRef, refs);
 
-        if (species == DinoSpecies.RaptorHeavy)
-            return SwapRaptorHeavy(installDir, code, stage, room, targetRef, refs);
+        if (species == DinoSpecies.Velociraptor)
+            return SwapVelociraptor(installDir, code, stage, room, targetRef, refs);
 
         // Find a clean donor for the requested species anywhere in the game (carrying its texture).
         SpeciesDonor? donor = null;
@@ -871,7 +871,7 @@ internal sealed partial class CliApplication
         }
     }
 
-    static int SwapRaptorHeavy(string installDir, int code, int stage, int room,
+    static int SwapVelociraptor(string installDir, int code, int stage, int room,
                                RoomFileRef targetRef, IReadOnlyList<RoomFileRef> refs)
     {
         var game = new DinoCrisis1();
@@ -890,23 +890,23 @@ internal sealed partial class CliApplication
         }
 
         var importer = new CrossSpeciesImporter(rooms);
-        var plan = importer.Plan(target, target.Enemies.IndexOf(victim), DinoSpecies.RaptorHeavy);
+        var plan = importer.Plan(target, target.Enemies.IndexOf(victim), DinoSpecies.Velociraptor);
         if (plan is null)
         {
-            Console.Error.WriteLine($"error: ST{code:X3}+RaptorHeavy refused — no verified donor or stage support");
+            Console.Error.WriteLine($"error: ST{code:X3}+Velociraptor refused — no verified donor or stage support");
             return 1;
         }
         var preflight = importer.Preflight(plan);
         if (!preflight.Success)
         {
-            Console.Error.WriteLine($"error: ST{code:X3}+RaptorHeavy refused — {preflight.Note}");
+            Console.Error.WriteLine($"error: ST{code:X3}+Velociraptor refused — {preflight.Note}");
             Console.Error.WriteLine("hint : nothing was written.");
             return 1;
         }
 
         var applied = importer.Apply(plan, preflight);
         File.WriteAllBytes(targetRef.Path, applied.RoomBytes);
-        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {victim.Species} -> RaptorHeavy ({applied.Note})");
+        Console.WriteLine($"ST{code:X3} slot{victim.Slot}: {victim.Species} -> Velociraptor ({applied.Note})");
         Console.WriteLine($"wrote   : {targetRef.Path}");
         Console.WriteLine($"backup  : {backupPath}");
         Console.WriteLine($"undo    : dinorand --install \"{installDir}\" --restore");
@@ -930,7 +930,7 @@ internal sealed partial class CliApplication
         if (!TryParseSpecies(speciesName, out var species))
         {
             Console.Error.WriteLine($"error: unknown species '{speciesName}' " +
-                "(raptorheavy | pteranodon | swarm | velociraptor; largeground/trex are not yet importable)");
+                "(velociraptor | pteranodon | swarm | humanoid; trex is not yet importable; raptorheavy = velociraptor)");
             return 1;
         }
 
@@ -1055,7 +1055,7 @@ internal sealed partial class CliApplication
             if (!ushort.TryParse(hpArg, out var hp) || hp == 0)
             { Console.Error.WriteLine($"error: --hp must be 1..65535, got '{hpArg}'"); return 1; }
             authoring = authoring with { MaxHp = hp };
-            if (species is not (DinoSpecies.RaptorHeavy or DinoSpecies.Pteranodon))
+            if (species is not (DinoSpecies.Velociraptor or DinoSpecies.Pteranodon))
                 Console.WriteLine($"warning : --hp on a {species} is a provable no-op — only cat-2/cat-7 births "
                     + "keep a preset (STATIC-SCD-RE cont.48); the byte is written anyway for the record.");
         }
@@ -1443,7 +1443,7 @@ internal sealed partial class CliApplication
         if (eligible.Count == 0)
         {
             Console.Error.WriteLine($"error: ST{code:X3} has no eligible 0x20 dino to patch "
-                + "(0x59-placed enemies and birth-frozen species [Velociraptor/Swarm] are excluded).");
+                + "(0x59-placed enemies and birth-frozen classes [human rig/Swarm] are excluded).");
             return 1;
         }
 
@@ -2028,21 +2028,7 @@ internal sealed partial class CliApplication
     }
 
     static bool TryParseSpecies(string name, out DinoSpecies species)
-    {
-        species = name.ToLowerInvariant().Replace("-", "").Replace("_", "") switch
-        {
-            "raptorheavy" or "heavy" or "heavyraptor" => DinoSpecies.RaptorHeavy,
-            "pteranodon" or "flyer" or "ptera" => DinoSpecies.Pteranodon,
-            // "largeground"/"large"/"ground" were the 20-bone class now known to be the Tyrannosaurus (cont.23).
-            "tyrannosaurus" or "trex" or "rex" or "tyrant" or "largeground" or "large" or "ground"
-                => DinoSpecies.Tyrannosaurus,
-            "swarm" => DinoSpecies.Swarm,
-            "velociraptor" or "raptor" => DinoSpecies.Velociraptor,
-            "therizinosaurus" or "theri" or "theriz" or "scythe" => DinoSpecies.Therizinosaurus,
-            _ => DinoSpecies.Unknown,
-        };
-        return species != DinoSpecies.Unknown;
-    }
+        => EnemySkeleton.TryParseSpeciesName(name, out species);
 
     // Read-only diagnostic: reports how many rooms parse as packages, how many script
     // segments walk cleanly with the current (incomplete) opcode table, and the item-id

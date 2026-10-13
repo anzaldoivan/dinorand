@@ -219,7 +219,7 @@ public class EnemySoundSeTests
         if (!File.Exists(exePath)) return;
 
         byte[] exe = File.ReadAllBytes(exePath);
-        // st0102 (stage 1, room 2) natively loads the Velociraptor (r_*) set; st605 (stage 6, room 5) the Theri (j_*) set.
+        // st0102 (stage 1, room 2) natively loads the Humanoid (r_*) set; st605 (stage 6, room 5) the Theri (j_*) set.
         var st102Before = LoadedDino(exe, ExePatcher.SeBlockVa(exe, 1, 2));
         Assert.NotEmpty(st102Before);
         Assert.Contains(st102Before, r => r.Name.StartsWith(@"se\dino\r_", StringComparison.OrdinalIgnoreCase));

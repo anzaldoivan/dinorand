@@ -12,6 +12,13 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+### Changed
+
+- **The common DC1 raptor is now called Velociraptor.** Enemy options, help text, and logs used
+  the name RaptorHeavy for it and Velociraptor for what are really the human characters; those
+  are now Velociraptor and Humanoid. Existing command lines keep working: `raptorheavy` still
+  selects the raptor, and seeds are unaffected.
+
 ## [0.6.4] — 2026-10-13
 
 ### Added

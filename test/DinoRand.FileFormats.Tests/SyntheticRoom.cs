@@ -32,8 +32,8 @@ internal static class SyntheticRoom
     /// these pairs so <see cref="EnemyRecord.SpeciesMatchesCategory"/> holds and the corpus stays 1:1.</summary>
     public static readonly (byte Category, int Bones)[] Species =
     {
-        (1, 15), // Velociraptor
-        (2, 21), // RaptorHeavy
+        (1, 15), // Humanoid
+        (2, 21), // Velociraptor
         (3, 20), // Tyrannosaurus (boss)
         (4, 10), // Tyrannosaurus (Chief's Room)
         (5, 7),  // Swarm
