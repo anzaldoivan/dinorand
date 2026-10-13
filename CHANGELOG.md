@@ -12,6 +12,12 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 
 ## [Unreleased]
 
+### Added
+
+- **A read-only room inspector for modders.** `--dump-room <roomCode>` prints what a DC1 room
+  contains — its doors, items, enemies, camera and floor areas, and its script with the
+  instruction names that are known so far. It changes no files.
+
 ### Changed
 
 - **The common DC1 raptor is now called Velociraptor.** Enemy options, help text, and logs used

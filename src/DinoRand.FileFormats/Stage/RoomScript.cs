@@ -142,7 +142,7 @@ public sealed class RoomScript
     /// Read the self-describing function-offset table at header dword <c>0x14</c>. Returns its
     /// buffer offset and the list of subroutine start offsets, or false if it isn't valid.
     /// </summary>
-    private static bool TryReadFunctionTable(ReadOnlySpan<byte> buffer, out int tableOffset,
+    internal static bool TryReadFunctionTable(ReadOnlySpan<byte> buffer, out int tableOffset,
                                              out List<int> starts)
     {
         tableOffset = -1;

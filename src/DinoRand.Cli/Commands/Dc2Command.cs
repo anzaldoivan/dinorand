@@ -271,7 +271,7 @@ internal sealed partial class CliApplication
         string[] dc1Only =
         {
             "--swap-species", "--add-enemy", "--add-enemy-at", "--copy-enemy-palette", "--set-door", "--set-item", "--exe-patch",
-            "--fix-hitdeath", "--fix-sound", "--shuffle-bgm", "--shuffle-boxes", "--reroll-boxes", "--starting-items", "--starting-weapon", "--analyze-scripts", "--install-to-data", "--restore",
+            "--fix-hitdeath", "--fix-sound", "--shuffle-bgm", "--shuffle-boxes", "--reroll-boxes", "--starting-items", "--starting-weapon", "--analyze-scripts", "--dump-room", "--install-to-data", "--restore",
         };
         if (dc1Only.FirstOrDefault(o => argv.Contains(o)) is { } op)
         {

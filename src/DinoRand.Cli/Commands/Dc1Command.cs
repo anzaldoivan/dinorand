@@ -18,6 +18,10 @@ internal sealed partial class CliApplication
         if (argv.Contains("--analyze-scripts"))
             return AnalyzeScripts(install);
 
+        // Read-only: print one room's package entries, decoded records and named script instructions.
+        if (GetOpt("--dump-room") is { } dumpRoom)
+            return DumpRoom(install, dumpRoom);
+
         // Targeted single-room cross-room species swap (a manual in-game test of the importer,
         // docs/decisions/dc1/enemies/CROSS-ROOM-SPECIES-PLAN.md Step 6). Backs the room up to the same .dinorand_backup
         // folder --restore uses, then imports one foreign species over the room's first raptor.
@@ -2033,6 +2037,23 @@ internal sealed partial class CliApplication
     // Read-only diagnostic: reports how many rooms parse as packages, how many script
     // segments walk cleanly with the current (incomplete) opcode table, and the item-id
     // spread. Drives opcode-table discovery and verifies the non-destructive guarantee.
+    static int DumpRoom(string installDir, string roomArg)
+    {
+        int code;
+        try { code = Convert.ToInt32(roomArg.Replace("0x", "", StringComparison.OrdinalIgnoreCase), 16); }
+        catch { Console.Error.WriteLine($"error: bad room code '{roomArg}' (e.g. 102)"); return 1; }
+
+        var target = new DinoCrisis1().EnumerateRooms(installDir)
+            .FirstOrDefault(r => r.Stage == code >> 8 && r.Room == (code & 0xff));
+        if (target is null)
+        {
+            Console.Error.WriteLine($"error: room ST{code:X3} not found under {installDir}");
+            return 1;
+        }
+        RoomDump.Write(Console.Out, RoomFile.ReadFromFile(target.Stage, target.Room, target.Path));
+        return 0;
+    }
+
     static int AnalyzeScripts(string installDir)
     {
         var game = new DinoCrisis1();

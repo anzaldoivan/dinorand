@@ -36,6 +36,7 @@ internal static class CliOutput
             "           [--disable-weapons handgun,shotgun,grenade] [--install-to-data]\r\n" +
             "           [--no-spoiler]      (skip the per-seed spoiler file; game files identical either way)\r\n" +
             "  dinorand --install <gameDir> --restore\r\n" +
+            "  dinorand --install <gameDir> --dump-room <roomCode>   (read-only: package entries, doors/items/enemies, camera and floor zones, named script instructions)\r\n" +
             "  dinorand --install <gameDir> --verify-backup   (read-only: audit .dinorand_backup for poisoned captures; works for dc1 and dc2)\r\n" +
             "  dinorand --install <gameDir> --swap-species <roomCode> [--species <name>]\r\n" +
             "  dinorand --install <gameDir> --fix-sound <roomCode>\r\n" +

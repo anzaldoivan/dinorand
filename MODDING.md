@@ -38,6 +38,10 @@ Contributors to DinoRand itself: [CONTRIBUTING.md](CONTRIBUTING.md).
   `--swap-species`, `--copy-enemy-palette`, `--dc2-swap-enemies`, `--dc2-edit-door`… are a
   scriptable modding surface in their own right: single-room edits with automatic backup and
   `--restore`. See `dinorand --help` and the [User Guide](USER-GUIDE.md#targeted-one-shot-tools-advanced).
+- **`--dump-room <roomCode>`** — a read-only look inside one DC1 room: its package entries,
+  doors, items, enemies (including the script-driven entrances), camera and floor areas, and
+  every script instruction with its name where one is established (`OP_xx` otherwise). Start
+  here before planning an edit; it writes nothing.
 - **`apworld/` + `scripts/gen_ap_logic.py`** — the distilled progression-logic model (rooms,
   gated edges, locations) as plain JSON, regenerable from the authored data. Useful if you
   want machine-readable game logic without touching C#.
