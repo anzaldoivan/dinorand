@@ -8,6 +8,7 @@ using DinoRand.Randomizer.Dc2;
 using DinoRand.Randomizer.Dc2.Passes;
 using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Definitions;
+using DinoRand.Randomizer.Passes;
 using DinoRand.Randomizer.Install;
 using DinoRand.Randomizer.Spoiler;
 using DinoRand.Randomizer.Voice;
@@ -101,6 +102,31 @@ internal sealed partial class CliApplication
                 Console.Error.WriteLine($"error: --dc1-enemy-mode: invalid '{dc1Mode}' (expected weighted or fixed)");
                 return 1;
             }
+        }
+        if (GetOpt("--dc1-plug-costs") is { } plugCosts)
+        {
+            if (!Enum.TryParse<PlugCostMode>(plugCosts, ignoreCase: true, out var mode) || int.TryParse(plugCosts, out _))
+            {
+                Console.Error.WriteLine($"error: --dc1-plug-costs: invalid '{plugCosts}' (expected vanilla, shuffle or random)");
+                return 1;
+            }
+            config.PlugCostMode = mode;
+        }
+        if (GetOpt("--dc1-box-ids") is { } boxIds)
+        {
+            BoxIdMode? mode = boxIds.ToLowerInvariant() switch
+            {
+                "off" => BoxIdMode.Off,
+                "colour" or "color" => BoxIdMode.WithinColour,
+                "full" => BoxIdMode.Full,
+                _ => null,
+            };
+            if (mode is null)
+            {
+                Console.Error.WriteLine($"error: --dc1-box-ids: invalid '{boxIds}' (expected off, colour or full)");
+                return 1;
+            }
+            config.BoxIdMode = mode.Value;
         }
         if (GetOpt("--dc1-fixed-species") is { } dc1Fixed)
         {

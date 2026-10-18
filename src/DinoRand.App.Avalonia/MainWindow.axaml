@@ -437,6 +437,29 @@
                                     <ComboBoxItem Content="Reroll from box pool" />
                                 </ComboBox>
                             </StackPanel>
+                            <!-- DC1 emergency-box plug costs and ids (room-script edits; EMERGENCY-BOX-DATA.md). -->
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Spacing="6"
+                                        IsVisible="{Binding CanRandomizeBoxes}">
+                                <TextBlock Text="Box plug costs:" VerticalAlignment="Center" />
+                                <ComboBox Width="180"
+                                          SelectedIndex="{Binding PlugCostModeIndex, Mode=TwoWay}"
+                                          ToolTip.Tip="How many plugs each emergency box costs. Shuffle = swap the vanilla costs between boxes (still 26 in all). Random = 1 to 3 per box, never more in all than the plugs you can pick up. Not part of the shareable seed string.">
+                                    <ComboBoxItem Content="Vanilla" />
+                                    <ComboBoxItem Content="Shuffle" />
+                                    <ComboBoxItem Content="Random" />
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Spacing="6"
+                                        IsVisible="{Binding CanRandomizeBoxes}">
+                                <TextBlock Text="Box locations:" VerticalAlignment="Center" />
+                                <ComboBox Width="180"
+                                          SelectedIndex="{Binding BoxIdModeIndex, Mode=TwoWay}"
+                                          ToolTip.Tip="Move boxes between locations: a location gets another box's contents, colour message, Access list and opened flag. Same colour = only boxes of one colour swap. Any colour (experimental, not yet checked in game) = any boxes swap, and a box whose colour changed is repainted. The Control Room Hall box never moves. Not part of the shareable seed string.">
+                                    <ComboBoxItem Content="Vanilla" />
+                                    <ComboBoxItem Content="Same colour" />
+                                    <ComboBoxItem Content="Any colour (experimental)" />
+                                </ComboBox>
+                            </StackPanel>
 
                             <!-- DC2-only cross-species donor-pool sub-options; shown only for DC2 with enemy rando on. -->
                             <StackPanel Margin="0,4,0,0" IsVisible="{Binding Dc2EnemyOptionsVisible}">

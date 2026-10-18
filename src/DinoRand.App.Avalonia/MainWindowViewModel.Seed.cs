@@ -22,6 +22,7 @@ using DinoRand.Randomizer.Dc1;
 using DinoRand.Randomizer.Dc2.Passes;   // Dc2CharacterSkin
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Install;
+using DinoRand.Randomizer.Passes;
 using DinoRand.Randomizer.Voice;
 
 namespace DinoRand.App
@@ -83,6 +84,8 @@ namespace DinoRand.App
                 ShuffleKeyItems = _appSeed.Config.ShuffleKeyItems;
                 ShuffledKeyItemsModelChange = _appSeed.Config.ImportPickupModels;
                 ShortenCutscenes = _appSeed.Config.ShortenCutscenes;
+                PlugCostModeIndex = (int)_appSeed.Config.PlugCostMode;
+                BoxIdModeIndex = (int)_appSeed.Config.BoxIdMode;
                 Dc2DoorSkip = _appSeed.Config.Dc2DoorSkip;
                 DisableLaserFences = _appSeed.Config.DisableLaserFences;
                 RandomizeStartingInventory = _appSeed.Config.RandomizeStartingInventory;
@@ -196,6 +199,8 @@ namespace DinoRand.App
                 // Session-only (not seed-encoded): the cutscene shorten lever (DC1, experimental) and the
                 // REbirth DoorSkip ini passthrough (DC2). Both are lost on seed paste by design.
                 ShortenCutscenes = ShortenCutscenes && CanShortenCutscenes,
+                PlugCostMode = CanRandomizeBoxes ? (PlugCostMode)PlugCostModeIndex : PlugCostMode.Vanilla,
+                BoxIdMode = CanRandomizeBoxes ? (BoxIdMode)BoxIdModeIndex : BoxIdMode.Off,
                 Dc2DoorSkip = Dc2DoorSkip,
                 DisableLaserFences = DisableLaserFences && CanDisableLaserFences,
                 RandomizeStartingInventory = RandomizeStartingInventory,

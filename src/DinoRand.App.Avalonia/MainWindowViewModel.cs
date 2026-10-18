@@ -696,6 +696,10 @@ namespace DinoRand.App
         [ObservableProperty] private int _boxModeIndex = 1; // default = Reroll from box pool
         public bool BoxModeEnabled => RandomizeBoxes;
 
+        // DC1 emergency-box room-script options: indexes are the PlugCostMode / BoxIdMode values. Not seed-encoded.
+        [ObservableProperty] private int _plugCostModeIndex;
+        [ObservableProperty] private int _boxIdModeIndex;
+
         // --- Starting-inventory editor (bound) ---------------------------------
 
         public ObservableCollection<StartWeaponOption> StartWeapons { get; } = new();
@@ -797,6 +801,8 @@ namespace DinoRand.App
             UpdateSeedFromUi();
         }
         partial void OnShortenCutscenesChanged(bool value) => UpdateSeedFromUi();
+        partial void OnPlugCostModeIndexChanged(int value) => UpdateSeedFromUi();
+        partial void OnBoxIdModeIndexChanged(int value) => UpdateSeedFromUi();
         partial void OnDc2DoorSkipChanged(bool value) => UpdateSeedFromUi();
         partial void OnDisableLaserFencesChanged(bool value) => UpdateSeedFromUi();
         partial void OnDc2RandomizeStartWeaponChanged(bool value) => UpdateSeedFromUi();

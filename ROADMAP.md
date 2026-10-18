@@ -38,6 +38,7 @@ record.
 | next DC2 items (scope/policy owner decision) | Next | Prerequisite: owner decision in `docs/reference/dc2/ROADMAP.md`. Exit: selected scope and policy are recorded there. |
 | blocked DC2 doors runtime/human gate | Blocked | Prerequisite: runtime evidence and human approval. Exit: `docs/reference/dc2/ROADMAP.md` records both gates closed. |
 | blocked DC1 NPC/native-loader and exotic-species live gates | Blocked | Prerequisite: live gate and safety review. Exit: approved witness is recorded in `docs/reference/RE-PROGRESS.md`. |
+| pilot DC1 emergency-box plug costs and box ids (opt-in) | Pilot | Prerequisite: in-game witness of a moved, repriced and recoloured box and of ST105's shuttle. Exit: `docs/reference/dc1/items/EMERGENCY-BOX-DATA.md` records it. |
 | deferred DC1 door/progression work | Deferred | Prerequisite: `docs/reference/ROADMAP-HISTORY.md` and a bounded design. Exit: tested production surface is accepted there. |
 | DC2 generic TYPE 0x10/audio/voice | Deferred | Prerequisite: `docs/reference/dc2/ROADMAP.md` resolves scope and validation. Exit: supported command contract is accepted there. |
 

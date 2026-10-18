@@ -22,6 +22,9 @@ public sealed class RandomizerRunner
     private readonly IReadOnlyList<IRandomizationPass> _passes = new IRandomizationPass[]
     {
         new DoorRandomizer(),
+        // Gated off by default (PlugCostMode / BoxIdMode): emergency-box plug costs and ids in the room
+        // scripts. Before progression, so its plug-economy log reads the new costs. EMERGENCY-BOX-DATA.md.
+        new EmergencyBoxRandomizer(),
         new ProgressionPass(),
         new ItemRandomizer(),
         // Gated off by default (NormalizePickupVisuals). Runs after progression + item relocation so it sees

@@ -17,6 +17,20 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
 - **A read-only room inspector for modders.** `--dump-room <roomCode>` prints what a DC1 room
   contains — its doors, items, enemies, camera and floor areas, and its script with the
   instruction names that are known so far. It changes no files.
+- **Emergency boxes can cost different plugs and move between locations (DC1).** `--dc1-plug-costs`
+  (GUI: Box plug costs) swaps the vanilla costs between boxes or gives each box 1 to 3 plugs, never
+  more in all than the plugs you can find; the Control Room Hall box keeps its 1-plug price.
+  `--dc1-box-ids` (GUI: Box locations) moves boxes, so a location gets another box's contents,
+  colour message and Access list; `colour` swaps only boxes of the same colour, and `full`
+  (experimental, not yet checked in game) swaps any and repaints the box to its new colour. Both are
+  off by default and not part of the shareable seed string. The Control Room Hall box stays put,
+  because the shuttle needs it opened, and in Arrange Game two rooms keep their vanilla boxes.
+
+### Fixed
+
+- **Emergency-box contents shuffles now reach an Original Game (DC1).** `--shuffle-boxes` and
+  `--reroll-boxes` used to change only the box tables Arrange Game reads, so an Original Game kept
+  vanilla boxes. They now change both. A seed gives an Arrange Game the same boxes as before.
 
 ### Fixed
 
