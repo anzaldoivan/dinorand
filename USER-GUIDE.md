@@ -112,7 +112,7 @@ shop stock/prices, starting weapon, BGM shuffle + external music import/export.
 | `--bgm-import --bgm-packs <dir>` | Import external mood-tagged music over `Sound/BGM` slots. |
 | `--shuffle-boxes` / `--reroll-boxes` | EXPERIMENTAL emergency-box contents (exe patch; mutually exclusive). |
 | `--dc1-plug-costs vanilla\|shuffle\|random` | Plugs each emergency box costs: swap the vanilla costs, or 1–3 per box within the plugs you can find. |
-| `--dc1-box-ids off\|colour\|full` | Move boxes between locations (contents, colour message, Access list). `colour` keeps each box's colour; `full` is EXPERIMENTAL and recolours the box. The Control Room Hall box never moves. |
+| `--dc1-box-ids off\|colour\|full` | Move boxes between locations (contents, colour message, Access list). `colour` keeps each box's colour; `full` is EXPERIMENTAL and recolours the box; with the Classic REbirth HD texture pack it also swaps the box's HD picture. The Control Room Hall box never moves. |
 
 ### Dino Crisis 2
 

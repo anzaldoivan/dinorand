@@ -1,4 +1,5 @@
 using DinoRand.FileFormats.Stage;
+using DinoRand.Randomizer.Install;
 using DinoRand.Randomizer.Logic;
 
 namespace DinoRand.Randomizer.Passes;
@@ -22,7 +23,8 @@ public enum BoxIdMode
     Off,
     /// <summary>Permute ids among boxes of the same colour, so each box still looks like its colour.</summary>
     WithinColour,
-    /// <summary>Permute all ids, recolouring each box whose colour changes (<see cref="EmergencyBoxTexture"/>).
+    /// <summary>Permute all ids, recolouring each box whose colour changes (<see cref="EmergencyBoxTexture"/>, and
+    /// its HD-pack art when the pack is installed, <see cref="EmergencyBoxHd"/>).
     /// EXPERIMENTAL: the recoloured models have not been seen in game.</summary>
     Full,
 }
@@ -127,6 +129,9 @@ public sealed class EmergencyBoxRandomizer : IRandomizationPass
         foreach (var (room, writes) in recolours)
             foreach (var w in writes)
                 room.SetClutEntry(w.ClutX, w.ClutY, w.Index, w.Value);
+        var hd = context.Config.BoxIdMode == BoxIdMode.Full
+            ? ApplyHd(context, catalogue.Select((b, i) => (b.BoxId, ids[i])).ToList())
+            : "";
 
         var spoiler = context.Spoiler.Section("Emergency boxes", "Location", "Box", "Plugs");
         for (int i = 0; i < catalogue.Count; i++)
@@ -148,7 +153,41 @@ public sealed class EmergencyBoxRandomizer : IRandomizationPass
             + $"boxes cost {costs.Sum()} plugs in all, {supply} can be picked up");
         context.Log($"[boxes] plug costs {context.Config.PlugCostMode} (total {costs.Sum()}, supply {supply}), "
             + $"box ids {context.Config.BoxIdMode} ({ids.Where((id, i) => id != catalogue[i].BoxId).Count()} moved, "
-            + $"{recolours.Count} box models recoloured)");
+            + $"{recolours.Count} box models recoloured{hd})");
+    }
+
+    /// <summary>With the Classic REbirth HD pack installed (<c>&lt;game&gt;/HD</c>), queue the HD pages whose box art
+    /// changes colour (<see cref="EmergencyBoxHd"/>), read from the installer's loose backup when there is one so a
+    /// page is never edited twice. Returns the log text, empty without the pack.</summary>
+    private static string ApplyHd(RandomizationContext context, IReadOnlyList<(int, int)> moves)
+    {
+        if (context.InstallDir is not { } install || context.Game.GetDataDir(install) is not { } dataDir) return "";
+        var gameRoot = Path.GetDirectoryName(Path.GetFullPath(
+            dataDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)))!;
+        if (!Directory.Exists(Path.Combine(gameRoot, "HD"))) return "";
+        var backupRoot = Path.Combine(dataDir, GameInstaller.BackupDirName, GameInstaller.LooseBackupSubdir);
+        string Backup(string rel) => Path.Combine(backupRoot, rel.Replace('/', Path.DirectorySeparatorChar));
+        var plan = EmergencyBoxHd.Plan(moves, rel =>
+        {
+            var path = File.Exists(Backup(rel)) ? Backup(rel) : Path.Combine(gameRoot, rel.Replace('/', Path.DirectorySeparatorChar));
+            return File.Exists(path) ? File.ReadAllBytes(path) : null;
+        });
+        foreach (var (rel, png) in plan.Files) context.AddLooseFile(rel, png);
+
+        // The installer overlays only the files a run writes, so a page an earlier install edited (it has a
+        // backup) and this seed leaves alone is written back as vanilla.
+        var written = plan.Files.Select(f => f.RelPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        int putBack = 0;
+        foreach (var rel in EmergencyBoxHd.Cells.Where(c => c.Page is not null).Select(EmergencyBoxHd.RelPath)
+                     .Distinct(StringComparer.OrdinalIgnoreCase).Where(r => !written.Contains(r) && File.Exists(Backup(r))))
+        {
+            context.AddLooseFile(rel, File.ReadAllBytes(Backup(rel)));
+            putBack++;
+        }
+        return $"; HD: {plan.Hd.Count} cells on {plan.Files.Count} pages"
+            + (plan.Hd.Count > 0 ? $" ({string.Join(", ", plan.Hd)})" : "")
+            + (putBack > 0 ? $", {putBack} pages put back to vanilla" : "")
+            + (plan.StandardOnly.Count > 0 ? $"; standard only: {string.Join(", ", plan.StandardOnly)}" : "");
     }
 
     /// <summary>The box records of the rooms whose script parsed cleanly (<see cref="RoomFile.Write"/> writes

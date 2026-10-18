@@ -1,5 +1,6 @@
 using System.Text.Json;
 using DinoRand.FileFormats.Graphics;
+using DinoRand.FileFormats.Stage;
 
 namespace DinoRand.Randomizer.Passes;
 
@@ -39,6 +40,98 @@ public static class EmergencyBoxHd
         using var doc = JsonDocument.Parse(s);
         return doc.RootElement.GetProperty("boxes").Deserialize<Cell[]>(
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+    }
+
+    /// <summary>The HD pages to write and the changed boxes each way: <see cref="Hd"/> got the target colour's HD art,
+    /// <see cref="StandardOnly"/> only the CLUT recolour (no cell, page missing or unreadable, or a cell that does not
+    /// match its vanilla art, which means another pack version).</summary>
+    public sealed record HdPlan(IReadOnlyList<(string RelPath, byte[] Png)> Files, IReadOnlyList<string> Hd,
+        IReadOnlyList<string> StandardOnly);
+
+    /// <summary>The page of <paramref name="cell"/>, install-relative.</summary>
+    public static string RelPath(Cell cell) => $"HD/{cell.Folder}/{cell.Page}.png";
+
+    /// <summary>
+    /// Copy the HD art of each box's new colour over the boxes whose colour changes. <paramref name="moves"/> pairs a
+    /// location's vanilla id with its new id; every record of the location (base room and stage copy) changes alike.
+    /// <paramref name="readPristine"/> returns a page's vanilla bytes by <see cref="RelPath"/>, or null.
+    ///
+    /// <para>The donor of a colour is the first cell of that colour whose page reads, on a page of the target's size
+    /// when there is one. Each target page is decoded once, all its cells are copied in, and it is encoded once; donors
+    /// always come from the pristine decode, so two boxes on one page (ST602 <c>p07</c>) can take each other's colour.
+    /// A target or donor cell is used only if it matches another cell of its colour (<see cref="MatchThreshold"/>), so
+    /// another pack version leaves the page alone.</para>
+    /// </summary>
+    public static HdPlan Plan(IReadOnlyList<(int LocationId, int NewId)> moves, Func<string, byte[]?> readPristine)
+        => Plan(moves, readPristine, Cells);
+
+    internal static HdPlan Plan(IReadOnlyList<(int LocationId, int NewId)> moves, Func<string, byte[]?> readPristine,
+        IReadOnlyList<Cell> table)
+    {
+        var decoded = new Dictionary<string, PngImage?>(StringComparer.OrdinalIgnoreCase);
+        PngImage? PageOf(Cell c)
+        {
+            var rel = RelPath(c);
+            if (!decoded.TryGetValue(rel, out var page))
+                decoded[rel] = page = readPristine(rel) is { } bytes ? Png.Decode(bytes) : null;
+            return page is not null && page.Width == c.PageSize && page.Height == c.PageSize ? page : null;
+        }
+        IEnumerable<Cell> OfColour(EmergencyBoxColour colour)
+            => table.Where(c => c.Page is not null && EmergencyBoxRecord.ColourOf(c.BoxId) == colour);
+        // A cell is the expected art when it matches a cell of its colour elsewhere (a stage copy's cell is the same
+        // place, so it does not count).
+        var verified = new Dictionary<Cell, bool>();
+        bool Verified(Cell c)
+        {
+            if (verified.TryGetValue(c, out var ok)) return ok;
+            var page = PageOf(c);
+            return verified[c] = page is not null && OfColour(EmergencyBoxRecord.ColourOf(c.BoxId))
+                .Where(o => (o.Page, o.X, o.Y) != (c.Page, c.X, c.Y))
+                .Any(o => PageOf(o) is { } other
+                          && Score(page, c.X, c.Y, c.Size, other, o.X, o.Y, o.Size) < MatchThreshold);
+        }
+        Cell? Donor(EmergencyBoxColour colour, int pageSize)
+            => OfColour(colour).OrderBy(c => c.PageSize == pageSize ? 0 : 1).FirstOrDefault(Verified);
+
+        var targets = moves
+            .Where(m => EmergencyBoxRecord.ColourOf(m.LocationId) != EmergencyBoxRecord.ColourOf(m.NewId))
+            .SelectMany(m => table.Where(c => c.BoxId == m.LocationId)
+                .Select(c => (Cell: c, To: EmergencyBoxRecord.ColourOf(m.NewId))))
+            .ToList();
+        var files = new List<(string, byte[])>();
+        var hd = new List<string>();
+        var standard = targets.Where(t => t.Cell.Page is null).Select(t => $"{t.Cell.Folder} box {t.Cell.BoxId} (no HD cell)").ToList();
+        foreach (var group in targets.Where(t => t.Cell.Page is not null).GroupBy(t => RelPath(t.Cell), StringComparer.OrdinalIgnoreCase))
+        {
+            var pristine = PageOf(group.First().Cell);
+            var edit = pristine is null ? null : pristine with { Pixels = (byte[])pristine.Pixels.Clone() };
+            int copied = 0;
+            foreach (var (cell, to) in group)
+            {
+                var label = $"{cell.Folder} box {cell.BoxId}";
+                if (pristine is null)
+                {
+                    standard.Add($"{label} ({group.Key} missing or unreadable)");
+                    continue;
+                }
+                if (!Verified(cell))
+                {
+                    standard.Add($"{label} ({group.Key} is not the expected art)");
+                    continue;
+                }
+                if (Donor(to, cell.PageSize) is not { } donor)
+                {
+                    standard.Add($"{label} (no HD art of colour {to})");
+                    continue;
+                }
+                Png.CopyCell(PageOf(donor)!, donor.X, donor.Y, donor.Size, edit!, cell.X, cell.Y, cell.Size,
+                    border: cell.PageSize >= 2000 ? 4 : 2);
+                hd.Add(label);
+                copied++;
+            }
+            if (copied > 0) files.Add((group.Key, Png.Encode(edit!)));
+        }
+        return new HdPlan(files, hd, standard);
     }
 
     /// <summary>Mean absolute RGB difference (0–255) between two cells, sampled on a <paramref name="samples"/>²

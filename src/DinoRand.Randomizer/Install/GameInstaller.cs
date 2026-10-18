@@ -53,8 +53,8 @@ public static class GameInstaller
 
     /// <summary>
     /// Mod-dir subtrees overlaid as loose files into the game <b>root</b> (the parent of <c>Data\</c>),
-    /// keyed in the manifest by their forward-slash relative path. Scoped to known audio paths (voice banks,
-    /// speech, BGM slots) so an overlay can never clobber an arbitrary game file.
+    /// keyed in the manifest by their forward-slash relative path. Scoped to known paths (voice banks,
+    /// speech, BGM slots, the title image, HD texture pages) so an overlay can never clobber an arbitrary game file.
     /// </summary>
     private static readonly string[] LooseSubtrees =
     {
@@ -62,6 +62,8 @@ public static class GameInstaller
         // DC1 title-screen seed watermark — a single named file, not a subtree, so the
         // allow-list stays narrow (docs/decisions/cross/SEED-WATERMARK-PLAN.md).
         "Data/t_image.imd",
+        // DC1 Classic REbirth HD texture pages whose emergency-box art changes colour (EmergencyBoxHd).
+        "HD/",
     };
 
     /// <summary>The game root (parent of <c>Data\</c>) — where the exe and <c>Sound\VOICE\</c> live.</summary>

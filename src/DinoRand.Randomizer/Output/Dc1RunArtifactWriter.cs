@@ -17,7 +17,7 @@ internal static class Dc1RunArtifactWriter
         {
             cleared += DeleteIfPresent(Path.Combine(outputDir, ExePatchPlan.FileName));
             cleared += DeleteIfPresent(Path.Combine(outputDir, "Data", "t_image.imd"));
-            foreach (var relative in new[] { "Sound/VOICE", "Sound/BGM", "Speech" })
+            foreach (var relative in new[] { "Sound/VOICE", "Sound/BGM", "Speech", "HD" })
             {
                 var directory = Path.Combine(outputDir,
                     relative.Replace('/', Path.DirectorySeparatorChar));

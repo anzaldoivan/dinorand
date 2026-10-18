@@ -21,7 +21,7 @@ internal static class OverlayInstaller
 
     private static readonly string[] LooseSubtrees =
     {
-        "Sound/VOICE/", "Sound/BGM/", "Speech/", "Data/t_image.imd",
+        "Sound/VOICE/", "Sound/BGM/", "Speech/", "Data/t_image.imd", "HD/",
     };
 
     private static readonly JsonSerializerOptions JsonOpts = new()
