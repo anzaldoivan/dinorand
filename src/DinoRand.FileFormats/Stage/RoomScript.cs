@@ -87,6 +87,10 @@ public sealed class RoomScript
     /// and never written back. Empty when the script did not parse.</summary>
     public IReadOnlyList<EnemyRecord> ScriptedEntrances { get; private init; } = Array.Empty<EnemyRecord>();
 
+    /// <summary>Emergency boxes (<c>0x28</c> subtype 8). Edited in place and written back by
+    /// <see cref="ApplyEmergencyBoxEdits"/>. Empty when the script did not parse.</summary>
+    public IReadOnlyList<EmergencyBoxRecord> EmergencyBoxes { get; private init; } = Array.Empty<EmergencyBoxRecord>();
+
     /// <summary>Cameras set by the script (<c>0x2E</c> / <c>0x4C</c>, cont.99). Read-only.</summary>
     public IReadOnlyList<CameraShot> CameraShots { get; private init; } = Array.Empty<CameraShot>();
 
@@ -115,6 +119,7 @@ public sealed class RoomScript
         var entrances = new List<EnemyRecord>();
         var cameras = new List<CameraShot>();
         var doors = new List<DoorRecord>();
+        var boxes = new List<EmergencyBoxRecord>();
         var scenerySlots = new HashSet<byte>();
         var activationKinds = ClassifyDoorActivations(buffer, starts);
         bool clean = true;
@@ -123,7 +128,7 @@ public sealed class RoomScript
             int start = starts[i];
             int end = i + 1 < starts.Count ? starts[i + 1] : buffer.Length;
             bool ok = WalkSubroutine(buffer, start, end, i, activationKinds[i], items, enemies, entrances,
-                                     cameras, doors, scenerySlots);
+                                     cameras, doors, boxes, scenerySlots);
             // A derail anywhere but the last subroutine means an unknown/misaligned opcode.
             if (!ok && i != starts.Count - 1) clean = false;
         }
@@ -135,6 +140,7 @@ public sealed class RoomScript
         {
             ScriptedEntrances = entrances,
             CameraShots = cameras,
+            EmergencyBoxes = boxes,
         };
     }
 
@@ -177,7 +183,8 @@ public sealed class RoomScript
                                        DoorActivationKind activationKind,
                                        List<ItemRecord> items, List<EnemyRecord> enemies,
                                        List<EnemyRecord> entrances, List<CameraShot> cameras,
-                                       List<DoorRecord> doors, HashSet<byte> scenerySlots)
+                                       List<DoorRecord> doors, List<EmergencyBoxRecord> boxes,
+                                       HashSet<byte> scenerySlots)
     {
         if (start < 0 || end > buffer.Length) return false;
         int pos = start;
@@ -219,6 +226,22 @@ public sealed class RoomScript
                     door.EntryD = door.OriginalEntryD = (short)ReadU16(buffer, pos + DoorPoseLayout.EntryDOffset);
                 }
                 doors.Add(door);
+            }
+            else if (buffer[pos] == DcOpcodes.Item
+                && len == DcOpcodes.EmergencyBoxLength
+                && buffer[pos + 2] == DcOpcodes.EmergencyBoxSubtype)
+            {
+                byte id = buffer[pos + EmergencyBoxRecord.BoxIdOffset];
+                byte cost = buffer[pos + EmergencyBoxRecord.PlugCostOffset];
+                boxes.Add(new EmergencyBoxRecord
+                {
+                    BoxId = id,
+                    OriginalBoxId = id,
+                    PlugCost = cost,
+                    OriginalPlugCost = cost,
+                    Raw = buffer.Slice(pos, len).ToArray(),
+                    FileOffset = pos,
+                });
             }
             else if (buffer[pos] == DcOpcodes.Item
                 && len == DcOpcodes.ItemLength
@@ -587,6 +610,22 @@ public sealed class RoomScript
                 WriteU16(buffer, door.FileOffset + DoorPoseLayout.EntryZOffset, (ushort)door.EntryZ);
                 WriteU16(buffer, door.FileOffset + DoorPoseLayout.EntryDOffset, (ushort)door.EntryD);
             }
+        }
+    }
+
+    /// <summary>
+    /// Patch edited emergency boxes back into a decompressed RDT <paramref name="buffer"/>. Only the box id
+    /// (<c>+0x1c</c>) and plug cost (<c>+0x1d</c>) are written; unedited records are skipped.
+    /// </summary>
+    public void ApplyEmergencyBoxEdits(byte[] buffer, IReadOnlyList<EmergencyBoxRecord> edited)
+    {
+        foreach (var box in edited)
+        {
+            if (box.FileOffset < 0 || !box.IsEdited) continue;
+            if (box.BoxId >= EmergencyBoxRecord.BoxCount)
+                throw new InvalidDataException($"Emergency box id {box.BoxId} at RDT offset 0x{box.FileOffset:X} is not 0-16.");
+            buffer[box.FileOffset + EmergencyBoxRecord.BoxIdOffset] = box.BoxId;
+            buffer[box.FileOffset + EmergencyBoxRecord.PlugCostOffset] = box.PlugCost;
         }
     }
 

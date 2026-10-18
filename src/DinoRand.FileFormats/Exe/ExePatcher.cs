@@ -683,16 +683,24 @@ public static class ExePatcher
     // Each box = a 21-byte record [u8 slotCount=0x0A][≤10 (itemId,count) byte pairs][zero pad]. The table is
     // 7 blocks of 17 records (360-byte stride): a {JP, International} pair per difficulty tier plus one
     // special-mode block, with NO separate Normal block — the runtime selector (fn 0x483313, pointer table
-    // 0x65B578) maps difficulties 0 (Easy) and 1 (Normal) to the same block. The three INTERNATIONAL blocks
-    // below were located + validated against data/dc1/emergency-boxes.json (every box's content multiset
-    // matched the binary verbatim), so patching them covers all four selectable difficulties.
+    // 0x65B578) maps difficulties 0 (Easy) and 1 (Normal) to the same block. Bit 7 of the difficulty byte
+    // picks the half: clear (ORIGINAL GAME) reads the JP blocks, set (ARRANGE GAME only, title menu 0x411CBF)
+    // the International ones, so both halves are patched. The International blocks were validated against
+    // data/dc1/emergency-boxes.json (every box's content multiset matched the binary verbatim). Block 2
+    // (0x65AE18) is Operation Wipeout's and is left alone.
 
-    /// <summary>VA of the International Easy/Normal emergency-box block (17 × 21-byte records).</summary>
+    /// <summary>VA of the International (Arrange Game) Easy/Normal emergency-box block (17 × 21-byte records).</summary>
     public const uint EmergencyBoxBlockEasyVa = 0x0065ACB0;
     /// <summary>VA of the International Hard emergency-box block.</summary>
     public const uint EmergencyBoxBlockHardVa = 0x0065B0E8;
     /// <summary>VA of the International Very Hard emergency-box block.</summary>
     public const uint EmergencyBoxBlockVeryHardVa = 0x0065B3B8;
+    /// <summary>VA of the JP (Original Game) Easy/Normal emergency-box block, the start of the box table.</summary>
+    public const uint EmergencyBoxBlockJpEasyVa = 0x0065AB48;
+    /// <summary>VA of the JP (Original Game) Hard emergency-box block.</summary>
+    public const uint EmergencyBoxBlockJpHardVa = 0x0065AF80;
+    /// <summary>VA of the JP (Original Game) Very Hard emergency-box block.</summary>
+    public const uint EmergencyBoxBlockJpVeryHardVa = 0x0065B250;
 
     /// <summary>Size of one emergency-box record: <c>1</c> slot-count byte + <c>10×2</c> (id,count) pairs.</summary>
     public const int EmergencyBoxRecordStride = 21;
@@ -701,10 +709,14 @@ public static class ExePatcher
     /// <summary>Leading byte of every box record — the slot count (10 slots/box). Used to validate the build.</summary>
     public const byte EmergencyBoxSlotMarker = 0x0A;
 
-    /// <summary>The International difficulty blocks the shuffle operates on, ascending VA (the order the
-    /// permutation stream walks — so the result is a pure function of the seed + table).</summary>
+    /// <summary>The difficulty blocks the shuffle and reroll operate on, in the order the permutation stream
+    /// walks them (so the result is a pure function of the seed + table). The International blocks come first,
+    /// as they did when they were the only ones, so a seed still gives an Arrange Game the same boxes.</summary>
     public static readonly uint[] EmergencyBoxBlockVas =
-        { EmergencyBoxBlockEasyVa, EmergencyBoxBlockHardVa, EmergencyBoxBlockVeryHardVa };
+    {
+        EmergencyBoxBlockEasyVa, EmergencyBoxBlockHardVa, EmergencyBoxBlockVeryHardVa,
+        EmergencyBoxBlockJpEasyVa, EmergencyBoxBlockJpHardVa, EmergencyBoxBlockJpVeryHardVa,
+    };
 
     /// <summary>One shuffled box slot: where it sits and which slot's contents it now holds.</summary>
     public readonly record struct EmergencyBoxShuffleEntry(uint BlockVa, int Slot, int SourceSlot);

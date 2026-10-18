@@ -892,7 +892,7 @@ public class GameInstallerExeTests : IDisposable
 
     // ---- Emergency-box content shuffle (docs/dc1/EMERGENCY-BOX-DATA.md) ----
 
-    /// <summary>Seed the three International box blocks with valid, distinguishable 21-byte records
+    /// <summary>Seed the six difficulty box blocks with valid, distinguishable 21-byte records
     /// (<c>[0x0A][unique id, unique count][pad]</c>) so the shuffle/restore contract is checkable.</summary>
     private void SeedBoxTable(byte[] exe)
     {
@@ -981,7 +981,7 @@ public class GameInstallerExeTests : IDisposable
         File.Copy(realExe, ExePath, overwrite: true);
         var pristine = File.ReadAllBytes(ExePath);
 
-        // Every record in each International block must lead with the 10-slot marker (offsets are correct).
+        // Every record in each difficulty block must lead with the 10-slot marker (offsets are correct).
         foreach (var va in ExePatcher.EmergencyBoxBlockVas)
         {
             int blockOff = ExePatcher.VaToFileOffset(va);

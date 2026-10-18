@@ -238,6 +238,23 @@ public sealed class RandomizerConfig
     public bool ShortenCutscenes { get; set; } = false;
 
     /// <summary>
+    /// DC1 emergency-box plug costs (default <see cref="Passes.PlugCostMode.Vanilla"/>): Shuffle permutes the
+    /// vanilla costs, Random draws 1–3 per box within the plug supply. A room-script edit of each box record's
+    /// <c>+0x1D</c> byte; costs are optional storage prices, not progression. CLI <c>--dc1-plug-costs</c>. Not
+    /// seed-encoded. EMERGENCY-BOX-DATA.md.
+    /// </summary>
+    public Passes.PlugCostMode PlugCostMode { get; set; } = Passes.PlugCostMode.Vanilla;
+
+    /// <summary>
+    /// DC1 emergency-box ids (default <see cref="Passes.BoxIdMode.Off"/>): which contents, colour message,
+    /// Access pool and unlock flag each box location has (record byte <c>+0x1C</c>). WithinColour keeps each
+    /// box's colour; Full is experimental (a box whose colour changes is recoloured, not yet seen in game).
+    /// Box 8 stays in ST105.
+    /// CLI <c>--dc1-box-ids</c>. Not seed-encoded. EMERGENCY-BOX-DATA.md.
+    /// </summary>
+    public Passes.BoxIdMode BoxIdMode { get; set; } = Passes.BoxIdMode.Off;
+
+    /// <summary>
     /// DC2 only. Additionally emit each touched room's edits as a Classic REbirth
     /// <c>patch\ST*.d2p</c> word-patch into <c>&lt;out&gt;\patch\</c>
     /// (<see cref="FileFormats.Stage.Dc2.Dc2D2pWriter"/> — the wrapper's decoded non-destructive

@@ -23,6 +23,7 @@ internal static class CliOutput
             "           [--dc1-cutscene-safe] [--no-dc1-door-skip] [--dc1-fast-forward-cutscenes] [--allow-hidden-spots] [--normalize-pickup-visuals] [--pickup-ground-models] [--no-pickup-ground-models]   (dc1)\r\n" +
              "           [--include-setpiece-enemies] [--include-boss-enemies] [--dc2-allow-water-swaps] [--dc2-emit-d2p]\r\n" +
              "           [--dc1-enemy-mode weighted|fixed] [--dc1-fixed-species <name>] [--dc1-weight <name>=<0..255>]... (dc1)\r\n" +
+             "           [--dc1-plug-costs vanilla|shuffle|random] [--dc1-box-ids off|colour|full]   (dc1)\r\n" +
              "           [--dc2-enemy-mode weighted|fixed] [--dc2-fixed-species <name|0xNN>]\r\n" +
             "           [--dc2-weight <name|0xNN>=<0..15>]...                   (dc2)\r\n" +
             "           [--dc2-character-skin stock|gail|rick|random]           (dc2)\r\n" +
@@ -161,6 +162,17 @@ internal static class CliOutput
             "    (STATIC-SCD-RE cont.48). Scripted T-Rex and cutscene rooms skipped; 0x59-placed enemies\r\n" +
             "    untouched. Higher --difficulty widens the band upward; HP gates no progression, so seeds\r\n" +
             "    stay beatable. docs/decisions/dc1/spawn/ENEMY-SPAWN-SYSTEM.md \"Gap 4 — REVERSED\".\r\n" +
+            "  - --dc1-plug-costs (dc1, default vanilla) changes how many plugs each emergency box costs:\r\n" +
+            "    shuffle swaps the 17 vanilla costs between boxes (still 26 plugs in all); random gives each\r\n" +
+            "    box 1 to 3, never more in all than the plugs the game lets you pick up. A box's revisit\r\n" +
+            "    copy (e.g. ST104 and STA04) costs the same. The Control Room Hall box (ST105), which the\r\n" +
+            "    shuttle needs opened, keeps its 1-plug cost.\r\n" +
+            "  - --dc1-box-ids (dc1, default off) moves boxes between locations: a location gets another\r\n" +
+            "    box's contents (every difficulty), colour message, Access list and opened flag. colour\r\n" +
+            "    swaps only boxes of the same colour; full (EXPERIMENTAL, recoloured models not yet seen\r\n" +
+            "    in game) swaps any and repaints a box whose colour changed. The Control Room Hall box\r\n" +
+            "    (ST105) never moves, nor in full mode the Underground Heliport box (ST60D). In Arrange\r\n" +
+            "    Game, ST502 and ST50C keep their vanilla boxes. Composes with --shuffle-boxes/--reroll-boxes.\r\n" +
             "  - --game selects the target (default dc1). dc2 is an early scaffold: it loads the\r\n" +
             "    Dino Crisis 2 (Rebirth) rooms but its passes are no-ops until the room-record\r\n" +
             "    decoders land (docs/parity/BIORAND-REUSE-VALIDATION.md). The DC1-only targeted\r\n" +

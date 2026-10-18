@@ -165,29 +165,31 @@ public sealed class DinoCrisis1 : GameDefinition
     // (KeyItemIds 0x2B-0x6F), so the item pass never rerolls it. docs/decisions/cross/ITEM-RANDO-PLAN.md §7.4.
     public override int? PlugItemId => 0x2B;
 
-    // Emergency boxes: room + plug cost, mirror of data/dc1/emergency-boxes.json (room codes verified
-    // against room-data.json; plug counts are region/difficulty-invariant per the source FAQ). Locked by
-    // EmergencyBoxTests. Optional storage — never a progression gate; see PlugEconomy. Four rooms hold two
-    // boxes each (B3 / Experiment Room Hall / Central Stairway / Power Freq. Room).
+    // Emergency boxes by box id (record byte +0x1C, which is also the exe contents index): room + vanilla
+    // plug cost, mirror of data/dc1/emergency-boxes.json, read from the 0x28 subtype-8 records of every
+    // English room. Ids 0-7 are red, 8-12 green, 13-16 yellow. Locked by EmergencyBoxTests. Optional
+    // storage — never a progression gate; see PlugEconomy. Four rooms hold two boxes each (B3 / Experiment
+    // Room Hall / Central Stairway / Power Freq. Room), and nine boxes also have a record, with the same id,
+    // in the stage A/B/C revisit copy of their room.
     public override IReadOnlyList<EmergencyBox> EmergencyBoxes { get; } = new[]
     {
-        new EmergencyBox(0x0105, 1, "Control Room Hall"),
-        new EmergencyBox(0x0113, 2, "Elevator Hall"),
-        new EmergencyBox(0x0104, 1, "Strategy Room"),
-        new EmergencyBox(0x0306, 2, "Main Hallway B1"),
-        new EmergencyBox(0x0301, 2, "Research Area Hall"),
-        new EmergencyBox(0x0205, 1, "Communication Room"),
-        new EmergencyBox(0x0602, 1, "Control Room B3 (Yellow)"),
-        new EmergencyBox(0x0602, 3, "Control Room B3 (Red)"),
-        new EmergencyBox(0x0502, 1, "Experiment Room Hall (Green)"),
-        new EmergencyBox(0x0502, 2, "Experiment Room Hall (Red)"),
-        new EmergencyBox(0x0608, 1, "Central Stairway (Green)"),
-        new EmergencyBox(0x0608, 3, "Central Stairway (Red)"),
-        new EmergencyBox(0x050C, 2, "Power Freq. Room (Red)"),
-        new EmergencyBox(0x050C, 1, "Power Freq. Room (Green)"),
-        new EmergencyBox(0x060D, 1, "Underground Heliport"),
-        new EmergencyBox(0x0610, 1, "Hovercraft Storage"),
-        new EmergencyBox(0x0612, 1, "Hovercraft"),
+        new EmergencyBox(0, 0x0113, 2, "Elevator Hall"),
+        new EmergencyBox(1, 0x0205, 1, "Communication Room"),
+        new EmergencyBox(2, 0x0306, 2, "Main Hallway B1"),
+        new EmergencyBox(3, 0x0502, 2, "Experiment Room Hall (Red)"),
+        new EmergencyBox(4, 0x050C, 2, "Power Freq. Room (Red)"),
+        new EmergencyBox(5, 0x0602, 3, "Control Room B3 (Red)"),
+        new EmergencyBox(6, 0x0608, 3, "Central Stairway (Red)"),
+        new EmergencyBox(7, 0x0610, 1, "Hovercraft Storage"),
+        new EmergencyBox(8, 0x0105, 1, "Control Room Hall"),
+        new EmergencyBox(9, 0x0301, 2, "Research Area Hall"),
+        new EmergencyBox(10, 0x0502, 1, "Experiment Room Hall (Green)"),
+        new EmergencyBox(11, 0x050C, 1, "Power Freq. Room (Green)"),
+        new EmergencyBox(12, 0x0608, 1, "Central Stairway (Green)"),
+        new EmergencyBox(13, 0x0104, 1, "Strategy Room"),
+        new EmergencyBox(14, 0x0602, 1, "Control Room B3 (Yellow)"),
+        new EmergencyBox(15, 0x060D, 1, "Underground Heliport"),
+        new EmergencyBox(16, 0x0612, 1, "Hovercraft"),
     };
 
     // Scripted CUTSCENE rooms — each scene choreographs its dinosaur entities by slot, so permuting

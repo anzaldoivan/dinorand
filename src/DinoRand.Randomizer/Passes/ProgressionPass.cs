@@ -92,7 +92,7 @@ public sealed class ProgressionPass : IRandomizationPass
                     doorKeys.Add(k);
         var world = KeyItemPlacer.Reachable(graph, game, game.StartRoomCode, doorKeys);
 
-        var balance = PlugEconomy.Evaluate(graph, game, world);
+        var balance = PlugEconomy.Evaluate(graph, game, world, PlugEconomy.BoxCosts(context.Rooms));
         context.Log($"[plugs] reachable plug supply {balance.Supply}, reachable box demand {balance.Demand}"
                     + (balance.MeetsDemand
                         ? " (every reachable box can be opened)"

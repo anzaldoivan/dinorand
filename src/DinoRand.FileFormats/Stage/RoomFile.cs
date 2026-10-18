@@ -103,6 +103,9 @@ public sealed class RoomFile
 
     private readonly RoomTextureStager _textureStager = new();
 
+    /// <summary>CLUT words to write into the package's palette entries, by file offset (<see cref="SetClutEntry"/>).</summary>
+    private readonly Dictionary<int, ushort> _clutWords = new();
+
     /// <summary>True when the SCD script walked cleanly (writes are only applied then).</summary>
     public bool ParsedCleanly => Script?.ParsedCleanly ?? false;
 
@@ -168,6 +171,7 @@ public sealed class RoomFile
         Doors.AddRange(committed.Doors);
         _structurallyEdited = false;
         _textureStager.Clear();
+        _clutWords.Clear();
     }
 
     /// <summary>
@@ -466,6 +470,7 @@ public sealed class RoomFile
         Doors.Clear(); Doors.AddRange(committed.Doors);
         _structurallyEdited = false;
         _textureStager.Clear();
+        _clutWords.Clear();
     }
 
     internal TexturedImportResult StageTexture(
@@ -503,18 +508,71 @@ public sealed class RoomFile
             foreach (var enemy in Enemies)
                 if (enemy.IsEdited) { changed = true; break; }
         if (!changed)
+            foreach (var box in Script.EmergencyBoxes)
+                if (box.IsEdited) { changed = true; break; }
+        if (!changed)
             foreach (var door in Doors)
                 if (door.IsEdited) { changed = true; break; }
-        if (!changed) return OriginalBytes;
+        if (!changed) return _clutWords.Count == 0 ? OriginalBytes : ApplyClutWords((byte[])OriginalBytes.Clone());
 
         var edited = (byte[])RdtBuffer.Clone();
         Script.ApplyEdits(edited, Items);
         Script.ApplyEnemyEdits(edited, Enemies);
         Script.ApplyDoorEdits(edited, Doors);
+        Script.ApplyEmergencyBoxEdits(edited, Script.EmergencyBoxes);
 
         byte[] payload = RoomPackageCodec.EncodeRdt(edited, RdtCompressed);
         byte[] result = RoomPackageCodec.RebuildRoomData(OriginalBytes, Package!, payload);
-        return _textureStager.Apply(result);
+        return ApplyClutWords(_textureStager.Apply(result));
+    }
+
+    /// <summary>
+    /// File offset of entry <paramref name="index"/> of the CLUT at VRAM (<paramref name="clutX"/>,
+    /// <paramref name="clutY"/>) in this package's palette entries, or null when no palette entry covers it.
+    /// A DC1 entry header holds the VRAM rect as u16 x, y, w, h at <c>+8</c>; a palette payload is that rect's
+    /// BGR555 words, row by row. Entries before the room data are copied verbatim by <see cref="Write"/>, so
+    /// the offset holds in its output too.
+    /// </summary>
+    public int? ClutEntryOffset(int clutX, int clutY, int index)
+    {
+        if (Package is null || Package.IsDc2) return null;
+        for (int i = 0; i < Package.Entries.Count; i++)
+        {
+            var e = Package.Entries[i];
+            if (e.Type != GianEntryType.Palette) continue;
+            int h = i * 16;
+            int x = OriginalBytes[h + 8] | (OriginalBytes[h + 9] << 8), y = OriginalBytes[h + 10] | (OriginalBytes[h + 11] << 8);
+            int w = OriginalBytes[h + 12] | (OriginalBytes[h + 13] << 8), rows = OriginalBytes[h + 14] | (OriginalBytes[h + 15] << 8);
+            int cx = clutX + index;
+            if (cx < x || cx >= x + w || clutY < y || clutY >= y + rows) continue;
+            long off = e.PayloadOffset + ((long)(clutY - y) * w + (cx - x)) * 2;
+            if (off + 2 > e.PayloadOffset + e.DeclaredSize || off + 2 > OriginalBytes.Length) return null;
+            return (int)off;
+        }
+        return null;
+    }
+
+    /// <summary>The vanilla value of a CLUT entry (see <see cref="ClutEntryOffset"/>), or null.</summary>
+    public ushort? ReadClutEntry(int clutX, int clutY, int index)
+        => ClutEntryOffset(clutX, clutY, index) is { } off ? (ushort)(OriginalBytes[off] | (OriginalBytes[off + 1] << 8)) : null;
+
+    /// <summary>Set a CLUT entry (see <see cref="ClutEntryOffset"/>) in the bytes <see cref="Write"/> returns.
+    /// False, and nothing changes, when no palette entry covers it.</summary>
+    public bool SetClutEntry(int clutX, int clutY, int index, ushort value)
+    {
+        if (ClutEntryOffset(clutX, clutY, index) is not { } off) return false;
+        _clutWords[off] = value;
+        return true;
+    }
+
+    private byte[] ApplyClutWords(byte[] bytes)
+    {
+        foreach (var (off, v) in _clutWords)
+        {
+            bytes[off] = (byte)v;
+            bytes[off + 1] = (byte)(v >> 8);
+        }
+        return bytes;
     }
 
     /// <summary>
