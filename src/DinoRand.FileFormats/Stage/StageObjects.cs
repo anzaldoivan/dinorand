@@ -318,6 +318,42 @@ public sealed class ItemRecord
     public int FileOffset { get; set; } = -1;
 }
 
+/// <summary>Colour of an emergency box, set by its id (handler <c>0x44AAC3</c>: below 8 red, below 13 green).</summary>
+public enum EmergencyBoxColour { Red, Green, Yellow }
+
+/// <summary>
+/// An emergency box: SCD opcode <c>0x28</c> in its subtype-8 form (32 bytes), handled by <c>0x44AAC3</c>
+/// with the purchase FSM <c>0x44AE97</c> (English DINO.exe; EMERGENCY-BOX-DATA.md "Engine handler").
+/// The box id is the index of the box's contents record in the exe table, and also picks the colour
+/// message, the same-colour Access pool and the unlock flag (group 9, bit <c>0x2F + id</c>). The plug cost
+/// is compared with the player's plug count and taken on YES; 0 opens the box without setting the flag.
+/// </summary>
+public sealed class EmergencyBoxRecord
+{
+    /// <summary>Byte offset of the box id (0–16) within the record.</summary>
+    public const int BoxIdOffset = 0x1c;
+    /// <summary>Byte offset of the plug cost within the record.</summary>
+    public const int PlugCostOffset = 0x1d;
+    /// <summary>Number of box ids, which is also the record count of an exe contents block.</summary>
+    public const int BoxCount = 17;
+
+    public byte BoxId { get; set; }
+    public byte PlugCost { get; set; }
+    public byte OriginalBoxId { get; set; }
+    public byte OriginalPlugCost { get; set; }
+    public byte[] Raw { get; set; } = Array.Empty<byte>();
+
+    /// <summary>Byte offset of this record's opcode within the decompressed RDT buffer, or -1.</summary>
+    public int FileOffset { get; set; } = -1;
+
+    public EmergencyBoxColour Colour => ColourOf(BoxId);
+
+    public bool IsEdited => BoxId != OriginalBoxId || PlugCost != OriginalPlugCost;
+
+    public static EmergencyBoxColour ColourOf(int boxId)
+        => boxId < 8 ? EmergencyBoxColour.Red : boxId < 13 ? EmergencyBoxColour.Green : EmergencyBoxColour.Yellow;
+}
+
 /// <summary>An enemy spawn placed by SCD opcode <c>0x20</c> (the <c>SCE_EM_SET</c> analog).</summary>
 /// <remarks>
 /// The species of a Dino Crisis enemy is <b>not</b> a small id byte in the record (unlike the

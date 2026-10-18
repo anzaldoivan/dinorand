@@ -2,20 +2,11 @@
   "_source": "docs/dc1/reference/dinocrisis-emergency-items.md (community FAQ 'EMERGENCY BOX LOCATIONS'). INTERNATIONAL version only (the build DinoRand installs). Contents are given per difficulty (easy/normal/hard/veryHard).",
   "_confidence": "STRUCTURE (room code, plug cost) is HIGH: room codes cross-checked against data/dc1/room-data.json names and the forum room list; the FAQ states plug counts are 'consistent across all regions and difficulties'. CONTENTS are now EXE-VALIDATED (see _exe): all 47 distinct International content-vectors here were found VERBATIM in the DINO.exe box-contents table — zero discrepancies — so the FAQ transcription is confirmed against ground truth for the International version.",
   "_exe": "The live box-contents table is in english/DINO.exe at file offset 0x25AB48 (VA 0x65AB48; erratum 2026-07-16 — previously misrecorded as 0x65AC05, which is record 9 of block 0). Format: 21-byte records = [0x0A slot-count (10 slots/box)][up to 10 (itemId,count) byte pairs][zero pad]; empty boxes are all-zero records. Layout: 7 blocks of 17 records at a 360-byte stride (357 data + 3 pad), grouped by difficulty: JP-Easy/Normal 0x65AB48, Intl-Easy/Normal 0x65ACB0, special-mode 0x65AE18 (not a difficulty), JP-Hard 0x65AF80, Intl-Hard 0x65B0E8, JP-VH 0x65B250, Intl-VH 0x65B3B8; within a block the 8 RED boxes come first (indices 0-7) then the 9 green/yellow boxes (8-16). There is NO separate Normal block: the runtime selector (fn 0x483313, 6-entry pointer table 0x65B578) maps difficulties 0 and 1 to the same block, which is why easy==normal here. Every International block's 17-record multiset matches this file exactly. (Reverse-engineered 2026-06-26, corrected + selector decoded 2026-07-16; see docs/reference/dc1/items/EMERGENCY-BOX-DATA.md.)",
-  "_color_note": "17 boxes total: 8 red, 5 green, 4 yellow (FAQ intro). The FAQ labels colour only for rooms holding TWO boxes; the EXE block ordering (8 reds first) additionally identifies the unlabelled RED singles — Elevator Hall, Communication Room, Main Hallway B1, Hovercraft Storage — set to 'red' here. That makes 8 red (4 EXE-grouped + the 4 FAQ-labelled dual-box reds). The remaining 5 single-box rooms (Control Room Hall, Strategy Room, Research Area Hall, Underground Heliport, Hovercraft) are the 5 green / 4 yellow minus the 3 FAQ-labelled greens + 1 labelled yellow; their exact green-vs-yellow split is not yet pinned, so colour=null.",
+  "_color_note": "17 boxes: 8 red, 5 green, 4 yellow. boxId is the box's 0x28 subtype-8 record byte +0x1C (handler 0x44AAC3): it is the exe contents-record index (checked against all three International blocks, every slot in order) and sets the colour, red below 8, green below 13, else yellow. plugs is record byte +0x1D. Boxes are listed by boxId. (Read from the room scripts 2026-10-18, which also settled the five single-box colours the FAQ left unlabelled.)",
   "plugItemId": "0x2B",
   "boxes": [
     {
-      "id": "control-room-hall", "name": "Control Room Hall", "room": "0x0105", "color": null, "plugs": 1,
-      "contents": {
-        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
-        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
-        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "veryHard": [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
-      }
-    },
-    {
-      "id": "elevator-hall", "name": "Elevator Hall", "room": "0x0113", "color": "red", "plugs": 2,
+      "id": "elevator-hall", "boxId": 0, "name": "Elevator Hall", "room": "0x0113", "color": "red", "plugs": 2,
       "contents": {
         "easy":     [ { "id": "0x16", "name": "9mm Parabellum", "count": 34 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 } ],
         "normal":   [ { "id": "0x16", "name": "9mm Parabellum", "count": 34 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 } ],
@@ -24,34 +15,7 @@
       }
     },
     {
-      "id": "strategy-room", "name": "Strategy Room", "room": "0x0104", "color": null, "plugs": 1,
-      "contents": {
-        "easy":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 5 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "normal":   [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 5 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "hard":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 5 } ],
-        "veryHard": [ { "id": "0x1C", "name": "Med. Pak S", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 } ]
-      }
-    },
-    {
-      "id": "main-hallway-b1", "name": "Main Hallway B1", "room": "0x0306", "color": "red", "plugs": 2,
-      "contents": {
-        "easy":     [ { "id": "0x17", "name": "40S&W Bullets", "count": 30 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 1 } ],
-        "normal":   [ { "id": "0x17", "name": "40S&W Bullets", "count": 30 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 1 } ],
-        "hard":     [ { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x15", "name": "Poison Dart", "count": 1 } ],
-        "veryHard": [ { "id": "0x17", "name": "40S&W Bullets", "count": 30 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 2 }, { "id": "0x18", "name": "Grenade Bullets", "count": 6 } ]
-      }
-    },
-    {
-      "id": "research-area-hall", "name": "Research Area Hall", "room": "0x0301", "color": null, "plugs": 2,
-      "contents": {
-        "easy":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
-        "normal":   [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
-        "hard":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "veryHard": [ { "id": "0x1C", "name": "Med. Pak S", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
-      }
-    },
-    {
-      "id": "communication-room", "name": "Communication Room", "room": "0x0205", "color": "red", "plugs": 1,
+      "id": "communication-room", "boxId": 1, "name": "Communication Room", "room": "0x0205", "color": "red", "plugs": 1,
       "contents": {
         "easy":     [ { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 } ],
         "normal":   [ { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 } ],
@@ -60,34 +24,16 @@
       }
     },
     {
-      "id": "control-room-b3-yellow", "name": "Control Room B3 (Yellow)", "room": "0x0602", "color": "yellow", "plugs": 1,
+      "id": "main-hallway-b1", "boxId": 2, "name": "Main Hallway B1", "room": "0x0306", "color": "red", "plugs": 2,
       "contents": {
-        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 } ],
-        "veryHard": [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x13", "name": "An. Darts M", "count": 3 }, { "id": "0x13", "name": "An. Darts M", "count": 3 } ]
+        "easy":     [ { "id": "0x17", "name": "40S&W Bullets", "count": 30 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 1 } ],
+        "normal":   [ { "id": "0x17", "name": "40S&W Bullets", "count": 30 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 1 } ],
+        "hard":     [ { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x15", "name": "Poison Dart", "count": 1 } ],
+        "veryHard": [ { "id": "0x17", "name": "40S&W Bullets", "count": 30 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x15", "name": "Poison Dart", "count": 2 }, { "id": "0x18", "name": "Grenade Bullets", "count": 6 } ]
       }
     },
     {
-      "id": "control-room-b3-red", "name": "Control Room B3 (Red)", "room": "0x0602", "color": "red", "plugs": 3,
-      "contents": {
-        "easy":     [ { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
-        "normal":   [ { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
-        "hard":     [ { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
-        "veryHard": [ { "id": "0x18", "name": "Grenade Bullets", "count": 6 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 } ]
-      }
-    },
-    {
-      "id": "experiment-room-hall-green", "name": "Experiment Room Hall (Green)", "room": "0x0502", "color": "green", "plugs": 1,
-      "contents": {
-        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "veryHard": [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
-      }
-    },
-    {
-      "id": "experiment-room-hall-red", "name": "Experiment Room Hall (Red)", "room": "0x0502", "color": "red", "plugs": 2,
+      "id": "experiment-room-hall-red", "boxId": 3, "name": "Experiment Room Hall (Red)", "room": "0x0502", "color": "red", "plugs": 2,
       "contents": {
         "easy":     [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
         "normal":   [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 }, { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
@@ -96,25 +42,7 @@
       }
     },
     {
-      "id": "central-stairway-green", "name": "Central Stairway (Green)", "room": "0x0608", "color": "green", "plugs": 1,
-      "contents": {
-        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "veryHard": [ { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
-      }
-    },
-    {
-      "id": "central-stairway-red", "name": "Central Stairway (Red)", "room": "0x0608", "color": "red", "plugs": 3,
-      "contents": {
-        "easy":     [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
-        "normal":   [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
-        "hard":     [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
-        "veryHard": [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 6 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ]
-      }
-    },
-    {
-      "id": "power-freq-room-red", "name": "Power Freq. Room (Red)", "room": "0x050C", "color": "red", "plugs": 2,
+      "id": "power-freq-room-red", "boxId": 4, "name": "Power Freq. Room (Red)", "room": "0x050C", "color": "red", "plugs": 2,
       "contents": {
         "easy":     [ { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
         "normal":   [ { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x17", "name": "40S&W Bullets", "count": 15 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
@@ -123,25 +51,25 @@
       }
     },
     {
-      "id": "power-freq-room-green", "name": "Power Freq. Room (Green)", "room": "0x050C", "color": "green", "plugs": 1,
+      "id": "control-room-b3-red", "boxId": 5, "name": "Control Room B3 (Red)", "room": "0x0602", "color": "red", "plugs": 3,
       "contents": {
-        "easy":     [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "normal":   [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "hard":     [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "veryHard": [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
+        "easy":     [ { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
+        "normal":   [ { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
+        "hard":     [ { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x10", "name": "SG Bullets", "count": 5 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
+        "veryHard": [ { "id": "0x18", "name": "Grenade Bullets", "count": 6 }, { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 } ]
       }
     },
     {
-      "id": "underground-heliport", "name": "Underground Heliport", "room": "0x060D", "color": null, "plugs": 1,
+      "id": "central-stairway-red", "boxId": 6, "name": "Central Stairway (Red)", "room": "0x0608", "color": "red", "plugs": 3,
       "contents": {
-        "easy":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "normal":   [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
-        "hard":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
-        "veryHard": [ { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 } ]
+        "easy":     [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
+        "normal":   [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
+        "hard":     [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 3 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
+        "veryHard": [ { "id": "0x15", "name": "Poison Dart", "count": 1 }, { "id": "0x19", "name": "Heat Bullets", "count": 6 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x18", "name": "Grenade Bullets", "count": 3 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ]
       }
     },
     {
-      "id": "hovercraft-storage", "name": "Hovercraft Storage", "room": "0x0610", "color": "red", "plugs": 1,
+      "id": "hovercraft-storage", "boxId": 7, "name": "Hovercraft Storage", "room": "0x0610", "color": "red", "plugs": 1,
       "contents": {
         "easy":     [ { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
         "normal":   [ { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
@@ -150,7 +78,79 @@
       }
     },
     {
-      "id": "hovercraft", "name": "Hovercraft", "room": "0x0612", "color": null, "plugs": 1,
+      "id": "control-room-hall", "boxId": 8, "name": "Control Room Hall", "room": "0x0105", "color": "green", "plugs": 1,
+      "contents": {
+        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
+        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
+        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "veryHard": [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
+      }
+    },
+    {
+      "id": "research-area-hall", "boxId": 9, "name": "Research Area Hall", "room": "0x0301", "color": "green", "plugs": 2,
+      "contents": {
+        "easy":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
+        "normal":   [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 2 } ],
+        "hard":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "veryHard": [ { "id": "0x1C", "name": "Med. Pak S", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
+      }
+    },
+    {
+      "id": "experiment-room-hall-green", "boxId": 10, "name": "Experiment Room Hall (Green)", "room": "0x0502", "color": "green", "plugs": 1,
+      "contents": {
+        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "veryHard": [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
+      }
+    },
+    {
+      "id": "power-freq-room-green", "boxId": 11, "name": "Power Freq. Room (Green)", "room": "0x050C", "color": "green", "plugs": 1,
+      "contents": {
+        "easy":     [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "normal":   [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "hard":     [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "veryHard": [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
+      }
+    },
+    {
+      "id": "central-stairway-green", "boxId": 12, "name": "Central Stairway (Green)", "room": "0x0608", "color": "green", "plugs": 1,
+      "contents": {
+        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "veryHard": [ { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ]
+      }
+    },
+    {
+      "id": "strategy-room", "boxId": 13, "name": "Strategy Room", "room": "0x0104", "color": "yellow", "plugs": 1,
+      "contents": {
+        "easy":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 5 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "normal":   [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 5 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "hard":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 5 } ],
+        "veryHard": [ { "id": "0x1C", "name": "Med. Pak S", "count": 1 }, { "id": "0x22", "name": "Intensifier", "count": 1 }, { "id": "0x11", "name": "Slag Bullets", "count": 10 } ]
+      }
+    },
+    {
+      "id": "control-room-b3-yellow", "boxId": 14, "name": "Control Room B3 (Yellow)", "room": "0x0602", "color": "yellow", "plugs": 1,
+      "contents": {
+        "easy":     [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "normal":   [ { "id": "0x1B", "name": "Hemostat", "count": 2 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "hard":     [ { "id": "0x1B", "name": "Hemostat", "count": 1 }, { "id": "0x23", "name": "Multiplier", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 } ],
+        "veryHard": [ { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x13", "name": "An. Darts M", "count": 3 }, { "id": "0x13", "name": "An. Darts M", "count": 3 } ]
+      }
+    },
+    {
+      "id": "underground-heliport", "boxId": 15, "name": "Underground Heliport", "room": "0x060D", "color": "yellow", "plugs": 1,
+      "contents": {
+        "easy":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "normal":   [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
+        "hard":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 } ],
+        "veryHard": [ { "id": "0x10", "name": "SG Bullets", "count": 10 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 } ]
+      }
+    },
+    {
+      "id": "hovercraft", "boxId": 16, "name": "Hovercraft", "room": "0x0612", "color": "yellow", "plugs": 1,
       "contents": {
         "easy":     [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],
         "normal":   [ { "id": "0x1D", "name": "Med. Pak M", "count": 2 }, { "id": "0x21", "name": "Recovery Aid", "count": 1 }, { "id": "0x20", "name": "An. Aid", "count": 1 }, { "id": "0x1F", "name": "Resuscitation", "count": 1 } ],

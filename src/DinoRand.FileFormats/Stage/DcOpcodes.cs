@@ -82,6 +82,12 @@ public static class DcOpcodes
     /// <summary>Total length of the door (<c>0x28</c> subtype-0) record, opcode byte included.</summary>
     public const int DoorLength = 48;
 
+    /// <summary>Subtype byte of an emergency-box AOT (<c>0x28</c> subtype 8, handler <c>0x44AAC3</c>).</summary>
+    public const byte EmergencyBoxSubtype = 8;
+
+    /// <summary>Total length of the emergency-box (<c>0x28</c> subtype-8) record, opcode byte included.</summary>
+    public const int EmergencyBoxLength = 32;
+
     /// <summary>Sentinel in <see cref="Lengths"/> for a variable-length opcode (use <see cref="Length"/>).</summary>
     private const int Variable = -1;
 
