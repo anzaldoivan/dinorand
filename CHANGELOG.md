@@ -18,6 +18,12 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
   contains — its doors, items, enemies, camera and floor areas, and its script with the
   instruction names that are known so far. It changes no files.
 
+### Fixed
+
+- **Emergency-box contents shuffles now reach an Original Game (DC1).** `--shuffle-boxes` and
+  `--reroll-boxes` used to change only the box tables Arrange Game reads, so an Original Game kept
+  vanilla boxes. They now change both. A seed gives an Arrange Game the same boxes as before.
+
 ### Changed
 
 - **The common DC1 raptor is now called Velociraptor.** Enemy options, help text, and logs used

@@ -1180,7 +1180,7 @@ public class ExePatcherTests
 
     // --- Emergency-box content shuffle (the box-content randomizer lever) ----------------------------
 
-    // A synthetic image with each of the three International blocks filled with 17 distinguishable, valid
+    // A synthetic image with each of the six difficulty blocks filled with 17 distinguishable, valid
     // box records: [0x0A][unique itemId, unique count][zero pad]. The unique (id,count) lets us track each
     // record through the permutation.
     private static byte[] NewImageWithBoxTable()
@@ -1242,14 +1242,14 @@ public class ExePatcherTests
     }
 
     [Fact]
-    public void ShuffleEmergencyBoxContents_TouchesOnlyTheThreeBlocks()
+    public void ShuffleEmergencyBoxContents_TouchesOnlyTheSixBlocks()
     {
         var exe = NewImageWithBoxTable();
         var before = (byte[])exe.Clone();
 
         ExePatcher.ShuffleEmergencyBoxContents(exe, seed: 7);
 
-        // Every byte outside the three 17×21 blocks is unchanged.
+        // Every byte outside the six 17×21 blocks is unchanged.
         var blockRanges = ExePatcher.EmergencyBoxBlockVas
             .Select(va => ExePatcher.VaToFileOffset(va))
             .Select(off => (off, end: off + ExePatcher.EmergencyBoxesPerBlock * ExePatcher.EmergencyBoxRecordStride))
@@ -1413,20 +1413,22 @@ public class ExePatcherTests
     //     [0] JP Easy/Normal, [1] Intl Easy/Normal, [2] special-mode, [3] JP Hard, [4] Intl Hard,
     //     [5] JP VH, [6] Intl VH;
     //   • the runtime selector (fn 0x483313): difficulty d → pointer index (d<=1 ? 0 : d==2 ? 1 : 2)
-    //     into the International pointer half {0x65ACB0, 0x65B0E8, 0x65B3B8} (bit7 of the difficulty
-    //     byte = International; the build DinoRand ships).
-    // Guarantee: for EVERY selectable difficulty the block the game reads is randomized and valid, and
-    // the blocks the International runtime never reads (JP + special-mode) stay byte-identical.
+    //     into the JP pointer half {0x65AB48, 0x65AF80, 0x65B250} for an Original Game, or the
+    //     International half {0x65ACB0, 0x65B0E8, 0x65B3B8} for an Arrange Game (bit7 of the difficulty
+    //     byte, set only by the title menu's ARRANGE GAME at 0x411CBF);
+    //   • block 2 is Operation Wipeout's (byte[[0x6D3CC8]] == 2, set at 0x4124A6).
+    // Guarantee: for EVERY selectable difficulty of both modes the block the game reads is randomized and
+    // valid, and the Wipeout block stays byte-identical.
 
     private const uint BoxTableBaseVa = 0x0065AB48;   // real table base (block 0), NOT the patcher const
     private const int BoxBlockStride = 360;           // 17*21 data + 3 pad
     private static uint RealBlockVa(int block) => BoxTableBaseVa + (uint)(block * BoxBlockStride);
 
-    /// <summary>The block VA the game's decoded runtime selector reads for a difficulty (International).</summary>
-    private static uint RuntimeBoxBlockVa(int difficulty)
-        => RealBlockVa(difficulty <= 1 ? 1 : difficulty == 2 ? 4 : 6);
+    /// <summary>The block VA the game's decoded runtime selector reads for a difficulty and game mode.</summary>
+    private static uint RuntimeBoxBlockVa(int difficulty, bool arrange)
+        => RealBlockVa((difficulty <= 1 ? 0 : difficulty == 2 ? 3 : 5) + (arrange ? 1 : 0));
 
-    private static readonly int[] NonRuntimeBoxBlocks = { 0, 2, 3, 5 }; // JP Easy/N, special-mode, JP Hard, JP VH
+    private static readonly int[] NonRuntimeBoxBlocks = { 2 }; // Operation Wipeout
 
     /// <summary>A synthetic image with the REAL 7-block topology: every block filled with 17
     /// distinguishable valid records ([0x0A][unique id in 0x10–0x23][unique count]).</summary>
@@ -1464,14 +1466,18 @@ public class ExePatcherTests
     }
 
     [Theory]
-    [InlineData(0)] // Easy
-    [InlineData(1)] // Normal (shares the Easy block via the 0x483313 selector — must still be covered)
-    [InlineData(2)] // Hard
-    [InlineData(3)] // Very Hard
-    public void ShuffleEmergencyBoxContents_RandomizesTheBlockEachDifficultyReads(int difficulty)
+    [InlineData(0, false)] // Easy
+    [InlineData(1, false)] // Normal (shares the Easy block via the 0x483313 selector — must still be covered)
+    [InlineData(2, false)] // Hard
+    [InlineData(3, false)] // Very Hard
+    [InlineData(0, true)]  // the same four in an Arrange Game
+    [InlineData(1, true)]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    public void ShuffleEmergencyBoxContents_RandomizesTheBlockEachDifficultyReads(int difficulty, bool arrange)
     {
         var exe = NewImageWithRealBoxTopology();
-        uint runtimeVa = RuntimeBoxBlockVa(difficulty);
+        uint runtimeVa = RuntimeBoxBlockVa(difficulty, arrange);
         var pristine = BlockBytes(exe, runtimeVa);
 
         ExePatcher.ShuffleEmergencyBoxContents(exe, seed: 4242);
@@ -1482,14 +1488,18 @@ public class ExePatcherTests
     }
 
     [Theory]
-    [InlineData(0)]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    public void RerollEmergencyBoxContents_RandomizesTheBlockEachDifficultyReads(int difficulty)
+    [InlineData(0, false)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    [InlineData(0, true)]
+    [InlineData(1, true)]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    public void RerollEmergencyBoxContents_RandomizesTheBlockEachDifficultyReads(int difficulty, bool arrange)
     {
         var exe = NewImageWithRealBoxTopology();
-        uint runtimeVa = RuntimeBoxBlockVa(difficulty);
+        uint runtimeVa = RuntimeBoxBlockVa(difficulty, arrange);
         var pristine = BlockBytes(exe, runtimeVa);
 
         ExePatcher.RerollEmergencyBoxContents(exe, seed: 777);
@@ -1502,8 +1512,8 @@ public class ExePatcherTests
     [Fact]
     public void EmergencyBoxPatches_LeaveBlocksTheRuntimeNeverReadsUntouched()
     {
-        // The International runtime never reads the JP blocks or the special-mode block (mode-2 override,
-        // identity unconfirmed) — both modes must leave all four byte-identical, pads included.
+        // Operation Wipeout's block (mode-2 override) is not a box location's contents in the main game —
+        // both modes must leave it byte-identical, pads included.
         foreach (var patch in new[]
                  {
                      (Action<byte[]>)(e => ExePatcher.ShuffleEmergencyBoxContents(e, seed: 4242)),
@@ -1524,13 +1534,17 @@ public class ExePatcherTests
     }
 
     [Theory]
-    [InlineData(0)]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    public void EmergencyBoxPatches_AreDeterministicPerDifficultyBlock(int difficulty)
+    [InlineData(0, false)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    [InlineData(0, true)]
+    [InlineData(1, true)]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    public void EmergencyBoxPatches_AreDeterministicPerDifficultyBlock(int difficulty, bool arrange)
     {
-        uint runtimeVa = RuntimeBoxBlockVa(difficulty);
+        uint runtimeVa = RuntimeBoxBlockVa(difficulty, arrange);
 
         var a = NewImageWithRealBoxTopology();
         var b = NewImageWithRealBoxTopology();

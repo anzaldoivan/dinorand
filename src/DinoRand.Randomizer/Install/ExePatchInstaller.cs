@@ -739,10 +739,10 @@ internal static class ExePatchInstaller
             pristine, patchPlan.EmergencyBoxSourceSlots!);
 
         // Transplant ONLY the box-table span into the live exe (additive — preserves any other exe patch).
-        // The three International blocks are non-contiguous; copy the whole enclosing span (the untouched
-        // Japanese blocks in between are byte-identical in `pristine`, so re-copying them is inert).
+        // Copy the whole span from the first block to the last (the untouched Wipeout block in between is
+        // byte-identical in `pristine`, so re-copying it is inert).
         byte[] bytes = File.ReadAllBytes(exePath);
-        int spanStart = ExePatcher.VaToFileOffset(ExePatcher.EmergencyBoxBlockEasyVa);
+        int spanStart = ExePatcher.VaToFileOffset(ExePatcher.EmergencyBoxBlockJpEasyVa);
         int spanEnd = ExePatcher.VaToFileOffset(ExePatcher.EmergencyBoxBlockVeryHardVa)
                       + ExePatcher.EmergencyBoxesPerBlock * ExePatcher.EmergencyBoxRecordStride;
         Array.Copy(pristine, spanStart, bytes, spanStart, spanEnd - spanStart);
@@ -751,7 +751,7 @@ internal static class ExePatchInstaller
         int moved = entries.Count(e => e.Slot != e.SourceSlot);
         int blocks = entries.Select(e => e.BlockVa).Distinct().Count();
         string entry = $"emergency-box shuffle (seed {seedLabel ?? seed.ToString()}): {moved}/{entries.Length} " +
-                       $"boxes relocated across {blocks} difficulty blocks @ 0x{ExePatcher.EmergencyBoxBlockEasyVa:X}";
+                       $"boxes relocated across {blocks} difficulty blocks @ 0x{ExePatcher.EmergencyBoxBlockJpEasyVa:X}";
         // Keyed on the shared prefix so a later box patch (shuffle OR reroll) replaces this line — both modes
         // rewrite the same span, so only one can be active per install.
         const string key = "emergency-box ";
@@ -785,7 +785,7 @@ internal static class ExePatchInstaller
 
         // Transplant ONLY the box-table span into the live exe (additive — preserves any other exe patch).
         byte[] bytes = File.ReadAllBytes(exePath);
-        int spanStart = ExePatcher.VaToFileOffset(ExePatcher.EmergencyBoxBlockEasyVa);
+        int spanStart = ExePatcher.VaToFileOffset(ExePatcher.EmergencyBoxBlockJpEasyVa);
         int spanEnd = ExePatcher.VaToFileOffset(ExePatcher.EmergencyBoxBlockVeryHardVa)
                       + ExePatcher.EmergencyBoxesPerBlock * ExePatcher.EmergencyBoxRecordStride;
         Array.Copy(pristine, spanStart, bytes, spanStart, spanEnd - spanStart);
@@ -793,7 +793,7 @@ internal static class ExePatchInstaller
 
         int blocks = entries.Select(e => e.BlockVa).Distinct().Count();
         string entry = $"emergency-box reroll (seed {seedLabel ?? seed.ToString()}): {entries.Length} " +
-                       $"boxes rerolled from per-block pools across {blocks} difficulty blocks @ 0x{ExePatcher.EmergencyBoxBlockEasyVa:X}";
+                       $"boxes rerolled from per-block pools across {blocks} difficulty blocks @ 0x{ExePatcher.EmergencyBoxBlockJpEasyVa:X}";
         // Keyed so a later box patch (shuffle OR reroll) replaces this line — the two modes share the span.
         const string key = "emergency-box ";
         var manifest = ReadManifest(dataDir) ?? new InstallManifest(seedLabel, DateTime.UtcNow.ToString("o"),
