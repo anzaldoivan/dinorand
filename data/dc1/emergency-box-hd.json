@@ -1,0 +1,30 @@
+{
+  "boxes": [
+    { "folder": "ST104", "boxId": 13, "colour": "yellow", "page": "p06", "pageSize": 2000, "x": 500, "y": 1500, "size": 500 },
+    { "folder": "ST105", "boxId": 8, "colour": "green", "page": "p05", "pageSize": 2000, "x": 1000, "y": 0, "size": 500 },
+    { "folder": "ST113", "boxId": 0, "colour": "red", "page": "p21", "pageSize": 2000, "x": 1500, "y": 1500, "size": 500 },
+    { "folder": "ST205", "boxId": 1, "colour": "red", "page": "p25", "pageSize": 2000, "x": 1500, "y": 500, "size": 500 },
+    { "folder": "ST301", "boxId": 9, "colour": "green", "page": "p23", "pageSize": 2000, "x": 1000, "y": 250, "size": 500 },
+    { "folder": "ST306", "boxId": 2, "colour": "red", "page": "p07", "pageSize": 2000, "x": 0, "y": 0, "size": 500 },
+    { "folder": "ST502", "boxId": 3, "colour": "red", "page": "p05", "pageSize": 2000, "x": 1000, "y": 500, "size": 500 },
+    { "folder": "ST502", "boxId": 10, "colour": "green", "page": "p05", "pageSize": 2000, "x": 1500, "y": 500, "size": 500 },
+    { "folder": "ST50C", "boxId": 4, "colour": "red", "page": "p07", "pageSize": 2000, "x": 1000, "y": 0, "size": 500 },
+    { "folder": "ST50C", "boxId": 11, "colour": "green", "page": "p07", "pageSize": 2000, "x": 1500, "y": 0, "size": 500 },
+    { "folder": "ST602", "boxId": 5, "colour": "red", "page": "p07", "pageSize": 2000, "x": 1500, "y": 1000, "size": 500 },
+    { "folder": "ST602", "boxId": 14, "colour": "yellow", "page": "p07", "pageSize": 2000, "x": 1000, "y": 1000, "size": 500 },
+    { "folder": "ST608", "boxId": 6, "colour": "red", "page": "p07", "pageSize": 2000, "x": 0, "y": 0, "size": 500 },
+    { "folder": "ST608", "boxId": 12, "colour": "green", "page": "p07", "pageSize": 2000, "x": 500, "y": 0, "size": 500 },
+    { "folder": "ST60D", "boxId": 15, "colour": "yellow", "page": null, "pageSize": 0, "x": 0, "y": 0, "size": 0 },
+    { "folder": "ST610", "boxId": 7, "colour": "red", "page": "p21", "pageSize": 1024, "x": 768, "y": 510, "size": 256 },
+    { "folder": "ST612", "boxId": 16, "colour": "yellow", "page": "p07", "pageSize": 1024, "x": 129, "y": 510, "size": 256 },
+    { "folder": "STA04", "boxId": 13, "colour": "yellow", "page": "p06", "pageSize": 2000, "x": 500, "y": 1500, "size": 500 },
+    { "folder": "STA05", "boxId": 8, "colour": "green", "page": "p05", "pageSize": 2000, "x": 1000, "y": 0, "size": 500 },
+    { "folder": "STA13", "boxId": 0, "colour": "red", "page": "p21", "pageSize": 2000, "x": 1500, "y": 1500, "size": 500 },
+    { "folder": "STB01", "boxId": 9, "colour": "green", "page": "p23", "pageSize": 2000, "x": 1000, "y": 250, "size": 500 },
+    { "folder": "STB06", "boxId": 2, "colour": "red", "page": "p07", "pageSize": 2000, "x": 0, "y": 0, "size": 500 },
+    { "folder": "STC02", "boxId": 5, "colour": "red", "page": "p07", "pageSize": 2000, "x": 1500, "y": 1000, "size": 500 },
+    { "folder": "STC02", "boxId": 14, "colour": "yellow", "page": "p07", "pageSize": 2000, "x": 1000, "y": 1000, "size": 500 },
+    { "folder": "STC08", "boxId": 6, "colour": "red", "page": "p07", "pageSize": 2000, "x": 0, "y": 0, "size": 500 },
+    { "folder": "STC08", "boxId": 12, "colour": "green", "page": "p07", "pageSize": 2000, "x": 500, "y": 0, "size": 500 }
+  ]
+}
