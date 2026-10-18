@@ -46,3 +46,7 @@ are upstream research or content tables. `RoomDataConsistencyTests` locks them t
   records are op-0x22-bound + op-0x3a/0x5a-scripted (STATIC-SCD-RE cont.49/59, cont.58 policy),
   plus the hand-curated `scripted_enemy`/`cutscene` exclusion tiers the enemy pass ships
   (moved out of C#). Embedded resource consumed by `DinoCrisis1` / the DC1 enemy pass.
+- `emergency-box-hd.json` — **GENERATED** by `EmergencyBoxHdCensusTests` (needs the game install with
+  the Classic REbirth HD pack, pristine; on a mismatch the test prints the table to paste). One row per
+  emergency-box record: the HD page and the pixel cell of its front picture, or `page: null` when it has
+  none (ST60D). Embedded resource consumed by `EmergencyBoxHd`.

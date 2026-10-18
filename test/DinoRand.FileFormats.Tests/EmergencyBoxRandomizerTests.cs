@@ -2,6 +2,7 @@ using DinoRand.FileFormats.Stage;
 using DinoRand.Randomizer;
 using DinoRand.Randomizer.Definitions;
 using DinoRand.Randomizer.Graph;
+using DinoRand.Randomizer.Install;
 using DinoRand.Randomizer.Logic;
 using DinoRand.Randomizer.Passes;
 using Xunit;
@@ -312,5 +313,42 @@ public class EmergencyBoxRandomizerTests
         var rooms = World().Where(r => !(r.Stage == 6 && r.Room == 0x12)).ToList(); // no box 16
         Assert.All(Run(rooms, 3, PlugCostMode.Shuffle, BoxIdMode.Full),
             x => Assert.Equal(x.Vanilla.OriginalBytes, x.Written.OriginalBytes));
+    }
+
+    /// <summary>Run the pass in Full mode against an install folder holding one room file, after
+    /// <paramref name="setup"/> adds HD files to it; returns the loose files queued.</summary>
+    private static IReadOnlyDictionary<string, byte[]> RunWithInstall(Action<string> setup)
+    {
+        var install = Directory.CreateTempSubdirectory("dinorand_boxhd_").FullName;
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(install, "Data"));
+            File.WriteAllBytes(Path.Combine(install, "Data", "st100.dat"), new byte[1]);
+            setup(install);
+            var rooms = World();
+            var config = new RandomizerConfig { BoxIdMode = BoxIdMode.Full };
+            var context = new RandomizationContext(Game, rooms, RoomGraph.Build(rooms), new Seed(5), config, _ => { }, install);
+            new EmergencyBoxRandomizer().Apply(context);
+            return context.LooseFiles;
+        }
+        finally { Directory.Delete(install, true); }
+    }
+
+    [Fact]
+    public void FullMode_WithoutTheHdPack_WritesNoLooseFiles()
+        => Assert.Empty(RunWithInstall(_ => { }));
+
+    [Fact]
+    public void FullMode_PutsBackAnHdPageAnEarlierInstallEdited()
+    {
+        // The backup is not a PNG, so the planner cannot use the page; it is still written back as it was.
+        var files = RunWithInstall(install =>
+        {
+            Directory.CreateDirectory(Path.Combine(install, "HD", "ST602"));
+            var backup = Path.Combine(install, "Data", GameInstaller.BackupDirName, GameInstaller.LooseBackupSubdir, "HD", "ST602");
+            Directory.CreateDirectory(backup);
+            File.WriteAllBytes(Path.Combine(backup, "p07.png"), new byte[] { 1, 2, 3 });
+        });
+        Assert.Equal(new byte[] { 1, 2, 3 }, Assert.Single(files, f => f.Key == "HD/ST602/p07.png").Value);
     }
 }

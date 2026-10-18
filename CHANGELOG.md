@@ -22,7 +22,9 @@ The version number is set by `<VersionPrefix>` in [`Directory.Build.props`](Dire
   more in all than the plugs you can find; the Control Room Hall box keeps its 1-plug price.
   `--dc1-box-ids` (GUI: Box locations) moves boxes, so a location gets another box's contents,
   colour message and Access list; `colour` swaps only boxes of the same colour, and `full`
-  (experimental, not yet checked in game) swaps any and repaints the box to its new colour. Both are
+  (experimental, not yet checked in game) swaps any and repaints the box to its new colour, in the
+  Classic REbirth HD texture pack too when it is installed (the box takes the HD picture of a box of
+  its new colour; Restore puts the pack's pages back). Both are
   off by default and not part of the shareable seed string. The Control Room Hall box stays put,
   because the shuttle needs it opened, and in Arrange Game two rooms keep their vanilla boxes.
 
